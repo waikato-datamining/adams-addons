@@ -1,0 +1,78 @@
+# Project: adams
+# Date: 2014-04-14 14:27:07
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Converts JPG images into heatmaps and displays them.
+	-actor
+		adams.flow.source.DirectoryLister
+			-dir
+			${EXAMPLE_FLOWS}/data
+			-list-files
+			true
+			-regexp
+			.*.jpg
+			-sorting
+			SORT_BY_NAME
+	-actor
+		adams.flow.control.Tee
+			-name
+			get filename
+			-tee
+				adams.flow.transformer.BaseName
+					-remove-extensions
+					true
+			-tee
+				adams.flow.transformer.SetVariable
+					-var-name
+					entry
+	-actor
+		adams.flow.transformer.JAIReader
+	-actor
+		adams.flow.transformer.JAITransformer
+			-transformer
+				adams.data.jai.transformer.Resize
+					-width
+					0.1
+					-height
+					0.1
+	-actor
+		adams.flow.transformer.Convert
+			-conversion
+				adams.data.conversion.BufferedImageToHeatmap
+	-actor
+		adams.flow.control.Tee
+			-tee
+				adams.flow.transformer.Convert
+					-conversion
+						adams.data.conversion.HeatmapToSpreadSheet
+			-tee
+				adams.flow.sink.DisplayPanelManager
+					-x
+					-3
+					-provider
+						adams.flow.sink.SpreadSheetDisplay
+							-writer
+								adams.data.io.output.NullWriter
+					-entry-name-variable
+					entry
+	-actor
+		adams.flow.sink.DisplayPanelManager
+			-width
+			1200
+			-height
+			750
+			-provider
+				adams.flow.sink.HeatmapDisplay
+					-writer
+						adams.gui.print.NullWriter
+					-color-generator
+						adams.gui.visualization.core.MultiColorGenerator
+					-zoom
+					400.0
+			-entry-name-variable
+			entry
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

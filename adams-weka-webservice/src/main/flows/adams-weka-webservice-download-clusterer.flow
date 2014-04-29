@@ -1,0 +1,24 @@
+# Project: adams
+# Date: 2014-03-25 13:29:22
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Downloads a previously trained SimpleKMeans cluster model.\nSee flow defined in \"adams-weka-webservice-weka-webservice.flow\" for running the webservice\nand \"adams-weka-webservice-train-clusterer.flow\" for training the SimpleKMeans model.
+	-actor
+		adams.flow.source.WekaWSDownloadClusterer
+			-model-name
+			simplekmeans
+	-actor
+		adams.flow.transformer.WSTransformer
+			-logging-level
+			INFO
+			-client
+				adams.flow.webservice.DownloadClusterer
+	-actor
+		adams.flow.sink.Display
+			-writer
+				adams.data.io.output.NullWriter
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

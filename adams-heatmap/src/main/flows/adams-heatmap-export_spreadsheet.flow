@@ -1,0 +1,42 @@
+# Project: adams
+# Date: 2014-01-23 15:30:38
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Loads a JPG image, converts it into a heatmap,\nstandardizes it and then exports it to a CSV file
+	-actor
+		adams.flow.source.FileSupplier
+			-file
+			${EXAMPLE_FLOWS}/data/3666455665_18795f0741.jpg
+	-actor
+		adams.flow.transformer.JAIReader
+	-actor
+		adams.flow.transformer.Convert
+			-conversion
+				adams.data.conversion.BufferedImageToHeatmap
+	-actor
+		adams.flow.transformer.HeatmapFilter
+			-filter
+				adams.data.filter.Standardize
+	-actor
+		adams.flow.transformer.Convert
+			-name
+			Convert-1
+			-conversion
+				adams.data.conversion.HeatmapToSpreadSheet
+	-actor
+		adams.flow.control.Tee
+			-tee
+				adams.flow.sink.SpreadSheetDisplay
+					-num-decimals
+					6
+	-actor
+		adams.flow.sink.SpreadSheetFileWriter
+			-output
+			${EXAMPLE_FLOWS}/output/out.csv
+			-writer
+				adams.data.io.output.CsvSpreadSheetWriter
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

@@ -1,0 +1,39 @@
+# File for listing rules for suggesting actors in the flow editor.
+#
+# Format:
+#   rulename = rule
+#
+# Rules adhere to the syntax described in adams.parser.ActorSuggestion.
+# As "rulename" anything apart from "Default" can be used. In order to avoid
+# name clashes with other modules, it is recommended to prefix the rules
+# with the module name, e.g. "adams-core.rule1=...".
+#
+# Author: FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision$
+
+adams-heatmap.HeatmapFileReader1=\
+  IF AFTER adams.flow.source.FileSupplier THEN adams.flow.transformer.HeatmapFileReader
+
+adams-heatmap.HeatmapFileReader2=\
+  IF AFTER adams.flow.source.SelectFile THEN adams.flow.transformer.HeatmapFileReader
+
+adams-heatmap.HeatmapFileReader3=\
+  IF AFTER adams.flow.source.DirectoryLister THEN adams.flow.transformer.HeatmapFileReader
+
+adams-heatmap.HeatmapFileReader4=\
+  IF AFTER adams.flow.source.FileSystemSearch THEN adams.flow.transformer.HeatmapFileReader
+
+adams-heatmap.HeatmapFilter1=\
+  IF AFTER adams.flow.transformer.HeatmapFileReader THEN adams.flow.transformer.HeatmapFilter
+
+adams-heatmap.Convert1=\
+  IF AFTER adams.flow.transformer.HeatmapFilter THEN "adams.flow.transformer.Convert -conversion adams.data.conversion.HeatmapToBufferedImage"
+
+adams-heatmap.HeatmapInstanceGenerator1=\
+  IF AFTER adams.flow.transformer.HeatmapFilter THEN adams.flow.transformer.HeatmapInstanceGenerator
+
+adams-heatmap.WekaInstanceDumper1=\
+  IF AFTER adams.flow.transformer.HeatmapInstanceGenerator THEN adams.flow.transformer.WekaInstanceDumper
+
+adams-heatmap.WekaFilter1=\
+  IF AFTER adams.flow.transformer.HeatmapInstanceGenerator THEN adams.flow.transformer.WekaFilter

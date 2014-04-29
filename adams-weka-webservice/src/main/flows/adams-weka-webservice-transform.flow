@@ -1,0 +1,50 @@
+# Project: adams
+# Date: 2014-01-31 09:00:52
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Uses the global transformer \'simple transform\' on the webservice server to \ntransform WEKA datasets.\nSee \"adams-weka-webservice-weka-webservice.flow\" flow for running the server and further information\non the global actor in use for transforming the data.
+	-actor
+		adams.flow.source.SelectFile
+			-stop-if-canceled
+			true
+			-custom-stop-message
+			User canceled dataset selection!
+			-file-chooser-title
+			Select dataset to cross-validate
+			-initial-dir
+			${EXAMPLE_FLOWS}/data
+			-extension
+			ARFF
+			-extension
+			CSV
+			-initial-file
+			${EXAMPLE_FLOWS}/data/anneal.arff
+	-actor
+		adams.flow.transformer.WekaFileReader
+			-loader
+				weka.core.converters.ArffLoader
+	-actor
+		adams.flow.transformer.WekaWSTransform
+			-actor-name
+			simple transform
+	-actor
+		adams.flow.transformer.WSTransformer
+			-logging-level
+			INFO
+			-client
+				adams.flow.webservice.Transform
+	-actor
+		adams.flow.transformer.Convert
+			-conversion
+				adams.data.conversion.DatasetToWekaInstances
+	-actor
+		adams.flow.sink.DisplayPanelManager
+			-provider
+				adams.flow.sink.WekaInstancesDisplay
+					-writer
+						adams.gui.print.NullWriter
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

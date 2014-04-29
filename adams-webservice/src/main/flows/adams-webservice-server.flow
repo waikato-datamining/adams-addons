@@ -1,0 +1,26 @@
+# Project: adams
+# Date: 2014-01-23 15:46:27
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Runs the webservice of the Apache CXF \"WSDL first\" example:\nhttp://cxf.apache.org/docs/sample-projects.html
+	-actor
+		adams.flow.standalone.WSServer
+			-web-service
+				com.example.customerservice.flow.CustomerServiceWS
+	-actor
+		adams.flow.source.Start
+	-actor
+		adams.flow.control.WhileLoop
+			-name
+			keep going
+			-condition
+				adams.flow.condition.bool.True
+			-loop
+				adams.flow.source.Start
+			-loop
+				adams.flow.control.Sleep
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

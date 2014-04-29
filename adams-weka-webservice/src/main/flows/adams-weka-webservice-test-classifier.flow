@@ -1,0 +1,52 @@
+# Project: adams
+# Date: 2014-01-31 09:00:39
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Uses a previously trained classifier model (\'j48\') provided by the webservice\nand evaluates it against the provided test set.\nSee \"adams-weka-webservice-train-classifier.flow\" flow for training (and storing) the classifier model on the server-side.
+	-actor
+		adams.flow.source.SelectFile
+			-stop-if-canceled
+			true
+			-custom-stop-message
+			User canceled dataset selection!
+			-file-chooser-title
+			Select dataset to cross-validate
+			-initial-dir
+			${EXAMPLE_FLOWS}/data
+			-extension
+			ARFF
+			-extension
+			CSV
+			-initial-file
+			${EXAMPLE_FLOWS}/data/anneal_test.arff
+	-actor
+		adams.flow.transformer.WekaFileReader
+			-loader
+				weka.core.converters.ArffLoader
+	-actor
+		adams.flow.transformer.WekaClassSelector
+	-actor
+		adams.flow.transformer.WekaWSTestClassifier
+			-model-name
+			j48
+	-actor
+		adams.flow.transformer.WSTransformer
+			-logging-level
+			INFO
+			-client
+				adams.flow.webservice.TestClassifier
+	-actor
+		adams.flow.transformer.Convert
+			-conversion
+				adams.data.conversion.DatasetToWekaInstances
+	-actor
+		adams.flow.sink.DisplayPanelManager
+			-provider
+				adams.flow.sink.WekaInstancesDisplay
+					-writer
+						adams.gui.print.NullWriter
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

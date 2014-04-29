@@ -1,0 +1,18 @@
+# Configuration file listing the superclasses and the packages in which to
+# look for derived classes.
+#
+# Format:
+# class.name=package1,package2,...
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision$
+
+# the servers
+adams.flow.webservice.WebServiceProvider=\
+  adams.flow.webservice,\
+  com.example.customerservice.flow
+
+# the clients
+adams.flow.webservice.WebServiceClient=\
+  adams.flow.webservice,\
+  com.example.customerservice.flow

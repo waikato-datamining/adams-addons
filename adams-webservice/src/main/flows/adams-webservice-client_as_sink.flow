@@ -1,0 +1,20 @@
+# Project: adams
+# Date: 2014-01-23 15:45:49
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Sends data to the webservice \"UpdateCustomer\", defined in \nthe Apache CXF \"WSDL first\" example:\nhttp://cxf.apache.org/docs/sample-projects.html\nUses the names coming from the StringConstants source as\nparameters for updating the customers.
+	-actor
+		adams.flow.source.StringConstants
+			-string
+			Smith
+			-string
+			Jones
+	-actor
+		adams.flow.sink.WSSink
+			-client
+				com.example.customerservice.flow.UpdateCustomer
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

@@ -1,0 +1,15 @@
+wsdl2java
+
+  wsdl2java is a tool that comes with Apache CXf.
+
+  The following command-line turns the "CustomerService.wsdl" webservice
+  description into Java code, including client and server and an example
+  implementation class.
+
++---
+  apache-cxf-2.6.1/bin/wsdl2java -frontend jaxws21 -client -server -impl CustomerService.wsdl
++---
+    
+
+  $Revision$
+  

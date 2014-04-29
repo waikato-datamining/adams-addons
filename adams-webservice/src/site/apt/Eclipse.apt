@@ -1,0 +1,37 @@
+Eclipse
+
+  Add the following build plugin to your pom.xml to include cxf generated sources 
+  (from .wsdl files) in Eclipse's build path:
+  
++---
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/generated-sources/cxf/</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
++---
+
+  And install the "buildhelper" m2e connector:
+
++---
+  Window
+  -> Preferences
+  -> Maven
+  -> Discovery
++---
+  
+
+  $Revision: 5277 $

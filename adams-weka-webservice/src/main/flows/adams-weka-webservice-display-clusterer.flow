@@ -1,0 +1,18 @@
+# Project: adams
+# Date: 2014-01-31 09:00:02
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Displays the previously built clusterer model (\'simplekmeans\').\nSee \"adams-weka-webservice-train-clusterer.flow\" flow for training the model on the server-side.
+	-actor
+		adams.flow.source.WSSource
+			-client
+				adams.flow.webservice.DisplayCluster
+					-clusterer
+					simplekmeans
+	-actor
+		adams.flow.sink.Display
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

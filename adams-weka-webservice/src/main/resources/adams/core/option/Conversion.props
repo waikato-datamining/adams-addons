@@ -1,0 +1,28 @@
+# Contains the setup for conversion operations.
+#
+# Author: FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision$
+
+# Lists the keys that contain classname mappings.
+# This is used to ensure a minimal backwards compatibility, in case classes
+# get renamed.
+Rename=\
+  Rename-wstransformer_crossvalidationclassifier,\
+  Rename-wstransformer_optimizeclassifiermultisearch,\
+  Rename-wstransformer_predictclassifier,\
+  Rename-wstransformer_predictclusterer,\
+  Rename-wstransformer_testclassifier,\
+  Rename-wstransformer_trainclassifier,\
+  Rename-wstransformer_trainclusterer,\
+  Rename-wstransformer_transform
+
+# general format for classname mappings ("rename"):
+# <key>=<old classname>-<new classname>
+Rename-wstransformer_crossvalidationclassifier=adams.flow.transformer.CrossValidationClassifier-adams.flow.transformer.WekaWSCrossValidationClassifier
+Rename-wstransformer_optimizeclassifiermultisearch=adams.flow.transformer.OptimizeClassifierMultiSearch-adams.flow.transformer.WekaWSOptimizeClassifierMultiSearch
+Rename-wstransformer_predictclassifier=adams.flow.transformer.PredictClassifier-adams.flow.transformer.WekaWSPredictClassifier
+Rename-wstransformer_predictclusterer=adams.flow.transformer.PredictClusterer-adams.flow.transformer.WekaWSPredictClusterer
+Rename-wstransformer_testclassifier=adams.flow.transformer.TestClassifier-adams.flow.transformer.WekaWSTestClassifier
+Rename-wstransformer_trainclassifier=adams.flow.transformer.TrainClassifier-adams.flow.transformer.WekaWSTrainClassifier
+Rename-wstransformer_trainclusterer=adams.flow.transformer.TrainClusterer-adams.flow.transformer.WekaWSTrainClusterer
+Rename-wstransformer_transform=adams.flow.transformer.Transform-adams.flow.transformer.WekaWSTransform

@@ -1,0 +1,24 @@
+# Project: adams
+# Date: 2014-03-25 13:29:32
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Downloads a previously trained J48 classifier.\nSee flow defined in \"adams-weka-webservice-weka-webservice.flow\" for running the webservice\nand \"adams-weka-webservice-train-classifier.flow\" for training the J48 model.
+	-actor
+		adams.flow.source.WekaWSDownloadClassifier
+			-model-name
+			j48
+	-actor
+		adams.flow.transformer.WSTransformer
+			-logging-level
+			INFO
+			-client
+				adams.flow.webservice.DownloadClassifier
+	-actor
+		adams.flow.sink.Display
+			-writer
+				adams.data.io.output.NullWriter
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

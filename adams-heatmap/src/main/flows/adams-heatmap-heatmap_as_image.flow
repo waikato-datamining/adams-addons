@@ -1,0 +1,50 @@
+# Project: adams
+# Date: 2014-04-15 13:06:01
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Loads a heatmap, converts it to an image and enlarges it before displaying it.
+	-actor
+		adams.flow.source.FileSupplier
+			-file
+			${EXAMPLE_FLOWS}/data/sample.csv
+	-actor
+		adams.flow.transformer.SpreadSheetFileReader
+			-reader
+				adams.data.io.input.CsvSpreadSheetReader
+					-spreadsheet-type
+						adams.data.spreadsheet.SpreadSheet
+	-actor
+		adams.flow.transformer.Convert
+			-conversion
+				adams.data.conversion.SpreadSheetToHeatmap
+	-actor
+		adams.flow.transformer.Convert
+			-name
+			Convert-1
+			-conversion
+				adams.data.conversion.HeatmapToBufferedImage
+					-generator
+						adams.gui.visualization.core.MultiColorGenerator
+	-actor
+		adams.flow.transformer.JAITransformer
+			-transformer
+				adams.data.jai.transformer.Resize
+					-width
+					400.0
+					-height
+					400.0
+					-interpolation-type
+					NEAREST
+	-actor
+		adams.flow.sink.ImageViewer
+			-writer
+				adams.gui.print.NullWriter
+			-selection-processor
+				adams.gui.visualization.image.selection.NullProcessor
+			-image-overlay
+				adams.gui.visualization.image.NullOverlay
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>nz.ac.waikato.cms.adams</groupId>
+    <artifactId>adams-pom</artifactId>
+    <version>0.4.5-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>adams-addons-pom</artifactId>
+  <version>0.4.5-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>adams-addons-pom</name>
+  <description>The project object model for all adams-addons modules.</description>
+  <url>https://adams.cms.waikato.ac.nz/</url>
+  <organization>
+    <name>University of Waikato, Hamilton, NZ</name>
+    <url>http://www.waikato.ac.nz/</url>
+  </organization>
+
+  <scm>
+    <connection>scm:svn:https://svn.cms.waikato.ac.nz/svn/adams/addons/trunk</connection>
+    <developerConnection>scm:svn:https://svn.cms.waikato.ac.nz/svn/adams/addons/trunk</developerConnection>
+    <url>https://svn.cms.waikato.ac.nz/svn/adams/addons/trunk</url>
+  </scm>
+
+  <modules>
+    <!-- all modules -->
+    <module>adams-addons-all</module>
+    <!-- individual modules -->
+    <module>adams-heatmap</module>
+    <module>adams-phmm4weka</module>
+    <module>adams-rats</module>
+    <module>adams-webservice</module>
+    <module>adams-weka-webservice</module>
+  </modules>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.2.2</version>
+          <configuration>
+            <tagBase>https://svn.cms.waikato.ac.nz/svn/adams/addons/tags</tagBase>
+            <useReleaseProfile>false</useReleaseProfile>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

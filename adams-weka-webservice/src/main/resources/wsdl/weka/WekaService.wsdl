@@ -1,0 +1,935 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="WekaServiceService"
+                  targetNamespace="http://weka.webservice.adams.waikato.ac.nz/"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:tns="http://weka.webservice.adams.waikato.ac.nz/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:documentation> wsdl for the weka web service </wsdl:documentation>
+
+  <wsdl:types>
+    <xsd:schema attributeFormDefault="unqualified"
+                elementFormDefault="unqualified"
+                targetNamespace="http://weka.webservice.adams.waikato.ac.nz/">
+      <xsd:element name="crossValidateClassifier"
+                   type="tns:crossValidateClassifier" />
+
+      <xsd:element name="crossValidateClassifierResponse"
+                   type="tns:crossValidateClassifierResponse" />
+
+      <xsd:element name="trainClassifier" type="tns:trainClassifier" />
+
+      <xsd:element name="trainClassifierResponse"
+                   type="tns:trainClassifierResponse" />
+
+      <xsd:element name="testClassifier" type="tns:testClassifier" />
+
+      <xsd:element name="testClassifierResponse"
+                   type="tns:testClassifierResponse" />
+
+      <xsd:element name="predictClassifier" type="tns:predictClassifier" />
+
+      <xsd:element name="predictClassifierResponse"
+                   type="tns:predictClassifierResponse" />
+      <xsd:element name="transform" type="tns:transform" />
+
+      <xsd:element name="transformResponse" type="tns:transformResponse" />
+
+      <xsd:element name="trainClusterer" type="tns:trainClusterer" />
+
+      <xsd:element name="trainClustererResponse"
+                   type="tns:trainClustererResponse" />
+
+      <xsd:element name="predictClusterer" type="tns:predictClusterer" />
+
+      <xsd:element name="predictClustererResponse"
+                   type="tns:predictClustererResponse" />
+
+      <xsd:element name="displayClassifier" type="tns:displayClassifier" />
+
+      <xsd:element name="displayClassifierResponse"
+                   type="tns:displayClassifierResponse" />
+
+      <xsd:element name="displayClusterer" type="tns:displayClusterer" />
+
+      <xsd:element name="displayClustererResponse"
+                   type="tns:displayClustererResponse" />
+
+      <xsd:element name="listClassifiers" type="tns:listClassifiers" />
+
+      <xsd:element name="listClassifiersResponse"
+                   type="tns:listClassifiersResponse" />
+
+      <xsd:element name="listClusterers" type="tns:listClusterers" />
+
+      <xsd:element name="listClusterersResponse"
+                   type="tns:listClusterersResponse" />
+
+
+      <xsd:element name="downloadClassifier" type="tns:downloadClassifier" />
+
+      <xsd:element name="downloadClassifierResponse"
+                   type="tns:downloadClassifierResponse" />
+
+      <xsd:element name="downloadClusterer" type="tns:downloadClusterer" />
+
+      <xsd:element name="downloadClustererResponse"
+                   type="tns:downloadClustererResponse" />
+
+      <xsd:element name="optimizeClassifierMultiSearch"
+	           type="tns:optimizeClassifierMultiSearch" />
+
+      <xsd:element name="optimizeClassifierMultiSearchResponse"
+		   type="tns:optimizeClassifierMultiSearchResponse" />
+
+
+      <xsd:complexType name="crossValidateClassifier">
+        <xsd:sequence>
+          <xsd:element name="dataset" type="tns:Dataset" />
+
+          <xsd:element name="seed" type="xsd:int" />
+
+          <xsd:element name="folds">
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:int">
+                <xsd:minInclusive value="2" />
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:element>
+
+          <xsd:element name="classifier" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="crossValidateClassifierResponse">
+        <xsd:sequence>
+          <xsd:element name="crossValidateResponse" type="tns:crossValidateResponseObject" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="crossValidateResponseObject">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="returnDataset" type="tns:Dataset" />
+
+          <xsd:element minOccurs="0" name="errorMessage" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="trainClassifier">
+        <xsd:sequence>
+          <xsd:element name="dataset" type="tns:Dataset" />
+
+          <xsd:element name="classifier" type="xsd:string" />
+
+          <xsd:element name="name" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="trainClassifierResponse">
+        <xsd:sequence>
+          <xsd:element name="trainReponse"
+                       type="tns:trainClassifierResponseObject" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="trainClassifierResponseObject">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="model" type="xsd:string" />
+
+          <xsd:element minOccurs="0" name="errorMessage" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="testClassifier">
+        <xsd:sequence>
+          <xsd:element name="dataset" type="tns:Dataset" />
+
+          <xsd:element name="modelName" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="testClassifierResponse">
+        <xsd:sequence>
+          <xsd:element name="testReponse"
+                       type="tns:testClassifierResponseObject" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="testClassifierResponseObject">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="returnDataset" type="tns:Dataset" />
+
+          <xsd:element minOccurs="0" name="errorMessage" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="predictClassifier">
+        <xsd:sequence>
+          <xsd:element name="dataset" type="tns:Dataset" />
+
+          <xsd:element name="modelName" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="predictClassifierResponse">
+        <xsd:sequence>
+          <xsd:element name="predictResponse"
+                       type="tns:predictClassifierResponseObject" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="predictClassifierResponseObject">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="returnDataset" type="tns:Dataset" />
+
+          <xsd:element minOccurs="0" name="errorMessage" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="transform">
+        <xsd:sequence>
+          <xsd:element name="dataset" type="tns:Dataset" />
+
+          <xsd:element name="actorName" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="transformResponse">
+        <xsd:sequence>
+          <xsd:element name="transformResponse"
+                       type="tns:transformResponseObject" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="transformResponseObject">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="returnDataset" type="tns:Dataset" />
+
+          <xsd:element minOccurs="0" name="errorMessage" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="trainClusterer">
+        <xsd:sequence>
+          <xsd:element name="dataset" type="tns:Dataset" />
+
+          <xsd:element name="clusterer" type="xsd:string" />
+
+          <xsd:element name="modelName" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="trainClustererResponse">
+        <xsd:sequence>
+          <xsd:element name="trainReponse"
+                       type="tns:trainClustererResponseObject" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="trainClustererResponseObject">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="model" type="xsd:string" />
+
+          <xsd:element minOccurs="0" name="errorMessage" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="predictClusterer">
+        <xsd:sequence>
+          <xsd:element name="dataset" type="tns:Dataset" />
+
+          <xsd:element name="modelName" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="predictClustererResponse">
+        <xsd:sequence>
+          <xsd:element name="predictClustererResponseObject"
+                       type="tns:predictClustererResponseObject" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="predictClustererResponseObject">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="returnDataset" type="tns:Dataset" />
+
+          <xsd:element minOccurs="0" name="errorMessage" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="displayClassifier">
+        <xsd:sequence>
+          <xsd:element name="model" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="displayClassifierResponse">
+        <xsd:sequence>
+          <xsd:element name="returnedDisplay"
+                       type="tns:displayClassifierResponseObject" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="displayClassifierResponseObject">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="displayString" type="xsd:string" />
+
+          <xsd:element minOccurs="0" name="errorMessage" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="displayClusterer">
+        <xsd:sequence>
+          <xsd:element name="model" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="displayClustererResponse">
+        <xsd:sequence>
+          <xsd:element name="displayString"
+                       type="tns:displayClustererResponseObject" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="displayClustererResponseObject">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="displayString" type="xsd:string" />
+
+          <xsd:element minOccurs="0" name="errorMessage" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="listClassifiers">
+        <xsd:sequence />
+      </xsd:complexType>
+
+      <xsd:complexType name="listClassifiersResponse">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="Classifier"
+                       type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="listClusterers">
+        <xsd:sequence />
+      </xsd:complexType>
+
+      <xsd:complexType name="listClusterersResponse">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="Clusterer"
+                       type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+
+      <xsd:complexType name="downloadClassifier">
+        <xsd:sequence>
+          <xsd:element name="modelName" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="downloadClassifierResponse">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="downloadResponse"
+                       type="tns:downloadClassifierResponseObject" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="downloadClassifierResponseObject">
+        <xsd:sequence>
+          <xsd:element name="modelData" type="xsd:base64Binary"
+                       xmime:expectedContentTypes="application/octet-stream"/>
+          <xsd:element minOccurs="0" name="errorMessage" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+
+      <xsd:complexType name="downloadClusterer">
+        <xsd:sequence>
+          <xsd:element name="modelName" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="downloadClustererResponse">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="downloadResponse"
+                       type="tns:downloadClustererResponseObject" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="downloadClustererResponseObject">
+        <xsd:sequence>
+          <xsd:element name="modelData" type="xsd:base64Binary"
+                       xmime:expectedContentTypes="application/octet-stream"/>
+          <xsd:element minOccurs="0" name="errorMessage" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="optimizeClassifierMultiSearch">
+		<xsd:sequence>
+	  <xsd:element name="Classifier"
+		       type="xsd:string" />
+	  <xsd:element maxOccurs="unbounded" name="SearchParameters"
+		       type="xsd:string" />
+          <xsd:element name="dataset" type="tns:Dataset" />
+          <xsd:element name="evaluation" type="xsd:string" />
+		</xsd:sequence>
+      </xsd:complexType>	
+
+      <xsd:complexType name="optimizeClassifierMultiSearchResponse">
+	<xsd:sequence>
+	  <xsd:element name="optimizeReturn" type="tns:optimizeReturnObject" />
+	</xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="optimizeReturnObject">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="BestClassifierSetup"
+		       type="xsd:string" />
+	  <xsd:element minOccurs="0" name="ErrorMessage"
+		       type="xsd:string" />
+	  <xsd:element minOccurs="0" name="WarningMessage"
+		       type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      
+
+      <xsd:complexType name="Dataset">
+        <xsd:sequence>
+          <xsd:element name="header" type="tns:header" />
+
+          <xsd:element name="body" type="tns:body" />
+        </xsd:sequence>
+
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+
+        <xsd:attribute default="3.5.4" name="version" type="xsd:string" />
+      </xsd:complexType>
+
+      <xsd:complexType name="header">
+        <xsd:sequence>
+          <xsd:element name="attributes" type="tns:attributes" />
+
+          <xsd:element minOccurs="0" name="notes" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="attributes">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" name="attribute"
+                       type="tns:attribute" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="attribute">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="labels" type="tns:labels" />
+
+          <xsd:element minOccurs="0" name="metadata" type="tns:metadata" />
+
+          <xsd:element minOccurs="0" name="attributes" type="tns:attributes" />
+        </xsd:sequence>
+
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+
+        <xsd:attribute name="type" type="tns:type" use="required" />
+
+        <xsd:attribute default="no" name="classAttribute" type="tns:yesNo" />
+
+        <xsd:attribute name="format" type="xsd:string" />
+
+        <xsd:attribute default="1.0" name="weight" type="xsd:double" />
+      </xsd:complexType>
+
+      <xsd:simpleType name="yesNo">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="yes" />
+
+          <xsd:enumeration value="no" />
+        </xsd:restriction>
+      </xsd:simpleType>
+
+      <xsd:simpleType name="type">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="numeric" />
+
+          <xsd:enumeration value="date" />
+
+          <xsd:enumeration value="nominal" />
+
+          <xsd:enumeration value="string" />
+
+          <xsd:enumeration value="relational" />
+        </xsd:restriction>
+      </xsd:simpleType>
+
+      <xsd:complexType name="labels">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="label"
+                       type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="metadata">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="property"
+                       type="tns:property" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="property">
+        <xsd:sequence>
+          <xsd:element name="content" type="xsd:string" />
+        </xsd:sequence>
+
+        <xsd:attribute name="propertyName" type="xsd:string" use="required" />
+      </xsd:complexType>
+
+      <xsd:complexType name="body">
+        <xsd:sequence>
+          <xsd:element name="instances" type="tns:instances" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="instances">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="instance"
+                       type="tns:instance" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="instance">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="value"
+                       type="tns:value" />
+        </xsd:sequence>
+
+        <xsd:attribute default="normal" name="instanceType"
+                       type="tns:InstanceType" />
+
+        <xsd:attribute name="instanceWeight" type="xsd:double" />
+      </xsd:complexType>
+
+      <xsd:simpleType name="InstanceType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="normal" />
+
+          <xsd:enumeration value="sparse" />
+        </xsd:restriction>
+      </xsd:simpleType>
+
+      <xsd:complexType name="value">
+        <xsd:simpleContent>
+          <xsd:extension base="xsd:string">
+            <xsd:attribute name="valueIndex" type="xsd:int" />
+
+            <xsd:attribute default="no" name="valueMissing" type="tns:yesNo" />
+          </xsd:extension>
+        </xsd:simpleContent>
+      </xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="crossValidateClassifier">
+    <wsdl:part element="tns:crossValidateClassifier" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="crossValidateClassifierResponse">
+    <wsdl:part element="tns:crossValidateClassifierResponse" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="trainClassifier">
+    <wsdl:part element="tns:trainClassifier" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="trainClassifierResponse">
+    <wsdl:part element="tns:trainClassifierResponse" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="testClassifier">
+    <wsdl:part element="tns:testClassifier" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="testClassifierResponse">
+    <wsdl:part element="tns:testClassifierResponse" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="predictClassifier">
+    <wsdl:part element="tns:predictClassifier" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="predictClassifierResponse">
+    <wsdl:part element="tns:predictClassifierResponse" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="transform">
+    <wsdl:part element="tns:transform" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="transformResponse">
+    <wsdl:part element="tns:transformResponse" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="trainClusterer">
+    <wsdl:part element="tns:trainClusterer" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="trainClustererResponse">
+    <wsdl:part element="tns:trainClustererResponse" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="predictClusterer">
+    <wsdl:part element="tns:predictClusterer" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="predictClustererResponse">
+    <wsdl:part element="tns:predictClustererResponse" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="displayClassifier">
+    <wsdl:part element="tns:displayClassifier" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="displayClassifierResponse">
+    <wsdl:part element="tns:displayClassifierResponse" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="displayClusterer">
+    <wsdl:part element="tns:displayClusterer" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="displayClustererResponse">
+    <wsdl:part element="tns:displayClustererResponse" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="listClassifiers">
+    <wsdl:part element="tns:listClassifiers" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="listClassifiersResponse">
+    <wsdl:part element="tns:listClassifiersResponse" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="listClusterers">
+    <wsdl:part element="tns:listClusterers" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="listClusterersResponse">
+    <wsdl:part element="tns:listClusterersResponse" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="downloadClassifier">
+    <wsdl:part element="tns:downloadClassifier" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="downloadClassifierResponse">
+    <wsdl:part element="tns:downloadClassifierResponse" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="downloadClusterer">
+    <wsdl:part element="tns:downloadClusterer" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="downloadClustererResponse">
+    <wsdl:part element="tns:downloadClustererResponse" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="optimizeClassifierMultiSearch">
+    <wsdl:part element="tns:optimizeClassifierMultiSearch" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="optimizeClassifierMultiSearchResponse">
+    <wsdl:part element="tns:optimizeClassifierMultiSearchResponse" name="parameters" />
+  </wsdl:message>
+
+  
+
+  <wsdl:portType name="WekaService">
+    <wsdl:operation name="crossValidateClassifier">
+      <wsdl:input message="tns:crossValidateClassifier"
+                  name="crossValidateClassifier" />
+
+      <wsdl:output message="tns:crossValidateClassifierResponse"
+                   name="crossValidateClassifierResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="trainClassifier">
+      <wsdl:input message="tns:trainClassifier" name="trainClassifier" />
+
+      <wsdl:output message="tns:trainClassifierResponse"
+                   name="trainClassifierResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="testClassifier">
+      <wsdl:input message="tns:testClassifier" name="testClassifier" />
+
+      <wsdl:output message="tns:testClassifierResponse"
+                   name="testClassifierResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="predictClassifier">
+      <wsdl:input message="tns:predictClassifier" name="predictClassifier" />
+
+      <wsdl:output message="tns:predictClassifierResponse"
+                   name="predictClassifierResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="transform">
+      <wsdl:input message="tns:transform" name="transform" />
+
+      <wsdl:output message="tns:transformResponse" name="transformResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="trainClusterer">
+      <wsdl:input message="tns:trainClusterer" name="trainClusterer" />
+
+      <wsdl:output message="tns:trainClustererResponse"
+                   name="trainClustererResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="predictClusterer">
+      <wsdl:input message="tns:predictClusterer" name="predictClusterer" />
+
+      <wsdl:output message="tns:predictClustererResponse"
+                   name="predictClustererResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="displayClassifier">
+      <wsdl:input message="tns:displayClassifier" name="displayClassifier" />
+
+      <wsdl:output message="tns:displayClassifierResponse"
+                   name="displayClassifierResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="displayClusterer">
+      <wsdl:input message="tns:displayClusterer" name="displayClusterer" />
+
+      <wsdl:output message="tns:displayClustererResponse"
+                   name="displayClustererResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="listClassifiers">
+      <wsdl:input message="tns:listClassifiers" name="listClassifiers" />
+
+      <wsdl:output message="tns:listClassifiersResponse"
+                   name="listClassifiersResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="listClusterers">
+      <wsdl:input message="tns:listClusterers" name="listClusterers" />
+
+      <wsdl:output message="tns:listClusterersResponse"
+                   name="listClusterersResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="downloadClassifier">
+      <wsdl:input message="tns:downloadClassifier" name="downloadClassifier" />
+
+      <wsdl:output message="tns:downloadClassifierResponse"
+                   name="downloadClassifierResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="downloadClusterer">
+      <wsdl:input message="tns:downloadClusterer" name="downloadClusterer" />
+
+      <wsdl:output message="tns:downloadClustererResponse"
+                   name="downloadClustererResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="optimizeClassifierMultiSearch">
+      <wsdl:input message="tns:optimizeClassifierMultiSearch" name="optimizeClassifierMultiSearch" />
+
+      <wsdl:output message="tns:optimizeClassifierMultiSearchResponse"
+                   name="optimizeClassifierMultiSearchResponse" />
+    </wsdl:operation>
+
+    
+  </wsdl:portType>
+
+  <wsdl:binding name="WekaServiceServiceSoapBinding" type="tns:WekaService">
+    <soap:binding style="document"
+                  transport="http://schemas.xmlsoap.org/soap/http" />
+
+    <wsdl:operation name="crossValidateClassifier">
+      <soap:operation soapAction="" style="document" />
+
+      <wsdl:input name="crossValidateClassifier">
+        <soap:body use="literal" />
+      </wsdl:input>
+
+      <wsdl:output name="crossValidateClassifierResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="trainClassifier">
+      <soap:operation soapAction="" style="document" />
+
+      <wsdl:input name="trainClassifier">
+        <soap:body use="literal" />
+      </wsdl:input>
+
+      <wsdl:output name="trainClassifierResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="testClassifier">
+      <soap:operation soapAction="" style="document" />
+
+      <wsdl:input name="testClassifier">
+        <soap:body use="literal" />
+      </wsdl:input>
+
+      <wsdl:output name="testClassifierResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="predictClassifier">
+      <soap:operation soapAction="" style="document" />
+
+      <wsdl:input name="predictClassifier">
+        <soap:body use="literal" />
+      </wsdl:input>
+
+      <wsdl:output name="predictClassifierResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="transform">
+      <soap:operation soapAction="" style="document" />
+
+      <wsdl:input name="transform">
+        <soap:body use="literal" />
+      </wsdl:input>
+
+      <wsdl:output name="transformResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="trainClusterer">
+      <soap:operation soapAction="" style="document" />
+
+      <wsdl:input name="trainClusterer">
+        <soap:body use="literal" />
+      </wsdl:input>
+
+      <wsdl:output name="trainClustererResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="predictClusterer">
+      <soap:operation soapAction="" style="document" />
+
+      <wsdl:input name="predictClusterer">
+        <soap:body use="literal" />
+      </wsdl:input>
+
+      <wsdl:output name="predictClustererResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="displayClassifier">
+      <soap:operation soapAction="" style="document" />
+
+      <wsdl:input name="displayClassifier">
+        <soap:body use="literal" />
+      </wsdl:input>
+
+      <wsdl:output name="displayClassifierResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="displayClusterer">
+      <soap:operation soapAction="" style="document" />
+
+      <wsdl:input name="displayClusterer">
+        <soap:body use="literal" />
+      </wsdl:input>
+
+      <wsdl:output name="displayClustererResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="listClassifiers">
+      <soap:operation soapAction="" style="document" />
+
+      <wsdl:input name="listClassifiers">
+        <soap:body use="literal" />
+      </wsdl:input>
+
+      <wsdl:output name="listClassifiersResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="listClusterers">
+      <soap:operation soapAction="" style="document" />
+
+      <wsdl:input name="listClusterers">
+        <soap:body use="literal" />
+      </wsdl:input>
+
+      <wsdl:output name="listClusterersResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="downloadClassifier">
+      <soap:operation soapAction="" style="document" />
+
+      <wsdl:input name="downloadClassifier">
+        <soap:body use="literal" />
+      </wsdl:input>
+
+      <wsdl:output name="downloadClassifierResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="downloadClusterer">
+      <soap:operation soapAction="" style="document" />
+
+      <wsdl:input name="downloadClusterer">
+        <soap:body use="literal" />
+      </wsdl:input>
+
+      <wsdl:output name="downloadClustererResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="optimizeClassifierMultiSearch">
+      <soap:operation soapAction="" style="document" />
+
+      <wsdl:input name="optimizeClassifierMultiSearch">
+        <soap:body use="literal" />
+      </wsdl:input>
+
+      <wsdl:output name="optimizeClassifierMultiSearchResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="WekaServiceService">
+    <wsdl:port binding="tns:WekaServiceServiceSoapBinding"
+               name="WekaServicePort">
+      <!-- embedded deployment -->
+
+      <soap:address location="http://localhost:9090/WekaServicePort" />
+
+      <!-- standalone Tomcat deployment -->
+
+      <!--soap:address location="http://localhost:8080/wsdl_first-<cxf-version>/services/adviceServicePort"/-->
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

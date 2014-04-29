@@ -1,0 +1,18 @@
+# Project: adams
+# Date: 2014-01-31 09:00:10
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Displays a previously trained model (\'j48\').\nSee \"adams-weka-webservice-train-classifier.flow\" flow for training the model on the server-side.
+	-actor
+		adams.flow.source.WSSource
+			-client
+				adams.flow.webservice.DisplayClassifier
+					-classifier
+					j48
+	-actor
+		adams.flow.sink.Display
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

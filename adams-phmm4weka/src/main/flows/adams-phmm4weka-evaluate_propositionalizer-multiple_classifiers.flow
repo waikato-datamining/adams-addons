@@ -1,0 +1,251 @@
+# Project: adams
+# Date: 2014-01-23 15:38:45
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Evaluates multiple IterativeHMMPropositionalizers on a dataset\nand plots the AUC for each iteration and each classifier.
+	-actor
+		adams.flow.standalone.CallableActors
+			-actor
+				adams.flow.source.WekaClassifierSetup
+					-name
+					RandomForest
+					-classifier
+						weka.classifiers.meta.IterativeHMMPropositionalizer
+							-H
+							weka.classifiers.sequence.IterativeProfileHMMClassifier -X 35 -A weka.classifiers.sequence.core.ExtendedProteinAlphabet -C 1.0E-4 -B 2 -F 100 -J POS
+							-M
+							5-7
+							-S
+							1
+							-W
+							weka.classifiers.trees.RandomForest
+							--
+							-I
+							100
+							-K
+							0
+							-S
+							1
+							-num-slots
+							1
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+			-actor
+				adams.flow.source.WekaClassifierSetup
+					-name
+					DecisionStump
+					-classifier
+						weka.classifiers.meta.IterativeHMMPropositionalizer
+							-H
+							weka.classifiers.sequence.IterativeProfileHMMClassifier -X 35 -A weka.classifiers.sequence.core.ExtendedProteinAlphabet -C 1.0E-4 -B 2 -F 100 -J POS
+							-M
+							5-7
+							-S
+							1
+							-W
+							weka.classifiers.trees.DecisionStump
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+			-actor
+				adams.flow.source.WekaClassifierSetup
+					-name
+					J48
+					-classifier
+						weka.classifiers.meta.IterativeHMMPropositionalizer
+							-H
+							weka.classifiers.sequence.IterativeProfileHMMClassifier -X 35 -A weka.classifiers.sequence.core.ExtendedProteinAlphabet -C 1.0E-4 -B 2 -F 100 -J POS
+							-M
+							5-7
+							-S
+							1
+							-W
+							weka.classifiers.trees.J48
+							--
+							-C
+							0.25
+							-M
+							2
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+			-actor
+				adams.flow.sink.SequencePlotter
+					-writer
+						adams.gui.print.NullWriter
+					-paintlet
+						adams.gui.visualization.sequence.LinePaintlet
+					-overlay-paintlet
+						adams.gui.visualization.sequence.CirclePaintlet
+					-marker-paintlet
+						adams.flow.sink.sequenceplotter.NoMarkers
+					-error-paintlet
+						adams.flow.sink.sequenceplotter.NoErrorPaintlet
+					-color-provider
+						adams.gui.visualization.core.DefaultColorProvider
+					-overlay-color-provider
+						adams.gui.visualization.core.DefaultColorProvider
+					-title
+					AUC
+					-axis-x
+						adams.gui.visualization.core.AxisPanelOptions
+							-label
+							Iterations
+							-tick-generator
+								adams.gui.visualization.core.axis.FancyTickGenerator
+							-width
+							40
+							-custom-format
+							0
+					-axis-y
+						adams.gui.visualization.core.AxisPanelOptions
+							-label
+							Percent (0.0-1.0)
+							-tick-generator
+								adams.gui.visualization.core.axis.FancyTickGenerator
+							-width
+							40
+							-custom-format
+							0.00
+					-plot-updater
+						adams.flow.sink.sequenceplotter.SimplePlotUpdater
+					-post-processor
+						adams.flow.sink.sequenceplotter.PassThrough
+	-actor
+		adams.flow.source.FileSupplier
+			-file
+			${EXAMPLE_FLOWS}/data/pro_occ2.arff
+	-actor
+		adams.flow.transformer.WekaFileReader
+			-loader
+				weka.core.converters.ArffLoader
+	-actor
+		adams.flow.transformer.WekaClassSelector
+	-actor
+		adams.flow.control.Branch
+			-branch
+				adams.flow.control.Sequence
+					-name
+					RandomForest
+					-actor
+						adams.flow.transformer.PHMMIterativeEvaluation
+							-output
+								weka.classifiers.evaluation.output.prediction.Null
+							-classifier
+							RandomForest
+							-folds
+							2
+							-num-iterations
+							20
+					-actor
+						adams.flow.transformer.WekaEvaluationValuePicker
+							-statistic
+							AREA_UNDER_ROC
+					-actor
+						adams.flow.transformer.MakePlotContainer
+							-plot-name
+							RandomForest
+					-actor
+						adams.flow.sink.CallableSink
+							-callable
+							SequencePlotter
+			-branch
+				adams.flow.control.Sequence
+					-name
+					DecisionStump
+					-actor
+						adams.flow.transformer.PHMMIterativeEvaluation
+							-output
+								weka.classifiers.evaluation.output.prediction.Null
+							-classifier
+							DecisionStump
+							-folds
+							2
+							-num-iterations
+							20
+					-actor
+						adams.flow.transformer.WekaEvaluationValuePicker
+							-statistic
+							AREA_UNDER_ROC
+					-actor
+						adams.flow.transformer.MakePlotContainer
+							-plot-name
+							DecisionStump
+					-actor
+						adams.flow.sink.CallableSink
+							-callable
+							SequencePlotter
+			-branch
+				adams.flow.control.Sequence
+					-name
+					J48
+					-actor
+						adams.flow.transformer.PHMMIterativeEvaluation
+							-output
+								weka.classifiers.evaluation.output.prediction.Null
+							-classifier
+							J48
+							-folds
+							2
+							-num-iterations
+							20
+					-actor
+						adams.flow.transformer.WekaEvaluationValuePicker
+							-statistic
+							AREA_UNDER_ROC
+					-actor
+						adams.flow.transformer.MakePlotContainer
+							-plot-name
+							J48
+					-actor
+						adams.flow.sink.CallableSink
+							-callable
+							SequencePlotter
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

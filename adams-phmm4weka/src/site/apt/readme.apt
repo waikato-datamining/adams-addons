@@ -1,0 +1,48 @@
+README
+
+  Package Structure of the phmm4weka library:
+
+weka.classifiers.sequence.core
+
+  Contains the classes to build and learn a Profile Hidden Markov Model.
+  The algorithms are based on Durbin et al: Biological Sequence Analysis,
+  CUP 1998.
+
+weka.classifiers.sequence
+
+  Contains PHMM based binary classifiers. There are two kind of classifiers:
+  The classical (one-class) PHMM trained on the positive class (needs to be
+  index 0 in the arff header) only and the newly introduced binary PHMM that
+  trains a PHMM for the positive and the negative class.
+
+weka.classifiers.meta
+
+  Defines new meta classifiers to use a PHMM in propositionalisation. The
+  trained PHMM is used to create a feature vector representation for sequences.
+  This representation is consecutively used on any specified standard ML
+  classifier. The method based on sufficient statistics of a PHMM is from
+  Jaakkola et al. A Discriminative Framework for Detecting Remote Protein
+  Homologies. Journal of Computational Biology, 7 (1-2):95-114,2000
+  doi: 10.1089/10665270050081405. However, no dirichlet mixture distributions
+  are used.
+
+weka.classifiers.function.supportVector
+
+  Contains an implementation of Fisher Kernels from Jaakkola et al.
+  A Discriminative Framework for Detecting Remote Protein Homologies.
+  Journal of Computational Biology, 7 (1-2):95-114,2000
+  doi: 10.1089/10665270050081405.
+
+weka.filters.supervised.attribute
+
+  Contains filters to change from feature vector representations with numeric
+  values in log space to their exponential counterparts. The results are
+  normalised when possible into real probabilities.
+
+weka.utils
+
+  Contains classes that allow to evaluate PHMMs and their propositionalisation
+  after each iteration of the Baum-Welch training algorithm.
+
+
+  $Revision$

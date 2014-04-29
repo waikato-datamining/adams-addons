@@ -1,0 +1,22 @@
+# Project: adams
+# Date: 2014-01-23 15:46:24
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Queries the webservice for \"CustomersByName\", defined in \nthe Apache CXF \"WSDL first\" example:\nhttp://cxf.apache.org/docs/sample-projects.html\nUses the names coming from the StringConstants source as\nparameters for querying the webservice.
+	-actor
+		adams.flow.source.StringConstants
+			-string
+			Smith
+			-string
+			Jones
+	-actor
+		adams.flow.transformer.WSTransformer
+			-client
+				com.example.customerservice.flow.CustomersByName
+	-actor
+		adams.flow.sink.Display
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

@@ -1,0 +1,97 @@
+% Copyright (c) 2012 by the University of Waikato, Hamilton, NZ. 
+% This work is made available under the terms of the 
+% Creative Commons Attribution-ShareAlike 3.0 license, 
+% http://creativecommons.org/licenses/by-sa/3.0/. 
+%
+% Version: $Revision$
+
+\documentclass[a4paper]{book}
+
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{scalefnt}
+\usepackage{tikz}
+
+% watermark -- for draft stage
+\usepackage[firstpage]{draftwatermark}
+\SetWatermarkLightness{0.9}
+\SetWatermarkScale{5}
+
+\input{latex_extensions}
+
+\title{
+  \textbf{ADAMS} \\
+  {\Large \textbf{A}dvanced \textbf{D}ata mining \textbf{A}nd \textbf{M}achine
+  learning \textbf{S}ystem} \\
+  {\Large Module: adams-heatmap} \\
+  \vspace{1cm}
+  \includegraphics[width=2cm]{images/heatmap-module.png} \\
+}
+\author{
+  Peter Reutemann
+}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+
+\thispagestyle{empty}
+\center
+\begin{table}[b]
+	\begin{tabular}{c l l}
+		\parbox[c][2cm]{2cm}{\copyright 2011-2013} &
+		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
+	\end{tabular}
+	\includegraphics[width=12cm]{images/cc.png} \\
+\end{table}
+
+\end{titlepage}
+
+\tableofcontents
+\listoffigures
+%\listoftables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introduction}
+According to WikiPedia \cite{heatmap}, a ``heat map is a graphical representation of data 
+where the individual values contained in a matrix are represented as 
+colors.''
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Flow}
+The following conversions are available:
+\begin{tight_itemize}
+  	\item \textit{BufferedImageToHeatmap} -- turns a BufferedImage into a heat
+  	map, using the RGB values (but not alpha).
+  	\item \textit{HeatmapToArray} -- generates a double array from a heat map.
+  	\item \textit{HeatmapToBufferedImage} -- generates an image from heat map.
+  	\item \textit{HeatmapToSpreadSheet} -- converts the heat map into a 
+  	spreadsheet object.
+  	\item \textit{SpreadSheetToHeatmap} -- creates a heat map from an all-numeric
+  	spreadsheet.
+\end{tight_itemize}
+The following transformers are available:
+\begin{tight_itemize}
+  	\item \textit{HeatmapFileReader} -- reads a heat map from disk with a 
+  	specified reader.
+  	\item \textit{HeatmapFileWriter} -- writes a heat map back to disk with
+  	a custom writer.
+  	\item \textit{HeatmapFilter} -- transform a heat map using a filter.
+  	\item \textit{HeatmapInstanceGenerator} -- turns a heat map into a WEKA
+  	instance.
+\end{tight_itemize}
+The following sinks are available:
+\begin{tight_itemize}
+  	\item \textit{HeatmapDisplay} -- displays a heatmap.
+\end{tight_itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{bibliography}
+
+\end{document}

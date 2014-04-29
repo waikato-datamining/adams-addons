@@ -1,0 +1,66 @@
+/*
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * WebServiceProvider.java
+ * Copyright (C) 2012 University of Waikato, Hamilton, New Zealand
+ */
+package adams.flow.webservice;
+
+import adams.flow.core.AbstractActor;
+
+/**
+ * Interface for webservice providers, i.e., the server side.
+ * 
+ * @author  fracpete (fracpete at waikato dot ac dot nz)
+ * @version $Revision$
+ */
+public interface WebServiceProvider {
+  
+  /**
+   * Sets the actor that executes this webservice.
+   * 
+   * @param value	the owner
+   */
+  public void setOwner(AbstractActor value);
+  
+  /**
+   * Returns the owning actor.
+   * 
+   * @return		the owner
+   */
+  public AbstractActor getOwner();
+
+  /**
+   * Returns the URL used for the service.
+   * 
+   * @return		the URL
+   */
+  public String getURL();
+  
+  /**
+   * Starts the server.
+   * 
+   * @return 		null if successful, otherwise error message
+   */
+  public String start();
+  
+  /**
+   * Stops the server.
+   * 
+   * @return		null if successful, otherwise error message
+   */
+  public String stop();
+}

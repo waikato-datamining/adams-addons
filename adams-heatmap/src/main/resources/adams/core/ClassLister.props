@@ -1,0 +1,24 @@
+# Configuration file listing the superclasses and the packages in which to
+# look for derived classes.
+#
+# Format:
+# class.name=package1,package2,...
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision$
+
+# the feature generators
+adams.data.featuregenerator.AbstractFeatureGenerator=\
+  adams.data.featuregenerator
+
+# the heatmap readers
+adams.data.io.input.AbstractHeatmapReader=\
+  adams.data.io.input
+
+# the heatmap writers
+adams.data.io.output.AbstractHeatmapWriter=\
+  adams.data.io.output
+
+# the image overlays
+adams.gui.visualization.image.ImageOverlay=\
+  adams.gui.visualization.heatmap
