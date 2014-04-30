@@ -110,6 +110,7 @@ public class RatsTransmission
    */
   public void setTransmitter(Transmitter value) {
     m_Transmitter = value;
+    m_Transmitter.setOwner(this);
     reset();
   }
 
@@ -169,7 +170,6 @@ public class RatsTransmission
     result = null;
     
     try {
-      m_Transmitter.setOwner(this);
       if (isLoggingEnabled())
 	getLogger().fine(OptionUtils.getCommandLine(m_Transmitter));
       m_Transmitter.transmit();

@@ -110,6 +110,7 @@ public class RatsReception
    */
   public void setReceiver(Receiver value) {
     m_Receiver = value;
+    m_Receiver.setOwner(this);
     reset();
   }
 
@@ -169,7 +170,6 @@ public class RatsReception
     result = null;
     
     try {
-      m_Receiver.setOwner(this);
       if (isLoggingEnabled())
 	getLogger().fine(OptionUtils.getCommandLine(m_Receiver));
       m_Receiver.receive();
