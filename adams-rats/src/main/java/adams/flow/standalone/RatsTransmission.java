@@ -21,6 +21,7 @@ package adams.flow.standalone;
 
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
+import adams.core.option.OptionUtils;
 import adams.flow.standalone.rats.DummyTransmitter;
 import adams.flow.standalone.rats.Transmitter;
 
@@ -169,6 +170,8 @@ public class RatsTransmission
     
     try {
       m_Transmitter.setOwner(this);
+      if (isLoggingEnabled())
+	getLogger().fine(OptionUtils.getCommandLine(m_Transmitter));
       m_Transmitter.transmit();
     }
     catch (Exception e) {

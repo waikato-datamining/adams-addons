@@ -21,6 +21,7 @@ package adams.flow.standalone;
 
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
+import adams.core.option.OptionUtils;
 import adams.flow.standalone.rats.DummyReceiver;
 import adams.flow.standalone.rats.Receiver;
 
@@ -169,6 +170,8 @@ public class RatsReception
     
     try {
       m_Receiver.setOwner(this);
+      if (isLoggingEnabled())
+	getLogger().fine(OptionUtils.getCommandLine(m_Receiver));
       m_Receiver.receive();
     }
     catch (Exception e) {
