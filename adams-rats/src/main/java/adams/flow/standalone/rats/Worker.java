@@ -20,6 +20,10 @@
 package adams.flow.standalone.rats;
 
 import adams.core.Stoppable;
+import adams.core.Utils;
+import adams.core.logging.LoggingLevel;
+import adams.core.logging.LoggingLevelHandler;
+import adams.core.logging.LoggingObject;
 
 /**
  * Worker class used in a thread.
@@ -28,18 +32,27 @@ import adams.core.Stoppable;
  * @version $Revision$
  */
 public abstract class Worker
-  implements Runnable, Stoppable {
+  extends LoggingObject
+  implements LoggingLevelHandler, Runnable, Stoppable {
   
+  /** for serialization. */
+  private static final long serialVersionUID = 143445804089303521L;
+
   /** whether the execution was stopped. */
   protected boolean m_Stopped;
   
   /** whether the worker is still running. */
   protected boolean m_Running;
-  
+
   /**
-   * Does the actual work.
+   * Sets the logging level.
+   *
+   * @param value 	the level
    */
-  protected abstract void doRun();
+  public synchronized void setLoggingLevel(LoggingLevel value) {
+    m_LoggingLevel = value;
+    m_Logger       = null;
+  }
   
   /**
    * A simple waiting method.
@@ -53,11 +66,14 @@ public abstract class Worker
     if (msec == 0)
       return;
     
+    if (isLoggingEnabled())
+      getLogger().fine("doWait: " + msec);
+    
     count = 0;
     while (count < msec) {
       try {
 	current = msec - 100;
-	if (current < 0)
+	if (current <= 0)
 	  current = msec;
 	if (current > 100)
 	  current = 100;
@@ -71,7 +87,12 @@ public abstract class Worker
       }
     }
   }
-  
+
+  /**
+   * Does the actual work.
+   */
+  protected abstract void doRun();
+
   /**
    * Starts the work.
    */
@@ -79,7 +100,20 @@ public abstract class Worker
   public void run() {
     m_Stopped = false;
     m_Running = true;
-    doRun();
+
+    if (isLoggingEnabled())
+      getLogger().fine("Running...");
+    
+    try {
+      doRun();
+    }
+    catch (Exception e) {
+      Utils.handleException(this, "Exception occurred on run!", e);
+    }
+    
+    if (isLoggingEnabled())
+      getLogger().fine("Finished");
+    
     m_Running = false;
   }
   
@@ -89,6 +123,8 @@ public abstract class Worker
   @Override
   public void stopExecution() {
     m_Stopped = true;
+    if (isLoggingEnabled())
+      getLogger().fine("Stopped");
   }
   
   /**
