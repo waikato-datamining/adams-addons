@@ -25,6 +25,7 @@ import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.base.BaseRegExp;
 import adams.core.io.DirectoryLister;
+import adams.core.io.DirectoryLister.Sorting;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
@@ -51,6 +52,16 @@ import adams.core.io.PlaceholderFile;
  * <pre>-regexp &lt;adams.core.base.BaseRegExp&gt; (property: regExp)
  * &nbsp;&nbsp;&nbsp;The regular expression that the files must match.
  * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
+ * <pre>-sorting &lt;NO_SORTING|SORT_BY_NAME|SORT_BY_LAST_MODIFIED&gt; (property: sorting)
+ * &nbsp;&nbsp;&nbsp;The type of sorting to perform.
+ * &nbsp;&nbsp;&nbsp;default: NO_SORTING
+ * </pre>
+ * 
+ * <pre>-sort-descending &lt;boolean&gt; (property: sortDescending)
+ * &nbsp;&nbsp;&nbsp;If enabled, the sort direction is descending.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
  * <pre>-wait-move &lt;int&gt; (property: waitMove)
@@ -122,6 +133,14 @@ public class SimpleFileMover
     m_OptionManager.add(
 	    "regexp", "regExp",
 	    new BaseRegExp(""));
+
+    m_OptionManager.add(
+	    "sorting", "sorting",
+	    Sorting.NO_SORTING);
+
+    m_OptionManager.add(
+	    "sort-descending", "sortDescending",
+	    false);
 
     m_OptionManager.add(
 	    "wait-move", "waitMove",
@@ -205,6 +224,64 @@ public class SimpleFileMover
    */
   public String regExpTipText() {
     return "The regular expression that the files must match.";
+  }
+
+  /**
+   * Sets the sorting type.
+   *
+   * @param value 	the sorting
+   */
+  public void setSorting(Sorting value) {
+    m_Lister.setSorting(value);
+    reset();
+  }
+
+  /**
+   * Returns the sorting type.
+   *
+   * @return 		the sorting
+   */
+  public Sorting getSorting() {
+    return m_Lister.getSorting();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String sortingTipText() {
+    return "The type of sorting to perform.";
+  }
+
+  /**
+   * Sets whether to sort in descending manner.
+   *
+   * @param value 	true if desending sort manner
+   */
+  public void setSortDescending(boolean value) {
+    m_Lister.setSortDescending(value);
+    reset();
+  }
+
+  /**
+   * Returns whether to sort in descending manner.
+   *
+   * @return 		true if descending sort manner
+   */
+  public boolean getSortDescending() {
+    return m_Lister.getSortDescending();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String sortDescendingTipText() {
+    return "If enabled, the sort direction is descending.";
   }
 
   /**
@@ -347,6 +424,7 @@ public class SimpleFileMover
    * 
    * @return		the {@link Worker} instance to use
    */
+  @SuppressWarnings("serial")
   @Override
   protected Worker newWorker() {
     Worker	result;
