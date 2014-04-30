@@ -98,10 +98,21 @@ public abstract class AbstractThreadedQueueReceiver
   /**
    * Returns the flow's queue.
    * 
+   * @param name	the name of the queue
+   * @return		the queue, null if not initialized
+   * @see		QueueInit
+   */
+  protected ArrayList getQueue(StorageName name) {
+    return (ArrayList) getOwner().getStorageHandler().getStorage().get(name);
+  }
+  
+  /**
+   * Returns the flow's queue.
+   * 
    * @return		the queue, null if not initialized
    * @see		QueueInit
    */
   protected ArrayList getQueue() {
-    return (ArrayList) getOwner().getStorageHandler().getStorage().get(m_StorageName);
+    return getQueue(m_StorageName);
   }
 }
