@@ -408,6 +408,7 @@ public class FtpTransmitter
    * 
    * @return		the {@link Worker} instance to use
    */
+  @SuppressWarnings("serial")
   @Override
   protected Worker newWorker() {
     Worker	result;
