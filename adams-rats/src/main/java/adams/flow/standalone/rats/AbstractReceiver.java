@@ -161,5 +161,7 @@ public abstract class AbstractReceiver
    */
   public void stopExecution() {
     m_Stopped = true;
+    if (isLoggingEnabled())
+      getLogger().info("Stopped");
   }
 }

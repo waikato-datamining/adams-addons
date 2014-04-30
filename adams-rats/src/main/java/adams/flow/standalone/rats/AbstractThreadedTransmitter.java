@@ -49,7 +49,10 @@ public abstract class AbstractThreadedTransmitter
    */
   @Override
   protected void doTransmit() throws Exception {
+    if (isLoggingEnabled())
+      getLogger().info("Starting transmitter worker...");
     m_Worker = newWorker();
+    m_Worker.setLoggingLevel(getLoggingLevel());
     new Thread(m_Worker).start();
   }
   
@@ -59,15 +62,20 @@ public abstract class AbstractThreadedTransmitter
   @Override
   public void stopExecution() {
     if (!m_Stopped) {
+      if (isLoggingEnabled())
+	getLogger().info("Stopping transmitter worker...");
       if (m_Worker != null) {
 	m_Worker.stopExecution();
 	while (m_Worker.isRunning()) {
+	  if (isLoggingEnabled())
+	    getLogger().info("Waiting for transmitter worker to stop...");
 	  try {
-	    synchronized(m_Worker) {
-	      m_Worker.wait(100);
+	    synchronized(this) {
+	      wait(100);
 	    }
 	  }
 	  catch (Exception e) {
+	    e.printStackTrace();
 	    // ignored
 	  }
 	}

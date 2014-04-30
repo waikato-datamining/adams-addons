@@ -49,7 +49,10 @@ public abstract class AbstractThreadedReceiver
    */
   @Override
   protected void doReceive() throws Exception {
+    if (isLoggingEnabled())
+      getLogger().info("Starting receiver worker...");
     m_Worker = newWorker();
+    m_Worker.setLoggingLevel(getLoggingLevel());
     new Thread(m_Worker).start();
   }
   
@@ -60,14 +63,19 @@ public abstract class AbstractThreadedReceiver
   public void stopExecution() {
     if (!m_Stopped) {
       if (m_Worker != null) {
+	if (isLoggingEnabled())
+	  getLogger().info("Stopping receiver worker...");
 	m_Worker.stopExecution();
 	while (m_Worker.isRunning()) {
+	  if (isLoggingEnabled())
+	    getLogger().info("Waiting for receiver worker to stop...");
 	  try {
-	    synchronized(m_Worker) {
-	      m_Worker.wait(100);
+	    synchronized(this) {
+	      wait(100);
 	    }
 	  }
 	  catch (Exception e) {
+	    e.printStackTrace();
 	    // ignored
 	  }
 	}
