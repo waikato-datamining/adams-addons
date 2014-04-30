@@ -19,11 +19,7 @@
  */
 package adams.flow.standalone.rats;
 
-import adams.core.Stoppable;
-import adams.core.Utils;
-import adams.core.logging.LoggingLevel;
-import adams.core.logging.LoggingLevelHandler;
-import adams.core.logging.LoggingObject;
+import adams.flow.core.RunnableWithLogging;
 
 /**
  * Worker class used in a thread.
@@ -32,27 +28,10 @@ import adams.core.logging.LoggingObject;
  * @version $Revision$
  */
 public abstract class Worker
-  extends LoggingObject
-  implements LoggingLevelHandler, Runnable, Stoppable {
+  extends RunnableWithLogging {
   
   /** for serialization. */
   private static final long serialVersionUID = 143445804089303521L;
-
-  /** whether the execution was stopped. */
-  protected boolean m_Stopped;
-  
-  /** whether the worker is still running. */
-  protected boolean m_Running;
-
-  /**
-   * Sets the logging level.
-   *
-   * @param value 	the level
-   */
-  public synchronized void setLoggingLevel(LoggingLevel value) {
-    m_LoggingLevel = value;
-    m_Logger       = null;
-  }
   
   /**
    * A simple waiting method.
@@ -86,53 +65,5 @@ public abstract class Worker
 	// ignored
       }
     }
-  }
-
-  /**
-   * Does the actual work.
-   */
-  protected abstract void doRun();
-
-  /**
-   * Starts the work.
-   */
-  @Override
-  public void run() {
-    m_Stopped = false;
-    m_Running = true;
-
-    if (isLoggingEnabled())
-      getLogger().fine("Running...");
-    
-    try {
-      doRun();
-    }
-    catch (Exception e) {
-      Utils.handleException(this, "Exception occurred on run!", e);
-    }
-    
-    if (isLoggingEnabled())
-      getLogger().fine("Finished");
-    
-    m_Running = false;
-  }
-  
-  /**
-   * Stops the execution.
-   */
-  @Override
-  public void stopExecution() {
-    m_Stopped = true;
-    if (isLoggingEnabled())
-      getLogger().fine("Stopped");
-  }
-  
-  /**
-   * Returns whether the worker is still running.
-   * 
-   * @return		true if still running
-   */
-  public boolean isRunning() {
-    return m_Running;
   }
 }
