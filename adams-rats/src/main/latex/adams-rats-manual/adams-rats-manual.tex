@@ -1,0 +1,89 @@
+% Copyright (c) 2014 by the University of Waikato, Hamilton, NZ. 
+% This work is made available under the terms of the 
+% Creative Commons Attribution-ShareAlike 3.0 license, 
+% http://creativecommons.org/licenses/by-sa/3.0/. 
+%
+% Version: $Revision: 6651 $
+
+\documentclass[a4paper]{book}
+
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{scalefnt}
+\usepackage{tikz}
+\usepackage{caption}
+\usepackage{subcaption}
+\PassOptionsToPackage{obeyspaces}{url}
+\usepackage{hyperref}
+% watermark -- for draft stage
+\usepackage[firstpage]{draftwatermark}
+\SetWatermarkLightness{0.9}
+\SetWatermarkScale{5}
+
+\input{latex_extensions}
+
+\title{
+  \textbf{ADAMS} \\
+  {\Large \textbf{A}dvanced \textbf{D}ata mining \textbf{A}nd \textbf{M}achine
+  learning \textbf{S}ystem} \\
+  {\Large Module: adams-rats} \\
+  \vspace{1cm}
+  \includegraphics[width=2cm]{images/rats-module.png} \\
+}
+\author{
+  Peter Reutemann
+}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+
+\thispagestyle{empty}
+\center
+\begin{table}[b]
+	\begin{tabular}{c l l}
+		\parbox[c][2cm]{2cm}{\copyright 2014} &
+		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}}
+	\end{tabular}
+	\includegraphics[width=12cm]{images/cc.png} \\
+\end{table}
+
+\end{titlepage}
+
+\tableofcontents
+%\listoffigures
+%\listoftables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introduction}
+The \textit{Reception And Transmission System}, or RATS for short, is aimed
+at scenarios where data is being received from various sources, processed
+and then transmitted to various destinations again. It simplifies the design
+of flows that handle these kind of scenarios, by providing off-the-shelf
+\textit{receivers} and \textit{transmitters}, e.g., for directory polling
+or FTPing files.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Flow}
+\section{Actors}
+The following standalone actors are available:
+\begin{itemize}
+	\item \textit{RatsSetup} -- This standalone represents a complete setup
+	of receivers and transmitters.
+	\item \textit{RatsReceptions} -- Encapsulates all the separate reception
+	setups.
+	\item \textit{RatsReception} -- Defines a single reception setup.
+	\item \textit{RatsTransmissions} -- Groups the transmission setups.
+	\item \textit{RatsTransmission} -- Defines a single transmission setup.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{bibliography}
+
+\end{document}
