@@ -22,7 +22,7 @@ package adams.flow.webservice;
 import adams.flow.core.AbstractActor;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.CallableActorReference;
-import adams.flow.core.CallabledActorHelper;
+import adams.flow.core.CallableActorHelper;
 import adams.flow.core.InputConsumer;
 import adams.flow.core.OutputProducer;
 import adams.flow.core.Token;
@@ -99,12 +99,12 @@ public abstract class AbstractWebServiceClientTransformerWithCallableTransformer
    */
   @Override
   protected void preQuery() throws Exception {
-    CallabledActorHelper	helper;
+    CallableActorHelper	helper;
     
     super.preQuery();
     
     if (m_ActualTransformer == null) {
-      helper = new CallabledActorHelper();
+      helper = new CallableActorHelper();
       m_ActualTransformer = helper.findCallableActorRecursive(getOwner(), m_Transformer);
       if (m_ActualTransformer == null)
 	throw new IllegalStateException("Failed to locate callable transformer '" + m_Transformer + "'!");

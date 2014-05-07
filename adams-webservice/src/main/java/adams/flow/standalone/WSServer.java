@@ -28,7 +28,7 @@ import adams.core.option.OptionHandler;
 import adams.db.LogEntry;
 import adams.flow.core.AbstractActor;
 import adams.flow.core.CallableActorReference;
-import adams.flow.core.CallabledActorHelper;
+import adams.flow.core.CallableActorHelper;
 import adams.flow.core.Compatibility;
 import adams.flow.core.InputConsumer;
 import adams.flow.core.Token;
@@ -105,7 +105,7 @@ public class WSServer
   protected AbstractActor m_LogActor;
 
   /** the helper class. */
-  protected CallabledActorHelper m_Helper;
+  protected CallableActorHelper m_Helper;
 
   /**
    * Returns a string describing the object.
@@ -140,7 +140,7 @@ public class WSServer
   protected void initialize() {
     super.initialize();
 
-    m_Helper = new CallabledActorHelper();
+    m_Helper = new CallableActorHelper();
   }
 
   /**
