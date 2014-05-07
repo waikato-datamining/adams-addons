@@ -79,6 +79,7 @@ import adams.flow.core.ActorHandlerInfo;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
+@Deprecated
 public class RatsSetup
   extends AbstractStandaloneGroup {
 

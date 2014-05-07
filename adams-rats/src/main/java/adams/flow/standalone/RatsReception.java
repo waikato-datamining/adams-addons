@@ -72,6 +72,7 @@ import adams.flow.standalone.rats.Receiver;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
+@Deprecated
 public class RatsReception
   extends AbstractStandaloneGroupItem {
 

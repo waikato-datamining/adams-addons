@@ -14,7 +14,7 @@
  */
 
 /**
- * RatsTransmissions.java
+ * Rats.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
@@ -28,58 +28,23 @@ import adams.flow.core.ActorHandlerInfo;
 
 /**
  <!-- globalinfo-start -->
- * Encapsulates all transmission setups.
- * <p/>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
  <!-- flow-summary-end -->
  *
  <!-- options-start -->
- * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
- * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
- * &nbsp;&nbsp;&nbsp;default: WARNING
- * </pre>
- * 
- * <pre>-name &lt;java.lang.String&gt; (property: name)
- * &nbsp;&nbsp;&nbsp;The name of the actor.
- * &nbsp;&nbsp;&nbsp;default: RatsTransmissions
- * </pre>
- * 
- * <pre>-annotation &lt;adams.core.base.BaseText&gt; (property: annotations)
- * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
- * &nbsp;&nbsp;&nbsp;default: 
- * </pre>
- * 
- * <pre>-skip &lt;boolean&gt; (property: skip)
- * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
- * &nbsp;&nbsp;&nbsp;as it is.
- * &nbsp;&nbsp;&nbsp;default: false
- * </pre>
- * 
- * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
- * &nbsp;&nbsp;&nbsp; useful for critical actors.
- * &nbsp;&nbsp;&nbsp;default: false
- * </pre>
- * 
- * <pre>-transmission &lt;adams.flow.core.AbstractActor&gt; [-transmission ...] (property: transmissions)
- * &nbsp;&nbsp;&nbsp;The transmission setups.
- * &nbsp;&nbsp;&nbsp;default: 
- * </pre>
- * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-@Deprecated
-public class RatsTransmissions
-  extends AbstractStandaloneMutableGroup<RatsTransmission> {
+public class Rats
+  extends AbstractStandaloneMutableGroup<Rat> {
 
   /** for serialization. */
   private static final long serialVersionUID = -6092821156832607603L;
-
+  
   /**
    * Returns a string describing the object.
    *
@@ -87,7 +52,7 @@ public class RatsTransmissions
    */
   @Override
   public String globalInfo() {
-    return "Encapsulates all transmission setups.";
+    return "Encapsulates all Rat setups.";
   }
 
   /**
@@ -98,7 +63,7 @@ public class RatsTransmissions
     super.defineOptions();
 
     m_OptionManager.add(
-	    "transmission", "transmissions",
+	    "rat", "rats",
 	    new AbstractActor[0]);
   }
 
@@ -108,16 +73,16 @@ public class RatsTransmissions
    * @return		the default actors
    */
   @Override
-  protected List<RatsTransmission> getDefaultActors() {
-    return new ArrayList<RatsTransmission>();
+  protected List<Rat> getDefaultActors() {
+    return new ArrayList<Rat>();
   }
 
   /**
-   * Sets the transmissions to use.
+   * Sets the receptions to use.
    *
-   * @param value	the transmissions
+   * @param value	the receptions
    */
-  public void setTransmissions(AbstractActor[] value) {
+  public void setRats(AbstractActor[] value) {
     int		i;
     String	msg;
     
@@ -131,17 +96,17 @@ public class RatsTransmissions
     
     m_Actors.clear();
     for (AbstractActor actor: value)
-      m_Actors.add((RatsTransmission) actor);
+      m_Actors.add((Rat) actor);
     reset();
     updateParent();
   }
 
   /**
-   * Returns the transmissions to use.
+   * Returns the receptions to use.
    *
-   * @return		the transmissions
+   * @return		the receptions
    */
-  public AbstractActor[] getTransmissions() {
+  public AbstractActor[] getRats() {
     return m_Actors.toArray(new AbstractActor[m_Actors.size()]);
   }
 
@@ -151,8 +116,8 @@ public class RatsTransmissions
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String transmissionsTipText() {
-    return "The transmission setups.";
+  public String ratsTipText() {
+    return "The reception/transmission setups.";
   }
 
   /**
@@ -163,7 +128,7 @@ public class RatsTransmissions
    */
   @Override
   public ActorHandlerInfo getActorHandlerInfo() {
-    return new ActorHandlerInfo(true, false, ActorExecution.UNDEFINED, false, new Class[]{RatsTransmission.class});
+    return new ActorHandlerInfo(true, false, ActorExecution.UNDEFINED, false, new Class[]{Rat.class});
   }
 
   /**
@@ -175,8 +140,8 @@ public class RatsTransmissions
    */
   @Override
   protected String checkActor(AbstractActor actor, int index) {
-    if (!(actor instanceof RatsTransmission))
-      return "Transmission" + (index > -1 ? (" #" + (index+1)) : "") + " is not " + RatsTransmission.class.getName() + ", provided: " + actor.getClass().getName();
+    if (!(actor instanceof Rat))
+      return "Setup" + (index > -1 ? (" #" + (index+1)) : "") + " is not " + Rat.class.getName() + ", provided: " + actor.getClass().getName();
     else
       return null;
   }
@@ -188,24 +153,9 @@ public class RatsTransmissions
    */
   @Override
   public String check() {
-    String	result;
-    int		i;
-    
-    result = null;
-    
-    for (i = 0; i < m_Actors.size(); i++) {
-      if (m_Actors.get(i).getSkip())
-	continue;
-      result = m_Actors.get(i).check();
-      if (result != null) {
-	result = "Transmission #" + (i+1) + ": " + result;
-	break;
-      }
-    }
-    
-    return result;
+    return null;
   }
-
+  
   /**
    * Executes the flow item.
    *
@@ -225,12 +175,12 @@ public class RatsTransmissions
       try {
 	result = m_Actors.get(i).execute();
 	if (result != null) {
-	  result = "Transmission #" + (i+1) + " failed setup: " + result;
+	  result = "Rat #" + (i+1) + " failed: " + result;
 	  break;
 	}
       }
       catch (Exception e) {
-	result = handleException("Failed to execute transmission #" + (i+1), e);
+	result = handleException("Failed to execute Rat #" + (i+1), e);
       }
     }
       

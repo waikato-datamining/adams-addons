@@ -14,3 +14,11 @@ adams.flow.standalone.rats.Receiver=\
 # classes for transmitting data
 adams.flow.standalone.rats.Transmitter=\
   adams.flow.standalone.rats
+
+# input handlers
+adams.flow.standalone.rats.RatInput=\
+  adams.flow.standalone.rats
+  
+# output handlers
+adams.flow.standalone.rats.RatOutput=\
+  adams.flow.standalone.rats
