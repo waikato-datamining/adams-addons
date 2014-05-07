@@ -65,7 +65,7 @@ import adams.core.option.WekaCommandLineHandler;
 import adams.flow.core.AbstractActor;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.CallableActorReference;
-import adams.flow.core.CallabledActorHelper;
+import adams.flow.core.CallableActorHelper;
 import adams.flow.core.Compatibility;
 import adams.flow.core.DatasetHelper;
 import adams.flow.core.InputConsumer;
@@ -416,7 +416,7 @@ public class SimpleWekaService
   @Override
   public TransformResponseObject transform(nz.ac.waikato.adams.webservice.weka.Dataset dataset,java.lang.String actorName) { 
     TransformResponseObject	result;
-    CallabledActorHelper	helper;
+    CallableActorHelper	helper;
     AbstractActor		callable;
     Compatibility		comp;
     weka.core.Instances		data;
@@ -426,7 +426,7 @@ public class SimpleWekaService
     result = new TransformResponseObject();
     
     m_Owner.getLogger().info("transform");
-    helper = new CallabledActorHelper();
+    helper = new CallableActorHelper();
     callable = helper.findCallableActor(m_Owner.getOwner().getRoot(), new CallableActorReference(actorName));
     // not found
     if (callable == null) {

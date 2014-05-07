@@ -26,7 +26,7 @@ import weka.core.setupgenerator.AbstractParameter;
 import adams.core.QuickInfoHelper;
 import adams.core.option.OptionUtils;
 import adams.flow.core.CallableActorReference;
-import adams.flow.core.CallabledActorHelper;
+import adams.flow.core.CallableActorHelper;
 import adams.flow.core.DatasetHelper;
 import adams.flow.core.Token;
 import adams.flow.source.WekaClassifierSetup;
@@ -232,7 +232,7 @@ extends AbstractTransformer {
    * @return Classifier object
    */
   protected weka.classifiers.Classifier getClassifierInstance() {
-    return (weka.classifiers.Classifier) CallabledActorHelper.getSetup(
+    return (weka.classifiers.Classifier) CallableActorHelper.getSetup(
 	weka.classifiers.Classifier.class, m_ClassifierActor, this);
   }
   

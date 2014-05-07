@@ -24,7 +24,7 @@ import weka.core.Instances;
 import adams.core.QuickInfoHelper;
 import adams.core.option.OptionUtils;
 import adams.flow.core.CallableActorReference;
-import adams.flow.core.CallabledActorHelper;
+import adams.flow.core.CallableActorHelper;
 import adams.flow.core.DatasetHelper;
 import adams.flow.core.Token;
 import adams.flow.source.WekaClustererSetup;
@@ -163,7 +163,7 @@ extends AbstractTransformer{
    * @return		clusterer to use 
    */
   protected weka.clusterers.Clusterer getClustererInstance() {
-    return (weka.clusterers.Clusterer) CallabledActorHelper.getSetup(weka.clusterers.Clusterer.class, m_Clusterer, this);
+    return (weka.clusterers.Clusterer) CallableActorHelper.getSetup(weka.clusterers.Clusterer.class, m_Clusterer, this);
   }
 
   /**
