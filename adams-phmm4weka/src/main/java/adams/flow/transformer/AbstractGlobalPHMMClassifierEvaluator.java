@@ -21,7 +21,7 @@ package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
 import adams.flow.core.CallableActorReference;
-import adams.flow.core.CallabledActorHelper;
+import adams.flow.core.CallableActorHelper;
 
 /**
  * Ancestor for classifier evaluators that make use of a callable PHMM classifier.
@@ -93,6 +93,6 @@ public abstract class AbstractGlobalPHMMClassifierEvaluator<T extends weka.class
    * @return		the classifier
    */
   protected T getClassifierInstance() {
-    return (T) CallabledActorHelper.getSetup(null, m_Classifier, this);
+    return (T) CallableActorHelper.getSetup(null, m_Classifier, this);
   }
 }
