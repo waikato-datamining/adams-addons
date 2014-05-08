@@ -74,13 +74,10 @@ or FTPing files.
 \section{Actors}
 The following standalone actors are available:
 \begin{itemize}
-	\item \textit{RatsSetup} -- This standalone represents a complete setup
-	of receivers and transmitters.
-	\item \textit{RatsReceptions} -- Encapsulates all the separate reception
-	setups.
-	\item \textit{RatsReception} -- Defines a single reception setup.
-	\item \textit{RatsTransmissions} -- Groups the transmission setups.
-	\item \textit{RatsTransmission} -- Defines a single transmission setup.
+	\item \textit{Rats} -- This standalone encloses multiple RAT configurations.
+	\item \textit{Rat} -- Definition of how to receive data and how to transmit 
+	it, based on the specified \textit{RatInput} (= receiver) and 
+	\textit{RatOutput} (= transmitter).
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

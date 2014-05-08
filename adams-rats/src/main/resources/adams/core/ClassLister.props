@@ -7,14 +7,6 @@
 # Author:  FracPete (fracpete at waikato dot ac dot nz)
 # Version: $Revision: 7746 $
 
-# classes for receiving data
-adams.flow.standalone.rats.Receiver=\
-  adams.flow.standalone.rats
-
-# classes for transmitting data
-adams.flow.standalone.rats.Transmitter=\
-  adams.flow.standalone.rats
-
 # input handlers
 adams.flow.standalone.rats.RatInput=\
   adams.flow.standalone.rats
