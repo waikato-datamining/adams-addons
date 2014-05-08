@@ -58,7 +58,7 @@ public class InputPolling
 
     m_OptionManager.add(
 	    "wait-poll", "waitPoll",
-	    1000, 1, null);
+	    1000, 0, null);
   }
 
   /**
