@@ -19,10 +19,9 @@
  */
 package adams.flow.standalone.rats;
 
-import java.util.ArrayList;
-
 import adams.core.QuickInfoHelper;
 import adams.flow.control.StorageName;
+import adams.flow.control.StorageQueueHandler;
 import adams.flow.standalone.QueueInit;
 
 /**
@@ -102,8 +101,8 @@ public abstract class AbstractThreadedQueueReceiver
    * @return		the queue, null if not initialized
    * @see		QueueInit
    */
-  protected ArrayList getQueue(StorageName name) {
-    return (ArrayList) getOwner().getStorageHandler().getStorage().get(name);
+  protected StorageQueueHandler getQueue(StorageName name) {
+    return (StorageQueueHandler) getOwner().getStorageHandler().getStorage().get(name);
   }
   
   /**
@@ -112,7 +111,7 @@ public abstract class AbstractThreadedQueueReceiver
    * @return		the queue, null if not initialized
    * @see		QueueInit
    */
-  protected ArrayList getQueue() {
+  protected StorageQueueHandler getQueue() {
     return getQueue(m_StorageName);
   }
 }
