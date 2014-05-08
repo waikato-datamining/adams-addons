@@ -26,7 +26,10 @@ import adams.core.Stoppable;
 import adams.core.logging.LoggingHelper;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.OptionUtils;
+import adams.flow.control.StorageName;
+import adams.flow.control.StorageQueueHandler;
 import adams.flow.core.AbstractActor;
+import adams.flow.standalone.QueueInit;
 
 /**
  * Ancestor for output transmitters.
@@ -214,6 +217,17 @@ public abstract class AbstractRatOutput
 	// ignored
       }
     }
+  }
+  
+  /**
+   * Returns the flow's queue.
+   * 
+   * @param name	the name of the queue
+   * @return		the queue, null if not initialized
+   * @see		QueueInit
+   */
+  protected StorageQueueHandler getQueue(StorageName name) {
+    return (StorageQueueHandler) getOwner().getStorageHandler().getStorage().get(name);
   }
 
   /**

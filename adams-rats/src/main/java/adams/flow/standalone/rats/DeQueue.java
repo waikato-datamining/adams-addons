@@ -156,10 +156,14 @@ public class DeQueue
     StorageQueueHandler	queue;
 
     result = null;
-    queue  = (StorageQueueHandler) getOwner().getStorageHandler().getStorage().get(m_StorageName);
+    queue  = getQueue(m_StorageName);
+    if (queue == null)
+      result = "Queue not available: " + m_StorageName;
 
-    if (queue.size() > 0)
-      m_Output = queue.remove();
+    if (result == null) {
+      if (queue.size() > 0)
+	m_Output = queue.remove();
+    }
 
     return result;
   }

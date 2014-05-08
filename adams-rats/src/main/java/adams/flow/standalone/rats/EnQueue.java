@@ -132,7 +132,16 @@ public class EnQueue
    */
   @Override
   protected String doTransmit() {
-    ((StorageQueueHandler) getOwner().getStorageHandler().getStorage().get(m_StorageName)).add(m_Input);
-    return null;
+    String		result;
+    StorageQueueHandler	queue;
+    
+    result = null;
+    queue  = getQueue(m_StorageName);
+    if (queue == null)
+      result = "Queue not available: " + m_StorageName;
+    else
+      queue.add(m_Input);
+    
+    return result;
   }
 }
