@@ -258,8 +258,7 @@ public class FileLister
   public String getQuickInfo() {
     String	result;
     
-    result  = super.getQuickInfo();
-    result += QuickInfoHelper.toString(this, "source", getSource(), "source: ");
+    result  = QuickInfoHelper.toString(this, "source", getSource(), "source: ");
     result += QuickInfoHelper.toString(this, "regExp", getRegExp(), ", regexp: ");
     
     return result;
