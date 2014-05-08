@@ -19,10 +19,9 @@
  */
 package adams.flow.standalone.rats;
 
-import java.util.ArrayList;
-
 import adams.core.QuickInfoHelper;
 import adams.flow.control.StorageName;
+import adams.flow.control.StorageQueueHandler;
 import adams.flow.control.StorageUpdater;
 import adams.flow.core.Unknown;
 
@@ -153,14 +152,14 @@ public class DeQueue
    */
   @Override
   protected String doReceive() {
-    String	result;
-    ArrayList	queue;
+    String		result;
+    StorageQueueHandler	queue;
 
     result = null;
-    queue  = (ArrayList) getOwner().getStorageHandler().getStorage().get(m_StorageName);
+    queue  = (StorageQueueHandler) getOwner().getStorageHandler().getStorage().get(m_StorageName);
 
     if (queue.size() > 0)
-      m_Output = queue.remove(0);
+      m_Output = queue.remove();
 
     return result;
   }

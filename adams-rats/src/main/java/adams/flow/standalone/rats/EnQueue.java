@@ -19,10 +19,9 @@
  */
 package adams.flow.standalone.rats;
 
-import java.util.ArrayList;
-
 import adams.core.QuickInfoHelper;
 import adams.flow.control.StorageName;
+import adams.flow.control.StorageQueueHandler;
 import adams.flow.control.StorageUpdater;
 import adams.flow.core.Unknown;
 
@@ -133,7 +132,7 @@ public class EnQueue
    */
   @Override
   protected String doTransmit() {
-    ((ArrayList) getOwner().getStorageHandler().getStorage().get(m_StorageName)).add(m_Input);
+    ((StorageQueueHandler) getOwner().getStorageHandler().getStorage().get(m_StorageName)).add(m_Input);
     return null;
   }
 }
