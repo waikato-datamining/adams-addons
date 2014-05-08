@@ -28,6 +28,7 @@ import adams.flow.core.AbstractActor;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
+@Deprecated
 public interface Transmitter
   extends Stoppable {
 
