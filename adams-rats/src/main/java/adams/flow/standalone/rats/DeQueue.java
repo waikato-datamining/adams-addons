@@ -127,12 +127,7 @@ public class DeQueue
    */
   @Override
   public String getQuickInfo() {
-    String	result;
-
-    result  = super.getQuickInfo();
-    result += QuickInfoHelper.toString(this, "storageName", m_StorageName, ", storage: ");
-
-    return result;
+    return QuickInfoHelper.toString(this, "storageName", m_StorageName, ", storage: ");
   }
 
   /**
