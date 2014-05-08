@@ -51,6 +51,9 @@ public class FileLister
   /** the located files. */
   protected List<String> m_Files;
 
+  /** the waiting period in msec after listing the files. */
+  protected int m_WaitList;
+
   /**
    * Returns a string describing the object.
    *
@@ -87,6 +90,10 @@ public class FileLister
     m_OptionManager.add(
 	    "sort-descending", "sortDescending",
 	    false);
+
+    m_OptionManager.add(
+	    "wait-list", "waitList",
+	    0, 0, null);
   }
 
   /**
@@ -248,7 +255,41 @@ public class FileLister
   public String sortDescendingTipText() {
     return "If enabled, the sort direction is descending.";
   }
-  
+
+  /**
+   * Sets the number of milli-seconds to wait after listing the files.
+   *
+   * @param value	the number of milli-seconds
+   */
+  public void setWaitList(int value) {
+    if (value >= 0) {
+      m_WaitList = value;
+      reset();
+    }
+    else {
+      getLogger().warning("Number of milli-seconds to wait must be >=0, provided: " + value);
+    }
+  }
+
+  /**
+   * Returns the number of milli-seconds to wait after listing the files.
+   *
+   * @return		the number of milli-seconds
+   */
+  public int getWaitList() {
+    return m_WaitList;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String waitListTipText() {
+    return "The number of milli-seconds to wait after listing the fails.";
+  }
+
   /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
@@ -260,6 +301,7 @@ public class FileLister
     
     result  = QuickInfoHelper.toString(this, "source", getSource(), "source: ");
     result += QuickInfoHelper.toString(this, "regExp", getRegExp(), ", regexp: ");
+    result += QuickInfoHelper.toString(this, "waitList", getWaitList(), ", wait-list: ");
     
     return result;
   }
@@ -324,6 +366,8 @@ public class FileLister
     
     files = m_Lister.list();
     m_Files.addAll(Arrays.asList(files));
+    
+    doWait(m_WaitList);
     
     return null;
   }
