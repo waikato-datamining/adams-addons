@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2014-05-07 16:01:08
+# Date: 2014-05-09 15:58:00
 # User: fracpete
 #
 adams.flow.control.Flow
@@ -35,6 +35,8 @@ adams.flow.control.Flow
 									nothing1
 							-wait-poll
 							2000
+					-actor
+						adams.flow.transformer.PassThrough
 					-transmitter
 						adams.flow.standalone.rats.FileMover
 							-wait-move
@@ -55,6 +57,10 @@ adams.flow.control.Flow
 									${EXAMPLE_FLOWS}/2_processing
 							-wait-poll
 							2000
+					-actor
+						adams.flow.transformer.PassThrough
+							-skip
+							true
 					-transmitter
 						adams.flow.standalone.rats.OutputWithCallableTransformer
 							-output
