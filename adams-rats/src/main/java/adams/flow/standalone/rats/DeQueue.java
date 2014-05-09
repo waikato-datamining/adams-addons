@@ -27,9 +27,21 @@ import adams.flow.core.Unknown;
 
 /**
  <!-- globalinfo-start -->
+ * Polls the specified queue in internal storage for an item, blocks till an item is available.
+ * <p/>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-storage-name &lt;adams.flow.control.StorageName&gt; (property: storageName)
+ * &nbsp;&nbsp;&nbsp;The name of the queue in the internal storage.
+ * &nbsp;&nbsp;&nbsp;default: queue
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)

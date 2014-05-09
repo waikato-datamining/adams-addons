@@ -35,9 +35,26 @@ import adams.flow.core.Unknown;
 
 /**
  <!-- globalinfo-start -->
+ * Meta-receiver that passes the received data through an external transformer before passing it on.
+ * <p/>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-input &lt;adams.flow.standalone.rats.RatInput&gt; (property: input)
+ * &nbsp;&nbsp;&nbsp;The receiver to wrap.
+ * &nbsp;&nbsp;&nbsp;default: adams.flow.standalone.rats.DummyInput
+ * </pre>
+ * 
+ * <pre>-file &lt;adams.core.io.FlowFile&gt; (property: actorFile)
+ * &nbsp;&nbsp;&nbsp;The file containing the external transformer.
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)

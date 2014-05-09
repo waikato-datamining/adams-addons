@@ -21,9 +21,27 @@ package adams.flow.standalone.rats;
 
 /**
  <!-- globalinfo-start -->
+ * Turns the base-input into one that performs polling every x msec.
+ * <p/>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-input &lt;adams.flow.standalone.rats.RatInput&gt; (property: input)
+ * &nbsp;&nbsp;&nbsp;The receiver to wrap.
+ * &nbsp;&nbsp;&nbsp;default: adams.flow.standalone.rats.DummyInput
+ * </pre>
+ * 
+ * <pre>-wait-poll &lt;int&gt; (property: waitPoll)
+ * &nbsp;&nbsp;&nbsp;The number of milli-seconds to wait before polling again.
+ * &nbsp;&nbsp;&nbsp;default: 1000
+ * &nbsp;&nbsp;&nbsp;minimum: 0
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)

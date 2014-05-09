@@ -31,9 +31,48 @@ import adams.core.io.PlaceholderDirectory;
 
 /**
  <!-- globalinfo-start -->
+ * Polls files in a directory and forwards them.
+ * <p/>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-source &lt;adams.core.io.PlaceholderDirectory&gt; (property: source)
+ * &nbsp;&nbsp;&nbsp;The directory to watch for incoming files.
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
+ * </pre>
+ * 
+ * <pre>-regexp &lt;adams.core.base.BaseRegExp&gt; (property: regExp)
+ * &nbsp;&nbsp;&nbsp;The regular expression that the files must match.
+ * &nbsp;&nbsp;&nbsp;default: .*
+ * </pre>
+ * 
+ * <pre>-max-files &lt;int&gt; (property: maxFiles)
+ * &nbsp;&nbsp;&nbsp;The maximum number of files to list; -1 for unlimited.
+ * &nbsp;&nbsp;&nbsp;default: -1
+ * &nbsp;&nbsp;&nbsp;minimum: -1
+ * </pre>
+ * 
+ * <pre>-sorting &lt;NO_SORTING|SORT_BY_NAME|SORT_BY_LAST_MODIFIED&gt; (property: sorting)
+ * &nbsp;&nbsp;&nbsp;The type of sorting to perform.
+ * &nbsp;&nbsp;&nbsp;default: NO_SORTING
+ * </pre>
+ * 
+ * <pre>-sort-descending &lt;boolean&gt; (property: sortDescending)
+ * &nbsp;&nbsp;&nbsp;If enabled, the sort direction is descending.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-wait-list &lt;int&gt; (property: waitList)
+ * &nbsp;&nbsp;&nbsp;The number of milli-seconds to wait after listing the fails.
+ * &nbsp;&nbsp;&nbsp;default: 0
+ * &nbsp;&nbsp;&nbsp;minimum: 0
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)

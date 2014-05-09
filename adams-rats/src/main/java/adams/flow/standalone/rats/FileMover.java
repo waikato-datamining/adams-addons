@@ -29,9 +29,27 @@ import adams.core.io.PlaceholderFile;
 
 /**
  <!-- globalinfo-start -->
+ * Moves files into the target directory after a specified time period.
+ * <p/>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-wait-move &lt;int&gt; (property: waitMove)
+ * &nbsp;&nbsp;&nbsp;The number of milli-seconds to wait before moving the files.
+ * &nbsp;&nbsp;&nbsp;default: 0
+ * &nbsp;&nbsp;&nbsp;minimum: 0
+ * </pre>
+ * 
+ * <pre>-target &lt;adams.core.io.PlaceholderDirectory&gt; (property: target)
+ * &nbsp;&nbsp;&nbsp;The directory to move the files to.
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)

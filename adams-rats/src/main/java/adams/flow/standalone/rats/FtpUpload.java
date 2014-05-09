@@ -34,9 +34,27 @@ import adams.flow.standalone.FTPConnection;
 
 /**
  <!-- globalinfo-start -->
+ * Sends the incoming files to a FTP server.
+ * <p/>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-wait-ftp &lt;int&gt; (property: waitFTP)
+ * &nbsp;&nbsp;&nbsp;The number of milli-seconds to wait before FTP-ing the files.
+ * &nbsp;&nbsp;&nbsp;default: 0
+ * &nbsp;&nbsp;&nbsp;minimum: 0
+ * </pre>
+ * 
+ * <pre>-remote-dir &lt;java.lang.String&gt; (property: remoteDir)
+ * &nbsp;&nbsp;&nbsp;The FTP directory to upload the file(s) to.
+ * &nbsp;&nbsp;&nbsp;default: &#47;pub
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)

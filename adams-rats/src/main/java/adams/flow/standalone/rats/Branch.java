@@ -24,9 +24,21 @@ import adams.flow.core.Unknown;
 
 /**
  <!-- globalinfo-start -->
+ * Forwards the input data to all defined sub-outputs ('sub-branches').
+ * <p/>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-output &lt;adams.flow.standalone.rats.RatOutput&gt; [-output ...] (property: outputs)
+ * &nbsp;&nbsp;&nbsp;The transmitters to send the data to.
+ * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)

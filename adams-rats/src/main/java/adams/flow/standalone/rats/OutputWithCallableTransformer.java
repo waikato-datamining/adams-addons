@@ -32,9 +32,26 @@ import adams.flow.core.Unknown;
 
 /**
  <!-- globalinfo-start -->
+ * Meta-transmitter that passes the data through the callable transformer before forwarding it to the base-transmitter.
+ * <p/>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-output &lt;adams.flow.standalone.rats.RatOutput&gt; (property: output)
+ * &nbsp;&nbsp;&nbsp;The transmitter to wrap.
+ * &nbsp;&nbsp;&nbsp;default: adams.flow.standalone.rats.DummyOutput
+ * </pre>
+ * 
+ * <pre>-callable &lt;adams.flow.core.CallableActorReference&gt; (property: callableName)
+ * &nbsp;&nbsp;&nbsp;The name of the callable transformer to use.
+ * &nbsp;&nbsp;&nbsp;default: unknown
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)

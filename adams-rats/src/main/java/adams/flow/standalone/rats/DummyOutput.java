@@ -23,9 +23,16 @@ import adams.flow.core.Unknown;
 
 /**
  <!-- globalinfo-start -->
+ * Dummy transmitter, does nothing.
+ * <p/>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -62,6 +69,7 @@ public class DummyOutput
    * 
    * @return		true if input is accepted
    */
+  @Override
   public boolean canInput() {
     return true;
   }

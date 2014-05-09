@@ -27,9 +27,27 @@ import adams.flow.core.Unknown;
 
 /**
  <!-- globalinfo-start -->
+ * Forwards the input data to all defined sub-outputs ('sub-branches').
+ * <p/>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-condition &lt;adams.flow.condition.bool.BooleanCondition&gt; [-condition ...] (property: conditions)
+ * &nbsp;&nbsp;&nbsp;The switch conditions to evaluate - the first condition that evaluates to 
+ * &nbsp;&nbsp;&nbsp;'true' triggers the execution of the corresponding 'case' actor.
+ * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
+ * <pre>-case &lt;adams.flow.standalone.rats.RatOutput&gt; [-case ...] (property: cases)
+ * &nbsp;&nbsp;&nbsp;The transmitters to send the data to.
+ * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -156,7 +174,7 @@ public class Switch
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String outputsTipText() {
+  public String casesTipText() {
     return "The transmitters to send the data to.";
   }
 

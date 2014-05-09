@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import adams.core.QuickInfoHelper;
 import adams.flow.core.AbstractActor;
 import adams.flow.core.ActorUtils;
+import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.CallableActorUser;
-import adams.flow.core.CallableActorHelper;
 import adams.flow.core.InputConsumer;
 import adams.flow.core.OutputProducer;
 import adams.flow.core.Token;
@@ -34,9 +34,26 @@ import adams.flow.core.Unknown;
 
 /**
  <!-- globalinfo-start -->
+ * Meta-receiver that passes the received data through a callable transformer before passing it on.
+ * <p/>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-input &lt;adams.flow.standalone.rats.RatInput&gt; (property: input)
+ * &nbsp;&nbsp;&nbsp;The receiver to wrap.
+ * &nbsp;&nbsp;&nbsp;default: adams.flow.standalone.rats.DummyInput
+ * </pre>
+ * 
+ * <pre>-callable &lt;adams.flow.core.CallableActorReference&gt; (property: callableName)
+ * &nbsp;&nbsp;&nbsp;The name of the callable transformer to use.
+ * &nbsp;&nbsp;&nbsp;default: unknown
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
