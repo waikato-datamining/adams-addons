@@ -19,15 +19,19 @@
  */
 package adams.flow.standalone.rats;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import adams.core.QuickInfoHelper;
+import adams.core.Utils;
 import adams.core.base.BaseRegExp;
 import adams.core.io.DirectoryLister;
 import adams.core.io.DirectoryLister.Sorting;
+import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderDirectory;
+import adams.core.io.PlaceholderFile;
 
 /**
  <!-- globalinfo-start -->
@@ -73,6 +77,17 @@ import adams.core.io.PlaceholderDirectory;
  * &nbsp;&nbsp;&nbsp;minimum: 0
  * </pre>
  * 
+ * <pre>-move-files &lt;boolean&gt; (property: moveFiles)
+ * &nbsp;&nbsp;&nbsp;If enabled, the files get moved to the specified directory first before 
+ * &nbsp;&nbsp;&nbsp;being transmitted (with their new filename).
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-target &lt;adams.core.io.PlaceholderDirectory&gt; (property: target)
+ * &nbsp;&nbsp;&nbsp;The directory to move the files to before transmitting their names.
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -93,6 +108,12 @@ public class FileLister
   /** the waiting period in msec after listing the files. */
   protected int m_WaitList;
 
+  /** whether to move the files before transmitting them. */
+  protected boolean m_MoveFiles;
+  
+  /** the directory to move the files to. */
+  protected PlaceholderDirectory m_Target;
+  
   /**
    * Returns a string describing the object.
    *
@@ -133,6 +154,14 @@ public class FileLister
     m_OptionManager.add(
 	    "wait-list", "waitList",
 	    0, 0, null);
+
+    m_OptionManager.add(
+	    "move-files", "moveFiles",
+	    false);
+
+    m_OptionManager.add(
+	    "target", "target",
+	    new PlaceholderDirectory());
   }
 
   /**
@@ -330,6 +359,68 @@ public class FileLister
   }
 
   /**
+   * Sets whether to move the files to the specified target directory
+   * before transmitting them.
+   *
+   * @param value	true if to move files
+   */
+  public void setMoveFiles(boolean value) {
+    m_MoveFiles = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to move the files to the specified target directory
+   * before transmitting them.
+   *
+   * @return		true if to move files
+   */
+  public boolean getMoveFiles() {
+    return m_MoveFiles;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String moveFilesTipText() {
+    return 
+	"If enabled, the files get moved to the specified directory first "
+	+ "before being transmitted (with their new filename).";
+  }
+
+  /**
+   * Sets the move-to directory.
+   *
+   * @param value	the move-to directory
+   */
+  public void setTarget(PlaceholderDirectory value) {
+    m_Target = value;
+    reset();
+  }
+
+  /**
+   * Returns the move-to directory.
+   *
+   * @return		the move-to directory.
+   */
+  public PlaceholderDirectory getTarget() {
+    return m_Target;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String targetTipText() {
+    return "The directory to move the files to before transmitting their names.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -341,6 +432,8 @@ public class FileLister
     result  = QuickInfoHelper.toString(this, "source", getSource(), "source: ");
     result += QuickInfoHelper.toString(this, "regExp", getRegExp(), ", regexp: ");
     result += QuickInfoHelper.toString(this, "waitList", getWaitList(), ", wait-list: ");
+    result += QuickInfoHelper.toString(this, "moveFiles", (getMoveFiles() ? "move" : "keep"), ", ");
+    result += QuickInfoHelper.toString(this, "target", getTarget(), ", target: ");
     
     return result;
   }
@@ -360,6 +453,13 @@ public class FileLister
       result = "Source directory does not exist: " + getSource();
     if ((result == null) && (!getSource().isDirectory()))
       result ="Source is not a directory: " + getSource();
+    
+    if (m_MoveFiles) {
+      if ((result == null) && (!getTarget().exists()))
+	result = "Target directory does not exist: " + getTarget();
+      if ((result == null) && (!getTarget().isDirectory()))
+	result ="Target is not a directory: " + getTarget();
+    }
     
     return result;
   }
@@ -401,13 +501,36 @@ public class FileLister
    */
   @Override
   protected String doReceive() {
-    String[]	files;
+    String		result;
+    String[]		files;
+    int			i;
+    PlaceholderFile	file;
+    
+    result = null;
     
     files = m_Lister.list();
-    m_Files.addAll(Arrays.asList(files));
-    
     doWait(m_WaitList);
     
-    return null;
+    if (m_MoveFiles) {
+      for (i = 0; i < files.length; i++) {
+	file = new PlaceholderFile(files[i]);
+	try {
+	  if (!FileUtils.move(file, m_Target))
+	    result = "Failed to move '" + file + "' to '" + m_Target + "'!";
+	  else
+	    files[i] = m_Target.getAbsolutePath() + File.separator + file.getName();
+	}
+	catch (Exception e) {
+	  result = "Failed to move '" + file + "' to '" + m_Target + "': " + Utils.throwableToString(e);
+	}
+	if (result != null)
+	  break;
+      }
+    }
+    
+    if (result == null)
+      m_Files.addAll(Arrays.asList(files));
+    
+    return result;
   }
 }
