@@ -20,6 +20,7 @@
 package adams.flow.standalone.rats;
 
 import adams.flow.core.RunnableWithLogging;
+import adams.flow.core.Token;
 import adams.flow.standalone.Rat;
 
 /**
@@ -37,6 +38,9 @@ public class RatRunnable
   /** the owning Rat. */
   protected Rat m_Owner;
   
+  /** whether we have any actors to apply to the data. */
+  protected boolean m_HasActors;
+  
   /**
    * Initializes the runnable.
    * 
@@ -44,7 +48,9 @@ public class RatRunnable
    */
   public RatRunnable(Rat owner) {
     super();
-    m_Owner = owner;
+    
+    m_Owner     = owner;
+    m_HasActors = (owner.getActorHandler().active() > 0);
   }
   
   /**
@@ -89,6 +95,40 @@ public class RatRunnable
       }
     }
   }
+  
+  /**
+   * Transmits the data.
+   * 
+   * @param data 	the data to transmit, ignored if null
+   * @return		null if successful, otherwise error message
+   */
+  protected String transmit(Object data) {
+    String	result;
+    
+    result = null;
+
+    if (data != null) {
+      while (!m_Owner.getTransmitter().canInput() && !m_Stopped)
+	doWait(100);
+
+      if (!m_Stopped) {
+	if (isLoggingEnabled())
+	  getLogger().finer("Inputting to " + m_Owner.getTransmitter().getFullName());
+	m_Owner.getTransmitter().input(data);
+	
+	if (isLoggingEnabled())
+	  getLogger().info("Transmitting to " + m_Owner.getTransmitter().getFullName());
+	result = m_Owner.getTransmitter().transmit();
+	
+	if (result != null)
+	  getLogger().warning("Failed to transmit to " + m_Owner.getTransmitter().getFullName() + ": " + result);
+	else if (isLoggingEnabled())
+	  getLogger().info("Transmitted to " + m_Owner.getTransmitter().getFullName());
+      }
+    }
+    
+    return result;
+  }
 
   /**
    * Performs the actual execution.
@@ -97,6 +137,7 @@ public class RatRunnable
   protected void doRun() {
     String	result;
     Object	data;
+    Token	token;
     
     while (!m_Stopped) {
       data = null;
@@ -111,26 +152,32 @@ public class RatRunnable
 	  getLogger().info("Received from " + m_Owner.getReceiver().getFullName());
 	if (isLoggingEnabled())
 	  getLogger().fine("Pending output from " + m_Owner.getReceiver().getFullName() + ": " + m_Owner.getReceiver().hasPendingOutput());
+
 	while (m_Owner.getReceiver().hasPendingOutput()) {
 	  data = m_Owner.getReceiver().output();
 	  if (isLoggingEnabled())
 	    getLogger().finer("Data: " + data);
-	  if (data != null) {
-	    while (!m_Owner.getTransmitter().canInput() && !m_Stopped) {
-	      doWait(100);
+	  
+	  // actors?
+	  if (m_HasActors) {
+	    if (data != null) {
+	      m_Owner.getActorHandler().input(new Token(data));
+	      result = m_Owner.getActorHandler().execute();
+	      if (result == null) {
+		while (m_Owner.getActorHandler().hasPendingOutput()) {
+		  token  = m_Owner.getActorHandler().output();
+		  result = transmit(token.getPayload());
+		  if (result != null)
+		    break;
+		}
+	      }
+	      else {
+		getLogger().warning("Actors failed to transform data: " + result);
+	      }
 	    }
-	    if (!m_Stopped) {
-	      if (isLoggingEnabled())
-		getLogger().finer("Inputting to " + m_Owner.getTransmitter().getFullName());
-	      m_Owner.getTransmitter().input(data);
-	      if (isLoggingEnabled())
-		getLogger().info("Transmitting to " + m_Owner.getTransmitter().getFullName());
-	      result = m_Owner.getTransmitter().transmit();
-	      if (result != null)
-		getLogger().warning("Failed to transmit to " + m_Owner.getTransmitter().getFullName() + ": " + result);
-	      else if (isLoggingEnabled())
-		getLogger().info("Transmitted to " + m_Owner.getTransmitter().getFullName());
-	    }
+	  }
+	  else {
+	    result = transmit(data);
 	  }
 	}
       }
