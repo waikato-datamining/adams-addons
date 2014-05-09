@@ -479,6 +479,7 @@ public class Rat
   public void stopExecution() {
     if (!m_Stopped) {
       m_Receiver.stopExecution();
+      m_Actors.stopExecution();
       m_Transmitter.stopExecution();
       if (m_Runnable != null) {
 	m_Runnable.stopExecution();

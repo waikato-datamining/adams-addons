@@ -153,7 +153,7 @@ public class RatRunnable
 	if (isLoggingEnabled())
 	  getLogger().fine("Pending output from " + m_Owner.getReceiver().getFullName() + ": " + m_Owner.getReceiver().hasPendingOutput());
 
-	while (m_Owner.getReceiver().hasPendingOutput()) {
+	while (m_Owner.getReceiver().hasPendingOutput() && !m_Stopped) {
 	  data = m_Owner.getReceiver().output();
 	  if (isLoggingEnabled())
 	    getLogger().finer("Data: " + data);
@@ -164,7 +164,7 @@ public class RatRunnable
 	      m_Owner.getActorHandler().input(new Token(data));
 	      result = m_Owner.getActorHandler().execute();
 	      if (result == null) {
-		while (m_Owner.getActorHandler().hasPendingOutput()) {
+		while (m_Owner.getActorHandler().hasPendingOutput() && !m_Stopped) {
 		  token  = m_Owner.getActorHandler().output();
 		  result = transmit(token.getPayload());
 		  if (result != null)
