@@ -15,7 +15,7 @@
 
 /**
  * WebServiceProvider.java
- * Copyright (C) 2012 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
@@ -51,14 +51,21 @@ public interface WebServiceProvider {
   public String getURL();
   
   /**
-   * Starts the server.
+   * Starts the service.
    * 
    * @return 		null if successful, otherwise error message
    */
   public String start();
   
   /**
-   * Stops the server.
+   * Returns whether the service is running.
+   * 
+   * @return		true if running
+   */
+  public boolean isRunning();
+  
+  /**
+   * Stops the service.
    * 
    * @return		null if successful, otherwise error message
    */

@@ -15,7 +15,7 @@
 
 /**
  * AbstractWebServiceProvider.java
- * Copyright (C) 2012-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
@@ -46,6 +46,9 @@ public abstract class AbstractWebServiceProvider
   /** the URL of the webservice. */
   protected String m_URL;
 
+  /** whether the webservice is running. */
+  protected boolean m_Running;
+  
   /**
    * Adds options to the internal list of options.
    */
@@ -147,7 +150,7 @@ public abstract class AbstractWebServiceProvider
   protected abstract void doStart() throws Exception;
   
   /**
-   * Starts the server.
+   * Starts the service.
    * 
    * @return 		null if successful, otherwise error message
    */
@@ -158,7 +161,8 @@ public abstract class AbstractWebServiceProvider
     try {
       check();
       doStart();
-      result = null;
+      result    = null;
+      m_Running = true;
     }
     catch (Exception e) {
       msg = "Failed to start service: ";
@@ -167,6 +171,15 @@ public abstract class AbstractWebServiceProvider
     }
     
     return result;
+  }
+  
+  /**
+   * Returns whether the service is running.
+   * 
+   * @return		true if running
+   */
+  public boolean isRunning() {
+    return m_Running;
   }
 
   /**
@@ -177,7 +190,7 @@ public abstract class AbstractWebServiceProvider
   protected abstract void doStop() throws Exception;
   
   /**
-   * Stops the server.
+   * Stops the service.
    * 
    * @return		null if successful, otherwise error message
    */
@@ -194,6 +207,8 @@ public abstract class AbstractWebServiceProvider
       getLogger().log(Level.SEVERE, msg, e);
       result = msg + Utils.throwableToString(e);
     }
+    
+    m_Running = false;
     
     return result;
   }
