@@ -401,12 +401,8 @@ public class Rat
    */
   @Override
   protected void forceVariables(Variables value) {
-    int		i;
-    
     super.forceVariables(value);
-    
-    for (i = 0; i < size(); i++)
-      get(i).setVariables(value);
+    m_Actors.setVariables(value);
   }
 
   /**
