@@ -22,7 +22,6 @@ package adams.flow.standalone.rats;
 import java.io.File;
 
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
@@ -224,7 +223,7 @@ public class FileMover
 	    result = "";
 	  else
 	    result += "\n";
-	  result += Utils.handleException(this, "Failed to move '" + file + "' to '" + m_Target + "'!", e);
+	  result += handleException("Failed to move '" + file + "' to '" + m_Target + "'!", e);
 	}
       }
     }

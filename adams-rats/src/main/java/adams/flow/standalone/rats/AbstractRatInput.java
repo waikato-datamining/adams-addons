@@ -23,6 +23,7 @@ import adams.core.CleanUpHandler;
 import adams.core.QuickInfoSupporter;
 import adams.core.ShallowCopySupporter;
 import adams.core.Stoppable;
+import adams.core.Utils;
 import adams.core.logging.LoggingHelper;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.OptionUtils;
@@ -112,6 +113,18 @@ public abstract class AbstractRatInput
    */
   public AbstractActor getOwner() {
     return m_Owner;
+  }
+
+  /**
+   * Outputs the stacktrace along with the message on stderr and returns a 
+   * combination of both of them as string.
+   * 
+   * @param msg		the message for the exception
+   * @param t		the exception
+   * @return		the full error message (message + stacktrace)
+   */
+  protected String handleException(String msg, Throwable t) {
+    return Utils.handleException(this, msg, t);
   }
 
   /**

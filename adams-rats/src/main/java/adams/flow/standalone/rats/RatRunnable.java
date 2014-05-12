@@ -157,6 +157,9 @@ public class RatRunnable
 	  data = m_Owner.getReceiver().output();
 	  if (isLoggingEnabled())
 	    getLogger().finer("Data: " + data);
+
+	  if (m_Stopped)
+	    break;
 	  
 	  // actors?
 	  if (m_HasActors) {
@@ -183,8 +186,10 @@ public class RatRunnable
       }
       
       // wait before next poll?
-      if (m_Owner.getReceiver() instanceof PollingRatInput) {
-	doWait(((PollingRatInput) m_Owner.getReceiver()).getWaitPoll());
+      if (!m_Stopped) {
+	if (m_Owner.getReceiver() instanceof PollingRatInput) {
+	  doWait(((PollingRatInput) m_Owner.getReceiver()).getWaitPoll());
+	}
       }
     }
   }

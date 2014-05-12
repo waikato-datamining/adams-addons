@@ -22,7 +22,6 @@ package adams.flow.standalone.rats;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.logging.Level;
 
 import org.apache.commons.net.ftp.FTPClient;
 
@@ -215,13 +214,16 @@ public class FtpUpload
    * Uploads the specified file to the FTP server.
    * 
    * @param filename	the file to upload
+   * @return		null if successful, otherwise error message
    */
-  protected void ftp(String filename) {
+  protected String ftp(String filename) {
+    String		result;
     FTPClient		client;
     File		file;
     String		remotefile;
     BufferedInputStream	stream;
 
+    result     = null;
     file       = new PlaceholderFile(filename);
     remotefile = m_RemoteDir + "/" + file.getName();
     client     = m_Connection.getFTPClient();
@@ -234,7 +236,7 @@ public class FtpUpload
       stream.close();
     }
     catch (Exception e) {
-      getLogger().log(Level.SEVERE, "Failed to ftp '" + file + "' to '" + remotefile + "'!", e);
+      result = handleException("Failed to ftp '" + file + "' to '" + remotefile + "'!", e);
     }
     finally {
       if (stream != null) {
@@ -246,6 +248,7 @@ public class FtpUpload
 	}
       }
     }
+    return result;
   }
 
   /**
@@ -261,8 +264,11 @@ public class FtpUpload
     result = null;
     files  = FileUtils.toStringArray(m_Input);
     doWait(m_WaitFTP);
-    for (String file: files)
-      ftp(file);
+    for (String file: files) {
+      result = ftp(file);
+      if (result != null)
+	break;
+    }
     
     return result;
   }
