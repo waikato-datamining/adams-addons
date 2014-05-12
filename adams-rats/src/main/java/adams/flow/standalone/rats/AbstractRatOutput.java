@@ -296,6 +296,15 @@ public abstract class AbstractRatOutput
   }
 
   /**
+   * Returns whether the transmitter has been stopped.
+   * 
+   * @return		true if stopped
+   */
+  public boolean isStopped() {
+    return m_Stopped;
+  }
+
+  /**
    * Cleans up data structures, frees up memory.
    */
   public void cleanUp() {

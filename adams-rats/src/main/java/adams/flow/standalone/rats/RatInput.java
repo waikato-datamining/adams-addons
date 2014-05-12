@@ -86,4 +86,16 @@ public interface RatInput
    * @return		null if successful, otherwise error message
    */
   public String receive();
+
+  /**
+   * Stops the execution.
+   */
+  public void stopExecution();
+
+  /**
+   * Returns whether the receiver has been stopped.
+   * 
+   * @return		true if stopped
+   */
+  public boolean isStopped();
 }

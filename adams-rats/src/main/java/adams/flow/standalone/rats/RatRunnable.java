@@ -143,6 +143,8 @@ public class RatRunnable
       data = null;
       if (isLoggingEnabled())
 	getLogger().info("Receiving from " + m_Owner.getReceiver().getFullName());
+      if (m_Owner.getReceiver().isStopped())
+	break;
       result = m_Owner.getReceiver().receive();
       if (result != null) {
 	getLogger().warning("Failed to receive from " + m_Owner.getReceiver().getFullName() + ": " + result);

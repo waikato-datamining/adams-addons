@@ -86,4 +86,16 @@ public interface RatOutput
    * @return		null if successful, otherwise error message
    */
   public String transmit();
+
+  /**
+   * Stops the execution.
+   */
+  public void stopExecution();
+
+  /**
+   * Returns whether the transmitter has been stopped.
+   * 
+   * @return		true if stopped
+   */
+  public boolean isStopped();
 }
