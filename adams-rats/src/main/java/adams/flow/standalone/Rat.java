@@ -21,6 +21,7 @@ package adams.flow.standalone;
 
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
+import adams.core.Variables;
 import adams.flow.control.SubProcess;
 import adams.flow.core.AbstractActor;
 import adams.flow.core.Actor;
@@ -390,6 +391,23 @@ public class Rat
   public void removeAll() {
     m_Actors.removeAll();
   }
+  
+  /**
+   * Updates the Variables instance in use.
+   * <p/>
+   * Use with caution!
+   *
+   * @param value	the instance to use
+   */
+  @Override
+  protected void forceVariables(Variables value) {
+    int		i;
+    
+    super.forceVariables(value);
+    
+    for (i = 0; i < size(); i++)
+      get(i).setVariables(value);
+  }
 
   /**
    * Returns the internal actor.
@@ -473,10 +491,9 @@ public class Rat
   }
   
   /**
-   * Stops the execution. No message set.
+   * Stops the execution if necessary.
    */
-  @Override
-  public void stopExecution() {
+  protected void stopIfNecessary() {
     if (!m_Stopped) {
       m_Receiver.stopExecution();
       m_Actors.stopExecution();
@@ -496,6 +513,26 @@ public class Rat
 	m_Runnable = null;
       }
     }
+  }
+  
+  /**
+   * Stops the execution. No message set.
+   */
+  @Override
+  public void stopExecution() {
+    stopIfNecessary();
     super.stopExecution();
+  }
+  
+  /**
+   * Cleans up after the execution has finished. Graphical output is left
+   * untouched.
+   */
+  @Override
+  public void wrapUp() {
+    if (m_Runnable != null)
+      stopIfNecessary();
+    
+    super.wrapUp();
   }
 }
