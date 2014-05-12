@@ -72,7 +72,7 @@ import adams.core.io.PlaceholderFile;
  * </pre>
  * 
  * <pre>-wait-list &lt;int&gt; (property: waitList)
- * &nbsp;&nbsp;&nbsp;The number of milli-seconds to wait after listing the fails.
+ * &nbsp;&nbsp;&nbsp;The number of milli-seconds to wait after listing the files.
  * &nbsp;&nbsp;&nbsp;default: 0
  * &nbsp;&nbsp;&nbsp;minimum: 0
  * </pre>
@@ -355,7 +355,7 @@ public class FileLister
    * 			displaying in the GUI or for listing the options.
    */
   public String waitListTipText() {
-    return "The number of milli-seconds to wait after listing the fails.";
+    return "The number of milli-seconds to wait after listing the files.";
   }
 
   /**
