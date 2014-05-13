@@ -208,6 +208,7 @@ public class FileMover
   protected String doTransmit() {
     String		result;
     PlaceholderFile[]	files;
+    boolean		ok;
     
     result = null;
     files  = FileUtils.toPlaceholderFileArray(m_Input);
@@ -216,7 +217,9 @@ public class FileMover
       doWait(m_WaitMove);
       for (File file: files) {
 	try {
-	  FileUtils.move(file, m_Target);
+	  ok = FileUtils.move(file, m_Target);
+	  if (isLoggingEnabled())
+	    getLogger().fine("Moving " + (ok ? "succeeded" : "failed") + ": " + file + " -> " + m_Target);
 	}
 	catch (Exception e) {
 	  if (result == null)
