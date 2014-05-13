@@ -528,7 +528,17 @@ public class Rat
   public void wrapUp() {
     if (m_Runnable != null)
       stopIfNecessary();
-    
+    m_Actors.wrapUp();
     super.wrapUp();
+  }
+  
+  /**
+   * Cleans up after the execution has finished. Also removes graphical
+   * components.
+   */
+  @Override
+  public void cleanUp() {
+    m_Actors.cleanUp();
+    super.cleanUp();
   }
 }
