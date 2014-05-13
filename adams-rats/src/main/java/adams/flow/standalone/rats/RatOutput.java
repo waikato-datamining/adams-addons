@@ -20,6 +20,8 @@
 package adams.flow.standalone.rats;
 
 import adams.core.Stoppable;
+import adams.event.VariableChangeEvent;
+import adams.event.VariableChangeListener;
 import adams.flow.core.AbstractActor;
 
 /**
@@ -29,7 +31,7 @@ import adams.flow.core.AbstractActor;
  * @version $Revision$
  */
 public interface RatOutput
-  extends Stoppable {
+  extends Stoppable, VariableChangeListener {
 
   /**
    * Returns the full name of the receiver.
@@ -98,4 +100,11 @@ public interface RatOutput
    * @return		true if stopped
    */
   public boolean isStopped();
+
+  /**
+   * Gets triggered when a variable changed (added, modified, removed).
+   *
+   * @param e		the event
+   */
+  public void variableChanged(VariableChangeEvent e);
 }

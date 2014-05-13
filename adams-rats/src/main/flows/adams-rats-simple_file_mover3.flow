@@ -1,0 +1,110 @@
+# Project: adams
+# Date: 2014-05-14 11:57:23
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Simple demonstration that shows how to move files around\nusing the Reception And Transmission System (RATS).\n\nThe first RAT is monitoring the \"1_incoming\" directory and moves\nfiles to \"2_processing\".\nThe second RAT is monitoring the \"2_processing\" directory and \nmoves files to either \"3_outgoing\" or \"4_outgoing\". This managed\nthrough a variable attaced to the \"target\" option, which gets set\nin the sequence of actors.\n\nIn a real-world scenario, \"transmission\" wouldn\'t monitor \"2_processing\", \nbut the actual application processing the files. Instead, it would\nmonitor another directory altogether before moving it to \"3_outgoing\".
+	-actor
+		adams.flow.standalone.Rats
+			-rat
+				adams.flow.standalone.Rat
+					-logging-level
+					FINER
+					-name
+					incoming -> processing
+					-receiver
+						adams.flow.standalone.rats.InputPolling
+							-input
+								adams.flow.standalone.rats.FileLister
+									-source
+									${EXAMPLE_FLOWS}/1_incoming
+									-move-files
+									true
+									-target
+									${EXAMPLE_FLOWS}/2_processing
+							-wait-poll
+							2000
+					-transmitter
+						adams.flow.standalone.rats.DummyOutput
+			-rat
+				adams.flow.standalone.Rat
+					-logging-level
+					FINER
+					-name
+					processing -> outgoing
+					-receiver
+						adams.flow.standalone.rats.InputPolling
+							-input
+								adams.flow.standalone.rats.FileLister
+									-source
+									${EXAMPLE_FLOWS}/2_processing
+									-target
+									${EXAMPLE_FLOWS}/2_processing
+							-wait-poll
+							2000
+					-actor
+						adams.flow.transformer.IncVariable
+							-var-name
+							count
+					-actor
+						adams.flow.control.Tee
+							-tee
+								adams.flow.control.Switch
+									-condition
+										adams.flow.condition.bool.Expression
+											-expression
+											(@{count} % 2 = 1)
+									-case
+										adams.flow.transformer.SetVariable
+											-name
+											different
+											-var-name
+											dir
+											-var-value
+											${EXAMPLE_FLOWS}/4_outgoing
+									-case
+										adams.flow.transformer.SetVariable
+											-name
+											default
+											-var-name
+											dir
+											-var-value
+											${EXAMPLE_FLOWS}/3_outgoing
+					-transmitter
+						adams.flow.standalone.rats.FileMover
+							-wait-move
+							500
+							-target
+							@{dir}
+	-actor
+		adams.flow.standalone.SetVariable
+			-name
+			reset counter
+			-var-name
+			count
+			-var-value
+			0
+	-actor
+		adams.flow.standalone.SetVariable
+			-name
+			initial output dir
+			-var-name
+			dir
+			-var-value
+			${EXAMPLE_FLOWS}/3_outgoing
+	-actor
+		adams.flow.source.Start
+	-actor
+		adams.flow.control.WhileLoop
+			-name
+			keep going
+			-condition
+				adams.flow.condition.bool.True
+			-loop
+				adams.flow.source.Start
+			-loop
+				adams.flow.control.Sleep
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+
