@@ -205,7 +205,7 @@ For convenience, you can simply sub-class the following abstract superclass:
 adams.flow.webservice.AbstractWebServiceProvider
 \end{verbatim}
 If you need to process the query data with a sub-flow, see section 
-\ref{webservice_global_transformer}.
+\ref{webservice_callable_transformer}.
 
 Using the example code generated earlier, we can now implement out server
 component. You only need to specify the default URL that the web-service
@@ -291,7 +291,7 @@ of abstract classes is already available:
 	to the web-service and generates no output\footnote{adams-webservice-client\_as\_sink.flow}.
 \end{tight_itemize}
 If some of the data requires pre- or post-processing with a sub-flow, check
-out section \ref{webservice_global_transformer} for more details on how to do
+out section \ref{webservice_callable_transformer} for more details on how to do
 this.
 
 Using the previous customer service example again, we can now generate a
@@ -369,7 +369,7 @@ public class CustomersByName extends AbstractWebServiceClientTransformer<String,
 }
 
 \subsection{Callable transformer support}
-\label{webservice_global_transformer}
+\label{webservice_callable_transformer}
 In order to utilize the power of the workflow, you can also process data,
 in the server and client alike, using a callable transformer.
 If your component needs to take advantage of such functionality, it needs to
@@ -382,7 +382,7 @@ there are already abstract classes in place:
 	source client that pre-processes the query or post-processes the response.
 	\item \textit{AbstractWebServiceClientTransformerWithCallableTransformer} --
 	a transformer client that post-processes the 
-	response\footnote{adams-webservice-client\_as\_transformer-global\_transformer.flow}.
+	response\footnote{adams-webservice-client\_as\_transformer-callable\_transformer.flow}.
 	\item \textit{AbstractWebServiceClientSinkWithCallableTransformer} -- a
 	sink client that pre-processes the incoming data before querying the service.
 \end{tight_itemize}
@@ -407,7 +407,7 @@ The following transformers are available:
 \begin{tight_itemize}
 	\item \textit{WSTransformer} -- sends the data it receives to a web-service
 	and forwards the data from the response in 
-	turn\footnote{adams-webservice-client\_as\_transformer.flow}\footnote{adams-webservice-client\_as\_transformer-global\_transformer.flow}.
+	turn\footnote{adams-webservice-client\_as\_transformer.flow}\footnote{adams-webservice-client\_as\_transformer-callable\_transformer.flow}.
 \end{tight_itemize}
 The following sinks are available:
 \begin{tight_itemize}
