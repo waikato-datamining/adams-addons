@@ -5,7 +5,7 @@
 
   <parent>
     <groupId>nz.ac.waikato.cms.adams</groupId>
-    <artifactId>adams-incubator-pom</artifactId>
+    <artifactId>adams-addons-pom</artifactId>
     <version>0.4.5-SNAPSHOT</version>
   </parent>
 
