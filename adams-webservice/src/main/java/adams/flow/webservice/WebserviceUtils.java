@@ -15,7 +15,7 @@
 
 /**
  * WebserviceUtils.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
@@ -44,6 +44,9 @@ public class WebserviceUtils {
 
   /** mime type: application/octet-stream. */
   public final static String MIMETYPE_APPLICATION_OCTETSTREAM = "application/octet-stream";
+
+  /** mime type: plain/text. */
+  public final static String MIMETYPE_PLAIN_TEXT = "plain/text";
   
   /**
    * Enables the schema validation.
