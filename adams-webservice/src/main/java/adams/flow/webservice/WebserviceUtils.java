@@ -73,13 +73,15 @@ public class WebserviceUtils {
    * @param servicePort	the service port to set the timeouts for
    * @param connection	the timeout for the connection in msec, 0 is infinite
    * @param receive	the timeout for receiving in msec, 0 is infinite
+   * @param url		the URL of the webservice, null to use default
    * @see		ProxyHelper
    */
-  public static void configureClient(Object servicePort, int connection, int receive) {
+  public static void configureClient(Object servicePort, int connection, int receive, String url) {
     Client 			client;
     HTTPConduit			http;
     HTTPClientPolicy 		clPolicy;
     ProxyAuthorizationPolicy	proxyPolicy;
+    BindingProvider 		bindingProvider;
     
     client   = ClientProxy.getClient(servicePort);
     http     = (HTTPConduit) client.getConduit();
@@ -129,5 +131,10 @@ public class WebserviceUtils {
     http.setClient(clPolicy);
     if (proxyPolicy != null)
       http.setProxyAuthorization(proxyPolicy);	
+
+    if (url != null) {
+      bindingProvider = (BindingProvider) servicePort;
+      bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
+    }
   }
 }

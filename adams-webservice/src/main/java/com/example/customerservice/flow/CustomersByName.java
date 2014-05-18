@@ -15,7 +15,7 @@
 
 /**
  * CustomersByName.java
- * Copyright (C) 2012 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
  */
 package com.example.customerservice.flow;
 
@@ -159,7 +159,7 @@ public class CustomersByName
     m_Customers            = null;
     customerServiceService = new CustomerServiceService(getWsdlLocation());
     customerService        = customerServiceService.getCustomerServicePort();
-    WebserviceUtils.configureClient(customerService, m_ConnectionTimeout, m_ReceiveTimeout);
+    WebserviceUtils.configureClient(customerService, m_ConnectionTimeout, m_ReceiveTimeout, getAlternativeURL());
     m_Customers            = customerService.getCustomersByName(name);
     m_ProvidedCustomerName = null;
   }

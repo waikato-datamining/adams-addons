@@ -15,7 +15,7 @@
 
 /**
  * OptimizeClassifierMultiSearch.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
@@ -133,7 +133,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
     WekaService wekaService;
     wekaServiceService = new WekaServiceService(getWsdlLocation());
     wekaService = wekaServiceService.getWekaServicePort();
-    WebserviceUtils.configureClient(wekaService, m_ConnectionTimeout, m_ReceiveTimeout);
+    WebserviceUtils.configureClient(wekaService, m_ConnectionTimeout, m_ReceiveTimeout, getAlternativeURL());
 
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));

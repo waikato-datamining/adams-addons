@@ -15,12 +15,15 @@
 
 /**
  * AbstractWebServiceClientTransformer.java
- * Copyright (C) 2012-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
 import java.net.URL;
+import java.util.logging.Level;
 
+import adams.core.QuickInfoHelper;
+import adams.core.QuickInfoSupporter;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.AbstractActor;
 
@@ -34,7 +37,7 @@ import adams.flow.core.AbstractActor;
  */
 public abstract class AbstractWebServiceClientTransformer<I, O>
   extends AbstractOptionHandler
-  implements WebServiceClientConsumer<I>, WebServiceClientProducer<O> {
+  implements WebServiceClientConsumer<I>, WebServiceClientProducer<O>, QuickInfoSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = 3420305488797791952L;
@@ -47,6 +50,12 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
   
   /** the receive timeout. */
   protected int m_ReceiveTimeout;
+
+  /** whether to use an alternative URL. */
+  protected boolean m_UseAlternativeURL;
+  
+  /** the URL of the webservice. */
+  protected String m_AlternativeURL;
 
   /**
    * Adds options to the internal list of options.
@@ -62,6 +71,14 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
     m_OptionManager.add(
 	    "receive-timeout", "receiveTimeout",
 	    300000, 0, null);
+
+    m_OptionManager.add(
+	    "use-alternative-url", "useAlternativeURL",
+	    false);
+
+    m_OptionManager.add(
+	    "alternative-url", "alternativeURL",
+	    getDefaultAlternativeURL());
   }
 
   /**
@@ -122,6 +139,95 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
     return "The timeout for receiving in msec, 0 is infinite.";
   }
   
+  /**
+   * Sets whether to use the alternative URL.
+   * 
+   * @param value	whether to use the alternative URL
+   */
+  public void setUseAlternativeURL(boolean value) {
+    m_UseAlternativeURL = value;
+    reset();
+  }
+  
+  /**
+   * Returns whether to use the alternative URL used for the service.
+   * 
+   * @return		true if to use alternative URL
+   */
+  public boolean getUseAlternativeURL() {
+    return m_UseAlternativeURL;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String useAlternativeURLTipText() {
+    return "If enabled, the specified alternative URL is used.";
+  }
+
+  /**
+   * Returns the default URL for the service.
+   * 
+   * @return		the URL
+   */
+  public String getDefaultAlternativeURL() {
+    return "http://localhost:8080/";
+  }
+  
+  /**
+   * Sets the alternative URL to use.
+   * 
+   * @param value	the URL to use
+   */
+  public void setAlternativeURL(String value) {
+    try {
+      new URL(value);
+      m_AlternativeURL = value;
+      reset();
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Invalid URL: " + value, e);
+    }
+  }
+  
+  /**
+   * Returns the alternative URL used for the service.
+   * 
+   * @return		the URL
+   */
+  public String getAlternativeURL() {
+    return m_AlternativeURL;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String alternativeURLTipText() {
+    return "The URL of the service.";
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  public String getQuickInfo() {
+    String	result;
+    
+    result = null;
+    
+    if (m_UseAlternativeURL || QuickInfoHelper.hasVariable(this, "useAlternativeURL"))
+      result = QuickInfoHelper.toString(this, "alternativeURL", m_AlternativeURL);
+    
+    return result;
+  }
+
   /**
    * Sets the actor that executes this webservice.
    * 

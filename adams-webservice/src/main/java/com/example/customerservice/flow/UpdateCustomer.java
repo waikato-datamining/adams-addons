@@ -15,7 +15,7 @@
 
 /**
  * UpdateCustomer.java
- * Copyright (C) 2012 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
  */
 package com.example.customerservice.flow;
 
@@ -156,7 +156,7 @@ public class UpdateCustomer
     customer.setName(name);
     customerServiceService = new CustomerServiceService(getWsdlLocation());
     customerService        = customerServiceService.getCustomerServicePort();
-    WebserviceUtils.configureClient(customerService, m_ConnectionTimeout, m_ReceiveTimeout);
+    WebserviceUtils.configureClient(customerService, m_ConnectionTimeout, m_ReceiveTimeout, getAlternativeURL());
     customerService.updateCustomer(customer);
     m_ProvidedCustomerName = null;
   }
