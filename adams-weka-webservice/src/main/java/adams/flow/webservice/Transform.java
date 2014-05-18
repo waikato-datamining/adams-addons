@@ -133,7 +133,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
     WekaService wekaService;
     wekaServiceService = new WekaServiceService(getWsdlLocation());
     wekaService = wekaServiceService.getWekaServicePort();
-    WebserviceUtils.configureClient(wekaService, m_ConnectionTimeout, m_ReceiveTimeout, getAlternativeURL());
+    WebserviceUtils.configureClient(wekaService, m_ConnectionTimeout, m_ReceiveTimeout, getUseAlternativeURL() ? getAlternativeURL() : null);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
    

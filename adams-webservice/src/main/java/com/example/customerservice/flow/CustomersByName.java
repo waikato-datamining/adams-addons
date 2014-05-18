@@ -159,7 +159,7 @@ public class CustomersByName
     m_Customers            = null;
     customerServiceService = new CustomerServiceService(getWsdlLocation());
     customerService        = customerServiceService.getCustomerServicePort();
-    WebserviceUtils.configureClient(customerService, m_ConnectionTimeout, m_ReceiveTimeout, getAlternativeURL());
+    WebserviceUtils.configureClient(customerService, m_ConnectionTimeout, m_ReceiveTimeout, getUseAlternativeURL() ? getAlternativeURL() : null);
     m_Customers            = customerService.getCustomersByName(name);
     m_ProvidedCustomerName = null;
   }
