@@ -29,7 +29,7 @@ import com.example.customerservice.flow.CustomersByName;
 
 /**
  <!-- globalinfo-start -->
- * Uses a webservice for retrieving spectra. Internally polls whether data has arrived.
+ * Uses a webservice for retrieving data from a webservice. Needs to be wrapped in poller.
  * <p/>
  <!-- globalinfo-end -->
  *
@@ -68,7 +68,7 @@ extends AbstractRatInput {
    */
   @Override
   public String globalInfo() {
-    return "Uses a webservice for retrieving spectra. Internally polls whether data has arrived.";
+    return "Uses a webservice for retrieving data from a webservice. Needs to be wrapped in poller.";
   }
 
   /**
