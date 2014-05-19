@@ -162,6 +162,7 @@ public class WebserviceOutput
     result = null;
     
     try {
+      m_Client.setOwner(getOwner());
       ((WebServiceClientConsumer) m_Client).setRequestData(m_Input);
       m_Client.query();
     }
