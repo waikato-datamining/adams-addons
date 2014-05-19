@@ -19,6 +19,7 @@
  */
 package adams.flow.standalone.rats;
 
+import adams.core.Utils;
 import adams.flow.core.RunnableWithLogging;
 import adams.flow.core.Token;
 import adams.flow.standalone.Rat;
@@ -145,9 +146,16 @@ public class RatRunnable
 	getLogger().info("Receiving from " + m_Owner.getReceiver().getFullName());
       if (m_Owner.getReceiver().isStopped())
 	break;
-      result = m_Owner.getReceiver().receive();
+      
+      try {
+	result = m_Owner.getReceiver().receive();
+      }
+      catch (Exception e) {
+	result = Utils.throwableToString(e);
+      }
+      
       if (result != null) {
-	getLogger().warning("Failed to receive from " + m_Owner.getReceiver().getFullName() + ": " + result);
+	getOwner().log("Failed to receive from " + m_Owner.getReceiver().getFullName() + ": " + result, "receive");
       }
       else {
 	if (isLoggingEnabled())
@@ -155,35 +163,45 @@ public class RatRunnable
 	if (isLoggingEnabled())
 	  getLogger().fine("Pending output from " + m_Owner.getReceiver().getFullName() + ": " + m_Owner.getReceiver().hasPendingOutput());
 
-	while (m_Owner.getReceiver().hasPendingOutput() && !m_Stopped) {
-	  data = m_Owner.getReceiver().output();
-	  if (isLoggingEnabled())
-	    getLogger().finer("Data: " + data);
+	try {
+	  while (m_Owner.getReceiver().hasPendingOutput() && !m_Stopped) {
+	    data = m_Owner.getReceiver().output();
+	    if (isLoggingEnabled())
+	      getLogger().finer("Data: " + data);
 
-	  if (m_Stopped)
-	    break;
-	  
-	  // actors?
-	  if (m_HasActors) {
-	    if (data != null) {
-	      m_Owner.getActorHandler().input(new Token(data));
-	      result = m_Owner.getActorHandler().execute();
-	      if (result == null) {
-		while (m_Owner.getActorHandler().hasPendingOutput() && !m_Stopped) {
-		  token  = m_Owner.getActorHandler().output();
-		  result = transmit(token.getPayload());
-		  if (result != null)
-		    break;
+	    if (m_Stopped)
+	      break;
+
+	    // actors?
+	    if (m_HasActors) {
+	      if (data != null) {
+		m_Owner.getActorHandler().input(new Token(data));
+		result = m_Owner.getActorHandler().execute();
+		if (result == null) {
+		  while (m_Owner.getActorHandler().hasPendingOutput() && !m_Stopped) {
+		    token  = m_Owner.getActorHandler().output();
+		    result = transmit(token.getPayload());
+		    if (result != null)
+		      break;
+		  }
 		}
 	      }
-	      else {
-		getLogger().warning("Actors failed to transform data: " + result);
-	      }
+	    }
+	    else {
+	      result = transmit(data);
 	    }
 	  }
-	  else {
-	    result = transmit(data);
-	  }
+	}
+	catch (Exception e) {
+	  result = Utils.throwableToString(e);
+	}
+
+	// log error
+	if (result != null) {
+	  if (m_HasActors)
+	    getOwner().log("Actors failed to transform/transmit data: " + result, "transform/transmit");
+	  else
+	    getOwner().log("Failed to transmit data: " + result, "transmit");
 	}
       }
       

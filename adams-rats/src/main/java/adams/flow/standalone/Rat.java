@@ -19,16 +19,25 @@
  */
 package adams.flow.standalone;
 
+import java.util.HashSet;
+
+import adams.core.Properties;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.Variables;
+import adams.db.LogEntry;
 import adams.flow.control.SubProcess;
 import adams.flow.core.AbstractActor;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorHandlerInfo;
+import adams.flow.core.CallableActorHelper;
+import adams.flow.core.CallableActorReference;
+import adams.flow.core.CallableActorUser;
 import adams.flow.core.Compatibility;
+import adams.flow.core.InputConsumer;
 import adams.flow.core.InternalActorHandler;
 import adams.flow.core.MutableActorHandler;
+import adams.flow.core.Token;
 import adams.flow.standalone.rats.DummyInput;
 import adams.flow.standalone.rats.DummyOutput;
 import adams.flow.standalone.rats.RatInput;
@@ -88,6 +97,12 @@ import adams.flow.standalone.rats.RatRunnable;
  * &nbsp;&nbsp;&nbsp;default: adams.flow.standalone.rats.DummyOutput
  * </pre>
  * 
+ * <pre>-log &lt;adams.flow.core.CallableActorReference&gt; (property: log)
+ * &nbsp;&nbsp;&nbsp;The name of the callable log actor to use (logging disabled if actor not 
+ * &nbsp;&nbsp;&nbsp;found).
+ * &nbsp;&nbsp;&nbsp;default: unknown
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -95,7 +110,7 @@ import adams.flow.standalone.rats.RatRunnable;
  */
 public class Rat
   extends AbstractStandaloneGroupItem
-  implements MutableActorHandler, InternalActorHandler {
+  implements MutableActorHandler, InternalActorHandler, CallableActorUser {
 
   /** for serialization. */
   private static final long serialVersionUID = -154461277343021604L;
@@ -108,7 +123,16 @@ public class Rat
   
   /** the transmitter to use. */
   protected RatOutput m_Transmitter;
-  
+
+  /** the callable name. */
+  protected CallableActorReference m_Log;
+
+  /** the callable log actor. */
+  protected AbstractActor m_LogActor;
+
+  /** the helper class. */
+  protected CallableActorHelper m_Helper;
+
   /** the runnable doing the work. */
   protected RatRunnable m_Runnable;
   
@@ -140,6 +164,10 @@ public class Rat
     m_OptionManager.add(
 	    "transmitter", "transmitter",
 	    new DummyOutput());
+
+    m_OptionManager.add(
+	    "log", "log",
+	    new CallableActorReference("unknown"));
   }
 
   /**
@@ -151,6 +179,7 @@ public class Rat
     
     m_Actors = new SubProcess();
     m_Actors.setAllowEmpty(true);
+    m_Helper = new CallableActorHelper();
   }
   
   /**
@@ -254,6 +283,35 @@ public class Rat
   }
 
   /**
+   * Sets the name of the callable log actor to use.
+   *
+   * @param value 	the callable name
+   */
+  public void setLog(CallableActorReference value) {
+    m_Log = value;
+    reset();
+  }
+
+  /**
+   * Returns the name of the callable log actor in use.
+   *
+   * @return 		the callable name
+   */
+  public CallableActorReference getLog() {
+    return m_Log;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String logTipText() {
+    return "The name of the callable log actor to use (logging disabled if actor not found).";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -264,6 +322,7 @@ public class Rat
     
     result  = QuickInfoHelper.toString(this, "receiver", m_Receiver, "receiver: ");
     result += QuickInfoHelper.toString(this, "transmitter", m_Transmitter, ", transmitter: ");
+    result += QuickInfoHelper.toString(this, "log", m_Log, ", log: ");
     
     return result;
   }
@@ -413,7 +472,80 @@ public class Rat
   public Actor getInternalActor() {
     return m_Actors;
   }
+
+  /**
+   * Tries to find the callable actor referenced by its callable name.
+   *
+   * @return		the callable actor or null if not found
+   */
+  protected AbstractActor findCallableActor() {
+    return m_Helper.findCallableActorRecursive(this, getLog());
+  }
+
+  /**
+   * Checks whether a reference to the callable actor is currently available.
+   *
+   * @return		true if a reference is available
+   * @see		#getCallableActor()
+   */
+  public boolean hasCallableActor() {
+    return (m_LogActor != null);
+  }
+
+  /**
+   * Returns the currently set callable actor.
+   *
+   * @return		the actor, can be null
+   */
+  public AbstractActor getCallableActor() {
+    return m_LogActor;
+  }
   
+  /**
+   * Logs an error message if a valid callable log actor has been set up.
+   * 
+   * @param msg		the message to log
+   * @param id		an optional ID of the data token that failed in the web service
+   */
+  public void log(String msg, String id) {
+    LogEntry		log;
+    Properties		props;
+    String		result;
+
+    if ((id != null) && (id.trim().length() == 0))
+      id = null;
+    
+    // just log to console if not log actor
+    if (m_LogActor == null) {
+      getLogger().severe("LOG: " + ((id == null) ? "" : (id + " - ")) + msg);
+      return;
+    }
+    
+    // generate log container
+    props = new Properties();
+    props.setProperty(LogEntry.KEY_ERRORS, msg);
+    if (id != null)
+      props.setProperty(LogEntry.KEY_ID, id);
+
+    log = new LogEntry();
+    log.setType("Rat");
+    log.setSource(getFullName());
+    log.setStatus(LogEntry.STATUS_NEW);
+    log.setMessage(props);
+    
+    try {
+      synchronized(m_LogActor) {
+	((InputConsumer) m_LogActor).input(new Token(log));
+	result = m_LogActor.execute();
+      }
+      if (result != null)
+	getLogger().severe("Failed to log message:\n" + log + "\n" + result);
+    }
+    catch (Exception e) {
+      handleException("Failed to log message:\n" + log, e);
+    }
+  }
+
   /**
    * Initializes the item for flow execution.
    *
@@ -423,6 +555,8 @@ public class Rat
   public String setUp() {
     String		result;
     Compatibility	comp;
+    String		msg;
+    HashSet<String>	variables;
     
     result = super.setUp();
 
@@ -460,6 +594,25 @@ public class Rat
 	result = m_Transmitter.setUp();
     }
     
+    if (result == null) {
+      m_LogActor = findCallableActor();
+      if (m_LogActor == null) {
+        msg = "Couldn't find callable log actor '" + getLog() + "' - logging disabled!";
+        getLogger().severe(msg);
+      }
+      else {
+	comp = new Compatibility();
+	if (!comp.isCompatible(new Class[]{LogEntry.class}, ((InputConsumer) m_LogActor).accepts()))
+	  result = "Log actor '" + getLog() + "' must accept " + LogEntry.class.getName() + "!";
+	if (result == null) {
+	  variables = findVariables(m_LogActor);
+	  m_DetectedVariables.addAll(variables);
+	  if (m_DetectedVariables.size() > 0)
+	    getVariables().addVariableChangeListener(this);
+	}
+      }
+    }
+
     return result;
   }
 
@@ -528,7 +681,15 @@ public class Rat
   public void wrapUp() {
     if (m_Runnable != null)
       stopIfNecessary();
+    
     m_Actors.wrapUp();
+
+    if (m_LogActor != null) {
+      synchronized(m_LogActor) {
+	m_LogActor.wrapUp();
+      }
+    }
+    
     super.wrapUp();
   }
   
@@ -539,6 +700,12 @@ public class Rat
   @Override
   public void cleanUp() {
     m_Actors.cleanUp();
+
+    if (m_LogActor != null) {
+      m_LogActor.cleanUp();
+      m_LogActor = null;
+    }
+    
     super.cleanUp();
   }
 }
