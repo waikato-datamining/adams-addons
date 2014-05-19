@@ -27,8 +27,9 @@ import adams.core.QuickInfoHelper;
 import adams.core.option.OptionHandler;
 import adams.db.LogEntry;
 import adams.flow.core.AbstractActor;
-import adams.flow.core.CallableActorReference;
 import adams.flow.core.CallableActorHelper;
+import adams.flow.core.CallableActorReference;
+import adams.flow.core.CallableActorUser;
 import adams.flow.core.Compatibility;
 import adams.flow.core.InputConsumer;
 import adams.flow.core.Token;
@@ -90,7 +91,8 @@ import com.example.customerservice.flow.CustomerServiceWS;
  * @version $Revision$
  */
 public class WSServer
-  extends AbstractStandalone {
+  extends AbstractStandalone
+  implements CallableActorUser {
 
   /** for serialization. */
   private static final long serialVersionUID = 7347507489169005088L;
