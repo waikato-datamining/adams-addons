@@ -25,8 +25,10 @@ import adams.core.Properties;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.Variables;
+import adams.core.base.BaseRegExp;
 import adams.db.LogEntry;
-import adams.flow.control.SubProcess;
+import adams.flow.control.LocalScopeTransformer;
+import adams.flow.control.ScopeHandler.ScopeHandling;
 import adams.flow.core.AbstractActor;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorHandlerInfo;
@@ -103,6 +105,43 @@ import adams.flow.standalone.rats.RatRunnable;
  * &nbsp;&nbsp;&nbsp;default: unknown
  * </pre>
  * 
+ * <pre>-scope-handling-variables &lt;EMPTY|COPY|SHARE&gt; (property: scopeHandlingVariables)
+ * &nbsp;&nbsp;&nbsp;Defines how variables are handled in the local scope; whether to start with 
+ * &nbsp;&nbsp;&nbsp;empty set, a copy of the outer scope variables or share variables with the 
+ * &nbsp;&nbsp;&nbsp;outer scope.
+ * &nbsp;&nbsp;&nbsp;default: EMPTY
+ * </pre>
+ * 
+ * <pre>-propagate-variables &lt;boolean&gt; (property: propagateVariables)
+ * &nbsp;&nbsp;&nbsp;If enabled, variables that match the specified regular expression get propagated 
+ * &nbsp;&nbsp;&nbsp;to the outer scope.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-variables-regexp &lt;adams.core.base.BaseRegExp&gt; (property: variablesRegExp)
+ * &nbsp;&nbsp;&nbsp;The regular expression that variable names must match in order to get propagated.
+ * &nbsp;&nbsp;&nbsp;default: .*
+ * </pre>
+ * 
+ * <pre>-scope-handling-storage &lt;EMPTY|COPY|SHARE&gt; (property: scopeHandlingStorage)
+ * &nbsp;&nbsp;&nbsp;Defines how storage is handled in the local scope; whether to start with 
+ * &nbsp;&nbsp;&nbsp;empty set, a (deep) copy of the outer scope storage or share the storage 
+ * &nbsp;&nbsp;&nbsp;with the outer scope.
+ * &nbsp;&nbsp;&nbsp;default: EMPTY
+ * </pre>
+ * 
+ * <pre>-propagate-storage &lt;boolean&gt; (property: propagateStorage)
+ * &nbsp;&nbsp;&nbsp;If enabled, storage items which names match the specified regular expression 
+ * &nbsp;&nbsp;&nbsp;get propagated to the outer scope.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-storage-regexp &lt;adams.core.base.BaseRegExp&gt; (property: storageRegExp)
+ * &nbsp;&nbsp;&nbsp;The regular expression that the names of storage items must match in order 
+ * &nbsp;&nbsp;&nbsp;to get propagated.
+ * &nbsp;&nbsp;&nbsp;default: .*
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -119,7 +158,7 @@ public class Rat
   protected RatInput m_Receiver;
   
   /** the actors for transforming the data. */
-  protected SubProcess m_Actors;
+  protected LocalScopeTransformer m_Actors;
   
   /** the transmitter to use. */
   protected RatOutput m_Transmitter;
@@ -168,6 +207,30 @@ public class Rat
     m_OptionManager.add(
 	    "log", "log",
 	    new CallableActorReference("unknown"));
+
+    m_OptionManager.add(
+	    "scope-handling-variables", "scopeHandlingVariables",
+	    ScopeHandling.EMPTY);
+
+    m_OptionManager.add(
+	    "propagate-variables", "propagateVariables",
+	    false);
+
+    m_OptionManager.add(
+	    "variables-regexp", "variablesRegExp",
+	    new BaseRegExp(BaseRegExp.MATCH_ALL));
+
+    m_OptionManager.add(
+	    "scope-handling-storage", "scopeHandlingStorage",
+	    ScopeHandling.EMPTY);
+
+    m_OptionManager.add(
+	    "propagate-storage", "propagateStorage",
+	    false);
+
+    m_OptionManager.add(
+	    "storage-regexp", "storageRegExp",
+	    new BaseRegExp(BaseRegExp.MATCH_ALL));
   }
 
   /**
@@ -177,8 +240,7 @@ public class Rat
   protected void initialize() {
     super.initialize();
     
-    m_Actors = new SubProcess();
-    m_Actors.setAllowEmpty(true);
+    m_Actors = new LocalScopeTransformer();
     m_Helper = new CallableActorHelper();
   }
   
@@ -217,7 +279,7 @@ public class Rat
    * 
    * @return		the handler
    */
-  public SubProcess getActorHandler() {
+  public LocalScopeTransformer getActorHandler() {
     return m_Actors;
   }
   
@@ -312,18 +374,208 @@ public class Rat
   }
 
   /**
+   * Sets how to handle variables into the local scope.
+   * 
+   * @param value	the scope handling
+   */
+  public void setScopeHandlingVariables(ScopeHandling value) {
+    m_Actors.setScopeHandlingVariables(value);
+    reset();
+  }
+  
+  /**
+   * Returns how variables are handled in the local scope.
+   * 
+   * @return		the scope handling
+   */
+  public ScopeHandling getScopeHandlingVariables() {
+    return m_Actors.getScopeHandlingVariables();
+  }
+  
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String scopeHandlingVariablesTipText() {
+    return m_Actors.scopeHandlingVariablesTipText(); 
+  }
+
+  /**
+   * Sets whether to propagate variables from the local to the outer scope.
+   * 
+   * @param value	if true then variables get propagated
+   */
+  public void setPropagateVariables(boolean value) {
+    m_Actors.setPropagateVariables(value);
+    reset();
+  }
+  
+  /**
+   * Returns whether to propagate variables from the local to the outer scope.
+   * 
+   * @return		true if variables get propagated
+   */
+  public boolean getPropagateVariables() {
+    return m_Actors.getPropagateVariables();
+  }
+  
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String propagateVariablesTipText() {
+    return "If enabled, variables that match the specified regular expression get propagated to the outer scope.";
+  }
+
+  /**
+   * Sets the regular expression that variable names must match to get
+   * propagated.
+   * 
+   * @param value	the expression
+   */
+  public void setVariablesRegExp(BaseRegExp value) {
+    m_Actors.setVariablesRegExp(value);
+    reset();
+  }
+  
+  /**
+   * Returns the regular expression that variable names must match to get
+   * propagated.
+   * 
+   * @return		the expression
+   */
+  public BaseRegExp getVariablesRegExp() {
+    return m_Actors.getVariablesRegExp();
+  }
+  
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String variablesRegExpTipText() {
+    return "The regular expression that variable names must match in order to get propagated.";
+  }
+
+  /**
+   * Sets how to handle storage in the local scope.
+   * 
+   * @param value	the scope handling
+   */
+  public void setScopeHandlingStorage(ScopeHandling value) {
+    m_Actors.setScopeHandlingStorage(value);
+    reset();
+  }
+  
+  /**
+   * Returns how storage is handled in the local scope.
+   * 
+   * @return		the scope handling
+   */
+  public ScopeHandling getScopeHandlingStorage() {
+    return m_Actors.getScopeHandlingStorage();
+  }
+  
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String scopeHandlingStorageTipText() {
+    return m_Actors.scopeHandlingStorageTipText();
+  }
+
+  /**
+   * Sets whether to propagate storage items from the local to the outer scope.
+   * 
+   * @param value	if true then storage items get propagated
+   */
+  public void setPropagateStorage(boolean value) {
+    m_Actors.setPropagateStorage(value);
+    reset();
+  }
+  
+  /**
+   * Returns whether to propagate storage items from the local to the outer scope.
+   * 
+   * @return		true if storage items get propagated
+   */
+  public boolean getPropagateStorage() {
+    return m_Actors.getPropagateStorage();
+  }
+  
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String propagateStorageTipText() {
+    return "If enabled, storage items which names match the specified regular expression get propagated to the outer scope.";
+  }
+
+  /**
+   * Sets the regular expression that storage item names must match to get
+   * propagated.
+   * 
+   * @param value	the expression
+   */
+  public void setStorageRegExp(BaseRegExp value) {
+    m_Actors.setStorageRegExp(value);
+    reset();
+  }
+  
+  /**
+   * Returns the regular expression that storage item names must match to get
+   * propagated.
+   * 
+   * @return		the expression
+   */
+  public BaseRegExp getStorageRegExp() {
+    return m_Actors.getStorageRegExp();
+  }
+  
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String storageRegExpTipText() {
+    return "The regular expression that the names of storage items must match in order to get propagated.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
    */
   @Override
   public String getQuickInfo() {
-    String	result;
+    String		result;
     
     result  = QuickInfoHelper.toString(this, "receiver", m_Receiver, "receiver: ");
     result += QuickInfoHelper.toString(this, "transmitter", m_Transmitter, ", transmitter: ");
     result += QuickInfoHelper.toString(this, "log", m_Log, ", log: ");
     
+    result += ", variables [";
+    result += QuickInfoHelper.toString(this, "scopeHandlingVariables", getScopeHandlingVariables(), "scope: ");
+    result += QuickInfoHelper.toString(this, "propagateVariables", (getPropagateVariables() ? "propagate" : "no propagation"), ", ");
+    result += QuickInfoHelper.toString(this, "variablesRegExp", getVariablesRegExp(), ", regexp: ");
+    result += "]";
+    
+    result += ", storage [";
+    result += QuickInfoHelper.toString(this, "scopeHandlingStorage", getScopeHandlingStorage(), "scope: ");
+    result += QuickInfoHelper.toString(this, "propagateStorage", (getPropagateStorage() ? "propagate" : "no propagation"), ", ");
+    result += QuickInfoHelper.toString(this, "storageRegExp", getStorageRegExp(), ", regexp: ");
+    result += "]";
+
     return result;
   }
 
