@@ -66,7 +66,8 @@ import adams.gui.sendto.SendToActionSupporter;
 import adams.gui.sendto.SendToActionUtils;
 import adams.gui.visualization.container.FilterDialog;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
-import adams.gui.visualization.image.plugins.AbstractImageFilter;
+import adams.gui.visualization.image.plugins.AbstractCurrentImageFilter;
+import adams.gui.visualization.image.plugins.AbstractSelectedImagesFilter;
 import adams.gui.visualization.image.plugins.ImageJTransformer;
 import adams.gui.visualization.image.plugins.ImageMagick;
 import adams.gui.visualization.image.plugins.JAITransformer;
@@ -927,7 +928,24 @@ public class HeatmapViewerPanel
    * @param panel	the panel's image to process
    * @param filter	the image filter to apply
    */
-  protected void applyImageFilter(HeatmapPanel panel, AbstractImageFilter filter) {
+  protected void applyImageFilter(HeatmapPanel panel, AbstractSelectedImagesFilter filter) {
+    String	result;
+    double	scale;
+
+    scale  = panel.getImagePanel().getScale();
+    result = filter.execute(panel.getImagePanel());
+    panel.getImagePanel().setScale(scale);
+    if (result != null)
+      GUIHelper.showErrorMessage(this, "Failed to filter heatmap image:\n" + result);
+  }
+
+  /**
+   * Applies the image filter to the heatmap image.
+   *
+   * @param panel	the panel's image to process
+   * @param filter	the image filter to apply
+   */
+  protected void applyImageFilter(HeatmapPanel panel, AbstractCurrentImageFilter filter) {
     String	result;
     double	scale;
 
