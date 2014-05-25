@@ -14,3 +14,15 @@ adams.flow.standalone.rats.RatInput=\
 # output handlers
 adams.flow.standalone.rats.RatOutput=\
   adams.flow.standalone.rats
+
+# the servers
+adams.flow.webservice.WebServiceProvider=\
+  adams.flow.webservice.text
+
+# the clients
+adams.flow.webservice.WebServiceClient=\
+  adams.flow.webservice.text
+  
+# the text webservice implementations
+nz.ac.waikato.adams.webservice.rats.text.RatsTextService=\
+  adams.flow.webservice.text
