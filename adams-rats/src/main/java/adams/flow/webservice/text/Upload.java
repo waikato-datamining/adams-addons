@@ -47,6 +47,9 @@ public class Upload
   /** input container */
   protected TextContainer m_ContainerIn;
 
+  /** the format. */
+  protected String m_Format;
+  
   /**
    * Returns a string describing the object.
    *
@@ -55,6 +58,47 @@ public class Upload
   @Override
   public String globalInfo() {
     return "Stores a TextContainer using the RATS text webservice.";
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+	    "format", "format",
+	    WebserviceUtils.MIMETYPE_PLAIN_TEXT);
+  }
+  
+  /**
+   * Sets the text format.
+   *
+   * @param value	the format
+   */
+  public void setFormat(String value) {
+    m_Format = value;
+    reset();
+  }
+
+  /**
+   * Returns the text format.
+   *
+   * @return		the format
+   */
+  public String getFormat() {
+    return m_Format;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String formatTipText() {
+    return "The text format type.";
   }
 
   /**
@@ -104,7 +148,7 @@ public class Upload
    
     UploadRequest request = new UploadRequest();
     request.setId(m_ContainerIn.getID());
-    request.setFormat("txt");  // TODO parameter?
+    request.setFormat(m_Format);
     request.setText(RatsTextHelper.containerToWebservice(m_ContainerIn));
     UploadResponse response = ratsService.upload(request);
     
