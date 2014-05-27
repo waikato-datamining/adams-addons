@@ -1,0 +1,101 @@
+# Project: adams
+# Date: 2014-05-27 15:26:44
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Trains a MEKA classifier and then uses the model\nto generate predictions on a dataset.
+	-actor
+		adams.flow.standalone.CallableActors
+			-actor
+				adams.flow.source.MekaClassifierSetup
+					-name
+					setup
+					-stop-flow-on-error
+					true
+					-classifier
+						meka.classifiers.multilabel.BR
+							-W
+							weka.classifiers.trees.J48
+							--
+							-C
+							0.25
+							-M
+							2
+			-actor
+				adams.flow.source.StorageValue
+					-name
+					model
+					-storage-name
+					model
+	-actor
+		adams.flow.source.Start
+	-actor
+		adams.flow.control.Trigger
+			-name
+			train classifier
+			-tee
+				adams.flow.source.FileSupplier
+					-file
+					${EXAMPLE_FLOWS}/data/Music.arff
+			-tee
+				adams.flow.transformer.WekaFileReader
+					-loader
+						weka.core.converters.ArffLoader
+			-tee
+				adams.flow.transformer.MekaPrepareData
+			-tee
+				adams.flow.transformer.MekaTrainClassifier
+					-classifier
+					setup
+			-tee
+				adams.flow.control.ContainerValuePicker
+					-value
+					Model
+					-switch-outputs
+					true
+			-tee
+				adams.flow.transformer.SetStorageValue
+					-storage-name
+					model
+	-actor
+		adams.flow.control.Trigger
+			-name
+			perform classification
+			-tee
+				adams.flow.source.FileSupplier
+					-file
+					${EXAMPLE_FLOWS}/data/Music.arff
+			-tee
+				adams.flow.transformer.WekaFileReader
+					-loader
+						weka.core.converters.ArffLoader
+			-tee
+				adams.flow.transformer.MekaPrepareData
+			-tee
+				adams.flow.transformer.WekaInstanceBuffer
+					-operation
+					INSTANCES_TO_INSTANCE
+			-tee
+				adams.flow.transformer.MekaClassifying
+					-model-actor
+					model
+					-on-the-fly
+					true
+			-tee
+				adams.flow.control.ContainerValuePicker
+					-value
+					Distribution
+					-switch-outputs
+					true
+			-tee
+				adams.flow.transformer.Convert
+					-conversion
+						adams.data.conversion.AnyToString
+			-tee
+				adams.flow.sink.Display
+					-writer
+						adams.data.io.output.NullWriter
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

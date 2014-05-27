@@ -1,0 +1,45 @@
+--> dumpfile.txt
+     Classifier_name : meka.classifiers.multilabel.BR
+      Classifier_ops : [-W, weka.classifiers.rules.ZeroR]
+     Classifier_info : 
+        Dataset_name : Music
+                Type : ML
+           Threshold : 0.30788804071246817
+           Verbosity : 3
+
+                   L : 6    
+            Accuracy : 0.228
+       Hamming score : 0.571
+         Exact match : 0.025
+        Jaccard dist : 0.772
+        Hamming loss : 0.429
+        ZeroOne loss : 0.975
+      Harmonic score : 0.356
+           One error : 0.607
+           Rank loss : 0.452
+       Avg precision : 0.524
+          Log Loss D : 0.613
+          Log Loss L : 0.613
+             F-micro : 0.328
+           F-macro_D : 0.307
+           F-macro_L : 0.157
+             N_empty : 0    
+         Accuracy[0] : 0.682
+         Harmonic[0] : 0    
+         Accuracy[1] : 0.726
+         Harmonic[1] : 0    
+         Accuracy[2] : 0.393
+         Harmonic[2] : 0    
+         Accuracy[3] : 0.756
+         Harmonic[3] : 0    
+         Accuracy[4] : 0.234
+         Harmonic[4] : 0    
+         Accuracy[5] : 0.637
+         Harmonic[5] : 0    
+          LCard_pred : 2    
+
+             N_train : 391
+              N_test : 201
+         LCard_train : 1.893
+          LCard_test : 1.826
+

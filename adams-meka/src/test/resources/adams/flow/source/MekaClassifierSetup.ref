@@ -1,0 +1,3 @@
+--> dumpfile.txt
+meka.classifiers.multilabel.BR -W weka.classifiers.rules.ZeroR
+
