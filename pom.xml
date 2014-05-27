@@ -32,6 +32,7 @@
     <module>adams-addons-all</module>
     <!-- individual modules -->
     <module>adams-heatmap</module>
+    <module>adams-meka</module>
     <module>adams-phmm4weka</module>
     <module>adams-rats</module>
     <module>adams-webservice</module>
