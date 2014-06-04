@@ -14,6 +14,9 @@
 adams-meka.MekaClassifierSetup=\
   IF PARENT IS adams.flow.standalone.CallableActors THEN adams.flow.source.MekaClassifierSetup
 
+adams-meka.MekaClassSelector1=\
+  IF AFTER adams.flow.transformer.WekaFileReader THEN adams.flow.transformer.MekaClassSelector
+
 adams-meka.MekaCrossValidationEvaluator1=\
   IF AFTER adams.flow.transformer.MekaPrepareData THEN adams.flow.transformer.MekaCrossValidationEvaluator
 

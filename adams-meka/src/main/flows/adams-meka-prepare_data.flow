@@ -1,0 +1,26 @@
+# Project: adams
+# Date: 2014-06-04 15:19:52
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Shows how to select the first 6 attributes\nfrom the uninitialized \"Music\" dataset as\nclass attributes.
+	-actor
+		adams.flow.source.FileSupplier
+			-file
+			${EXAMPLE_FLOWS}/data/Music_uninitialized.arff
+	-actor
+		adams.flow.transformer.WekaFileReader
+			-loader
+				weka.core.converters.ArffLoader
+	-actor
+		adams.flow.transformer.MekaClassSelector
+			-range
+			1-6
+	-actor
+		adams.flow.sink.WekaInstancesDisplay
+			-writer
+				adams.gui.print.NullWriter
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+
