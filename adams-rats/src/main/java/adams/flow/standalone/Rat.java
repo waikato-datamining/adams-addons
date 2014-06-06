@@ -894,7 +894,7 @@ public class Rat
   /**
    * Stops the execution if necessary.
    */
-  protected void stopIfNecessary() {
+  protected synchronized void stopIfNecessary() {
     if (!m_Stopped) {
       m_Receiver.stopExecution();
       m_Actors.stopExecution();
