@@ -242,6 +242,7 @@ public class Rat
     super.initialize();
     
     m_Actors = new LocalScopeTransformer();
+    m_Actors.setParent(this);
     m_Helper = new CallableActorHelper();
   }
   
