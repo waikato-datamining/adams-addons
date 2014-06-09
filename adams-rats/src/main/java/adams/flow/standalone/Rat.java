@@ -19,6 +19,7 @@
  */
 package adams.flow.standalone;
 
+import java.util.Date;
 import java.util.HashSet;
 
 import adams.core.Properties;
@@ -588,6 +589,36 @@ public class Rat
   @Override
   public ActorHandlerInfo getActorHandlerInfo() {
     return m_Actors.getActorHandlerInfo();
+  }
+
+  /**
+   * Handles the given error message with the flow that this actor belongs to,
+   * if the flow has error logging turned on. Might stop the flow as well.
+   *
+   * @param source	the source of the error
+   * @param type	the type of error
+   * @param msg		the error message to log
+   * @return		always null
+   */
+  @Override
+  public String handleError(AbstractActor source, String type, String msg) {
+    LogEntry		entry;
+    Properties		props;
+    
+    if (m_LogActor != null) {
+      props   = new Properties();
+      props.setProperty("Message", msg);
+      entry = new LogEntry();
+      entry.setGeneration(new Date());
+      entry.setSource(getFullName());
+      entry.setType(type);
+      entry.setStatus(LogEntry.STATUS_NEW);
+      entry.setMessage(props);
+      ((InputConsumer) m_LogActor).input(new Token(entry));
+      m_LogActor.execute();
+    }
+    
+    return null;
   }
 
   /**
