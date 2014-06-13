@@ -22,6 +22,8 @@ package adams.flow.webservice;
 import java.net.URL;
 import java.util.logging.Level;
 
+import org.apache.cxf.jaxws.EndpointImpl;
+
 import adams.core.Utils;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.AbstractActor;
@@ -142,6 +144,25 @@ public abstract class AbstractWebServiceProvider
       ((WSServer) m_Owner).log(msg, id);
   }
 
+  /**
+   * Configures the logging for the endpoint (incoming and outgoing).
+   * 
+   * @param endpoint	the endpoint to configure
+   */
+  protected void configureLogging(EndpointImpl endpoint) {
+    BaseLoggingInInterceptor 	logIn;
+    BaseLoggingOutInterceptor 	logOut;
+
+    if (isLoggingEnabled()) {
+      logIn = new BaseLoggingInInterceptor();
+      logIn.setLoggingLevel(getLoggingLevel());
+      logOut = new BaseLoggingOutInterceptor();
+      logOut.setLoggingLevel(getLoggingLevel());
+      endpoint.getServer().getEndpoint().getInInterceptors().add(logIn);
+      endpoint.getServer().getEndpoint().getOutInterceptors().add(logOut);
+    }
+  }
+  
   /**
    * Performs the actual start of the service.
    * 

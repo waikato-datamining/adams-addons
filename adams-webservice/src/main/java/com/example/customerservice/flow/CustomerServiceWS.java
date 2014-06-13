@@ -15,14 +15,12 @@
 
 /**
  * CustomerServiceWS.java
- * Copyright (C) 2012-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
  */
 package com.example.customerservice.flow;
 
 import javax.xml.ws.Endpoint;
 
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 
 import adams.core.License;
@@ -60,7 +58,9 @@ public class CustomerServiceWS
    */
   @Override
   public String globalInfo() {
-    return "Provides a customer service webservice.";
+    return 
+	"Provides a customer service webservice.\n"
+	+ "Enable logging to see inbound/outgoing messages.";
   }
 
   /**
@@ -85,11 +85,7 @@ public class CustomerServiceWS
     implementor = new CustomerServiceImpl(this);
     m_Endpoint  = (EndpointImpl) Endpoint.publish(getURL(), implementor);
 
-    // Adding logging for incoming and outgoing messages
-    if (isLoggingEnabled()) {
-      m_Endpoint.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-      m_Endpoint.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
-    }
+    configureLogging(m_Endpoint);
   }
 
   /**
