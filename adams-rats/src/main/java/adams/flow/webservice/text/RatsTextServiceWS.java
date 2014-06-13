@@ -24,8 +24,6 @@ import javax.xml.ws.Endpoint;
 
 import nz.ac.waikato.adams.webservice.rats.text.RatsTextService;
 
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 
 import adams.core.Utils;
@@ -69,7 +67,7 @@ public class RatsTextServiceWS
 	+ "- get spectrum\n"
 	+ "- put spectrum\n"
 	+ "- transform spectrum\n"
-	+ "";
+	+ "Enable logging to see inbound/outgoing messages.";
   }
 
   /**
@@ -159,12 +157,8 @@ public class RatsTextServiceWS
 
     javax.xml.ws.soap.SOAPBinding binding = (javax.xml.ws.soap.SOAPBinding) m_Endpoint.getBinding();
     binding.setMTOMEnabled(true);
-    	
-    // Adding logging for incoming and outgoing messages
-    if (isLoggingEnabled()) {
-      m_Endpoint.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-      m_Endpoint.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
-    }
+
+    configureLogging(m_Endpoint);
   }
 
   /**
