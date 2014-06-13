@@ -15,7 +15,7 @@
 
 /*
  * WekaServiceWS.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.webservice;
@@ -24,8 +24,6 @@ import javax.xml.ws.Endpoint;
 
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 
 import adams.core.Utils;
@@ -70,7 +68,7 @@ public class WekaServiceWS
 	+ "- making predictions (classifiers/clusterers)\n"
 	+ "- list classifiers (classifiers/clusterers)\n"
 	+ "- transform data\n"
-	+ "";
+	+ "Enable logging to see inbound/outgoing messages.";
   }
 
   /**
@@ -213,12 +211,8 @@ public class WekaServiceWS
 
     javax.xml.ws.soap.SOAPBinding binding = (javax.xml.ws.soap.SOAPBinding) m_Endpoint.getBinding();
     binding.setMTOMEnabled(true);
-    	
-    // Adding logging for incoming and outgoing messages
-    if (isLoggingEnabled()) {
-      m_Endpoint.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-      m_Endpoint.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
-    }
+
+    configureLogging(m_Endpoint);
   }
 
   /**
