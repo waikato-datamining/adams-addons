@@ -59,8 +59,17 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Introduction}
-The \textit{adams-meka} module integrates the MEKA \cite{meka} multi-label
-and multi-target software suite in ADAMS.
+The \textit{adams-meka} module integrates the MEKA \cite{meka} software suite 
+in ADAMS.
+
+\noindent From the MEKA homepage:
+\begin{quote}
+``The MEKA project provides an open source implementation of methods for 
+multi-label classification and evaluation. It is based on the WEKA Machine 
+Learning Toolkit. Several benchmark methods are also included, as well as the 
+pruned sets and classifier chains methods, other methods from the scientific 
+literature, and a wrapper to the MULAN framework.''
+\end{quote}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
@@ -85,6 +94,37 @@ The following transformers are available:
 	\item \textit{MekaTrainTestSetEvaluator} -- evaluates a MEKA classifier
 	on the incoming train/test split.
 \end{tight_itemize}
+
+\newpage
+Figures \ref{crossvalidate-flow} and \ref{crossvalidate-output} show a flow
+and its associated output of cross-validating a MEKA classifier.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=10.0cm]{images/crossvalidate-flow.png}
+  \caption{Flow for cross-validating a MEKA classifier.}
+  \label{crossvalidate-flow}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=8.0cm]{images/crossvalidate-output.png}
+  \caption{The result of a cross-validated MEKA classifier.}
+  \label{crossvalidate-output}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Tools}
+The \textit{MEKA Explorer} can be launched from the main menu. It is located
+in the \textit{Machine learning} section.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=10.0cm]{images/explorer.png}
+  \caption{MEKA Explorer}
+  \label{explorer}
+\end{figure}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
