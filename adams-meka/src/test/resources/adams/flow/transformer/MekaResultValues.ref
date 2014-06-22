@@ -1,0 +1,13 @@
+--> dumpfile.csv
+Key,Value
+Classifier_name,meka.classifiers.multilabel.BR
+Classifier_ops,"[-W, weka.classifiers.trees.J48, --, -C, 0.25, -M, 2]"
+Dataset_name,Music
+Type,CV
+Threshold,0.111111111111
+Accuracy,"0.428 +/- 0.06 "
+"Hamming score","0.716 +/- 0.055"
+"Exact match","0.138 +/- 0.06 "
+"Jaccard dist","0.572 +/- 0.06 "
+
+

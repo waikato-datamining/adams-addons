@@ -1,0 +1,59 @@
+# Project: adams
+# Date: 2014-06-23 10:11:38
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Demonstrates how to load and prepare data for \na MEKA classifier that then gets cross-validated.\nOnly the user-specified info values get turned \ninto a spreadsheet and displayed.
+	-actor
+		adams.flow.standalone.CallableActors
+			-actor
+				adams.flow.source.MekaClassifierSetup
+					-classifier
+						meka.classifiers.multilabel.BR
+							-W
+							weka.classifiers.trees.J48
+							--
+							-C
+							0.25
+							-M
+							2
+	-actor
+		adams.flow.source.FileSupplier
+			-file
+			${EXAMPLE_FLOWS}/data/Music.arff
+	-actor
+		adams.flow.transformer.WekaFileReader
+			-loader
+				weka.core.converters.ArffLoader
+	-actor
+		adams.flow.transformer.MekaPrepareData
+	-actor
+		adams.flow.transformer.MekaCrossValidationEvaluator
+	-actor
+		adams.flow.transformer.MekaResultValues
+			-info-value
+			Classifier_name
+			-info-value
+			Classifier_ops
+			-info-value
+			Dataset_name
+			-info-value
+			Type
+			-info-value
+			Threshold
+			-info-value
+			Accuracy
+			-info-value
+			Hamming score
+			-info-value
+			Exact match
+			-info-value
+			Jaccard dist
+	-actor
+		adams.flow.sink.SpreadSheetDisplay
+			-writer
+				adams.data.io.output.NullWriter
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

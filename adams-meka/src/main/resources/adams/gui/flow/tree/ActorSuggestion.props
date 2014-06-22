@@ -29,6 +29,12 @@ adams-meka.MekaEvaluationSummary1=\
 adams-meka.MekaEvaluationSummary2=\
   IF AFTER adams.flow.transformer.MekaTrainTestSetEvaluator THEN adams.flow.transformer.MekaResultSummary
 
+adams-meka.MekaEvaluationValues1=\
+  IF AFTER adams.flow.transformer.MekaCrossValidationEvaluator THEN adams.flow.transformer.MekaResultValues
+
+adams-meka.MekaEvaluationValues2=\
+  IF AFTER adams.flow.transformer.MekaTrainTestSetEvaluator THEN adams.flow.transformer.MekaResultValues
+
 adams-meka.MekaTrainTestSetEvaluator1=\
   IF AFTER adams.flow.transformer.WekaCrossValidationSplit THEN adams.flow.transformer.MekaTrainTestSetEvaluator
 
@@ -37,6 +43,9 @@ adams-meka.MekaTrainTestSetEvaluator2=\
 
 adams-meka.Display1=\
   IF AFTER adams.flow.transformer.MekaResultSummary THEN adams.flow.sink.Display
+
+adams-meka.SpreadSheetDisplay1=\
+  IF AFTER adams.flow.transformer.MekaResultValues THEN adams.flow.sink.SpreadSheetDisplay
 
 adams-meka.WekaModelWriter1=\
   IF AFTER adams.flow.transformer.MekaTrainClassifier THEN adams.flow.sink.WekaModelWriter
