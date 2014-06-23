@@ -28,7 +28,7 @@
   </scm>
 
   <properties>
-    <adams.version>0.4.6</adams.version>
+    <adams.version>0.4.7-SNAPSHOT</adams.version>
   </properties>
 
   <modules>
