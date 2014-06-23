@@ -6,7 +6,7 @@
   <parent>
     <groupId>nz.ac.waikato.cms.adams</groupId>
     <artifactId>adams-pom</artifactId>
-    <version>0.4.6</version>
+    <version>0.4.6-SNAPSHOT</version>
   </parent>
 
   <artifactId>adams-addons-pom</artifactId>
@@ -26,6 +26,10 @@
     <developerConnection>scm:svn:https://svn.cms.waikato.ac.nz/svn/adams/addons/trunk</developerConnection>
     <url>https://svn.cms.waikato.ac.nz/svn/adams/addons/trunk</url>
   </scm>
+
+  <properties>
+    <adams.version>0.4.6</adams.version>
+  </properties>
 
   <modules>
     <!-- all modules -->
