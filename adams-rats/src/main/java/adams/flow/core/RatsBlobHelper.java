@@ -14,57 +14,57 @@
  */
 
 /**
- * RatsTextHelper.java
+ * RatsBlobHelper.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.core;
 
-import java.io.StringWriter;
+import gnu.trove.list.array.TByteArrayList;
+
+import java.io.InputStream;
 
 import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
 
-import org.apache.commons.io.IOUtils;
-
 import adams.core.Utils;
+import adams.data.blob.BlobContainer;
 import adams.data.report.AbstractField;
 import adams.data.report.Field;
-import adams.data.text.TextContainer;
 import adams.flow.webservice.WebserviceUtils;
 
 /**
- * Helper class for converting text.
+ * Helper class for converting blobs.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2085 $
  */
-public class RatsTextHelper {
+public class RatsBlobHelper {
 
   /**
-   * Converts a {@link TextContainer} into a Webservice Text objecct.
+   * Converts a {@link BlobContainer} into a Webservice Blob objecct.
    * 
-   * @param input	the {@link TextContainer}
-   * @return		the Webservice Text object
+   * @param input	the {@link BlobContainer}
+   * @return		the Webservice Blob object
    */
-  public static nz.ac.waikato.adams.webservice.rats.text.Text containerToWebservice(TextContainer input) {
-    nz.ac.waikato.adams.webservice.rats.text.Text	result;
-    nz.ac.waikato.adams.webservice.rats.text.Properties	props;
-    nz.ac.waikato.adams.webservice.rats.text.Property	prop;
+  public static nz.ac.waikato.adams.webservice.rats.blob.Blob containerToWebservice(BlobContainer input) {
+    nz.ac.waikato.adams.webservice.rats.blob.Blob	result;
+    nz.ac.waikato.adams.webservice.rats.blob.Properties	props;
+    nz.ac.waikato.adams.webservice.rats.blob.Property	prop;
     adams.data.report.Report				report;
     
-    result = new nz.ac.waikato.adams.webservice.rats.text.Text();
+    result = new nz.ac.waikato.adams.webservice.rats.blob.Blob();
     
-    // text
-    result.setData(new DataHandler(new ByteArrayDataSource(input.getContent().getBytes(), WebserviceUtils.MIMETYPE_APPLICATION_OCTETSTREAM)));
+    // blob
+    result.setData(new DataHandler(new ByteArrayDataSource(input.getContent(), WebserviceUtils.MIMETYPE_APPLICATION_OCTETSTREAM)));
     
     // report
-    props = new nz.ac.waikato.adams.webservice.rats.text.Properties();
+    props = new nz.ac.waikato.adams.webservice.rats.blob.Properties();
     if (input.hasReport()) {
       report = input.getReport();
       for (AbstractField field: report.getFields()) {
-	prop = new nz.ac.waikato.adams.webservice.rats.text.Property();
+	prop = new nz.ac.waikato.adams.webservice.rats.blob.Property();
 	prop.setKey(field.getName());
-	prop.setType(nz.ac.waikato.adams.webservice.rats.text.DataType.valueOf(field.getDataType().toRaw()));
+	prop.setType(nz.ac.waikato.adams.webservice.rats.blob.DataType.valueOf(field.getDataType().toRaw()));
 	prop.setValue("" + report.getValue(field));
 	props.getProp().add(prop);
       }
@@ -76,32 +76,36 @@ public class RatsTextHelper {
   }
 
   /**
-   * Converts a Webservice Text object into a {@link TextContainer}.
+   * Converts a Webservice Blob object into a {@link BlobContainer}.
    * 
-   * @param input	the Text object
-   * @return		the {@link TextContainer}
+   * @param input	the Blob object
+   * @return		the {@link BlobContainer}
    */
-  public static TextContainer webserviceToContainer(nz.ac.waikato.adams.webservice.rats.text.Text input) {
-    TextContainer		result;
+  public static BlobContainer webserviceToContainer(nz.ac.waikato.adams.webservice.rats.blob.Blob input) {
+    BlobContainer		result;
     adams.data.report.Report	report;
     Field			field;
-    StringWriter 		writer;
+    TByteArrayList		bytes;
+    InputStream			in;
+    int				read;
     
-    result = new TextContainer();
+    result = new BlobContainer();
     
-    // text
-    writer = new StringWriter();
+    // blob
+    bytes = new TByteArrayList();
     try {
-      IOUtils.copy(input.getData().getInputStream(), writer);
-      result.setContent(writer.toString());
+      in = input.getData().getInputStream();
+      while ((read = in.read()) != -1)
+	bytes.add((byte) read);
+      result.setContent(bytes.toArray());
     }
     catch (Exception e) {
-      result.getNotes().addError(RatsTextHelper.class, Utils.throwableToString(e));
+      result.getNotes().addError(RatsBlobHelper.class, Utils.throwableToString(e));
     }
     
     // report
     report = new adams.data.report.Report();
-    for (nz.ac.waikato.adams.webservice.rats.text.Property prop: input.getProps().getProp()) {
+    for (nz.ac.waikato.adams.webservice.rats.blob.Property prop: input.getProps().getProp()) {
       field = new Field(prop.getKey(), adams.data.report.DataType.valueOf(prop.getType().toString()));
       report.addField(field);
       report.setValue(

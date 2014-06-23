@@ -14,15 +14,15 @@
  */
 
 /*
- * RatsTextServiceWS.java
+ * RatsBlobServiceWS.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
 
-package adams.flow.webservice.text;
+package adams.flow.webservice.blob;
 
 import javax.xml.ws.Endpoint;
 
-import nz.ac.waikato.adams.webservice.rats.text.RatsTextService;
+import nz.ac.waikato.adams.webservice.rats.blob.RatsBlobService;
 
 import org.apache.cxf.jaxws.EndpointImpl;
 
@@ -34,12 +34,12 @@ import adams.flow.standalone.rats.RatInputUser;
 import adams.flow.webservice.AbstractWebServiceProvider;
 
 /**
- * Webservice for RATS Text.
+ * Webservice for RATS Blob.
  * 
  * @author Fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2085 $
  */
-public class RatsTextServiceWS
+public class RatsBlobServiceWS
   extends AbstractWebServiceProvider
   implements RatInputUser {
 
@@ -50,7 +50,7 @@ public class RatsTextServiceWS
   protected transient EndpointImpl m_Endpoint;
   
   /** the webservice implementation to use. */
-  protected RatsTextService m_Implementation;
+  protected RatsBlobService m_Implementation;
   
   /** the associated rat input. */
   protected RatInput m_RatInput;
@@ -63,10 +63,8 @@ public class RatsTextServiceWS
   @Override
   public String globalInfo() {
     return 
-	"Provides a KNIR web service with the following services available:\n"
-	+ "- get spectrum\n"
-	+ "- put spectrum\n"
-	+ "- transform spectrum\n"
+	"Provides a blob web service with the following services available:\n"
+	+ "- upload blob\n"
 	+ "Enable logging to see inbound/outgoing messages.";
   }
 
@@ -79,7 +77,7 @@ public class RatsTextServiceWS
     
     m_OptionManager.add(
 	"implementation", "implementation", 
-	new SimpleRatsTextService());
+	new SimpleRatsBlobService());
   }
 
   /**
@@ -89,7 +87,7 @@ public class RatsTextServiceWS
    */
   @Override
   public String getDefaultURL() {
-    return "http://localhost:9090/RatsTextServicePort";
+    return "http://localhost:9090/RatsBlobServicePort";
   }
   
   /**
@@ -115,7 +113,7 @@ public class RatsTextServiceWS
    * 
    * @param value	the implementation
    */
-  public void setImplementation(RatsTextService value) {
+  public void setImplementation(RatsBlobService value) {
     m_Implementation = value;
     reset();
   }
@@ -125,7 +123,7 @@ public class RatsTextServiceWS
    * 
    * @return 		the implementation
    */
-  public RatsTextService getImplementation() {
+  public RatsBlobService getImplementation() {
     return m_Implementation;
   }
 
@@ -145,14 +143,14 @@ public class RatsTextServiceWS
    */
   @Override
   protected void doStart() throws Exception {
-    RatsTextService implementer;
+    RatsBlobService implementer;
 
     if (m_Implementation instanceof OptionHandler)
-      implementer = (RatsTextService) OptionUtils.shallowCopy((OptionHandler) m_Implementation, false);
+      implementer = (RatsBlobService) OptionUtils.shallowCopy((OptionHandler) m_Implementation, false);
     else
-      implementer = (RatsTextService) Utils.deepCopy(m_Implementation);
-    if (implementer instanceof OwnedByRatsTextServiceWS)
-      ((OwnedByRatsTextServiceWS) implementer).setOwner(this);
+      implementer = (RatsBlobService) Utils.deepCopy(m_Implementation);
+    if (implementer instanceof OwnedByRatsBlobServiceWS)
+      ((OwnedByRatsBlobServiceWS) implementer).setOwner(this);
     m_Endpoint  = (EndpointImpl) Endpoint.publish(getURL(), implementer);
 
     javax.xml.ws.soap.SOAPBinding binding = (javax.xml.ws.soap.SOAPBinding) m_Endpoint.getBinding();

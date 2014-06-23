@@ -189,6 +189,22 @@
               <goal>wsdl2java</goal>
             </goals>
           </execution>
+          <execution>
+            <id>generate-sources-rats-blob</id>
+            <phase>generate-sources</phase>
+            <configuration>
+              <wsdlOptions>
+                  <wsdlOption>
+                  <wsdl>src/main/resources/wsdl/adams/RatsBlobService.wsdl</wsdl>
+                  <wsdlLocation>classpath:wsdl/adams/RatsBlobService.wsdl</wsdlLocation>
+                  <frontEnd>jaxws21</frontEnd>
+                </wsdlOption>
+              </wsdlOptions>
+            </configuration>
+            <goals>
+              <goal>wsdl2java</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
     </plugins>

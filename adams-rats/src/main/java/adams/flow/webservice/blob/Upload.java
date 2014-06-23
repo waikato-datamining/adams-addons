@@ -17,35 +17,35 @@
  * Upload.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.text;
+package adams.flow.webservice.blob;
 
 import java.net.URL;
 
 import javax.xml.ws.BindingProvider;
 
-import nz.ac.waikato.adams.webservice.rats.text.RatsTextService;
-import nz.ac.waikato.adams.webservice.rats.text.RatsTextServiceService;
-import nz.ac.waikato.adams.webservice.rats.text.UploadRequest;
-import nz.ac.waikato.adams.webservice.rats.text.UploadResponse;
-import adams.data.text.TextContainer;
-import adams.flow.core.RatsTextHelper;
+import nz.ac.waikato.adams.webservice.rats.blob.RatsBlobService;
+import nz.ac.waikato.adams.webservice.rats.blob.RatsBlobServiceService;
+import nz.ac.waikato.adams.webservice.rats.blob.UploadRequest;
+import nz.ac.waikato.adams.webservice.rats.blob.UploadResponse;
+import adams.data.blob.BlobContainer;
+import adams.flow.core.RatsBlobHelper;
 import adams.flow.webservice.AbstractWebServiceClientSink;
 import adams.flow.webservice.WebserviceUtils;
 
 /**
- * Uploads a TextContainer.
+ * Uploads a BlobContainer.
  * 
  * @author FracPete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2085 $
  */
 public class Upload 
-  extends AbstractWebServiceClientSink<TextContainer>{
+  extends AbstractWebServiceClientSink<BlobContainer>{
 
   /** for serialization*/
   private static final long serialVersionUID = -338043583699608760L;
   
   /** input container */
-  protected TextContainer m_ContainerIn;
+  protected BlobContainer m_ContainerIn;
 
   /** the format. */
   protected String m_Format;
@@ -57,7 +57,7 @@ public class Upload
    */
   @Override
   public String globalInfo() {
-    return "Stores a TextContainer using the RATS text webservice.";
+    return "Stores a BlobContainer using the RATS text webservice.";
   }
 
   /**
@@ -69,11 +69,11 @@ public class Upload
 
     m_OptionManager.add(
 	    "format", "format",
-	    WebserviceUtils.MIMETYPE_PLAIN_TEXT);
+	    WebserviceUtils.MIMETYPE_APPLICATION_OCTETSTREAM);
   }
   
   /**
-   * Sets the text format.
+   * Sets the mime format.
    *
    * @param value	the format
    */
@@ -83,7 +83,7 @@ public class Upload
   }
 
   /**
-   * Returns the text format.
+   * Returns the mime format.
    *
    * @return		the format
    */
@@ -98,7 +98,7 @@ public class Upload
    * 			displaying in the GUI or for listing the options.
    */
   public String formatTipText() {
-    return "The text format type.";
+    return "The mime format type.";
   }
 
   /**
@@ -108,7 +108,7 @@ public class Upload
    */
   @Override
   public Class[] accepts() {
-    return new Class[]{TextContainer.class};
+    return new Class[]{BlobContainer.class};
   }
 
   /**
@@ -118,7 +118,7 @@ public class Upload
    */
   @Override
   protected URL getWsdlLocation() {
-    return getClass().getClassLoader().getResource("wsdl/adams/RatsTextService.wsdl");
+    return getClass().getClassLoader().getResource("wsdl/adams/RatsBlobService.wsdl");
   }
 
   /**
@@ -127,7 +127,7 @@ public class Upload
    * @param value	the request data
    */
   @Override
-  public void setRequestData(TextContainer value) {
+  public void setRequestData(BlobContainer value) {
     m_ContainerIn = value;
   }
 
@@ -138,18 +138,18 @@ public class Upload
    */
   @Override
   protected void doQuery() throws Exception {
-    RatsTextServiceService ratsServiceService;
-    RatsTextService ratsService;
-    ratsServiceService = new RatsTextServiceService(getWsdlLocation());
-    ratsService = ratsServiceService.getRatsTextServicePort();
+    RatsBlobServiceService ratsServiceService;
+    RatsBlobService ratsService;
+    ratsServiceService = new RatsBlobServiceService(getWsdlLocation());
+    ratsService = ratsServiceService.getRatsBlobServicePort();
     WebserviceUtils.configureClient(ratsService, m_ConnectionTimeout, m_ReceiveTimeout, getUseAlternativeURL() ? getAlternativeURL() : null);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) ratsService));
    
     UploadRequest request = new UploadRequest();
-    request.setId(m_ContainerIn.getID());
+    request.setFilename(m_ContainerIn.getID());  // TODO
     request.setFormat(m_Format);
-    request.setText(RatsTextHelper.containerToWebservice(m_ContainerIn));
+    request.setBlob(RatsBlobHelper.containerToWebservice(m_ContainerIn));
     UploadResponse response = ratsService.upload(request);
     
     // failed to generate data?
