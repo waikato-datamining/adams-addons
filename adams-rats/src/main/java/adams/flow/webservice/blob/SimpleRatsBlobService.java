@@ -120,6 +120,7 @@ public class SimpleRatsBlobService
     result.setFormat(parameters.getFormat());
     result.setSuccess(true);
     cont = RatsBlobHelper.webserviceToContainer(parameters.getBlob());
+    cont.setID(parameters.getFilename());
     if (isLoggingEnabled())
       getLogger().fine(cont.toString());
 
