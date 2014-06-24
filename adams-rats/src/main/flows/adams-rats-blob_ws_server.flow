@@ -1,0 +1,56 @@
+# Project: adams
+# Date: 2014-06-24 12:38:00
+# User: fracpete
+#
+adams.flow.control.Flow
+	-actor
+		adams.flow.standalone.SetVariable
+			-var-name
+			output_dir
+			-var-value
+			${EXAMPLE_FLOWS}/output
+	-actor
+		adams.flow.standalone.Rats
+			-rat
+				adams.flow.standalone.Rat
+					-receiver
+						adams.flow.standalone.rats.WSBlobReception
+							-web-service
+								adams.flow.webservice.blob.RatsBlobServiceWS
+									-implementation
+										adams.flow.webservice.blob.SimpleRatsBlobService
+					-actor
+						adams.flow.control.Tee
+							-name
+							create output filename
+							-tee
+								adams.flow.transformer.GetID
+							-tee
+								adams.flow.transformer.BaseName
+							-tee
+								adams.flow.transformer.PrependDir
+									-prefix
+									@{output_dir}
+							-tee
+								adams.flow.transformer.SetVariable
+									-var-name
+									file
+					-transmitter
+						adams.flow.standalone.rats.BinaryFileWriter
+							-output
+							@{file}
+					-scope-handling-variables
+					SHARE
+	-actor
+		adams.flow.source.Start
+	-actor
+		adams.flow.control.WhileLoop
+			-condition
+				adams.flow.condition.bool.True
+			-loop
+				adams.flow.source.Start
+			-loop
+				adams.flow.control.Sleep
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

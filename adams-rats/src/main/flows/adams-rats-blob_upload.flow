@@ -1,0 +1,30 @@
+# Project: adams
+# Date: 2014-06-24 12:07:48
+# User: fracpete
+#
+adams.flow.control.Flow
+	-actor
+		adams.flow.source.FileSupplier
+			-file
+			${EXAMPLE_FLOWS}/0_data/3666455665_18795f0741.jpg
+	-actor
+		adams.flow.transformer.SetVariable
+			-var-name
+			file
+	-actor
+		adams.flow.transformer.BinaryFileReader
+			-output-array
+			true
+	-actor
+		adams.flow.transformer.Convert
+			-conversion
+				adams.data.conversion.ByteArrayToBlobContainer
+					-id
+					@{file}
+	-actor
+		adams.flow.sink.WSSink
+			-client
+				adams.flow.webservice.blob.Upload
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+
