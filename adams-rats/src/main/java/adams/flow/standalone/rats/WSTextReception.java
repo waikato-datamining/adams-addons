@@ -249,7 +249,7 @@ public class WSTextReception
     }
     
     if (result == null) {
-      while ((m_Data.size() > 0) && !m_Stopped)
+      while ((m_Data.size() == 0) && !m_Stopped)
 	doWait(m_WaitPoll);
     }
     
