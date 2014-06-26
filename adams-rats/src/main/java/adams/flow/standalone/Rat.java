@@ -33,6 +33,7 @@ import adams.flow.control.ScopeHandler.ScopeHandling;
 import adams.flow.core.AbstractActor;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorHandlerInfo;
+import adams.flow.core.ActorUtils;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.CallableActorUser;
@@ -631,6 +632,9 @@ public class Rat
       m_LogActor.execute();
     }
     
+    if (m_StopFlowOnError)
+      stopIfNecessary();
+    
     return null;
   }
 
@@ -868,10 +872,8 @@ public class Rat
     
     result = super.setUp();
 
-    if (result == null) {
-      m_Actors.setParent(this);
+    if (result == null)
       result = m_Actors.setUp();
-    }
     
     if (result == null) {
       comp = new Compatibility();
@@ -920,6 +922,9 @@ public class Rat
 	}
       }
     }
+    
+    if (result == null)
+      ActorUtils.updateErrorHandler(this, this, isLoggingEnabled());
 
     return result;
   }
