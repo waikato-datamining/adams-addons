@@ -580,7 +580,19 @@ public class Rat
 
     return result;
   }
-
+  
+  /**
+   * Sets the parent of this actor, e.g., the group it belongs to.
+   *
+   * @param value	the new parent
+   */
+  @Override
+  public void setParent(AbstractActor value) {
+    super.setParent(value);
+    m_Actors.setParent(null);
+    m_Actors.setParent(this);
+  }
+  
   /**
    * Returns some information about the actor handler, e.g., whether it can
    * contain standalones and the actor execution.
@@ -755,6 +767,18 @@ public class Rat
    */
   public Actor getInternalActor() {
     return m_Actors;
+  }
+  
+  /**
+   * Sets whether the actor is to be run in headless mode, i.e., suppressing
+   * GUI components.
+   *
+   * @param value	if true then GUI components will be suppressed
+   */
+  @Override
+  public void setHeadless(boolean value) {
+    super.setHeadless(value);
+    m_Actors.setHeadless(value);
   }
 
   /**
