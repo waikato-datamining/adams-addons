@@ -91,7 +91,7 @@ public class RatRunnable
 	}
 	count += current;
       }
-      catch (Exception e) {
+      catch (Throwable t) {
 	// ignored
       }
     }
@@ -150,8 +150,8 @@ public class RatRunnable
       try {
 	result = m_Owner.getReceiver().receive();
       }
-      catch (Exception e) {
-	result = Utils.throwableToString(e);
+      catch (Throwable t) {
+	result = Utils.throwableToString(t);
       }
       
       if (result != null) {
@@ -192,8 +192,8 @@ public class RatRunnable
 	    }
 	  }
 	}
-	catch (Exception e) {
-	  result = Utils.throwableToString(e);
+	catch (Throwable t) {
+	  result = Utils.throwableToString(t);
 	}
 
 	// log error
