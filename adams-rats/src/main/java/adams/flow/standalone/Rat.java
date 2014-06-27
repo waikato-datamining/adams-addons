@@ -21,6 +21,7 @@ package adams.flow.standalone;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 
 import adams.core.Properties;
 import adams.core.QuickInfoHelper;
@@ -28,6 +29,7 @@ import adams.core.Utils;
 import adams.core.Variables;
 import adams.core.base.BaseRegExp;
 import adams.db.LogEntry;
+import adams.flow.control.Breakpoint;
 import adams.flow.control.LocalScopeTransformer;
 import adams.flow.control.ScopeHandler.ScopeHandling;
 import adams.flow.core.AbstractActor;
@@ -869,6 +871,7 @@ public class Rat
     Compatibility	comp;
     String		msg;
     HashSet<String>	variables;
+    List<AbstractActor>	breakpoints;
     
     result = super.setUp();
 
@@ -923,9 +926,15 @@ public class Rat
       }
     }
     
-    if (result == null)
+    if (result == null) {
+      // redirect error handling
       ActorUtils.updateErrorHandler(this, this, isLoggingEnabled());
-
+      // disable stop buttons in breakpoints
+      breakpoints = ActorUtils.enumerate(this, new Class[]{Breakpoint.class});
+      for (AbstractActor actor: breakpoints)
+	((Breakpoint) actor).setStopButtonEnabled(false);
+    }
+    
     return result;
   }
 
