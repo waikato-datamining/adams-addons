@@ -15,7 +15,7 @@
 
 /**
  * CentroidOverlay.java
- * Copyright (C) 2011-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2014 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.heatmap;
 
@@ -145,6 +145,16 @@ public class CentroidOverlay
     m_Centroid    = new double[2];
     m_Centroid[0] = map.getReport().getDoubleValue(new Field(Centroid.CENTROID_X, DataType.NUMERIC));
     m_Centroid[1] = map.getReport().getDoubleValue(new Field(Centroid.CENTROID_Y, DataType.NUMERIC));
+  }
+
+  /**
+   * Notifies the overlay that the image has changed.
+   *
+   * @param panel	the panel this overlay belongs to
+   */
+  @Override
+  protected void doImageChanged(PaintPanel panel) {
+    m_Centroid = null;
   }
 
   /**
