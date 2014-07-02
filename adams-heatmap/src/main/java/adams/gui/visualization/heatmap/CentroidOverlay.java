@@ -153,7 +153,7 @@ public class CentroidOverlay
    * @param panel	the panel this overlay belongs to
    */
   @Override
-  protected void doImageChanged(PaintPanel panel) {
+  protected synchronized void doImageChanged(PaintPanel panel) {
     m_Centroid = null;
   }
 
@@ -164,7 +164,7 @@ public class CentroidOverlay
    * @param g		the graphics context
    */
   @Override
-  protected void doPaintOverlay(PaintPanel panel, Graphics g) {
+  protected synchronized void doPaintOverlay(PaintPanel panel, Graphics g) {
     int		x;
     int		y;
 
