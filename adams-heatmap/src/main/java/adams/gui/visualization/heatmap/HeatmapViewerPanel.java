@@ -68,9 +68,9 @@ import adams.gui.visualization.container.FilterDialog;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.image.plugins.AbstractCurrentImageFilter;
 import adams.gui.visualization.image.plugins.AbstractSelectedImagesFilter;
+import adams.gui.visualization.image.plugins.BufferedImageTransformer;
 import adams.gui.visualization.image.plugins.ImageJTransformer;
 import adams.gui.visualization.image.plugins.ImageMagick;
-import adams.gui.visualization.image.plugins.JAITransformer;
 
 /**
  * Panel for viewing/processing heatmaps.
@@ -128,8 +128,8 @@ public class HeatmapViewerPanel
   /** the ImageJ menu item. */
   protected JMenuItem m_MenuItemProcessApplyImageJ;
 
-  /** the JAI menu item. */
-  protected JMenuItem m_MenuItemProcessApplyJAI;
+  /** the BufferedImage menu item. */
+  protected JMenuItem m_MenuItemProcessApplyBufferedImage;
 
   /** the ImageMagick menu item. */
   protected JMenuItem m_MenuItemProcessApplyImageMagick;
@@ -440,17 +440,17 @@ public class HeatmapViewerPanel
       m_MenuItemProcessApplyImageJ = menuitem;
 
       // Process/Apply ImageJ
-      menuitem = new JMenuItem("Apply JAI...");
+      menuitem = new JMenuItem("Apply BufferedImage...");
       menu.add(menuitem);
       menuitem.setMnemonic('J');
       menuitem.setIcon(GUIHelper.getEmptyIcon());
       menuitem.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent e) {
-	  applyJAI(getCurrentPanel());
+	  applyBufferedImage(getCurrentPanel());
 	}
       });
-      m_MenuItemProcessApplyJAI = menuitem;
+      m_MenuItemProcessApplyBufferedImage = menuitem;
 
       // Process/Apply ImageMagick
       menuitem = new JMenuItem("Apply ImageMagick...");
@@ -684,7 +684,7 @@ public class HeatmapViewerPanel
     m_MenuItemProcessFilterHeatmap.setEnabled(dataLoaded);
     m_MenuItemProcessFilterAllHeatmaps.setEnabled(dataLoaded);
     m_MenuItemProcessApplyImageJ.setEnabled(dataLoaded);
-    m_MenuItemProcessApplyJAI.setEnabled(dataLoaded);
+    m_MenuItemProcessApplyBufferedImage.setEnabled(dataLoaded);
     m_MenuItemProcessApplyImageMagick.setEnabled(dataLoaded);
 
     // View
@@ -966,12 +966,12 @@ public class HeatmapViewerPanel
   }
 
   /**
-   * Applies JAI to the heatmap images.
+   * Applies BufferedImage to the heatmap images.
    *
    * @param panel	the heatmap image to process
    */
-  protected void applyJAI(HeatmapPanel panel) {
-    applyImageFilter(panel, new JAITransformer());
+  protected void applyBufferedImage(HeatmapPanel panel) {
+    applyImageFilter(panel, new BufferedImageTransformer());
   }
 
   /**
