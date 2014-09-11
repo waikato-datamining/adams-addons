@@ -1,0 +1,62 @@
+# Project: adams
+# Date: 2014-03-26 11:24:44
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Uploads user-selected image files using the Image image webservice.
+	-actor
+		adams.flow.source.SelectFile
+			-stop-if-canceled
+			true
+			-custom-stop-message
+			User canceled selection of image!
+			-file-chooser-title
+			Select image file
+			-extension
+			jpg
+			-extension
+			bmp
+			-extension
+			png
+	-actor
+		adams.flow.control.Tee
+			-name
+			ID
+			-tee
+				adams.flow.transformer.BaseName
+					-remove-extensions
+					true
+			-tee
+				adams.flow.transformer.SetVariable
+					-var-name
+					id
+	-actor
+		adams.flow.control.Tee
+			-name
+			format
+			-tee
+				adams.flow.transformer.FileExtension
+			-tee
+				adams.flow.transformer.Convert
+					-conversion
+						adams.data.conversion.UpperCase
+			-tee
+				adams.flow.transformer.SetVariable
+					-var-name
+					format
+	-actor
+		adams.flow.transformer.BinaryFileReader
+			-output-array
+			true
+	-actor
+		adams.flow.sink.WSSink
+			-client
+				adams.flow.webservice.Upload
+					-id
+					@{id}
+					-format
+					@{format}
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

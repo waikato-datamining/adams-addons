@@ -1,0 +1,32 @@
+# Project: adams
+# Date: 2014-03-26 10:30:44
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	The webservice that allows clients to upload images to the specified upload directory.
+	-actor
+		adams.flow.standalone.WSServer
+			-logging-level
+			INFO
+			-web-service
+				adams.flow.webservice.ImageServiceWS
+					-implementation
+						adams.flow.webservice.SimpleImageService
+							-upload-dir
+							${EXAMPLE_FLOWS}/image-webservice/upload
+	-actor
+		adams.flow.source.Start
+	-actor
+		adams.flow.control.WhileLoop
+			-name
+			keep going
+			-condition
+				adams.flow.condition.bool.True
+			-loop
+				adams.flow.source.Start
+			-loop
+				adams.flow.control.Sleep
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+
