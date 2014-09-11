@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2014-03-26 11:24:44
+# Date: 2014-09-12 09:30:11
 # User: fracpete
 #
 adams.flow.control.Flow
@@ -13,6 +13,8 @@ adams.flow.control.Flow
 			User canceled selection of image!
 			-file-chooser-title
 			Select image file
+			-initial-dir
+			${EXAMPLE_FLOWS}/data
 			-extension
 			jpg
 			-extension
