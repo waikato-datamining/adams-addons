@@ -136,7 +136,7 @@ public class CustomersByName
    * @return		the location
    */
   @Override
-  protected URL getWsdlLocation() {
+  public URL getWsdlLocation() {
     return getClass().getClassLoader().getResource("wsdl/customerservice/CustomerService.wsdl");
   }
 

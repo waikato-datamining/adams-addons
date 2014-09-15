@@ -117,7 +117,7 @@ public class Upload
    * @return		the location
    */
   @Override
-  protected URL getWsdlLocation() {
+  public URL getWsdlLocation() {
     return getClass().getClassLoader().getResource("wsdl/adams/RatsBlobService.wsdl");
   }
 

@@ -37,7 +37,7 @@ import adams.flow.core.AbstractActor;
  */
 public abstract class AbstractWebServiceClientTransformer<I, O>
   extends AbstractOptionHandler
-  implements WebServiceClientConsumer<I>, WebServiceClientProducer<O>, QuickInfoSupporter {
+  implements WebServiceClientConsumer<I>, WebServiceClientProducer<O>, QuickInfoSupporter, WsdlUrlProvider {
 
   /** for serialization. */
   private static final long serialVersionUID = 3420305488797791952L;
@@ -211,6 +211,15 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
   public String alternativeURLTipText() {
     return "The URL of the service.";
   }
+  
+  /**
+   * Returns the additional information.
+   * 
+   * @return		the additional information, null or 0-length string for no information
+   */
+  public String getAdditionalInformation() {
+    return "WSDL: " + getWsdlLocation();
+  }
 
   /**
    * Returns a quick info about the object, which can be displayed in the GUI.
@@ -251,7 +260,7 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
    * 
    * @return		the location
    */
-  protected abstract URL getWsdlLocation();
+  public abstract URL getWsdlLocation();
   
   /**
    * Hook method before querying the webservice.

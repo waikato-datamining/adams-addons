@@ -134,7 +134,7 @@ extends AbstractWebServiceClientSource<String>{
    * @return		the location
    */
   @Override
-  protected URL getWsdlLocation() {
+  public URL getWsdlLocation() {
     return getClass().getClassLoader().getResource("wsdl/weka/WekaService.wsdl");
 
   }

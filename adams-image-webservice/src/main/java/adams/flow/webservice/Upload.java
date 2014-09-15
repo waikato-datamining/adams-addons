@@ -25,10 +25,10 @@ import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.ws.BindingProvider;
 
-import nz.ac.waikato.adams.webservice.image.ImageService;
-import nz.ac.waikato.adams.webservice.image.ImageServiceService;
 import nz.ac.waikato.adams.webservice.image.Image;
 import nz.ac.waikato.adams.webservice.image.ImageFormat;
+import nz.ac.waikato.adams.webservice.image.ImageService;
+import nz.ac.waikato.adams.webservice.image.ImageServiceService;
 import nz.ac.waikato.adams.webservice.image.UploadRequest;
 import nz.ac.waikato.adams.webservice.image.UploadResponse;
 
@@ -153,7 +153,7 @@ public class Upload
    * @return		the location
    */
   @Override
-  protected URL getWsdlLocation() {
+  public URL getWsdlLocation() {
     return getClass().getClassLoader().getResource("wsdl/image/ImageService.wsdl");
   }
 
