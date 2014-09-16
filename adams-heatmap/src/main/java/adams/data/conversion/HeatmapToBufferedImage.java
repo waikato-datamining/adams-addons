@@ -24,7 +24,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import adams.data.heatmap.Heatmap;
-import adams.data.image.AbstractImage;
+import adams.data.image.AbstractImageContainer;
 import adams.data.image.BufferedImageContainer;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
@@ -146,7 +146,7 @@ public class HeatmapToBufferedImage
    */
   @Override
   public Class generates() {
-    return AbstractImage.class;
+    return AbstractImageContainer.class;
   }
 
   /**

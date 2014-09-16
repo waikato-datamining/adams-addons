@@ -24,7 +24,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.Raster;
 
 import adams.data.heatmap.Heatmap;
-import adams.data.image.AbstractImage;
+import adams.data.image.AbstractImageContainer;
 
 /**
  <!-- globalinfo-start -->
@@ -73,7 +73,7 @@ public class BufferedImageToHeatmap
    */
   @Override
   public Class accepts() {
-    return AbstractImage.class;
+    return AbstractImageContainer.class;
   }
 
   /**
@@ -103,7 +103,7 @@ public class BufferedImageToHeatmap
     Object		data;
     int			value;
     
-    image  = ((AbstractImage) m_Input).toBufferedImage();
+    image  = ((AbstractImageContainer) m_Input).toBufferedImage();
     result = new Heatmap(image.getHeight(), image.getWidth());
 
     raster     = image.getRaster();

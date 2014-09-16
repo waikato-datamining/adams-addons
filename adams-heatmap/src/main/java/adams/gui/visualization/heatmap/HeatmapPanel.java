@@ -34,7 +34,7 @@ import adams.data.conversion.HeatmapToBufferedImage;
 import adams.data.conversion.HeatmapToSpreadSheet;
 import adams.data.heatmap.Heatmap;
 import adams.data.heatmap.HeatmapStatistic;
-import adams.data.image.AbstractImage;
+import adams.data.image.AbstractImageContainer;
 import adams.data.io.input.AbstractHeatmapReader;
 import adams.data.report.Report;
 import adams.data.spreadsheet.SpreadSheet;
@@ -230,7 +230,7 @@ public class HeatmapPanel
       m_HeatmapImage.setCurrentImage((BufferedImage) null);
     }
     else {
-      m_HeatmapImage.setCurrentImage(((AbstractImage) hm2bi.getOutput()).toBufferedImage());
+      m_HeatmapImage.setCurrentImage(((AbstractImageContainer) hm2bi.getOutput()).toBufferedImage());
       m_HeatmapImage.setScale(props.getDouble("Image.Scale", 1.5));
     }
 
