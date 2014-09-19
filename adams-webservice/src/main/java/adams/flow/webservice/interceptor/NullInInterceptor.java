@@ -23,7 +23,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 
 /**
- * Interceptor for imcoming messages that does nothing.
+ * Interceptor for incoming messages that does nothing.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$

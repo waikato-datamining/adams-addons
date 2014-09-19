@@ -32,7 +32,7 @@ import adams.core.logging.LoggingLevelHandler;
 import adams.core.logging.LoggingSupporter;
 
 /**
- * Interceptor for imcoming messages.
+ * Interceptor for incoming messages.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
