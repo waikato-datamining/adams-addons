@@ -124,7 +124,7 @@ public class BaseLoggingInInterceptor
   public void handleMessage(Message message) throws Fault {
     if (!isLoggingEnabled())
       return;
-    final LoggingMessage buffer = InterceptorHelper.writeIncomingMessage(message);
+    LoggingMessage buffer = InterceptorHelper.writeIncomingMessage(message);
     if (buffer != null)
       getLogger().log(getLoggingLevel().getLevel(), buffer.toString());
   }
