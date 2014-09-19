@@ -132,16 +132,14 @@ public class BaseLoggingOutInterceptor
     if ((os == null) && (iowriter == null))
       return;
 
-    if (isLoggingEnabled()) {
-      // Write the output while caching it for the log message
-      boolean hasLogged = message.containsKey(InterceptorHelper.OUTGOING_LOG_SETUP);
-      if (!hasLogged) {
-	message.put(InterceptorHelper.OUTGOING_LOG_SETUP, Boolean.TRUE);
-	if (os != null) {
-	  final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
-	  message.setContent(OutputStream.class, newOut);
-	  newOut.registerCallback(new OutgoingLoggingCallback(getLogger(), message, os));
-	}
+    // Write the output while caching it for the log message
+    boolean hasLogged = message.containsKey(InterceptorHelper.OUTGOING_LOG_SETUP);
+    if (!hasLogged) {
+      message.put(InterceptorHelper.OUTGOING_LOG_SETUP, Boolean.TRUE);
+      if (os != null) {
+	final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
+	message.setContent(OutputStream.class, newOut);
+	newOut.registerCallback(new OutgoingLoggingCallback(getLogger(), message, os));
       }
     }
   }
