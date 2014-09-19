@@ -92,7 +92,7 @@ public class LogFileOutInterceptor
       if (os != null) {
 	final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
 	message.setContent(OutputStream.class, newOut);
-	newOut.registerCallback(new FileBasedCallback(m_LogFile, message, os));
+	newOut.registerCallback(new OutgoingFileBasedCallback(m_LogFile, message, os));
       }
     }
   }

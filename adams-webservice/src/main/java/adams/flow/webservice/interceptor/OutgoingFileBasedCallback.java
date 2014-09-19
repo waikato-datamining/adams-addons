@@ -14,7 +14,7 @@
  */
 
 /**
- * FileBasedCallback.java
+ * OutgoingFileBasedCallback.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice.interceptor;
@@ -33,7 +33,7 @@ import org.apache.cxf.message.Message;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class FileBasedCallback
+public class OutgoingFileBasedCallback
   extends AbstractOutgoingCallback {
 
   /** the file to write the collected data to. */
@@ -46,7 +46,7 @@ public class FileBasedCallback
    * @param msg		the message to process
    * @param os		the output stream
    */
-  public FileBasedCallback(final File file, final Message msg, final OutputStream os) {
+  public OutgoingFileBasedCallback(final File file, final Message msg, final OutputStream os) {
     super(msg, os);
     m_File = file;
   }
