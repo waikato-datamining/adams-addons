@@ -17,7 +17,7 @@
  * BaseLoggingInInterceptor.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice;
+package adams.flow.webservice.interceptor;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -39,8 +39,6 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedWriter;
 import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
-import org.apache.cxf.phase.Phase;
 
 import adams.core.License;
 import adams.core.annotation.MixedCopyright;
@@ -56,8 +54,8 @@ import adams.core.logging.LoggingSupporter;
  * @version $Revision$
  */
 public class BaseLoggingInInterceptor
-extends AbstractPhaseInterceptor<Message>
-implements LoggingSupporter, LoggingLevelHandler {
+  extends AbstractInInterceptor
+  implements LoggingSupporter, LoggingLevelHandler {
 
   /** the logging level. */
   protected LoggingLevel m_LoggingLevel;
@@ -66,13 +64,14 @@ implements LoggingSupporter, LoggingLevelHandler {
   protected transient Logger m_Logger;
 
   /**
-   * Initializes the interceptor.
+   * Initializes the members.
    */
-  public BaseLoggingInInterceptor() {
-    super(Phase.RECEIVE);
+  @Override
+  protected void initialize() {
+    super.initialize();
     initializeLogging();
   }
-
+  
   /**
    * Pre-configures the logging.
    */

@@ -23,11 +23,21 @@ import java.net.URL;
 import java.util.logging.Level;
 
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
 import adams.core.Utils;
+import adams.core.logging.LoggingLevelHandler;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.AbstractActor;
 import adams.flow.standalone.WSServer;
+import adams.flow.webservice.interceptor.AbstractInInterceptorGenerator;
+import adams.flow.webservice.interceptor.AbstractOutInterceptorGenerator;
+import adams.flow.webservice.interceptor.NullInInterceptor;
+import adams.flow.webservice.interceptor.NullInInterceptorGenerator;
+import adams.flow.webservice.interceptor.NullOutInterceptor;
+import adams.flow.webservice.interceptor.NullOutInterceptorGenerator;
+import adams.flow.webservice.interceptor.PhaseInterceptorWithActor;
 
 /**
  * Ancestor for servers providing webservices.
@@ -48,6 +58,12 @@ public abstract class AbstractWebServiceProvider
   /** the URL of the webservice. */
   protected String m_URL;
 
+  /** the interceptor generator for incoming messages. */
+  protected AbstractInInterceptorGenerator m_InInterceptor;
+
+  /** the interceptor generator for outgoing messages. */
+  protected AbstractOutInterceptorGenerator m_OutInterceptor;
+  
   /** whether the webservice is running. */
   protected boolean m_Running;
   
@@ -61,6 +77,14 @@ public abstract class AbstractWebServiceProvider
     m_OptionManager.add(
 	    "url", "URL",
 	    getDefaultURL());
+
+    m_OptionManager.add(
+	    "in-interceptor", "inInterceptor",
+	    getDefaultInInterceptor());
+
+    m_OptionManager.add(
+	    "out-interceptor", "outInterceptor",
+	    getDefaultOutInterceptor());
   }
   
   /**
@@ -126,6 +150,82 @@ public abstract class AbstractWebServiceProvider
   }
   
   /**
+   * Returns the default interceptor for incoming messages.
+   * 
+   * @return		the interceptor
+   */
+  protected AbstractInInterceptorGenerator getDefaultInInterceptor() {
+    return new NullInInterceptorGenerator();
+  }
+  
+  /**
+   * Sets the interceptor for incoming messages.
+   * 
+   * @param value	the interceptor
+   */
+  public void setInInterceptor(AbstractInInterceptorGenerator value) {
+    m_InInterceptor = value;
+    reset();
+  }
+  
+  /**
+   * Returns the interceptor for incoming messages.
+   * 
+   * @return		the interceptor
+   */
+  public AbstractInInterceptorGenerator getInInterceptor() {
+    return m_InInterceptor;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String inInterceptorTipText() {
+    return "The interceptor to use for incoming messages.";
+  }
+  
+  /**
+   * Returns the default interceptor for outgoing messages.
+   * 
+   * @return		the interceptor
+   */
+  protected AbstractOutInterceptorGenerator getDefaultOutInterceptor() {
+    return new NullOutInterceptorGenerator();
+  }
+
+  /**
+   * Sets the interceptor for outgoing messages.
+   * 
+   * @param value	the interceptor
+   */
+  public void setOutInterceptor(AbstractOutInterceptorGenerator value) {
+    m_OutInterceptor = value;
+    reset();
+  }
+  
+  /**
+   * Returns the interceptor for outgoing messages.
+   * 
+   * @return		the interceptor
+   */
+  public AbstractOutInterceptorGenerator getOutInterceptor() {
+    return m_OutInterceptor;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String outInterceptorTipText() {
+    return "The interceptor to use for outgoing messages.";
+  }
+
+  /**
    * Performs some initial checks before starting the service.
    * <p/>
    * Default implementation does nothing.
@@ -145,22 +245,38 @@ public abstract class AbstractWebServiceProvider
   }
 
   /**
-   * Configures the logging for the endpoint (incoming and outgoing).
+   * Configures the interceptors/logging for the endpoint (incoming and outgoing).
    * 
    * @param endpoint	the endpoint to configure
+   * @see		#m_InInterceptor
+   * @see		#m_OutInterceptor
    */
-  protected void configureLogging(EndpointImpl endpoint) {
-    BaseLoggingInInterceptor 	logIn;
-    BaseLoggingOutInterceptor 	logOut;
-
+  protected void configureInterceptors(EndpointImpl endpoint) {
+    AbstractPhaseInterceptor<Message> 	in;
+    AbstractPhaseInterceptor<Message> 	out;
+    
+    in  = m_InInterceptor.generate();
+    out = m_OutInterceptor.generate();
+    
+    // logging
     if (isLoggingEnabled()) {
-      logIn = new BaseLoggingInInterceptor();
-      logIn.setLoggingLevel(getLoggingLevel());
-      logOut = new BaseLoggingOutInterceptor();
-      logOut.setLoggingLevel(getLoggingLevel());
-      endpoint.getServer().getEndpoint().getInInterceptors().add(logIn);
-      endpoint.getServer().getEndpoint().getOutInterceptors().add(logOut);
+      if (in instanceof LoggingLevelHandler)
+	((LoggingLevelHandler) in).setLoggingLevel(getLoggingLevel());
+      if (out instanceof LoggingLevelHandler)
+	((LoggingLevelHandler) out).setLoggingLevel(getLoggingLevel());
     }
+    
+    // actor aware?
+    if (in instanceof PhaseInterceptorWithActor)
+      ((PhaseInterceptorWithActor) in).setActor(m_Owner);
+    if (out instanceof PhaseInterceptorWithActor)
+      ((PhaseInterceptorWithActor) out).setActor(m_Owner);
+      
+    // add interceptors
+    if (!(in instanceof NullInInterceptor))
+      endpoint.getServer().getEndpoint().getInInterceptors().add(in);
+    if (!(out instanceof NullOutInterceptor))
+      endpoint.getServer().getEndpoint().getOutInterceptors().add(out);
   }
   
   /**

@@ -85,7 +85,7 @@ public class CustomerServiceWS
     implementor = new CustomerServiceImpl(this);
     m_Endpoint  = (EndpointImpl) Endpoint.publish(getURL(), implementor);
 
-    configureLogging(m_Endpoint);
+    configureInterceptors(m_Endpoint);
   }
 
   /**

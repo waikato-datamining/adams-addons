@@ -20,6 +20,8 @@
 package adams.flow.webservice;
 
 import adams.flow.core.AbstractActor;
+import adams.flow.webservice.interceptor.AbstractInInterceptorGenerator;
+import adams.flow.webservice.interceptor.AbstractOutInterceptorGenerator;
 
 /**
  * Interface for webservice providers, i.e., the server side.
@@ -42,6 +44,34 @@ public interface WebServiceProvider {
    * @return		the owner
    */
   public AbstractActor getOwner();
+  
+  /**
+   * Sets the interceptor for incoming messages.
+   * 
+   * @param value	the interceptor
+   */
+  public void setInInterceptor(AbstractInInterceptorGenerator value);
+  
+  /**
+   * Returns the interceptor for incoming messages.
+   * 
+   * @return		the interceptor
+   */
+  public AbstractInInterceptorGenerator getInInterceptor();
+  
+  /**
+   * Sets the interceptor for outgoing messages.
+   * 
+   * @param value	the interceptor
+   */
+  public void setOutInterceptor(AbstractOutInterceptorGenerator value);
+  
+  /**
+   * Returns the interceptor for outgoing messages.
+   * 
+   * @return		the interceptor
+   */
+  public AbstractOutInterceptorGenerator getOutInterceptor();
 
   /**
    * Returns the URL used for the service.

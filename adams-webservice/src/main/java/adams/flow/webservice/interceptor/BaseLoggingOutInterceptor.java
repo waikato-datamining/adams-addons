@@ -17,7 +17,7 @@
  * BaseLoggingOutInterceptor.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice;
+package adams.flow.webservice.interceptor;
 
 import java.io.OutputStream;
 import java.io.StringWriter;
@@ -38,8 +38,6 @@ import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
-import org.apache.cxf.phase.Phase;
 
 import adams.core.License;
 import adams.core.annotation.MixedCopyright;
@@ -55,7 +53,7 @@ import adams.core.logging.LoggingSupporter;
  * @version $Revision$
  */
 public class BaseLoggingOutInterceptor
-  extends AbstractPhaseInterceptor<Message>
+  extends AbstractOutInterceptor
   implements LoggingSupporter, LoggingLevelHandler {
 
   protected static final String BINARY_CONTENT_MESSAGE = "--- Binary Content ---";
@@ -110,12 +108,13 @@ public class BaseLoggingOutInterceptor
 
   /** the logger in use. */
   protected transient Logger m_Logger;
-
+  
   /**
-   * Initializes the interceptor.
+   * Initializes the members.
    */
-  public BaseLoggingOutInterceptor() {
-    super(Phase.SEND);
+  @Override
+  protected void initialize() {
+    super.initialize();
     initializeLogging();
   }
   
