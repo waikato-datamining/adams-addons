@@ -212,7 +212,7 @@ public class WekaServiceWS
     javax.xml.ws.soap.SOAPBinding binding = (javax.xml.ws.soap.SOAPBinding) m_Endpoint.getBinding();
     binding.setMTOMEnabled(true);
 
-    configureLogging(m_Endpoint);
+    configureInterceptors(m_Endpoint);
   }
 
   /**
