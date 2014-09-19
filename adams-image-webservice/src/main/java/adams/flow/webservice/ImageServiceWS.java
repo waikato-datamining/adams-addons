@@ -127,7 +127,7 @@ public class ImageServiceWS
     SOAPBinding binding = (SOAPBinding) m_Endpoint.getBinding();
     binding.setMTOMEnabled(true);
 
-    configureLogging(m_Endpoint);
+    configureInterceptors(m_Endpoint);
   }
 
   /**
