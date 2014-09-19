@@ -48,6 +48,11 @@ public class BaseLoggingOutInterceptorGenerator
    */
   @Override
   protected BaseLoggingOutInterceptor doGenerate() {
-    return new BaseLoggingOutInterceptor();
+    BaseLoggingOutInterceptor	result;
+    
+    result = new BaseLoggingOutInterceptor();
+    result.setLoggingLevel(getLoggingLevel());
+    
+    return result;
   }
 }

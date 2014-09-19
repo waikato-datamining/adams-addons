@@ -48,6 +48,11 @@ public class BaseLoggingInInterceptorGenerator
    */
   @Override
   protected BaseLoggingInInterceptor doGenerate() {
-    return new BaseLoggingInInterceptor();
+    BaseLoggingInInterceptor	result;
+    
+    result = new BaseLoggingInInterceptor();
+    result.setLoggingLevel(getLoggingLevel());
+    
+    return result;
   }
 }
