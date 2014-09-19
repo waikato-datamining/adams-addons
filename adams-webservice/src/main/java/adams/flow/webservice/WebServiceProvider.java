@@ -46,28 +46,32 @@ public interface WebServiceProvider {
   public AbstractActor getOwner();
   
   /**
-   * Sets the interceptor for incoming messages.
+   * Sets the interceptor for incoming messages 
+   * (actually generator, since interceptors aren't serializable).
    * 
    * @param value	the interceptor
    */
   public void setInInterceptor(AbstractInInterceptorGenerator value);
   
   /**
-   * Returns the interceptor for incoming messages.
+   * Returns the interceptor for incoming messages
+   * (actually generator, since interceptors aren't serializable).
    * 
    * @return		the interceptor
    */
   public AbstractInInterceptorGenerator getInInterceptor();
   
   /**
-   * Sets the interceptor for outgoing messages.
+   * Sets the interceptor for outgoing messages
+   * (actually generator, since interceptors aren't serializable).
    * 
    * @param value	the interceptor
    */
   public void setOutInterceptor(AbstractOutInterceptorGenerator value);
   
   /**
-   * Returns the interceptor for outgoing messages.
+   * Returns the interceptor for outgoing messages
+   * (actually generator, since interceptors aren't serializable).
    * 
    * @return		the interceptor
    */
