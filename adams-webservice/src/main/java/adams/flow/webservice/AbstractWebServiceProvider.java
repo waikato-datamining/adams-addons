@@ -37,7 +37,7 @@ import adams.flow.webservice.interceptor.NullInInterceptor;
 import adams.flow.webservice.interceptor.NullInInterceptorGenerator;
 import adams.flow.webservice.interceptor.NullOutInterceptor;
 import adams.flow.webservice.interceptor.NullOutInterceptorGenerator;
-import adams.flow.webservice.interceptor.PhaseInterceptorWithActor;
+import adams.flow.webservice.interceptor.InterceptorWithActor;
 
 /**
  * Ancestor for servers providing webservices.
@@ -267,10 +267,10 @@ public abstract class AbstractWebServiceProvider
     }
     
     // actor aware?
-    if (in instanceof PhaseInterceptorWithActor)
-      ((PhaseInterceptorWithActor) in).setActor(m_Owner);
-    if (out instanceof PhaseInterceptorWithActor)
-      ((PhaseInterceptorWithActor) out).setActor(m_Owner);
+    if (in instanceof InterceptorWithActor)
+      ((InterceptorWithActor) in).setActor(m_Owner);
+    if (out instanceof InterceptorWithActor)
+      ((InterceptorWithActor) out).setActor(m_Owner);
       
     // add interceptors
     if (!(in instanceof NullInInterceptor))

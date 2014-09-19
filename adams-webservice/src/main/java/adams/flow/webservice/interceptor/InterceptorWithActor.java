@@ -14,7 +14,7 @@
  */
 
 /**
- * PhaseInterceptorWithActor.java
+ * InterceptorWithActor.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice.interceptor;
@@ -30,7 +30,7 @@ import adams.flow.core.Actor;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public interface PhaseInterceptorWithActor<T extends Message>
+public interface InterceptorWithActor<T extends Message>
   extends PhaseInterceptor<T> {
 
   /**
