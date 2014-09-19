@@ -30,8 +30,8 @@ import adams.flow.core.Actor;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public interface InterceptorWithActor<T extends Message>
-  extends PhaseInterceptor<T> {
+public interface InterceptorWithActor
+  extends PhaseInterceptor<Message> {
 
   /**
    * Sets the actor to use.

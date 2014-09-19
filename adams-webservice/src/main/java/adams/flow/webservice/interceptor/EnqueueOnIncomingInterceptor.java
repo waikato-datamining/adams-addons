@@ -37,7 +37,7 @@ import adams.flow.core.NullToken;
  */
 public class EnqueueOnIncomingInterceptor
   extends AbstractInInterceptor
-  implements InterceptorWithActor<Message> {
+  implements InterceptorWithActor {
 
   /** the queue to enqueue the token in. */
   protected StorageName m_StorageName;
