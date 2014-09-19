@@ -81,7 +81,7 @@ public abstract class AbstractOutgoingCallback
     String ct = (String)m_Message.get(Message.CONTENT_TYPE);
 
     if (cos.getTempFile() == null) {
-      //buffer.append("Outbound Message:\n");
+      buffer.getMessage().append("Outbound Message:\n");
     } 
     else {
       buffer.getMessage().append("Outbound Message (saved to tmp file):\n");
@@ -89,10 +89,11 @@ public abstract class AbstractOutgoingCallback
     }
     try {
       String encoding = (String)m_Message.get(Message.ENCODING);
-      InterceptorHelper.writeOutgoingPayload(buffer.getPayload(), cos, encoding, ct); 
+      InterceptorHelper.writeOutgoingPayload(buffer.getPayload(), m_Message, cos, encoding, ct); 
     } 
     catch (Exception ex) {
-      //ignore
+      System.err.println("Failed to write payload!");
+      ex.printStackTrace();
     }
 
     try {

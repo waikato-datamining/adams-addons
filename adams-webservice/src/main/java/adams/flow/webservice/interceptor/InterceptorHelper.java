@@ -103,11 +103,12 @@ public class InterceptorHelper {
    * Writes the outgoing payload to a buffer.
    * 
    * @param builder	the buffer to write to
+   * @param message	the message
    * @param cos		the cached output stream
    * @param encoding	the encoding to use
    * @param contentType	the content type
    */
-  public static void writeOutgoingPayload(StringBuilder builder, CachedOutputStream cos, String encoding, String contentType) throws Exception {
+  public static void writeOutgoingPayload(StringBuilder builder, Message message, CachedOutputStream cos, String encoding, String contentType) throws Exception {
     // Just transform the XML message when the cos has content
     if (((contentType != null) && (contentType.indexOf("xml") >= 0) 
 	&& contentType.toLowerCase().indexOf("multipart/related") < 0) && (cos.size() > 0)) {
@@ -119,7 +120,7 @@ public class InterceptorHelper {
       StringWriter swriter = new StringWriter();
       serializer.transform(new StreamSource(cos.getInputStream()), new StreamResult(swriter));
       builder.append(swriter.toString());
-    } 
+    }
     else {
       if (StringUtils.isEmpty(encoding))
 	cos.writeCacheTo(builder);
