@@ -104,6 +104,8 @@ public abstract class AbstractOutgoingCallback
       //ignore
     }
     m_Message.setContent(OutputStream.class, m_OrigStream);
+    
+    write(buffer);
   }
   
   /**
