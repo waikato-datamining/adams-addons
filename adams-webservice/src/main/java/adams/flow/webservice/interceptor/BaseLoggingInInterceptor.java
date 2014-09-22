@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.LoggingMessage;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
 
 import adams.core.logging.LoggingHelper;
 import adams.core.logging.LoggingLevel;
@@ -46,6 +47,13 @@ public class BaseLoggingInInterceptor
 
   /** the logger in use. */
   protected transient Logger m_Logger;
+
+  /**
+   * Initializes the interceptor.
+   */
+  public BaseLoggingInInterceptor() {
+    super(Phase.RECEIVE);
+  }
 
   /**
    * Initializes the members.

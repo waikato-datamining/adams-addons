@@ -29,7 +29,7 @@ import adams.flow.core.NullToken;
  * @version $Revision$
  */
 public class EnqueueOnOutgoingInterceptorGenerator
-  extends AbstractInInterceptorGenerator<EnqueueOnOutgoingInterceptor> {
+  extends AbstractOutInterceptorGenerator<EnqueueOnOutgoingInterceptor> {
 
   /** for serialization. */
   private static final long serialVersionUID = -8109018608359183466L;

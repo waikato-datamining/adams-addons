@@ -22,6 +22,7 @@ package adams.flow.webservice.interceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.LoggingMessage;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
 
 import adams.flow.control.StorageName;
 import adams.flow.control.StorageQueueHandler;
@@ -47,7 +48,14 @@ public class EnqueueOnIncomingInterceptor
   
   /** the actor to use for getting access to queues. */
   protected Actor m_Actor;
-  
+
+  /**
+   * Initializes the interceptor.
+   */
+  public EnqueueOnIncomingInterceptor() {
+    super(Phase.RECEIVE);
+  }
+
   /**
    * Initializes the members.
    */

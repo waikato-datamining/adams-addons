@@ -24,6 +24,7 @@ import java.io.File;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.LoggingMessage;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
 
 import adams.core.io.FileUtils;
 
@@ -38,6 +39,13 @@ public class LogFileInInterceptor
 
   /** the file to write to. */
   protected File m_LogFile;
+
+  /**
+   * Initializes the interceptor.
+   */
+  public LogFileInInterceptor() {
+    super(Phase.RECEIVE);
+  }
 
   /**
    * Initializes the members.

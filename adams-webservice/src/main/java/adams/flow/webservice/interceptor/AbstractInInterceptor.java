@@ -34,9 +34,12 @@ public abstract class AbstractInInterceptor
 
   /**
    * Initializes the interceptor.
+   * 
+   * @param phase	the phase to use
+   * @ssee		{@link Phase}
    */
-  public AbstractInInterceptor() {
-    super(Phase.RECEIVE);
+  protected AbstractInInterceptor(String phase) {
+    super(phase);
     initialize();
   }
 

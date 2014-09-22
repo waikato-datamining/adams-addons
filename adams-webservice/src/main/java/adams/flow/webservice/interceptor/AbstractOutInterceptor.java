@@ -21,7 +21,6 @@ package adams.flow.webservice.interceptor;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
-import org.apache.cxf.phase.Phase;
 
 /**
  * Interceptor for outgoing messages.
@@ -34,9 +33,11 @@ public abstract class AbstractOutInterceptor
 
   /**
    * Initializes the interceptor.
+   * 
+   * @param phase	the phase to use
    */
-  public AbstractOutInterceptor() {
-    super(Phase.SEND);
+  protected AbstractOutInterceptor(String phase) {
+    super(phase);
     initialize();
   }
   

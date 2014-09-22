@@ -26,6 +26,7 @@ import java.io.Writer;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
 
 /**
  * Interceptor for outgoing messages, writing the data to a log file.
@@ -38,6 +39,13 @@ public class LogFileOutInterceptor
 
   /** the file to write to. */
   protected File m_LogFile;
+
+  /**
+   * Initializes the interceptor.
+   */
+  public LogFileOutInterceptor() {
+    super(Phase.SEND);
+  }
 
   /**
    * Initializes the members.

@@ -21,6 +21,7 @@ package adams.flow.webservice.interceptor;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
 
 /**
  * Interceptor for incoming messages that does nothing.
@@ -30,6 +31,13 @@ import org.apache.cxf.message.Message;
  */
 public class NullInInterceptor
   extends AbstractInInterceptor {
+
+  /**
+   * Initializes the interceptor.
+   */
+  public NullInInterceptor() {
+    super(Phase.RECEIVE);
+  }
 
   /**
    * Intercepts a message. 

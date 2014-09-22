@@ -26,6 +26,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.LoggingMessage;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
 
 import adams.flow.control.StorageName;
 import adams.flow.control.StorageQueueHandler;
@@ -40,7 +41,7 @@ import adams.flow.core.NullToken;
  * @version $Revision$
  */
 public class EnqueueOnOutgoingInterceptor
-  extends AbstractInInterceptor
+  extends AbstractOutInterceptor
   implements InterceptorWithActor {
 
   /** the queue to enqueue the token in. */
@@ -51,7 +52,14 @@ public class EnqueueOnOutgoingInterceptor
   
   /** the actor to use for getting access to queues. */
   protected Actor m_Actor;
-  
+
+  /**
+   * Initializes the interceptor.
+   */
+  public EnqueueOnOutgoingInterceptor() {
+    super(Phase.SEND);
+  }
+
   /**
    * Initializes the members.
    */

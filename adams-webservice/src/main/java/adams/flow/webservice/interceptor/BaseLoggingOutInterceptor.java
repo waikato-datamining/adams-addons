@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
 
 import adams.core.logging.LoggingHelper;
 import adams.core.logging.LoggingLevel;
@@ -48,7 +49,14 @@ public class BaseLoggingOutInterceptor
 
   /** the logger in use. */
   protected transient Logger m_Logger;
-  
+
+  /**
+   * Initializes the interceptor.
+   */
+  public BaseLoggingOutInterceptor() {
+    super(Phase.SEND);
+  }
+
   /**
    * Initializes the members.
    */
