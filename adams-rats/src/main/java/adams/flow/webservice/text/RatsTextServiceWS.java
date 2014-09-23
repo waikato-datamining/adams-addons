@@ -63,11 +63,7 @@ public class RatsTextServiceWS
   @Override
   public String globalInfo() {
     return 
-	"Provides a KNIR web service with the following services available:\n"
-	+ "- get spectrum\n"
-	+ "- put spectrum\n"
-	+ "- transform spectrum\n"
-	+ "Enable logging to see inbound/outgoing messages.";
+	"Provides a RATS web service for receiving text.";
   }
 
   /**

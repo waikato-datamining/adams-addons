@@ -77,7 +77,7 @@ public class WSTextReception
    */
   @Override
   public String globalInfo() {
-    return "Uses a webservice for retrieving text. Internally polls whether data has arrived.";
+    return "Uses a webservice for receiving text. Internally polls whether data has arrived.";
   }
 
   /**
