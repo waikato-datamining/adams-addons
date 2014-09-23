@@ -67,7 +67,7 @@ public class SimpleRatsTextService
    */
   @Override
   public String globalInfo() {
-    return "Simple implementation of a RATS spectrum webservice.";
+    return "Simple implementation of a RATS text webservice.";
   }
 
   /**
