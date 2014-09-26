@@ -36,7 +36,8 @@ import adams.flow.core.AbstractActor;
  */
 public abstract class AbstractWebServiceClientSink<I>
   extends AbstractOptionHandler
-  implements WebServiceClientConsumer<I>, QuickInfoSupporter, WsdlUrlProvider {
+  implements WebServiceClientConsumer<I>, QuickInfoSupporter, WsdlUrlProvider, 
+             AlternativeUrlSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = 3420305488797791952L;
