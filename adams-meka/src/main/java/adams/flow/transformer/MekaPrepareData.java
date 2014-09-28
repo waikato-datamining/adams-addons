@@ -19,7 +19,7 @@
  */
 package adams.flow.transformer;
 
-import meka.gui.explorer.Explorer;
+import meka.core.MLUtils;
 import weka.core.Instances;
 import adams.flow.core.Token;
 
@@ -124,8 +124,7 @@ public class MekaPrepareData
     
     try {
       data = (Instances) m_InputToken.getPayload();
-      // TODO move that into utility class?
-      Explorer.prepareData(data);
+      MLUtils.prepareData(data);
       m_OutputToken = new Token(data);
     }
     catch (Exception e) {
