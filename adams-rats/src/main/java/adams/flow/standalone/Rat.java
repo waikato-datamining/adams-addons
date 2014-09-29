@@ -29,9 +29,11 @@ import adams.core.Utils;
 import adams.core.Variables;
 import adams.core.base.BaseRegExp;
 import adams.db.LogEntry;
+import adams.flow.container.ErrorContainer;
 import adams.flow.control.Breakpoint;
 import adams.flow.control.LocalScopeTransformer;
 import adams.flow.control.ScopeHandler.ScopeHandling;
+import adams.flow.control.StorageName;
 import adams.flow.core.AbstractActor;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorHandlerInfo;
@@ -43,6 +45,7 @@ import adams.flow.core.Compatibility;
 import adams.flow.core.InputConsumer;
 import adams.flow.core.InternalActorHandler;
 import adams.flow.core.MutableActorHandler;
+import adams.flow.core.QueueHelper;
 import adams.flow.core.Token;
 import adams.flow.standalone.rats.DummyInput;
 import adams.flow.standalone.rats.DummyOutput;
@@ -146,6 +149,11 @@ import adams.flow.standalone.rats.RatRunnable;
  * &nbsp;&nbsp;&nbsp;default: .*
  * </pre>
  * 
+ * <pre>-send-error-queue &lt;adams.flow.control.StorageName&gt; (property: sendErrorQueue)
+ * &nbsp;&nbsp;&nbsp;The name of the (optional) queue in internal storage to feed with send errors.
+ * &nbsp;&nbsp;&nbsp;default: senderrors
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -178,6 +186,9 @@ public class Rat
 
   /** the runnable doing the work. */
   protected RatRunnable m_Runnable;
+
+  /** the name of the (optional) queue in internal storage for sending send error to. */
+  protected StorageName m_SendErrorQueue;
   
   /**
    * Returns a string describing the object.
@@ -235,6 +246,10 @@ public class Rat
     m_OptionManager.add(
 	    "storage-regexp", "storageRegExp",
 	    new BaseRegExp(BaseRegExp.MATCH_ALL));
+
+    m_OptionManager.add(
+	    "send-error-queue", "sendErrorQueue",
+	    new StorageName("senderrors"));
   }
 
   /**
@@ -557,6 +572,35 @@ public class Rat
   }
 
   /**
+   * Sets the name for the queue in internal storage to feed with send errors.
+   *
+   * @param value	the name
+   */
+  public void setSendErrorQueue(StorageName value) {
+    m_SendErrorQueue = value;
+    reset();
+  }
+
+  /**
+   * Returns the name for the queue in internal storage to feed with send errors.
+   *
+   * @return		the name
+   */
+  public StorageName getSendErrorQueue() {
+    return m_SendErrorQueue;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String sendErrorQueueTipText() {
+    return "The name of the (optional) queue in internal storage to feed with send errors.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -568,6 +612,7 @@ public class Rat
     result  = QuickInfoHelper.toString(this, "receiver", m_Receiver, "receiver: ");
     result += QuickInfoHelper.toString(this, "transmitter", m_Transmitter, ", transmitter: ");
     result += QuickInfoHelper.toString(this, "log", m_Log, ", log: ");
+    result += QuickInfoHelper.toString(this, "sendErrorQueue", m_SendErrorQueue, ", send errors: ");
     
     result += ", variables [";
     result += QuickInfoHelper.toString(this, "scopeHandlingVariables", getScopeHandlingVariables(), "scope: ");
@@ -858,6 +903,24 @@ public class Rat
     catch (Exception e) {
       handleException("Failed to log message:\n" + log, e);
     }
+  }
+  
+  /**
+   * Creates an {@link ErrorContainer} with the provided data and puts it
+   * in the {@link #m_SendErrorQueue} (if the queue is available).
+   * 
+   * @param payload	the payload to forward
+   * @param error	the associated error
+   * @return		true if successfully queued
+   */
+  public boolean queueSendError(Object payload, String error) {
+    ErrorContainer	cont;
+    
+    if (!getStorageHandler().getStorage().has(m_SendErrorQueue))
+      return false;
+    
+    cont = new ErrorContainer(payload, error, getFullName() + "#send");
+    return QueueHelper.enqueue(this, m_SendErrorQueue, cont);
   }
 
   /**

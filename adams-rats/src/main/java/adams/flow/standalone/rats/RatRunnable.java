@@ -189,11 +189,14 @@ public class RatRunnable
 	    }
 	    else {
 	      result = transmit(data);
+	      if (result != null)
+		getOwner().queueSendError(data, result);
 	    }
 	  }
 	}
 	catch (Throwable t) {
 	  result = Utils.throwableToString(t);
+	  getOwner().queueSendError(data, result);
 	}
 
 	// log error

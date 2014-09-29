@@ -37,6 +37,7 @@ import adams.flow.control.StorageName;
 import adams.flow.control.StorageQueueHandler;
 import adams.flow.core.AbstractActor;
 import adams.flow.core.ActorVariablesFinder;
+import adams.flow.core.QueueHelper;
 import adams.flow.standalone.QueueInit;
 
 /**
@@ -315,7 +316,7 @@ public abstract class AbstractRatOutput
    * @see		QueueInit
    */
   protected StorageQueueHandler getQueue(StorageName name) {
-    return (StorageQueueHandler) getOwner().getStorageHandler().getStorage().get(name);
+    return QueueHelper.getQueue(getOwner(), name);
   }
 
   /**
