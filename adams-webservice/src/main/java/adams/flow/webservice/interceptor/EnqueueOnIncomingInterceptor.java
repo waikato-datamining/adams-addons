@@ -25,9 +25,9 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 import adams.flow.control.StorageName;
-import adams.flow.control.StorageQueueHandler;
 import adams.flow.core.Actor;
 import adams.flow.core.NullToken;
+import adams.flow.core.QueueHelper;
 
 /**
  * Enqueues a token in the specified queue whenever an incoming message 
@@ -146,6 +146,6 @@ public class EnqueueOnIncomingInterceptor
     else {
       obj = new NullToken();
     }
-    ((StorageQueueHandler) m_Actor.getStorageHandler().getStorage().get(m_StorageName)).add(obj);
+    QueueHelper.enqueue(m_Actor, m_StorageName, obj);
   }
 }

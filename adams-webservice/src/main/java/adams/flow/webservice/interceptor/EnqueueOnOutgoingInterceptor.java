@@ -29,9 +29,9 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 import adams.flow.control.StorageName;
-import adams.flow.control.StorageQueueHandler;
 import adams.flow.core.Actor;
 import adams.flow.core.NullToken;
+import adams.flow.core.QueueHelper;
 
 /**
  * Enqueues a token in the specified queue whenever an outgoing message 
@@ -163,13 +163,13 @@ public class EnqueueOnOutgoingInterceptor
 	newOut.registerCallback(new AbstractOutgoingCallback(message, os) {
 	  @Override
 	  protected void write(LoggingMessage buffer) {
-	    ((StorageQueueHandler) m_Actor.getStorageHandler().getStorage().get(m_StorageName)).add("" + buffer);
+	    QueueHelper.enqueue(m_Actor, m_StorageName, "" + buffer);
 	  }
 	});
       }
     }
     else {
-      ((StorageQueueHandler) m_Actor.getStorageHandler().getStorage().get(m_StorageName)).add(new NullToken());
+      QueueHelper.enqueue(m_Actor, m_StorageName, new NullToken());
     }
   }
 }
