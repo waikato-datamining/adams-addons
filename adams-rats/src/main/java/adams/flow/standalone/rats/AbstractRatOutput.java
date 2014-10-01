@@ -35,10 +35,10 @@ import adams.event.VariableChangeEvent;
 import adams.event.VariableChangeEvent.Type;
 import adams.flow.control.StorageName;
 import adams.flow.control.StorageQueueHandler;
-import adams.flow.core.AbstractActor;
 import adams.flow.core.ActorVariablesFinder;
 import adams.flow.core.QueueHelper;
 import adams.flow.standalone.QueueInit;
+import adams.flow.standalone.Rat;
 
 /**
  * Ancestor for output transmitters.
@@ -55,7 +55,7 @@ public abstract class AbstractRatOutput
   private static final long serialVersionUID = -2633576389566678059L;
 
   /** the owner. */
-  protected AbstractActor m_Owner;
+  protected Rat m_Owner;
 
   /** whether the reception was stopped. */
   protected boolean m_Stopped;
@@ -139,7 +139,7 @@ public abstract class AbstractRatOutput
    * 
    * @param value	the owner
    */
-  public void setOwner(AbstractActor value) {
+  public void setOwner(Rat value) {
     m_Owner = value;
     updatePrefix();
   }
@@ -149,7 +149,7 @@ public abstract class AbstractRatOutput
    * 
    * @return		the owner
    */
-  public AbstractActor getOwner() {
+  public Rat getOwner() {
     return m_Owner;
   }
 
@@ -404,6 +404,7 @@ public abstract class AbstractRatOutput
    */
   protected String updateVariables() {
     String		result;
+    Variables		backup;
 
     if (isLoggingEnabled()) {
       getLogger().info(
@@ -413,7 +414,15 @@ public abstract class AbstractRatOutput
 
     // obtain the new value(s)
     m_BackupState = backupState();
-    getOptionManager().updateVariableValues();
+    // outer variables
+    getOptionManager().setQuiet(true);
+    getOptionManager().updateVariableValues(true);
+    // inner variables
+    backup = getOptionManager().getVariables();
+    getOptionManager().setVariables(getOwner().getInternalActor().getVariables());
+    getOptionManager().updateVariableValues(true);
+    getOptionManager().setVariables(backup);
+    getOptionManager().setQuiet(false);
 
     // re-initialize the actor
     result = setUp();
@@ -452,7 +461,8 @@ public abstract class AbstractRatOutput
 
     // do we need to re-setup the output, due to changes in variables?
     if (    (m_VariablesUpdated.size() > 0) 
-         || ((m_DetectedVariables != null) && (m_DetectedObjectVariables.size() > 0))) {
+         || (m_DetectedVariables != null) 
+         || (m_DetectedObjectVariables.size() > 0) ) {
       updateVariables();
     }
     

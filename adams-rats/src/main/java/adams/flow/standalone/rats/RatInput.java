@@ -20,7 +20,7 @@
 package adams.flow.standalone.rats;
 
 import adams.core.Stoppable;
-import adams.flow.core.AbstractActor;
+import adams.flow.standalone.Rat;
 
 /**
  * Interface for input receivers for the the RATS framework.
@@ -43,14 +43,14 @@ public interface RatInput
    * 
    * @param value	the owner
    */
-  public void setOwner(AbstractActor value);
+  public void setOwner(Rat value);
 
   /**
    * Returns the actor the receiver belongs to.
    * 
    * @return		the owner
    */
-  public AbstractActor getOwner();
+  public Rat getOwner();
 
   /**
    * Hook method for performing checks at setup time.

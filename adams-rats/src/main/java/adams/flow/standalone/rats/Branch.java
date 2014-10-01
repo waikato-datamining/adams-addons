@@ -19,8 +19,8 @@
  */
 package adams.flow.standalone.rats;
 
-import adams.flow.core.AbstractActor;
 import adams.flow.core.Unknown;
+import adams.flow.standalone.Rat;
 
 /**
  <!-- globalinfo-start -->
@@ -81,7 +81,7 @@ public class Branch
    * @param value	the owner
    */
   @Override
-  public void setOwner(AbstractActor value) {
+  public void setOwner(Rat value) {
     super.setOwner(value);
     for (RatOutput output: m_Outputs)
       output.setOwner(getOwner());

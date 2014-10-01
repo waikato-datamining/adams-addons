@@ -22,7 +22,7 @@ package adams.flow.standalone.rats;
 import java.util.ArrayList;
 
 import adams.core.QuickInfoHelper;
-import adams.flow.core.AbstractActor;
+import adams.flow.standalone.Rat;
 
 /**
  * Ancestor for {@link RatInput} schemes that wrap another {@link RatInput}.
@@ -70,7 +70,7 @@ public abstract class AbstractMetaRatInput
    * @param value	the owner
    */
   @Override
-  public void setOwner(AbstractActor value) {
+  public void setOwner(Rat value) {
     super.setOwner(value);
     m_Input.setOwner(value);
   }

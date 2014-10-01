@@ -22,7 +22,7 @@ package adams.flow.standalone.rats;
 import adams.core.Stoppable;
 import adams.event.VariableChangeEvent;
 import adams.event.VariableChangeListener;
-import adams.flow.core.AbstractActor;
+import adams.flow.standalone.Rat;
 
 /**
  * Interface for output transmitters for the RATS framework.
@@ -45,14 +45,14 @@ public interface RatOutput
    * 
    * @param value	the owner
    */
-  public void setOwner(AbstractActor value);
+  public void setOwner(Rat value);
 
   /**
    * Returns the actor the transmitter belongs to.
    * 
    * @return		the owner
    */
-  public AbstractActor getOwner();
+  public Rat getOwner();
 
   /**
    * Hook method for performing checks at setup time.

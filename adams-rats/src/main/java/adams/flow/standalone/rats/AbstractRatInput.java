@@ -29,9 +29,9 @@ import adams.core.option.AbstractOptionHandler;
 import adams.core.option.OptionUtils;
 import adams.flow.control.StorageName;
 import adams.flow.control.StorageQueueHandler;
-import adams.flow.core.AbstractActor;
 import adams.flow.core.QueueHelper;
 import adams.flow.standalone.QueueInit;
+import adams.flow.standalone.Rat;
 
 /**
  * Ancestor for input receivers.
@@ -48,7 +48,7 @@ public abstract class AbstractRatInput
   private static final long serialVersionUID = 9152793366076258048L;
 
   /** the owner. */
-  protected AbstractActor m_Owner;
+  protected Rat m_Owner;
   
   /** whether the reception was stopped. */
   protected boolean m_Stopped;
@@ -102,7 +102,7 @@ public abstract class AbstractRatInput
    * 
    * @param value	the owner
    */
-  public void setOwner(AbstractActor value) {
+  public void setOwner(Rat value) {
     m_Owner = value;
     updatePrefix();
   }
@@ -112,7 +112,7 @@ public abstract class AbstractRatInput
    * 
    * @return		the owner
    */
-  public AbstractActor getOwner() {
+  public Rat getOwner() {
     return m_Owner;
   }
 
