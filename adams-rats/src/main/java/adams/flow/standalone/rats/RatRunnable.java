@@ -181,8 +181,10 @@ public class RatRunnable
 		  while (m_Owner.getActorHandler().hasPendingOutput() && !m_Stopped) {
 		    token  = m_Owner.getActorHandler().output();
 		    result = transmit(token.getPayload());
-		    if (result != null)
+		    if (result != null) {
+		      getOwner().queueSendError(data, result);
 		      break;
+		    }
 		  }
 		}
 	      }
