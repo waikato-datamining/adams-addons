@@ -34,12 +34,17 @@ import adams.flow.container.AbstractContainer;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- *
+ * 
  * <pre>-output &lt;adams.flow.standalone.rats.RatOutput&gt; (property: output)
  * &nbsp;&nbsp;&nbsp;The transmitter to wrap.
  * &nbsp;&nbsp;&nbsp;default: adams.flow.standalone.rats.DummyOutput
  * </pre>
- *
+ * 
+ * <pre>-value &lt;java.lang.String&gt; (property: valueName)
+ * &nbsp;&nbsp;&nbsp;The name of the value to extract.
+ * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -64,6 +69,18 @@ public class ContainerValuePicker
     return
 	"Extracts the specified value from the container and passes this on "
 	+ "to the base rat output scheme.";
+  }
+  
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+	    "value", "valueName",
+	    "");
   }
 
   /**
