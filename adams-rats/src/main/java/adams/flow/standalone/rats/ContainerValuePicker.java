@@ -21,7 +21,9 @@
 package adams.flow.standalone.rats;
 
 import adams.core.QuickInfoHelper;
+import adams.core.Utils;
 import adams.flow.container.AbstractContainer;
+import adams.flow.core.Compatibility;
 
 /**
  <!-- globalinfo-start -->
@@ -141,12 +143,22 @@ public class ContainerValuePicker
   protected String callTransmit() {
     AbstractContainer	cont;
     Object		input;
+    Compatibility		comp;
 
-    cont = (AbstractContainer) m_Input;
+    cont  = (AbstractContainer) m_Input;
     input = cont.getValue(m_ValueName);
     if (input != null) {
-      m_Output.input(input);
-      return m_Output.transmit();
+      comp = new Compatibility();
+      if (comp.isCompatible(new Class[]{input.getClass()}, m_Output.accepts())) {
+	m_Output.input(input);
+	return m_Output.transmit();
+      }
+      else {
+	return 
+	    "Container content of type '" + input.getClass() + "' is not "
+	    + "compatible with base outputs accepted input: " 
+	    + Utils.classesToString(m_Output.accepts());
+      }
     }
     else {
       return "No value named '" + m_ValueName + "' in container!";
