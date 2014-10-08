@@ -27,7 +27,7 @@ import adams.core.option.AbstractOptionHandler;
 import adams.data.blob.BlobContainer;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.RatsBlobHelper;
-import adams.flow.standalone.rats.WSBlobReception;
+import adams.flow.standalone.rats.input.WSBlobReception;
 
 
 /**

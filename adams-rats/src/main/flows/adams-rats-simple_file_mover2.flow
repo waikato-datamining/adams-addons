@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2014-05-09 16:35:43
+# Date: 2014-10-09 12:47:09
 # User: fracpete
 #
 adams.flow.control.Flow
@@ -24,11 +24,11 @@ adams.flow.control.Flow
 					-name
 					incoming -> processing
 					-receiver
-						adams.flow.standalone.rats.InputPolling
+						adams.flow.standalone.rats.input.InputPolling
 							-input
-								adams.flow.standalone.rats.InputWithCallableTransformer
+								adams.flow.standalone.rats.input.InputWithCallableTransformer
 									-input
-										adams.flow.standalone.rats.FileLister
+										adams.flow.standalone.rats.input.FileLister
 											-source
 											${EXAMPLE_FLOWS}/1_incoming
 											-move-files
@@ -42,7 +42,7 @@ adams.flow.control.Flow
 					-actor
 						adams.flow.transformer.PassThrough
 					-transmitter
-						adams.flow.standalone.rats.DummyOutput
+						adams.flow.standalone.rats.output.DummyOutput
 			-rat
 				adams.flow.standalone.Rat
 					-logging-level
@@ -50,9 +50,9 @@ adams.flow.control.Flow
 					-name
 					processing -> outgoing
 					-receiver
-						adams.flow.standalone.rats.InputPolling
+						adams.flow.standalone.rats.input.InputPolling
 							-input
-								adams.flow.standalone.rats.FileLister
+								adams.flow.standalone.rats.input.FileLister
 									-source
 									${EXAMPLE_FLOWS}/2_processing
 									-target
@@ -64,9 +64,9 @@ adams.flow.control.Flow
 							-skip
 							true
 					-transmitter
-						adams.flow.standalone.rats.OutputWithCallableTransformer
+						adams.flow.standalone.rats.output.OutputWithCallableTransformer
 							-output
-								adams.flow.standalone.rats.FileMover
+								adams.flow.standalone.rats.output.FileMover
 									-wait-move
 									500
 									-target

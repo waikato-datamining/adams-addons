@@ -29,8 +29,8 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import adams.core.Utils;
 import adams.core.option.OptionHandler;
 import adams.core.option.OptionUtils;
-import adams.flow.standalone.rats.RatInput;
-import adams.flow.standalone.rats.RatInputUser;
+import adams.flow.standalone.rats.input.RatInput;
+import adams.flow.standalone.rats.input.RatInputUser;
 import adams.flow.webservice.AbstractWebServiceProvider;
 
 /**

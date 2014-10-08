@@ -23,6 +23,7 @@ import adams.core.Utils;
 import adams.flow.core.RunnableWithLogging;
 import adams.flow.core.Token;
 import adams.flow.standalone.Rat;
+import adams.flow.standalone.rats.input.PollingRatInput;
 
 /**
  * Runnable class for Rat used in a thread.

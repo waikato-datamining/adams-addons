@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2014-06-24 12:38:00
+# Date: 2014-10-09 12:46:46
 # User: fracpete
 #
 adams.flow.control.Flow
@@ -14,9 +14,13 @@ adams.flow.control.Flow
 			-rat
 				adams.flow.standalone.Rat
 					-receiver
-						adams.flow.standalone.rats.WSBlobReception
+						adams.flow.standalone.rats.input.WSBlobReception
 							-web-service
 								adams.flow.webservice.blob.RatsBlobServiceWS
+									-in-interceptor
+										adams.flow.webservice.interceptor.NullInInterceptorGenerator
+									-out-interceptor
+										adams.flow.webservice.interceptor.NullOutInterceptorGenerator
 									-implementation
 										adams.flow.webservice.blob.SimpleRatsBlobService
 					-actor
@@ -36,7 +40,7 @@ adams.flow.control.Flow
 									-var-name
 									file
 					-transmitter
-						adams.flow.standalone.rats.BinaryFileWriter
+						adams.flow.standalone.rats.output.BinaryFileWriter
 							-output
 							@{file}
 					-scope-handling-variables

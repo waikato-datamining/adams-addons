@@ -1,0 +1,61 @@
+# Contains the setup for conversion operations.
+#
+# Author: FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision: 9394 $
+
+# Lists the keys that contain classname mappings.
+# This is used to ensure a minimal backwards compatibility, in case classes
+# get renamed.
+Rename=\
+  Rename-rat_dequeue,\
+  Rename-rat_dummyinput,\
+  Rename-rat_filelister,\
+  Rename-rat_inputpolling,\
+  Rename-rat_inputwithcallabletransformer,\
+  Rename-rat_inputwithexternaltransformer,\
+  Rename-rat_webserviceinput,\
+  Rename-rat_wsblobreception,\
+  Rename-rat_wstextreception,\
+  Rename-rat_binaryfilewriter,\
+  Rename-rat_branch,\
+  Rename-rat_callableactor,\
+  Rename-rat_containervaluepicker,\
+  Rename-rat_dummyoutput,\
+  Rename-rat_enqueue,\
+  Rename-rat_filemover,\
+  Rename-rat_outputwithcallabletransformer,\
+  Rename-rat_outputwithexternaltransformer,\
+  Rename-rat_sendemail,\
+  Rename-rat_serialize,\
+  Rename-rat_simplecontainercontent,\
+  Rename-rat_switch,\
+  Rename-rat_textwriter,\
+  Rename-rat_webserviceoutput
+
+# general format for classname mappings ("rename"):
+# <key>=<old classname>-<new classname>
+Rename-rat_dequeue=adams.flow.standalone.rats.DeQueue-adams.flow.standalone.rats.input.DeQueue
+Rename-rat_dummyinput=adams.flow.standalone.rats.DummyInput-adams.flow.standalone.rats.input.DummyInput
+Rename-rat_filelister=adams.flow.standalone.rats.FileLister-adams.flow.standalone.rats.input.FileLister
+Rename-rat_inputpolling=adams.flow.standalone.rats.InputPolling-adams.flow.standalone.rats.input.InputPolling
+Rename-rat_inputwithcallabletransformer=adams.flow.standalone.rats.InputWithCallableTransformer-adams.flow.standalone.rats.input.InputWithCallableTransformer
+Rename-rat_inputwithexternaltransformer=adams.flow.standalone.rats.InputWithExternalTransformer-adams.flow.standalone.rats.input.InputWithExternalTransformer
+Rename-rat_webserviceinput=adams.flow.standalone.rats.WebserviceInput-adams.flow.standalone.rats.input.WebserviceInput
+Rename-rat_wsblobreception=adams.flow.standalone.rats.WSBlobReception-adams.flow.standalone.rats.input.WSBlobReception
+Rename-rat_wstextreception=adams.flow.standalone.rats.WSTextReception-adams.flow.standalone.rats.input.WSTextReception
+Rename-rat_binaryfilewriter=adams.flow.standalone.rats.BinaryFileWriter-adams.flow.standalone.rats.output.BinaryFileWriter
+Rename-rat_branch=adams.flow.standalone.rats.Branch-adams.flow.standalone.rats.output.Branch
+Rename-rat_callableactor=adams.flow.standalone.rats.CallableActor-adams.flow.standalone.rats.output.CallableActor
+Rename-rat_containervaluepicker=adams.flow.standalone.rats.ContainerValuePicker-adams.flow.standalone.rats.output.ContainerValuePicker
+Rename-rat_dummyoutput=adams.flow.standalone.rats.DummyOutput-adams.flow.standalone.rats.output.DummyOutput
+Rename-rat_enqueue=adams.flow.standalone.rats.EnQueue-adams.flow.standalone.rats.output.EnQueue
+Rename-rat_filemover=adams.flow.standalone.rats.FileMover-adams.flow.standalone.rats.output.FileMover
+Rename-rat_ftpupload=adams.flow.standalone.rats.FtpUpload-adams.flow.standalone.rats.output.FtpUpload
+Rename-rat_outputwithcallabletransformer=adams.flow.standalone.rats.OutputWithCallableTransformer-adams.flow.standalone.rats.output.OutputWithCallableTransformer
+Rename-rat_outputwithexternaltransformer=adams.flow.standalone.rats.OutputWithExternalTransformer-adams.flow.standalone.rats.output.OutputWithExternalTransformer
+Rename-rat_sendemail=adams.flow.standalone.rats.SendEmail-adams.flow.standalone.rats.output.SendEmail
+Rename-rat_serialize=adams.flow.standalone.rats.Serialize-adams.flow.standalone.rats.output.Serialize
+Rename-rat_simplecontainercontent=adams.flow.standalone.rats.SimpleContainerContent-adams.flow.standalone.rats.output.SimpleContainerContent
+Rename-rat_switch=adams.flow.standalone.rats.Switch-adams.flow.standalone.rats.output.Switch
+Rename-rat_textwriter=adams.flow.standalone.rats.TextWriter-adams.flow.standalone.rats.output.TextWriter
+Rename-rat_webserviceoutput=adams.flow.standalone.rats.WebserviceOutput-adams.flow.standalone.rats.output.WebserviceOutput

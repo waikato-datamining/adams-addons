@@ -47,11 +47,11 @@ import adams.flow.core.InternalActorHandler;
 import adams.flow.core.MutableActorHandler;
 import adams.flow.core.QueueHelper;
 import adams.flow.core.Token;
-import adams.flow.standalone.rats.DummyInput;
-import adams.flow.standalone.rats.DummyOutput;
-import adams.flow.standalone.rats.RatInput;
-import adams.flow.standalone.rats.RatOutput;
 import adams.flow.standalone.rats.RatRunnable;
+import adams.flow.standalone.rats.input.DummyInput;
+import adams.flow.standalone.rats.input.RatInput;
+import adams.flow.standalone.rats.output.DummyOutput;
+import adams.flow.standalone.rats.output.RatOutput;
 
 /**
  <!-- globalinfo-start -->

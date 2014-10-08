@@ -27,7 +27,7 @@ import adams.core.option.AbstractOptionHandler;
 import adams.data.text.TextContainer;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.RatsTextHelper;
-import adams.flow.standalone.rats.WSTextReception;
+import adams.flow.standalone.rats.input.WSTextReception;
 
 
 /**
