@@ -18,10 +18,10 @@ adams.flow.webservice.WebServiceClient=\
   com.example.customerservice.flow
 
 # the interceptor generators for incoming messages
-adams.flow.webservice.interceptor.AbstractInInterceptorGenerator=\
-  adams.flow.webservice.interceptor
+adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator=\
+  adams.flow.webservice.interceptor.incoming
 
 # the interceptor generators for outgoing messages
-adams.flow.webservice.interceptor.AbstractOutInterceptorGenerator=\
-  adams.flow.webservice.interceptor
+adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator=\
+  adams.flow.webservice.interceptor.outgoing
   

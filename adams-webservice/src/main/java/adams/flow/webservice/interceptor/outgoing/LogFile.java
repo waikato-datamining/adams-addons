@@ -14,28 +14,30 @@
  */
 
 /**
- * LogFileInInterceptor.java
+ * LogFile.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.outgoing;
 
 import java.io.File;
+import java.io.OutputStream;
+import java.io.Writer;
 
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.LoggingMessage;
+import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
-import adams.core.io.FileUtils;
+import adams.flow.webservice.interceptor.InterceptorHelper;
 
 /**
- * Interceptor for incoming messages, writing them to a file.
+ * Interceptor for outgoing messages, writing the data to a log file.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class LogFileInInterceptor
-  extends AbstractInInterceptor {
+public class LogFile
+  extends AbstractOutInterceptor {
 
   /** the file to write to. */
   protected File m_LogFile;
@@ -43,8 +45,8 @@ public class LogFileInInterceptor
   /**
    * Initializes the interceptor.
    */
-  public LogFileInInterceptor() {
-    super(Phase.RECEIVE);
+  public LogFile() {
+    super(Phase.SEND);
   }
 
   /**
@@ -74,7 +76,7 @@ public class LogFileInInterceptor
   public File getLogFile() {
     return m_LogFile;
   }
-  
+
   /**
    * Intercepts a message. 
    * Interceptors should NOT invoke handleMessage or handleFault
@@ -87,9 +89,21 @@ public class LogFileInInterceptor
   public void handleMessage(Message message) throws Fault {
     if (m_LogFile.isDirectory())
       return;
-    LoggingMessage buffer = InterceptorHelper.writeIncomingMessage(message);
-    if (buffer != null) {
-      FileUtils.writeToFile(m_LogFile.getAbsolutePath(), buffer.toString(), true);
+    
+    final OutputStream os = message.getContent(OutputStream.class);
+    final Writer iowriter = message.getContent(Writer.class);
+    if ((os == null) && (iowriter == null))
+      return;
+
+    // Write the output while caching it for the log message
+    boolean hasLogged = message.containsKey(InterceptorHelper.OUTGOING_LOG_SETUP);
+    if (!hasLogged) {
+      message.put(InterceptorHelper.OUTGOING_LOG_SETUP, Boolean.TRUE);
+      if (os != null) {
+	final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
+	message.setContent(OutputStream.class, newOut);
+	newOut.registerCallback(new OutgoingFileBasedCallback(m_LogFile, message, os));
+      }
     }
   }
 }

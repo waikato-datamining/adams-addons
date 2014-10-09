@@ -20,8 +20,8 @@
 package adams.flow.webservice;
 
 import adams.flow.core.AbstractActor;
-import adams.flow.webservice.interceptor.AbstractInInterceptorGenerator;
-import adams.flow.webservice.interceptor.AbstractOutInterceptorGenerator;
+import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
+import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
 
 /**
  * Interface for webservice providers, i.e., the server side.

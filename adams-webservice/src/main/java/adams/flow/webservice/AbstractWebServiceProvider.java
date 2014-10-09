@@ -31,13 +31,9 @@ import adams.core.logging.LoggingLevelHandler;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.AbstractActor;
 import adams.flow.standalone.WSServer;
-import adams.flow.webservice.interceptor.AbstractInInterceptorGenerator;
-import adams.flow.webservice.interceptor.AbstractOutInterceptorGenerator;
-import adams.flow.webservice.interceptor.NullInInterceptor;
-import adams.flow.webservice.interceptor.NullInInterceptorGenerator;
-import adams.flow.webservice.interceptor.NullOutInterceptor;
-import adams.flow.webservice.interceptor.NullOutInterceptorGenerator;
 import adams.flow.webservice.interceptor.InterceptorWithActor;
+import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
+import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
 
 /**
  * Ancestor for servers providing webservices.
@@ -155,7 +151,7 @@ public abstract class AbstractWebServiceProvider
    * @return		the interceptor
    */
   protected AbstractInInterceptorGenerator getDefaultInInterceptor() {
-    return new NullInInterceptorGenerator();
+    return new adams.flow.webservice.interceptor.incoming.NullGenerator();
   }
   
   /**
@@ -193,7 +189,7 @@ public abstract class AbstractWebServiceProvider
    * @return		the interceptor
    */
   protected AbstractOutInterceptorGenerator getDefaultOutInterceptor() {
-    return new NullOutInterceptorGenerator();
+    return new adams.flow.webservice.interceptor.outgoing.NullGenerator();
   }
 
   /**
@@ -273,9 +269,9 @@ public abstract class AbstractWebServiceProvider
       ((InterceptorWithActor) out).setActor(m_Owner);
       
     // add interceptors
-    if (!(in instanceof NullInInterceptor))
+    if (!(in instanceof adams.flow.webservice.interceptor.incoming.Null))
       endpoint.getServer().getEndpoint().getInInterceptors().add(in);
-    if (!(out instanceof NullOutInterceptor))
+    if (!(out instanceof adams.flow.webservice.interceptor.outgoing.Null))
       endpoint.getServer().getEndpoint().getOutInterceptors().add(out);
   }
   

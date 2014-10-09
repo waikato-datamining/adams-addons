@@ -14,22 +14,22 @@
  */
 
 /**
- * EnqueueOnIncomingInterceptorGenerator.java
+ * EnqueueGenerator.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.outgoing;
 
 import adams.flow.control.StorageName;
 import adams.flow.core.NullToken;
 
 /**
- * Generator for {@link EnqueueOnIncomingInterceptor}.
+ * Generator for {@link Enqueue}.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class EnqueueOnIncomingInterceptorGenerator
-  extends AbstractInInterceptorGenerator<EnqueueOnIncomingInterceptor> {
+public class EnqueueGenerator
+  extends AbstractOutInterceptorGenerator<Enqueue> {
 
   /** for serialization. */
   private static final long serialVersionUID = -8109018608359183466L;
@@ -47,7 +47,7 @@ public class EnqueueOnIncomingInterceptorGenerator
    */
   @Override
   public String globalInfo() {
-    return "Generates an " + EnqueueOnIncomingInterceptor.class.getName() + " instance.";
+    return "Generates an " + Enqueue.class.getName() + " instance.";
   }
 
   /**
@@ -130,10 +130,10 @@ public class EnqueueOnIncomingInterceptorGenerator
    * @return		the interceptor
    */
   @Override
-  protected EnqueueOnIncomingInterceptor doGenerate() {
-    EnqueueOnIncomingInterceptor	result;
+  protected Enqueue doGenerate() {
+    Enqueue	result;
     
-    result = new EnqueueOnIncomingInterceptor();
+    result = new Enqueue();
     result.setStorageName(getStorageName());
     result.setEnqueueMessage(getEnqueueMessage());
     

@@ -14,58 +14,62 @@
  */
 
 /**
- * EnqueueOnOutgoingInterceptorGenerator.java
+ * Enqueue.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.incoming;
+
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.LoggingMessage;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
 
 import adams.flow.control.StorageName;
+import adams.flow.core.Actor;
 import adams.flow.core.NullToken;
+import adams.flow.core.QueueHelper;
+import adams.flow.webservice.interceptor.InterceptorHelper;
+import adams.flow.webservice.interceptor.InterceptorWithActor;
 
 /**
- * Generator for {@link EnqueueOnOutgoingInterceptor}.
+ * Enqueues a token in the specified queue whenever an incoming message 
+ * is received.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class EnqueueOnOutgoingInterceptorGenerator
-  extends AbstractOutInterceptorGenerator<EnqueueOnOutgoingInterceptor> {
-
-  /** for serialization. */
-  private static final long serialVersionUID = -8109018608359183466L;
+public class Enqueue
+  extends AbstractInInterceptor
+  implements InterceptorWithActor {
 
   /** the queue to enqueue the token in. */
   protected StorageName m_StorageName;
   
   /** whether to enqueue the message or just a {@link NullToken}. */
   protected boolean m_EnqueueMessage;
+  
+  /** the actor to use for getting access to queues. */
+  protected Actor m_Actor;
 
   /**
-   * Returns a string describing the object.
-   *
-   * @return 			a description suitable for displaying in the gui
+   * Initializes the interceptor.
    */
-  @Override
-  public String globalInfo() {
-    return "Generates an " + EnqueueOnOutgoingInterceptor.class.getName() + " instance.";
+  public Enqueue() {
+    super(Phase.RECEIVE);
   }
 
   /**
-   * Adds options to the internal list of options.
+   * Initializes the members.
    */
   @Override
-  public void defineOptions() {
-    super.defineOptions();
-
-    m_OptionManager.add(
-	    "storage-name", "storageName",
-	    new StorageName("queue"));
-
-    m_OptionManager.add(
-	    "enqueue-message", "enqueueMessage",
-	    false);
+  protected void initialize() {
+    super.initialize();
+    
+    m_StorageName    = new StorageName("queue");
+    m_EnqueueMessage = false;
+    m_Actor          = null;
   }
-
+  
   /**
    * Sets the queue to use.
    * 
@@ -73,7 +77,6 @@ public class EnqueueOnOutgoingInterceptorGenerator
    */
   public void setStorageName(StorageName value) {
     m_StorageName = value;
-    reset();
   }
   
   /**
@@ -86,23 +89,12 @@ public class EnqueueOnOutgoingInterceptorGenerator
   }
 
   /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String storageNameTipText() {
-    return "The name of the queue to send data to.";
-  }
-
-  /**
    * Sets whether to enqueue the whole message or just a {@link NullToken}.
    * 
    * @param value	true if to enqueue whole message
    */
   public void setEnqueueMessage(boolean value) {
     m_EnqueueMessage = value;
-    reset();
   }
   
   /**
@@ -113,30 +105,49 @@ public class EnqueueOnOutgoingInterceptorGenerator
   public boolean getEnqueueMessage() {
     return m_EnqueueMessage;
   }
-
+  
   /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
+   * Sets the actor to use.
+   * 
+   * @param value	the actor to use
    */
-  public String enqueueMessageTipText() {
-    return "If enabled, the complete message gets enqueued, otherwise just a " + NullToken.class.getName() + ".";
+  @Override
+  public void setActor(Actor value) {
+    m_Actor = value;
   }
 
   /**
-   * Generates the actual interceptor for incoming messages.
+   * Returns the actor in use.
    * 
-   * @return		the interceptor
+   * @return		the actor in use
    */
   @Override
-  protected EnqueueOnOutgoingInterceptor doGenerate() {
-    EnqueueOnOutgoingInterceptor	result;
+  public Actor getActor() {
+    return m_Actor;
+  }
+  
+  /**
+   * Intercepts a message. 
+   * Interceptors should NOT invoke handleMessage or handleFault
+   * on the next interceptor - the interceptor chain will
+   * take care of this.
+   * 
+   * @param message
+   */
+  @Override
+  public void handleMessage(Message message) throws Fault {
+    Object	obj;
     
-    result = new EnqueueOnOutgoingInterceptor();
-    result.setStorageName(getStorageName());
-    result.setEnqueueMessage(getEnqueueMessage());
+    if (m_Actor == null)
+      return;
     
-    return result;
+    if (m_EnqueueMessage) {
+      LoggingMessage buffer = InterceptorHelper.writeIncomingMessage(message);
+      obj = "" + buffer;
+    }
+    else {
+      obj = new NullToken();
+    }
+    QueueHelper.enqueue(m_Actor, m_StorageName, obj);
   }
 }

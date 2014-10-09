@@ -14,21 +14,21 @@
  */
 
 /**
- * LogFileOutInterceptorGenerator.java
+ * LogFileGenerator.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.outgoing;
 
 import adams.core.io.PlaceholderFile;
 
 /**
- * Generator for {@link LogFileOutInterceptor}.
+ * Generator for {@link LogFile}.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class LogFileOutInterceptorGenerator
-  extends AbstractOutInterceptorGenerator<LogFileOutInterceptor> {
+public class LogFileGenerator
+  extends AbstractOutInterceptorGenerator<LogFile> {
 
   /** for serialization. */
   private static final long serialVersionUID = -8109018608359183466L;
@@ -43,7 +43,7 @@ public class LogFileOutInterceptorGenerator
    */
   @Override
   public String globalInfo() {
-    return "Generates a " + LogFileOutInterceptor.class.getName() + " instance.";
+    return "Generates a " + LogFile.class.getName() + " instance.";
   }
 
   /**
@@ -93,10 +93,10 @@ public class LogFileOutInterceptorGenerator
    * @return		the interceptor
    */
   @Override
-  protected LogFileOutInterceptor doGenerate() {
-    LogFileOutInterceptor	result;
+  protected LogFile doGenerate() {
+    LogFile	result;
     
-    result = new LogFileOutInterceptor();
+    result = new LogFile();
     result.setLogFile(getLogFile());
     
     return result;

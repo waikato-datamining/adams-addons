@@ -14,20 +14,20 @@
  */
 
 /**
- * AbstractOutInterceptorGenerator.java
+ * AbstractInInterceptorGenerator.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.incoming;
 
 import adams.core.option.AbstractOptionHandler;
 
 /**
- * Ancestor for generators for outgoing message interceptors.
+ * Ancestor for generators for incoming message interceptors.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public abstract class AbstractOutInterceptorGenerator<T extends AbstractOutInterceptor>
+public abstract class AbstractInInterceptorGenerator<T extends AbstractInInterceptor>
   extends AbstractOptionHandler {
 
   /** for serialization. */
@@ -42,14 +42,14 @@ public abstract class AbstractOutInterceptorGenerator<T extends AbstractOutInter
   }
   
   /**
-   * Generates the actual interceptor for outgoing messages.
+   * Generates the actual interceptor for incoming messages.
    * 
    * @return		the interceptor
    */
   protected abstract T doGenerate();
   
   /**
-   * Generates the interceptor for outgoing messages.
+   * Generates the interceptor for incoming messages.
    * 
    * @return		the interceptor
    */

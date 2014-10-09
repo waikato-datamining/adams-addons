@@ -14,35 +14,33 @@
  */
 
 /**
- * AbstractInInterceptor.java
+ * AbstractOutInterceptor.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.outgoing;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
-import org.apache.cxf.phase.Phase;
 
 /**
- * Interceptor for incoming messages.
+ * Interceptor for outgoing messages.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public abstract class AbstractInInterceptor
+public abstract class AbstractOutInterceptor
   extends AbstractPhaseInterceptor<Message> {
 
   /**
    * Initializes the interceptor.
    * 
    * @param phase	the phase to use
-   * @ssee		{@link Phase}
    */
-  protected AbstractInInterceptor(String phase) {
+  protected AbstractOutInterceptor(String phase) {
     super(phase);
     initialize();
   }
-
+  
   /**
    * Initializes the members.
    * <p/>

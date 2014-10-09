@@ -14,38 +14,46 @@
  */
 
 /**
- * AbstractOutInterceptor.java
+ * BaseLoggingGenerator.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.incoming;
 
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
 /**
- * Interceptor for outgoing messages.
+ * Generator for {@link BaseLogging}.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public abstract class AbstractOutInterceptor
-  extends AbstractPhaseInterceptor<Message> {
+public class BaseLoggingGenerator
+  extends AbstractInInterceptorGenerator<BaseLogging> {
+
+  /** for serialization. */
+  private static final long serialVersionUID = -8109018608359183466L;
 
   /**
-   * Initializes the interceptor.
-   * 
-   * @param phase	the phase to use
+   * Returns a string describing the object.
+   *
+   * @return 			a description suitable for displaying in the gui
    */
-  protected AbstractOutInterceptor(String phase) {
-    super(phase);
-    initialize();
+  @Override
+  public String globalInfo() {
+    return "Generates a " + BaseLogging.class.getName() + " instance.";
   }
-  
+
   /**
-   * Initializes the members.
-   * <p/>
-   * Default implementation does nothing.
+   * Generates the actual interceptor for incoming messages.
+   * 
+   * @return		the interceptor
    */
-  protected void initialize() {
+  @Override
+  protected BaseLogging doGenerate() {
+    BaseLogging	result;
+    
+    result = new BaseLogging();
+    result.setLoggingLevel(getLoggingLevel());
+    
+    return result;
   }
 }

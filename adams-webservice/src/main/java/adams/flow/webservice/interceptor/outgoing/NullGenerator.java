@@ -14,19 +14,19 @@
  */
 
 /**
- * NullOutInterceptorGenerator.java
+ * NullGenerator.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.outgoing;
 
 /**
- * Generator for {@link NullOutInterceptor}.
+ * Generator for {@link Null}.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class NullOutInterceptorGenerator
-  extends AbstractOutInterceptorGenerator<NullOutInterceptor> {
+public class NullGenerator
+  extends AbstractOutInterceptorGenerator<Null> {
 
   /** for serialization. */
   private static final long serialVersionUID = -8109018608359183466L;
@@ -38,7 +38,7 @@ public class NullOutInterceptorGenerator
    */
   @Override
   public String globalInfo() {
-    return "Generates a " + NullOutInterceptor.class.getName() + " instance.";
+    return "Generates a " + Null.class.getName() + " instance.";
   }
 
   /**
@@ -47,7 +47,7 @@ public class NullOutInterceptorGenerator
    * @return		the interceptor
    */
   @Override
-  protected NullOutInterceptor doGenerate() {
-    return new NullOutInterceptor();
+  protected Null doGenerate() {
+    return new Null();
   }
 }

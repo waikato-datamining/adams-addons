@@ -18,7 +18,7 @@
  * Copyright (C) Apache Foundation
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.outgoing;
 
 import java.io.OutputStream;
 
@@ -29,6 +29,7 @@ import org.apache.cxf.message.Message;
 
 import adams.core.License;
 import adams.core.annotation.MixedCopyright;
+import adams.flow.webservice.interceptor.InterceptorHelper;
 
 /**
  * Ancestor for callback classes for outgoing messages.

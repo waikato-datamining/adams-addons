@@ -14,40 +14,47 @@
  */
 
 /**
- * NullInInterceptor.java
+ * AbstractOutInterceptorGenerator.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.outgoing;
 
-import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.Phase;
+import adams.core.option.AbstractOptionHandler;
 
 /**
- * Interceptor for incoming messages that does nothing.
+ * Ancestor for generators for outgoing message interceptors.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class NullInInterceptor
-  extends AbstractInInterceptor {
+public abstract class AbstractOutInterceptorGenerator<T extends AbstractOutInterceptor>
+  extends AbstractOptionHandler {
+
+  /** for serialization. */
+  private static final long serialVersionUID = -8741445331354712393L;
 
   /**
-   * Initializes the interceptor.
+   * Hook method for checks, throws an exception if check fails.
+   * <p/>
+   * Default implementation does nothing.
    */
-  public NullInInterceptor() {
-    super(Phase.RECEIVE);
+  protected void check() {
   }
-
+  
   /**
-   * Intercepts a message. 
-   * Interceptors should NOT invoke handleMessage or handleFault
-   * on the next interceptor - the interceptor chain will
-   * take care of this.
+   * Generates the actual interceptor for outgoing messages.
    * 
-   * @param message
+   * @return		the interceptor
    */
-  @Override
-  public void handleMessage(Message message) throws Fault {
+  protected abstract T doGenerate();
+  
+  /**
+   * Generates the interceptor for outgoing messages.
+   * 
+   * @return		the interceptor
+   */
+  public T generate() {
+    check();
+    return doGenerate();
   }
 }

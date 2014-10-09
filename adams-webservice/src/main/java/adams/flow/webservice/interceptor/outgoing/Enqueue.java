@@ -14,10 +14,10 @@
  */
 
 /**
- * EnqueueOnOutgoingInterceptor.java
+ * Enqueue.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.outgoing;
 
 import java.io.OutputStream;
 import java.io.Writer;
@@ -32,6 +32,8 @@ import adams.flow.control.StorageName;
 import adams.flow.core.Actor;
 import adams.flow.core.NullToken;
 import adams.flow.core.QueueHelper;
+import adams.flow.webservice.interceptor.InterceptorHelper;
+import adams.flow.webservice.interceptor.InterceptorWithActor;
 
 /**
  * Enqueues a token in the specified queue whenever an outgoing message 
@@ -40,7 +42,7 @@ import adams.flow.core.QueueHelper;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class EnqueueOnOutgoingInterceptor
+public class Enqueue
   extends AbstractOutInterceptor
   implements InterceptorWithActor {
 
@@ -56,7 +58,7 @@ public class EnqueueOnOutgoingInterceptor
   /**
    * Initializes the interceptor.
    */
-  public EnqueueOnOutgoingInterceptor() {
+  public Enqueue() {
     super(Phase.SEND);
   }
 

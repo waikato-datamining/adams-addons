@@ -1,0 +1,28 @@
+# Contains the setup for conversion operations.
+#
+# Author: FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision: 9394 $
+
+# Lists the keys that contain classname mappings.
+# This is used to ensure a minimal backwards compatibility, in case classes
+# get renamed.
+Rename=\
+  Rename-interceptor_in_baselogging,\
+  Rename-interceptor_in_enqueue,\
+  Rename-interceptor_in_logfile,\
+  Rename-interceptor_in_null,\
+  Rename-interceptor_out_baselogging,\
+  Rename-interceptor_out_enqueue,\
+  Rename-interceptor_out_logfile,\
+  Rename-interceptor_out_null
+
+# general format for classname mappings ("rename"):
+# <key>=<old classname>-<new classname>
+Rename-interceptor_in_baselogging=adams.flow.webservice.interceptor.BaseLoggingInInterceptorGenerator-adams.flow.webservice.interceptor.incoming.BaseLoggingGenerator
+Rename-interceptor_in_enqueue=adams.flow.webservice.interceptor.EnqueueOnIncomingInterceptorGenerator-adams.flow.webservice.interceptor.incoming.EnqueueGenerator
+Rename-interceptor_in_logfile=adams.flow.webservice.interceptor.LogFileInInterceptorGenerator-adams.flow.webservice.interceptor.incoming.LogFileGenerator
+Rename-interceptor_in_null=adams.flow.webservice.interceptor.NullInInterceptorGenerator-adams.flow.webservice.interceptor.incoming.NullGenerator
+Rename-interceptor_out_baselogging=adams.flow.webservice.interceptor.BaseLoggingOutInterceptorGenerator-adams.flow.webservice.interceptor.outgoing.BaseLoggingGenerator
+Rename-interceptor_out_enqueue=adams.flow.webservice.interceptor.EnqueueOnOutgoingInterceptorGenerator-adams.flow.webservice.interceptor.outgoing.EnqueueGenerator
+Rename-interceptor_out_logfile=adams.flow.webservice.interceptor.LogFileOutInterceptorGenerator-adams.flow.webservice.interceptor.outgoing.LogFileGenerator
+Rename-interceptor_out_null=adams.flow.webservice.interceptor.NullOutInterceptorGenerator-adams.flow.webservice.interceptor.outgoing.NullGenerator

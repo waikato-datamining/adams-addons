@@ -14,19 +14,20 @@
  */
 
 /**
- * NullInInterceptorGenerator.java
+ * BaseLoggingGenerator.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.outgoing;
+
 
 /**
- * Generator for {@link NullInInterceptor}.
+ * Generator for {@link BaseLogging}.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class NullInInterceptorGenerator
-  extends AbstractInInterceptorGenerator<NullInInterceptor> {
+public class BaseLoggingGenerator
+  extends AbstractOutInterceptorGenerator<BaseLogging> {
 
   /** for serialization. */
   private static final long serialVersionUID = -8109018608359183466L;
@@ -38,7 +39,7 @@ public class NullInInterceptorGenerator
    */
   @Override
   public String globalInfo() {
-    return "Generates a " + NullInInterceptor.class.getName() + " instance.";
+    return "Generates a " + BaseLogging.class.getName() + " instance.";
   }
 
   /**
@@ -47,7 +48,12 @@ public class NullInInterceptorGenerator
    * @return		the interceptor
    */
   @Override
-  protected NullInInterceptor doGenerate() {
-    return new NullInInterceptor();
+  protected BaseLogging doGenerate() {
+    BaseLogging	result;
+    
+    result = new BaseLogging();
+    result.setLoggingLevel(getLoggingLevel());
+    
+    return result;
   }
 }

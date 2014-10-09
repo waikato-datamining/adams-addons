@@ -40,6 +40,7 @@ import org.apache.cxf.message.Message;
 
 import adams.core.License;
 import adams.core.annotation.MixedCopyright;
+import adams.flow.webservice.interceptor.outgoing.BaseLogging;
 
 /**
  * Helper class for interceptor related stuff.
@@ -56,7 +57,7 @@ public class InterceptorHelper {
 
   public static final String OUTGOING_BINARY_CONTENT_MESSAGE = "--- Binary Content ---";
 
-  public static final String OUTGOING_LOG_SETUP = BaseLoggingOutInterceptor.class.getName() + ".log-setup";
+  public static final String OUTGOING_LOG_SETUP = BaseLogging.class.getName() + ".log-setup";
 
   /**
    * Configures the buffer for the outgoing message.

@@ -14,10 +14,10 @@
  */
 
 /**
- * BaseLoggingInInterceptor.java
+ * BaseLogging.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.incoming;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +31,7 @@ import adams.core.logging.LoggingHelper;
 import adams.core.logging.LoggingLevel;
 import adams.core.logging.LoggingLevelHandler;
 import adams.core.logging.LoggingSupporter;
+import adams.flow.webservice.interceptor.InterceptorHelper;
 
 /**
  * Interceptor for incoming messages.
@@ -38,7 +39,7 @@ import adams.core.logging.LoggingSupporter;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class BaseLoggingInInterceptor
+public class BaseLogging
   extends AbstractInInterceptor
   implements LoggingSupporter, LoggingLevelHandler {
 
@@ -51,7 +52,7 @@ public class BaseLoggingInInterceptor
   /**
    * Initializes the interceptor.
    */
-  public BaseLoggingInInterceptor() {
+  public BaseLogging() {
     super(Phase.RECEIVE);
   }
 

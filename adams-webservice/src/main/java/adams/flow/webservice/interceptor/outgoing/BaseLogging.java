@@ -14,36 +14,47 @@
  */
 
 /**
- * LogFileOutInterceptor.java
+ * BaseLogging.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.outgoing;
 
-import java.io.File;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
+import adams.core.logging.LoggingHelper;
+import adams.core.logging.LoggingLevel;
+import adams.core.logging.LoggingLevelHandler;
+import adams.core.logging.LoggingSupporter;
+import adams.flow.webservice.interceptor.InterceptorHelper;
+
 /**
- * Interceptor for outgoing messages, writing the data to a log file.
+ * Interceptor for outgoing messages.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class LogFileOutInterceptor
-  extends AbstractOutInterceptor {
+public class BaseLogging
+  extends AbstractOutInterceptor
+  implements LoggingSupporter, LoggingLevelHandler {
 
-  /** the file to write to. */
-  protected File m_LogFile;
+  /** the logging level. */
+  protected LoggingLevel m_LoggingLevel;
+
+  /** the logger in use. */
+  protected transient Logger m_Logger;
 
   /**
    * Initializes the interceptor.
    */
-  public LogFileOutInterceptor() {
+  public BaseLogging() {
     super(Phase.SEND);
   }
 
@@ -53,26 +64,63 @@ public class LogFileOutInterceptor
   @Override
   protected void initialize() {
     super.initialize();
-    
-    m_LogFile = new File(".");
+    initializeLogging();
   }
   
   /**
-   * Sets the log file to write to.
-   * 
-   * @param value	the file to write to
+   * Pre-configures the logging.
    */
-  public void setLogFile(File value) {
-    m_LogFile = value;
+  protected void initializeLogging() {
+    m_LoggingLevel = LoggingLevel.WARNING;
   }
   
   /**
-   * Returns the log file to write to.
-   * 
-   * @return		the file to write to
+   * Initializes the logger.
+   * <p/>
+   * Default implementation uses the class name.
    */
-  public File getLogFile() {
-    return m_LogFile;
+  protected void configureLogger() {
+    m_Logger = LoggingHelper.getLogger(getClass());
+    m_Logger.setLevel(m_LoggingLevel.getLevel());
+  }
+  
+  /**
+   * Returns the logger in use.
+   * 
+   * @return		the logger
+   */
+  public synchronized Logger getLogger() {
+    if (m_Logger == null)
+      configureLogger();
+    return m_Logger;
+  }
+
+  /**
+   * Sets the logging level.
+   *
+   * @param value 	the level
+   */
+  public void setLoggingLevel(LoggingLevel value) {
+    m_LoggingLevel = value;
+    configureLogger();
+  }
+
+  /**
+   * Returns the logging level.
+   *
+   * @return 		the level
+   */
+  public LoggingLevel getLoggingLevel() {
+    return m_LoggingLevel;
+  }
+  
+  /**
+   * Returns whether logging is enabled.
+   * 
+   * @return		true if at least {@link Level#INFO}
+   */
+  public boolean isLoggingEnabled() {
+    return LoggingHelper.isAtLeast(m_LoggingLevel.getLevel(), Level.CONFIG);
   }
 
   /**
@@ -85,7 +133,7 @@ public class LogFileOutInterceptor
    */
   @Override
   public void handleMessage(Message message) throws Fault {
-    if (m_LogFile.isDirectory())
+    if (!isLoggingEnabled())
       return;
     
     final OutputStream os = message.getContent(OutputStream.class);
@@ -100,7 +148,7 @@ public class LogFileOutInterceptor
       if (os != null) {
 	final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
 	message.setContent(OutputStream.class, newOut);
-	newOut.registerCallback(new OutgoingFileBasedCallback(m_LogFile, message, os));
+	newOut.registerCallback(new OutgoingLoggingCallback(getLogger(), message, os));
       }
     }
   }

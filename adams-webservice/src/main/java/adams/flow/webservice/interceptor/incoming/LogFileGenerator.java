@@ -14,21 +14,21 @@
  */
 
 /**
- * LogFileInInterceptorGenerator.java
+ * LogFileGenerator.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.incoming;
 
 import adams.core.io.PlaceholderFile;
 
 /**
- * Generator for {@link LogFileInInterceptor}.
+ * Generator for {@link LogFile}.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class LogFileInInterceptorGenerator
-  extends AbstractInInterceptorGenerator<LogFileInInterceptor> {
+public class LogFileGenerator
+  extends AbstractInInterceptorGenerator<LogFile> {
 
   /** for serialization. */
   private static final long serialVersionUID = -8109018608359183466L;
@@ -43,7 +43,7 @@ public class LogFileInInterceptorGenerator
    */
   @Override
   public String globalInfo() {
-    return "Generates a " + LogFileInInterceptor.class.getName() + " instance.";
+    return "Generates a " + LogFile.class.getName() + " instance.";
   }
 
   /**
@@ -93,10 +93,10 @@ public class LogFileInInterceptorGenerator
    * @return		the interceptor
    */
   @Override
-  protected LogFileInInterceptor doGenerate() {
-    LogFileInInterceptor	result;
+  protected LogFile doGenerate() {
+    LogFile	result;
     
-    result = new LogFileInInterceptor();
+    result = new LogFile();
     result.setLogFile(getLogFile());
     
     return result;

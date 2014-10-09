@@ -14,47 +14,41 @@
  */
 
 /**
- * AbstractInInterceptorGenerator.java
+ * NullGenerator.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.incoming;
 
-import adams.core.option.AbstractOptionHandler;
 
 /**
- * Ancestor for generators for incoming message interceptors.
+ * Generator for {@link Null}.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public abstract class AbstractInInterceptorGenerator<T extends AbstractInInterceptor>
-  extends AbstractOptionHandler {
+public class NullGenerator
+  extends AbstractInInterceptorGenerator<Null> {
 
   /** for serialization. */
-  private static final long serialVersionUID = -8741445331354712393L;
+  private static final long serialVersionUID = -8109018608359183466L;
 
   /**
-   * Hook method for checks, throws an exception if check fails.
-   * <p/>
-   * Default implementation does nothing.
+   * Returns a string describing the object.
+   *
+   * @return 			a description suitable for displaying in the gui
    */
-  protected void check() {
+  @Override
+  public String globalInfo() {
+    return "Generates a " + Null.class.getName() + " instance.";
   }
-  
+
   /**
    * Generates the actual interceptor for incoming messages.
    * 
    * @return		the interceptor
    */
-  protected abstract T doGenerate();
-  
-  /**
-   * Generates the interceptor for incoming messages.
-   * 
-   * @return		the interceptor
-   */
-  public T generate() {
-    check();
-    return doGenerate();
+  @Override
+  protected Null doGenerate() {
+    return new Null();
   }
 }

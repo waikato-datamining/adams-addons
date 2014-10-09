@@ -14,45 +14,40 @@
  */
 
 /**
- * BaseLoggingInInterceptorGenerator.java
+ * Null.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.incoming;
+
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
 
 /**
- * Generator for {@link BaseLoggingInInterceptor}.
+ * Interceptor for incoming messages that does nothing.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class BaseLoggingInInterceptorGenerator
-  extends AbstractInInterceptorGenerator<BaseLoggingInInterceptor> {
-
-  /** for serialization. */
-  private static final long serialVersionUID = -8109018608359183466L;
+public class Null
+  extends AbstractInInterceptor {
 
   /**
-   * Returns a string describing the object.
-   *
-   * @return 			a description suitable for displaying in the gui
+   * Initializes the interceptor.
    */
-  @Override
-  public String globalInfo() {
-    return "Generates a " + BaseLoggingInInterceptor.class.getName() + " instance.";
+  public Null() {
+    super(Phase.RECEIVE);
   }
 
   /**
-   * Generates the actual interceptor for incoming messages.
+   * Intercepts a message. 
+   * Interceptors should NOT invoke handleMessage or handleFault
+   * on the next interceptor - the interceptor chain will
+   * take care of this.
    * 
-   * @return		the interceptor
+   * @param message
    */
   @Override
-  protected BaseLoggingInInterceptor doGenerate() {
-    BaseLoggingInInterceptor	result;
-    
-    result = new BaseLoggingInInterceptor();
-    result.setLoggingLevel(getLoggingLevel());
-    
-    return result;
+  public void handleMessage(Message message) throws Fault {
   }
 }

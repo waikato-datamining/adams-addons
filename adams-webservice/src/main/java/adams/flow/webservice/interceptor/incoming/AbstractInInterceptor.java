@@ -14,40 +14,40 @@
  */
 
 /**
- * NullOutInterceptor.java
+ * AbstractInInterceptor.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice.interceptor;
+package adams.flow.webservice.interceptor.incoming;
 
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 /**
- * Interceptor for outgoing messages that does nothing.
+ * Interceptor for incoming messages.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class NullOutInterceptor
-  extends AbstractOutInterceptor {
+public abstract class AbstractInInterceptor
+  extends AbstractPhaseInterceptor<Message> {
 
   /**
    * Initializes the interceptor.
+   * 
+   * @param phase	the phase to use
+   * @ssee		{@link Phase}
    */
-  public NullOutInterceptor() {
-    super(Phase.SEND);
+  protected AbstractInInterceptor(String phase) {
+    super(phase);
+    initialize();
   }
 
   /**
-   * Intercepts a message. 
-   * Interceptors should NOT invoke handleMessage or handleFault
-   * on the next interceptor - the interceptor chain will
-   * take care of this.
-   * 
-   * @param message
+   * Initializes the members.
+   * <p/>
+   * Default implementation does nothing.
    */
-  @Override
-  public void handleMessage(Message message) throws Fault {
+  protected void initialize() {
   }
 }
