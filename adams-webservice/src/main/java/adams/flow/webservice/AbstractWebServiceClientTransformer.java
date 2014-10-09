@@ -401,5 +401,7 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
    */
   @Override
   public void cleanUp() {
+    m_InInterceptor.cleanUp();
+    m_OutInterceptor.cleanUp();
   }
 }

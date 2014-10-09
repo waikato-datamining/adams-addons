@@ -19,6 +19,7 @@
  */
 package adams.flow.webservice;
 
+import adams.core.CleanUpHandler;
 import adams.flow.core.AbstractActor;
 import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
@@ -29,7 +30,8 @@ import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerato
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public interface WebServiceProvider {
+public interface WebServiceProvider
+  extends CleanUpHandler {
   
   /**
    * Sets the actor that executes this webservice.
@@ -104,4 +106,9 @@ public interface WebServiceProvider {
    * @return		null if successful, otherwise error message
    */
   public String stop();
+
+  /**
+   * Cleans up data structures, frees up memory.
+   */
+  public void cleanUp();
 }

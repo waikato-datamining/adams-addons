@@ -317,4 +317,12 @@ public abstract class AbstractWebServiceProvider
     
     return result;
   }
+
+  /**
+   * Cleans up data structures, frees up memory.
+   */
+  public void cleanUp() {
+    m_InInterceptor.cleanUp();
+    m_OutInterceptor.cleanUp();
+  }
 }

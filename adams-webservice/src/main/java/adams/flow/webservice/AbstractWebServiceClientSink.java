@@ -354,5 +354,6 @@ public abstract class AbstractWebServiceClientSink<I>
    */
   @Override
   public void cleanUp() {
+    m_OutInterceptor.cleanUp();
   }
 }

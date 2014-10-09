@@ -15,7 +15,7 @@
 
 /**
  * WSSource.java
- * Copyright (C) 2012 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.source;
 
@@ -160,5 +160,14 @@ public class WSSource
   @Override
   public Token output() {
     return new Token(((WebServiceClientProducer) m_Client).getResponseData());
+  }
+  
+  /**
+   * Cleans up the actor.
+   */
+  @Override
+  public void cleanUp() {
+    m_Client.cleanUp();
+    super.cleanUp();
   }
 }

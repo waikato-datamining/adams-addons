@@ -353,5 +353,6 @@ public abstract class AbstractWebServiceClientSource<O>
    */
   @Override
   public void cleanUp() {
+    m_InInterceptor.cleanUp();
   }
 }

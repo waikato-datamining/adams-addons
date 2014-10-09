@@ -372,6 +372,8 @@ public class WSServer
   public void cleanUp() {
     super.cleanUp();
 
+    m_WebService.cleanUp();
+    
     if (m_LogActor != null) {
       m_LogActor.cleanUp();
       m_LogActor = null;

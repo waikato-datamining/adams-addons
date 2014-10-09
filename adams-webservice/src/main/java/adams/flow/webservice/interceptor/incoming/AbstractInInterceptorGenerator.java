@@ -19,6 +19,7 @@
  */
 package adams.flow.webservice.interceptor.incoming;
 
+import adams.core.CleanUpHandler;
 import adams.core.option.AbstractOptionHandler;
 
 /**
@@ -28,11 +29,15 @@ import adams.core.option.AbstractOptionHandler;
  * @version $Revision$
  */
 public abstract class AbstractInInterceptorGenerator<T extends AbstractInInterceptor>
-  extends AbstractOptionHandler {
+  extends AbstractOptionHandler
+  implements CleanUpHandler {
 
   /** for serialization. */
   private static final long serialVersionUID = -8741445331354712393L;
 
+  /** the last interceptor generated. */
+  protected transient T m_LastInterceptor;
+  
   /**
    * Hook method for checks, throws an exception if check fails.
    * <p/>
@@ -56,10 +61,38 @@ public abstract class AbstractInInterceptorGenerator<T extends AbstractInInterce
   public T generate() {
     T	result;
     
+    m_LastInterceptor = null;
     check();
     result = doGenerate();
     result.setLoggingLevel(getLoggingLevel());
+    m_LastInterceptor = result;
     
     return result;
+  }
+  
+  /**
+   * Checks whether there is a last interceptor available.
+   * 
+   * @return		true if available
+   */
+  public boolean hasLastInterceptor() {
+    return (m_LastInterceptor != null);
+  }
+  
+  /**
+   * Returns the last interceptor that was generated.
+   * 
+   * @return		the interceptor, null if not available
+   */
+  public T getLastInterceptor() {
+    return m_LastInterceptor;
+  }
+  
+  /**
+   * Cleans up data structures, frees up memory.
+   */
+  @Override
+  public void cleanUp() {
+    m_LastInterceptor = null;
   }
 }
