@@ -182,7 +182,14 @@ public class Upload
 
     imageServiceService = new ImageServiceService(getWsdlLocation());
     imageService = imageServiceService.getImageServicePort();
-    WebserviceUtils.configureClient(imageService, m_ConnectionTimeout, m_ReceiveTimeout, getUseAlternativeURL() ? getAlternativeURL() : null);
+    WebserviceUtils.configureClient(
+	m_Owner,
+	imageService, 
+	m_ConnectionTimeout, 
+	m_ReceiveTimeout, 
+	(getUseAlternativeURL() ? getAlternativeURL() : null),
+	null,
+	m_OutInterceptor);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) imageService));
    
