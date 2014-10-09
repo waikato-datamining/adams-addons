@@ -26,6 +26,8 @@ import adams.core.QuickInfoHelper;
 import adams.core.QuickInfoSupporter;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.AbstractActor;
+import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
+import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
 
 /**
  * Ancestor for webservice clients.
@@ -58,6 +60,12 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
   /** the URL of the webservice. */
   protected String m_AlternativeURL;
 
+  /** the interceptor generator for incoming messages. */
+  protected AbstractInInterceptorGenerator m_InInterceptor;
+
+  /** the interceptor generator for outgoing messages. */
+  protected AbstractOutInterceptorGenerator m_OutInterceptor;
+
   /**
    * Adds options to the internal list of options.
    */
@@ -80,6 +88,14 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
     m_OptionManager.add(
 	    "alternative-url", "alternativeURL",
 	    getDefaultAlternativeURL());
+
+    m_OptionManager.add(
+	    "out-interceptor", "outInterceptor",
+	    getDefaultOutInterceptor());
+
+    m_OptionManager.add(
+	    "in-interceptor", "inInterceptor",
+	    getDefaultInInterceptor());
   }
 
   /**
@@ -213,6 +229,82 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
     return "The URL of the service.";
   }
   
+  /**
+   * Returns the default interceptor for outgoing messages.
+   * 
+   * @return		the interceptor
+   */
+  protected AbstractOutInterceptorGenerator getDefaultOutInterceptor() {
+    return new adams.flow.webservice.interceptor.outgoing.NullGenerator();
+  }
+
+  /**
+   * Sets the interceptor for outgoing messages.
+   * 
+   * @param value	the interceptor
+   */
+  public void setOutInterceptor(AbstractOutInterceptorGenerator value) {
+    m_OutInterceptor = value;
+    reset();
+  }
+  
+  /**
+   * Returns the interceptor for outgoing messages.
+   * 
+   * @return		the interceptor
+   */
+  public AbstractOutInterceptorGenerator getOutInterceptor() {
+    return m_OutInterceptor;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String outInterceptorTipText() {
+    return "The interceptor to use for outgoing messages.";
+  }
+  
+  /**
+   * Returns the default interceptor for incoming messages.
+   * 
+   * @return		the interceptor
+   */
+  protected AbstractInInterceptorGenerator getDefaultInInterceptor() {
+    return new adams.flow.webservice.interceptor.incoming.NullGenerator();
+  }
+  
+  /**
+   * Sets the interceptor for incoming messages.
+   * 
+   * @param value	the interceptor
+   */
+  public void setInInterceptor(AbstractInInterceptorGenerator value) {
+    m_InInterceptor = value;
+    reset();
+  }
+  
+  /**
+   * Returns the interceptor for incoming messages.
+   * 
+   * @return		the interceptor
+   */
+  public AbstractInInterceptorGenerator getInInterceptor() {
+    return m_InInterceptor;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String inInterceptorTipText() {
+    return "The interceptor to use for incoming messages.";
+  }
+
   /**
    * Returns the additional information.
    * 

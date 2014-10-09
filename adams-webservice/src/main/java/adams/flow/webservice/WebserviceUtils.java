@@ -26,13 +26,21 @@ import javax.xml.ws.BindingProvider;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.ConnectionType;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.transports.http.configuration.ProxyServerType;
 
 import adams.core.Utils;
+import adams.core.logging.LoggingLevelHandler;
 import adams.core.net.ProxyHelper;
+import adams.flow.core.Actor;
+import adams.flow.webservice.interceptor.InterceptorWithActor;
+import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
+import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
 
 /**
  * Utility class around webservices.
@@ -70,18 +78,23 @@ public class WebserviceUtils {
    * Sets the timeouts for connection and receiving. Also configures the
    * proxy settings in case there is a system-wide proxy configured.
    * 
-   * @param servicePort	the service port to set the timeouts for
-   * @param connection	the timeout for the connection in msec, 0 is infinite
-   * @param receive	the timeout for receiving in msec, 0 is infinite
-   * @param url		the URL of the webservice, null to use default
-   * @see		ProxyHelper
+   * @param owner		the owning actor
+   * @param servicePort		the service port to set the timeouts for
+   * @param connection		the timeout for the connection in msec, 0 is infinite
+   * @param receive		the timeout for receiving in msec, 0 is infinite
+   * @param url			the URL of the webservice, null to use default
+   * @param inInterceptor	the interceptor for incoming messages, null if not available
+   * @param outInterceptor	the interceptor for outcoing messages, null if not available
+   * @see			ProxyHelper
    */
-  public static void configureClient(Object servicePort, int connection, int receive, String url) {
-    Client 			client;
-    HTTPConduit			http;
-    HTTPClientPolicy 		clPolicy;
-    ProxyAuthorizationPolicy	proxyPolicy;
-    BindingProvider 		bindingProvider;
+  public static void configureClient(Actor owner, Object servicePort, int connection, int receive, String url, AbstractInInterceptorGenerator inInterceptor, AbstractOutInterceptorGenerator outInterceptor) {
+    Client 				client;
+    HTTPConduit				http;
+    HTTPClientPolicy 			clPolicy;
+    ProxyAuthorizationPolicy		proxyPolicy;
+    BindingProvider 			bindingProvider;
+    AbstractPhaseInterceptor<Message> 	in;
+    AbstractPhaseInterceptor<Message> 	out;
     
     client   = ClientProxy.getClient(servicePort);
     http     = (HTTPConduit) client.getConduit();
@@ -91,8 +104,9 @@ public class WebserviceUtils {
     clPolicy.setAllowChunking(false);
     clPolicy.setAutoRedirect(false);
     clPolicy.setConnection(ConnectionType.KEEP_ALIVE);
+
+    // proxy
     proxyPolicy = null;
-    
     switch (ProxyHelper.getSingleton().getProxyType()) {
       case DIRECT:
 	// do nothing
@@ -125,16 +139,70 @@ public class WebserviceUtils {
 	break;
       
       default:
-	System.err.println("Proxy type not supported by CXF clients: " + ProxyHelper.getSingleton().getProxyType());
+	throw new IllegalStateException(
+	    "Proxy type not supported by CXF clients: " + ProxyHelper.getSingleton().getProxyType());
     }
-    
     http.setClient(clPolicy);
     if (proxyPolicy != null)
       http.setProxyAuthorization(proxyPolicy);	
 
+    // alternative url?
     if (url != null) {
       bindingProvider = (BindingProvider) servicePort;
       bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
     }
+    
+    // interceptors?
+    in = null;
+    if ((inInterceptor != null) && !(inInterceptor instanceof adams.flow.webservice.interceptor.incoming.NullGenerator))
+      in = inInterceptor.generate();
+    if (in instanceof InterceptorWithActor)
+      ((InterceptorWithActor) in).setActor(owner);
+    if (in != null)
+      client.getInInterceptors().add(in);
+
+    out = null;
+    if ((outInterceptor != null) && !(outInterceptor instanceof adams.flow.webservice.interceptor.outgoing.NullGenerator))
+      out = outInterceptor.generate();
+    if (out instanceof InterceptorWithActor)
+      ((InterceptorWithActor) out).setActor(owner);
+    if (out != null)
+      client.getOutInterceptors().add(out);
+  }
+
+  /**
+   * Configures the interceptors/logging for the service endpoint (incoming and outgoing).
+   * 
+   * @param owner		the owning actor
+   * @param endpoint		the endpoint to configure
+   * @param inInterceptor	the interceptor for incoming messages
+   * @param outInterceptor	the interceptor for outcoing messages
+   */
+  public static void configureServiceInterceptors(Actor owner, EndpointImpl endpoint, AbstractInInterceptorGenerator inInterceptor, AbstractOutInterceptorGenerator outInterceptor) {
+    AbstractPhaseInterceptor<Message> 	in;
+    AbstractPhaseInterceptor<Message> 	out;
+    
+    in  = inInterceptor.generate();
+    out = outInterceptor.generate();
+    
+    // logging
+    if (owner.isLoggingEnabled()) {
+      if (in instanceof LoggingLevelHandler)
+	((LoggingLevelHandler) in).setLoggingLevel(owner.getLoggingLevel());
+      if (out instanceof LoggingLevelHandler)
+	((LoggingLevelHandler) out).setLoggingLevel(owner.getLoggingLevel());
+    }
+    
+    // actor aware?
+    if (in instanceof InterceptorWithActor)
+      ((InterceptorWithActor) in).setActor(owner);
+    if (out instanceof InterceptorWithActor)
+      ((InterceptorWithActor) out).setActor(owner);
+      
+    // add interceptors
+    if (!(in instanceof adams.flow.webservice.interceptor.incoming.Null))
+      endpoint.getServer().getEndpoint().getInInterceptors().add(in);
+    if (!(out instanceof adams.flow.webservice.interceptor.outgoing.Null))
+      endpoint.getServer().getEndpoint().getOutInterceptors().add(out);
   }
 }

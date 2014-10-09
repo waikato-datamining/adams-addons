@@ -26,6 +26,7 @@ import adams.core.QuickInfoHelper;
 import adams.core.QuickInfoSupporter;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.AbstractActor;
+import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
 
 /**
  * Ancestor for webservice clients.
@@ -56,6 +57,9 @@ public abstract class AbstractWebServiceClientSource<O>
   /** the URL of the webservice. */
   protected String m_AlternativeURL;
 
+  /** the interceptor generator for incoming messages. */
+  protected AbstractInInterceptorGenerator m_InInterceptor;
+
   /**
    * Adds options to the internal list of options.
    */
@@ -78,6 +82,10 @@ public abstract class AbstractWebServiceClientSource<O>
     m_OptionManager.add(
 	    "alternative-url", "alternativeURL",
 	    getDefaultAlternativeURL());
+
+    m_OptionManager.add(
+	    "in-interceptor", "inInterceptor",
+	    getDefaultInInterceptor());
   }
 
   /**
@@ -211,6 +219,44 @@ public abstract class AbstractWebServiceClientSource<O>
     return "The URL of the service.";
   }
   
+  /**
+   * Returns the default interceptor for incoming messages.
+   * 
+   * @return		the interceptor
+   */
+  protected AbstractInInterceptorGenerator getDefaultInInterceptor() {
+    return new adams.flow.webservice.interceptor.incoming.NullGenerator();
+  }
+  
+  /**
+   * Sets the interceptor for incoming messages.
+   * 
+   * @param value	the interceptor
+   */
+  public void setInInterceptor(AbstractInInterceptorGenerator value) {
+    m_InInterceptor = value;
+    reset();
+  }
+  
+  /**
+   * Returns the interceptor for incoming messages.
+   * 
+   * @return		the interceptor
+   */
+  public AbstractInInterceptorGenerator getInInterceptor() {
+    return m_InInterceptor;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String inInterceptorTipText() {
+    return "The interceptor to use for incoming messages.";
+  }
+
   /**
    * Returns the additional information.
    * 

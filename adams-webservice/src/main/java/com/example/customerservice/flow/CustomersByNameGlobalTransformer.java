@@ -160,7 +160,14 @@ public class CustomersByNameGlobalTransformer
     m_Customers            = null;
     customerServiceService = new CustomerServiceService(getWsdlLocation());
     customerService        = customerServiceService.getCustomerServicePort();
-    WebserviceUtils.configureClient(customerService, m_ConnectionTimeout, m_ReceiveTimeout, getUseAlternativeURL() ? getAlternativeURL() : null);
+    WebserviceUtils.configureClient(
+	m_Owner,
+	customerService, 
+	m_ConnectionTimeout, 
+	m_ReceiveTimeout, 
+	(getUseAlternativeURL() ? getAlternativeURL() : null), 
+	m_InInterceptor, 
+	m_OutInterceptor);
     m_Customers            = customerService.getCustomersByName(name);
     m_ProvidedCustomerName = null;
   }

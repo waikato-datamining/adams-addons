@@ -156,7 +156,14 @@ public class UpdateCustomer
     customer.setName(name);
     customerServiceService = new CustomerServiceService(getWsdlLocation());
     customerService        = customerServiceService.getCustomerServicePort();
-    WebserviceUtils.configureClient(customerService, m_ConnectionTimeout, m_ReceiveTimeout, getUseAlternativeURL() ? getAlternativeURL() : null);
+    WebserviceUtils.configureClient(
+	m_Owner,
+	customerService, 
+	m_ConnectionTimeout, 
+	m_ReceiveTimeout, 
+	(getUseAlternativeURL() ? getAlternativeURL() : null),
+	null,
+	m_OutInterceptor);
     customerService.updateCustomer(customer);
     m_ProvidedCustomerName = null;
   }

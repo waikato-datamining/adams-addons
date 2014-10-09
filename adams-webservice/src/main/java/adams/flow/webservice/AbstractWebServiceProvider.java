@@ -23,15 +23,11 @@ import java.net.URL;
 import java.util.logging.Level;
 
 import org.apache.cxf.jaxws.EndpointImpl;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
 import adams.core.Utils;
-import adams.core.logging.LoggingLevelHandler;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.AbstractActor;
 import adams.flow.standalone.WSServer;
-import adams.flow.webservice.interceptor.InterceptorWithActor;
 import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
 
@@ -248,31 +244,7 @@ public abstract class AbstractWebServiceProvider
    * @see		#m_OutInterceptor
    */
   protected void configureInterceptors(EndpointImpl endpoint) {
-    AbstractPhaseInterceptor<Message> 	in;
-    AbstractPhaseInterceptor<Message> 	out;
-    
-    in  = m_InInterceptor.generate();
-    out = m_OutInterceptor.generate();
-    
-    // logging
-    if (isLoggingEnabled()) {
-      if (in instanceof LoggingLevelHandler)
-	((LoggingLevelHandler) in).setLoggingLevel(getLoggingLevel());
-      if (out instanceof LoggingLevelHandler)
-	((LoggingLevelHandler) out).setLoggingLevel(getLoggingLevel());
-    }
-    
-    // actor aware?
-    if (in instanceof InterceptorWithActor)
-      ((InterceptorWithActor) in).setActor(m_Owner);
-    if (out instanceof InterceptorWithActor)
-      ((InterceptorWithActor) out).setActor(m_Owner);
-      
-    // add interceptors
-    if (!(in instanceof adams.flow.webservice.interceptor.incoming.Null))
-      endpoint.getServer().getEndpoint().getInInterceptors().add(in);
-    if (!(out instanceof adams.flow.webservice.interceptor.outgoing.Null))
-      endpoint.getServer().getEndpoint().getOutInterceptors().add(out);
+    WebserviceUtils.configureServiceInterceptors(m_Owner, endpoint, m_InInterceptor, m_OutInterceptor);
   }
   
   /**

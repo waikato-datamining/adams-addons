@@ -15,9 +15,11 @@
 
 /**
  * WebServiceClientProducer.java
- * Copyright (C) 2012 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
+
+import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
 
 /**
  * Interface for classes that use webservices.
@@ -50,4 +52,20 @@ public interface WebServiceClientProducer<T>
    * @return		the response data
    */
   public T getResponseData();
+  
+  /**
+   * Sets the interceptor for incoming messages 
+   * (actually generator, since interceptors aren't serializable).
+   * 
+   * @param value	the interceptor
+   */
+  public void setInInterceptor(AbstractInInterceptorGenerator value);
+  
+  /**
+   * Returns the interceptor for incoming messages
+   * (actually generator, since interceptors aren't serializable).
+   * 
+   * @return		the interceptor
+   */
+  public AbstractInInterceptorGenerator getInInterceptor();
 }

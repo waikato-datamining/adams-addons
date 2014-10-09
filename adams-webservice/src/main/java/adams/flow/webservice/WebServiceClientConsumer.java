@@ -15,9 +15,11 @@
 
 /**
  * WebServiceClientConsumer.java
- * Copyright (C) 2012 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
+
+import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
 
 /**
  * Interface for classes that use webservices, sending data to them.
@@ -42,4 +44,20 @@ public interface WebServiceClientConsumer<T>
    * @param value	the request data
    */
   public void setRequestData(T value);
+  
+  /**
+   * Sets the interceptor for outgoing messages
+   * (actually generator, since interceptors aren't serializable).
+   * 
+   * @param value	the interceptor
+   */
+  public void setOutInterceptor(AbstractOutInterceptorGenerator value);
+  
+  /**
+   * Returns the interceptor for outgoing messages
+   * (actually generator, since interceptors aren't serializable).
+   * 
+   * @return		the interceptor
+   */
+  public AbstractOutInterceptorGenerator getOutInterceptor();
 }
