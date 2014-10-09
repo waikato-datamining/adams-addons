@@ -19,18 +19,11 @@
  */
 package adams.flow.webservice.interceptor.incoming;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.LoggingMessage;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
-import adams.core.logging.LoggingHelper;
-import adams.core.logging.LoggingLevel;
-import adams.core.logging.LoggingLevelHandler;
-import adams.core.logging.LoggingSupporter;
 import adams.flow.webservice.interceptor.InterceptorHelper;
 
 /**
@@ -40,85 +33,13 @@ import adams.flow.webservice.interceptor.InterceptorHelper;
  * @version $Revision$
  */
 public class BaseLogging
-  extends AbstractInInterceptor
-  implements LoggingSupporter, LoggingLevelHandler {
-
-  /** the logging level. */
-  protected LoggingLevel m_LoggingLevel;
-
-  /** the logger in use. */
-  protected transient Logger m_Logger;
+  extends AbstractInInterceptor {
 
   /**
    * Initializes the interceptor.
    */
   public BaseLogging() {
     super(Phase.RECEIVE);
-  }
-
-  /**
-   * Initializes the members.
-   */
-  @Override
-  protected void initialize() {
-    super.initialize();
-    initializeLogging();
-  }
-  
-  /**
-   * Pre-configures the logging.
-   */
-  protected void initializeLogging() {
-    m_LoggingLevel = LoggingLevel.WARNING;
-  }
-
-  /**
-   * Initializes the logger.
-   * <p/>
-   * Default implementation uses the class name.
-   */
-  protected void configureLogger() {
-    m_Logger = LoggingHelper.getLogger(getClass());
-    m_Logger.setLevel(m_LoggingLevel.getLevel());
-  }
-
-  /**
-   * Returns the logger in use.
-   * 
-   * @return		the logger
-   */
-  public synchronized Logger getLogger() {
-    if (m_Logger == null)
-      configureLogger();
-    return m_Logger;
-  }
-
-  /**
-   * Sets the logging level.
-   *
-   * @param value 	the level
-   */
-  public void setLoggingLevel(LoggingLevel value) {
-    m_LoggingLevel = value;
-    configureLogger();
-  }
-
-  /**
-   * Returns the logging level.
-   *
-   * @return 		the level
-   */
-  public LoggingLevel getLoggingLevel() {
-    return m_LoggingLevel;
-  }
-
-  /**
-   * Returns whether logging is enabled.
-   * 
-   * @return		true if at least {@link Level#INFO}
-   */
-  public boolean isLoggingEnabled() {
-    return LoggingHelper.isAtLeast(m_LoggingLevel.getLevel(), Level.CONFIG);
   }
 
   /**

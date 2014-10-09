@@ -165,12 +165,16 @@ public class Enqueue
 	newOut.registerCallback(new AbstractOutgoingCallback(message, os) {
 	  @Override
 	  protected void write(LoggingMessage buffer) {
+	    if (isLoggingEnabled())
+	      getLogger().info(m_StorageName + ": " + buffer);
 	    QueueHelper.enqueue(m_Actor, m_StorageName, "" + buffer);
 	  }
 	});
       }
     }
     else {
+      if (isLoggingEnabled())
+	getLogger().info(m_StorageName + ": null token");
       QueueHelper.enqueue(m_Actor, m_StorageName, new NullToken());
     }
   }

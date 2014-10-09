@@ -43,7 +43,9 @@ public class LogFileGenerator
    */
   @Override
   public String globalInfo() {
-    return "Generates a " + LogFile.class.getName() + " instance.";
+    return 
+	"Generates a " + LogFile.class.getName() + " instance.\n"
+	+ "Outputs the messages to the specified log file.";
   }
 
   /**

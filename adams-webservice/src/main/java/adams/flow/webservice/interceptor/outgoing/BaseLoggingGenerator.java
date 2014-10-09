@@ -19,7 +19,6 @@
  */
 package adams.flow.webservice.interceptor.outgoing;
 
-
 /**
  * Generator for {@link BaseLogging}.
  * 
@@ -39,7 +38,9 @@ public class BaseLoggingGenerator
    */
   @Override
   public String globalInfo() {
-    return "Generates a " + BaseLogging.class.getName() + " instance.";
+    return 
+	"Generates a " + BaseLogging.class.getName() + " instance.\n"
+	+ "Simply logs the messages using its logger instance.";
   }
 
   /**
@@ -49,11 +50,6 @@ public class BaseLoggingGenerator
    */
   @Override
   protected BaseLogging doGenerate() {
-    BaseLogging	result;
-    
-    result = new BaseLogging();
-    result.setLoggingLevel(getLoggingLevel());
-    
-    return result;
+    return new BaseLogging();
   }
 }

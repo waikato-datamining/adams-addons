@@ -47,7 +47,10 @@ public class EnqueueGenerator
    */
   @Override
   public String globalInfo() {
-    return "Generates an " + Enqueue.class.getName() + " instance.";
+    return 
+	"Generates an " + Enqueue.class.getName() + " instance.\n"
+	+ "Enqueues either the full message or just a " 
+	+ NullToken.class.getName() + " in the specified queue.";
   }
 
   /**

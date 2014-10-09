@@ -144,9 +144,13 @@ public class Enqueue
     if (m_EnqueueMessage) {
       LoggingMessage buffer = InterceptorHelper.writeIncomingMessage(message);
       obj = "" + buffer;
+      if (isLoggingEnabled())
+	getLogger().info(m_StorageName + ": " + buffer);
     }
     else {
       obj = new NullToken();
+      if (isLoggingEnabled())
+	getLogger().info(m_StorageName + ": null token");
     }
     QueueHelper.enqueue(m_Actor, m_StorageName, obj);
   }

@@ -54,7 +54,12 @@ public abstract class AbstractInInterceptorGenerator<T extends AbstractInInterce
    * @return		the interceptor
    */
   public T generate() {
+    T	result;
+    
     check();
-    return doGenerate();
+    result = doGenerate();
+    result.setLoggingLevel(getLoggingLevel());
+    
+    return result;
   }
 }
