@@ -142,7 +142,14 @@ public class Upload
     RatsBlobService ratsService;
     ratsServiceService = new RatsBlobServiceService(getWsdlLocation());
     ratsService = ratsServiceService.getRatsBlobServicePort();
-    WebserviceUtils.configureClient(ratsService, m_ConnectionTimeout, m_ReceiveTimeout, getUseAlternativeURL() ? getAlternativeURL() : null);
+    WebserviceUtils.configureClient(
+	m_Owner,
+	ratsService, 
+	m_ConnectionTimeout, 
+	m_ReceiveTimeout, 
+	(getUseAlternativeURL() ? getAlternativeURL() : null),
+	null,
+	m_OutInterceptor);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) ratsService));
    
