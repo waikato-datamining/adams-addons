@@ -129,7 +129,14 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
     WekaService wekaService;
     wekaServiceService = new WekaServiceService(getWsdlLocation());
     wekaService = wekaServiceService.getWekaServicePort();
-    WebserviceUtils.configureClient(wekaService, m_ConnectionTimeout, m_ReceiveTimeout, getUseAlternativeURL() ? getAlternativeURL() : null);
+    WebserviceUtils.configureClient(
+	m_Owner,
+	wekaService, 
+	m_ConnectionTimeout, 
+	m_ReceiveTimeout, 
+	(getUseAlternativeURL() ? getAlternativeURL() : null),
+	m_InInterceptor,
+	m_OutInterceptor);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
     TrainClustererResponseObject response = wekaService.trainClusterer(m_Train.getDataset(), m_Train.getClusterer(), m_Train.getModelName());

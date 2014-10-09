@@ -136,7 +136,14 @@ extends AbstractWebServiceClientTransformer<CrossValidateClassifier, Dataset>{
     WekaService wekaService;
     wekaServiceService = new WekaServiceService(getWsdlLocation());
     wekaService = wekaServiceService.getWekaServicePort();
-    WebserviceUtils.configureClient(wekaService, m_ConnectionTimeout, m_ReceiveTimeout, getUseAlternativeURL() ? getAlternativeURL() : null);
+    WebserviceUtils.configureClient(
+	m_Owner,
+	wekaService, 
+	m_ConnectionTimeout, 
+	m_ReceiveTimeout, 
+	(getUseAlternativeURL() ? getAlternativeURL() : null),
+	m_InInterceptor,
+	m_OutInterceptor);
 
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));

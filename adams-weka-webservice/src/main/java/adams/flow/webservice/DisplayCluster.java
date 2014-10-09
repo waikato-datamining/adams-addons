@@ -150,7 +150,14 @@ extends AbstractWebServiceClientSource<String>{
     WekaService wekaService;
     wekaServiceService = new WekaServiceService(getWsdlLocation());
     wekaService = wekaServiceService.getWekaServicePort();
-    WebserviceUtils.configureClient(wekaService, m_ConnectionTimeout, m_ReceiveTimeout, getUseAlternativeURL() ? getAlternativeURL() : null);
+    WebserviceUtils.configureClient(
+	m_Owner,
+	wekaService, 
+	m_ConnectionTimeout, 
+	m_ReceiveTimeout, 
+	(getUseAlternativeURL() ? getAlternativeURL() : null),
+	m_InInterceptor,
+	null);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
     m_Returned = wekaService.displayClusterer(m_Clusterer);
