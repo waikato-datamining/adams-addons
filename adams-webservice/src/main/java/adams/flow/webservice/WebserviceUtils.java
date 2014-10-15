@@ -19,7 +19,10 @@
  */
 package adams.flow.webservice;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.Proxy;
+import java.net.URL;
 
 import javax.xml.ws.BindingProvider;
 
@@ -204,5 +207,116 @@ public class WebserviceUtils {
       endpoint.getServer().getEndpoint().getInInterceptors().add(in);
     if (!(out instanceof adams.flow.webservice.interceptor.outgoing.Null))
       endpoint.getServer().getEndpoint().getOutInterceptors().add(out);
+  }
+  
+  /**
+   * Loads the WSDL from the given location.
+   * 
+   * @param location	the location of the WSDL
+   * @return		the content of the WSDL, null if failed to load
+   */
+  public static String loadWsdl(URL location) {
+    StringBuilder	result;
+    BufferedReader	reader;
+    String		line;
+    
+    result = new StringBuilder();
+    
+    reader = null;
+    try {
+      reader = new BufferedReader(new InputStreamReader(location.openStream()));
+      while ((line = reader.readLine()) != null) {
+	result.append(line);
+	result.append("\n");
+      }
+    }
+    catch (Exception e) {
+      System.err.println("Failed to load WSDL from " + location + ": ");
+      e.printStackTrace();
+      result = null;
+    }
+    finally {
+      if (reader != null) {
+	try {
+	  reader.close();
+	}
+	catch (Exception e) {
+	  // ignored
+	}
+      }
+    }
+    
+    if (result != null)
+      return result.toString();
+    else
+      return null;
+  }
+  
+  /**
+   * Turns the WSDL content into content to be displayed as HTML.
+   * 
+   * @param wsdl	the WSDL to convert
+   * @return		the HTML code
+   */
+  public static String wsdlToHtml(String wsdl) {
+    // TODO better syntax highlighting
+    StringBuilder	result;
+    int			i;
+    char		c;
+    String		conv;
+    boolean		lineStart;
+
+    if (wsdl == null)
+      return "";
+    
+    result    = new StringBuilder();
+    lineStart = true;
+    for (i = 0; i < wsdl.length(); i++) {
+      c = wsdl.charAt(i);
+      // convert character?
+      switch (c) {
+	case '<':
+	  conv = "&lt;";
+	  break;
+	case '>':
+	  conv = "&gt;";
+	  break;
+	case '/':
+	  conv = "&#47;";
+	  break;
+	case '&':
+	  conv = "&amp;";
+	  break;
+	case '@':
+	  conv = "&#64;";
+	  break;
+	default:
+	  conv = "" + c;
+	  break;
+      }
+      
+      // line handling/indentation
+      switch (c) {
+	case '\r':
+	case '\n':
+	  lineStart = true;
+	  conv = "" + c;
+	  break;
+	case ' ':
+	  if (lineStart)
+	    conv = "&nbsp;";
+	  else
+	    conv = " ";
+	  break;
+	default:
+	  lineStart = false;
+	  conv = "" + c;
+	  break;
+      }
+      
+      result.append(conv);
+    }
+
+    return result.toString();
   }
 }

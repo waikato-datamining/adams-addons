@@ -263,7 +263,17 @@ public abstract class AbstractWebServiceClientSource<O>
    * @return		the additional information, null or 0-length string for no information
    */
   public String getAdditionalInformation() {
-    return "WSDL: " + getWsdlLocation();
+    StringBuilder	result;
+    String		wsdl;
+    
+    result = new StringBuilder("WSDL: " + getWsdlLocation());
+    wsdl   = WebserviceUtils.loadWsdl(getWsdlLocation());
+    if (wsdl != null) {
+      result.append("\n\n");
+      result.append(WebserviceUtils.wsdlToHtml(wsdl));
+    }
+    
+    return result.toString();
   }
 
   /**
