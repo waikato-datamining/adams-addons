@@ -39,7 +39,7 @@ public class LogURL
    * Initializes the interceptor.
    */
   public LogURL() {
-    super(Phase.SEND);
+    super(Phase.SETUP);
   }
 
   /**
