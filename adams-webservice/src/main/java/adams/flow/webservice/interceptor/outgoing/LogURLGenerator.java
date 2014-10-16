@@ -42,7 +42,7 @@ public class LogURLGenerator
 	"Generates a " + LogURL.class.getName() + " instance.\n"
 	+ "Simply logs the endpoint URL, ie the URL that gets contacted.\n"
 	+ "The URL is available through the " + LogURL.class.getName() + "#getLastURL() method.\n"
-	+ "If logging is enabled, the URL gets output via the logger as well.";
+	+ "If logging is enabled (INFO+), the URL gets output via the logger as well.";
   }
 
   /**
