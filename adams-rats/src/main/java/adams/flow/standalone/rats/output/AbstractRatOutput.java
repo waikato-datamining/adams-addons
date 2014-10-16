@@ -459,12 +459,8 @@ public abstract class AbstractRatOutput
     
     m_Stopped = false;
 
-    // do we need to re-setup the output, due to changes in variables?
-    if (    (m_VariablesUpdated.size() > 0) 
-         || (m_DetectedVariables != null) 
-         || (m_DetectedObjectVariables.size() > 0) ) {
-      updateVariables();
-    }
+    // always try to update variables
+    updateVariables();
     
     result = check();
     if (result == null) {
