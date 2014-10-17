@@ -43,6 +43,9 @@ public class RatRunnable
   /** whether we have any actors to apply to the data. */
   protected boolean m_HasActors;
   
+  /** whether the execution has been paused. */
+  protected boolean m_Paused;
+  
   /**
    * Initializes the runnable.
    * 
@@ -53,6 +56,7 @@ public class RatRunnable
     
     m_Owner     = owner;
     m_HasActors = (owner.getActorHandler().active() > 0);
+    m_Paused    = false;
   }
   
   /**
@@ -142,6 +146,9 @@ public class RatRunnable
     Token	token;
     
     while (!m_Stopped) {
+      while (m_Paused && !m_Stopped)
+	doWait(100);
+      
       data = null;
       if (isLoggingEnabled())
 	getLogger().info("Receiving from " + m_Owner.getReceiver().getFullName());
@@ -218,5 +225,28 @@ public class RatRunnable
 	}
       }
     }
+  }
+  
+  /**
+   * Pauses the execution.
+   */
+  public void pauseExecution() {
+    m_Paused = true;
+  }
+  
+  /**
+   * Resumes the execution.
+   */
+  public void resumeExecution() {
+    m_Paused = false;
+  }
+  
+  /**
+   * Returns whether the execution has been suspended.
+   * 
+   * @return		true if paused
+   */
+  public boolean isPaused() {
+    return m_Paused;
   }
 }

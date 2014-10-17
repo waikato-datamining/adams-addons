@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
+import adams.core.Pausable;
 import adams.core.Properties;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
@@ -161,7 +162,8 @@ import adams.flow.standalone.rats.output.RatOutput;
  */
 public class Rat
   extends AbstractStandaloneGroupItem
-  implements MutableActorHandler, InternalActorHandler, CallableActorUser {
+  implements MutableActorHandler, InternalActorHandler, CallableActorUser,
+             Pausable {
 
   /** for serialization. */
   private static final long serialVersionUID = -154461277343021604L;
@@ -189,6 +191,9 @@ public class Rat
 
   /** the name of the (optional) queue in internal storage for sending send error to. */
   protected StorageName m_SendErrorQueue;
+  
+  /** whether to show in {@link RatControl}. */
+  protected boolean m_ShowInControl;
   
   /**
    * Returns a string describing the object.
@@ -250,6 +255,10 @@ public class Rat
     m_OptionManager.add(
 	    "send-error-queue", "sendErrorQueue",
 	    new StorageName("senderrors"));
+
+    m_OptionManager.add(
+	    "show-in-control", "showInControl",
+	    false);
   }
 
   /**
@@ -601,18 +610,51 @@ public class Rat
   }
 
   /**
+   * Sets whether to show in RatControl.
+   * 
+   * @param value	true if to show in RatControl
+   */
+  public void setShowInControl(boolean value) {
+    m_ShowInControl = value;
+    reset();
+  }
+  
+  /**
+   * Returns whether to show in RatControl.
+   * 
+   * @return		true if to show in RatControl
+   */
+  public boolean getShowInControl() {
+    return m_ShowInControl;
+  }
+  
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String showInControlTipText() {
+    return "If enabled, this Rat will be displayed in the " + RatControl.class.getName() + " control panel.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
    */
   @Override
   public String getQuickInfo() {
-    String		result;
+    String	result;
+    String	value;
     
     result  = QuickInfoHelper.toString(this, "receiver", m_Receiver, "receiver: ");
     result += QuickInfoHelper.toString(this, "transmitter", m_Transmitter, ", transmitter: ");
     result += QuickInfoHelper.toString(this, "log", m_Log, ", log: ");
     result += QuickInfoHelper.toString(this, "sendErrorQueue", m_SendErrorQueue, ", send errors: ");
+    value   = QuickInfoHelper.toString(this, "showInControl", m_ShowInControl, "control", ", ");
+    if (value != null)
+      result += value;
     
     result += ", variables [";
     result += QuickInfoHelper.toString(this, "scopeHandlingVariables", getScopeHandlingVariables(), "scope: ");
@@ -1023,7 +1065,35 @@ public class Rat
     
     return result;
   }
-  
+
+  /**
+   * Pauses the execution.
+   */
+  @Override
+  public void pauseExecution() {
+    if (m_Runnable != null)
+      m_Runnable.pauseExecution();
+  }
+
+  /**
+   * Returns whether the object is currently paused.
+   *
+   * @return		true if object is paused
+   */
+  @Override
+  public boolean isPaused() {
+    return (m_Runnable != null) && m_Runnable.isPaused();
+  }
+
+  /**
+   * Resumes the execution.
+   */
+  @Override
+  public void resumeExecution() {
+    if (m_Runnable != null)
+      m_Runnable.resumeExecution();
+  }
+
   /**
    * Stops the execution if necessary.
    */

@@ -22,6 +22,7 @@ package adams.flow.standalone;
 import java.util.ArrayList;
 import java.util.List;
 
+import adams.core.Pausable;
 import adams.flow.core.AbstractActor;
 import adams.flow.core.ActorExecution;
 import adams.flow.core.ActorHandlerInfo;
@@ -74,10 +75,14 @@ import adams.flow.core.ActorHandlerInfo;
  * @version $Revision$
  */
 public class Rats
-  extends AbstractStandaloneMutableGroup<Rat> {
+  extends AbstractStandaloneMutableGroup<Rat>
+  implements Pausable {
 
   /** for serialization. */
   private static final long serialVersionUID = -6092821156832607603L;
+  
+  /** whether the execution has been paused. */
+  protected boolean m_Paused;
   
   /**
    * Returns a string describing the object.
@@ -101,6 +106,16 @@ public class Rats
 	    new AbstractActor[0]);
   }
 
+  /**
+   * Initializes the members.
+   */
+  @Override
+  protected void initialize() {
+    super.initialize();
+    
+    m_Paused = false;
+  }
+  
   /**
    * Returns the list of default actors.
    * 
@@ -219,5 +234,41 @@ public class Rats
     }
       
     return result;
+  }
+
+  /**
+   * Pauses the execution.
+   */
+  @Override
+  public void pauseExecution() {
+    int		i;
+    
+    for (i = 0; i < size(); i++)
+      ((Rat) get(i)).pauseExecution();
+    
+    m_Paused = true;
+  }
+
+  /**
+   * Returns whether the object is currently paused.
+   *
+   * @return		true if object is paused
+   */
+  @Override
+  public boolean isPaused() {
+    return m_Paused;
+  }
+
+  /**
+   * Resumes the execution.
+   */
+  @Override
+  public void resumeExecution() {
+    int		i;
+    
+    for (i = 0; i < size(); i++)
+      ((Rat) get(i)).resumeExecution();
+    
+    m_Paused = false;
   }
 }
