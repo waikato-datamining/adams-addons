@@ -404,7 +404,7 @@ public abstract class AbstractRatOutput
    */
   protected String updateVariables() {
     String		result;
-    Variables		backup;
+    Variables		combined;
 
     if (isLoggingEnabled()) {
       getLogger().info(
@@ -414,14 +414,13 @@ public abstract class AbstractRatOutput
 
     // obtain the new value(s)
     m_BackupState = backupState();
-    // outer variables
+    // combine variables
+    combined = getOptionManager().getVariables().getClone();
+    combined.assign(getOwner().getInternalActor().getVariables());
     getOptionManager().setQuiet(true);
+    getOptionManager().setVariables(combined);
+    getOptionManager().updateVariablesInstance(combined);
     getOptionManager().updateVariableValues(true);
-    // inner variables
-    backup = getOptionManager().getVariables();
-    getOptionManager().setVariables(getOwner().getInternalActor().getVariables());
-    getOptionManager().updateVariableValues(true);
-    getOptionManager().setVariables(backup);
     getOptionManager().setQuiet(false);
 
     // re-initialize the actor
