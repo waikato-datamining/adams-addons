@@ -15,6 +15,10 @@ adams.flow.standalone.rats.input.RatInput=\
 adams.flow.standalone.rats.output.RatOutput=\
   adams.flow.standalone.rats.output
 
+# rat generators
+adams.flow.standalone.rats.generator.AbstractRatGenerator=\
+  adams.flow.standalone.rats.generator
+
 # the servers
 adams.flow.webservice.WebServiceProvider=\
   adams.flow.webservice.blob,\

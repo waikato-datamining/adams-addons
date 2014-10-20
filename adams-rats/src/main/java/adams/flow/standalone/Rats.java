@@ -177,7 +177,7 @@ public class Rats
    */
   @Override
   public ActorHandlerInfo getActorHandlerInfo() {
-    return new ActorHandlerInfo(true, false, ActorExecution.UNDEFINED, false, new Class[]{Rat.class});
+    return new ActorHandlerInfo(true, false, ActorExecution.UNDEFINED, false, new Class[]{Rat.class, LabRat.class});
   }
 
   /**
@@ -189,8 +189,11 @@ public class Rats
    */
   @Override
   protected String checkActor(AbstractActor actor, int index) {
-    if (!(actor instanceof Rat))
-      return "Setup" + (index > -1 ? (" #" + (index+1)) : "") + " is not " + Rat.class.getName() + ", provided: " + actor.getClass().getName();
+    if (!(actor instanceof Rat) && !(actor instanceof LabRat))
+      return 
+	  "Actor" + (index > -1 ? (" #" + (index+1)) : "") + " is neither " 
+	+ Rat.class.getName() + " nor " + LabRat.class.getName() 
+	+ ", provided: " + actor.getClass().getName();
     else
       return null;
   }
