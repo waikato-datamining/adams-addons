@@ -88,6 +88,11 @@ public class Cron
       Cron	owner;
 
       owner = (Cron) context.getJobDetail().getJobDataMap().get(KEY_OWNER);
+      
+      // skip if paused
+      if (owner.getOwner().isPaused())
+	return;
+      
       result = owner.receiveData();
       if (result != null)
 	owner.getLogger().warning(result);
