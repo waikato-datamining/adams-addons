@@ -20,9 +20,9 @@
 
 package adams.data.conversion;
 
-import adams.core.JAIHelper;
 import adams.data.heatmap.Heatmap;
 import adams.data.image.BufferedImageContainer;
+import adams.data.jai.JAIHelper;
 import adams.test.TmpFile;
 
 /**
