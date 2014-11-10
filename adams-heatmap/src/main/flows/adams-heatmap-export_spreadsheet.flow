@@ -10,7 +10,7 @@ adams.flow.control.Flow
 			-file
 			${EXAMPLE_FLOWS}/data/3666455665_18795f0741.jpg
 	-actor
-		adams.flow.transformer.JAIReader
+		adams.flow.transformer.ImageReader
 	-actor
 		adams.flow.transformer.Convert
 			-conversion

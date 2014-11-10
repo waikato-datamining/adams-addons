@@ -28,7 +28,7 @@ adams.flow.control.Flow
 					-var-name
 					entry
 	-actor
-		adams.flow.transformer.JAIReader
+		adams.flow.transformer.ImageReader
 	-actor
 		adams.flow.transformer.JAITransformer
 			-transformer
