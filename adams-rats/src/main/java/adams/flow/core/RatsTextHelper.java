@@ -101,12 +101,14 @@ public class RatsTextHelper {
     
     // report
     report = new adams.data.report.Report();
-    for (nz.ac.waikato.adams.webservice.rats.text.Property prop: input.getProps().getProp()) {
-      field = new Field(prop.getKey(), adams.data.report.DataType.valueOf(prop.getType().toString()));
-      report.addField(field);
-      report.setValue(
-	  field, 
-	  prop.getValue());
+    if (input.getProps() != null) {
+      for (nz.ac.waikato.adams.webservice.rats.text.Property prop: input.getProps().getProp()) {
+	field = new Field(prop.getKey(), adams.data.report.DataType.valueOf(prop.getType().toString()));
+	report.addField(field);
+	report.setValue(
+	    field, 
+	    prop.getValue());
+      }
     }
     
     result.setReport(report);
