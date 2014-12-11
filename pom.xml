@@ -37,6 +37,7 @@
     <!-- individual modules -->
     <module>adams-heatmap</module>
     <module>adams-image-webservice</module>
+    <module>adams-jooq</module>
     <module>adams-meka</module>
     <module>adams-phmm4weka</module>
     <module>adams-rats</module>

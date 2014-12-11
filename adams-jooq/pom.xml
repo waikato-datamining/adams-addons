@@ -9,11 +9,11 @@
     <version>0.4.7-SNAPSHOT</version>
   </parent>
 
-  <artifactId>adams-heatmap</artifactId>
+  <artifactId>adams-jooq</artifactId>
   <packaging>jar</packaging>
 
-  <name>adams-heatmap</name>
-  <description>Components for processing and displaying heatmaps.</description>
+  <name>adams-jooq</name>
+  <description>Module containing jOOQ support (http://www.jooq.org/).</description>
   <url>https://adams.cms.waikato.ac.nz/</url>
   <organization>
     <name>University of Waikato, Hamilton, NZ</name>
@@ -78,31 +78,21 @@
     </dependency>
 
     <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-weka</artifactId>
-      <version>${adams.version}</version>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq</artifactId>
+      <version>3.2.2</version>
     </dependency>
-
+    
     <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-weka</artifactId>
-      <version>${adams.version}</version>
-      <scope>test</scope>
-      <type>test-jar</type>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq-meta</artifactId>
+      <version>3.2.2</version>
     </dependency>
-
+    
     <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-imaging</artifactId>
-      <version>${adams.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-imaging</artifactId>
-      <version>${adams.version}</version>
-      <scope>test</scope>
-      <type>test-jar</type>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq-codegen</artifactId>
+      <version>3.2.2</version>
     </dependency>
   </dependencies>
 
@@ -126,21 +116,22 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <descriptors>
-            <descriptor>src/main/assembly/sources.xml</descriptor>
-            <descriptor>src/main/assembly/test-sources.xml</descriptor>
-            <descriptor>src/main/assembly/doc.xml</descriptor>
-            <descriptor>src/main/assembly/flows.xml</descriptor>
-          </descriptors>
-        </configuration>
         <executions>
           <execution>
-            <id>make-assembly</id>
+            <id>make-assembly-attached</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
+            <configuration>
+              <attach>true</attach>
+              <descriptors>
+                <!--descriptor>src/main/assembly/doc.xml</descriptor-->
+                <!--descriptor>src/main/assembly/flows.xml</descriptor-->
+                <descriptor>src/main/assembly/sources.xml</descriptor>
+                <!--descriptor>src/main/assembly/test-sources.xml</descriptor-->
+              </descriptors>
+            </configuration>
           </execution>
         </executions>
       </plugin>

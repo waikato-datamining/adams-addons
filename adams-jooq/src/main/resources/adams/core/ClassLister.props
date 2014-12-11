@@ -1,0 +1,16 @@
+# Configuration file listing the superclasses and the packages in which to
+# look for derived classes.
+#
+# Format:
+# class.name=package1,package2,...
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision: 8697 $
+
+# the XML configuration generators
+adams.data.jooq.AbstractJOOQConfigurationGenerator=\
+  adams.data.jooq
+
+# the providers for jOOQ code generators
+adams.data.jooq.AbstractJOOQCodeGeneratorProvider=\
+  adams.data.jooq

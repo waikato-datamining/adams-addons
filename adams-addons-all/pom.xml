@@ -112,6 +112,21 @@
       <type>test-jar</type>
     </dependency>
 
+    <!-- jooq -->
+    <dependency>
+      <groupId>nz.ac.waikato.cms.adams</groupId>
+      <artifactId>adams-jooq</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!--dependency>
+      <groupId>nz.ac.waikato.cms.adams</groupId>
+      <artifactId>adams-jooq</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+      <type>test-jar</type>
+    </dependency-->
+
     <!-- meka -->
     <dependency>
       <groupId>nz.ac.waikato.cms.adams</groupId>
