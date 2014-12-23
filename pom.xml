@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>adams-addons-pom</artifactId>
-  <version>0.4.7-SNAPSHOT</version>
+  <version>0.4.7</version>
   <packaging>pom</packaging>
 
   <name>adams-addons-pom</name>
@@ -22,9 +22,9 @@
   </organization>
 
   <scm>
-    <connection>scm:svn:https://svn.cms.waikato.ac.nz/svn/adams/addons/trunk</connection>
-    <developerConnection>scm:svn:https://svn.cms.waikato.ac.nz/svn/adams/addons/trunk</developerConnection>
-    <url>https://svn.cms.waikato.ac.nz/svn/adams/addons/trunk</url>
+    <connection>scm:svn:https://svn.cms.waikato.ac.nz/svn/adams/addons/tags/adams-addons-pom-0.4.7</connection>
+    <developerConnection>scm:svn:https://svn.cms.waikato.ac.nz/svn/adams/addons/tags/adams-addons-pom-0.4.7</developerConnection>
+    <url>https://svn.cms.waikato.ac.nz/svn/adams/addons/tags/adams-addons-pom-0.4.7</url>
   </scm>
 
   <properties>
