@@ -15,27 +15,9 @@
 
 /**
  * HeatmapViewerPanel.java
- * Copyright (C) 2011-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.heatmap;
-
-import java.awt.BorderLayout;
-import java.awt.Dialog.ModalityType;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.List;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import adams.core.CleanUpHandler;
 import adams.core.Properties;
@@ -71,6 +53,23 @@ import adams.gui.visualization.image.plugins.AbstractSelectedImagesFilter;
 import adams.gui.visualization.image.plugins.BufferedImageTransformer;
 import adams.gui.visualization.image.plugins.ImageJTransformer;
 import adams.gui.visualization.image.plugins.ImageMagick;
+
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.BorderLayout;
+import java.awt.Dialog.ModalityType;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.List;
 
 /**
  * Panel for viewing/processing heatmaps.
@@ -513,7 +512,6 @@ public class HeatmapViewerPanel
       m_MenuItemViewZoomOut = menuitem;
 
       // zoom levels
-      // TODO: add "fit" zoom
       zooms = new int[]{
 	  -100,
 	  25,
@@ -754,6 +752,7 @@ public class HeatmapViewerPanel
       result.setShowCentroid(m_MenuItemViewShowCentroid.isSelected());
     result.setSearchPanelVisible(false);
     result.setHeatmap(map);
+    result.setZoom(-1);
 
     return result;
   }
@@ -779,6 +778,7 @@ public class HeatmapViewerPanel
           HeatmapPanel panel = newPanel(maps.get(0));
           panel.setReader(reader);
           m_TabbedPane.addTab(panel.getTitle(), panel);
+	  m_TabbedPane.setSelectedComponent(panel);
           showStatus("");
           if (m_RecentFilesHandler != null)
             m_RecentFilesHandler.addRecentItem(new Setup(file, reader));
@@ -804,7 +804,7 @@ public class HeatmapViewerPanel
       return;
     }
     
-    load(new File[]{file}, (AbstractHeatmapReader) reader);
+    load(new File[]{file}, reader);
   }
 
   /**
