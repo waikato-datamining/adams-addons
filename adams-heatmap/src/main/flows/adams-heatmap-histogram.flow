@@ -1,0 +1,64 @@
+# Project: adams
+# Date: 2015-02-09 14:44:42
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Generates a histogram from the image loaded as heatmap\nand displays it alongside the heatmap.
+	-actor
+		adams.flow.standalone.GridView
+			-height
+			800
+			-actor
+				adams.flow.sink.HeatmapDisplay
+					-name
+					Heatmap
+					-short-title
+					true
+					-writer
+						adams.gui.print.NullWriter
+					-color-generator
+						adams.gui.visualization.core.BiColorGenerator
+					-zoom
+					-1.0
+			-actor
+				adams.flow.sink.HeatmapHistogram
+					-name
+					Histogram
+					-short-title
+					true
+					-writer
+						adams.gui.print.NullWriter
+					-array-histogram
+						adams.data.statistics.ArrayHistogram
+			-num-rows
+			2
+			-writer
+				adams.gui.print.NullWriter
+	-actor
+		adams.flow.source.FileSupplier
+			-file
+			${EXAMPLE_FLOWS}/data/3666455665_18795f0741_small.jpg
+	-actor
+		adams.flow.transformer.HeatmapFileReader
+			-reader
+				adams.data.io.input.SimpleImageHeatmapReader
+					-reader
+						adams.data.io.input.JAIImageReader
+	-actor
+		adams.flow.control.Branch
+			-branch
+				adams.flow.sink.CallableSink
+					-name
+					heatmap
+					-callable
+					Heatmap
+			-branch
+				adams.flow.sink.CallableSink
+					-name
+					histogram
+					-callable
+					Histogram
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+
