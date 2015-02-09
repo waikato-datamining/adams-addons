@@ -157,6 +157,9 @@ public class HeatmapViewerPanel
   /** the color generator menu item. */
   protected JMenuItem m_MenuItemViewColorGenerator;
 
+  /** the histogram menu item. */
+  protected JMenuItem m_MenuItemViewShowHistogram;
+
   /** for loading heatmaps from disk. */
   protected HeatmapFileChooser m_FileChooser;
 
@@ -613,6 +616,20 @@ public class HeatmapViewerPanel
 	}
       });
       m_MenuItemViewShowStatistics = menuitem;
+
+      // View/Show histogram
+      menuitem = new JMenuItem("Show histogram...");
+      menu.add(menuitem);
+      menuitem.setMnemonic('h');
+      menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed H"));
+      menuitem.setIcon(GUIHelper.getIcon("histogram.png"));
+      menuitem.addActionListener(new ActionListener() {
+	@Override
+	public void actionPerformed(ActionEvent e) {
+	  getCurrentPanel().showHistogram();
+	}
+      });
+      m_MenuItemViewShowHistogram = menuitem;
 
       // View/Show notes
       menuitem = new JMenuItem("Show notes...");

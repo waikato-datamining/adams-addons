@@ -29,6 +29,7 @@ import adams.data.image.AbstractImageContainer;
 import adams.data.io.input.AbstractHeatmapReader;
 import adams.data.report.Report;
 import adams.data.spreadsheet.SpreadSheet;
+import adams.data.statistics.ArrayHistogram;
 import adams.data.statistics.InformativeStatistic;
 import adams.gui.core.BaseDialog;
 import adams.gui.core.BasePanel;
@@ -42,6 +43,7 @@ import adams.gui.core.SpreadSheetTable;
 import adams.gui.core.SpreadSheetTableModel;
 import adams.gui.event.SearchEvent;
 import adams.gui.event.SearchListener;
+import adams.gui.goe.GenericObjectEditorDialog;
 import adams.gui.visualization.container.NotesFactory;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
@@ -105,6 +107,9 @@ public class HeatmapPanel
   /** the color generator to use. */
   protected AbstractColorGradientGenerator m_ColorGenerator;
 
+  /** the last ArrayHistogram setup that was used. */
+  protected ArrayHistogram m_LastArrayHistogram;
+
   /**
    * Initializes the panel.
    *
@@ -125,11 +130,12 @@ public class HeatmapPanel
 
     super.initialize();
 
-    props            = getProperties();
-    m_Owner          = null;
-    m_Heatmap        = new Heatmap(0, 0);
-    m_Reader         = null;
-    m_ColorGenerator = AbstractColorGradientGenerator.forCommandLine(props.getProperty("Image.GradientColorGenerator", new BiColorGenerator().toCommandLine()));
+    props                = getProperties();
+    m_Owner              = null;
+    m_Heatmap            = new Heatmap(0, 0);
+    m_Reader             = null;
+    m_ColorGenerator     = AbstractColorGradientGenerator.forCommandLine(props.getProperty("Image.GradientColorGenerator", new BiColorGenerator().toCommandLine()));
+    m_LastArrayHistogram = null;
   }
 
   /**
@@ -415,6 +421,48 @@ public class HeatmapPanel
     dialog.setSize(
 	props.getInteger("View.SpreadSheet.Width", 800),
 	props.getInteger("View.SpreadSheet.Height", 600));
+    dialog.setLocationRelativeTo(this);
+    dialog.setVisible(true);
+  }
+
+  /**
+   * Displays the heatmap as histogram.
+   */
+  public void showHistogram() {
+    BaseDialog			dialog;
+    HistogramPanel		panel;
+    GenericObjectEditorDialog	goe;
+
+    // display options dialog for histogram
+    if (m_LastArrayHistogram == null)
+      m_LastArrayHistogram = new ArrayHistogram();
+
+    if (getParentDialog() != null)
+      goe = new GenericObjectEditorDialog(getParentDialog(), ModalityType.DOCUMENT_MODAL);
+    else
+      goe = new GenericObjectEditorDialog(getParentFrame(), true);
+    goe.setDefaultCloseOperation(GenericObjectEditorDialog.DISPOSE_ON_CLOSE);
+    goe.getGOEEditor().setClassType(ArrayHistogram.class);
+    goe.getGOEEditor().setCanChangeClassInDialog(false);
+    goe.getGOEEditor().setValue(m_LastArrayHistogram);
+    goe.setLocationRelativeTo(this);
+    goe.setVisible(true);
+    if (goe.getResult() != GenericObjectEditorDialog.APPROVE_OPTION)
+      return;
+    m_LastArrayHistogram = (ArrayHistogram) goe.getCurrent();
+
+    panel = new HistogramPanel();
+    panel.setData(getHeatmap());
+    panel.setArrayHistogram((ArrayHistogram) m_LastArrayHistogram.shallowCopy());
+
+    if (getParentDialog() != null)
+      dialog = new BaseDialog(getParentDialog(), ModalityType.MODELESS);
+    else
+      dialog = new BaseDialog(getParentFrame(), false);
+    dialog.setTitle("Heatmap #" + getHeatmap().getID());
+    dialog.getContentPane().setLayout(new BorderLayout());
+    dialog.getContentPane().add(panel, BorderLayout.CENTER);
+    dialog.setSize(600, 400);
     dialog.setLocationRelativeTo(this);
     dialog.setVisible(true);
   }
