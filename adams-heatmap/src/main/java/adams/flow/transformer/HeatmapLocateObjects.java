@@ -23,7 +23,6 @@ import adams.data.Notes;
 import adams.data.conversion.HeatmapToBufferedImage;
 import adams.data.heatmap.Heatmap;
 import adams.data.image.AbstractImageContainer;
-import adams.data.image.BufferedImageContainer;
 import adams.data.report.Report;
 import adams.flow.core.Token;
 import adams.flow.transformer.locateobjects.AbstractObjectLocator;
@@ -367,11 +366,10 @@ public class HeatmapLocateObjects
     Heatmap			submap;
     BufferedImage		image;
     LocatedObjects		objects;
-    AbstractImageContainer	contIn;
+    AbstractImageContainer 	cont;
     Notes			notes;
     Report			report;
     Report			reportNew;
-    BufferedImageContainer	cont;
 
     result = null;
 
@@ -382,8 +380,8 @@ public class HeatmapLocateObjects
     m_Conversion.setInput(heatmap);
     result = m_Conversion.convert();
     if (result == null) {
-      contIn = (AbstractImageContainer) m_Conversion.getOutput();
-      image  = contIn.toBufferedImage();
+      cont = (AbstractImageContainer) m_Conversion.getOutput();
+      image  = cont.toBufferedImage();
     }
 
     // doesn't work in headless mode
