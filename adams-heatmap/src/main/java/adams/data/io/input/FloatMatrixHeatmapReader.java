@@ -15,17 +15,18 @@
 
 /*
  * FloatMatrixHeatmapReader.java
- * Copyright (C) 2011-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
 
+import adams.data.heatmap.Heatmap;
+import adams.data.report.Report;
+
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.nio.ByteBuffer;
-
-import adams.data.heatmap.Heatmap;
-import adams.data.report.Report;
+import java.util.logging.Level;
 
 /**
  <!-- globalinfo-start -->
@@ -252,8 +253,7 @@ public class FloatMatrixHeatmapReader
       while (read == 4);
     }
     catch (Exception e) {
-      System.err.println("Failed to read heatmap from '" + m_Input + "':");
-      e.printStackTrace();
+      getLogger().log(Level.SEVERE, "Failed to read heatmap from '" + m_Input + "'!", e);
       map = null;
     }
     finally {
