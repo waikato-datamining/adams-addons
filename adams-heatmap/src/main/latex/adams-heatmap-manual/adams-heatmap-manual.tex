@@ -1,4 +1,4 @@
-% Copyright (c) 2012 by the University of Waikato, Hamilton, NZ. 
+% Copyright (c) 2012-2015 by the University of Waikato, Hamilton, NZ.
 % This work is made available under the terms of the 
 % Creative Commons Attribution-ShareAlike 3.0 license, 
 % http://creativecommons.org/licenses/by-sa/3.0/. 
@@ -45,7 +45,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2011-2013} &
+		\parbox[c][2cm]{2cm}{\copyright 2011-2015} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -78,18 +78,35 @@ The following conversions are available:
 \end{tight_itemize}
 The following transformers are available:
 \begin{tight_itemize}
-  	\item \textit{HeatmapFileReader} -- reads a heat map from disk with a 
+  	\item \textit{HeatmapArrayStatistics} -- interprets a heatmap as array
+  	(row-wise concatenated) and generates statistics from it.
+  	\item \textit{HeatmapFileReader} -- reads a heat map from disk with a
   	specified reader.
   	\item \textit{HeatmapFileWriter} -- writes a heat map back to disk with
   	a custom writer.
   	\item \textit{HeatmapFilter} -- transform a heat map using a filter.
   	\item \textit{HeatmapInstanceGenerator} -- turns a heat map into a WEKA
   	instance.
+  	\item \textit{HeatmapLocateObjects} -- generates sub-heatmaps from objects
+  	that were located in the heatmap.
 \end{tight_itemize}
 The following sinks are available:
 \begin{tight_itemize}
   	\item \textit{HeatmapDisplay} -- displays a heatmap.
+  	\item \textit{HeatmapHistogram} -- displays a histogram generated from a heatmap.
 \end{tight_itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Tools}
+
+The \textit{Heatmap viewer} allows you to load, process and analyze heatmaps
+from a variety of formats. See Figure \ref{heatmap-viewer} for a screenshot.
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=10.0cm]{images/heatmap-viewer.png}
+  \caption{Heatmap viewer displaying a heatmap with the associated histogram.}
+  \label{heatmap-viewer}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
