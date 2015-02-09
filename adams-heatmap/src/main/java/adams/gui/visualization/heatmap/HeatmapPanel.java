@@ -15,18 +15,9 @@
 
 /**
  * HeatmapPanel.java
- * Copyright (C) 2011-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.heatmap;
-
-import java.awt.BorderLayout;
-import java.awt.Dialog.ModalityType;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JPanel;
 
 import adams.core.Properties;
 import adams.core.io.PlaceholderFile;
@@ -57,6 +48,14 @@ import adams.gui.visualization.core.BiColorGenerator;
 import adams.gui.visualization.image.ImagePanel;
 import adams.gui.visualization.report.ReportFactory;
 import adams.gui.visualization.statistics.InformativeStatisticFactory;
+
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.Dialog.ModalityType;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Panel for displaying a single heatmap.
@@ -532,7 +531,7 @@ public class HeatmapPanel
   /**
    * Sets the zoom factor (0-16). Use -1 to fit inside panel.
    *
-   * @param value	the zoom factor
+   * @param zoom	the zoom factor
    */
   public void setZoom(double zoom) {
     m_HeatmapImage.setScale(zoom);
