@@ -76,6 +76,8 @@ public class HeatmapLocateObjectsTest
    * Performs a regression test, comparing against previously generated output.
    */
   public void testRegression() {
+    if (m_Headless)
+      return;
     performRegressionTest(
         new TmpFile[]{
           new TmpFile("dumpfile.txt")
