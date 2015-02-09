@@ -269,7 +269,5 @@ public class FloatMatrixHeatmapReader
 
     if (map != null)
       m_ReadData.add(map);
-    else
-      getLogger().severe("Error reading heatmap from '" + m_Input.getAbsolutePath() + "'!");
   }
 }
