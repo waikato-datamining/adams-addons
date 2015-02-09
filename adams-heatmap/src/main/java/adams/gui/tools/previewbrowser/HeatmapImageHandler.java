@@ -15,17 +15,19 @@
 
 /**
  * HeatmapImageHandler.java
- * Copyright (C) 2011-2012 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.tools.previewbrowser;
 
-import java.io.File;
-import java.util.List;
-
 import adams.core.io.PlaceholderFile;
 import adams.data.heatmap.Heatmap;
-import adams.data.io.input.FloatMatrixHeatmapReader;
+import adams.data.io.input.AbstractDataContainerReader;
+import adams.gui.chooser.HeatmapFileChooser;
 import adams.gui.visualization.heatmap.HeatmapPanel;
+
+import javax.swing.JLabel;
+import java.io.File;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -72,7 +74,7 @@ public class HeatmapImageHandler
    */
   @Override
   public String[] getExtensions() {
-    return new String[]{"dat"};
+    return new String[]{"*"};
   }
 
   /**
@@ -83,14 +85,17 @@ public class HeatmapImageHandler
    */
   @Override
   protected PreviewPanel createPreview(File file) {
-    HeatmapPanel		result;
-    FloatMatrixHeatmapReader	reader;
-    List<Heatmap>		maps;
+    HeatmapPanel				result;
+    AbstractDataContainerReader<Heatmap> 	reader;
+    List<Heatmap>				maps;
 
     result = new HeatmapPanel(null);
     result.setSearchPanelVisible(false);
 
-    reader = new FloatMatrixHeatmapReader();
+    reader = new HeatmapFileChooser().getReaderForFile(file);
+    if (reader == null)
+      return new PreviewPanel(new JLabel("Cannot display heatmap file: " + file));
+
     reader.setInput(new PlaceholderFile(file));
     maps = reader.read();
 

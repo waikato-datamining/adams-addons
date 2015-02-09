@@ -9,8 +9,8 @@ Panel.DividerLocation=550
 # The generator to use for creating the color gradient
 Image.GradientColorGenerator=adams.gui.visualization.core.BiColorGenerator
 
-# The initial scaling factor (1.0 == 100%)
-Image.Scale=1.5
+# The initial scaling factor (1.0 == 100%; -1 for optimal fit)
+Image.Scale=-1.0
 
 # Whether to display the heatmap also as spreadsheet (true|false)
 SpreadSheet.Show=false

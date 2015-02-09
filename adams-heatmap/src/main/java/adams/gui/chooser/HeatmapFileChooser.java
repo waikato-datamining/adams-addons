@@ -15,19 +15,19 @@
 
 /*
  * HeatmapFileChooser.java
- * Copyright (C) 2011-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.chooser;
-
-import java.io.File;
-import java.util.List;
 
 import adams.data.heatmap.Heatmap;
 import adams.data.io.input.AbstractDataContainerReader;
 import adams.data.io.input.AbstractHeatmapReader;
 import adams.data.io.output.AbstractDataContainerWriter;
 import adams.data.io.output.AbstractHeatmapWriter;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * A specialized JFileChooser that lists all available file Readers and Writers
@@ -74,7 +74,7 @@ public class HeatmapFileChooser
    */
   @Override
   protected AbstractDataContainerReader<Heatmap> getDefaultReader() {
-    return new adams.data.io.input.SpreadSheetHeatmapReader();
+    return new adams.data.io.input.SimpleHeatmapReader();
   }
 
   /**
@@ -84,7 +84,7 @@ public class HeatmapFileChooser
    */
   @Override
   protected AbstractDataContainerWriter<Heatmap> getDefaultWriter() {
-    return new adams.data.io.output.SpreadSheetHeatmapWriter();
+    return new adams.data.io.output.SimpleHeatmapWriter();
   }
 
   /**
@@ -128,8 +128,10 @@ public class HeatmapFileChooser
     result = null;
 
     for (List<ExtensionFileFilterWithClass> list: m_ReaderFileFilters.values()) {
+      // try filters that don't use "*.*"
       for (ExtensionFileFilterWithClass filter: list) {
-	// TODO: handling of *.* filters?
+	if (isAllFilter(filter))
+	  continue;
 	if (filter.accept(file)) {
 	  try {
 	    result = (AbstractDataContainerReader<Heatmap>) Class.forName(filter.getClassname()).newInstance();
@@ -137,6 +139,22 @@ public class HeatmapFileChooser
 	  catch (Exception e) {
 	    System.err.println("Failed to instantiate reader '" + filter.getClassname() + "':");
 	    e.printStackTrace();
+	  }
+	}
+      }
+      // try filters that use "*.*"
+      if (result == null) {
+	for (ExtensionFileFilterWithClass filter : list) {
+	  if (!isAllFilter(filter))
+	    continue;
+	  if (filter.accept(file)) {
+	    try {
+	      result = (AbstractDataContainerReader<Heatmap>) Class.forName(filter.getClassname()).newInstance();
+	    }
+	    catch (Exception e) {
+	      System.err.println("Failed to instantiate reader '" + filter.getClassname() + "':");
+	      e.printStackTrace();
+	    }
 	  }
 	}
       }
@@ -157,8 +175,10 @@ public class HeatmapFileChooser
     result = null;
 
     for (List<ExtensionFileFilterWithClass> list: m_WriterFileFilters.values()) {
+      // try filters that don't match "*.*"
       for (ExtensionFileFilterWithClass filter: list) {
-	// TODO: handling of *.* filters?
+	if (isAllFilter(filter))
+	  continue;
 	if (filter.accept(file)) {
 	  try {
 	    result = (AbstractDataContainerWriter<Heatmap>) Class.forName(filter.getClassname()).newInstance();
@@ -166,6 +186,22 @@ public class HeatmapFileChooser
 	  catch (Exception e) {
 	    System.err.println("Failed to instantiate writer '" + filter.getClassname() + "':");
 	    e.printStackTrace();
+	  }
+	}
+      }
+      // try filters that use "*.*"
+      if (result == null) {
+	for (ExtensionFileFilterWithClass filter: list) {
+	  if (!isAllFilter(filter))
+	    continue;
+	  if (filter.accept(file)) {
+	    try {
+	      result = (AbstractDataContainerWriter<Heatmap>) Class.forName(filter.getClassname()).newInstance();
+	    }
+	    catch (Exception e) {
+	      System.err.println("Failed to instantiate writer '" + filter.getClassname() + "':");
+	      e.printStackTrace();
+	    }
 	  }
 	}
       }

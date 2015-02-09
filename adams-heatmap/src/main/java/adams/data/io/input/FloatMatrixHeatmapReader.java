@@ -225,12 +225,10 @@ public class FloatMatrixHeatmapReader
     try {
       // assemble meta-data
       report = Heatmap.createEmptyReport();
-      report.setStringValue(Heatmap.FIELD_FILENAME, m_Input.getAbsolutePath());
 
       // read heatmap data
       map = new Heatmap(m_Height, m_Width);
       map.setReport(report);
-      map.setID(m_Input.getName());
       stream = new DataInputStream(new FileInputStream(m_Input.getAbsoluteFile()));
       x      = 0;
       y      = 0;

@@ -15,23 +15,25 @@
 
 /**
  * HeatmapSpreadSheetHandler.java
- * Copyright (C) 2011-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.tools.previewbrowser;
-
-import java.awt.BorderLayout;
-import java.io.File;
-import java.util.List;
 
 import adams.core.io.PlaceholderFile;
 import adams.data.conversion.HeatmapToSpreadSheet;
 import adams.data.heatmap.Heatmap;
-import adams.data.io.input.FloatMatrixHeatmapReader;
+import adams.data.io.input.AbstractDataContainerReader;
 import adams.data.spreadsheet.SpreadSheet;
+import adams.gui.chooser.HeatmapFileChooser;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.SpreadSheetTable;
 import adams.gui.core.SpreadSheetTableModel;
+
+import javax.swing.JLabel;
+import java.awt.BorderLayout;
+import java.io.File;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -78,7 +80,7 @@ public class HeatmapSpreadSheetHandler
    */
   @Override
   public String[] getExtensions() {
-    return new String[]{"dat"};
+    return new String[]{"*"};
   }
 
   /**
@@ -89,17 +91,20 @@ public class HeatmapSpreadSheetHandler
    */
   @Override
   protected PreviewPanel createPreview(File file) {
-    BasePanel			result;
-    FloatMatrixHeatmapReader	reader;
-    List<Heatmap>		maps;
-    HeatmapToSpreadSheet	hm2ss;
-    SpreadSheetTable		table;
-    String			msg;
-    SpreadSheetTableModel	model;
+    BasePanel					result;
+    AbstractDataContainerReader<Heatmap> 	reader;
+    List<Heatmap>				maps;
+    HeatmapToSpreadSheet			hm2ss;
+    SpreadSheetTable				table;
+    String					msg;
+    SpreadSheetTableModel			model;
 
     result = new BasePanel(new BorderLayout());
 
-    reader = new FloatMatrixHeatmapReader();
+    reader = new HeatmapFileChooser().getReaderForFile(file);
+    if (reader == null)
+      return new PreviewPanel(new JLabel("Cannot display heatmap file: " + file));
+
     reader.setInput(new PlaceholderFile(file));
     maps = reader.read();
 

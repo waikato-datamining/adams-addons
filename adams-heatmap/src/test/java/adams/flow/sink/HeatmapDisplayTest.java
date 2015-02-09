@@ -14,7 +14,7 @@
  */
 
 /*
- * HeatmapHistogramTest.java
+ * HeatmapDisplayTest.java
  * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
  */
 
@@ -29,13 +29,13 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
- * Test for HeatmapHistogram actor.
+ * Test for HeatmapDisplay actor.
  *
  * @author fracpete
  * @author adams.core.option.FlowJUnitTestProducer (code generator)
  * @version $Revision$
  */
-public class HeatmapHistogramTest
+public class HeatmapDisplayTest
   extends AbstractFlowTest {
 
   /**
@@ -43,7 +43,7 @@ public class HeatmapHistogramTest
    *
    * @param name	the name of the test
    */
-  public HeatmapHistogramTest(String name) {
+  public HeatmapDisplayTest(String name) {
     super(name);
   }
 
@@ -76,7 +76,7 @@ public class HeatmapHistogramTest
    * @return		the test suite
    */
   public static Test suite() {
-    return new TestSuite(HeatmapHistogramTest.class);
+    return new TestSuite(HeatmapDisplayTest.class);
   }
 
   /**
@@ -113,19 +113,17 @@ public class HeatmapHistogramTest
 
       actors1[1] = heatmapfilereader4;
 
-      // Flow.HeatmapHistogram
-      adams.flow.sink.HeatmapHistogram heatmaphistogram9 = new adams.flow.sink.HeatmapHistogram();
-      heatmaphistogram9.setShortTitle(true);
-
-      argOption = (AbstractArgumentOption) heatmaphistogram9.getOptionManager().findByProperty("writer");
+      // Flow.HeatmapDisplay
+      adams.flow.sink.HeatmapDisplay heatmapdisplay9 = new adams.flow.sink.HeatmapDisplay();
+      argOption = (AbstractArgumentOption) heatmapdisplay9.getOptionManager().findByProperty("writer");
       adams.gui.print.NullWriter nullwriter11 = new adams.gui.print.NullWriter();
-      heatmaphistogram9.setWriter(nullwriter11);
+      heatmapdisplay9.setWriter(nullwriter11);
 
-      argOption = (AbstractArgumentOption) heatmaphistogram9.getOptionManager().findByProperty("arrayHistogram");
-      adams.data.statistics.ArrayHistogram arrayhistogram13 = new adams.data.statistics.ArrayHistogram();
-      heatmaphistogram9.setArrayHistogram(arrayhistogram13);
+      argOption = (AbstractArgumentOption) heatmapdisplay9.getOptionManager().findByProperty("colorGenerator");
+      adams.gui.visualization.core.BiColorGenerator bicolorgenerator13 = new adams.gui.visualization.core.BiColorGenerator();
+      heatmapdisplay9.setColorGenerator(bicolorgenerator13);
 
-      actors1[2] = heatmaphistogram9;
+      actors1[2] = heatmapdisplay9;
       flow.setActors(actors1);
 
       argOption = (AbstractArgumentOption) flow.getOptionManager().findByProperty("flowExecutionListener");

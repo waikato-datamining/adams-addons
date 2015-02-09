@@ -21,6 +21,11 @@ package adams.data.io.output;
 
 import adams.core.ClassLister;
 import adams.data.heatmap.Heatmap;
+import adams.data.report.DataType;
+import adams.data.report.Field;
+import adams.data.report.Report;
+
+import java.util.List;
 
 /**
  * Ancestor for writers that output heatmaps.
@@ -42,6 +47,28 @@ public abstract class AbstractHeatmapWriter
   @Override
   public boolean canWriteMultiple() {
     return false;
+  }
+
+  /**
+   * The default implementation only checks whether the provided file is an
+   * actual file and whether it exists (if m_OutputIsFile is TRUE). Otherwise
+   * the directory has to exist.
+   *
+   * @param data	the data to write
+   */
+  protected void checkData(List<Heatmap> data) {
+    Report	meta;
+
+    super.checkData(data);
+
+    for (Heatmap map: data) {
+      meta = map.getReport().getClone();
+      if (!meta.hasValue("Height"))
+	meta.setValue(new Field("Height", DataType.NUMERIC), map.getHeight());
+      if (!meta.hasValue("Width"))
+	meta.setValue(new Field("Width", DataType.NUMERIC), map.getWidth());
+      map.setReport(meta);
+    }
   }
 
   /**

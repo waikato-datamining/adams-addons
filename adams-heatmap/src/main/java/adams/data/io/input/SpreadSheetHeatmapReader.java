@@ -15,18 +15,17 @@
 
 /*
  * SpreadSheetHeatmapReader.java
- * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2015 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
 
-import weka.core.Utils;
 import adams.data.heatmap.Heatmap;
-import adams.data.report.Report;
 import adams.data.spreadsheet.Cell;
 import adams.data.spreadsheet.Cell.ContentType;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.columnfinder.ByContentType;
+import weka.core.Utils;
 
 /**
  <!-- globalinfo-start -->
@@ -152,7 +151,6 @@ public class SpreadSheetHeatmapReader
   protected void readData() {
     Heatmap		map;
     SpreadSheet		sheet;
-    Report		report;
     ByContentType	finder;
     int[]		numeric;
     int			i;
@@ -171,14 +169,8 @@ public class SpreadSheetHeatmapReader
       return;
     }
 
-    // assemble meta-data
-    report = Heatmap.createEmptyReport();
-    report.setStringValue(Heatmap.FIELD_FILENAME, m_Input.getAbsolutePath());
-
     // assemble heatmap data
     map = new Heatmap(sheet.getRowCount(), numeric.length);
-    map.setReport(report);
-    map.setID(m_Input.getName());
     if (isLoggingEnabled())
       getLogger().info("map: rows=" + map.getHeight() + ", cols=" + map.getWidth());
 

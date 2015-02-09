@@ -236,7 +236,7 @@ public class HeatmapPanel
     }
     else {
       m_HeatmapImage.setCurrentImage(((AbstractImageContainer) hm2bi.getOutput()).toBufferedImage());
-      m_HeatmapImage.setScale(props.getDouble("Image.Scale", 1.5));
+      m_HeatmapImage.setScale(props.getDouble("Image.Scale", -1.0));
     }
 
     // spreadsheet

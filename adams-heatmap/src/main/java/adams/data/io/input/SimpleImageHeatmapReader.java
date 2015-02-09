@@ -24,7 +24,6 @@ import adams.data.heatmap.Heatmap;
 import adams.data.image.AbstractImageContainer;
 import adams.data.image.BufferedImageHelper;
 import adams.data.image.IntArrayMatrixView;
-import adams.data.report.Report;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -162,8 +161,7 @@ public class SimpleImageHeatmapReader
    */
   @Override
   protected void readData() {
-    Heatmap map;
-    Report report;
+    Heatmap 			map;
     AbstractImageContainer	cont;
     BufferedImage 		image;
     IntArrayMatrixView		matrix;
@@ -177,14 +175,8 @@ public class SimpleImageHeatmapReader
       image  = BufferedImageHelper.convert(cont.toBufferedImage(), BufferedImage.TYPE_BYTE_GRAY);
       matrix = BufferedImageHelper.getPixelMatrix(image);
 
-      // assemble meta-data
-      report = Heatmap.createEmptyReport();
-      report.setStringValue(Heatmap.FIELD_FILENAME, m_Input.getAbsolutePath());
-
       // read heatmap data
       map = new Heatmap(matrix.getHeight(), matrix.getWidth());
-      map.setReport(report);
-      map.setID(m_Input.getName());
       for (y = 0; y < matrix.getHeight(); y++) {
 	for (x = 0; x < matrix.getWidth(); x++) {
 	  rgba = matrix.getRGBA(x, y);

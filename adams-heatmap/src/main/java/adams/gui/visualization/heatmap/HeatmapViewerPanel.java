@@ -769,7 +769,6 @@ public class HeatmapViewerPanel
       result.setShowCentroid(m_MenuItemViewShowCentroid.isSelected());
     result.setSearchPanelVisible(false);
     result.setHeatmap(map);
-    result.setZoom(-1);
 
     return result;
   }

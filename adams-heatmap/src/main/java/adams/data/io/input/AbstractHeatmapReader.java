@@ -21,6 +21,8 @@ package adams.data.io.input;
 
 import adams.core.ClassLister;
 import adams.data.heatmap.Heatmap;
+import adams.data.report.DataType;
+import adams.data.report.Field;
 
 /**
  * Ancestor for readers that read heatmaps.
@@ -33,6 +35,24 @@ public abstract class AbstractHeatmapReader
 
   /** for serialization. */
   private static final long serialVersionUID = -2206748744422806213L;
+
+  /**
+   * For performing post-processing.
+   */
+  protected void postProcessData() {
+    super.postProcessData();
+
+    for (Heatmap map: m_ReadData) {
+      // set filename
+      if (map.hasReport()) {
+	map.getReport().addField(new Field(Heatmap.FIELD_FILENAME, DataType.NUMERIC));
+	map.getReport().setStringValue(Heatmap.FIELD_FILENAME, m_Input.getAbsolutePath());
+      }
+      // fix ID
+      if (map.getID().trim().length() == 0)
+	map.setID(m_Input.getName());
+    }
+  }
 
   /**
    * Returns a list with classnames of readers.
