@@ -56,7 +56,7 @@ public class HeatmapArrayStatisticTest
   protected void setUp() throws Exception {
     super.setUp();
     
-    m_TestHelper.copyResourceToTmp("3666455665_18795f0741_small.jpg");
+    m_TestHelper.copyResourceToTmp("3666455665_18795f0741_small.hm");
     m_TestHelper.deleteFileFromTmp("dumpfile.csv");
   }
 
@@ -66,7 +66,7 @@ public class HeatmapArrayStatisticTest
    * @throws Exception	if tear-down fails
    */
   protected void tearDown() throws Exception {
-    m_TestHelper.deleteFileFromTmp("3666455665_18795f0741_small.jpg");
+    m_TestHelper.deleteFileFromTmp("3666455665_18795f0741_small.hm");
     m_TestHelper.deleteFileFromTmp("dumpfile.csv");
     
     super.tearDown();
@@ -110,19 +110,16 @@ public class HeatmapArrayStatisticTest
       adams.flow.source.FileSupplier filesupplier2 = new adams.flow.source.FileSupplier();
       argOption = (AbstractArgumentOption) filesupplier2.getOptionManager().findByProperty("files");
       adams.core.io.PlaceholderFile[] files3 = new adams.core.io.PlaceholderFile[1];
-      files3[0] = (adams.core.io.PlaceholderFile) argOption.valueOf("${TMP}/3666455665_18795f0741_small.jpg");
+      files3[0] = (adams.core.io.PlaceholderFile) argOption.valueOf("${TMP}/3666455665_18795f0741_small.hm");
       filesupplier2.setFiles(files3);
       actors1[0] = filesupplier2;
 
       // Flow.HeatmapFileReader
       adams.flow.transformer.HeatmapFileReader heatmapfilereader4 = new adams.flow.transformer.HeatmapFileReader();
       argOption = (AbstractArgumentOption) heatmapfilereader4.getOptionManager().findByProperty("reader");
-      adams.data.io.input.SimpleImageHeatmapReader simpleimageheatmapreader6 = new adams.data.io.input.SimpleImageHeatmapReader();
-      argOption = (AbstractArgumentOption) simpleimageheatmapreader6.getOptionManager().findByProperty("reader");
-      adams.data.io.input.JAIImageReader jaiimagereader8 = new adams.data.io.input.JAIImageReader();
-      simpleimageheatmapreader6.setReader(jaiimagereader8);
+      adams.data.io.input.SimpleHeatmapReader simpleheatmapreader6 = new adams.data.io.input.SimpleHeatmapReader();
 
-      heatmapfilereader4.setReader(simpleimageheatmapreader6);
+      heatmapfilereader4.setReader(simpleheatmapreader6);
 
       actors1[1] = heatmapfilereader4;
 
