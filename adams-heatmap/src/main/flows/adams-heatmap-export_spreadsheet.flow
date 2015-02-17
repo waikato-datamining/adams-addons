@@ -18,7 +18,7 @@ adams.flow.control.Flow
 	-actor
 		adams.flow.transformer.HeatmapFilter
 			-filter
-				adams.data.filter.Standardize
+				adams.data.filter.HeatmapStandardize
 	-actor
 		adams.flow.transformer.Convert
 			-name
