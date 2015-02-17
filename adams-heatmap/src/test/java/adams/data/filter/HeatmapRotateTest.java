@@ -14,8 +14,8 @@
  */
 
 /**
- * NormalizeTest.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * HeatmapRotateTest.java
+ * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.filter;
 
@@ -24,13 +24,13 @@ import junit.framework.TestSuite;
 import adams.env.Environment;
 
 /**
- * Test class for the Normalize filter. Run from the command line with: <p/>
- * java adams.data.filter.NormalizeTest
+ * Test class for the HeatmapRotate filter. Run from the command line with: <p/>
+ * java adams.data.filter.HeatmapRotateTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class NormalizeTest
+public class HeatmapRotateTest
   extends AbstractHeatmapFilterTestCase {
 
   /**
@@ -38,7 +38,7 @@ public class NormalizeTest
    *
    * @param name 	the name of the test
    */
-  public NormalizeTest(String name) {
+  public HeatmapRotateTest(String name) {
     super(name);
   }
 
@@ -63,7 +63,7 @@ public class NormalizeTest
   @Override
   protected AbstractFilter[] getRegressionSetups() {
     return new AbstractFilter[]{
-	new Normalize()
+	new HeatmapRotate()
     };
   }
 
@@ -73,7 +73,7 @@ public class NormalizeTest
    * @return		the suite
    */
   public static Test suite() {
-    return new TestSuite(NormalizeTest.class);
+    return new TestSuite(HeatmapRotateTest.class);
   }
 
   /**

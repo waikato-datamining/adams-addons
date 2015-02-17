@@ -14,57 +14,32 @@
  */
 
 /**
- * NormalizeToFieldTest.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * HeatmapStandardizeTest.java
+ * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.filter;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import adams.data.heatmap.Heatmap;
-import adams.data.report.DataType;
-import adams.data.report.Field;
 import adams.env.Environment;
 
 /**
- * Test class for the NormalizeToField filter. Run from the command line with: <p/>
- * java adams.data.filter.NormalizeToFieldTest
+ * Test class for the HeatmapStandardize filter. Run from the command line with: <p/>
+ * java adams.data.filter.HeatmapStandardizeTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class NormalizeToFieldTest
+public class HeatmapStandardizeTest
   extends AbstractHeatmapFilterTestCase {
 
-  /** the field to use. */
-  public final static String FIELD = "Blah";
-  
   /**
    * Constructs the test case. Called by subclasses.
    *
    * @param name 	the name of the test
    */
-  public NormalizeToFieldTest(String name) {
+  public HeatmapStandardizeTest(String name) {
     super(name);
-  }
-  
-  /**
-   * Loads the data to process.
-   *
-   * @param filename	the filename to load (without path)
-   * @return		the data, null if it could not be loaded
-   */
-  @Override
-  protected Heatmap load(String filename) {
-    Heatmap	result;
-    
-    result = super.load(filename);
-    if (result != null) {
-      result.getReport().addField(new Field(FIELD, DataType.NUMERIC));
-      result.getReport().setNumericValue(FIELD, 10);
-    }
-    
-    return result;
   }
 
   /**
@@ -87,13 +62,9 @@ public class NormalizeToFieldTest
    */
   @Override
   protected AbstractFilter[] getRegressionSetups() {
-    NormalizeToField[]	result;
-    
-    result    = new NormalizeToField[1];
-    result[0] = new NormalizeToField();
-    result[0].setField(new Field(FIELD, DataType.NUMERIC));
-    
-    return result;
+    return new AbstractFilter[]{
+	new HeatmapStandardize()
+    };
   }
 
   /**
@@ -102,7 +73,7 @@ public class NormalizeToFieldTest
    * @return		the suite
    */
   public static Test suite() {
-    return new TestSuite(NormalizeToFieldTest.class);
+    return new TestSuite(HeatmapStandardizeTest.class);
   }
 
   /**

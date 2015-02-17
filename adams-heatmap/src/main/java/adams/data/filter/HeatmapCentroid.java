@@ -76,7 +76,7 @@ import adams.data.report.Field;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class Centroid
+public class HeatmapCentroid
   extends AbstractFilter<Heatmap>
   implements TechnicalInformationHandler {
 
@@ -313,11 +313,11 @@ public class Centroid
       // crop
       width   = (int) Math.round(data.getWidth()  * m_ShrinkFactor);
       height  = (int) Math.round(data.getHeight() * m_ShrinkFactor);
-      current = CropToCentroid.crop(current, (int) Math.round(newY), (int) Math.round(newX), height, width);
+      current = HeatmapCropToCentroid.crop(current, (int) Math.round(newY), (int) Math.round(newX), height, width);
 
       // offset for next iteration
-      offsetX += current.getReport().getDoubleValue(CropToCentroid.CROP_LEFT).intValue();
-      offsetY += current.getReport().getDoubleValue(CropToCentroid.CROP_TOP).intValue();
+      offsetX += current.getReport().getDoubleValue(HeatmapCropToCentroid.CROP_LEFT).intValue();
+      offsetY += current.getReport().getDoubleValue(HeatmapCropToCentroid.CROP_TOP).intValue();
     }
 
     return result;

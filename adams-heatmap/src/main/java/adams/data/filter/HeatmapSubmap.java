@@ -69,7 +69,7 @@ import adams.data.heatmap.Heatmap;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class Submap
+public class HeatmapSubmap
   extends AbstractFilter<Heatmap> {
 
   /** for serialization. */

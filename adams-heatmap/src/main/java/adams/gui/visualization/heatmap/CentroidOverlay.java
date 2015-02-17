@@ -23,7 +23,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import weka.core.Utils;
-import adams.data.filter.Centroid;
+import adams.data.filter.HeatmapCentroid;
 import adams.data.heatmap.Heatmap;
 import adams.data.report.DataType;
 import adams.data.report.Field;
@@ -58,7 +58,7 @@ import adams.gui.visualization.image.ImagePanel.PaintPanel;
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
- * @see Centroid
+ * @see adams.data.filter.HeatmapCentroid
  */
 public class CentroidOverlay
   extends AbstractHeatmapOverlay {
@@ -137,14 +137,14 @@ public class CentroidOverlay
    * Calculates the centroid.
    */
   protected void calcCentroid() {
-    Centroid	centroid;
+    HeatmapCentroid centroid;
     Heatmap	map;
 
-    centroid      = new Centroid();
+    centroid      = new HeatmapCentroid();
     map           = centroid.filter(m_HeatmapPanel.getHeatmap());
     m_Centroid    = new double[2];
-    m_Centroid[0] = map.getReport().getDoubleValue(new Field(Centroid.CENTROID_X, DataType.NUMERIC));
-    m_Centroid[1] = map.getReport().getDoubleValue(new Field(Centroid.CENTROID_Y, DataType.NUMERIC));
+    m_Centroid[0] = map.getReport().getDoubleValue(new Field(HeatmapCentroid.CENTROID_X, DataType.NUMERIC));
+    m_Centroid[1] = map.getReport().getDoubleValue(new Field(HeatmapCentroid.CENTROID_Y, DataType.NUMERIC));
   }
 
   /**

@@ -69,7 +69,7 @@ import adams.db.DatabaseConnectionHandler;
  * @version $Revision$
  * @param <T> the type of data to filter
  */
-public class FeatureGenerator
+public class HeatmapFeatureGenerator
   extends AbstractDatabaseConnectionFilter<Heatmap> {
 
   /** for serialization. */

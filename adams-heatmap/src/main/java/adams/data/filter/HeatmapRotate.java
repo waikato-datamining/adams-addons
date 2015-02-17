@@ -48,7 +48,7 @@ import adams.data.heatmap.Heatmap;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class Rotate
+public class HeatmapRotate
   extends AbstractFilter<Heatmap> {
 
   /** for serialization. */

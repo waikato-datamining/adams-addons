@@ -14,32 +14,57 @@
  */
 
 /**
- * SubmapTest.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * HeatmapSubtractFieldTest.java
+ * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.filter;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import adams.data.heatmap.Heatmap;
+import adams.data.report.DataType;
+import adams.data.report.Field;
 import adams.env.Environment;
 
 /**
- * Test class for the Submap filter. Run from the command line with: <p/>
- * java adams.data.filter.SubmapTest
+ * Test class for the HeatmapSubtractField filter. Run from the command line with: <p/>
+ * java adams.data.filter.HeatmapSubtractFieldTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class SubmapTest
+public class HeatmapSubtractFieldTest
   extends AbstractHeatmapFilterTestCase {
 
+  /** the field to use. */
+  public final static String FIELD = "Blah";
+  
   /**
    * Constructs the test case. Called by subclasses.
    *
    * @param name 	the name of the test
    */
-  public SubmapTest(String name) {
+  public HeatmapSubtractFieldTest(String name) {
     super(name);
+  }
+  
+  /**
+   * Loads the data to process.
+   *
+   * @param filename	the filename to load (without path)
+   * @return		the data, null if it could not be loaded
+   */
+  @Override
+  protected Heatmap load(String filename) {
+    Heatmap	result;
+    
+    result = super.load(filename);
+    if (result != null) {
+      result.getReport().addField(new Field(FIELD, DataType.NUMERIC));
+      result.getReport().setNumericValue(FIELD, 0.5);
+    }
+    
+    return result;
   }
 
   /**
@@ -62,14 +87,11 @@ public class SubmapTest
    */
   @Override
   protected AbstractFilter[] getRegressionSetups() {
-    Submap[]	result;
+    HeatmapSubtractField[]	result;
     
-    result    = new Submap[1];
-    result[0] = new Submap();
-    result[0].setColumn(1);
-    result[0].setRow(1);
-    result[0].setWidth(2);
-    result[0].setHeight(2);
+    result    = new HeatmapSubtractField[1];
+    result[0] = new HeatmapSubtractField();
+    result[0].setField(new Field(FIELD, DataType.NUMERIC));
     
     return result;
   }
@@ -80,7 +102,7 @@ public class SubmapTest
    * @return		the suite
    */
   public static Test suite() {
-    return new TestSuite(SubmapTest.class);
+    return new TestSuite(HeatmapSubtractFieldTest.class);
   }
 
   /**

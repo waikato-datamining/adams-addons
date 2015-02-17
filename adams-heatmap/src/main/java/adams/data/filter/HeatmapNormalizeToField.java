@@ -52,7 +52,7 @@ import adams.data.report.Field;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class NormalizeToField
+public class HeatmapNormalizeToField
   extends AbstractFilter<Heatmap> {
 
   /** for serialization. */

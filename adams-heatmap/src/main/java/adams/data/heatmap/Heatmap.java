@@ -181,10 +181,8 @@ public class Heatmap
    * @param value	the new value
    */
   protected void updateMinMax(double value) {
-    if (value > 0.0) {
-      m_Min = Math.min(m_Min, value);
-      m_Max = Math.max(m_Max, value);
-    }
+    m_Min = Math.min(m_Min, value);
+    m_Max = Math.max(m_Max, value);
   }
 
   /**
@@ -295,9 +293,6 @@ public class Heatmap
    * @throws IllegalArgumentException	if negative value encountered
    */
   public void set(int row, int col, double value) {
-    if (value < 0.0)
-      throw new IllegalArgumentException("Value cannot be less than 0.0 (y=" + row + ", x=" + col + "): " + value);
-
     updateMinMax(value);
 
     m_Map[row][col] = value;
@@ -312,9 +307,6 @@ public class Heatmap
    * @throws IllegalArgumentException	if negative value encountered
    */
   public void set(int pos, double value) {
-    if (value < 0.0)
-      throw new IllegalArgumentException("Value cannot be less than 0.0 (pos=" + pos + "): " + value);
-
     set(getY(pos), getX(pos), value);
   }
 

@@ -67,7 +67,7 @@ import adams.data.report.Field;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class CropToCentroid
+public class HeatmapCropToCentroid
   extends AbstractPreFilter<Heatmap> {
 
   /** for serialization. */
@@ -92,7 +92,7 @@ public class CropToCentroid
   protected int m_Width;
 
   /** the centroid filter. */
-  protected Centroid m_Centroid;
+  protected HeatmapCentroid m_Centroid;
 
   /**
    * Returns a string describing the object.
@@ -123,7 +123,7 @@ public class CropToCentroid
 
     m_OptionManager.add(
 	"centroid", "centroid",
-	new Centroid());
+	new HeatmapCentroid());
   }
 
   /**
@@ -133,7 +133,7 @@ public class CropToCentroid
    */
   @Override
   protected AbstractFilter getDefaultFilter() {
-    return new Threshold();
+    return new HeatmapThreshold();
   }
 
   /**
@@ -209,7 +209,7 @@ public class CropToCentroid
    *
    * @param value 	the filter
    */
-  public void setCentroid(Centroid value) {
+  public void setCentroid(HeatmapCentroid value) {
     m_Centroid = value;
     reset();
   }
@@ -219,7 +219,7 @@ public class CropToCentroid
    *
    * @return 		the filter
    */
-  public Centroid getCentroid() {
+  public HeatmapCentroid getCentroid() {
     return m_Centroid;
   }
 
@@ -244,7 +244,7 @@ public class CropToCentroid
   @Override
   protected Heatmap processData(Heatmap filtered, Heatmap original) {
     Heatmap	result;
-    Centroid	centroid;
+    HeatmapCentroid centroid;
     Heatmap	centered;
     int		c_x;
     int		c_y;
@@ -252,12 +252,12 @@ public class CropToCentroid
     result = original.getHeader(m_Height, m_Width);
 
     // calculate centroid
-    centroid = (Centroid) m_Centroid.shallowCopy(true);
+    centroid = (HeatmapCentroid) m_Centroid.shallowCopy(true);
     centered = centroid.filter(filtered);
     centroid.destroy();
 
-    c_x = (int) Math.round(centered.getReport().getDoubleValue(new Field(Centroid.CENTROID_X, DataType.NUMERIC)));
-    c_y = (int) Math.round(centered.getReport().getDoubleValue(new Field(Centroid.CENTROID_Y, DataType.NUMERIC)));
+    c_x = (int) Math.round(centered.getReport().getDoubleValue(new Field(HeatmapCentroid.CENTROID_X, DataType.NUMERIC)));
+    c_y = (int) Math.round(centered.getReport().getDoubleValue(new Field(HeatmapCentroid.CENTROID_Y, DataType.NUMERIC)));
     if (isLoggingEnabled())
       getLogger().info("Centroid location (y,x): " + c_y + "," + c_x);
 

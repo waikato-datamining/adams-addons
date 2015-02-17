@@ -51,7 +51,7 @@ import adams.data.report.Field;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class SubtractField
+public class HeatmapSubtractField
   extends AbstractFilter<Heatmap> {
 
   /** for serialization. */

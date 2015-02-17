@@ -14,23 +14,24 @@
  */
 
 /**
- * StandardizeTest.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * HeatmapFeatureGeneratorTest.java
+ * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.filter;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import adams.data.featuregenerator.Min;
 import adams.env.Environment;
 
 /**
- * Test class for the Standardize filter. Run from the command line with: <p/>
- * java adams.data.filter.StandardizeTest
+ * Test class for the HeatmapFeatureGenerator filter. Run from the command line with: <p/>
+ * java adams.data.filter.HeatmapFeatureGeneratorTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class StandardizeTest
+public class HeatmapFeatureGeneratorTest
   extends AbstractHeatmapFilterTestCase {
 
   /**
@@ -38,7 +39,7 @@ public class StandardizeTest
    *
    * @param name 	the name of the test
    */
-  public StandardizeTest(String name) {
+  public HeatmapFeatureGeneratorTest(String name) {
     super(name);
   }
 
@@ -62,9 +63,13 @@ public class StandardizeTest
    */
   @Override
   protected AbstractFilter[] getRegressionSetups() {
-    return new AbstractFilter[]{
-	new Standardize()
-    };
+    HeatmapFeatureGenerator[]	result;
+    
+    result    = new HeatmapFeatureGenerator[1];
+    result[0] = new HeatmapFeatureGenerator();
+    result[0].setGenerator(new Min());
+    
+    return result;
   }
 
   /**
@@ -73,7 +78,7 @@ public class StandardizeTest
    * @return		the suite
    */
   public static Test suite() {
-    return new TestSuite(StandardizeTest.class);
+    return new TestSuite(HeatmapFeatureGeneratorTest.class);
   }
 
   /**

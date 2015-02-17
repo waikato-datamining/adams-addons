@@ -14,7 +14,7 @@
  */
 
 /*
- * Normalize.java
+ * Standardize.java
  * Copyright (C) 2011 University of Waikato, Hamilton, New Zealand
  */
 
@@ -25,7 +25,8 @@ import adams.data.statistics.StatUtils;
 
 /**
  <!-- globalinfo-start -->
- * Normalizes the values of a heatmap to have a range of 0 to 1.
+ * Standardizes the values of a heatmap to have mean of 1 and stdev 1.<br/>
+ * NB: normally, the mean is 0 when standardizing, but heatmaps only allow positive values.
  * <p/>
  <!-- globalinfo-end -->
  *
@@ -44,11 +45,14 @@ import adams.data.statistics.StatUtils;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class Normalize
+public class HeatmapStandardize
   extends AbstractFilter<Heatmap> {
 
   /** for serialization. */
   private static final long serialVersionUID = 2270876952032422552L;
+
+  /** whether the arrays are samples or populations. */
+  protected boolean m_IsSample;
 
   /**
    * Returns a string describing the object.
@@ -56,7 +60,11 @@ public class Normalize
    * @return 			a description suitable for displaying in the gui
    */
   public String globalInfo() {
-    return "Normalizes the values of a heatmap to have a range of 0 to 1.";
+    return
+        "Standardizes the values of a heatmap to have mean of 'min' and stdev 1.\n"
+      + "NB: normally, the mean is 0 when standardizing, but heatmaps only "
+      + "allow positive values, hence the mean is shifted yb 'min', the smallest "
+      + "value of the standardized values.";
   }
 
   /**
@@ -68,17 +76,15 @@ public class Normalize
   protected Heatmap processData(Heatmap data) {
     Heatmap		result;
     Double[]		values;
+    int			i;
+    double		min;
 
     result = data.getHeader();
     values = data.toDoubleArray();
-    values = StatUtils.normalize(values);
-    if (values == null) {
-      result.getNotes().addError(getClass(), "Failed to normalize, sum = 0!");
-      result.set(data.toDoubleArray());
-    }
-    else {
-      result.set(values);
-    }
+    values = StatUtils.standardize(values, false);
+    min    = StatUtils.min(values).doubleValue();
+    for (i = 0; i < values.length; i++)
+      result.set(i, values[i] - min);
 
     return result;
   }

@@ -24,6 +24,7 @@ import adams.core.Properties;
 import adams.core.StatusMessageHandler;
 import adams.core.io.PlaceholderFile;
 import adams.data.filter.AbstractFilter;
+import adams.data.filter.HeatmapNormalize;
 import adams.data.heatmap.Heatmap;
 import adams.data.io.input.AbstractHeatmapReader;
 import adams.data.io.output.AbstractDataContainerWriter;
@@ -195,7 +196,7 @@ public class HeatmapViewerPanel
 
     props                  = getProperties();
     m_FileChooser          = new HeatmapFileChooser(props.getPath("InitialDir", "%h"));
-    m_CurrentFilter        = new adams.data.filter.Normalize();
+    m_CurrentFilter        = new HeatmapNormalize();
     m_FilterAll            = false;
     m_DialogColorGenerator = null;
     m_RecentFilesHandler   = null;

@@ -14,8 +14,8 @@
  */
 
 /*
- * Threshold.java
- * Copyright (C) 2011 University of Waikato, Hamilton, New Zealand
+ * HeatmapThreshold.java
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.filter;
@@ -57,7 +57,7 @@ import adams.data.heatmap.Heatmap;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class Threshold
+public class HeatmapThreshold
   extends AbstractFilter<Heatmap> {
 
   /** for serialization. */
@@ -82,6 +82,9 @@ public class Threshold
   /** the threshold percentage. */
   protected double m_Threshold;
 
+  /** the replacement value. */
+  protected double m_Replacement;
+
   /**
    * Returns a string describing the object.
    *
@@ -89,8 +92,9 @@ public class Threshold
    */
   public String globalInfo() {
     return
-        "Zeroes all intensity values that are either below or above a user-specified "
-      + "threshold, depending on the selected threshold type.";
+        "Replaces all intensity values that are either below or above a user-specified "
+      + "threshold, depending on the selected threshold type, using the pre-defined "
+      + "replacement value.";
   }
 
   /**
@@ -105,7 +109,11 @@ public class Threshold
 
     m_OptionManager.add(
 	"threshold", "threshold",
-	90.0, 0.0, 100.0);
+	0.0);
+
+    m_OptionManager.add(
+	"replacement", "replacement",
+	-1.0);
   }
 
   /**
@@ -143,7 +151,7 @@ public class Threshold
   /**
    * Sets the threshold to use.
    *
-   * @param value 	the threshold (0.0 - 100.0)
+   * @param value 	the threshold
    */
   public void setThreshold(double value) {
     m_Threshold = value;
@@ -153,7 +161,7 @@ public class Threshold
   /**
    * Returns the threshold in use.
    *
-   * @return 		the threshold (0.0 - 100.0)
+   * @return 		the threshold
    */
   public double getThreshold() {
     return m_Threshold;
@@ -166,7 +174,36 @@ public class Threshold
    * 			displaying in the GUI or for listing the options.
    */
   public String thresholdTipText() {
-    return "The threshold in percent (0.0 - 100.0).";
+    return "The threshold to use.";
+  }
+
+  /**
+   * Sets the replacement value to use.
+   *
+   * @param value 	the replacement
+   */
+  public void setReplacement(double value) {
+    m_Replacement = value;
+    reset();
+  }
+
+  /**
+   * Returns the replacement value in use.
+   *
+   * @return 		the replacement
+   */
+  public double getReplacement() {
+    return m_Replacement;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String replacementTipText() {
+    return "The replacement value to use.";
   }
 
   /**
@@ -178,23 +215,20 @@ public class Threshold
   protected Heatmap processData(Heatmap data) {
     Heatmap		result;
     int			i;
-    double		thr;
     double		value;
 
-    result = data.getHeader();
-    thr    = (data.getMax() - data.getMin()) * m_Threshold / 100.0 + data.getMin();
+    result = data.getClone();
     for (i = 0; i < data.size(); i++) {
       value = data.get(i);
-
       switch (m_Type) {
 	case BELOW:
-	  if (value >= thr)
-	    result.set(i, value);
+	  if (value < m_Threshold)
+	    result.set(i, m_Replacement);
 	  break;
 
 	case ABOVE:
-	  if (value <= thr)
-	    result.set(i, value);
+	  if (value > m_Threshold)
+	    result.set(i, m_Replacement);
 	  break;
 
 	default:

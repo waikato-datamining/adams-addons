@@ -14,8 +14,8 @@
  */
 
 /**
- * CropToCentroidTest.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * HeatmapCentroidTest.java
+ * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.filter;
 
@@ -24,13 +24,13 @@ import junit.framework.TestSuite;
 import adams.env.Environment;
 
 /**
- * Test class for the CropToCentroid filter. Run from the command line with: <p/>
- * java adams.data.filter.CropToCentroidTest
+ * Test class for the HeatmapCentroid filter. Run from the command line with: <p/>
+ * java adams.data.filter.HeatmapCentroidTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class CropToCentroidTest
+public class HeatmapCentroidTest
   extends AbstractHeatmapFilterTestCase {
 
   /**
@@ -38,7 +38,7 @@ public class CropToCentroidTest
    *
    * @param name 	the name of the test
    */
-  public CropToCentroidTest(String name) {
+  public HeatmapCentroidTest(String name) {
     super(name);
   }
 
@@ -62,14 +62,9 @@ public class CropToCentroidTest
    */
   @Override
   protected AbstractFilter[] getRegressionSetups() {
-    CropToCentroid[]	result;
-    
-    result    = new CropToCentroid[1];
-    result[0] = new CropToCentroid();
-    result[0].setWidth(5);
-    result[0].setHeight(5);
-    
-    return result;
+    return new AbstractFilter[]{
+	new HeatmapCentroid()
+    };
   }
 
   /**
@@ -78,7 +73,7 @@ public class CropToCentroidTest
    * @return		the suite
    */
   public static Test suite() {
-    return new TestSuite(CropToCentroidTest.class);
+    return new TestSuite(HeatmapCentroidTest.class);
   }
 
   /**

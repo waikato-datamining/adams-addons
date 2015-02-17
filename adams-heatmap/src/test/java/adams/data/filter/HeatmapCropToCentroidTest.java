@@ -14,8 +14,8 @@
  */
 
 /**
- * ThresholdTest.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * HeatmapCropToCentroidTest.java
+ * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.filter;
 
@@ -24,21 +24,21 @@ import junit.framework.TestSuite;
 import adams.env.Environment;
 
 /**
- * Test class for the Threshold filter. Run from the command line with: <p/>
- * java adams.data.filter.ThresholdTest
+ * Test class for the HeatmapCropToCentroid filter. Run from the command line with: <p/>
+ * java adams.data.filter.HeatmapCropToCentroidTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class ThresholdTest
+public class HeatmapCropToCentroidTest
   extends AbstractHeatmapFilterTestCase {
-  
+
   /**
    * Constructs the test case. Called by subclasses.
    *
    * @param name 	the name of the test
    */
-  public ThresholdTest(String name) {
+  public HeatmapCropToCentroidTest(String name) {
     super(name);
   }
 
@@ -51,8 +51,7 @@ public class ThresholdTest
   @Override
   protected String[] getRegressionInputFiles() {
     return new String[]{
-	"simple.csv",
-	"simple.csv",
+	"simple.csv"
     };
   }
 
@@ -63,12 +62,12 @@ public class ThresholdTest
    */
   @Override
   protected AbstractFilter[] getRegressionSetups() {
-    Threshold[]	result;
+    HeatmapCropToCentroid[]	result;
     
-    result    = new Threshold[2];
-    result[0] = new Threshold();
-    result[1] = new Threshold();
-    result[1].setThreshold(30.0);
+    result    = new HeatmapCropToCentroid[1];
+    result[0] = new HeatmapCropToCentroid();
+    result[0].setWidth(5);
+    result[0].setHeight(5);
     
     return result;
   }
@@ -79,7 +78,7 @@ public class ThresholdTest
    * @return		the suite
    */
   public static Test suite() {
-    return new TestSuite(ThresholdTest.class);
+    return new TestSuite(HeatmapCropToCentroidTest.class);
   }
 
   /**

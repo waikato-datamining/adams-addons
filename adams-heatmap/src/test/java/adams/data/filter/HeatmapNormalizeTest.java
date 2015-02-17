@@ -14,57 +14,32 @@
  */
 
 /**
- * SubtractFieldTest.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * HeatmapNormalizeTest.java
+ * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.filter;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import adams.data.heatmap.Heatmap;
-import adams.data.report.DataType;
-import adams.data.report.Field;
 import adams.env.Environment;
 
 /**
- * Test class for the SubtractField filter. Run from the command line with: <p/>
- * java adams.data.filter.SubtractFieldTest
+ * Test class for the HeatmapNormalize filter. Run from the command line with: <p/>
+ * java adams.data.filter.HeatmapNormalizeTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class SubtractFieldTest
+public class HeatmapNormalizeTest
   extends AbstractHeatmapFilterTestCase {
 
-  /** the field to use. */
-  public final static String FIELD = "Blah";
-  
   /**
    * Constructs the test case. Called by subclasses.
    *
    * @param name 	the name of the test
    */
-  public SubtractFieldTest(String name) {
+  public HeatmapNormalizeTest(String name) {
     super(name);
-  }
-  
-  /**
-   * Loads the data to process.
-   *
-   * @param filename	the filename to load (without path)
-   * @return		the data, null if it could not be loaded
-   */
-  @Override
-  protected Heatmap load(String filename) {
-    Heatmap	result;
-    
-    result = super.load(filename);
-    if (result != null) {
-      result.getReport().addField(new Field(FIELD, DataType.NUMERIC));
-      result.getReport().setNumericValue(FIELD, 0.5);
-    }
-    
-    return result;
   }
 
   /**
@@ -87,13 +62,9 @@ public class SubtractFieldTest
    */
   @Override
   protected AbstractFilter[] getRegressionSetups() {
-    SubtractField[]	result;
-    
-    result    = new SubtractField[1];
-    result[0] = new SubtractField();
-    result[0].setField(new Field(FIELD, DataType.NUMERIC));
-    
-    return result;
+    return new AbstractFilter[]{
+	new HeatmapNormalize()
+    };
   }
 
   /**
@@ -102,7 +73,7 @@ public class SubtractFieldTest
    * @return		the suite
    */
   public static Test suite() {
-    return new TestSuite(SubtractFieldTest.class);
+    return new TestSuite(HeatmapNormalizeTest.class);
   }
 
   /**

@@ -14,8 +14,8 @@
  */
 
 /**
- * RotateTest.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * HeatmapSubmapTest.java
+ * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.filter;
 
@@ -24,13 +24,13 @@ import junit.framework.TestSuite;
 import adams.env.Environment;
 
 /**
- * Test class for the Rotate filter. Run from the command line with: <p/>
- * java adams.data.filter.RotateTest
+ * Test class for the HeatmapSubmap filter. Run from the command line with: <p/>
+ * java adams.data.filter.HeatmapSubmapTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class RotateTest
+public class HeatmapSubmapTest
   extends AbstractHeatmapFilterTestCase {
 
   /**
@@ -38,7 +38,7 @@ public class RotateTest
    *
    * @param name 	the name of the test
    */
-  public RotateTest(String name) {
+  public HeatmapSubmapTest(String name) {
     super(name);
   }
 
@@ -62,9 +62,16 @@ public class RotateTest
    */
   @Override
   protected AbstractFilter[] getRegressionSetups() {
-    return new AbstractFilter[]{
-	new Rotate()
-    };
+    HeatmapSubmap[]	result;
+    
+    result    = new HeatmapSubmap[1];
+    result[0] = new HeatmapSubmap();
+    result[0].setColumn(1);
+    result[0].setRow(1);
+    result[0].setWidth(2);
+    result[0].setHeight(2);
+    
+    return result;
   }
 
   /**
@@ -73,7 +80,7 @@ public class RotateTest
    * @return		the suite
    */
   public static Test suite() {
-    return new TestSuite(RotateTest.class);
+    return new TestSuite(HeatmapSubmapTest.class);
   }
 
   /**
