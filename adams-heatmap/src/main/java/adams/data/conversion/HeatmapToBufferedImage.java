@@ -19,15 +19,15 @@
  */
 package adams.data.conversion;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-
 import adams.data.heatmap.Heatmap;
 import adams.data.image.AbstractImageContainer;
 import adams.data.image.BufferedImageContainer;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 /**
  <!-- globalinfo-start -->
@@ -36,20 +36,32 @@ import adams.gui.visualization.core.BiColorGenerator;
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <p/>
- *
- * <pre>-D &lt;int&gt; (property: debugLevel)
- * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to
- * &nbsp;&nbsp;&nbsp;the console (0 = off).
- * &nbsp;&nbsp;&nbsp;default: 0
- * &nbsp;&nbsp;&nbsp;minimum: 0
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- *
- * <pre>-generator &lt;adams.gui.visualization.heatmap.AbstractColorGradientGenerator&gt; (property: generator)
+ * 
+ * <pre>-generator &lt;adams.gui.visualization.core.AbstractColorGradientGenerator&gt; (property: generator)
  * &nbsp;&nbsp;&nbsp;The generator to use for creating the gradient colors.
- * &nbsp;&nbsp;&nbsp;default: adams.gui.visualization.heatmap.BiColorGenerator
+ * &nbsp;&nbsp;&nbsp;default: adams.gui.visualization.core.BiColorGenerator
  * </pre>
- *
+ * 
+ * <pre>-use-fixed-range &lt;boolean&gt; (property: useFixedRange)
+ * &nbsp;&nbsp;&nbsp;Whether to use pre-defined min&#47;max values or ones determined from the heatmap
+ * &nbsp;&nbsp;&nbsp;itself.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-min &lt;double&gt; (property: min)
+ * &nbsp;&nbsp;&nbsp;The minimum to use in case of using a fixed range.
+ * &nbsp;&nbsp;&nbsp;default: 0.0
+ * </pre>
+ * 
+ * <pre>-max &lt;double&gt; (property: max)
+ * &nbsp;&nbsp;&nbsp;The maximum to use in case of using a fixed range.
+ * &nbsp;&nbsp;&nbsp;default: 100.0
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -63,6 +75,15 @@ public class HeatmapToBufferedImage
 
   /** the generator to use. */
   protected AbstractColorGradientGenerator m_Generator;
+
+  /** whether to use a fixed min/max. */
+  protected boolean m_UseFixedRange;
+
+  /** the fixed min. */
+  protected double m_Min;
+
+  /** the fixed max. */
+  protected double m_Max;
 
   /** the gradient colors. */
   protected Color[] m_GradientColors;
@@ -86,8 +107,20 @@ public class HeatmapToBufferedImage
     super.defineOptions();
 
     m_OptionManager.add(
-	    "generator", "generator",
-	    new BiColorGenerator());
+      "generator", "generator",
+      new BiColorGenerator());
+
+    m_OptionManager.add(
+      "use-fixed-range", "useFixedRange",
+      false);
+
+    m_OptionManager.add(
+      "min", "min",
+      0.0);
+
+    m_OptionManager.add(
+      "max", "max",
+      100.0);
   }
 
   /**
@@ -101,9 +134,9 @@ public class HeatmapToBufferedImage
   }
 
   /**
-   * Sets the number of gradient colors to use.
+   * Sets the color generator.
    *
-   * @param value	the number of colors
+   * @param value	the generator
    */
   public void setGenerator(AbstractColorGradientGenerator value) {
     m_Generator = value;
@@ -111,9 +144,9 @@ public class HeatmapToBufferedImage
   }
 
   /**
-   * Returns the number of gradient colors to use.
+   * Returns the color generator.
    *
-   * @return		the number of colors
+   * @return		the generator
    */
   public AbstractColorGradientGenerator getGenerator() {
     return m_Generator;
@@ -127,6 +160,93 @@ public class HeatmapToBufferedImage
    */
   public String generatorTipText() {
     return "The generator to use for creating the gradient colors.";
+  }
+
+  /**
+   * Sets whether to use a fixed range.
+   *
+   * @param value	true if to use fixed range
+   */
+  public void setUseFixedRange(boolean value) {
+    m_UseFixedRange = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to use a fixed range.
+   *
+   * @return		true if to use fixed range
+   */
+  public boolean getUseFixedRange() {
+    return m_UseFixedRange;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String useFixedRangeTipText() {
+    return "Whether to use pre-defined min/max values or ones determined from the heatmap itself.";
+  }
+
+  /**
+   * Sets the minimum in case of using a fixed range.
+   *
+   * @param value	the minimum
+   */
+  public void setMin(double value) {
+    m_Min = value;
+    reset();
+  }
+
+  /**
+   * Returns the minimum in case of using a fixed range.
+   *
+   * @return		the minimum
+   */
+  public double getMin() {
+    return m_Min;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String minTipText() {
+    return "The minimum to use in case of using a fixed range.";
+  }
+
+  /**
+   * Sets the maximum in case of using a fixed range.
+   *
+   * @param value	the maximum
+   */
+  public void setMax(double value) {
+    m_Max = value;
+    reset();
+  }
+
+  /**
+   * Returns the maximum in case of using a fixed range.
+   *
+   * @return		the maximum
+   */
+  public double getMax() {
+    return m_Max;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String maxTipText() {
+    return "The maximum to use in case of using a fixed range.";
   }
 
   /**
@@ -162,6 +282,27 @@ public class HeatmapToBufferedImage
   }
 
   /**
+   * Checks whether the data can be processed.
+   *
+   * @return		null if checks passed, otherwise error message
+   */
+  @Override
+  protected String checkData() {
+    String	result;
+
+    result = super.checkData();
+
+    if (result == null) {
+      if (m_UseFixedRange) {
+	if (m_Min >= m_Max)
+	  result = "Max must be greater than Min: max=" + m_Max + ", min=" + m_Min;
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Performs the actual conversion.
    *
    * @return		the converted data
@@ -181,27 +322,27 @@ public class HeatmapToBufferedImage
     Graphics2D			g;
     Color			color;
 
-    map    = (Heatmap) m_Input;
-    colors = getGradientColors();
-    min    = Double.MAX_VALUE;
-    max    = Double.MIN_VALUE;
-    for (y = 0; y < map.getHeight(); y++) {
-      for (x = 0; x < map.getWidth(); x++) {
-	if (map.get(y, x) > 0.0)
-	  min = Math.min(map.get(y, x), min);   // we don't want zeroes
-	max = Math.max(map.get(y, x), max);
+    map = (Heatmap) m_Input;
+    if (m_UseFixedRange) {
+      min = m_Min;
+      max = m_Max;
+    }
+    else {
+      min = map.getMin();
+      max = map.getMax();
+      if (max == min) {
+	max = min + 1.0;
+	getLogger().warning("Max/min are the same, using min=" + min + ", max=" + max + " instead!");
       }
     }
-    range = max - min;
+    colors = getGradientColors();
+    range  = max - min;
 
     image = new BufferedImage(map.getWidth(), map.getHeight(), BufferedImage.TYPE_INT_RGB);
     g      = image.createGraphics();
     for (y = 0; y < map.getHeight(); y++) {
       for (x = 0; x < map.getWidth(); x++) {
-	if (map.get(y, x) == 0.0)
-	  color = colors[0];
-	else
-	  color = colors[(int) (((map.get(y, x) - min) / range) * (colors.length - 2)) + 1];
+	color = colors[(int) (((map.get(y, x) - min) / range) * (colors.length - 2)) + 1];
 	g.setColor(color);
 	g.drawLine(x, y, x, y);
       }
