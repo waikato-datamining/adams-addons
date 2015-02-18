@@ -7,6 +7,10 @@
 # Author:  FracPete (fracpete at waikato dot ac dot nz)
 # Version: $Revision$
 
+# feature generators
+adams.data.heatmapfeatures.AbstractHeatmapFeatureGenerator=\
+  adams.data.heatmapfeatures
+
 # the feature generators
 adams.data.featuregenerator.AbstractFeatureGenerator=\
   adams.data.featuregenerator
