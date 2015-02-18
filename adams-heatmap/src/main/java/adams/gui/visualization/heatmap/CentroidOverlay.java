@@ -15,19 +15,19 @@
 
 /**
  * CentroidOverlay.java
- * Copyright (C) 2011-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.heatmap;
 
-import java.awt.Color;
-import java.awt.Graphics;
-
-import weka.core.Utils;
+import adams.core.Utils;
 import adams.data.filter.HeatmapCentroid;
 import adams.data.heatmap.Heatmap;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.gui.visualization.image.ImagePanel.PaintPanel;
+
+import java.awt.Color;
+import java.awt.Graphics;
 
 /**
  <!-- globalinfo-start -->
