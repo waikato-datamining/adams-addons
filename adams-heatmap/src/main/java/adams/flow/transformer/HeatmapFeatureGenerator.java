@@ -22,9 +22,8 @@ package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
 import adams.data.heatmap.Heatmap;
-import adams.data.heatmapfeatures.*;
+import adams.data.heatmapfeatures.AbstractHeatmapFeatureGenerator;
 import adams.data.heatmapfeatures.Max;
-import adams.data.image.AbstractImageContainer;
 import adams.flow.core.Token;
 import adams.flow.provenance.ActorType;
 import adams.flow.provenance.Provenance;
@@ -45,7 +44,7 @@ import java.util.Hashtable;
  <!-- flow-summary-start -->
  * Input&#47;output:<br/>
  * - accepts:<br/>
- * &nbsp;&nbsp;&nbsp;adams.data.image.AbstractImageContainer<br/>
+ * &nbsp;&nbsp;&nbsp;adams.data.heatmap.Heatmap<br/>
  * - generates:<br/>
  * &nbsp;&nbsp;&nbsp;adams.data.spreadsheet.Row<br/>
  * <p/>
@@ -240,7 +239,7 @@ public class HeatmapFeatureGenerator
    * @return		the Class of objects that can be processed
    */
   public Class[] accepts() {
-    return new Class[]{AbstractImageContainer.class};
+    return new Class[]{Heatmap.class};
   }
 
   /**
