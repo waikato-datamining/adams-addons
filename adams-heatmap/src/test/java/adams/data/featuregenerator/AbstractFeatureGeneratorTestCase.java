@@ -15,13 +15,9 @@
 
 /**
  * AbstractFeatureGeneratorTestCase.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.featuregenerator;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import adams.core.CleanUpHandler;
 import adams.core.Destroyable;
@@ -37,13 +33,15 @@ import adams.test.Regression;
 import adams.test.TestHelper;
 import adams.test.TmpFile;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * Ancestor for report reader test cases.
+ * Ancestor for heatmap feature generator test cases.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
- * @param <A> the type of reader to use
- * @param <D> the type of data to read
  */
 public abstract class AbstractFeatureGeneratorTestCase
   extends AbstractDatabaseTestCase {
