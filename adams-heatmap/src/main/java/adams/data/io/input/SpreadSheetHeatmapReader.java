@@ -25,7 +25,7 @@ import adams.data.spreadsheet.Cell;
 import adams.data.spreadsheet.Cell.ContentType;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.columnfinder.ByContentType;
-import weka.core.Utils;
+import adams.core.Utils;
 
 /**
  <!-- globalinfo-start -->
