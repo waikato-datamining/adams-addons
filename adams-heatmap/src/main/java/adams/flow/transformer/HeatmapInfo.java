@@ -22,6 +22,7 @@ package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
 import adams.data.heatmap.Heatmap;
+import adams.data.heatmap.HeatmapStatistic;
 import adams.flow.core.DataInfoActor;
 
 import java.util.ArrayList;
@@ -31,12 +32,62 @@ import java.util.HashSet;
 
 /**
  <!-- globalinfo-start -->
+ * Outputs statistics of a heatmap object.
+ * <p/>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
+ * Input&#47;output:<br/>
+ * - accepts:<br/>
+ * &nbsp;&nbsp;&nbsp;adams.data.heatmap.Heatmap<br/>
+ * - generates:<br/>
+ * &nbsp;&nbsp;&nbsp;java.lang.Integer<br/>
+ * <p/>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-name &lt;java.lang.String&gt; (property: name)
+ * &nbsp;&nbsp;&nbsp;The name of the actor.
+ * &nbsp;&nbsp;&nbsp;default: HeatmapInfo
+ * </pre>
+ * 
+ * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
+ * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
+ * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
+ * <pre>-skip &lt;boolean&gt; (property: skip)
+ * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
+ * &nbsp;&nbsp;&nbsp;as it is.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
+ * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-output-array &lt;boolean&gt; (property: outputArray)
+ * &nbsp;&nbsp;&nbsp;If enabled, the info items get output as array rather than one-by-one.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-type &lt;WIDTH|HEIGHT|MIN|MAX|ZEROES|NON_ZEROES|MISSING|VALUES&gt; (property: type)
+ * &nbsp;&nbsp;&nbsp;The type of information to generate.
+ * &nbsp;&nbsp;&nbsp;default: WIDTH
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -64,6 +115,12 @@ public class HeatmapInfo
     MIN,
     /** the maximum value. */
     MAX,
+    /** the number of zero values. */
+    ZEROES,
+    /** the number of non-zero values. */
+    NON_ZEROES,
+    /** the number of missing values. */
+    MISSING,
     /** all (unique) values. */
     VALUES
   }
@@ -153,6 +210,9 @@ public class HeatmapInfo
     switch (m_Type) {
       case WIDTH:
       case HEIGHT:
+      case ZEROES:
+      case NON_ZEROES:
+      case MISSING:
 	return Integer.class;
 
       case MIN:
@@ -168,7 +228,7 @@ public class HeatmapInfo
   /**
    * Returns the class that the consumer accepts.
    *
-   * @return		<!-- flow-accepts-start -->adams.data.spreadsheet.SpreadSheet.class<!-- flow-accepts-end -->
+   * @return		<!-- flow-accepts-start -->adams.data.heatmap.Heatmap.class<!-- flow-accepts-end -->
    */
   public Class[] accepts() {
     return new Class[]{Heatmap.class};
@@ -184,6 +244,7 @@ public class HeatmapInfo
     String		result;
     Heatmap		map;
     HashSet<Double> 	values;
+    HeatmapStatistic	stats;
 
     result = null;
 
@@ -206,7 +267,22 @@ public class HeatmapInfo
       case MAX:
 	m_Queue.add(map.getMax());
 	break;
-      
+
+      case ZEROES:
+	stats = map.toStatistic();
+	m_Queue.add(stats.getStatistic(HeatmapStatistic.COUNT_ZEROES));
+	break;
+
+      case NON_ZEROES:
+	stats = map.toStatistic();
+	m_Queue.add(stats.getStatistic(HeatmapStatistic.COUNT_NONZEROES));
+	break;
+
+      case MISSING:
+	stats = map.toStatistic();
+	m_Queue.add(stats.getStatistic(HeatmapStatistic.COUNT_MISSING));
+	break;
+
       case VALUES:
 	values = new HashSet<>(Arrays.asList(map.toDoubleArray()));
 	m_Queue.addAll(values);

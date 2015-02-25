@@ -15,17 +15,9 @@
 
 /**
  * Heatmap.java
- * Copyright (C) 2011-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.heatmap;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
 
 import adams.core.Constants;
 import adams.core.Utils;
@@ -39,6 +31,14 @@ import adams.data.report.Field;
 import adams.data.report.MutableReportHandler;
 import adams.data.report.Report;
 import adams.data.statistics.InformativeStatisticSupporter;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeSet;
 
 /**
  * Simple wrapper around a 2-D array representing a heatmap.
@@ -59,6 +59,9 @@ public class Heatmap
 
   /** the field for the "timestamp" meta-data entry. */
   public final static String FIELD_TIMESTAMP = "Timestamp";
+
+  /** the missing value. */
+  public final static double MISSING_VALUE = Double.NaN;
 
   /** the singleton comparator. */
   protected static DataPointComparator<HeatmapValue> m_Comparator;
@@ -181,8 +184,10 @@ public class Heatmap
    * @param value	the new value
    */
   protected void updateMinMax(double value) {
-    m_Min = Math.min(m_Min, value);
-    m_Max = Math.max(m_Max, value);
+    if (!isMissingValue(value)) {
+      m_Min = Math.min(m_Min, value);
+      m_Max = Math.max(m_Max, value);
+    }
   }
 
   /**
@@ -290,7 +295,6 @@ public class Heatmap
    * @param row		the row index
    * @param col		the column index
    * @param value	the heat value to set (>= 0.0)
-   * @throws IllegalArgumentException	if negative value encountered
    */
   public void set(int row, int col, double value) {
     updateMinMax(value);
@@ -304,7 +308,6 @@ public class Heatmap
    *
    * @param pos		the position in the map
    * @param value	the heat value to set
-   * @throws IllegalArgumentException	if negative value encountered
    */
   public void set(int pos, double value) {
     set(getY(pos), getX(pos), value);
@@ -316,7 +319,6 @@ public class Heatmap
    *
    * @param values	the values to set
    * @throws IllegalArgumentException	if array length and size of heatmap don't match
-   * @throws IllegalArgumentException	if negative values encountered
    */
   public void set(double[] values) {
     int		x;
@@ -342,7 +344,6 @@ public class Heatmap
    *
    * @param values	the values to set
    * @throws IllegalArgumentException	if array length and size of heatmap don't match
-   * @throws IllegalArgumentException	if negative values encountered
    */
   public void set(Double[] values) {
     int		x;
@@ -360,6 +361,46 @@ public class Heatmap
 	index++;
       }
     }
+  }
+
+  /**
+   * Sets the map value at the specified location.
+   *
+   * @param row		the row index
+   * @param col		the column index
+   */
+  public void setMissing(int row, int col) {
+    set(row, col, MISSING_VALUE);
+  }
+
+  /**
+   * Sets the map value at the specified position to missing from the top left corner
+   * of the map, walking through row-wise.
+   *
+   * @param pos		the position in the map
+   */
+  public void setMissing(int pos) {
+    set(pos, MISSING_VALUE);
+  }
+
+  /**
+   * Sets the map value at the specified location to missing.
+   *
+   * @param row		the row index
+   * @param col		the column index
+   */
+  public boolean isMissing(int row, int col) {
+    return isMissingValue(get(row, col));
+  }
+
+  /**
+   * Sets the map value at the specified position from the top left corner
+   * of the map, walking through row-wise.
+   *
+   * @param pos		the position in the map
+   */
+  public boolean isMissing(int pos) {
+    return isMissingValue(get(pos));
   }
 
   /**
@@ -627,7 +668,7 @@ public class Heatmap
   /**
    * Returns the stored points as array.
    *
-   * @param array	ignored
+   * @param a		ignored
    * @return		the points as array
    */
   @Override
@@ -997,6 +1038,16 @@ public class Heatmap
   }
 
   /**
+   * Returns a statistic object for this object.
+   *
+   * @return		statistics for this object
+   */
+  @Override
+  public HeatmapStatistic toStatistic() {
+    return new HeatmapStatistic(this);
+  }
+
+  /**
    * Creates a heatmap from the intensity string using the specified dimensions.
    *
    * @param rows	the height of the heatmap
@@ -1051,12 +1102,12 @@ public class Heatmap
   }
 
   /**
-   * Returns a statistic object for this object.
+   * Checks whether the value represents a missing value.
    *
-   * @return		statistics for this object
+   * @param value	the value to check
+   * @return		true if missing value
    */
-  @Override
-  public HeatmapStatistic toStatistic() {
-    return new HeatmapStatistic(this);
+  public static boolean isMissingValue(double value) {
+    return Double.isNaN(value);
   }
 }

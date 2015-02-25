@@ -14,32 +14,32 @@
  */
 
 /**
- * HeatmapThresholdTest.java
- * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
+ * HeatmapCropTest.java
+ * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.filter;
 
-import adams.data.filter.heatmapthreshold.Manual;
+import adams.data.filter.heatmapcrop.CropToCentroid;
 import adams.env.Environment;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
- * Test class for the HeatmapThreshold filter. Run from the command line with: <p/>
- * java adams.data.filter.HeatmapThresholdTest
+ * Test class for the HeatmapCrop filter. Run from the command line with: <p/>
+ * java adams.data.filter.HeatmapCropTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class HeatmapThresholdTest
+public class HeatmapCropTest
   extends AbstractHeatmapFilterTestCase {
-  
+
   /**
    * Constructs the test case. Called by subclasses.
    *
    * @param name 	the name of the test
    */
-  public HeatmapThresholdTest(String name) {
+  public HeatmapCropTest(String name) {
     super(name);
   }
 
@@ -64,15 +64,17 @@ public class HeatmapThresholdTest
    */
   @Override
   protected AbstractFilter[] getRegressionSetups() {
-    HeatmapThreshold[]	result;
+    HeatmapCrop[]	result;
+    CropToCentroid	crop2centr;
     
-    result    = new HeatmapThreshold[2];
-    result[0] = new HeatmapThreshold();
-    result[1] = new HeatmapThreshold();
-    Manual manual = new Manual();
-    manual.setThreshold(30.0);
-    result[1].setThreshold(manual);
-    
+    result    = new HeatmapCrop[2];
+    result[0] = new HeatmapCrop();
+    result[1] = new HeatmapCrop();
+    crop2centr = new CropToCentroid();
+    crop2centr.setWidth(3);
+    crop2centr.setHeight(3);
+    result[0].setAlgorithm(crop2centr);
+
     return result;
   }
 
@@ -82,7 +84,7 @@ public class HeatmapThresholdTest
    * @return		the suite
    */
   public static Test suite() {
-    return new TestSuite(HeatmapThresholdTest.class);
+    return new TestSuite(HeatmapCropTest.class);
   }
 
   /**

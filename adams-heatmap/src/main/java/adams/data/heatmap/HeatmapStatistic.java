@@ -19,13 +19,13 @@
  */
 package adams.data.heatmap;
 
+import adams.data.statistics.InformativeStatistic;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-
-import adams.data.statistics.InformativeStatistic;
 
 /**
  * Generates some statistics for a heatmap.
@@ -53,6 +53,9 @@ public class HeatmapStatistic
 
   /** the non-zeroes count. */
   public static String COUNT_NONZEROES = "Non-zeroes count";
+
+  /** the missing value count. */
+  public static String COUNT_MISSING = "Missing values count";
 
   /** the statistics. */
   protected Hashtable<String,Double> m_Statistics;
@@ -105,6 +108,7 @@ public class HeatmapStatistic
   protected void calculate() {
     double	zeroes;
     double	nonZeroes;
+    double	missing;
     int		i;
 
     m_Statistics.clear();
@@ -114,14 +118,18 @@ public class HeatmapStatistic
     m_Statistics.put(MAXIMUM, 0.0);
     m_Statistics.put(COUNT_ZEROES, 0.0);
     m_Statistics.put(COUNT_NONZEROES, 0.0);
+    m_Statistics.put(COUNT_MISSING, 0.0);
 
     if (m_Heatmap == null)
       return;
 
     zeroes    = 0.0;
     nonZeroes = 0.0;
+    missing   = 0.0;
     for (i = 0; i < m_Heatmap.size(); i++) {
-      if (m_Heatmap.get(i) == 0.0)
+      if (m_Heatmap.isMissing(i))
+	missing++;
+      else if (m_Heatmap.get(i) == 0.0)
 	zeroes++;
       else
 	nonZeroes++;
@@ -133,6 +141,7 @@ public class HeatmapStatistic
     m_Statistics.put(MAXIMUM, m_Heatmap.getMax());
     m_Statistics.put(COUNT_ZEROES, zeroes);
     m_Statistics.put(COUNT_NONZEROES, nonZeroes);
+    m_Statistics.put(COUNT_MISSING, missing);
   }
 
   /**

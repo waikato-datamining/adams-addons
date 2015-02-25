@@ -13,17 +13,21 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
+/**
  * CropToCentroid.java
- * Copyright (C) 2011-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015 University of Waikato, Hamilton, NZ
  */
 
-package adams.data.filter;
+package adams.data.filter.heatmapcrop;
 
-import adams.data.filter.heatmapcrop.CropToCentroid;
+import adams.data.filter.AbstractFilter;
+import adams.data.filter.HeatmapCentroid;
+import adams.data.filter.HeatmapThreshold;
 import adams.data.heatmap.Heatmap;
 import adams.data.report.DataType;
 import adams.data.report.Field;
+
+import java.awt.Point;
 
 /**
  <!-- globalinfo-start -->
@@ -32,60 +36,42 @@ import adams.data.report.Field;
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <p/>
- *
- * <pre>-D &lt;int&gt; (property: debugLevel)
- * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to
- * &nbsp;&nbsp;&nbsp;the console (0 = off).
- * &nbsp;&nbsp;&nbsp;default: 0
- * &nbsp;&nbsp;&nbsp;minimum: 0
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- *
+ * 
  * <pre>-filter &lt;adams.data.filter.AbstractFilter&gt; (property: filter)
- * &nbsp;&nbsp;&nbsp;Pre-filters the data, .
- * &nbsp;&nbsp;&nbsp;default: adams.data.filter.Threshold
+ * &nbsp;&nbsp;&nbsp;Pre-filters the heatmap.
+ * &nbsp;&nbsp;&nbsp;default: adams.data.filter.HeatmapThreshold -threshold adams.data.filter.heatmapthreshold.Manual
  * </pre>
- *
+ * 
  * <pre>-height &lt;int&gt; (property: height)
  * &nbsp;&nbsp;&nbsp;The height of the cropped region.
  * &nbsp;&nbsp;&nbsp;default: 240
  * &nbsp;&nbsp;&nbsp;minimum: 1
  * </pre>
- *
+ * 
  * <pre>-width &lt;int&gt; (property: width)
  * &nbsp;&nbsp;&nbsp;The width of the cropped region.
  * &nbsp;&nbsp;&nbsp;default: 320
  * &nbsp;&nbsp;&nbsp;minimum: 1
  * </pre>
- *
- * <pre>-centroid &lt;adams.data.filter.Centroid&gt; (property: centroid)
+ * 
+ * <pre>-centroid &lt;adams.data.filter.HeatmapCentroid&gt; (property: centroid)
  * &nbsp;&nbsp;&nbsp;The centroid filter to use.
- * &nbsp;&nbsp;&nbsp;default: adams.data.filter.Centroid
+ * &nbsp;&nbsp;&nbsp;default: adams.data.filter.HeatmapCentroid
  * </pre>
- *
+ * 
  <!-- options-end -->
  *
- * @author  fracpete (fracpete at waikato dot ac dot nz)
+ * @author FracPete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-@Deprecated
-public class HeatmapCropToCentroid
-  extends AbstractPreFilter<Heatmap> {
+public class CropToCentroid
+  extends AbstractFilteredHeatmapCrop {
 
-  /** for serialization. */
-  private static final long serialVersionUID = 2270876952032422552L;
-
-  /** the left coordinate of the crop in the original heatmap. */
-  public final static String CROP_LEFT = "Crop.Left";
-
-  /** the right coordinate of the crop in the original heatmap. */
-  public final static String CROP_TOP = "Crop.Top";
-
-  /** the right coordinate of the crop in the original heatmap. */
-  public final static String CROP_RIGHT = "Crop.Right";
-
-  /** the bottom coordinate of the crop in the original heatmap. */
-  public final static String CROP_BOTTOM = "Crop.Bottom";
+  private static final long serialVersionUID = 8109859053628417241L;
 
   /** the height of the crop region around the centroid. */
   protected int m_Height;
@@ -104,8 +90,8 @@ public class HeatmapCropToCentroid
   @Override
   public String globalInfo() {
     return
-        "Generates a cropped heatmap centered around the centroid "
-      + "calculated on the pre-filtered data.";
+      "Generates a cropped heatmap centered around the centroid "
+	+ "calculated on the pre-filtered data.";
   }
 
   /**
@@ -236,15 +222,15 @@ public class HeatmapCropToCentroid
   }
 
   /**
-   * Performs the actual filtering, using the pre-filtered data to manipulate
-   * the original data.
+   * Performs the actual cropping, using the pre-filtered heatmap to manipulate
+   * the original heatmap.
    *
-   * @param filtered	the pref-filtered data
-   * @param original	the original input data
+   * @param filtered	the pre-filtered heatmap
+   * @param original	the original heatmap
    * @return		the final data
    */
   @Override
-  protected Heatmap processData(Heatmap filtered, Heatmap original) {
+  protected Heatmap doCrop(Heatmap filtered, Heatmap original) {
     Heatmap	result;
     HeatmapCentroid centroid;
     Heatmap	centered;
@@ -261,7 +247,55 @@ public class HeatmapCropToCentroid
     if (isLoggingEnabled())
       getLogger().info("Centroid location (y,x): " + c_y + "," + c_x);
 
-    result = CropToCentroid.crop(original, c_y, c_x, m_Height, m_Width);
+    result        = crop(original, c_y, c_x, m_Height, m_Width);
+    m_TopLeft     = new Point(result.getReport().getDoubleValue(CROP_LEFT).intValue(), result.getReport().getDoubleValue(CROP_TOP).intValue());
+    m_BottomRight = new Point(result.getReport().getDoubleValue(CROP_RIGHT).intValue(), result.getReport().getDoubleValue(CROP_BOTTOM).intValue());
+
+    return result;
+  }
+
+  /**
+   * Crops the heatmap around the centroid stored in the heatmap's report.
+   *
+   * @param original	the heatmap, with the centroid information
+   * @param centroidY   the Y position of the centroid
+   * @param centroidX   the X position of the centroid
+   * @param height	the new height of the heatmap
+   * @param width	the new width of the heatmap
+   * @return		the cropped heatmap
+   */
+  public static Heatmap crop(Heatmap original, int centroidY, int centroidX, int height, int width) {
+    Heatmap	result;
+    int		start_x;
+    int		start_y;
+    int		end_x;
+    int		end_y;
+    int		x;
+    int		y;
+
+    result = original.getHeader(height, width);
+
+    // calculate valid region in original data
+    start_x = centroidX - width / 2;
+    start_y = centroidY - height / 2;
+    end_x   = start_x + width;
+    end_y   = start_y + height;
+    start_x = Math.max(0, start_x);
+    start_y = Math.max(0, start_y);
+    end_x   = Math.min(original.getWidth(),  end_x);
+    end_y   = Math.min(original.getHeight(), end_y);
+
+    result.getReport().setNumericValue(CROP_LEFT,   start_x);
+    result.getReport().setNumericValue(CROP_TOP,    start_y);
+    result.getReport().setNumericValue(CROP_RIGHT,  end_x);
+    result.getReport().setNumericValue(CROP_BOTTOM, end_y);
+
+    // transfer original data
+    for (y = start_y; y < end_y; y++) {
+      for (x = start_x; x < end_x; x++) {
+	result.set(y - start_y, x - start_x, original.get(y, x));
+      }
+    }
 
     return result;
   }

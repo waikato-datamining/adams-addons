@@ -20,38 +20,56 @@
 
 package adams.data.filter;
 
+import adams.data.filter.heatmapthreshold.AbstractHeatmapThreshold;
+import adams.data.filter.heatmapthreshold.Manual;
 import adams.data.heatmap.Heatmap;
 
 /**
  <!-- globalinfo-start -->
- * Zeroes all intensity values that are either below or above a user-specified threshold, depending on the selected threshold type.
+ * Replaces all intensity values that are either below or above a user-specified threshold, depending on the selected threshold type, using the pre-defined replacement value.
  * <p/>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <p/>
- *
- * <pre>-D &lt;int&gt; (property: debugLevel)
- * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to
- * &nbsp;&nbsp;&nbsp;the console (0 = off).
- * &nbsp;&nbsp;&nbsp;default: 0
- * &nbsp;&nbsp;&nbsp;minimum: 0
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- *
+ * 
+ * <pre>-no-id-update &lt;boolean&gt; (property: dontUpdateID)
+ * &nbsp;&nbsp;&nbsp;If enabled, suppresses updating the ID of adams.data.id.IDHandler data containers.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  * <pre>-type &lt;ABOVE|BELOW&gt; (property: type)
- * &nbsp;&nbsp;&nbsp;The type of threshold to use: if BELOW then all values that fall below the
- * &nbsp;&nbsp;&nbsp;threshold are zeroed, if ABOVE then all values that are above the threshold
+ * &nbsp;&nbsp;&nbsp;The type of threshold to use: if BELOW then all values that fall below the 
+ * &nbsp;&nbsp;&nbsp;threshold are zeroed, if ABOVE then all values that are above the threshold 
  * &nbsp;&nbsp;&nbsp;are zeroed.
  * &nbsp;&nbsp;&nbsp;default: BELOW
  * </pre>
- *
- * <pre>-threshold &lt;double&gt; (property: threshold)
- * &nbsp;&nbsp;&nbsp;The threshold in percent (0.0 - 100.0).
- * &nbsp;&nbsp;&nbsp;default: 90.0
- * &nbsp;&nbsp;&nbsp;minimum: 0.0
- * &nbsp;&nbsp;&nbsp;maximum: 100.0
+ * 
+ * <pre>-threshold &lt;adams.data.filter.heatmapthreshold.AbstractHeatmapThreshold&gt; (property: threshold)
+ * &nbsp;&nbsp;&nbsp;The threshold algorithm to use.
+ * &nbsp;&nbsp;&nbsp;default: adams.data.filter.heatmapthreshold.Manual
  * </pre>
- *
+ * 
+ * <pre>-replacement &lt;double&gt; (property: replacement)
+ * &nbsp;&nbsp;&nbsp;The replacement value to use.
+ * &nbsp;&nbsp;&nbsp;default: -1.0
+ * </pre>
+ * 
+ * <pre>-replace-with-missing &lt;boolean&gt; (property: replaceWithMissing)
+ * &nbsp;&nbsp;&nbsp;If enabled, the values are replaced with missing values rather than actual 
+ * &nbsp;&nbsp;&nbsp;values.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-missing-values-handling &lt;SKIP|REPLACE&gt; (property: missingValuesHandling)
+ * &nbsp;&nbsp;&nbsp;Determines how missing values are handled when processing the heatmap, eg 
+ * &nbsp;&nbsp;&nbsp;whether they get skipped or always replaced.
+ * &nbsp;&nbsp;&nbsp;default: SKIP
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -76,14 +94,33 @@ public class HeatmapThreshold
     BELOW
   }
 
+  /**
+   * Determines how missing values are treated.
+   *
+   * @author  fracpete (fracpete at waikato dot ac dot nz)
+   * @version $Revision$
+   */
+  public enum MissingValuesHandling {
+    /** ignores missing values. */
+    SKIP,
+    /** always replaces misssing values. */
+    REPLACE,
+  }
+
   /** the type of threshold. */
   protected Type m_Type;
 
-  /** the threshold percentage. */
-  protected double m_Threshold;
+  /** the threshold. */
+  protected AbstractHeatmapThreshold m_Threshold;
 
   /** the replacement value. */
   protected double m_Replacement;
+
+  /** whether to replace with missing values. */
+  protected boolean m_ReplaceWithMissing;
+
+  /** how missing values are treated. */
+  protected MissingValuesHandling m_MissingValuesHandling;
 
   /**
    * Returns a string describing the object.
@@ -104,16 +141,24 @@ public class HeatmapThreshold
     super.defineOptions();
 
     m_OptionManager.add(
-	"type", "type",
-	Type.BELOW);
+      "type", "type",
+      Type.BELOW);
 
     m_OptionManager.add(
-	"threshold", "threshold",
-	0.0);
+      "threshold", "threshold",
+      new Manual());
 
     m_OptionManager.add(
-	"replacement", "replacement",
-	-1.0);
+      "replacement", "replacement",
+      -1.0);
+
+    m_OptionManager.add(
+      "replace-with-missing", "replaceWithMissing",
+      false);
+
+    m_OptionManager.add(
+      "missing-values-handling", "missingValuesHandling",
+      MissingValuesHandling.SKIP);
   }
 
   /**
@@ -149,21 +194,21 @@ public class HeatmapThreshold
   }
 
   /**
-   * Sets the threshold to use.
+   * Sets the threshold algorithm to use.
    *
-   * @param value 	the threshold
+   * @param value 	the algorithm
    */
-  public void setThreshold(double value) {
+  public void setThreshold(AbstractHeatmapThreshold value) {
     m_Threshold = value;
     reset();
   }
 
   /**
-   * Returns the threshold in use.
+   * Returns the threshold algorithm in use.
    *
-   * @return 		the threshold
+   * @return 		the algorithm
    */
-  public double getThreshold() {
+  public AbstractHeatmapThreshold getThreshold() {
     return m_Threshold;
   }
 
@@ -174,7 +219,7 @@ public class HeatmapThreshold
    * 			displaying in the GUI or for listing the options.
    */
   public String thresholdTipText() {
-    return "The threshold to use.";
+    return "The threshold algorithm to use.";
   }
 
   /**
@@ -207,6 +252,66 @@ public class HeatmapThreshold
   }
 
   /**
+   * Sets whether to replace the values with missing values instead.
+   *
+   * @param value 	true if to replace with missing
+   */
+  public void setReplaceWithMissing(boolean value) {
+    m_ReplaceWithMissing = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to replace the values with missing values instead.
+   *
+   * @return 		true if to replace with missing
+   */
+  public boolean getReplaceWithMissing() {
+    return m_ReplaceWithMissing;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String replaceWithMissingTipText() {
+    return "If enabled, the values are replaced with missing values rather than actual values.";
+  }
+
+  /**
+   * Sets how missing values are handled.
+   *
+   * @param value 	the handling
+   */
+  public void setMissingValuesHandling(MissingValuesHandling value) {
+    m_MissingValuesHandling = value;
+    reset();
+  }
+
+  /**
+   * Returns how missing values are handled.
+   *
+   * @return 		the handling
+   */
+  public MissingValuesHandling getMissingValuesHandling() {
+    return m_MissingValuesHandling;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String missingValuesHandlingTipText() {
+    return
+        "Determines how missing values are handled when processing the heatmap, "
+	  + "eg whether they get skipped or always replaced.";
+  }
+
+  /**
    * Performs the actual filtering.
    *
    * @param data	the data to filter
@@ -216,23 +321,50 @@ public class HeatmapThreshold
     Heatmap		result;
     int			i;
     double		value;
+    double		threshold;
 
-    result = data.getClone();
+    result    = data.getClone();
+    threshold = m_Threshold.calcThreshold(data);
     for (i = 0; i < data.size(); i++) {
       value = data.get(i);
-      switch (m_Type) {
-	case BELOW:
-	  if (value < m_Threshold)
-	    result.set(i, m_Replacement);
-	  break;
+      if (Heatmap.isMissingValue(value)) {
+	switch (m_MissingValuesHandling) {
+	  case SKIP:
+	    // don't do anything;
+	    break;
 
-	case ABOVE:
-	  if (value > m_Threshold)
-	    result.set(i, m_Replacement);
-	  break;
+	  case REPLACE:
+	    if (!m_ReplaceWithMissing)
+	      result.set(i, m_Replacement);
+	    break;
 
-	default:
-	  throw new IllegalStateException("Unhandled type: " + m_Type);
+	  default:
+	    throw new IllegalStateException("Unhandled missing values handling: " + m_MissingValuesHandling);
+	}
+      }
+      else {
+	switch (m_Type) {
+	  case BELOW:
+	    if (value < threshold) {
+	      if (m_ReplaceWithMissing)
+		result.setMissing(i);
+	      else
+		result.set(i, m_Replacement);
+	    }
+	    break;
+
+	  case ABOVE:
+	    if (value > threshold) {
+	      if (m_ReplaceWithMissing)
+		result.setMissing(i);
+	      else
+		result.set(i, m_Replacement);
+	    }
+	    break;
+
+	  default:
+	    throw new IllegalStateException("Unhandled type: " + m_Type);
+	}
       }
     }
 

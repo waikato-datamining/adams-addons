@@ -15,7 +15,7 @@
 
 /**
  * HeatmapValue.java
- * Copyright (C) 2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.heatmap;
 
@@ -126,6 +126,15 @@ public class HeatmapValue
    */
   public double getValue() {
     return m_Value;
+  }
+
+  /**
+   * Returns whether the value represents a missing value.
+   *
+   * @return		true if missing value
+   */
+  public boolean isMissingValue() {
+    return Heatmap.isMissingValue(m_Value);
   }
 
   /**

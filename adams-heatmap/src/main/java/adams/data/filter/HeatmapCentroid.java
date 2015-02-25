@@ -15,7 +15,7 @@
 
 /*
  * Centroid.java
- * Copyright (C) 2011-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.filter;
@@ -23,6 +23,7 @@ package adams.data.filter;
 import adams.core.TechnicalInformation;
 import adams.core.TechnicalInformation.Type;
 import adams.core.TechnicalInformationHandler;
+import adams.data.filter.heatmapcrop.CropToCentroid;
 import adams.data.heatmap.Heatmap;
 import adams.data.report.DataType;
 import adams.data.report.Field;
@@ -313,11 +314,11 @@ public class HeatmapCentroid
       // crop
       width   = (int) Math.round(data.getWidth()  * m_ShrinkFactor);
       height  = (int) Math.round(data.getHeight() * m_ShrinkFactor);
-      current = HeatmapCropToCentroid.crop(current, (int) Math.round(newY), (int) Math.round(newX), height, width);
+      current = CropToCentroid.crop(current, (int) Math.round(newY), (int) Math.round(newX), height, width);
 
       // offset for next iteration
-      offsetX += current.getReport().getDoubleValue(HeatmapCropToCentroid.CROP_LEFT).intValue();
-      offsetY += current.getReport().getDoubleValue(HeatmapCropToCentroid.CROP_TOP).intValue();
+      offsetX += current.getReport().getDoubleValue(CropToCentroid.CROP_LEFT).intValue();
+      offsetY += current.getReport().getDoubleValue(CropToCentroid.CROP_TOP).intValue();
     }
 
     return result;

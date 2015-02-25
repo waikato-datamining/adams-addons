@@ -26,3 +26,11 @@ adams.data.io.output.AbstractHeatmapWriter=\
 # the image overlays
 adams.gui.visualization.image.ImageOverlay=\
   adams.gui.visualization.heatmap
+
+# the crop algorithms
+adams.data.filter.heatmapcrop.AbstractHeatmapCrop=\
+  adams.data.filter.heatmapcrop
+
+# the threshold algorithms
+adams.data.filter.heatmapthreshold.AbstractHeatmapThreshold=\
+  adams.data.filter.heatmapthreshold
