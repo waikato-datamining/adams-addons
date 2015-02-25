@@ -16,14 +16,9 @@
 /*
  * HeatmapToBufferedImageWithKey.java
  * Copyright (C) 2014 Soilcares Research, Wageningen, The Netherlands
+ * Copyright (C) 2015 University of Waikato, Hamilton, NZ
  */
 package adams.data.conversion;
-
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.text.DecimalFormat;
 
 import adams.core.annotation.ThirdPartyCopyright;
 import adams.data.heatmap.Heatmap;
@@ -31,6 +26,12 @@ import adams.data.image.AbstractImageContainer;
 import adams.data.image.BufferedImageContainer;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.text.DecimalFormat;
 
 /**
  <!-- globalinfo-start -->
@@ -446,7 +447,7 @@ public class HeatmapToBufferedImageWithKey
       //heatmap part
       for (y = 0; y < map.getHeight(); y++) {
 	for (x = 0; x < map.getWidth(); x++) {
-	  if (map.get(y, x) == 0.0)
+	  if ((map.get(y, x) == 0.0) || map.isMissing(y, x))
 	    color = m_MissingColor;
 	  else
 	    color = colors[(int) (((map.get(y, x) - min) / range) * (colors.length - 2)) + 1];
