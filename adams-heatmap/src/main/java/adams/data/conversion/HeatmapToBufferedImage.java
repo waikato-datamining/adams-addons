@@ -15,7 +15,7 @@
 
 /**
  * HeatmapToBufferedImage.java
- * Copyright (C) 2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.conversion;
 
@@ -46,8 +46,13 @@ import java.awt.image.BufferedImage;
  * &nbsp;&nbsp;&nbsp;default: adams.gui.visualization.core.BiColorGenerator
  * </pre>
  * 
+ * <pre>-missing-value-color &lt;java.awt.Color&gt; (property: missingValueColor)
+ * &nbsp;&nbsp;&nbsp;The color to use for missing values.
+ * &nbsp;&nbsp;&nbsp;default: #00ffffff
+ * </pre>
+ * 
  * <pre>-use-fixed-range &lt;boolean&gt; (property: useFixedRange)
- * &nbsp;&nbsp;&nbsp;Whether to use pre-defined min&#47;max values or ones determined from the heatmap
+ * &nbsp;&nbsp;&nbsp;Whether to use pre-defined min&#47;max values or ones determined from the heatmap 
  * &nbsp;&nbsp;&nbsp;itself.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
@@ -75,6 +80,9 @@ public class HeatmapToBufferedImage
 
   /** the generator to use. */
   protected AbstractColorGradientGenerator m_Generator;
+
+  /** the color for missing values. */
+  protected Color m_MissingValueColor;
 
   /** whether to use a fixed min/max. */
   protected boolean m_UseFixedRange;
@@ -109,6 +117,10 @@ public class HeatmapToBufferedImage
     m_OptionManager.add(
       "generator", "generator",
       new BiColorGenerator());
+
+    m_OptionManager.add(
+      "missing-value-color", "missingValueColor",
+      new Color(255, 255, 255, 0));
 
     m_OptionManager.add(
       "use-fixed-range", "useFixedRange",
@@ -160,6 +172,35 @@ public class HeatmapToBufferedImage
    */
   public String generatorTipText() {
     return "The generator to use for creating the gradient colors.";
+  }
+
+  /**
+   * Sets the color for missing values.
+   *
+   * @param value	the color
+   */
+  public void setMissingValueColor(Color value) {
+    m_MissingValueColor = value;
+    reset();
+  }
+
+  /**
+   * Returns the color for missing values.
+   *
+   * @return		the color
+   */
+  public Color getMissingValueColor() {
+    return m_MissingValueColor;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String missingValueColorTipText() {
+    return "The color to use for missing values.";
   }
 
   /**
@@ -342,7 +383,10 @@ public class HeatmapToBufferedImage
     g      = image.createGraphics();
     for (y = 0; y < map.getHeight(); y++) {
       for (x = 0; x < map.getWidth(); x++) {
-	color = colors[(int) (((map.get(y, x) - min) / range) * (colors.length - 2)) + 1];
+	if (map.isMissing(y, x))
+	  color = m_MissingValueColor;
+	else
+	  color = colors[(int) (((map.get(y, x) - min) / range) * (colors.length - 2)) + 1];
 	g.setColor(color);
 	g.drawLine(x, y, x, y);
       }
