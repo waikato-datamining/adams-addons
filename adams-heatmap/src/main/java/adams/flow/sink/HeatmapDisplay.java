@@ -15,14 +15,10 @@
 
 /*
  * HeatmapDisplay.java
- * Copyright (C) 2011-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
-
-import java.awt.BorderLayout;
-
-import javax.swing.JComponent;
 
 import adams.core.QuickInfoHelper;
 import adams.data.heatmap.Heatmap;
@@ -31,6 +27,10 @@ import adams.gui.core.BasePanel;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
 import adams.gui.visualization.heatmap.HeatmapPanel;
+
+import javax.swing.JComponent;
+import java.awt.BorderLayout;
+import java.awt.Color;
 
 /**
  <!-- globalinfo-start -->
@@ -56,7 +56,7 @@ import adams.gui.visualization.heatmap.HeatmapPanel;
  * &nbsp;&nbsp;&nbsp;default: HeatmapDisplay
  * </pre>
  * 
- * <pre>-annotation &lt;adams.core.base.BaseText&gt; (property: annotations)
+ * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
  * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
@@ -73,9 +73,20 @@ import adams.gui.visualization.heatmap.HeatmapPanel;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  * <pre>-short-title &lt;boolean&gt; (property: shortTitle)
  * &nbsp;&nbsp;&nbsp;If enabled uses just the name for the title instead of the actor's full 
  * &nbsp;&nbsp;&nbsp;name.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-display-in-editor &lt;boolean&gt; (property: displayInEditor)
+ * &nbsp;&nbsp;&nbsp;If enabled displays the panel in a tab in the flow editor rather than in 
+ * &nbsp;&nbsp;&nbsp;a separate frame.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
@@ -115,6 +126,11 @@ import adams.gui.visualization.heatmap.HeatmapPanel;
  * &nbsp;&nbsp;&nbsp;default: adams.gui.visualization.core.BiColorGenerator
  * </pre>
  * 
+ * <pre>-missing-value-color &lt;java.awt.Color&gt; (property: missingValueColor)
+ * &nbsp;&nbsp;&nbsp;The color to use for missing values.
+ * &nbsp;&nbsp;&nbsp;default: #00ffffff
+ * </pre>
+ * 
  * <pre>-zoom &lt;double&gt; (property: zoom)
  * &nbsp;&nbsp;&nbsp;The zoom level in percent.
  * &nbsp;&nbsp;&nbsp;default: 100.0
@@ -137,6 +153,9 @@ public class HeatmapDisplay
   /** the generator for the color gradient. */
   protected AbstractColorGradientGenerator m_ColorGenerator;
 
+  /** the color for missing values. */
+  protected Color m_MissingValueColor;
+
   /** the zoom level. */
   protected double m_Zoom;
 
@@ -158,12 +177,16 @@ public class HeatmapDisplay
     super.defineOptions();
 
     m_OptionManager.add(
-	    "color-generator", "colorGenerator",
-	    new BiColorGenerator());
+      "color-generator", "colorGenerator",
+      new BiColorGenerator());
 
     m_OptionManager.add(
-	    "zoom", "zoom",
-	    100.0, -1.0, 1600.0);
+      "missing-value-color", "missingValueColor",
+      new Color(255, 255, 255, 0));
+
+    m_OptionManager.add(
+      "zoom", "zoom",
+      100.0, -1.0, 1600.0);
   }
 
   /**
@@ -216,6 +239,35 @@ public class HeatmapDisplay
   }
 
   /**
+   * Sets the color for missing values.
+   *
+   * @param value	the color
+   */
+  public void setMissingValueColor(Color value) {
+    m_MissingValueColor = value;
+    reset();
+  }
+
+  /**
+   * Returns the color for missing values.
+   *
+   * @return		the color
+   */
+  public Color getMissingValueColor() {
+    return m_MissingValueColor;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String missingValueColorTipText() {
+    return "The color to use for missing values.";
+  }
+
+  /**
    * Sets the zoom level in percent (0-1600).
    *
    * @param value 	the zoom, -1 to fit window, or 0-1600
@@ -260,6 +312,7 @@ public class HeatmapDisplay
 
     result  = super.getQuickInfo();
     result += QuickInfoHelper.toString(this, "colorGenerator", m_ColorGenerator, ", generator: ");
+    result += QuickInfoHelper.toString(this, "missingValueColor", m_MissingValueColor, ", missing: ");
     result += QuickInfoHelper.toString(this, "zoom", m_Zoom, ", zoom: ");
     
     return result;
@@ -285,6 +338,7 @@ public class HeatmapDisplay
 
     result = new HeatmapPanel(null);
     result.setColorGenerator(m_ColorGenerator);
+    result.setMissingValueColor(m_MissingValueColor);
     result.setZoom(m_Zoom / 100.0);
 
     return result;
@@ -330,6 +384,7 @@ public class HeatmapDisplay
 	setLayout(new BorderLayout());
 	m_HeatmapPanel = new HeatmapPanel(null);
 	m_HeatmapPanel.setColorGenerator(m_ColorGenerator);
+	m_HeatmapPanel.setMissingValueColor(m_MissingValueColor);
 	m_HeatmapPanel.setZoom(m_Zoom / 100.0);
 	add(m_HeatmapPanel, BorderLayout.CENTER);
       }

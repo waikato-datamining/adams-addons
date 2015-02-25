@@ -1,1 +1,1 @@
-X:left, Y:top, W:1000, H:700, generator: BiColorGenerator, zoom: 100.0
+X:left, Y:top, W:1000, H:700, generator: BiColorGenerator, missing: #00ffffff, zoom: 100.0

@@ -53,6 +53,7 @@ import adams.gui.visualization.statistics.InformativeStatisticFactory;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dialog.ModalityType;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -107,6 +108,9 @@ public class HeatmapPanel
   /** the color generator to use. */
   protected AbstractColorGradientGenerator m_ColorGenerator;
 
+  /** the color to use for missing values. */
+  protected Color m_MissingValueColor;
+
   /** the last ArrayHistogram setup that was used. */
   protected ArrayHistogram m_LastArrayHistogram;
 
@@ -135,6 +139,7 @@ public class HeatmapPanel
     m_Heatmap            = new Heatmap(0, 0);
     m_Reader             = null;
     m_ColorGenerator     = AbstractColorGradientGenerator.forCommandLine(props.getProperty("Image.GradientColorGenerator", new BiColorGenerator().toCommandLine()));
+    m_MissingValueColor  = props.getColor("Image.MissingValueColor", new Color(255, 255, 255, 0));
     m_LastArrayHistogram = null;
   }
 
@@ -225,6 +230,7 @@ public class HeatmapPanel
     hm2bi = new HeatmapToBufferedImage();
     hm2bi.setInput(m_Heatmap);
     hm2bi.setGenerator(m_ColorGenerator);
+    hm2bi.setMissingValueColor(m_MissingValueColor);
     result = hm2bi.convert();
     if (result != null) {
       error = "Failed to generate image: " + result;
@@ -315,7 +321,26 @@ public class HeatmapPanel
   public AbstractColorGradientGenerator getColorGenerator() {
     return m_ColorGenerator;
   }
-  
+
+  /**
+   * Sets the color to use for missing values.
+   *
+   * @param value	the color
+   */
+  public void setMissingValueColor(Color value) {
+    m_MissingValueColor = value;
+    reload();
+  }
+
+  /**
+   * Returns the color to use for missing values.
+   *
+   * @return		the color
+   */
+  public Color getMissingValueColor() {
+    return m_MissingValueColor;
+  }
+
   /**
    * Returns the database ID or filename as title.
    *
