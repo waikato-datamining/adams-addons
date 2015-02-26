@@ -25,7 +25,9 @@ import adams.gui.dialog.ApprovalDialog;
 import adams.gui.visualization.heatmap.HeatmapPanel;
 import adams.gui.visualization.heatmap.HeatmapViewerPanel;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
@@ -33,6 +35,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.BorderLayout;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -181,10 +184,14 @@ public abstract class AbstractSelectedHeatmapsViewerPlugin
     result.setDiscardVisible(false);
     result.setSize(getDialogSize());
     
+    panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    panel.add(new JLabel("Please select:"));
+    result.getContentPane().add(panel, BorderLayout.NORTH);
     panel = new JPanel(new BorderLayout());
     result.getContentPane().add(panel, BorderLayout.CENTER);
     
     panelList   = createListPanel(result);
+    panelList.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     panelConfig = createConfigurationPanel(result);
     if (panelConfig == null) {
       panel.add(panelList, BorderLayout.CENTER);
