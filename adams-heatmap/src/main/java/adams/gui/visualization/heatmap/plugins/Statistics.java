@@ -21,9 +21,11 @@ package adams.gui.visualization.heatmap.plugins;
 
 import adams.data.heatmap.HeatmapStatistic;
 import adams.data.statistics.InformativeStatistic;
+import adams.gui.dialog.ApprovalDialog;
 import adams.gui.visualization.heatmap.HeatmapPanel;
 import adams.gui.visualization.statistics.InformativeStatisticFactory;
 
+import javax.swing.JPanel;
 import java.awt.Dialog.ModalityType;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +37,13 @@ import java.util.List;
  * @version $Revision$
  */
 public class Statistics
-  extends AbstractHeatmapViewerPlugin {
+  extends AbstractSelectedHeatmapsViewerPlugin {
   
   /** for serialization. */
   private static final long serialVersionUID = 3286345601880725626L;
+
+  /** the collected statistics. */
+  protected List<InformativeStatistic> m_StatsList;
 
   /**
    * Returns the text for the menu to place the plugin beneath.
@@ -81,6 +86,71 @@ public class Statistics
     return (panel != null) && (panel.getHeatmap() != null);
   }
 
+  @Override
+  protected JPanel createConfigurationPanel(ApprovalDialog dialog) {
+    return null;
+  }
+
+  /**
+   * Initializes the processing.
+   *
+   * @return		null if successful, otherwise error message
+   */
+  @Override
+  protected String processInit() {
+    String	result;
+
+    result = super.processInit();
+
+    if (result == null)
+      m_StatsList = new ArrayList<>();
+
+    return result;
+  }
+
+  /**
+   * Processes the specified panel.
+   *
+   * @param panel	the panel to process
+   * @return		null if successful, error message otherwise
+   */
+  @Override
+  protected String process(HeatmapPanel panel) {
+    HeatmapStatistic stats;
+
+    stats = new HeatmapStatistic(panel.getHeatmap());
+    m_StatsList.add(stats);
+
+    return null;
+  }
+
+  /**
+   * Finishes up the processing.
+   *
+   * @return		null if successful, otherwise error message
+   */
+  @Override
+  protected String processFinish() {
+    String				result;
+    InformativeStatisticFactory.Dialog	dialog;
+
+    result = super.processFinish();
+
+    if (result == null) {
+      if (m_CurrentPanel.getParentDialog() != null)
+	dialog = InformativeStatisticFactory.getDialog(m_CurrentPanel.getParentDialog(), ModalityType.MODELESS);
+      else
+	dialog = InformativeStatisticFactory.getDialog(m_CurrentPanel.getParentFrame(), false);
+      dialog.setStatistics(m_StatsList);
+      dialog.setTitle("Heatmap statistics");
+      dialog.pack();
+      dialog.setLocationRelativeTo(m_CurrentPanel);
+      dialog.setVisible(true);
+    }
+
+    return result;
+  }
+
   /**
    * Creates the log message.
    *
@@ -88,32 +158,6 @@ public class Statistics
    */
   @Override
   protected String createLogEntry() {
-    return null;
-  }
-
-  /**
-   * Processes the heatmap.
-   */
-  @Override
-  protected String doExecute() {
-    HeatmapStatistic stats;
-    InformativeStatisticFactory.Dialog	dialog;
-    List<InformativeStatistic> statsList;
-
-    stats     = new HeatmapStatistic(m_CurrentPanel.getHeatmap());
-    statsList = new ArrayList<InformativeStatistic>();
-    statsList.add(stats);
-
-    if (m_CurrentPanel.getParentDialog() != null)
-      dialog = InformativeStatisticFactory.getDialog(m_CurrentPanel.getParentDialog(), ModalityType.MODELESS);
-    else
-      dialog = InformativeStatisticFactory.getDialog(m_CurrentPanel.getParentFrame(), false);
-    dialog.setStatistics(statsList);
-    dialog.setTitle("Heatmap statistics");
-    dialog.pack();
-    dialog.setLocationRelativeTo(m_CurrentPanel);
-    dialog.setVisible(true);
-
     return null;
   }
 }

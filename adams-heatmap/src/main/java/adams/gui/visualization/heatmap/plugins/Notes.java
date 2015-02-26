@@ -19,10 +19,12 @@
  */
 package adams.gui.visualization.heatmap.plugins;
 
+import adams.gui.dialog.ApprovalDialog;
 import adams.gui.visualization.container.NotesFactory;
 import adams.gui.visualization.heatmap.HeatmapContainer;
 import adams.gui.visualization.heatmap.HeatmapPanel;
 
+import javax.swing.JPanel;
 import java.awt.Dialog.ModalityType;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +36,11 @@ import java.util.List;
  * @version $Revision$
  */
 public class Notes
-  extends AbstractHeatmapViewerPlugin {
-  
+  extends AbstractSelectedHeatmapsViewerPlugin {
+
+  /** the containers for the notes. */
+  protected List<HeatmapContainer> m_NotesList;
+
   /** for serialization. */
   private static final long serialVersionUID = 3286345601880725626L;
 
@@ -81,33 +86,72 @@ public class Notes
   }
 
   /**
+   * Creates the panel with the configuration (return null to suppress display).
+   *
+   * @param dialog	the dialog that is being created
+   * @return		the generated panel, null to suppress
+   */
+  @Override
+  protected JPanel createConfigurationPanel(ApprovalDialog dialog) {
+    return null;
+  }
+
+  /**
+   * Initializes the processing.
+   *
+   * @return		null if successful, otherwise error message
+   */
+  @Override
+  protected String processInit() {
+    String	result;
+
+    result = super.processInit();
+
+    if (result == null)
+      m_NotesList = new ArrayList<HeatmapContainer>();
+
+    return result;
+  }
+
+  /**
+   * Processes the specified panel.
+   *
+   * @param panel	the panel to process
+   * @return		null if successful, error message otherwise
+   */
+  @Override
+  protected String process(HeatmapPanel panel) {
+    m_NotesList.add(new HeatmapContainer(null, panel.getHeatmap()));
+    return null;
+  }
+
+  @Override
+  protected String processFinish() {
+    String			result;
+    NotesFactory.Dialog		dialog;
+
+    result = super.processFinish();
+
+    if (result == null) {
+      if (m_CurrentPanel.getParentDialog() != null)
+	dialog = NotesFactory.getDialog(m_CurrentPanel.getParentDialog(), ModalityType.MODELESS);
+      else
+	dialog = NotesFactory.getDialog(m_CurrentPanel.getParentFrame(), false);
+      dialog.setData(m_NotesList);
+      dialog.setLocationRelativeTo(m_CurrentPanel);
+      dialog.setVisible(true);
+    }
+
+    return result;
+  }
+
+  /**
    * Creates the log message.
    *
    * @return		the message, null if none available
    */
   @Override
   protected String createLogEntry() {
-    return null;
-  }
-
-  /**
-   * Processes the heatmap.
-   */
-  @Override
-  protected String doExecute() {
-    NotesFactory.Dialog		dialog;
-    List<HeatmapContainer>	data;
-
-    if (m_CurrentPanel.getParentDialog() != null)
-      dialog = NotesFactory.getDialog(m_CurrentPanel.getParentDialog(), ModalityType.MODELESS);
-    else
-      dialog = NotesFactory.getDialog(m_CurrentPanel.getParentFrame(), false);
-    data = new ArrayList<HeatmapContainer>();
-    data.add(new HeatmapContainer(null, m_CurrentPanel.getHeatmap()));
-    dialog.setData(data);
-    dialog.setLocationRelativeTo(m_CurrentPanel);
-    dialog.setVisible(true);
-
     return null;
   }
 }
