@@ -28,10 +28,12 @@ import adams.data.filter.HeatmapNormalize;
 import adams.data.heatmap.Heatmap;
 import adams.data.io.input.AbstractHeatmapReader;
 import adams.data.io.output.AbstractDataContainerWriter;
+import adams.gui.chooser.BaseColorChooser;
 import adams.gui.chooser.HeatmapFileChooser;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseStatusBar;
 import adams.gui.core.BaseTabbedPane;
+import adams.gui.core.CustomColorImageIcon;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.MenuBarProvider;
 import adams.gui.core.RecentFilesHandlerWithCommandline;
@@ -65,6 +67,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dialog.ModalityType;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -158,6 +161,9 @@ public class HeatmapViewerPanel
   /** the color generator menu item. */
   protected JMenuItem m_MenuItemViewColorGenerator;
 
+  /** the missing value color menu item. */
+  protected JMenuItem m_MenuItemViewMissingValueColor;
+
   /** the histogram menu item. */
   protected JMenuItem m_MenuItemViewShowHistogram;
 
@@ -182,6 +188,9 @@ public class HeatmapViewerPanel
   /** the dialog for selecting the color provider. */
   protected GenericObjectEditorDialog m_DialogColorGenerator;
 
+  /** the dialog for selecting the missing value color. */
+  protected BaseColorChooser m_DialogMissingValueColor;
+
   /** the recent files handler. */
   protected RecentFilesHandlerWithCommandline<JMenu> m_RecentFilesHandler;
 
@@ -194,12 +203,13 @@ public class HeatmapViewerPanel
 
     super.initialize();
 
-    props                  = getProperties();
-    m_FileChooser          = new HeatmapFileChooser(props.getPath("InitialDir", "%h"));
-    m_CurrentFilter        = new HeatmapNormalize();
-    m_FilterAll            = false;
-    m_DialogColorGenerator = null;
-    m_RecentFilesHandler   = null;
+    props                     = getProperties();
+    m_FileChooser             = new HeatmapFileChooser(props.getPath("InitialDir", "%h"));
+    m_CurrentFilter           = new HeatmapNormalize();
+    m_FilterAll               = false;
+    m_DialogColorGenerator    = null;
+    m_DialogMissingValueColor = null;
+    m_RecentFilesHandler      = null;
   }
 
   /**
@@ -220,6 +230,13 @@ public class HeatmapViewerPanel
     m_TabbedPane = new BaseTabbedPane();
     m_TabbedPane.setTabLayoutPolicy(BaseTabbedPane.SCROLL_TAB_LAYOUT);
     m_TabbedPane.setCloseTabsWithMiddelMouseButton(true);
+    m_TabbedPane.addChangeListener(new ChangeListener() {
+      @Override
+      public void stateChanged(ChangeEvent e) {
+	if ((m_MenuItemViewMissingValueColor != null) && (getCurrentPanel() != null))
+	  m_MenuItemViewMissingValueColor.setIcon(new CustomColorImageIcon(16, 16, getCurrentPanel().getMissingValueColor()));
+      }
+    });
     panel.add(m_TabbedPane, BorderLayout.CENTER);
 
     m_SearchPanel = new SearchPanel(LayoutType.HORIZONTAL, true, "_Search", true, null);
@@ -590,6 +607,18 @@ public class HeatmapViewerPanel
       });
       m_MenuItemViewColorGenerator = menuitem;
 
+      // View/Missing value color
+      menuitem = new JMenuItem("Missing value color...");
+      menuitem.setIcon(new CustomColorImageIcon(16, 16, HeatmapPanel.getProperties().getColor("Image.MissingValueColor", new Color(255, 255, 255, 0))));
+      menu.add(menuitem);
+      menuitem.setMnemonic('M');
+      menuitem.addActionListener(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	  selectMissingValueColor();
+	}
+      });
+      m_MenuItemViewMissingValueColor = menuitem;
+
       // View/Show spreadsheet
       menuitem = new JMenuItem("Show spreadsheet...");
       menu.addSeparator();
@@ -708,6 +737,7 @@ public class HeatmapViewerPanel
     m_MenuItemViewZoomIn.setEnabled(dataLoaded);
     m_MenuItemViewZoomOut.setEnabled(dataLoaded);
     m_MenuItemViewColorGenerator.setEnabled(dataLoaded);
+    m_MenuItemViewMissingValueColor.setEnabled(dataLoaded);
     m_MenuItemViewShowSpreadsheet.setEnabled(dataLoaded);
     m_MenuItemViewShowStatistics.setEnabled(dataLoaded);
     m_MenuItemViewShowNotes.setEnabled(dataLoaded);
@@ -1042,6 +1072,27 @@ public class HeatmapViewerPanel
     if (m_DialogColorGenerator.getResult() != GenericObjectEditorDialog.APPROVE_OPTION)
       return;
     getCurrentPanel().setColorGenerator(((AbstractColorGradientGenerator) m_DialogColorGenerator.getCurrent()).shallowCopy());
+  }
+
+  /**
+   * Shows a color dialog for selecting the color representing missing values.
+   */
+  protected void selectMissingValueColor() {
+    if (m_DialogMissingValueColor == null) {
+      if (getParentDialog() != null)
+	m_DialogMissingValueColor = new BaseColorChooser(getParentDialog(), ModalityType.DOCUMENT_MODAL);
+      else
+	m_DialogMissingValueColor = new BaseColorChooser(getParentFrame(), true);
+      m_DialogMissingValueColor.setTitle("Select missing value color");
+      m_DialogMissingValueColor.setLocationRelativeTo(this);
+    }
+
+    m_DialogMissingValueColor.setColor(getCurrentPanel().getMissingValueColor());
+    m_DialogMissingValueColor.setVisible(true);
+    if (m_DialogMissingValueColor.getOption() != BaseColorChooser.APPROVE_OPTION)
+      return;
+    getCurrentPanel().setMissingValueColor(m_DialogMissingValueColor.getColor());
+    m_MenuItemViewMissingValueColor.setIcon(new CustomColorImageIcon(16, 16, getCurrentPanel().getMissingValueColor()));
   }
 
   /**

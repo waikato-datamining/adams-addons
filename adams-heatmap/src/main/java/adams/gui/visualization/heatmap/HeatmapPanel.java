@@ -36,6 +36,7 @@ import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseSplitPane;
 import adams.gui.core.BaseTabbedPane;
+import adams.gui.core.ColorHelper;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.SearchPanel;
 import adams.gui.core.SearchPanel.LayoutType;
@@ -139,7 +140,7 @@ public class HeatmapPanel
     m_Heatmap            = new Heatmap(0, 0);
     m_Reader             = null;
     m_ColorGenerator     = AbstractColorGradientGenerator.forCommandLine(props.getProperty("Image.GradientColorGenerator", new BiColorGenerator().toCommandLine()));
-    m_MissingValueColor  = props.getColor("Image.MissingValueColor", new Color(255, 255, 255, 0));
+    m_MissingValueColor  = props.getColor("Image.MissingValueColor", ColorHelper.valueOf("#88ff0000"));
     m_LastArrayHistogram = null;
   }
 
@@ -210,23 +211,20 @@ public class HeatmapPanel
   }
 
   /**
-   * Sets the heatmap to display.
+   * Regenerates the image of the current heatmap and redisplays it.
    *
-   * @param value	the heatmap to display
+   * @return		null if everything OK, otherwiser error message
    */
-  public void setHeatmap(Heatmap value) {
+  protected String refresh() {
     String			result;
     Properties			props;
-    HeatmapToBufferedImage	hm2bi;
-    HeatmapToSpreadSheet	hm2ss;
     StringBuilder		errors;
     String			error;
+    HeatmapToBufferedImage	hm2bi;
 
-    m_Heatmap = value.getClone();
-    props     = getProperties();
-    errors    = new StringBuilder();
+    errors = new StringBuilder();
+    props  = getProperties();
 
-    // image
     hm2bi = new HeatmapToBufferedImage();
     hm2bi.setInput(m_Heatmap);
     hm2bi.setGenerator(m_ColorGenerator);
@@ -244,6 +242,33 @@ public class HeatmapPanel
       m_HeatmapImage.setCurrentImage(((AbstractImageContainer) hm2bi.getOutput()).toBufferedImage());
       m_HeatmapImage.setScale(props.getDouble("Image.Scale", -1.0));
     }
+
+    if (errors.length() == 0)
+      return null;
+    else
+      return errors.toString();
+  }
+
+  /**
+   * Sets the heatmap to display.
+   *
+   * @param value	the heatmap to display
+   */
+  public void setHeatmap(Heatmap value) {
+    String			result;
+    Properties			props;
+    HeatmapToSpreadSheet	hm2ss;
+    StringBuilder		errors;
+    String			error;
+
+    m_Heatmap = value.getClone();
+    props     = getProperties();
+    errors    = new StringBuilder();
+
+    // image
+    error = refresh();
+    if (error != null)
+      errors.append(error);
 
     // spreadsheet
     if (m_HeatmapTable != null) {
@@ -310,7 +335,7 @@ public class HeatmapPanel
    */
   public void setColorGenerator(AbstractColorGradientGenerator value) {
     m_ColorGenerator = value;
-    reload();
+    refresh();
   }
   
   /**
@@ -329,7 +354,7 @@ public class HeatmapPanel
    */
   public void setMissingValueColor(Color value) {
     m_MissingValueColor = value;
-    reload();
+    refresh();
   }
 
   /**
@@ -585,12 +610,12 @@ public class HeatmapPanel
    *
    * @return		the properties file for this panel
    */
-  public synchronized Properties getProperties() {
+  public static synchronized Properties getProperties() {
     String 	props;
 
     if (m_Properties == null) {
       try {
-	props = getClass().getName().replaceAll("\\.", "/") + ".props";
+	props = HeatmapPanel.class.getName().replaceAll("\\.", "/") + ".props";
 	m_Properties = Properties.read(props);
       }
       catch (Exception e) {
