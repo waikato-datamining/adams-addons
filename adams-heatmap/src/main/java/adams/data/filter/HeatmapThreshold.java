@@ -325,6 +325,9 @@ public class HeatmapThreshold
 
     result    = data.getClone();
     threshold = m_Threshold.calcThreshold(data);
+    if (isLoggingEnabled())
+      getLogger().info("Threshold: " + threshold);
+
     for (i = 0; i < data.size(); i++) {
       value = data.get(i);
       if (Heatmap.isMissingValue(value)) {
