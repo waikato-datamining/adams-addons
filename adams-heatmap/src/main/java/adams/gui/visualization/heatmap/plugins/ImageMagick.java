@@ -48,6 +48,16 @@ public class ImageMagick
   protected TextEditorPanel m_Editor;
 
   /**
+   * Returns the text for the menu to place the plugin beneath.
+   *
+   * @return		the menu
+   */
+  @Override
+  public String getMenu() {
+    return "Process";
+  }
+
+  /**
    * Returns the text for the menu item to create.
    *
    * @return		the text

@@ -39,6 +39,16 @@ public class BufferedImageTransformer
   private static final long serialVersionUID = 8515360604357492725L;
 
   /**
+   * Returns the text for the menu to place the plugin beneath.
+   *
+   * @return		the menu
+   */
+  @Override
+  public String getMenu() {
+    return "Process";
+  }
+
+  /**
    * Returns the text for the menu item to create.
    *
    * @return		the text
