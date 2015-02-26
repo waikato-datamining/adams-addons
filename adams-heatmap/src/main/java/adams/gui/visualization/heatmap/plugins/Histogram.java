@@ -22,23 +22,32 @@ package adams.gui.visualization.heatmap.plugins;
 import adams.core.option.OptionUtils;
 import adams.data.heatmap.Heatmap;
 import adams.data.statistics.ArrayHistogram;
+import adams.gui.core.BaseMultiPagePane;
 import adams.gui.dialog.ApprovalDialog;
 import adams.gui.visualization.heatmap.HeatmapPanel;
 import adams.gui.visualization.heatmap.HistogramPanel;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Displays the histogram for a heatmap.
+ * Displays the histogram for heatmap(s).
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
 public class Histogram
-  extends AbstractHeatmapViewerPluginWithGOE {
+  extends AbstractSelectedHeatmapsViewerPluginWithGOE {
   
   /** for serialization. */
   private static final long serialVersionUID = 3286345601880725626L;
+
+  /** the list of histogram panels. */
+  protected List<HistogramPanel> m_HistogramList;
+
+  /** the titles for the panels. */
+  protected List<String> m_TitleList;
 
   /**
    * Returns the text for the menu to place the plugin beneath.
@@ -82,16 +91,6 @@ public class Histogram
   }
 
   /**
-   * Creates the log message.
-   * 
-   * @return		the message, null if none available
-   */
-  @Override
-  protected String createLogEntry() {
-    return "Histogram: " + OptionUtils.getCommandLine(getLastSetup());
-  }
-
-  /**
    * Returns whether the class can be changed in the GOE.
    *
    * @return		true if class can be changed by the user
@@ -122,32 +121,88 @@ public class Histogram
   }
 
   /**
-   * Processes the heatmap.
+   * Initializes the processing.
+   *
+   * @return		null if successful, otherwise error message
    */
   @Override
-  protected String process() {
-    Heatmap 		map;
-    HistogramPanel	panel;
-    ApprovalDialog	dialog;
+  protected String processInit() {
+    String	result;
 
-    map = m_CurrentPanel.getHeatmap();
-    panel = new HistogramPanel();
-    panel.setArrayHistogram((ArrayHistogram) getLastSetup());
-    panel.setData(map);
+    result = super.processInit();
 
-    if (m_CurrentPanel.getParentDialog() != null)
-      dialog = new ApprovalDialog(m_CurrentPanel.getParentDialog());
-    else
-      dialog = new ApprovalDialog(m_CurrentPanel.getParentFrame());
-    dialog.setTitle("Histogram - " + m_CurrentPanel.getTitle());
-    dialog.setApproveVisible(true);
-    dialog.setCancelVisible(false);
-    dialog.setDiscardVisible(false);
-    dialog.getContentPane().add(panel, BorderLayout.CENTER);
-    dialog.pack();
-    dialog.setLocationRelativeTo(m_CurrentPanel);
-    dialog.setVisible(true);
+    if (result == null) {
+      m_HistogramList = new ArrayList<>();
+      m_TitleList     = new ArrayList<>();
+    }
+
+    return result;
+  }
+
+  /**
+   * Processes the specified panel.
+   *
+   * @param panel	the panel to process
+   * @return		null if successful, error message otherwise
+   */
+  @Override
+  protected String process(HeatmapPanel panel) {
+    Heatmap		map;
+    HistogramPanel	histo;
+
+    map   = panel.getHeatmap();
+    histo = new HistogramPanel();
+    histo.setArrayHistogram((ArrayHistogram) getLastSetup());
+    histo.setData(map);
+    m_HistogramList.add(histo);
+    m_TitleList.add(panel.getTitle());
 
     return null;
+  }
+
+  /**
+   * Finishes up the processing.
+   *
+   * @return		null if successful, otherwise error message
+   */
+  @Override
+  protected String processFinish() {
+    String		result;
+    BaseMultiPagePane	multipane;
+    ApprovalDialog	dialog;
+    int			i;
+
+    result = super.processFinish();
+
+    if (result == null) {
+      multipane = new BaseMultiPagePane();
+      for (i = 0; i < m_HistogramList.size(); i++)
+	multipane.addPage(m_TitleList.get(i), m_HistogramList.get(i));
+
+      if (m_CurrentPanel.getParentDialog() != null)
+	dialog = new ApprovalDialog(m_CurrentPanel.getParentDialog());
+      else
+	dialog = new ApprovalDialog(m_CurrentPanel.getParentFrame());
+      dialog.setTitle("Histogram");
+      dialog.setApproveVisible(true);
+      dialog.setCancelVisible(false);
+      dialog.setDiscardVisible(false);
+      dialog.getContentPane().add(multipane, BorderLayout.CENTER);
+      dialog.pack();
+      dialog.setLocationRelativeTo(m_CurrentPanel);
+      dialog.setVisible(true);
+    }
+
+    return result;
+  }
+
+  /**
+   * Creates the log message.
+   * 
+   * @return		the message, null if none available
+   */
+  @Override
+  protected String createLogEntry() {
+    return "Histogram: " + OptionUtils.getCommandLine(getLastSetup());
   }
 }
