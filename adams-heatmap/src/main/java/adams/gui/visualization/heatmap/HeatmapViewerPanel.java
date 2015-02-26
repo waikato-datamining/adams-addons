@@ -53,10 +53,6 @@ import adams.gui.sendto.SendToActionUtils;
 import adams.gui.visualization.container.FilterDialog;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.heatmap.plugins.AbstractHeatmapViewerPlugin;
-import adams.gui.visualization.image.plugins.AbstractSelectedImagesFilter;
-import adams.gui.visualization.image.plugins.BufferedImageTransformer;
-import adams.gui.visualization.image.plugins.ImageJTransformer;
-import adams.gui.visualization.image.plugins.ImageMagick;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -130,15 +126,6 @@ public class HeatmapViewerPanel
 
   /** the filter all menu item. */
   protected JMenuItem m_MenuItemProcessFilterAllHeatmaps;
-
-  /** the ImageJ menu item. */
-  protected JMenuItem m_MenuItemProcessApplyImageJ;
-
-  /** the BufferedImage menu item. */
-  protected JMenuItem m_MenuItemProcessApplyBufferedImage;
-
-  /** the ImageMagick menu item. */
-  protected JMenuItem m_MenuItemProcessApplyImageMagick;
 
   /** the show centroid menu item. */
   protected JMenuItem m_MenuItemViewShowCentroid;
@@ -459,47 +446,6 @@ public class HeatmapViewerPanel
       });
       m_MenuItemProcessFilterAllHeatmaps = menuitem;
 
-      menu.addSeparator();
-
-      // Process/Apply ImageJ
-      menuitem = new JMenuItem("Apply ImageJ...");
-      menu.add(menuitem);
-      menuitem.setMnemonic('I');
-      menuitem.setIcon(GUIHelper.getIcon("imagej.gif"));
-      menuitem.addActionListener(new ActionListener() {
-	@Override
-	public void actionPerformed(ActionEvent e) {
-	  applyImageJ(getCurrentPanel());
-	}
-      });
-      m_MenuItemProcessApplyImageJ = menuitem;
-
-      // Process/Apply ImageJ
-      menuitem = new JMenuItem("Apply BufferedImage...");
-      menu.add(menuitem);
-      menuitem.setMnemonic('J');
-      menuitem.setIcon(GUIHelper.getEmptyIcon());
-      menuitem.addActionListener(new ActionListener() {
-	@Override
-	public void actionPerformed(ActionEvent e) {
-	  applyBufferedImage(getCurrentPanel());
-	}
-      });
-      m_MenuItemProcessApplyBufferedImage = menuitem;
-
-      // Process/Apply ImageMagick
-      menuitem = new JMenuItem("Apply ImageMagick...");
-      menu.add(menuitem);
-      menuitem.setMnemonic('M');
-      menuitem.setIcon(GUIHelper.getIcon("imagemagick.png"));
-      menuitem.addActionListener(new ActionListener() {
-	@Override
-	public void actionPerformed(ActionEvent e) {
-	  applyImageMagick(getCurrentPanel());
-	}
-      });
-      m_MenuItemProcessApplyImageMagick = menuitem;
-
       // View
       menu = new JMenu("View");
       result.add(menu);
@@ -785,6 +731,8 @@ public class HeatmapViewerPanel
    */
   protected void updateMenu() {
     boolean	dataLoaded;
+    int		i;
+    boolean	enabled;
 
     if (m_MenuBar == null)
       return;
@@ -801,9 +749,6 @@ public class HeatmapViewerPanel
     // Process
     m_MenuItemProcessFilterHeatmap.setEnabled(dataLoaded);
     m_MenuItemProcessFilterAllHeatmaps.setEnabled(dataLoaded);
-    m_MenuItemProcessApplyImageJ.setEnabled(dataLoaded);
-    m_MenuItemProcessApplyBufferedImage.setEnabled(dataLoaded);
-    m_MenuItemProcessApplyImageMagick.setEnabled(dataLoaded);
 
     // View
     m_MenuViewZoom.setEnabled(dataLoaded);
@@ -815,6 +760,12 @@ public class HeatmapViewerPanel
     m_MenuItemViewShowHistogram.setEnabled(dataLoaded);
     m_MenuItemViewShowStatistics.setEnabled(dataLoaded);
     m_MenuItemViewShowNotes.setEnabled(dataLoaded);
+
+    // Plugins
+    for (i = 0; i < m_Plugins.size(); i++) {
+      enabled = m_Plugins.get(i).canExecute(getCurrentPanel());
+      m_MenuItemPlugins.get(i).setEnabled(enabled);
+    }
   }
 
   /**
@@ -1041,50 +992,6 @@ public class HeatmapViewerPanel
       };
       SwingUtilities.invokeLater(run);
     }
-  }
-
-  /**
-   * Applies the image filter to the heatmap image.
-   *
-   * @param panel	the panel's image to process
-   * @param filter	the image filter to apply
-   */
-  protected void applyImageFilter(HeatmapPanel panel, AbstractSelectedImagesFilter filter) {
-    String	result;
-    double	scale;
-
-    scale  = panel.getImagePanel().getScale();
-    result = filter.execute(panel.getImagePanel());
-    panel.getImagePanel().setScale(scale);
-    if (result != null)
-      GUIHelper.showErrorMessage(this, "Failed to filter heatmap image:\n" + result);
-  }
-
-  /**
-   * Applies ImageJ to the heatmap images.
-   *
-   * @param panel	the heatmap image to process
-   */
-  protected void applyImageJ(HeatmapPanel panel) {
-    applyImageFilter(panel, new ImageJTransformer());
-  }
-
-  /**
-   * Applies BufferedImage to the heatmap images.
-   *
-   * @param panel	the heatmap image to process
-   */
-  protected void applyBufferedImage(HeatmapPanel panel) {
-    applyImageFilter(panel, new BufferedImageTransformer());
-  }
-
-  /**
-   * Applies ImageMagick to the heatmap images.
-   *
-   * @param panel	the heatmap image to process
-   */
-  protected void applyImageMagick(HeatmapPanel panel) {
-    applyImageFilter(panel, new ImageMagick());
   }
 
   /**
