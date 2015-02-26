@@ -24,39 +24,31 @@ import adams.core.io.PlaceholderFile;
 import adams.data.conversion.HeatmapToBufferedImage;
 import adams.data.conversion.HeatmapToSpreadSheet;
 import adams.data.heatmap.Heatmap;
-import adams.data.heatmap.HeatmapStatistic;
 import adams.data.image.AbstractImageContainer;
 import adams.data.io.input.AbstractHeatmapReader;
 import adams.data.report.Report;
 import adams.data.spreadsheet.SpreadSheet;
-import adams.data.statistics.InformativeStatistic;
-import adams.gui.core.BaseDialog;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseSplitPane;
 import adams.gui.core.BaseTabbedPane;
 import adams.gui.core.ColorHelper;
-import adams.gui.core.GUIHelper;
 import adams.gui.core.SearchPanel;
 import adams.gui.core.SearchPanel.LayoutType;
 import adams.gui.core.SpreadSheetTable;
 import adams.gui.core.SpreadSheetTableModel;
 import adams.gui.event.SearchEvent;
 import adams.gui.event.SearchListener;
-import adams.gui.visualization.container.NotesFactory;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
 import adams.gui.visualization.image.ImagePanel;
 import adams.gui.visualization.report.ReportFactory;
-import adams.gui.visualization.statistics.InformativeStatisticFactory;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dialog.ModalityType;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -431,83 +423,6 @@ public class HeatmapPanel
     }
 
     return false;
-  }
-
-  /**
-   * Displays the heatmap as spreadsheet.
-   */
-  public void showSpreadsheet() {
-    BaseDialog			dialog;
-    SpreadSheetTable		table;
-    HeatmapToSpreadSheet	convert;
-    String			result;
-    Properties			props;
-
-    table   = new SpreadSheetTable(new SpreadSheetTableModel());
-    convert = new HeatmapToSpreadSheet();
-    convert.setInput(getHeatmap());
-    result  = convert.convert();
-    if (result != null) {
-      GUIHelper.showErrorMessage(this, "Failed to generate spreadsheet: " + result);
-      return;
-    }
-    props = getProperties();
-    table.setModel(new SpreadSheetTableModel((SpreadSheet) convert.getOutput()));
-    table.setNumDecimals(props.getInteger("SpreadSheet.NumDecimals", 3));
-
-    if (getParentDialog() != null)
-      dialog = new BaseDialog(getParentDialog(), ModalityType.MODELESS);
-    else
-      dialog = new BaseDialog(getParentFrame(), false);
-    dialog.setTitle("Heatmap #" + getHeatmap().getID());
-    dialog.getContentPane().setLayout(new BorderLayout());
-    dialog.getContentPane().add(new BaseScrollPane(table), BorderLayout.CENTER);
-    dialog.setSize(
-	props.getInteger("View.SpreadSheet.Width", 800),
-	props.getInteger("View.SpreadSheet.Height", 600));
-    dialog.setLocationRelativeTo(this);
-    dialog.setVisible(true);
-  }
-
-  /**
-   * Displays somes stats on the heatmap.
-   */
-  public void showStatistics() {
-    HeatmapStatistic			stats;
-    InformativeStatisticFactory.Dialog	dialog;
-    List<InformativeStatistic>	statsList;
-
-    stats     = new HeatmapStatistic(getHeatmap());
-    statsList = new ArrayList<InformativeStatistic>();
-    statsList.add(stats);
-
-    if (getParentDialog() != null)
-      dialog = InformativeStatisticFactory.getDialog(getParentDialog(), ModalityType.MODELESS);
-    else
-      dialog = InformativeStatisticFactory.getDialog(getParentFrame(), false);
-    dialog.setStatistics(statsList);
-    dialog.setTitle("Heatmap statistics");
-    dialog.pack();
-    dialog.setLocationRelativeTo(this);
-    dialog.setVisible(true);
-  }
-
-  /**
-   * Displays the notes of the heatmap.
-   */
-  public void showNotes() {
-    NotesFactory.Dialog		dialog;
-    List<HeatmapContainer>	data;
-
-    if (getParentDialog() != null)
-      dialog = NotesFactory.getDialog(getParentDialog(), ModalityType.MODELESS);
-    else
-      dialog = NotesFactory.getDialog(getParentFrame(), false);
-    data = new ArrayList<HeatmapContainer>();
-    data.add(new HeatmapContainer(null, getHeatmap()));
-    dialog.setData(data);
-    dialog.setLocationRelativeTo(this);
-    dialog.setVisible(true);
   }
 
   /**

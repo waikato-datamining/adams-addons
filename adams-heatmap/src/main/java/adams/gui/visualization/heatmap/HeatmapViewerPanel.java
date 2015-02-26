@@ -130,15 +130,6 @@ public class HeatmapViewerPanel
   /** the show centroid menu item. */
   protected JMenuItem m_MenuItemViewShowCentroid;
 
-  /** the show spreadhseet menu item. */
-  protected JMenuItem m_MenuItemViewShowSpreadsheet;
-
-  /** the show statistics menu item. */
-  protected JMenuItem m_MenuItemViewShowStatistics;
-
-  /** the show notes menu item. */
-  protected JMenuItem m_MenuItemViewShowNotes;
-
   /** the menu "zoom". */
   protected JMenu m_MenuViewZoom;
 
@@ -570,47 +561,6 @@ public class HeatmapViewerPanel
       });
       m_MenuItemViewMissingValueColor = menuitem;
 
-      // View/Show spreadsheet
-      menuitem = new JMenuItem("Show spreadsheet...");
-      menu.addSeparator();
-      menu.add(menuitem);
-      menuitem.setMnemonic('s');
-      menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed S"));
-      menuitem.setIcon(GUIHelper.getIcon("spreadsheet.png"));
-      menuitem.addActionListener(new ActionListener() {
-	@Override
-	public void actionPerformed(ActionEvent e) {
-	  getCurrentPanel().showSpreadsheet();
-	}
-      });
-      m_MenuItemViewShowSpreadsheet = menuitem;
-
-      // View/Show statistics
-      menuitem = new JMenuItem("Show statistics...");
-      menu.add(menuitem);
-      menuitem.setMnemonic('i');
-      menuitem.setIcon(GUIHelper.getIcon("properties.gif"));
-      menuitem.addActionListener(new ActionListener() {
-	@Override
-	public void actionPerformed(ActionEvent e) {
-	  getCurrentPanel().showStatistics();
-	}
-      });
-      m_MenuItemViewShowStatistics = menuitem;
-
-      // View/Show notes
-      menuitem = new JMenuItem("Show notes...");
-      menu.add(menuitem);
-      menuitem.setMnemonic('n');
-      menuitem.setIcon(GUIHelper.getIcon("report.gif"));
-      menuitem.addActionListener(new ActionListener() {
-	@Override
-	public void actionPerformed(ActionEvent e) {
-	  getCurrentPanel().showNotes();
-	}
-      });
-      m_MenuItemViewShowNotes = menuitem;
-
       m_PluginManager.addToMenuBar(result);
 
       m_MenuBar = result;
@@ -690,9 +640,6 @@ public class HeatmapViewerPanel
     m_MenuItemViewZoomOut.setEnabled(dataLoaded);
     m_MenuItemViewColorGenerator.setEnabled(dataLoaded);
     m_MenuItemViewMissingValueColor.setEnabled(dataLoaded);
-    m_MenuItemViewShowSpreadsheet.setEnabled(dataLoaded);
-    m_MenuItemViewShowStatistics.setEnabled(dataLoaded);
-    m_MenuItemViewShowNotes.setEnabled(dataLoaded);
 
     // plugins
     m_PluginManager.updateMenu();
