@@ -201,12 +201,6 @@ public class HeatmapViewerPanel
     m_DialogMissingValueColor = null;
     m_RecentFilesHandler      = null;
     m_PluginManager           = new HeatmapViewerPluginManager(this);
-    m_PluginManager.setMenuUpdateListener(new ChangeListener() {
-      @Override
-      public void stateChanged(ChangeEvent e) {
-	updateMenu();
-      }
-    });
   }
 
   /**
@@ -673,8 +667,6 @@ public class HeatmapViewerPanel
    */
   protected void updateMenu() {
     boolean	dataLoaded;
-    int		i;
-    boolean	enabled;
 
     if (m_MenuBar == null)
       return;
@@ -701,6 +693,9 @@ public class HeatmapViewerPanel
     m_MenuItemViewShowSpreadsheet.setEnabled(dataLoaded);
     m_MenuItemViewShowStatistics.setEnabled(dataLoaded);
     m_MenuItemViewShowNotes.setEnabled(dataLoaded);
+
+    // plugins
+    m_PluginManager.updateMenu();
   }
 
   /**
