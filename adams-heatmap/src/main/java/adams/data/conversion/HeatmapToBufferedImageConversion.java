@@ -20,6 +20,8 @@
 
 package adams.data.conversion;
 
+import adams.data.heatmap.Heatmap;
+
 /**
  * Indicator interface for conversion that convert heatmaps into
  * BufferedImage objects.
@@ -30,4 +32,12 @@ package adams.data.conversion;
 public interface HeatmapToBufferedImageConversion
   extends Conversion {
 
+  /**
+   * Turns the gray value back into an intensity value.
+   *
+   * @param map		the map that got converted
+   * @param gray	the gray value (0-255)
+   * @return		the generated intensity value
+   */
+  public double grayToIntensity(Heatmap map, int gray);
 }

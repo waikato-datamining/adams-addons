@@ -23,6 +23,7 @@ package adams.data.filter.heatmapthreshold;
 import adams.data.conversion.HeatmapToBufferedImage;
 import adams.data.conversion.HeatmapToBufferedImageConversion;
 import adams.data.heatmap.Heatmap;
+import adams.data.image.BufferedImageContainer;
 
 import java.awt.image.BufferedImage;
 
@@ -107,7 +108,7 @@ public abstract class AbstractBufferedImageBasedHeatmapThreshold
     if (msg != null)
       throw new IllegalStateException("Failed to convert Heatmap into BufferedImage: " + msg);
     else
-      img = (BufferedImage) m_Conversion.getOutput();
+      img = ((BufferedImageContainer) m_Conversion.getOutput()).getImage();
     m_Conversion.cleanUp();
 
     return doCalcThreshold(map, img);

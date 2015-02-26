@@ -507,4 +507,35 @@ public class HeatmapToBufferedImageWithKey
 
     return result;
   }
+
+  /**
+   * Turns the gray value back into an intensity value.
+   *
+   * @param map 	the map that got converted
+   * @param gray	the gray value (0-255)
+   * @return		the generated intensity value
+   */
+  public double grayToIntensity(Heatmap map, int gray) {
+    double		result;
+    double		min;
+    double		max;
+    double		range;
+
+    if (m_UseCustomRange) {
+      min = m_MinRange;
+      max = m_MaxRange;
+    }
+    else {
+      min = map.getMin();
+      max = map.getMax();
+      if (max == min) {
+	max = min + 1.0;
+	getLogger().warning("Max/min are the same, using min=" + min + ", max=" + max + " instead!");
+      }
+    }
+    range  = max - min;
+    result = min + range * ((double) gray / 256.0);
+
+    return result;
+  }
 }

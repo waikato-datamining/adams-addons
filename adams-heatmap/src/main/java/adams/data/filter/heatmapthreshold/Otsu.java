@@ -196,11 +196,13 @@ public class Otsu
   protected double doCalcThreshold(Heatmap map, BufferedImage img) {
     double	result;
     ImageBase 	gray;
+    int		otsu;
 
     gray   = BoofCVHelper.toBoofCVImage(img, BoofCVImageType.UNSIGNED_INT_8);
-    result = GThresholdImageOps.computeOtsu((ImageUInt8) gray, m_Min, m_Max);
+    otsu   = GThresholdImageOps.computeOtsu((ImageUInt8) gray, m_Min, m_Max);
+    result = m_Conversion.grayToIntensity(map, otsu);
     if (isLoggingEnabled())
-      getLogger().info("Otsu: " + result);
+      getLogger().info("Otsu (gray/intensity): " + otsu + "/" + result);
 
     return result;
   }
