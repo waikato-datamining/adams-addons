@@ -19,8 +19,6 @@
  */
 package adams.gui.visualization.heatmap.plugins;
 
-import adams.gui.core.ConsolePanel;
-import adams.gui.core.ConsolePanel.OutputType;
 import adams.gui.plugin.AbstractToolPlugin;
 import adams.gui.visualization.heatmap.HeatmapPanel;
 
@@ -42,6 +40,6 @@ public abstract class AbstractHeatmapViewerPlugin
    * @param msg		the message to log
    */
   protected void doLog(String msg) {
-    ConsolePanel.getSingleton().append(OutputType.INFO, msg);  // TODO in heatmap panel?
+    m_CurrentPanel.log(msg);
   }
 }

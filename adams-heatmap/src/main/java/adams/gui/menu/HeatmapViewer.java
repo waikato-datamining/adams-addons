@@ -67,7 +67,7 @@ public class HeatmapViewer
    */
   public void launch() {
     adams.gui.visualization.heatmap.HeatmapViewerPanel panel = new adams.gui.visualization.heatmap.HeatmapViewerPanel();
-    createChildFrame(panel, 1000, 700);
+    createChildFrame(panel, 1000, 800);
   }
 
   /**

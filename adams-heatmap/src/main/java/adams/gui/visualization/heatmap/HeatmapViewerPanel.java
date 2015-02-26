@@ -725,6 +725,7 @@ public class HeatmapViewerPanel
             return;
           }
           HeatmapPanel panel = newPanel(maps.get(0));
+	  panel.log("Load: " + file);
           panel.setReader(reader);
           m_TabbedPane.addTab(panel.getTitle(), panel);
 	  m_TabbedPane.setSelectedComponent(panel);
@@ -857,6 +858,7 @@ public class HeatmapViewerPanel
 	  HeatmapPanel panel = getPanelAt(index);
 	  Heatmap filtered = filter.filter(panel.getHeatmap());
 	  filter.cleanUp();
+	  panel.log("Filter: " + filter.toCommandLine());
 	  if (e.getOverlayOriginalData()) {
 	    panel = newPanel(filtered);
 	    m_TabbedPane.addTab(panel.getTitle(), panel);

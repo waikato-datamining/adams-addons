@@ -28,6 +28,7 @@ import adams.data.image.AbstractImageContainer;
 import adams.data.io.input.AbstractHeatmapReader;
 import adams.data.report.Report;
 import adams.data.spreadsheet.SpreadSheet;
+import adams.gui.core.BaseLogPanel;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseSplitPane;
@@ -81,6 +82,9 @@ public class HeatmapPanel
   /** the search panel for the heatmap report. */
   protected SearchPanel m_SearchPanel;
 
+  /** the tabbed pane for image/report and log. */
+  protected BaseTabbedPane m_LogTabbedPane;
+
   /** the split pane for image/spreadsheet and report. */
   protected BaseSplitPane m_SplitPane;
 
@@ -101,6 +105,9 @@ public class HeatmapPanel
 
   /** the color to use for missing values. */
   protected Color m_MissingValueColor;
+
+  /** the log panel. */
+  protected BaseLogPanel m_PanelLog;
 
   /**
    * Initializes the panel.
@@ -144,9 +151,13 @@ public class HeatmapPanel
 
     setLayout(new BorderLayout());
 
+    m_LogTabbedPane = new BaseTabbedPane();
+    m_LogTabbedPane.setTabPlacement(BaseTabbedPane.BOTTOM);
+    add(m_LogTabbedPane, BorderLayout.CENTER);
+
     m_SplitPane = new BaseSplitPane();
     m_SplitPane.setDividerLocation(props.getInteger("Panel.DividerLocation", 600));
-    add(m_SplitPane, BorderLayout.CENTER);
+    m_LogTabbedPane.addTab("Data", m_SplitPane);
 
     m_HeatmapImage = new ImagePanel();
     m_HeatmapTable = null;
@@ -185,6 +196,11 @@ public class HeatmapPanel
     m_CentroidOverlay.setHeatmapPanel(this);
     m_CentroidOverlay.setEnabled(false);
     m_HeatmapImage.addImageOverlay(m_CentroidOverlay);
+
+    m_PanelLog = new BaseLogPanel();
+    m_PanelLog.setRows(5);
+    m_PanelLog.setColumns(80);
+    m_LogTabbedPane.addTab("Log", m_PanelLog);
   }
 
   /**
@@ -417,6 +433,7 @@ public class HeatmapPanel
 	setHeatmap(maps.get(0));
 	getImagePanel().setScale(scale);
 	reader.cleanUp();
+	log("Reload: " + file);
 	return true;
       }
       reader.cleanUp();
@@ -509,5 +526,14 @@ public class HeatmapPanel
    */
   public double getZoom() {
     return m_HeatmapImage.getScale();
+  }
+
+  /**
+   * Logs the message in the log panel.
+   *
+   * @param msg		the log message
+   */
+  public void log(String msg) {
+    m_PanelLog.append(msg);
   }
 }
