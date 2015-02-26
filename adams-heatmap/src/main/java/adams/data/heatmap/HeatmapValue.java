@@ -180,8 +180,16 @@ public class HeatmapValue
     if (result == 0)
       result = new Integer(getX()).compareTo(new Integer(p.getX()));
 
-    if (result == 0)
-      result = new Double(getValue()).compareTo(new Double(p.getValue()));
+    if (result == 0) {
+      if (isMissingValue() && p.isMissingValue())
+	result = 0;
+      else if (isMissingValue())
+	result = -1;
+      else if (p.isMissingValue())
+	result = 1;
+      else
+	result = new Double(getValue()).compareTo(new Double(p.getValue()));
+    }
 
     return result;
   }
@@ -211,7 +219,7 @@ public class HeatmapValue
 
     result  = "y=" + getY();
     result += ", x=" + getX();
-    result += ", value=" + getValue();
+    result += ", value=" + (isMissingValue() ? "?" : getValue());
 
     return result;
   }
