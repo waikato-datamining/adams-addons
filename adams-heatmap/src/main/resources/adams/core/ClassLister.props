@@ -7,6 +7,10 @@
 # Author:  FracPete (fracpete at waikato dot ac dot nz)
 # Version: $Revision$
 
+# conversions that turn heatmaps into BufferedImage objects
+adams.data.conversion.HeatmapToBufferedImageConversion=\
+  adams.data.conversion
+
 # feature generators
 adams.data.heatmapfeatures.AbstractHeatmapFeatureGenerator=\
   adams.data.heatmapfeatures

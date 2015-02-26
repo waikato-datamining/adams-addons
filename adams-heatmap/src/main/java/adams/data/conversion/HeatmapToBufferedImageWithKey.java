@@ -92,7 +92,8 @@ import java.text.DecimalFormat;
     copyright = "2014 Soilcares Research, Wageningen, The Netherlands"
 )
 public class HeatmapToBufferedImageWithKey
-  extends AbstractConversion {
+  extends AbstractConversion
+  implements HeatmapToBufferedImageConversion {
 
   /** for serialization*/
   private static final long serialVersionUID = -9065168080375023679L;

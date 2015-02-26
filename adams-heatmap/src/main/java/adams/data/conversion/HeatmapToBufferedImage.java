@@ -73,7 +73,8 @@ import java.awt.image.BufferedImage;
  * @version $Revision$
  */
 public class HeatmapToBufferedImage
-  extends AbstractConversion {
+  extends AbstractConversion
+  implements HeatmapToBufferedImageConversion {
 
   /** for serialization. */
   private static final long serialVersionUID = 2535421741524997185L;
