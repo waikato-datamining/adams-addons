@@ -154,9 +154,6 @@ public class HeatmapViewerPanel
   /** the missing value color menu item. */
   protected JMenuItem m_MenuItemViewMissingValueColor;
 
-  /** the histogram menu item. */
-  protected JMenuItem m_MenuItemViewShowHistogram;
-
   /** manages the plugins. */
   protected HeatmapViewerPluginManager m_PluginManager;
 
@@ -607,20 +604,6 @@ public class HeatmapViewerPanel
       });
       m_MenuItemViewShowStatistics = menuitem;
 
-      // View/Show histogram
-      menuitem = new JMenuItem("Show histogram...");
-      menu.add(menuitem);
-      menuitem.setMnemonic('h');
-      menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed H"));
-      menuitem.setIcon(GUIHelper.getIcon("histogram.png"));
-      menuitem.addActionListener(new ActionListener() {
-	@Override
-	public void actionPerformed(ActionEvent e) {
-	  getCurrentPanel().showHistogram();
-	}
-      });
-      m_MenuItemViewShowHistogram = menuitem;
-
       // View/Show notes
       menuitem = new JMenuItem("Show notes...");
       menu.add(menuitem);
@@ -716,7 +699,6 @@ public class HeatmapViewerPanel
     m_MenuItemViewColorGenerator.setEnabled(dataLoaded);
     m_MenuItemViewMissingValueColor.setEnabled(dataLoaded);
     m_MenuItemViewShowSpreadsheet.setEnabled(dataLoaded);
-    m_MenuItemViewShowHistogram.setEnabled(dataLoaded);
     m_MenuItemViewShowStatistics.setEnabled(dataLoaded);
     m_MenuItemViewShowNotes.setEnabled(dataLoaded);
   }
