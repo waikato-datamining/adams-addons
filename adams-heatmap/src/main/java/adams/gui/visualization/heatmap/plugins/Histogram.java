@@ -19,6 +19,7 @@
  */
 package adams.gui.visualization.heatmap.plugins;
 
+import adams.core.option.OptionUtils;
 import adams.data.heatmap.Heatmap;
 import adams.data.statistics.ArrayHistogram;
 import adams.gui.dialog.ApprovalDialog;
@@ -87,7 +88,7 @@ public class Histogram
    */
   @Override
   protected String createLogEntry() {
-    return null;
+    return "Histogram: " + OptionUtils.getCommandLine(getLastSetup());
   }
 
   /**
