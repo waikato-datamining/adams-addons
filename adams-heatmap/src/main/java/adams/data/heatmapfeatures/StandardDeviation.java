@@ -56,6 +56,12 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
  * 
+ * <pre>-skip-missing &lt;boolean&gt; (property: skipMissing)
+ * &nbsp;&nbsp;&nbsp;If enabled, missing values get skipped when collecting the values for the 
+ * &nbsp;&nbsp;&nbsp;histogram.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  * <pre>-is-sample &lt;boolean&gt; (property: isSample)
  * &nbsp;&nbsp;&nbsp;If set to true, the arrays are treated as samples and not as populations.
  * &nbsp;&nbsp;&nbsp;default: false
@@ -68,7 +74,7 @@ import java.util.List;
  * @version $Revision: 9598 $
  */
 public class StandardDeviation
-  extends AbstractHeatmapFeatureGenerator {
+  extends AbstractHeatmapFeatureGeneratorWithSkippableMissingValues {
 
   /** for serialization. */
   private static final long serialVersionUID = -8349656592325229512L;
@@ -155,7 +161,7 @@ public class StandardDeviation
 
     result    = new List[1];
     result[0] = new ArrayList<Object>();
-    values    = map.toDoubleArray();
+    values    = map.toDoubleArray(m_SkipMissing);
     result[0].add(StatUtils.stddev(values, getIsSample()));
 
     return result;

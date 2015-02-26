@@ -58,6 +58,12 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
  * 
+ * <pre>-skip-missing &lt;boolean&gt; (property: skipMissing)
+ * &nbsp;&nbsp;&nbsp;If enabled, missing values get skipped when collecting the values for the 
+ * &nbsp;&nbsp;&nbsp;histogram.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  * <pre>-num-bins &lt;int&gt; (property: numBins)
  * &nbsp;&nbsp;&nbsp;The number of bins to use in case of manual bin calculation.
  * &nbsp;&nbsp;&nbsp;default: 50
@@ -90,7 +96,7 @@ import java.util.List;
  * @version $Revision: 9598 $
  */
 public class Histogram
-  extends AbstractHeatmapFeatureGenerator {
+  extends AbstractHeatmapFeatureGeneratorWithSkippableMissingValues {
 
   /** for serialization. */
   private static final long serialVersionUID = -8349656592325229512L;
@@ -125,20 +131,20 @@ public class Histogram
     super.defineOptions();
 
     m_OptionManager.add(
-	    "num-bins", "numBins",
-	    50, 1, null);
+      "num-bins", "numBins",
+      50, 1, null);
 
     m_OptionManager.add(
-	    "use-fixed-min-max", "useFixedMinMax",
-	    false);
+      "use-fixed-min-max", "useFixedMinMax",
+      false);
 
     m_OptionManager.add(
       "manual-min", "manualMin",
       0.0);
 
     m_OptionManager.add(
-	    "manual-max", "manualMax",
-	    1.0);
+      "manual-max", "manualMax",
+      1.0);
   }
 
   /**
@@ -301,7 +307,7 @@ public class Histogram
 
     result    = new List[1];
     result[0] = new ArrayList<Object>();
-    values    = map.toDoubleArray();
+    values    = map.toDoubleArray(m_SkipMissing);
     histo     = new ArrayHistogram();
     histo.setBinCalculation(BinCalculation.MANUAL);
     histo.setNumBins(m_NumBins);
