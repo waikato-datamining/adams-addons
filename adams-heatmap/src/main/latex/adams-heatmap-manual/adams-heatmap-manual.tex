@@ -112,6 +112,21 @@ from a variety of formats. See Figure \ref{heatmap-viewer} for a screenshot.
   \label{heatmap-viewer}
 \end{figure}
 
+The viewer also allows you to add custom plugins to the menu. The superclass
+for all plugins is:
+\begin{verbatim}
+  adams.gui.visualization.heatmap.plugins.AbstractHeatmapViewerPlugin
+\end{verbatim}
+\begin{tight_itemize}
+  \item \textit{canExecute(HeatmapPanel)} -- determines whether the plugin can
+  be applied to the current heatmap panel.
+  \item \textit{doExecute()} -- executes the plugin and returns a string
+  depending on success (\textit{null}) or failure (\textit{error message}).
+  \item \textit{createLogEntry()} -- can be used to output a string that
+  should appear the in viewer's log tab; return \textit{null} if that does
+  not apply.
+\end{tight_itemize}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
 
