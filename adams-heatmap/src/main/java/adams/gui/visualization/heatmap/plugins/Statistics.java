@@ -141,6 +141,7 @@ public class Statistics
 	dialog = InformativeStatisticFactory.getDialog(m_CurrentPanel.getParentDialog(), ModalityType.MODELESS);
       else
 	dialog = InformativeStatisticFactory.getDialog(m_CurrentPanel.getParentFrame(), false);
+      dialog.setDefaultCloseOperation(InformativeStatisticFactory.Dialog.DISPOSE_ON_CLOSE);
       dialog.setStatistics(m_StatsList);
       dialog.setTitle("Heatmap statistics");
       dialog.pack();

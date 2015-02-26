@@ -184,6 +184,7 @@ public class Histogram
       else
 	dialog = new ApprovalDialog(m_CurrentPanel.getParentFrame());
       dialog.setTitle("Histogram");
+      dialog.setDefaultCloseOperation(ApprovalDialog.DISPOSE_ON_CLOSE);
       dialog.setApproveVisible(true);
       dialog.setCancelVisible(false);
       dialog.setDiscardVisible(false);

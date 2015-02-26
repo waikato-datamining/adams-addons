@@ -137,6 +137,7 @@ public class Notes
 	dialog = NotesFactory.getDialog(m_CurrentPanel.getParentDialog(), ModalityType.MODELESS);
       else
 	dialog = NotesFactory.getDialog(m_CurrentPanel.getParentFrame(), false);
+      dialog.setDefaultCloseOperation(NotesFactory.Dialog.DISPOSE_ON_CLOSE);
       dialog.setData(m_NotesList);
       dialog.setLocationRelativeTo(m_CurrentPanel);
       dialog.setVisible(true);
