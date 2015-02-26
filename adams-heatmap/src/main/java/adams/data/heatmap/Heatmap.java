@@ -471,21 +471,30 @@ public class Heatmap
    * @return		the heat values as Double array
    */
   public Double[] toDoubleArray() {
-    Double[]	result;
-    int		x;
-    int		y;
-    int		index;
+    return toDoubleArray(false);
+  }
 
-    result = new Double[size()];
-    index  = 0;
+  /**
+   * Turns the heatmap into a Double array (row wise).
+   *
+   * @param skipMissing	whether to skip missing values
+   * @return		the heat values as Double array
+   */
+  public Double[] toDoubleArray(boolean skipMissing) {
+    List<Double>	result;
+    int			x;
+    int			y;
+
+    result = new ArrayList<Double>();
     for (y = 0; y < getHeight(); y++) {
       for (x = 0; x < getWidth(); x++) {
-	result[index] = get(y, x);
-	index++;
+	if (skipMissing && isMissing(y, x))
+	  continue;
+	result.add(get(y, x));
       }
     }
 
-    return result;
+    return result.toArray(new Double[result.size()]);
   }
 
   /**
@@ -627,7 +636,7 @@ public class Heatmap
   }
 
   /**
-   * Sets all values to 0.0.
+   * Sets all values to missing.
    * <p/>
    * Note: the size of the collection won't be 0, as defined by the Collection
    * interface.
@@ -641,14 +650,14 @@ public class Heatmap
 
     for (y = 0; y < getHeight(); y++) {
       for (x = 0; x < getWidth(); x++)
-	set(y, x, 0.0);
+	setMissing(y, x);
     }
   }
 
   /**
-   * Only false if all values are 0.0.
+   * Only false if all values are missing.
    *
-   * @return		true if all values are 0.0
+   * @return		true if all values are missing
    */
   @Override
   public boolean isEmpty() {
@@ -657,7 +666,7 @@ public class Heatmap
 
     for (y = 0; y < getHeight(); y++) {
       for (x = 0; x < getWidth(); x++) {
-	if (get(y, x) > 0.0)
+	if (!isMissing(y, x))
 	  return false;
       }
     }
@@ -711,7 +720,7 @@ public class Heatmap
   }
 
   /**
-   * Sets the value at the location of the provided object to 0.0.
+   * Sets the value at the location of the provided object to missing.
    *
    * @param o		the heatmap value with the coordinates to remove
    * @return		true if the value changed
@@ -723,9 +732,9 @@ public class Heatmap
 
     v   = (HeatmapValue) o;
     old = get(v.getY(), v.getX());
-    set(v.getY(), v.getX(), 0.0);
+    setMissing(v.getY(), v.getX());
 
-    return (old > 0.0);
+    return !isMissingValue(old);
   }
 
   /**
@@ -765,8 +774,11 @@ public class Heatmap
 
     if (o instanceof HeatmapValue) {
       v = (HeatmapValue) o;
-      if ((v.getY() < getHeight()) && (v.getX() < getWidth()))
-	result = (v.getValue() == get(v.getY(), v.getX()));
+      if ((v.getY() < getHeight()) && (v.getX() < getWidth())) {
+	result =
+	  (v.isMissingValue() && isMissing(v.getY(), v.getX()))
+	  || (v.getValue() == get(v.getY(), v.getX()));
+      }
     }
 
     return result;
@@ -808,7 +820,7 @@ public class Heatmap
 
   /**
    * Merges its own data with the one provided by the specified object.
-   * Only adds a value from the other heatmap, if this one has a value of 0.0
+   * Only adds a value from the other heatmap, if this one has a missing value
    * at the specified location.
    *
    * @param other		the object to merge with
@@ -822,7 +834,7 @@ public class Heatmap
     while (iter.hasNext()) {
       v = iter.next();
       if ((v.getY() < getHeight()) && (v.getX() < getWidth())) {
-	if (get(v.getY(), v.getX()) == 0.0)
+	if (isMissing(v.getY(), v.getX()))
 	  set(v.getY(), v.getX(), v.getValue());
       }
     }
@@ -843,8 +855,16 @@ public class Heatmap
 	result = new Integer(o1.getY()).compareTo(new Integer(o2.getY()));
 	if (result == 0)
 	  result = new Integer(o1.getX()).compareTo(new Integer(o2.getX()));
-	if (result == 0)
-	  result = new Double(o1.getValue()).compareTo(new Double(o2.getValue()));
+	if (result == 0) {
+	  if (o1.isMissingValue() && o2.isMissingValue())
+	    result = 0;
+	  else if (o1.isMissingValue())
+	    result = -1;
+	  else if (o2.isMissingValue())
+	    result = 1;
+	  else
+	    result = new Double(o1.getValue()).compareTo(new Double(o2.getValue()));
+	}
         return result;
       }
     };
