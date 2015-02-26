@@ -15,17 +15,17 @@
 
 /**
  * HeatmapToSpreadSheet.java
- * Copyright (C) 2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.conversion;
-
-import java.util.Collections;
-import java.util.List;
 
 import adams.data.heatmap.Heatmap;
 import adams.data.report.AbstractField;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -118,8 +118,12 @@ public class HeatmapToSpreadSheet
     // data
     for (y = 0; y < map.getHeight(); y++) {
       row = result.addRow("y" + y);
-      for (x = 0; x < map.getWidth(); x++)
-	row.addCell("x" + x).setContent(map.get(y, x));
+      for (x = 0; x < map.getWidth(); x++) {
+	if (map.isMissing(y, x))
+	  row.addCell("x" + x).setMissing();
+	else
+	  row.addCell("x" + x).setContent(map.get(y, x));
+      }
     }
 
     return result;
