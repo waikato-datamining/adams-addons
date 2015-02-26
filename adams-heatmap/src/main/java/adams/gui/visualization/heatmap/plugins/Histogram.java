@@ -29,7 +29,7 @@ import adams.gui.visualization.heatmap.HistogramPanel;
 import java.awt.BorderLayout;
 
 /**
- * Displays the histogram(s) for an image.
+ * Displays the histogram for a heatmap.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
