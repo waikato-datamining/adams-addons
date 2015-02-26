@@ -41,6 +41,9 @@ public class HistogramPanel
   /** for generating the histogram. */
   protected ArrayHistogram m_ArrayHistogram;
 
+  /** whether to skip missing values. */
+  protected boolean m_SkipMissing;
+
   /**
    * Initializes the members.
    */
@@ -49,6 +52,7 @@ public class HistogramPanel
     super.initialize();
 
     m_ArrayHistogram = new ArrayHistogram();
+    m_SkipMissing    = true;   // TODO let user change this?
   }
 
   /**
@@ -71,6 +75,25 @@ public class HistogramPanel
   }
 
   /**
+   * Sets whether to exclude missing values from the histogram calculation.
+   *
+   * @param value 	true if to skip
+   */
+  public void setSkipMissing(boolean value) {
+    m_SkipMissing = value;
+    update();
+  }
+
+  /**
+   * Returns whether to exclude missing values from the histogram calculation.
+   *
+   * @return 		true if to skip
+   */
+  public boolean getSkipMissing() {
+    return m_SkipMissing;
+  }
+
+  /**
    * Generates the sequence(s) from the data.
    *
    * @return		the generated sequence(s)
@@ -83,7 +106,7 @@ public class HistogramPanel
     int				i;
 
     result = new SequencePlotSequence[1];
-    array  = m_Data.toDoubleArray();
+    array  = m_Data.toDoubleArray(m_SkipMissing);
     m_ArrayHistogram.clear();
     m_ArrayHistogram.add(array);
     cont = m_ArrayHistogram.calculate();
