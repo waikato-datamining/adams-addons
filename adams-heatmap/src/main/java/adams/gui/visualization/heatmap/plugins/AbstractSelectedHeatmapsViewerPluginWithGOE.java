@@ -120,4 +120,24 @@ public abstract class AbstractSelectedHeatmapsViewerPluginWithGOE
     
     return result;
   }
+
+  /**
+   * Initializes the processing.
+   * <p/>
+   * Sets the last setup.
+   *
+   * @return		null if successful, otherwise error message
+   * @see		#setLastSetup(Object)
+   */
+  @Override
+  protected String processInit() {
+    String	result;
+
+    result = super.processInit();
+
+    if (result == null)
+      setLastSetup(m_Editor.getValue());
+
+    return result;
+  }
 }
