@@ -19,7 +19,6 @@
  */
 package adams.gui.visualization.heatmap.plugins;
 
-import adams.core.ClassLister;
 import adams.gui.core.ConsolePanel;
 import adams.gui.core.ConsolePanel.OutputType;
 import adams.gui.plugin.AbstractToolPlugin;
@@ -44,14 +43,5 @@ public abstract class AbstractHeatmapViewerPlugin
    */
   protected void doLog(String msg) {
     ConsolePanel.getSingleton().append(OutputType.INFO, msg);  // TODO in heatmap panel?
-  }
-
-  /**
-   * Returns a list with classnames of plugins.
-   *
-   * @return		the plugin classnames
-   */
-  public static String[] getPlugins() {
-    return ClassLister.getSingleton().getClassnames(AbstractHeatmapViewerPlugin.class);
   }
 }

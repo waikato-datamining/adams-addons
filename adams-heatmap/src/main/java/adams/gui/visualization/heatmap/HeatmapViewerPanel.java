@@ -30,7 +30,6 @@ import adams.data.io.input.AbstractHeatmapReader;
 import adams.data.io.output.AbstractDataContainerWriter;
 import adams.gui.chooser.BaseColorChooser;
 import adams.gui.chooser.HeatmapFileChooser;
-import adams.gui.core.BaseMenu;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseStatusBar;
 import adams.gui.core.BaseTabbedPane;
@@ -48,11 +47,12 @@ import adams.gui.event.RecentItemListener;
 import adams.gui.event.SearchEvent;
 import adams.gui.event.SearchListener;
 import adams.gui.goe.GenericObjectEditorDialog;
+import adams.gui.plugin.ToolPluginSupporter;
 import adams.gui.sendto.SendToActionSupporter;
 import adams.gui.sendto.SendToActionUtils;
 import adams.gui.visualization.container.FilterDialog;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
-import adams.gui.visualization.heatmap.plugins.AbstractHeatmapViewerPlugin;
+import adams.gui.visualization.heatmap.plugins.HeatmapViewerPluginManager;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -72,7 +72,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Panel for viewing/processing heatmaps.
@@ -83,7 +82,8 @@ import java.util.Vector;
 public class HeatmapViewerPanel
   extends BasePanel
   implements MenuBarProvider, StatusMessageHandler,
-             FilterListener<Heatmap>, SendToActionSupporter, CleanUpHandler {
+             FilterListener<Heatmap>, SendToActionSupporter, CleanUpHandler,
+             ToolPluginSupporter<HeatmapPanel> {
 
   /** for serialization. */
   private static final long serialVersionUID = -2642034258827736757L;
@@ -157,14 +157,8 @@ public class HeatmapViewerPanel
   /** the histogram menu item. */
   protected JMenuItem m_MenuItemViewShowHistogram;
 
-  /** the menu "plugins". */
-  protected BaseMenu m_MenuPlugins;
-
-  /** the plugins. */
-  protected Vector<AbstractHeatmapViewerPlugin> m_Plugins;
-
-  /** the plugin menu items. */
-  protected Vector<JMenuItem> m_MenuItemPlugins;
+  /** manages the plugins. */
+  protected HeatmapViewerPluginManager m_PluginManager;
 
   /** for loading heatmaps from disk. */
   protected HeatmapFileChooser m_FileChooser;
@@ -209,8 +203,13 @@ public class HeatmapViewerPanel
     m_DialogColorGenerator    = null;
     m_DialogMissingValueColor = null;
     m_RecentFilesHandler      = null;
-    m_MenuItemPlugins         = new Vector<JMenuItem>();
-    m_Plugins                 = new Vector<AbstractHeatmapViewerPlugin>();
+    m_PluginManager           = new HeatmapViewerPluginManager(this);
+    m_PluginManager.setMenuUpdateListener(new ChangeListener() {
+      @Override
+      public void stateChanged(ChangeEvent e) {
+	updateMenu();
+      }
+    });
   }
 
   /**
@@ -635,47 +634,7 @@ public class HeatmapViewerPanel
       });
       m_MenuItemViewShowNotes = menuitem;
 
-      // Plugins
-      plugins = AbstractHeatmapViewerPlugin.getPlugins();
-      menu = new BaseMenu("Plugins");
-      result.add(menu);
-      menu.setMnemonic('P');
-      menu.setVisible(plugins.length > 0);
-      menu.addChangeListener(new ChangeListener() {
-	public void stateChanged(ChangeEvent e) {
-	  updateMenu();
-	}
-      });
-      m_MenuPlugins = (BaseMenu) menu;
-
-      // add plugins
-      m_MenuItemPlugins.clear();
-      m_Plugins.clear();
-      for (i = 0; i < plugins.length; i++) {
-	try {
-	  final AbstractHeatmapViewerPlugin plugin = (AbstractHeatmapViewerPlugin) Class.forName(plugins[i]).newInstance();
-	  menuitem = new JMenuItem(plugin.getCaption());
-	  menuitem.setIcon(plugin.getIcon());
-	  menu.add(menuitem);
-	  menuitem.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
-	      String error = plugin.execute(getCurrentPanel());
-	      if ((error != null) && !error.isEmpty())
-		GUIHelper.showErrorMessage(
-		    getCurrentPanel(),
-		    "Error occurred executing plugin '" + plugin.getCaption() + "':\n" + error);
-	      updateMenu();
-	    }
-	  });
-	  m_Plugins.add(plugin);
-	  m_MenuItemPlugins.add(menuitem);
-	}
-	catch (Exception e) {
-	  System.err.println("Failed to install plugin '" + plugins[i] + "':");
-	  e.printStackTrace();
-	}
-      }
-      m_MenuPlugins.sort();
+      m_PluginManager.addToMenuBar(result);
 
       m_MenuBar = result;
       updateMenu();
@@ -760,12 +719,6 @@ public class HeatmapViewerPanel
     m_MenuItemViewShowHistogram.setEnabled(dataLoaded);
     m_MenuItemViewShowStatistics.setEnabled(dataLoaded);
     m_MenuItemViewShowNotes.setEnabled(dataLoaded);
-
-    // Plugins
-    for (i = 0; i < m_Plugins.size(); i++) {
-      enabled = m_Plugins.get(i).canExecute(getCurrentPanel());
-      m_MenuItemPlugins.get(i).setEnabled(enabled);
-    }
   }
 
   /**
