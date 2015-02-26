@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Displays the statistics about the heatmap.
+ * Displays the statistics about heatmaps.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
