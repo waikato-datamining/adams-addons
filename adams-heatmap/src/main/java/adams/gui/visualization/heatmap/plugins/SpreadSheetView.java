@@ -22,14 +22,17 @@ package adams.gui.visualization.heatmap.plugins;
 import adams.core.Properties;
 import adams.data.conversion.HeatmapToSpreadSheet;
 import adams.data.spreadsheet.SpreadSheet;
-import adams.gui.core.BaseDialog;
+import adams.gui.core.BaseMultiPagePane;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.SpreadSheetTable;
 import adams.gui.core.SpreadSheetTableModel;
+import adams.gui.dialog.ApprovalDialog;
 import adams.gui.visualization.heatmap.HeatmapPanel;
 
+import javax.swing.JPanel;
 import java.awt.BorderLayout;
-import java.awt.Dialog.ModalityType;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Displays the heatmap as spreadsheet.
@@ -38,10 +41,19 @@ import java.awt.Dialog.ModalityType;
  * @version $Revision$
  */
 public class SpreadSheetView
-  extends AbstractHeatmapViewerPlugin {
+  extends AbstractSelectedHeatmapsViewerPlugin {
   
   /** for serialization. */
   private static final long serialVersionUID = 3286345601880725626L;
+
+  /** the list of spreadsheet tables. */
+  protected List<SpreadSheetTable> m_TableList;
+
+  /** the titles for the panels. */
+  protected List<String> m_TitleList;
+
+  /** the properties to use for display parameters. */
+  protected Properties m_Properties;
 
   /**
    * Returns the text for the menu to place the plugin beneath.
@@ -85,49 +97,111 @@ public class SpreadSheetView
   }
 
   /**
+   * Creates the panel with the configuration (return null to suppress display).
+   *
+   * @param dialog	the dialog that is being created
+   * @return		the generated panel, null to suppress
+   */
+  @Override
+  protected JPanel createConfigurationPanel(ApprovalDialog dialog) {
+    return null;
+  }
+
+  /**
+   * Initializes the processing.
+   *
+   * @return		null if successful, otherwise error message
+   */
+  @Override
+  protected String processInit() {
+    String	result;
+
+    result = super.processInit();
+
+    if (result == null) {
+      m_TableList  = new ArrayList<>();
+      m_TitleList  = new ArrayList<>();
+      m_Properties = null;
+    }
+
+    return result;
+  }
+
+  /**
+   * Processes the specified panel.
+   *
+   * @param panel	the panel to process
+   * @return		null if successful, error message otherwise
+   */
+  @Override
+  protected String process(HeatmapPanel panel) {
+    String			result;
+    SpreadSheetTable 		table;
+    HeatmapToSpreadSheet 	convert;
+
+    table   = new SpreadSheetTable(new SpreadSheetTableModel());
+    convert = new HeatmapToSpreadSheet();
+    convert.setInput(panel.getHeatmap());
+    result  = convert.convert();
+    if (result != null)
+      return "Failed to generate spreadsheet: " + result;
+    if (m_Properties == null)
+      m_Properties = panel.getProperties();
+    table.setModel(new SpreadSheetTableModel((SpreadSheet) convert.getOutput()));
+    table.setNumDecimals(m_Properties.getInteger("SpreadSheet.NumDecimals", 3));
+
+    m_TableList.add(table);
+    m_TitleList.add(panel.getTitle());
+
+    return null;
+  }
+
+  /**
+   * Finishes up the processing.
+   *
+   * @return		null if successful, otherwise error message
+   */
+  @Override
+  protected String processFinish() {
+    String		result;
+    BaseMultiPagePane 	multipane;
+    ApprovalDialog	dialog;
+    int			i;
+
+    result = super.processFinish();
+
+    if (result == null) {
+      multipane = new BaseMultiPagePane();
+      for (i = 0; i < m_TableList.size(); i++)
+	multipane.addPage(m_TitleList.get(i), new BaseScrollPane(m_TableList.get(i)));
+
+      if (m_CurrentPanel.getParentDialog() != null)
+	dialog = new ApprovalDialog(m_CurrentPanel.getParentDialog());
+      else
+	dialog = new ApprovalDialog(m_CurrentPanel.getParentFrame());
+      dialog.setTitle("Spreadsheet");
+      dialog.setDefaultCloseOperation(ApprovalDialog.DISPOSE_ON_CLOSE);
+      dialog.setApproveVisible(true);
+      dialog.setCancelVisible(false);
+      dialog.setDiscardVisible(false);
+      dialog.getContentPane().add(multipane, BorderLayout.CENTER);
+      dialog.setSize(
+	m_Properties.getInteger("View.SpreadSheet.Width", 800),
+	m_Properties.getInteger("View.SpreadSheet.Height", 600));
+      dialog.setLocationRelativeTo(m_CurrentPanel);
+      dialog.setVisible(true);
+    }
+
+    return result;
+  }
+
+  /**
    * Creates the log message.
    *
    * @return		the message, null if none available
    */
   @Override
   protected String createLogEntry() {
-    return null;
-  }
-
-  /**
-   * Processes the heatmap.
-   */
-  @Override
-  protected String doExecute() {
-    BaseDialog 			dialog;
-    SpreadSheetTable 		table;
-    HeatmapToSpreadSheet 	convert;
-    String			result;
-    Properties 			props;
-
-    table   = new SpreadSheetTable(new SpreadSheetTableModel());
-    convert = new HeatmapToSpreadSheet();
-    convert.setInput(m_CurrentPanel.getHeatmap());
-    result  = convert.convert();
-    if (result != null)
-      return "Failed to generate spreadsheet: " + result;
-    props = m_CurrentPanel.getProperties();
-    table.setModel(new SpreadSheetTableModel((SpreadSheet) convert.getOutput()));
-    table.setNumDecimals(props.getInteger("SpreadSheet.NumDecimals", 3));
-
-    if (m_CurrentPanel.getParentDialog() != null)
-      dialog = new BaseDialog(m_CurrentPanel.getParentDialog(), ModalityType.MODELESS);
-    else
-      dialog = new BaseDialog(m_CurrentPanel.getParentFrame(), false);
-    dialog.setTitle("Heatmap #" + m_CurrentPanel.getHeatmap().getID());
-    dialog.getContentPane().setLayout(new BorderLayout());
-    dialog.getContentPane().add(new BaseScrollPane(table), BorderLayout.CENTER);
-    dialog.setSize(
-	props.getInteger("View.SpreadSheet.Width", 800),
-	props.getInteger("View.SpreadSheet.Height", 600));
-    dialog.setLocationRelativeTo(m_CurrentPanel);
-    dialog.setVisible(true);
-
     return null;
   }
 }
