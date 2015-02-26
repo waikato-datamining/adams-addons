@@ -42,16 +42,6 @@ public abstract class AbstractBufferedImageBasedHeatmapThreshold
   protected HeatmapToBufferedImageConversion m_Conversion;
 
   /**
-   * Returns a string describing the object.
-   *
-   * @return 			a description suitable for displaying in the gui
-   */
-  @Override
-  public String globalInfo() {
-    return "Performs no calculation, simply returns the user-specified threshold.";
-  }
-
-  /**
    * Adds options to the internal list of options.
    */
   @Override
