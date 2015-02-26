@@ -31,6 +31,10 @@ adams.data.io.output.AbstractHeatmapWriter=\
 adams.gui.visualization.image.ImageOverlay=\
   adams.gui.visualization.heatmap
 
+# viewer plugins
+adams.gui.visualization.heatmap.plugins.AbstractHeatmapViewerPlugin=\
+  adams.gui.visualization.heatmap.plugins
+
 # the crop algorithms
 adams.data.filter.heatmapcrop.AbstractHeatmapCrop=\
   adams.data.filter.heatmapcrop

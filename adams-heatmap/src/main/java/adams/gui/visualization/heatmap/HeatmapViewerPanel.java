@@ -30,6 +30,7 @@ import adams.data.io.input.AbstractHeatmapReader;
 import adams.data.io.output.AbstractDataContainerWriter;
 import adams.gui.chooser.BaseColorChooser;
 import adams.gui.chooser.HeatmapFileChooser;
+import adams.gui.core.BaseMenu;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseStatusBar;
 import adams.gui.core.BaseTabbedPane;
@@ -51,7 +52,7 @@ import adams.gui.sendto.SendToActionSupporter;
 import adams.gui.sendto.SendToActionUtils;
 import adams.gui.visualization.container.FilterDialog;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
-import adams.gui.visualization.image.plugins.AbstractCurrentImageFilter;
+import adams.gui.visualization.heatmap.plugins.AbstractHeatmapViewerPlugin;
 import adams.gui.visualization.image.plugins.AbstractSelectedImagesFilter;
 import adams.gui.visualization.image.plugins.BufferedImageTransformer;
 import adams.gui.visualization.image.plugins.ImageJTransformer;
@@ -73,7 +74,9 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * Panel for viewing/processing heatmaps.
@@ -167,6 +170,15 @@ public class HeatmapViewerPanel
   /** the histogram menu item. */
   protected JMenuItem m_MenuItemViewShowHistogram;
 
+  /** the menu "plugins". */
+  protected BaseMenu m_MenuPlugins;
+
+  /** the plugins. */
+  protected Vector<AbstractHeatmapViewerPlugin> m_Plugins;
+
+  /** the plugin menu items. */
+  protected Vector<JMenuItem> m_MenuItemPlugins;
+
   /** for loading heatmaps from disk. */
   protected HeatmapFileChooser m_FileChooser;
 
@@ -210,6 +222,8 @@ public class HeatmapViewerPanel
     m_DialogColorGenerator    = null;
     m_DialogMissingValueColor = null;
     m_RecentFilesHandler      = null;
+    m_MenuItemPlugins         = new Vector<JMenuItem>();
+    m_Plugins                 = new Vector<AbstractHeatmapViewerPlugin>();
   }
 
   /**
@@ -269,6 +283,7 @@ public class HeatmapViewerPanel
     int			i;
     int[]		zooms;
     String[]		shortcuts;
+    String[]		plugins;
 
     if (m_MenuBar == null) {
       result = new JMenuBar();
@@ -674,6 +689,48 @@ public class HeatmapViewerPanel
       });
       m_MenuItemViewShowNotes = menuitem;
 
+      // Plugins
+      plugins = AbstractHeatmapViewerPlugin.getPlugins();
+      menu = new BaseMenu("Plugins");
+      result.add(menu);
+      menu.setMnemonic('P');
+      menu.setVisible(plugins.length > 0);
+      menu.addChangeListener(new ChangeListener() {
+	public void stateChanged(ChangeEvent e) {
+	  updateMenu();
+	}
+      });
+      m_MenuPlugins = (BaseMenu) menu;
+
+      // add plugins
+      m_MenuItemPlugins.clear();
+      m_Plugins.clear();
+      for (i = 0; i < plugins.length; i++) {
+	try {
+	  final AbstractHeatmapViewerPlugin plugin = (AbstractHeatmapViewerPlugin) Class.forName(plugins[i]).newInstance();
+	  menuitem = new JMenuItem(plugin.getCaption());
+	  menuitem.setIcon(plugin.getIcon());
+	  menu.add(menuitem);
+	  menuitem.addActionListener(new ActionListener() {
+	    public void actionPerformed(ActionEvent e) {
+	      String error = plugin.execute(getCurrentPanel());
+	      if ((error != null) && !error.isEmpty())
+		GUIHelper.showErrorMessage(
+		    getCurrentPanel(),
+		    "Error occurred executing plugin '" + plugin.getCaption() + "':\n" + error);
+	      updateMenu();
+	    }
+	  });
+	  m_Plugins.add(plugin);
+	  m_MenuItemPlugins.add(menuitem);
+	}
+	catch (Exception e) {
+	  System.err.println("Failed to install plugin '" + plugins[i] + "':");
+	  e.printStackTrace();
+	}
+      }
+      m_MenuPlugins.sort();
+
       m_MenuBar = result;
       updateMenu();
     }
@@ -708,6 +765,22 @@ public class HeatmapViewerPanel
   }
 
   /**
+   * Returns the all panels.
+   *
+   * @return		the panels
+   */
+  public HeatmapPanel[] getAllPanels() {
+    List<HeatmapPanel>	result;
+    int			i;
+
+    result = new ArrayList<HeatmapPanel>();
+    for (i = 0; i < m_TabbedPane.getTabCount(); i++)
+      result.add(getPanelAt(i));
+
+    return result.toArray(new HeatmapPanel[result.size()]);
+  }
+
+  /**
    * updates the enabled state of the menu items.
    */
   protected void updateMenu() {
@@ -739,6 +812,7 @@ public class HeatmapViewerPanel
     m_MenuItemViewColorGenerator.setEnabled(dataLoaded);
     m_MenuItemViewMissingValueColor.setEnabled(dataLoaded);
     m_MenuItemViewShowSpreadsheet.setEnabled(dataLoaded);
+    m_MenuItemViewShowHistogram.setEnabled(dataLoaded);
     m_MenuItemViewShowStatistics.setEnabled(dataLoaded);
     m_MenuItemViewShowNotes.setEnabled(dataLoaded);
   }
@@ -976,23 +1050,6 @@ public class HeatmapViewerPanel
    * @param filter	the image filter to apply
    */
   protected void applyImageFilter(HeatmapPanel panel, AbstractSelectedImagesFilter filter) {
-    String	result;
-    double	scale;
-
-    scale  = panel.getImagePanel().getScale();
-    result = filter.execute(panel.getImagePanel());
-    panel.getImagePanel().setScale(scale);
-    if (result != null)
-      GUIHelper.showErrorMessage(this, "Failed to filter heatmap image:\n" + result);
-  }
-
-  /**
-   * Applies the image filter to the heatmap image.
-   *
-   * @param panel	the panel's image to process
-   * @param filter	the image filter to apply
-   */
-  protected void applyImageFilter(HeatmapPanel panel, AbstractCurrentImageFilter filter) {
     String	result;
     double	scale;
 
