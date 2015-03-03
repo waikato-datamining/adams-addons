@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2015-01-30 10:32:15
+# Date: 2015-03-03 22:25:57
 # User: fracpete
 #
 adams.flow.control.Flow
@@ -76,9 +76,13 @@ adams.flow.control.Flow
 					-name
 					all
 					-receiver
-						adams.flow.standalone.rats.input.DeQueue
-							-storage-name
-							all
+						adams.flow.standalone.rats.input.InputPolling
+							-input
+								adams.flow.standalone.rats.input.DeQueue
+									-storage-name
+									all
+							-wait-poll
+							50
 					-transmitter
 						adams.flow.standalone.rats.output.DistributedEnQueue
 							-storage-name
@@ -92,9 +96,13 @@ adams.flow.control.Flow
 					-name
 					q1
 					-receiver
-						adams.flow.standalone.rats.input.DeQueue
-							-storage-name
-							q1
+						adams.flow.standalone.rats.input.InputPolling
+							-input
+								adams.flow.standalone.rats.input.DeQueue
+									-storage-name
+									q1
+							-wait-poll
+							50
 					-transmitter
 						adams.flow.standalone.rats.output.CallableActor
 							-callable
@@ -104,9 +112,13 @@ adams.flow.control.Flow
 					-name
 					q2
 					-receiver
-						adams.flow.standalone.rats.input.DeQueue
-							-storage-name
-							q2
+						adams.flow.standalone.rats.input.InputPolling
+							-input
+								adams.flow.standalone.rats.input.DeQueue
+									-storage-name
+									q2
+							-wait-poll
+							50
 					-transmitter
 						adams.flow.standalone.rats.output.CallableActor
 							-callable
@@ -116,9 +128,13 @@ adams.flow.control.Flow
 					-name
 					q3
 					-receiver
-						adams.flow.standalone.rats.input.DeQueue
-							-storage-name
-							q3
+						adams.flow.standalone.rats.input.InputPolling
+							-input
+								adams.flow.standalone.rats.input.DeQueue
+									-storage-name
+									q3
+							-wait-poll
+							50
 					-transmitter
 						adams.flow.standalone.rats.output.CallableActor
 							-callable
