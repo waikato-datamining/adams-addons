@@ -14,10 +14,10 @@
  */
 
 /**
- * CentroidOverlay.java
+ * Centroid.java
  * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
-package adams.gui.visualization.heatmap;
+package adams.gui.visualization.heatmap.overlay;
 
 import adams.core.Utils;
 import adams.data.filter.HeatmapCentroid;
@@ -26,7 +26,6 @@ import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.gui.visualization.image.ImagePanel.PaintPanel;
 
-import java.awt.Color;
 import java.awt.Graphics;
 
 /**
@@ -36,41 +35,35 @@ import java.awt.Graphics;
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <p/>
- *
- * <pre>-D &lt;int&gt; (property: debugLevel)
- * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to
- * &nbsp;&nbsp;&nbsp;the console (0 = off).
- * &nbsp;&nbsp;&nbsp;default: 0
- * &nbsp;&nbsp;&nbsp;minimum: 0
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- *
- * <pre>-enabled (property: enabled)
+ * 
+ * <pre>-enabled &lt;boolean&gt; (property: enabled)
  * &nbsp;&nbsp;&nbsp;If enabled, this overlay is painted over the image.
+ * &nbsp;&nbsp;&nbsp;default: true
  * </pre>
- *
+ * 
  * <pre>-color &lt;java.awt.Color&gt; (property: color)
  * &nbsp;&nbsp;&nbsp;The color for the overlay.
  * &nbsp;&nbsp;&nbsp;default: #ff0000
  * </pre>
- *
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  * @see adams.data.filter.HeatmapCentroid
  */
-public class CentroidOverlay
-  extends AbstractHeatmapOverlay {
+public class Centroid
+  extends AbstractSingleColorHeatmapOverlay {
 
   /** for serialization. */
   private static final long serialVersionUID = -2945211815191636810L;
 
   /** the calculated centroid. */
   protected double[] m_Centroid;
-
-  /** the color to paint the centroid in. */
-  protected Color m_Color;
 
   /**
    * Returns a string describing the object.
@@ -83,18 +76,6 @@ public class CentroidOverlay
   }
 
   /**
-   * Adds options to the internal list of options.
-   */
-  @Override
-  public void defineOptions() {
-    super.defineOptions();
-
-    m_OptionManager.add(
-	"color", "color",
-	Color.RED);
-  }
-
-  /**
    * Resets the overlay.
    */
   @Override
@@ -102,35 +83,6 @@ public class CentroidOverlay
     super.reset();
 
     m_Centroid = null;
-  }
-
-  /**
-   * Sets the color for the overlay.
-   *
-   * @param value 	the color
-   */
-  public void setColor(Color value) {
-    m_Color = value;
-    reset();
-  }
-
-  /**
-   * Returns the color for the overlay.
-   *
-   * @return 		the color
-   */
-  public Color getColor() {
-    return m_Color;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String colorTipText() {
-    return "The color for the overlay.";
   }
 
   /**

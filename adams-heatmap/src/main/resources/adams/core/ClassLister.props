@@ -27,9 +27,9 @@ adams.data.io.input.AbstractHeatmapReader=\
 adams.data.io.output.AbstractHeatmapWriter=\
   adams.data.io.output
 
-# the image overlays
-adams.gui.visualization.image.ImageOverlay=\
-  adams.gui.visualization.heatmap
+# the heatmap overlays
+adams.gui.visualization.heatmap.overlay.AbstractHeatmapOverlay=\
+  adams.gui.visualization.heatmap.overlay
 
 # viewer plugins
 adams.gui.visualization.heatmap.plugins.AbstractHeatmapViewerPlugin=\

@@ -15,14 +15,15 @@
 
 /**
  * CentroidOverlay.java
- * Copyright (C) 2011-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
-package adams.gui.visualization.heatmap;
+package adams.gui.visualization.heatmap.overlay;
 
-import java.awt.Graphics;
-
+import adams.gui.visualization.heatmap.HeatmapPanel;
 import adams.gui.visualization.image.AbstractImageOverlay;
 import adams.gui.visualization.image.ImagePanel.PaintPanel;
+
+import java.awt.Graphics;
 
 /**
  * Ancestor for heatmap image overlays.

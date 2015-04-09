@@ -42,6 +42,7 @@ import adams.gui.event.SearchEvent;
 import adams.gui.event.SearchListener;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
+import adams.gui.visualization.heatmap.overlay.AbstractHeatmapOverlay;
 import adams.gui.visualization.image.ImagePanel;
 import adams.gui.visualization.report.ReportFactory;
 
@@ -97,9 +98,6 @@ public class HeatmapPanel
   /** the reader that was used for reading in the heatmap. */
   protected AbstractHeatmapReader m_Reader;
 
-  /** the centroid image overlay. */
-  protected CentroidOverlay m_CentroidOverlay;
-  
   /** the color generator to use. */
   protected AbstractColorGradientGenerator m_ColorGenerator;
 
@@ -191,11 +189,6 @@ public class HeatmapPanel
     panel.add(new BaseScrollPane(m_ReportTable), BorderLayout.CENTER);
     panel.add(m_SearchPanel, BorderLayout.SOUTH);
     m_SplitPane.setRightComponent(panel);
-
-    m_CentroidOverlay = new CentroidOverlay();
-    m_CentroidOverlay.setHeatmapPanel(this);
-    m_CentroidOverlay.setEnabled(false);
-    m_HeatmapImage.addImageOverlay(m_CentroidOverlay);
 
     m_PanelLog = new BaseLogPanel();
     m_PanelLog.setRows(5);
@@ -294,9 +287,6 @@ public class HeatmapPanel
     // report
     m_ReportTable.setModel(new ReportFactory.Model(m_Heatmap.getReport()));
 
-    // centroid overlay
-    m_CentroidOverlay.setHeatmapPanel(this);
-
     // display errors in owner's statusbar
     if ((errors.length() > 0) && (m_Owner != null))
       m_Owner.showStatus(errors.toString());
@@ -347,6 +337,24 @@ public class HeatmapPanel
    */
   public AbstractColorGradientGenerator getColorGenerator() {
     return m_ColorGenerator;
+  }
+
+  /**
+   * Adds the heatmap overlay.
+   *
+   * @param overlay     the overlay to add
+   */
+  public void addOverlay(AbstractHeatmapOverlay overlay) {
+    overlay = (AbstractHeatmapOverlay) overlay.shallowCopy();
+    overlay.setHeatmapPanel(this);
+    getImagePanel().addImageOverlay(overlay);
+  }
+
+  /**
+   * Removes all overlays.
+   */
+  public void removeOverlays() {
+    getImagePanel().clearImageOverlays();
   }
 
   /**
@@ -468,25 +476,6 @@ public class HeatmapPanel
    */
   public boolean isSearchPanelVisible() {
     return m_SearchPanel.isVisible();
-  }
-
-  /**
-   * Sets whether the centroid overlay is painted as well.
-   *
-   * @param value	if true the centroid is painted
-   */
-  public void setShowCentroid(boolean value) {
-    m_CentroidOverlay.setEnabled(value);
-    m_HeatmapImage.repaint();
-  }
-
-  /**
-   * Returns whether the centroid overlay is painted as well.
-   *
-   * @return		true if the centroid is painted
-   */
-  public boolean getShowCentroid() {
-    return m_CentroidOverlay.isEnabled();
   }
 
   /**

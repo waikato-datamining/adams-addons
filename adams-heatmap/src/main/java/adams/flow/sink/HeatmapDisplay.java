@@ -27,6 +27,7 @@ import adams.gui.core.BasePanel;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
 import adams.gui.visualization.heatmap.HeatmapPanel;
+import adams.gui.visualization.heatmap.overlay.*;
 
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
@@ -126,6 +127,11 @@ import java.awt.Color;
  * &nbsp;&nbsp;&nbsp;default: adams.gui.visualization.core.BiColorGenerator
  * </pre>
  * 
+ * <pre>-overlay &lt;adams.gui.visualization.heatmap.overlay.AbstractHeatmapOverlay&gt; [-overlay ...] (property: overlays)
+ * &nbsp;&nbsp;&nbsp;The overlay(s) to use.
+ * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
  * <pre>-missing-value-color &lt;java.awt.Color&gt; (property: missingValueColor)
  * &nbsp;&nbsp;&nbsp;The color to use for missing values.
  * &nbsp;&nbsp;&nbsp;default: #00ffffff
@@ -153,6 +159,9 @@ public class HeatmapDisplay
   /** the generator for the color gradient. */
   protected AbstractColorGradientGenerator m_ColorGenerator;
 
+  /** the overlays to use. */
+  protected AbstractHeatmapOverlay[] m_Overlays;
+
   /** the color for missing values. */
   protected Color m_MissingValueColor;
 
@@ -179,6 +188,10 @@ public class HeatmapDisplay
     m_OptionManager.add(
       "color-generator", "colorGenerator",
       new BiColorGenerator());
+
+    m_OptionManager.add(
+      "overlay", "overlays",
+      new AbstractHeatmapOverlay[0]);
 
     m_OptionManager.add(
       "missing-value-color", "missingValueColor",
@@ -236,6 +249,35 @@ public class HeatmapDisplay
    */
   public String colorGeneratorTipText() {
     return "The generator for the color gradient.";
+  }
+
+  /**
+   * Sets the overlays to use.
+   *
+   * @param value 	the overlays
+   */
+  public void setOverlays(AbstractHeatmapOverlay[] value) {
+    m_Overlays = value;
+    reset();
+  }
+
+  /**
+   * Returns the overlays to use.
+   *
+   * @return 		the overlays
+   */
+  public AbstractHeatmapOverlay[] getOverlays() {
+    return m_Overlays;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String overlaysTipText() {
+    return "The overlay(s) to use.";
   }
 
   /**
@@ -338,6 +380,8 @@ public class HeatmapDisplay
 
     result = new HeatmapPanel(null);
     result.setColorGenerator(m_ColorGenerator);
+    for (AbstractHeatmapOverlay overlay: m_Overlays)
+      result.addOverlay(overlay);
     result.setMissingValueColor(m_MissingValueColor);
     result.setZoom(m_Zoom / 100.0);
 
@@ -377,6 +421,7 @@ public class HeatmapDisplay
 
     result = new AbstractComponentDisplayPanel(getClass().getSimpleName()) {
       private static final long serialVersionUID = -9139363702312636367L;
+
       protected HeatmapPanel m_HeatmapPanel;
       @Override
       protected void initGUI() {
@@ -384,6 +429,8 @@ public class HeatmapDisplay
 	setLayout(new BorderLayout());
 	m_HeatmapPanel = new HeatmapPanel(null);
 	m_HeatmapPanel.setColorGenerator(m_ColorGenerator);
+        for (AbstractHeatmapOverlay overlay: m_Overlays)
+          m_HeatmapPanel.addOverlay(overlay);
 	m_HeatmapPanel.setMissingValueColor(m_MissingValueColor);
 	m_HeatmapPanel.setZoom(m_Zoom / 100.0);
 	add(m_HeatmapPanel, BorderLayout.CENTER);
