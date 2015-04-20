@@ -78,6 +78,10 @@ The following conversions are available:
 \end{tight_itemize}
 The following transformers are available:
 \begin{tight_itemize}
+  	\item \textit{NewHeatmap} -- creates an empty heatmap.
+\end{tight_itemize}
+The following transformers are available:
+\begin{tight_itemize}
   	\item \textit{HeatmapArrayStatistics} -- interprets a heatmap as array
   	(row-wise concatenated) and generates statistics from it.
   	\item \textit{HeatmapFeatureGenerator} -- generates features from the
@@ -88,11 +92,13 @@ The following transformers are available:
   	\item \textit{HeatmapFileWriter} -- writes a heat map back to disk with
   	a custom writer.
   	\item \textit{HeatmapFilter} -- transform a heat map using a filter.
+  	\item \textit{HeatmapGetValue} -- retrieves one or more values from a heatmap.
   	\item \textit{HeatmapInfo} -- outputs information on a heatmap.
   	\item \textit{HeatmapInstanceGenerator} -- turns a heat map into a WEKA
   	instance.
   	\item \textit{HeatmapLocateObjects} -- generates sub-heatmaps from objects
   	that were located in the heatmap.
+  	\item \textit{HeatmapSetValue} -- set one or more values in a heatmap.
 \end{tight_itemize}
 The following sinks are available:
 \begin{tight_itemize}
