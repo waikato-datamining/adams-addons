@@ -4,7 +4,7 @@
 #
 adams.flow.control.Flow
 	-annotation
-	Uses the global transformer \'simple transform\' on the webservice server to \ntransform WEKA datasets.\nSee \"adams-weka-webservice-weka-webservice.flow\" flow for running the server and further information\non the global actor in use for transforming the data.
+	Uses the callable transformer \'simple transform\' on the webservice server to \ntransform WEKA datasets.\nSee \"adams-weka-webservice-weka-webservice.flow\" flow for running the server and further information\non the callable actor in use for transforming the data.
 	-actor
 		adams.flow.source.SelectFile
 			-stop-if-canceled

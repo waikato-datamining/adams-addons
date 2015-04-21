@@ -4,7 +4,7 @@
 #
 adams.flow.control.Flow
 	-annotation
-	The webservice that allows clients to:\n- cross-validate classifier setups\n- train (and cache) classifiers with data\n- use trained classifiers to make predictions on \n- evaluate trained classifiers on test data\n- optimize classifier setup on a dataset (MultiSearch)\n- train (and cache) clusterers with data\n- use trained clusterers to cluster data\n- transform data with a globally defined transformer
+	The webservice that allows clients to:\n- cross-validate classifier setups\n- train (and cache) classifiers with data\n- use trained classifiers to make predictions on \n- evaluate trained classifiers on test data\n- optimize classifier setup on a dataset (MultiSearch)\n- train (and cache) clusterers with data\n- use trained clusterers to cluster data\n- transform data with a callable transformer
 	-actor
 		adams.flow.standalone.CallableActors
 			-actor
