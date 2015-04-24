@@ -52,7 +52,8 @@ public class MaxTest
   @Override
   protected String[] getRegressionInputFiles() {
     return new String[]{
-	"simple.csv"
+	"simple.csv",
+	"simple.csv",
     };
   }
 
@@ -65,7 +66,8 @@ public class MaxTest
   @Override
   protected AbstractHeatmapReader[] getRegressionInputFileReaders() {
     return new AbstractHeatmapReader[]{
-	new SpreadSheetHeatmapReader()
+	new SpreadSheetHeatmapReader(),
+	new SpreadSheetHeatmapReader(),
     };
   }
 
@@ -76,9 +78,14 @@ public class MaxTest
    */
   @Override
   protected AbstractHeatmapFeatureGenerator[] getRegressionSetups() {
-    return new AbstractHeatmapFeatureGenerator[]{
-	new Max()
-    };
+    Max[]     result;
+
+    result = new Max[2];
+    result[0] = new Max();
+    result[1] = new Max();
+    result[1].setOutputPosition(true);
+
+    return result;
   }
 
   /**

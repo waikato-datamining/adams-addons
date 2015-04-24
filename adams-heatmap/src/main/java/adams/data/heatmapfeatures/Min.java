@@ -22,6 +22,7 @@ package adams.data.heatmapfeatures;
 
 import adams.data.featureconverter.HeaderDefinition;
 import adams.data.heatmap.Heatmap;
+import adams.data.heatmap.HeatmapValue;
 import adams.data.report.DataType;
 
 import java.util.ArrayList;
@@ -55,6 +56,12 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
  * 
+ * <pre>-output-position &lt;boolean&gt; (property: outputPosition)
+ * &nbsp;&nbsp;&nbsp;If enabled, the position of the minimum gets output as well (x&#47;y; 0-based
+ * &nbsp;&nbsp;&nbsp;).
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -67,6 +74,9 @@ public class Min
   /** for serialization. */
   private static final long serialVersionUID = -8349656592325229512L;
 
+  /** whether to output the position as well. */
+  protected boolean m_OutputPosition;
+
   /**
    * Returns a string describing the object.
    *
@@ -75,6 +85,47 @@ public class Min
   @Override
   public String globalInfo() {
     return "Extracts the lowest value.";
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "output-position", "outputPosition",
+      false);
+  }
+
+  /**
+   * Sets whether to output the position as well.
+   *
+   * @param value 	whether to output the position
+   */
+  public void setOutputPosition(boolean value) {
+    m_OutputPosition = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to output the position as well.
+   *
+   * @return 		true if to output the position as well
+   */
+  public boolean getOutputPosition() {
+    return m_OutputPosition;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String outputPositionTipText() {
+    return "If enabled, the position of the minimum gets output as well (x/y; 0-based).";
   }
 
   /**
@@ -89,6 +140,10 @@ public class Min
 
     result = new HeaderDefinition();
     result.add("min", DataType.NUMERIC);
+    if (m_OutputPosition) {
+      result.add("x", DataType.NUMERIC);
+      result.add("y", DataType.NUMERIC);
+    }
 
     return result;
   }
@@ -102,10 +157,16 @@ public class Min
   @Override
   public List<Object>[] generateRows(Heatmap map) {
     List<Object>[]	result;
+    HeatmapValue        min;
 
     result    = new List[1];
     result[0] = new ArrayList<Object>();
-    result[0].add(map.getMin());
+    min       = map.getMinValue();
+    result[0].add(min.getValue());
+    if (m_OutputPosition) {
+      result[0].add(min.getX());
+      result[0].add(min.getY());
+    }
 
     return result;
   }

@@ -52,7 +52,8 @@ public class MinTest
   @Override
   protected String[] getRegressionInputFiles() {
     return new String[]{
-	"simple.csv"
+	"simple.csv",
+	"simple.csv",
     };
   }
 
@@ -65,7 +66,8 @@ public class MinTest
   @Override
   protected AbstractHeatmapReader[] getRegressionInputFileReaders() {
     return new AbstractHeatmapReader[]{
-	new SpreadSheetHeatmapReader()
+	new SpreadSheetHeatmapReader(),
+	new SpreadSheetHeatmapReader(),
     };
   }
 
@@ -76,9 +78,14 @@ public class MinTest
    */
   @Override
   protected AbstractHeatmapFeatureGenerator[] getRegressionSetups() {
-    return new AbstractHeatmapFeatureGenerator[]{
-	new Min()
-    };
+    Min[]       result;
+
+    result = new Min[2];
+    result[0] = new Min();
+    result[1] = new Min();
+    result[1].setOutputPosition(true);
+
+    return result;
   }
 
   /**

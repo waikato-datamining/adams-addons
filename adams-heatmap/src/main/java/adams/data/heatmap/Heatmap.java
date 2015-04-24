@@ -79,10 +79,10 @@ public class Heatmap
   protected Notes m_Notes;
 
   /** the minimum intensity value. */
-  protected double m_Min;
+  protected HeatmapValue m_Min;
 
   /** the maximum intensity value. */
-  protected double m_Max;
+  protected HeatmapValue m_Max;
 
   /**
    * Initializes the heatmap.
@@ -116,7 +116,7 @@ public class Heatmap
     resetMinMax();
     for (int y = 0; y < getHeight(); y++) {
       for (int x = 0; x < getWidth(); x++)
-	updateMinMax(m_Map[y][x]);
+	updateMinMax(y, x, m_Map[y][x]);
     }
   }
 
@@ -174,8 +174,8 @@ public class Heatmap
    * Resets the min/max values.
    */
   protected void resetMinMax() {
-    m_Min = Double.MAX_VALUE;
-    m_Max = Double.MIN_VALUE;
+    m_Min = new HeatmapValue(0, 0, Double.MAX_VALUE);
+    m_Max = new HeatmapValue(0, 0, Double.MIN_VALUE);
   }
 
   /**
@@ -183,10 +183,15 @@ public class Heatmap
    *
    * @param value	the new value
    */
-  protected void updateMinMax(double value) {
+  protected void updateMinMax(int row, int col, double value) {
+    HeatmapValue  val;
+
     if (!isMissingValue(value)) {
-      m_Min = Math.min(m_Min, value);
-      m_Max = Math.max(m_Max, value);
+      val = new HeatmapValue(row, col, value);
+      if (val.getValue() < m_Min.getValue())
+        m_Min = val;
+      if (val.getValue() > m_Max.getValue())
+        m_Max = val;
     }
   }
 
@@ -197,6 +202,16 @@ public class Heatmap
    * 			in the heatmp
    */
   public double getMin() {
+    return m_Min.getValue();
+  }
+
+  /**
+   * Returns the smallest value in the heatmap.
+   *
+   * @return		the minimum, {@link Double#MAX_VALUE} if only zeroes
+   * 			in the heatmp
+   */
+  public HeatmapValue getMinValue() {
     return m_Min;
   }
 
@@ -207,6 +222,16 @@ public class Heatmap
    * 			in the heatmp
    */
   public double getMax() {
+    return m_Max.getValue();
+  }
+
+  /**
+   * Returns the largest value in the heatmap.
+   *
+   * @return		the maximum, {@link Double#MIN_VALUE} if only zeroes
+   * 			in the heatmp
+   */
+  public HeatmapValue getMaxValue() {
     return m_Max;
   }
 
@@ -297,7 +322,7 @@ public class Heatmap
    * @param value	the heat value to set (>= 0.0)
    */
   public void set(int row, int col, double value) {
-    updateMinMax(value);
+    updateMinMax(row, col, value);
 
     m_Map[row][col] = value;
   }
