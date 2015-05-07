@@ -15,7 +15,7 @@
 
 /*
  * AbstractPHMMIterativeEvaluation.java
- * Copyright (C) 2011-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -245,6 +245,8 @@ public abstract class AbstractPHMMIterativeEvaluation<T extends IterativeHMMClas
       if (folds == -1)
 	folds = data.numInstances();
 
+      initOutputBuffer();
+      m_Output.setHeader(data);
       eval = newEvaluation();
       eval.setOutput(m_Output);
       eval.setClassifier(cls);
