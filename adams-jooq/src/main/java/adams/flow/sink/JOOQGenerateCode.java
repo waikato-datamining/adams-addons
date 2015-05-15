@@ -15,18 +15,18 @@
 
 /**
  * JOOQGenerateCode.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.sink;
+
+import adams.core.io.FileUtils;
+import adams.core.io.PlaceholderFile;
+import org.jooq.util.GenerationTool;
+import org.jooq.util.jaxb.Configuration;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-
-import org.jooq.util.GenerationTool;
-import org.jooq.util.jaxb.Configuration;
-
-import adams.core.io.PlaceholderFile;
 
 /**
  <!-- globalinfo-start -->
@@ -129,13 +129,7 @@ public class JOOQGenerateCode
       result = handleException("Failed to generate code!", e);
     }
     finally {
-      try {
-	if (in != null)
-	  in.close();
-      }
-      catch (Exception e) {
-	// ignored
-      }
+      FileUtils.closeQuietly(in);
     }
     
     return result;

@@ -15,25 +15,25 @@
 
 /*
  * SimpleImageService.java
- * Copyright (C) 2014 Image BV, Wageningen, NL
+ * Copyright (C) 2014-2015 Image BV, Wageningen, NL
  */
 
 package adams.flow.webservice;
+
+import adams.core.Utils;
+import adams.core.io.FileUtils;
+import adams.core.io.PlaceholderDirectory;
+import adams.core.option.AbstractOptionHandler;
+import adams.flow.core.ActorUtils;
+import nz.ac.waikato.adams.webservice.image.ImageService;
+import nz.ac.waikato.adams.webservice.image.UploadRequest;
+import nz.ac.waikato.adams.webservice.image.UploadResponse;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.logging.Level;
-
-import nz.ac.waikato.adams.webservice.image.ImageService;
-import nz.ac.waikato.adams.webservice.image.UploadRequest;
-import nz.ac.waikato.adams.webservice.image.UploadResponse;
-import adams.core.Utils;
-import adams.core.io.FileUtils;
-import adams.core.io.PlaceholderDirectory;
-import adams.core.option.AbstractOptionHandler;
-import adams.flow.core.ActorUtils;
 
 /**
  * Class that implements the Image web service.  
@@ -162,6 +162,7 @@ public class SimpleImageService
     UploadResponse		result;
     String			filename;
     BufferedOutputStream	bos;
+    FileOutputStream		fos;
     InputStream			ins;
     int				data;
 
@@ -172,9 +173,12 @@ public class SimpleImageService
     result.setFormat(parameters.getFormat());
     filename = parameters.getId() + "." + parameters.getFormat().toString().toLowerCase();
     filename = m_UploadDir.getAbsolutePath() + File.separator + FileUtils.createFilename(filename, "_");
+    bos = null;
+    fos = null;
     try {
-      bos      = new BufferedOutputStream(new FileOutputStream(filename));
-      ins      = parameters.getImage().getData().getInputStream();
+      fos = new FileOutputStream(filename);
+      bos = new BufferedOutputStream(fos);
+      ins = parameters.getImage().getData().getInputStream();
       while ((data = ins.read()) != -1)
 	bos.write(data);
       bos.flush();
@@ -185,6 +189,10 @@ public class SimpleImageService
       getLogger().log(Level.SEVERE, "Failed to store image '" + parameters.getId() + "/" + parameters.getFormat() + "' as '" + filename + "'!", e);
       result.setMessage("Failed to store image '" + parameters.getId() + "/" + parameters.getFormat() + ":\n" + Utils.throwableToString(e));
       result.setSuccess(true);
+    }
+    finally {
+      FileUtils.closeQuietly(bos);
+      FileUtils.closeQuietly(fos);
     }
     
     return result;

@@ -15,17 +15,18 @@
 
 /**
  * FloatMatrixHeatmapWriter.java
- * Copyright (C) 2011-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.output;
+
+import adams.core.io.FileUtils;
+import adams.data.heatmap.Heatmap;
+import adams.data.io.input.FloatMatrixHeatmapReader;
 
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.util.List;
 import java.util.logging.Level;
-
-import adams.data.heatmap.Heatmap;
-import adams.data.io.input.FloatMatrixHeatmapReader;
 
 /**
  <!-- globalinfo-start -->
@@ -110,6 +111,7 @@ public class FloatMatrixHeatmapWriter
   protected boolean writeData(List<Heatmap> data) {
     boolean		result;
     DataOutputStream	stream;
+    FileOutputStream	fos;
     Heatmap		map;
     int			x;
     int			y;
@@ -120,8 +122,10 @@ public class FloatMatrixHeatmapWriter
     result = false;
 
     stream = null;
+    fos    = null;
     try {
-      stream = new DataOutputStream(new FileOutputStream(m_Output.getAbsoluteFile()));
+      fos    = new FileOutputStream(m_Output.getAbsoluteFile());
+      stream = new DataOutputStream(fos);
       map    = data.get(0);
       bytes  = new byte[4];
       for (y = 0; y < map.getHeight(); y++) {
@@ -141,15 +145,8 @@ public class FloatMatrixHeatmapWriter
       getLogger().log(Level.SEVERE, "Failed to write heatmap to '" + m_Output + "':", e);
     }
     finally {
-      if (stream != null) {
-	try {
-	  stream.flush();
-	  stream.close();
-	}
-	catch (Exception e) {
-	  // ignored
-	}
-      }
+      FileUtils.closeQuietly(stream);
+      FileUtils.closeQuietly(fos);
     }
 
     return result;

@@ -15,21 +15,20 @@
 
 /**
  * FtpUpload.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-
-import org.apache.commons.net.ftp.FTPClient;
 
 import adams.core.QuickInfoHelper;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 import adams.flow.core.ActorUtils;
 import adams.flow.standalone.FTPConnection;
+import org.apache.commons.net.ftp.FTPClient;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 
 /**
  <!-- globalinfo-start -->
@@ -222,16 +221,19 @@ public class FtpUpload
     File		file;
     String		remotefile;
     BufferedInputStream	stream;
+    FileInputStream	fis;
 
     result     = null;
     file       = new PlaceholderFile(filename);
     remotefile = m_RemoteDir + "/" + file.getName();
     client     = m_Connection.getFTPClient();
     stream     = null;
+    fis        = null;
     try {
       if (isLoggingEnabled())
 	getLogger().info("Uploading " + file + " to " + remotefile);
-      stream = new BufferedInputStream(new FileInputStream(file.getAbsoluteFile()));
+      fis    = new FileInputStream(file.getAbsoluteFile());
+      stream = new BufferedInputStream(fis);
       client.storeFile(remotefile, stream);
       stream.close();
     }
@@ -239,14 +241,8 @@ public class FtpUpload
       result = handleException("Failed to ftp '" + file + "' to '" + remotefile + "'!", e);
     }
     finally {
-      if (stream != null) {
-	try {
-	  stream.close();
-	}
-	catch (Exception e) {
-	  // ignored
-	}
-      }
+      FileUtils.closeQuietly(stream);
+      FileUtils.closeQuietly(fis);
     }
     return result;
   }

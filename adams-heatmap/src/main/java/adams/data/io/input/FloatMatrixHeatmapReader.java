@@ -20,6 +20,7 @@
 
 package adams.data.io.input;
 
+import adams.core.io.FileUtils;
 import adams.data.heatmap.Heatmap;
 import adams.data.report.Report;
 
@@ -212,6 +213,7 @@ public class FloatMatrixHeatmapReader
   @Override
   protected void readData() {
     Heatmap		map;
+    FileInputStream     fis;
     DataInputStream	stream;
     int			x;
     int			y;
@@ -222,6 +224,7 @@ public class FloatMatrixHeatmapReader
     Report		report;
 
     stream = null;
+    fis    = null;
     try {
       // assemble meta-data
       report = Heatmap.createEmptyReport();
@@ -229,7 +232,8 @@ public class FloatMatrixHeatmapReader
       // read heatmap data
       map = new Heatmap(m_Height, m_Width);
       map.setReport(report);
-      stream = new DataInputStream(new FileInputStream(m_Input.getAbsoluteFile()));
+      fis    = new FileInputStream(m_Input.getAbsoluteFile());
+      stream = new DataInputStream(fis);
       x      = 0;
       y      = 0;
       bytes  = new byte[4];
@@ -255,14 +259,8 @@ public class FloatMatrixHeatmapReader
       map = null;
     }
     finally {
-      if (stream != null) {
-	try {
-	  stream.close();
-	}
-	catch (Exception e) {
-	  // ignored
-	}
-      }
+      FileUtils.closeQuietly(stream);
+      FileUtils.closeQuietly(fis);
     }
 
     if (map != null)

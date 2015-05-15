@@ -21,6 +21,7 @@
 package adams.data.io.output;
 
 import adams.core.Utils;
+import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 import adams.data.CompressionSupporter;
 import adams.data.heatmap.Heatmap;
@@ -303,19 +304,32 @@ public class SimpleHeatmapWriter
   protected boolean write(List<Heatmap> data, String filename, boolean report) {
     boolean		result;
     BufferedWriter	writer;
+    FileOutputStream    fos;
+    FileWriter		fw;
 
     filename = new PlaceholderFile(filename).getAbsolutePath();
+    writer   = null;
+    fos      = null;
+    fw       = null;
     try {
-      if (filename.endsWith(".gz"))
-	writer = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(filename))));
-      else
-	writer = new BufferedWriter(new FileWriter(filename));
+      if (filename.endsWith(".gz")) {
+	fos    = new FileOutputStream(filename);
+	writer = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(fos)));
+      }
+      else {
+	fw     = new FileWriter(filename);
+	writer = new BufferedWriter(fw);
+      }
       result = write(data, writer, report);
-      writer.close();
     }
     catch (Exception e) {
       result = false;
       getLogger().log(Level.SEVERE, "Failed to write heatmap to '" + filename + "'!", e);
+    }
+    finally {
+      FileUtils.closeQuietly(writer);
+      FileUtils.closeQuietly(fw);
+      FileUtils.closeQuietly(fos);
     }
 
     return result;

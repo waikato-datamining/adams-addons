@@ -22,6 +22,7 @@ package adams.data.io.input;
 
 import adams.core.Properties;
 import adams.core.Utils;
+import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 import adams.data.heatmap.Heatmap;
 import adams.data.report.DataType;
@@ -208,19 +209,32 @@ public class SimpleHeatmapReader
   protected boolean read(String filename) {
     boolean		result;
     BufferedReader	reader;
+    FileInputStream     fis;
+    FileReader		fr;
 
     filename = new PlaceholderFile(filename).getAbsolutePath();
+    fis      = null;
+    fr       = null;
+    reader   = null;
     try {
-      if (filename.endsWith(".gz"))
-	reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(filename))));
-      else
-	reader = new BufferedReader(new FileReader(filename));
+      if (filename.endsWith(".gz")) {
+	fis    = new FileInputStream(filename);
+	reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(fis)));
+      }
+      else {
+	fr     = new FileReader(filename);
+	reader = new BufferedReader(fr);
+      }
       result = read(reader);
-      reader.close();
     }
     catch (Exception e) {
       result = false;
       getLogger().log(Level.SEVERE, "Failed to read spectral data from '" + filename + "'!", e);
+    }
+    finally {
+      FileUtils.closeQuietly(reader);
+      FileUtils.closeQuietly(fr);
+      FileUtils.closeQuietly(fis);
     }
 
     return result;

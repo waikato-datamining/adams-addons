@@ -15,17 +15,18 @@
 
 /**
  * BinaryFileWriter.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-
 import adams.core.QuickInfoHelper;
+import adams.core.io.FileUtils;
 import adams.core.io.FileWriter;
 import adams.core.io.PlaceholderFile;
 import adams.data.blob.BlobContainer;
+
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 
 /**
  <!-- globalinfo-start -->
@@ -151,15 +152,18 @@ public class BinaryFileWriter
     String			result;
     byte[]			content;
     BufferedOutputStream	out;
+    FileOutputStream            fos;
 
     out = null;
+    fos = null;
     try {
       result = null;
       if (m_Input instanceof BlobContainer)
 	content = ((BlobContainer) m_Input).getContent();
       else
 	content = (byte[]) m_Input;
-      out = new BufferedOutputStream(new FileOutputStream(m_OutputFile.getAbsolutePath()));
+      fos = new FileOutputStream(m_OutputFile.getAbsolutePath());
+      out = new BufferedOutputStream(fos);
       out.write(content);
       out.flush();
     }
@@ -167,14 +171,8 @@ public class BinaryFileWriter
       result = handleException("Failed to write byte array to " + m_OutputFile, e);
     }
     finally {
-      if (out != null) {
-	try {
-	  out.close();
-	}
-	catch (Exception e) {
-	  // ignored
-	}
-      }
+      FileUtils.closeQuietly(out);
+      FileUtils.closeQuietly(fos);
     }
 
     return result;
