@@ -152,7 +152,7 @@ public abstract class AbstractHeatmapWriterTestCase
 
   /**
    * Returns whether a regression can be run.
-   * <p/>
+   * <br><br>
    * Default implementation returns false.
    *
    * @return		true if the regression can be run (e.g., for non-binary output)
@@ -172,7 +172,7 @@ public abstract class AbstractHeatmapWriterTestCase
 
   /**
    * Regression test.
-   * <p/>
+   * <br><br>
    * Only gets executed if "hasRegressionTest" returns true.
    *
    * @see

@@ -662,7 +662,7 @@ public class Heatmap
 
   /**
    * Sets all values to missing.
-   * <p/>
+   * <br><br>
    * Note: the size of the collection won't be 0, as defined by the Collection
    * interface.
    */

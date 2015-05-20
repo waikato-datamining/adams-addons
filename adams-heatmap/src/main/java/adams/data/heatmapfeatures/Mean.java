@@ -31,7 +31,7 @@ import java.util.List;
 /**
  <!-- globalinfo-start -->
  * Determines the mean.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

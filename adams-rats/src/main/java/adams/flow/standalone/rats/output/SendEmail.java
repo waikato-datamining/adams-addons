@@ -27,8 +27,8 @@ import adams.flow.standalone.SMTPConnection;
 
 /**
  <!-- globalinfo-start -->
- * Transmitter for sending emails.<br/>
- * <p/>
+ * Transmitter for sending emails.<br>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

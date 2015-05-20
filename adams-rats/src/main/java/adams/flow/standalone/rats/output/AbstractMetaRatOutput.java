@@ -119,7 +119,7 @@ public abstract class AbstractMetaRatOutput
 
   /**
    * Hook method before calling the base-output's transmit() method.
-   * <p/>
+   * <br><br>
    * Default implementation does nothing.
    * 
    * @return		null if successful, otherwise error message
@@ -140,7 +140,7 @@ public abstract class AbstractMetaRatOutput
   
   /**
    * Hook method after calling the base-output's transmit() method.
-   * <p/>
+   * <br><br>
    * Default implementation does nothing.
    * 
    * @return		null if successful, otherwise error message

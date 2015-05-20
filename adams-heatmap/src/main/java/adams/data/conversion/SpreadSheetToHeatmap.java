@@ -25,13 +25,13 @@ import adams.data.spreadsheet.SpreadSheet;
 
 /**
  <!-- globalinfo-start -->
- * Turns an all-numeric spreadsheet into a heatmap.<br/>
+ * Turns an all-numeric spreadsheet into a heatmap.<br>
  * Missing values&#47;cells are tolerated and replaced with the specified value for missing values.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <p/>
+ * Valid options are: <br><br>
  * 
  * <pre>-D &lt;int&gt; (property: debugLevel)
  * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to 

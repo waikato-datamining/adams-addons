@@ -24,7 +24,7 @@ import adams.flow.core.Unknown;
 /**
  <!-- globalinfo-start -->
  * Dummy transmitter, does nothing.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
@@ -76,7 +76,7 @@ public class DummyOutput
 
   /**
    * Performs the actual transmission.
-   * <p/>
+   * <br><br>
    * Does nothing.
    * 
    * @return		null if successful, otherwise error message

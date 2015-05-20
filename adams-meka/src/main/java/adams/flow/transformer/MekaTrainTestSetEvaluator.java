@@ -34,22 +34,22 @@ import adams.flow.provenance.ProvenanceSupporter;
 
 /**
  <!-- globalinfo-start -->
- * Trains a Meka classifier on an incoming training dataset (from a container) and then evaluates it on the test set (also from a container).<br/>
+ * Trains a Meka classifier on an incoming training dataset (from a container) and then evaluates it on the test set (also from a container).<br>
  * The classifier setup being used in the evaluation is a callable 'Classifier' actor.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
- * Input&#47;output:<br/>
- * - accepts:<br/>
- * &nbsp;&nbsp;&nbsp;adams.flow.container.WekaTrainTestSetContainer<br/>
- * - generates:<br/>
- * &nbsp;&nbsp;&nbsp;adams.flow.container.MekaResultContainer<br/>
- * <p/>
- * Container information:<br/>
- * - adams.flow.container.WekaTrainTestSetContainer: Train, Test, Seed, FoldNumber, FoldCount<br/>
+ * Input&#47;output:<br>
+ * - accepts:<br>
+ * &nbsp;&nbsp;&nbsp;adams.flow.container.WekaTrainTestSetContainer<br>
+ * - generates:<br>
+ * &nbsp;&nbsp;&nbsp;adams.flow.container.MekaResultContainer<br>
+ * <br><br>
+ * Container information:<br>
+ * - adams.flow.container.WekaTrainTestSetContainer: Train, Test, Seed, FoldNumber, FoldCount<br>
  * - adams.flow.container.MekaResultContainer: Result, Model
- * <p/>
+ * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->

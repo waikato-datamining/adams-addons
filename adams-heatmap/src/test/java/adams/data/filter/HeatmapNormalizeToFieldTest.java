@@ -27,7 +27,7 @@ import adams.data.report.Field;
 import adams.env.Environment;
 
 /**
- * Test class for the HeatmapNormalizeToField filter. Run from the command line with: <p/>
+ * Test class for the HeatmapNormalizeToField filter. Run from the command line with: <br><br>
  * java adams.data.filter.HeatmapNormalizeToFieldTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)

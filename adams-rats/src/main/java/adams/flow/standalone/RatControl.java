@@ -41,7 +41,7 @@ import adams.gui.core.ParameterPanel;
 /**
  <!-- globalinfo-start -->
  * Control actor for Rats&#47;Rat actors.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->

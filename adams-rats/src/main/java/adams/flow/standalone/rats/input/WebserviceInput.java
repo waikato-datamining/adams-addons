@@ -30,7 +30,7 @@ import com.example.customerservice.flow.CustomersByName;
 /**
  <!-- globalinfo-start -->
  * Uses a webservice for retrieving data from a webservice. Needs to be wrapped in poller.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

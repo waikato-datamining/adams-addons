@@ -28,7 +28,7 @@ import adams.flow.standalone.rats.generator.Dummy;
 /**
  <!-- globalinfo-start -->
  * Replaces itself at runtime with the actual Rat setup created using the generator.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->

@@ -57,7 +57,7 @@ public abstract class AbstractSelectedHeatmapsViewerPlugin
 
   /**
    * Checks whether the plugin can be executed given the specified heatmap panel.
-   * <p/>
+   * <br><br>
    * Panel must be non-null and must contain an heatmap.
    *
    * @param panel	the panel to use as basis for decision
@@ -206,7 +206,7 @@ public abstract class AbstractSelectedHeatmapsViewerPlugin
   
   /**
    * Initializes the processing.
-   * <p/>
+   * <br><br>
    * Default implementation returns null.
    * 
    * @return		null if successful, otherwise error message
@@ -225,7 +225,7 @@ public abstract class AbstractSelectedHeatmapsViewerPlugin
   
   /**
    * Finishes up the processing.
-   * <p/>
+   * <br><br>
    * Default implementation returns null.
    * 
    * @return		null if successful, otherwise error message

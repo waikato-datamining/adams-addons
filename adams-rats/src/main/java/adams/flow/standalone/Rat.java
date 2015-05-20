@@ -57,7 +57,7 @@ import adams.flow.standalone.rats.output.RatOutput;
 /**
  <!-- globalinfo-start -->
  * Defines a single reception&#47;transmission setup.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
@@ -842,7 +842,7 @@ public class Rat
   
   /**
    * Updates the Variables instance in use.
-   * <p/>
+   * <br><br>
    * Use with caution!
    *
    * @param value	the instance to use

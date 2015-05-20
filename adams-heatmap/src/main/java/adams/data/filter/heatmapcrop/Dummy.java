@@ -25,7 +25,7 @@ import adams.data.heatmap.Heatmap;
 /**
  <!-- globalinfo-start -->
  * Dummy crop algorithm, performs no cropping at all.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

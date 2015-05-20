@@ -27,7 +27,7 @@ import adams.core.io.SimpleFilenameGenerator;
 /**
  <!-- globalinfo-start -->
  * Saves the objects that it receives using serialization under the filename created by the filename generator.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

@@ -33,7 +33,7 @@ import adams.flow.core.Unknown;
 /**
  <!-- globalinfo-start -->
  * Meta-transmitter that passes the data through the callable transformer before forwarding it to the base-transmitter.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
@@ -218,7 +218,7 @@ public class OutputWithCallableTransformer
 
   /**
    * Hook method before calling the base-output's transmit() method.
-   * <p/>
+   * <br><br>
    * Passes the input data through the callable transformer before 
    * passing it on to the base-transmitter.
    * 

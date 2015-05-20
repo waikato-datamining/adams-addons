@@ -134,7 +134,7 @@ public abstract class AbstractMetaRatInput
   
   /**
    * Hook method before calling the base-input's receive() method.
-   * <p/>
+   * <br><br>
    * Default implementation just clears the data queue.
    * 
    * @return		null if successful, otherwise error message
@@ -156,7 +156,7 @@ public abstract class AbstractMetaRatInput
 
   /**
    * Hook method after calling the base-input's receive() method.
-   * <p/>
+   * <br><br>
    * Default implementation collects all the pending data from the base-input.
    * 
    * @return		null if successful, otherwise error message

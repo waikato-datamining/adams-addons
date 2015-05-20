@@ -28,7 +28,7 @@ import com.example.customerservice.flow.UpdateCustomer;
 /**
  <!-- globalinfo-start -->
  * Allows to send data to webservices using the supplied client.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

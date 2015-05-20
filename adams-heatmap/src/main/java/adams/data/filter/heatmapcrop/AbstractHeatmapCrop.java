@@ -58,7 +58,7 @@ public abstract class AbstractHeatmapCrop
   /**
    * Checks whether the heatmap can be processed, throws an {@link IllegalArgumentException}
    * if not.
-   * <p/>
+   * <br><br>
    * Default implementation only checks whether a heatmap is present.
    *
    * @param map		the heatmap to check.
@@ -70,7 +70,7 @@ public abstract class AbstractHeatmapCrop
 
   /**
    * Hook method before the crop happens.
-   * <p/>
+   * <br><br>
    * Default method initializes the top-left and bottom-right corners to
    * map dimensions.
    *
@@ -93,7 +93,7 @@ public abstract class AbstractHeatmapCrop
 
   /**
    * Hook method after the crop happened.
-   * <p/>
+   * <br><br>
    * Sets the crop coordinates.
    *
    * @param map		the cropped heatmap

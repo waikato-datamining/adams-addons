@@ -27,7 +27,7 @@ import adams.data.heatmap.Heatmap;
 /**
  <!-- globalinfo-start -->
  * Generates a cropped heatmap by applying the specified crop algorithm.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

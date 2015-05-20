@@ -33,7 +33,7 @@ import java.util.List;
 /**
  <!-- globalinfo-start -->
  * Generates a histogram.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

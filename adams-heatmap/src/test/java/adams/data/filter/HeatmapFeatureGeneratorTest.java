@@ -25,7 +25,7 @@ import adams.data.featuregenerator.Min;
 import adams.env.Environment;
 
 /**
- * Test class for the HeatmapFeatureGenerator filter. Run from the command line with: <p/>
+ * Test class for the HeatmapFeatureGenerator filter. Run from the command line with: <br><br>
  * java adams.data.filter.HeatmapFeatureGeneratorTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)

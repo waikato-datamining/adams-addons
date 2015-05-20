@@ -32,7 +32,7 @@ import java.awt.image.BufferedImage;
 /**
  <!-- globalinfo-start -->
  * Turns a heatmap into a BufferedImage.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

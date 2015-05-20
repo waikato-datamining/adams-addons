@@ -31,7 +31,7 @@ import java.io.FileOutputStream;
 /**
  <!-- globalinfo-start -->
  * Writes incoming binary data (byte array or adams.data.blob.BlobContainer) to a binary file.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

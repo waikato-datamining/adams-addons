@@ -41,7 +41,7 @@ import java.util.zip.GZIPInputStream;
 /**
  <!-- globalinfo-start -->
  * Reads heatmaps in the internal heatmap CSV format.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

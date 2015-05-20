@@ -30,7 +30,7 @@ import java.util.logging.Level;
 /**
  <!-- globalinfo-start -->
  * Turns the heatmap into an image and uses the specified image writer for saving it to a file.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

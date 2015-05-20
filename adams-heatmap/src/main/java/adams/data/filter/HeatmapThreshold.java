@@ -27,7 +27,7 @@ import adams.data.heatmap.Heatmap;
 /**
  <!-- globalinfo-start -->
  * Replaces all intensity values that are either below or above a user-specified threshold, depending on the selected threshold type, using the pre-defined replacement value.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

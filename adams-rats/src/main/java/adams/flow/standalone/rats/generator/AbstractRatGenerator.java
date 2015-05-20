@@ -155,7 +155,7 @@ public abstract class AbstractRatGenerator
 
   /**
    * Hook method for checks.
-   * <p/>
+   * <br><br>
    * Default implementation does nothing.
    */
   protected void check() {

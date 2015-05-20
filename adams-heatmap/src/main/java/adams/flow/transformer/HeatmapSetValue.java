@@ -28,16 +28,16 @@ import adams.flow.core.Token;
 /**
  <!-- globalinfo-start -->
  * Sets the value of the specified positions in a heatmap.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
- * Input&#47;output:<br/>
- * - accepts:<br/>
- * &nbsp;&nbsp;&nbsp;adams.data.heatmap.Heatmap<br/>
- * - generates:<br/>
- * &nbsp;&nbsp;&nbsp;adams.data.heatmap.Heatmap<br/>
- * <p/>
+ * Input&#47;output:<br>
+ * - accepts:<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.heatmap.Heatmap<br>
+ * - generates:<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.heatmap.Heatmap<br>
+ * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->

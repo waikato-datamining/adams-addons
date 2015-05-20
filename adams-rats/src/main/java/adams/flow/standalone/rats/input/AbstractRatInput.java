@@ -130,7 +130,7 @@ public abstract class AbstractRatInput
 
   /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
-   * <p/>
+   * <br><br>
    * Default implementation returns null.
    *
    * @return		null if no info available, otherwise short string
@@ -181,7 +181,7 @@ public abstract class AbstractRatInput
 
   /**
    * Hook method for performing checks before receiving data.
-   * <p/>
+   * <br><br>
    * Default implementation returns null.
    * 
    * @return		null if successful, otherwise error message

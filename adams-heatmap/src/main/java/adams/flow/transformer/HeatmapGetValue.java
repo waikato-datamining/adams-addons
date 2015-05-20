@@ -27,16 +27,16 @@ import adams.data.heatmap.Heatmap;
 /**
  <!-- globalinfo-start -->
  * Extracts values from a heatmap.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
- * Input&#47;output:<br/>
- * - accepts:<br/>
- * &nbsp;&nbsp;&nbsp;adams.data.heatmap.Heatmap<br/>
- * - generates:<br/>
- * &nbsp;&nbsp;&nbsp;java.lang.Double<br/>
- * <p/>
+ * Input&#47;output:<br>
+ * - accepts:<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.heatmap.Heatmap<br>
+ * - generates:<br>
+ * &nbsp;&nbsp;&nbsp;java.lang.Double<br>
+ * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->

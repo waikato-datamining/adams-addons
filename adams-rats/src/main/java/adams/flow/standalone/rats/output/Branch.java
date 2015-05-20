@@ -25,7 +25,7 @@ import adams.flow.standalone.Rat;
 /**
  <!-- globalinfo-start -->
  * Forwards the input data to all defined sub-outputs ('sub-branches').
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

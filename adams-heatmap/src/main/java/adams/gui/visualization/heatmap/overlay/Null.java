@@ -27,7 +27,7 @@ import java.awt.Graphics;
 /**
  <!-- globalinfo-start -->
  * Dummy overlay, does nothing.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

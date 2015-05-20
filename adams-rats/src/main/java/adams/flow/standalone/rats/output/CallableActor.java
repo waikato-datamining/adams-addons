@@ -35,7 +35,7 @@ import adams.flow.core.Unknown;
 /**
  <!-- globalinfo-start -->
  * Forwards the data to the specified callable actor.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

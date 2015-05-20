@@ -26,13 +26,13 @@ import adams.data.report.Field;
 
 /**
  <!-- globalinfo-start -->
- * Divides all the heatmap values by the value of the specified numeric field.<br/>
+ * Divides all the heatmap values by the value of the specified numeric field.<br>
  * If the report field is not available or not numeric, then an error gets attached to the notes.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <p/>
+ * Valid options are: <br><br>
  *
  * <pre>-D &lt;int&gt; (property: debugLevel)
  * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to

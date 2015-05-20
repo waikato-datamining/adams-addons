@@ -29,7 +29,7 @@ import adams.flow.webservice.text.RatsTextServiceWS;
 /**
  <!-- globalinfo-start -->
  * Uses a webservice for retrieving text. Internally polls whether data has arrived.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

@@ -27,16 +27,16 @@ import adams.data.io.input.SpreadSheetHeatmapReader;
 /**
  <!-- globalinfo-start -->
  * Reads heat map files.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
- * Input&#47;output:<br/>
- * - accepts:<br/>
- * &nbsp;&nbsp;&nbsp;java.lang.String<br/>
- * - generates:<br/>
- * &nbsp;&nbsp;&nbsp;adams.data.heatmap.Heatmap<br/>
- * <p/>
+ * Input&#47;output:<br>
+ * - accepts:<br>
+ * &nbsp;&nbsp;&nbsp;java.lang.String<br>
+ * - generates:<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.heatmap.Heatmap<br>
+ * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->

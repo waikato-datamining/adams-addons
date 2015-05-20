@@ -97,7 +97,7 @@ public class SimpleWekaService
   
   /**
    * Default Constructor.
-   * <p/>
+   * <br><br>
    * NB: the owning webservice needs to get set before using this implemention,
    * using the {@link #setOwner(WekaServiceWS)} method.
    */

@@ -319,7 +319,7 @@ public abstract class AbstractWebServiceClientSource<O>
   
   /**
    * Hook method before querying the webservice.
-   * <p/>
+   * <br><br>
    * Default implementation ensures that an owner is set.
    * 
    * @throws Exception	if it fails for some reason
@@ -338,7 +338,7 @@ public abstract class AbstractWebServiceClientSource<O>
   
   /**
    * Hook method after querying the webservice.
-   * <p/>
+   * <br><br>
    * Default implementation does nothing.
    * 
    * @throws Exception	if it fails for some reason

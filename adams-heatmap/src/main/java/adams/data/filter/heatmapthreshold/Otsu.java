@@ -34,11 +34,11 @@ import java.awt.image.BufferedImage;
 
 /**
  <!-- globalinfo-start -->
- * Computes the variance based threshold using Otsu's method from an input image (gray scale; boofcv.struct.image.ImageUInt8).<br/>
- * <br/>
- * For more information see:<br/>
+ * Computes the variance based threshold using Otsu's method from an input image (gray scale; boofcv.struct.image.ImageUInt8).<br>
+ * <br>
+ * For more information see:<br>
  * WikiPedia. Otsu's method.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

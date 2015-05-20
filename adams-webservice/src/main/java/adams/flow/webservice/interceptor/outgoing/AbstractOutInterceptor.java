@@ -59,7 +59,7 @@ public abstract class AbstractOutInterceptor
   
   /**
    * Initializes the members.
-   * <p/>
+   * <br><br>
    * Default implementation does nothing.
    */
   protected void initialize() {
@@ -74,7 +74,7 @@ public abstract class AbstractOutInterceptor
   
   /**
    * Initializes the logger.
-   * <p/>
+   * <br><br>
    * Default implementation uses the class name.
    */
   protected void configureLogger() {

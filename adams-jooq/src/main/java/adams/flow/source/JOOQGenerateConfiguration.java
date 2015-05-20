@@ -28,16 +28,16 @@ import adams.flow.core.Token;
 
 /**
  <!-- globalinfo-start -->
- * Generates an XML configuration file for the jOOQ code generator.<br/>
+ * Generates an XML configuration file for the jOOQ code generator.<br>
  * Forwards the name of the generated file.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
- * Input&#47;output:<br/>
- * - generates:<br/>
- * &nbsp;&nbsp;&nbsp;adams.core.io.PlaceholderFile<br/>
- * <p/>
+ * Input&#47;output:<br>
+ * - generates:<br>
+ * &nbsp;&nbsp;&nbsp;adams.core.io.PlaceholderFile<br>
+ * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->

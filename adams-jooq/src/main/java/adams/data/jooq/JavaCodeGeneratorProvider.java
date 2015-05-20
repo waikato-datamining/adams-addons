@@ -25,7 +25,7 @@ import org.jooq.util.JavaGenerator;
 /**
  <!-- globalinfo-start -->
  * Returns a Java code generator.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

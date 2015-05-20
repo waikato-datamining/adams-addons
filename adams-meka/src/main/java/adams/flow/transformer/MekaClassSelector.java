@@ -35,19 +35,19 @@ import adams.flow.provenance.ProvenanceSupporter;
 
 /**
  <!-- globalinfo-start -->
- * Determines which attributes to use as class attributes using either a regular expression or an attribute index range.<br/>
- * In case the attribute range is a non-empty string, this will take precedence over the regular expression.<br/>
+ * Determines which attributes to use as class attributes using either a regular expression or an attribute index range.<br>
+ * In case the attribute range is a non-empty string, this will take precedence over the regular expression.<br>
  * Anything that follows a ':' or ' ' (blank) gets removed from the original relation name in order to create a valid MEKA one.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
- * Input&#47;output:<br/>
- * - accepts:<br/>
- * &nbsp;&nbsp;&nbsp;weka.core.Instances<br/>
- * - generates:<br/>
- * &nbsp;&nbsp;&nbsp;weka.core.Instances<br/>
- * <p/>
+ * Input&#47;output:<br>
+ * - accepts:<br>
+ * &nbsp;&nbsp;&nbsp;weka.core.Instances<br>
+ * - generates:<br>
+ * &nbsp;&nbsp;&nbsp;weka.core.Instances<br>
+ * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->

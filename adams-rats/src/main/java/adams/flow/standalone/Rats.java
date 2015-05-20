@@ -30,7 +30,7 @@ import adams.flow.core.ActorHandlerInfo;
 /**
  <!-- globalinfo-start -->
  * Encapsulates all Rat setups.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->

@@ -27,7 +27,7 @@ import adams.data.text.TextContainer;
 /**
  <!-- globalinfo-start -->
  * Writes incoming textual data to a text file.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

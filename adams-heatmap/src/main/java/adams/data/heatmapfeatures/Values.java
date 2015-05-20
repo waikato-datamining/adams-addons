@@ -30,7 +30,7 @@ import java.util.List;
 /**
  <!-- globalinfo-start -->
  * Gets all the values of the heatmap.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

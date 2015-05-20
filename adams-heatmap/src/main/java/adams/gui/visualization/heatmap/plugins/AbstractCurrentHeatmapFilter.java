@@ -42,7 +42,7 @@ public abstract class AbstractCurrentHeatmapFilter
 
   /**
    * Checks whether the plugin can be executed given the specified heatmap panel.
-   * <p/>
+   * <br><br>
    * Panel must be non-null and must contain an heatmap.
    *
    * @param panel	the panel to use as basis for decision

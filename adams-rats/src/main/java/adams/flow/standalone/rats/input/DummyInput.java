@@ -24,7 +24,7 @@ import adams.flow.core.Unknown;
 /**
  <!-- globalinfo-start -->
  * Dummy input receiver, does nothing.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
@@ -86,7 +86,7 @@ public class DummyInput
 
   /**
    * Performs the actual reception of data.
-   * <p/>
+   * <br><br>
    * Does nothing.
    * 
    * @return		null if successful, otherwise error message

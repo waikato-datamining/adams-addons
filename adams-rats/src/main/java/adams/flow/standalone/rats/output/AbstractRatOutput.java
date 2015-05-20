@@ -155,7 +155,7 @@ public abstract class AbstractRatOutput
 
   /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
-   * <p/>
+   * <br><br>
    * Default implementation returns null.
    *
    * @return		null if no info available, otherwise short string
@@ -265,7 +265,7 @@ public abstract class AbstractRatOutput
 
   /**
    * Hook method for performing checks.
-   * <p/>
+   * <br><br>
    * Default implementation does nothing.
    * 
    * @return		null if successful, otherwise error message
@@ -364,7 +364,7 @@ public abstract class AbstractRatOutput
 
   /**
    * Removes entries from the backup.
-   * <p/>
+   * <br><br>
    * Default implementation does nothing.
    *
    * @see		#reset()
@@ -374,7 +374,7 @@ public abstract class AbstractRatOutput
 
   /**
    * Backs up the current state of the actor before update the variables.
-   * <p/>
+   * <br><br>
    * Default implementation only returns an empty hashtable.
    *
    * @return		the backup
@@ -387,7 +387,7 @@ public abstract class AbstractRatOutput
 
   /**
    * Restores the state of the actor before the variables got updated.
-   * <p/>
+   * <br><br>
    * Default implementation does nothing.
    *
    * @param state	the backup of the state to restore from

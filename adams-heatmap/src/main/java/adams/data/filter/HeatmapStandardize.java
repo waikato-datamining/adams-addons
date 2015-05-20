@@ -25,13 +25,13 @@ import adams.data.statistics.StatUtils;
 
 /**
  <!-- globalinfo-start -->
- * Standardizes the values of a heatmap to have mean of 1 and stdev 1.<br/>
+ * Standardizes the values of a heatmap to have mean of 1 and stdev 1.<br>
  * NB: normally, the mean is 0 when standardizing, but heatmaps only allow positive values.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <p/>
+ * Valid options are: <br><br>
  *
  * <pre>-D &lt;int&gt; (property: debugLevel)
  * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to

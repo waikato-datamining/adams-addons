@@ -23,7 +23,7 @@ package adams.flow.standalone.rats.input;
 /**
  <!-- globalinfo-start -->
  * Turns the base-input into one that performs polling every x msec.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

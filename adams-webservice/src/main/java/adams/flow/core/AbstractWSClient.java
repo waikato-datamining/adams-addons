@@ -151,7 +151,7 @@ public abstract class AbstractWSClient
   
   /**
    * Hook method before the webservice gets queried.
-   * <p/>
+   * <br><br>
    * Default implementation does nothing.
    * 
    * @return		null if successful, otherwise error message
@@ -181,7 +181,7 @@ public abstract class AbstractWSClient
   
   /**
    * Hook method after the webservice got queried.
-   * <p/>
+   * <br><br>
    * Default implementation does nothing.
    * 
    * @return		null if successful, otherwise error message

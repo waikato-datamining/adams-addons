@@ -33,7 +33,7 @@ import java.io.FileInputStream;
 /**
  <!-- globalinfo-start -->
  * Sends the incoming files to a FTP server.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
@@ -189,7 +189,7 @@ public class FtpUpload
 
   /**
    * Hook method for performing checks.
-   * <p/>
+   * <br><br>
    * Checks for {@link FTPConnection} actor.
    * 
    * @return		null if successful, otherwise error message

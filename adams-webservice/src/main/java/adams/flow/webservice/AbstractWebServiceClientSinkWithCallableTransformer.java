@@ -91,7 +91,7 @@ public abstract class AbstractWebServiceClientSinkWithCallableTransformer<I>
   
   /**
    * Hook method before querying the webservice.
-   * <p/>
+   * <br><br>
    * Tries to obtain and initialize the callable transformer.
    * 
    * @throws Exception	if it fails for some reason

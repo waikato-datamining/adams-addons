@@ -25,7 +25,7 @@ import adams.data.heatmap.Heatmap;
 /**
  <!-- globalinfo-start -->
  * Performs no calculation, simply returns the user-specified threshold.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

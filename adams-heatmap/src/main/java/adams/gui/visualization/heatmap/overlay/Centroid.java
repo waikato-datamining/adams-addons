@@ -31,7 +31,7 @@ import java.awt.Graphics;
 /**
  <!-- globalinfo-start -->
  * Paints the centroid's location over the heatmap image.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

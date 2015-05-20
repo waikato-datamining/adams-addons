@@ -40,7 +40,7 @@ import java.util.zip.GZIPOutputStream;
 /**
  <!-- globalinfo-start -->
  * Writer that stores heatmaps in a simple CSV-like format.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

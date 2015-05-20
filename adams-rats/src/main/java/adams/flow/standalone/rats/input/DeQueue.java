@@ -28,7 +28,7 @@ import adams.flow.core.Unknown;
 /**
  <!-- globalinfo-start -->
  * Polls the specified queue in internal storage for an item, blocks till an item is available.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

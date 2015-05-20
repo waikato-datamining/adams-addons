@@ -40,7 +40,7 @@ public abstract class AbstractInInterceptorGenerator<T extends AbstractInInterce
   
   /**
    * Hook method for checks, throws an exception if check fails.
-   * <p/>
+   * <br><br>
    * Default implementation does nothing.
    */
   protected void check() {

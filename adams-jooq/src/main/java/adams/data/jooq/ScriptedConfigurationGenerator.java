@@ -27,7 +27,7 @@ import adams.core.scripting.Dummy;
 /**
  <!-- globalinfo-start -->
  * A configuration generator that uses any scripting handler for generating the configuration with a script located in the specified file.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

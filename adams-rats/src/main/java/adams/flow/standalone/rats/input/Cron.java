@@ -34,10 +34,10 @@ import adams.core.base.CronSchedule;
 
 /**
  <!-- globalinfo-start -->
- * Uses a cronjob for defining the execution of the base rat input.<br/>
- * For more information on the scheduler format see:<br/>
+ * Uses a cronjob for defining the execution of the base rat input.<br>
+ * For more information on the scheduler format see:<br>
  * http:&#47;&#47;www.quartz-scheduler.org&#47;docs&#47;tutorials&#47;crontrigger.html
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

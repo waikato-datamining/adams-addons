@@ -28,7 +28,7 @@ import adams.flow.core.Compatibility;
 /**
  <!-- globalinfo-start -->
  * Extracts the specified value from the container and passes this on to the base rat output scheme.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

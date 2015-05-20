@@ -24,7 +24,7 @@ import adams.flow.standalone.Rat;
 /**
  <!-- globalinfo-start -->
  * Generates a dummy Rat setup.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

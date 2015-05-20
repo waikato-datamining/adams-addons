@@ -36,14 +36,14 @@ import java.awt.Color;
 /**
  <!-- globalinfo-start -->
  * Actor that displays heatmaps.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
- * Input&#47;output:<br/>
- * - accepts:<br/>
- * &nbsp;&nbsp;&nbsp;adams.data.heatmap.Heatmap<br/>
- * <p/>
+ * Input&#47;output:<br>
+ * - accepts:<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.heatmap.Heatmap<br>
+ * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->

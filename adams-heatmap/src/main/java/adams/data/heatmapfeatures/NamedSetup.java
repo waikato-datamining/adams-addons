@@ -28,7 +28,7 @@ import java.util.List;
 /**
  <!-- globalinfo-start -->
  * Applies a hetmap feature generator that is referenced via its global setup name (see 'NamedSetups').
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

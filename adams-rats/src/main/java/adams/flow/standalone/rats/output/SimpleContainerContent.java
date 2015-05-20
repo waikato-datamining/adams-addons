@@ -27,7 +27,7 @@ import adams.flow.core.Compatibility;
 /**
  <!-- globalinfo-start -->
  * Extracts the content from the 'simple' container (containers derived from adams.data.container.AbstractSimpleContainer) and passes this on to the base rat output scheme.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

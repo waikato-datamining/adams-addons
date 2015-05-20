@@ -31,7 +31,7 @@ import java.util.List;
 /**
  <!-- globalinfo-start -->
  * Overlays the heatmap with the points that have the highest temperature.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

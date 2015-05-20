@@ -28,7 +28,7 @@ import adams.flow.core.Unknown;
 /**
  <!-- globalinfo-start -->
  * Distributes the incoming data in the specified queues in internal storage, iterating through the different queues.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

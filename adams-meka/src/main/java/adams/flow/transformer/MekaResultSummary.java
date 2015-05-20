@@ -27,20 +27,20 @@ import adams.flow.core.Token;
 /**
  <!-- globalinfo-start -->
  * Turns the Meka meka.core.Result object into a string.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
- * Input&#47;output:<br/>
- * - accepts:<br/>
- * &nbsp;&nbsp;&nbsp;meka.core.Result<br/>
- * &nbsp;&nbsp;&nbsp;adams.flow.container.MekaResultContainer<br/>
- * - generates:<br/>
- * &nbsp;&nbsp;&nbsp;java.lang.String<br/>
- * <p/>
- * Container information:<br/>
+ * Input&#47;output:<br>
+ * - accepts:<br>
+ * &nbsp;&nbsp;&nbsp;meka.core.Result<br>
+ * &nbsp;&nbsp;&nbsp;adams.flow.container.MekaResultContainer<br>
+ * - generates:<br>
+ * &nbsp;&nbsp;&nbsp;java.lang.String<br>
+ * <br><br>
+ * Container information:<br>
  * - adams.flow.container.MekaResultContainer: Result, Model
- * <p/>
+ * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->

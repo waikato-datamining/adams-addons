@@ -28,13 +28,13 @@ import adams.data.image.AbstractImageContainer;
 
 /**
  <!-- globalinfo-start -->
- * Turns a class java.awt.image.BufferedImage into a heatmap.<br/>
+ * Turns a class java.awt.image.BufferedImage into a heatmap.<br>
  * Simply uses the RGB value as heatmap value.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <p/>
+ * Valid options are: <br><br>
  * 
  * <pre>-D &lt;int&gt; (property: debugLevel)
  * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to 

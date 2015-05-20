@@ -35,7 +35,7 @@ import adams.flow.core.Unknown;
 /**
  <!-- globalinfo-start -->
  * Meta-receiver that passes the received data through a callable transformer before passing it on.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

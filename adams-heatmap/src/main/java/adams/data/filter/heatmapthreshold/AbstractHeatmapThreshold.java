@@ -35,7 +35,7 @@ public abstract class AbstractHeatmapThreshold
   /**
    * Checks whether the heatmap can be processed, throws an {@link java.lang.IllegalArgumentException}
    * if not.
-   * <p/>
+   * <br><br>
    * Default implementation only checks whether a heatmap is present.
    *
    * @param map		the heatmap to check.

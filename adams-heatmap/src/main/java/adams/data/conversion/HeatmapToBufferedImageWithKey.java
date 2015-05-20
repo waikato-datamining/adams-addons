@@ -36,7 +36,7 @@ import java.text.DecimalFormat;
 /**
  <!-- globalinfo-start -->
  * Turns a heatmap into a BufferedImage, allows the generation of a key in the image.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

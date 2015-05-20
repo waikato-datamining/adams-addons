@@ -31,7 +31,7 @@ import adams.core.io.PlaceholderDirectory;
 /**
  <!-- globalinfo-start -->
  * Basic generator.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

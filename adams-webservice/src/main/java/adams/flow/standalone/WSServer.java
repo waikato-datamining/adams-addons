@@ -40,7 +40,7 @@ import com.example.customerservice.flow.CustomerServiceWS;
 /**
  <!-- globalinfo-start -->
  * Runs a webservice.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->

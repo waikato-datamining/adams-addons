@@ -219,7 +219,7 @@ public abstract class AbstractWebServiceProvider
 
   /**
    * Performs some initial checks before starting the service.
-   * <p/>
+   * <br><br>
    * Default implementation does nothing.
    */
   protected void check() {

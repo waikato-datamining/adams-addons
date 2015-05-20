@@ -33,18 +33,18 @@ import java.awt.image.BufferedImage;
 
 /**
  <!-- globalinfo-start -->
- * Locates objects in a heatmap and forwards a sub-heatmap per located object, cropped around the object.<br/>
+ * Locates objects in a heatmap and forwards a sub-heatmap per located object, cropped around the object.<br>
  * It is also possible to simply annotate the heatmap by storing the locations of the located objects in the report.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
- * Input&#47;output:<br/>
- * - accepts:<br/>
- * &nbsp;&nbsp;&nbsp;adams.data.heatmap.Heatmap<br/>
- * - generates:<br/>
- * &nbsp;&nbsp;&nbsp;adams.data.heatmap.Heatmap<br/>
- * <p/>
+ * Input&#47;output:<br>
+ * - accepts:<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.heatmap.Heatmap<br>
+ * - generates:<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.heatmap.Heatmap<br>
+ * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->

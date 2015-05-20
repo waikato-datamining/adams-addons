@@ -25,11 +25,11 @@ import adams.data.heatmap.Heatmap;
 /**
  <!-- globalinfo-start -->
  * Outputs the largest intensity value in the heatmap as feature.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <p/>
+ * Valid options are: <br><br>
  *
  * <pre>-D &lt;int&gt; (property: debugLevel)
  * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to

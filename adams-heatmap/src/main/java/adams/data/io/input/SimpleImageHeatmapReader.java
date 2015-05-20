@@ -32,7 +32,7 @@ import java.util.logging.Level;
 /**
  <!-- globalinfo-start -->
  * Reads an image with the specified reader and turns the grayscale version of the image into a heatmap.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

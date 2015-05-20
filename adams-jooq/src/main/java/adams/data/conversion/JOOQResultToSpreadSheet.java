@@ -32,7 +32,7 @@ import adams.data.spreadsheet.SqlUtils.Reader;
 /**
  <!-- globalinfo-start -->
  * Converts a jOOQ query Result to a SpreadSheet object.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

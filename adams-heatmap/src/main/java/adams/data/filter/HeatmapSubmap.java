@@ -25,11 +25,11 @@ import adams.data.heatmap.Heatmap;
 /**
  <!-- globalinfo-start -->
  * Creates a submap, specified by the coordinates of the top-left corner (row and column), width and height.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <p/>
+ * Valid options are: <br><br>
  *
  * <pre>-D &lt;int&gt; (property: debugLevel)
  * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to

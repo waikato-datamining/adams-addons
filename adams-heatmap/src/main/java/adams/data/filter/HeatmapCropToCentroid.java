@@ -28,11 +28,11 @@ import adams.data.report.Field;
 /**
  <!-- globalinfo-start -->
  * Generates a cropped heatmap centered around the centroid calculated on the pre-filtered data.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <p/>
+ * Valid options are: <br><br>
  *
  * <pre>-D &lt;int&gt; (property: debugLevel)
  * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to

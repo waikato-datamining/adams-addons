@@ -37,7 +37,7 @@ public abstract class AbstractJOOQCodeGeneratorProvider
 
   /**
    * Performs some checks.
-   * <p/>
+   * <br><br>
    * Default implementation does nothing.
    */
   protected void check() {

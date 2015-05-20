@@ -32,7 +32,7 @@ import java.awt.Point;
 /**
  <!-- globalinfo-start -->
  * Generates a cropped heatmap centered around the centroid calculated on the pre-filtered data.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->

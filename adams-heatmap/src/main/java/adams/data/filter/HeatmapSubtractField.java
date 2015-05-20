@@ -26,13 +26,13 @@ import adams.data.report.Field;
 
 /**
  <!-- globalinfo-start -->
- * Subtracts the value of the numeric field from all non-zero heatmap values.<br/>
+ * Subtracts the value of the numeric field from all non-zero heatmap values.<br>
  * Values that fall below zero are automatically set to zero (minimum value for a heatmap).
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <p/>
+ * Valid options are: <br><br>
  *
  * <pre>-D &lt;int&gt; (property: debugLevel)
  * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to

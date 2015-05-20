@@ -30,11 +30,11 @@ import adams.data.report.Field;
 
 /**
  <!-- globalinfo-start -->
- * Computes the centroid of a heatmap and adds this to the heatmap's report.<br/>
- * It is possible to perform multiple iterations and each time with a shrunken heatmap. This is useful if the centroid cannot be computed reliably the first time.<br/>
- * For more information on the centroid calculation, see:<br/>
+ * Computes the centroid of a heatmap and adds this to the heatmap's report.<br>
+ * It is possible to perform multiple iterations and each time with a shrunken heatmap. This is useful if the centroid cannot be computed reliably the first time.<br>
+ * For more information on the centroid calculation, see:<br>
  * WikiPedia. Image moment.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- technical-bibtex-start -->
@@ -46,11 +46,11 @@ import adams.data.report.Field;
  *    HTTP = {http:&#47;&#47;en.wikipedia.org&#47;wiki&#47;Image_moment}
  * }
  * </pre>
- * <p/>
+ * <br><br>
  <!-- technical-bibtex-end -->
  *
  <!-- options-start -->
- * Valid options are: <p/>
+ * Valid options are: <br><br>
  *
  * <pre>-D &lt;int&gt; (property: debugLevel)
  * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to

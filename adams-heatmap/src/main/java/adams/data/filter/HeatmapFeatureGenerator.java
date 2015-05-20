@@ -29,11 +29,11 @@ import adams.db.DatabaseConnectionHandler;
 /**
  <!-- globalinfo-start -->
  * A filter that modifies the quantitation reports of chromatograms being passed through. The supplied quantitation report filter updates/modifies the quantitation report.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <p/>
+ * Valid options are: <br><br>
  *
  * <pre>-D (property: debug)
  *         If set to true, scheme may output additional info to the console.

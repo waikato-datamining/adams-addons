@@ -123,7 +123,7 @@ public abstract class AbstractSelectedHeatmapsViewerPluginWithGOE
 
   /**
    * Initializes the processing.
-   * <p/>
+   * <br><br>
    * Sets the last setup.
    *
    * @return		null if successful, otherwise error message

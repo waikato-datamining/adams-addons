@@ -28,14 +28,14 @@ import adams.flow.core.Token;
 /**
  <!-- globalinfo-start -->
  * Outputs an instance of the specified MEKA classifier.
- * <p/>
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
- * Input&#47;output:<br/>
- * - generates:<br/>
- * &nbsp;&nbsp;&nbsp;meka.classifiers.multilabel.MultilabelClassifier<br/>
- * <p/>
+ * Input&#47;output:<br>
+ * - generates:<br>
+ * &nbsp;&nbsp;&nbsp;meka.classifiers.multilabel.MultilabelClassifier<br>
+ * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->
