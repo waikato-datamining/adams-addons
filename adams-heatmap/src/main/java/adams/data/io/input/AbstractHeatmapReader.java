@@ -15,7 +15,7 @@
 
 /**
  * AbstractHeatmapReader.java
- * Copyright (C) 2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.input;
 
@@ -36,6 +36,61 @@ public abstract class AbstractHeatmapReader
   /** for serialization. */
   private static final long serialVersionUID = -2206748744422806213L;
 
+  /** whether to use absolute filename for the source report field or just the file's name. */
+  protected boolean m_UseAbsoluteSource;
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+	    "use-absolute-source", "useAbsoluteSource",
+	    getUseAbsoluteSource());
+  }
+
+  /**
+   * Returns the default for using absolute source filename.
+   *
+   * @return		the default
+   */
+  protected boolean getDefaultUseAbsoluteSource() {
+    return true;
+  }
+
+  /**
+   * Sets whether to use absolute source filename rather than just name.
+   *
+   * @param value 	true if to use absolute source
+   */
+  public void setUseAbsoluteSource(boolean value) {
+    m_UseAbsoluteSource = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to use absolute source filename rather than just name.
+   *
+   * @return 		true if to use absolute source
+   */
+  public boolean getUseAbsoluteSource() {
+    return m_UseAbsoluteSource;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String useAbsoluteSourceTipText() {
+    return
+      "If enabled the source report field stores the absolute file name "
+        + "rather than just the name.";
+  }
+
   /**
    * For performing post-processing.
    */
@@ -45,8 +100,11 @@ public abstract class AbstractHeatmapReader
     for (Heatmap map: m_ReadData) {
       // set filename
       if (map.hasReport()) {
-	map.getReport().addField(new Field(Heatmap.FIELD_FILENAME, DataType.NUMERIC));
-	map.getReport().setStringValue(Heatmap.FIELD_FILENAME, m_Input.getAbsolutePath());
+	map.getReport().addField(new Field(Heatmap.FIELD_FILENAME, DataType.STRING));
+        if (m_UseAbsoluteSource)
+	  map.getReport().setStringValue(Heatmap.FIELD_FILENAME, m_Input.getAbsolutePath());
+	else
+	  map.getReport().setStringValue(Heatmap.FIELD_FILENAME, m_Input.getName());
       }
       // fix ID
       if (map.getID().trim().length() == 0)

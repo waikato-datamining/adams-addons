@@ -15,11 +15,9 @@
 
 /**
  * AbstractHeatmapReaderTestCase.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.input;
-
-import java.util.List;
 
 import adams.core.CleanUpHandler;
 import adams.core.Destroyable;
@@ -29,6 +27,8 @@ import adams.test.AbstractTestHelper;
 import adams.test.AdamsTestCase;
 import adams.test.TestHelper;
 import adams.test.TmpFile;
+
+import java.util.List;
 
 /**
  * Ancestor for heatmap reader test cases.
@@ -68,6 +68,7 @@ public abstract class AbstractHeatmapReaderTestCase
   protected List<Heatmap> load(String filename, AbstractHeatmapReader scheme) {
     List<Heatmap>	result;
 
+    scheme.setUseAbsoluteSource(false);
     m_TestHelper.copyResourceToTmp(filename);
     scheme.setInput(new TmpFile(filename));
     result = scheme.read();
