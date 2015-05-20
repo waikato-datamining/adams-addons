@@ -120,6 +120,7 @@ public class HeatmapLocateObjectsTest
       adams.flow.transformer.HeatmapFileReader heatmapfilereader4 = new adams.flow.transformer.HeatmapFileReader();
       argOption = (AbstractArgumentOption) heatmapfilereader4.getOptionManager().findByProperty("reader");
       adams.data.io.input.SimpleImageHeatmapReader simpleimageheatmapreader6 = new adams.data.io.input.SimpleImageHeatmapReader();
+      simpleimageheatmapreader6.setUseAbsoluteSource(false);
       argOption = (AbstractArgumentOption) simpleimageheatmapreader6.getOptionManager().findByProperty("reader");
       adams.data.io.input.JAIImageReader jaiimagereader8 = new adams.data.io.input.JAIImageReader();
       simpleimageheatmapreader6.setReader(jaiimagereader8);

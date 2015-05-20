@@ -1,7 +1,7 @@
 --> dumpfile.txt
 Field,Type,Value
 "Parent ID",N,-1
-Filename,S,/tmp/particles.jpg
+Filename,S,particles.jpg
 Object.1.height,N,66
 Object.1.width,N,66
 Object.1.x,N,145
