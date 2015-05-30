@@ -15,14 +15,13 @@
 
 /**
  * AbstractRatInput.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
 import adams.core.CleanUpHandler;
 import adams.core.QuickInfoSupporter;
 import adams.core.ShallowCopySupporter;
-import adams.core.Stoppable;
 import adams.core.Utils;
 import adams.core.logging.LoggingHelper;
 import adams.core.option.AbstractOptionHandler;
@@ -41,7 +40,7 @@ import adams.flow.standalone.Rat;
  */
 public abstract class AbstractRatInput
   extends AbstractOptionHandler
-  implements RatInput, ShallowCopySupporter<AbstractRatInput>, Stoppable,
+  implements RatInput, ShallowCopySupporter<AbstractRatInput>,
              QuickInfoSupporter, CleanUpHandler {
 
   /** for serialization. */

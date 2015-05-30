@@ -15,17 +15,13 @@
 
 /**
  * AbstractRatOutput.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
-
-import java.util.HashSet;
-import java.util.Hashtable;
 
 import adams.core.CleanUpHandler;
 import adams.core.QuickInfoSupporter;
 import adams.core.ShallowCopySupporter;
-import adams.core.Stoppable;
 import adams.core.Utils;
 import adams.core.Variables;
 import adams.core.logging.LoggingHelper;
@@ -40,6 +36,9 @@ import adams.flow.core.QueueHelper;
 import adams.flow.standalone.QueueInit;
 import adams.flow.standalone.Rat;
 
+import java.util.HashSet;
+import java.util.Hashtable;
+
 /**
  * Ancestor for output transmitters.
  * 
@@ -48,7 +47,7 @@ import adams.flow.standalone.Rat;
  */
 public abstract class AbstractRatOutput
   extends AbstractOptionHandler
-  implements RatOutput, ShallowCopySupporter<AbstractRatOutput>, Stoppable, 
+  implements RatOutput, ShallowCopySupporter<AbstractRatOutput>,
              QuickInfoSupporter, CleanUpHandler {
 
   /** for serialization. */

@@ -15,11 +15,11 @@
 
 /**
  * RatOutput.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
 
-import adams.core.Stoppable;
+import adams.core.StoppableWithFeedback;
 import adams.event.VariableChangeEvent;
 import adams.event.VariableChangeListener;
 import adams.flow.standalone.Rat;
@@ -31,7 +31,7 @@ import adams.flow.standalone.Rat;
  * @version $Revision$
  */
 public interface RatOutput
-  extends Stoppable, VariableChangeListener {
+  extends StoppableWithFeedback, VariableChangeListener {
 
   /**
    * Returns the full name of the receiver.

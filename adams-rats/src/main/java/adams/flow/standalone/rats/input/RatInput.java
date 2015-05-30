@@ -15,11 +15,11 @@
 
 /**
  * RatInput.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
-import adams.core.Stoppable;
+import adams.core.StoppableWithFeedback;
 import adams.flow.standalone.Rat;
 
 /**
@@ -29,7 +29,7 @@ import adams.flow.standalone.Rat;
  * @version $Revision$
  */
 public interface RatInput
-  extends Stoppable {
+  extends StoppableWithFeedback {
 
   /**
    * Returns the full name of the receiver.
