@@ -67,41 +67,7 @@ public class RatRunnable
   public Rat getOwner() {
     return m_Owner;
   }
-  
-  /**
-   * A simple waiting method.
-   * 
-   * @param msec	the maximum number of milli-seconds to wait, no waiting if 0
-   */
-  protected void doWait(int msec) {
-    int		count;
-    int		current;
-    
-    if (msec == 0)
-      return;
-    
-    if (isLoggingEnabled())
-      getLogger().fine("doWait: " + msec);
-    
-    count = 0;
-    while ((count < msec) && !m_Stopped) {
-      try {
-	current = msec - 100;
-	if (current <= 0)
-	  current = msec;
-	if (current > 100)
-	  current = 100;
-	synchronized(this) {
-	  wait(current);
-	}
-	count += current;
-      }
-      catch (Throwable t) {
-	// ignored
-      }
-    }
-  }
-  
+
   /**
    * Transmits the data.
    * 
@@ -115,7 +81,7 @@ public class RatRunnable
 
     if (data != null) {
       while (!m_Owner.getTransmitter().canInput() && !m_Stopped)
-	doWait(100);
+	Utils.wait(this, this, 100, 100);
 
       if (!m_Stopped) {
 	if (isLoggingEnabled())
@@ -147,7 +113,7 @@ public class RatRunnable
     
     while (!m_Stopped) {
       while (m_Paused && !m_Stopped)
-	doWait(100);
+	Utils.wait(this, this, 100, 100);
       
       data = null;
       if (isLoggingEnabled())
@@ -221,7 +187,7 @@ public class RatRunnable
       // wait before next poll?
       if (!m_Stopped) {
 	if (m_Owner.getReceiver() instanceof PollingRatInput) {
-	  doWait(((PollingRatInput) m_Owner.getReceiver()).getWaitPoll());
+	  Utils.wait(this, this, ((PollingRatInput) m_Owner.getReceiver()).getWaitPoll(), 100);
 	}
       }
     }
