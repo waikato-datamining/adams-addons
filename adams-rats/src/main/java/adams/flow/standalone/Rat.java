@@ -15,13 +15,9 @@
 
 /**
  * Rat.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
-
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 
 import adams.core.Pausable;
 import adams.core.Properties;
@@ -31,7 +27,6 @@ import adams.core.Variables;
 import adams.core.base.BaseRegExp;
 import adams.db.LogEntry;
 import adams.flow.container.ErrorContainer;
-import adams.flow.control.Breakpoint;
 import adams.flow.control.LocalScopeTransformer;
 import adams.flow.control.ScopeHandler.ScopeHandling;
 import adams.flow.control.StorageName;
@@ -53,6 +48,10 @@ import adams.flow.standalone.rats.input.DummyInput;
 import adams.flow.standalone.rats.input.RatInput;
 import adams.flow.standalone.rats.output.DummyOutput;
 import adams.flow.standalone.rats.output.RatOutput;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -1034,12 +1033,8 @@ public class Rat
     if (result == null) {
       // redirect error handling
       ActorUtils.updateErrorHandler(this, this, isLoggingEnabled());
-      // disable stop buttons in breakpoints
-      breakpoints = ActorUtils.enumerate(this, new Class[]{Breakpoint.class});
-      for (AbstractActor actor: breakpoints)
-	((Breakpoint) actor).setStopButtonEnabled(false);
     }
-    
+
     return result;
   }
 
