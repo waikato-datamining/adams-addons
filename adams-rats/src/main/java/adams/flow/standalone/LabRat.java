@@ -15,7 +15,7 @@
 
 /**
  * LabRat.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
@@ -158,7 +158,6 @@ public class LabRat
       rat = m_Generator.generate();
       if (rat.getName().equals(rat.getDefaultName()))
 	rat.setName(getName());
-      rat.setHeadless(isHeadless());
       rat.setVariables(getVariables());
       ((ActorHandler) getParent()).set(index(), rat);
       result = rat.setUp();

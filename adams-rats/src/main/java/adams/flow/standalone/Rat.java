@@ -860,18 +860,6 @@ public class Rat
   public Actor getInternalActor() {
     return m_Actors;
   }
-  
-  /**
-   * Sets whether the actor is to be run in headless mode, i.e., suppressing
-   * GUI components.
-   *
-   * @param value	if true then GUI components will be suppressed
-   */
-  @Override
-  public void setHeadless(boolean value) {
-    super.setHeadless(value);
-    m_Actors.setHeadless(value);
-  }
 
   /**
    * Tries to find the callable actor referenced by its callable name.

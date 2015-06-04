@@ -15,12 +15,9 @@
 
 /**
  * InputWithExternalTransformer.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
@@ -32,6 +29,9 @@ import adams.flow.core.InputConsumer;
 import adams.flow.core.OutputProducer;
 import adams.flow.core.Token;
 import adams.flow.core.Unknown;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -162,7 +162,6 @@ public class InputWithExternalTransformer
       }
       else {
 	m_ExternalActor.setParent(getOwner());
-	m_ExternalActor.setHeadless(getOwner().isHeadless());
 	m_ExternalActor.setVariables(getOwner().getVariables());
 	result = m_ExternalActor.setUp();
 	// make sure we've got the current state of the variables

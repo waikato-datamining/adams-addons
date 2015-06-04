@@ -385,7 +385,7 @@ public class HeatmapLocateObjects
     }
 
     // doesn't work in headless mode
-    if (m_Headless) {
+    if (isHeadless()) {
       m_OutputToken = new Token(heatmap);
       return result;
     }
