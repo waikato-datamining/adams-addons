@@ -15,7 +15,7 @@
 
 /**
  * WSTransformer.java
- * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.transformer;
 
@@ -91,6 +91,9 @@ public class WSTransformer
   /** for serialization. */
   private static final long serialVersionUID = 3217721167611538066L;
 
+  /** the input token. */
+  protected Token m_InputToken;
+
   /**
    * Returns a string describing the object.
    *
@@ -143,7 +146,26 @@ public class WSTransformer
    */
   @Override
   public void input(Token token) {
+    m_InputToken = token;
     ((WebServiceClientConsumer) m_Client).setRequestData(token.getPayload());
+  }
+
+  /**
+   * Returns whether an input token is currently present.
+   *
+   * @return		true if input token present
+   */
+  public boolean hasInput() {
+    return (m_InputToken != null);
+  }
+
+  /**
+   * Returns the current input token, if any.
+   *
+   * @return		the input token, null if none present
+   */
+  public Token currentInput() {
+    return m_InputToken;
   }
 
   /**
@@ -184,9 +206,20 @@ public class WSTransformer
    */
   @Override
   public Token output() {
+    m_InputToken = null;
     return new Token(((WebServiceClientProducer) m_Client).getResponseData());
   }
-  
+
+  /**
+   * Cleans up after the execution has finished. Graphical output is left
+   * untouched.
+   */
+  @Override
+  public void wrapUp() {
+    m_InputToken = null;
+    super.wrapUp();
+  }
+
   /**
    * Cleans up the actor.
    */
