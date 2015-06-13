@@ -80,7 +80,7 @@
     <dependency>
       <groupId>net.sf.meka</groupId>
       <artifactId>meka</artifactId>
-      <version>1.7.5</version>
+      <version>1.7.6</version>
     </dependency>
   </dependencies>
 
