@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2014-01-31 09:00:13
+# Date: 2015-06-18 20:35:28
 # User: fracpete
 #
 adams.flow.control.Flow
@@ -9,10 +9,14 @@ adams.flow.control.Flow
 		adams.flow.source.WSSource
 			-client
 				adams.flow.webservice.ListClusterers
+					-in-interceptor
+						adams.flow.webservice.interceptor.incoming.NullGenerator
 	-actor
 		adams.flow.transformer.CollectionToSequence
 	-actor
-		adams.flow.sink.HistoryDisplay
+		adams.flow.sink.Display
+			-writer
+				adams.data.io.output.NullWriter
 	-flow-execution-listener
 		adams.flow.execution.NullListener
 
