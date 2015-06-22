@@ -6,11 +6,11 @@
   <parent>
     <groupId>nz.ac.waikato.cms.adams</groupId>
     <artifactId>adams-pom</artifactId>
-    <version>0.4.9-SNAPSHOT</version>
+    <version>0.4.9</version>
   </parent>
 
   <artifactId>adams-addons-pom</artifactId>
-  <version>0.4.9-SNAPSHOT</version>
+  <version>0.4.9</version>
   <packaging>pom</packaging>
 
   <name>adams-addons-pom</name>
@@ -28,7 +28,7 @@
   </scm>
 
   <properties>
-    <adams.version>0.4.9-SNAPSHOT</adams.version>
+    <adams.version>0.4.9</adams.version>
   </properties>
 
   <modules>
