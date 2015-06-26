@@ -15,22 +15,15 @@
 
 /**
  * InterceptorHelper.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice.interceptor;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringWriter;
-
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
+import adams.core.License;
+import adams.core.annotation.MixedCopyright;
+import adams.flow.webservice.interceptor.outgoing.BaseLogging;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.LoggingMessage;
 import org.apache.cxf.io.CachedOutputStream;
@@ -38,9 +31,14 @@ import org.apache.cxf.io.CachedWriter;
 import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.message.Message;
 
-import adams.core.License;
-import adams.core.annotation.MixedCopyright;
-import adams.flow.webservice.interceptor.outgoing.BaseLogging;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringWriter;
 
 /**
  * Helper class for interceptor related stuff.
@@ -113,7 +111,7 @@ public class InterceptorHelper {
     // Just transform the XML message when the cos has content
     if (((contentType != null) && (contentType.indexOf("xml") >= 0) 
 	&& contentType.toLowerCase().indexOf("multipart/related") < 0) && (cos.size() > 0)) {
-      Transformer serializer = XMLUtils.newTransformer(2);
+      Transformer serializer = TransformerFactory.newInstance().newTransformer();
       // Setup indenting to "pretty print"
       serializer.setOutputProperty(OutputKeys.INDENT, "yes");
       serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
@@ -142,7 +140,7 @@ public class InterceptorHelper {
     // Just transform the XML message when the cos has content
     if ((contentType != null && contentType.indexOf("xml") >= 0 
 	&& contentType.toLowerCase().indexOf("multipart/related") < 0) && cos.size() > 0) {
-      Transformer serializer = XMLUtils.newTransformer(2);
+      Transformer serializer = TransformerFactory.newInstance().newTransformer();
       // Setup indenting to "pretty print"
       serializer.setOutputProperty(OutputKeys.INDENT, "yes");
       serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
