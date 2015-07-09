@@ -76,6 +76,18 @@
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>
+
+    <dependency>
+      <groupId>org.boofcv</groupId>
+      <artifactId>WebcamCapture</artifactId>
+      <version>0.18</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.boofcv</groupId>
+      <artifactId>xuggler</artifactId>
+      <version>0.18</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -108,10 +120,10 @@
             <configuration>
               <attach>true</attach>
               <descriptors>
-                <!--descriptor>src/main/assembly/doc.xml</descriptor-->
-                <!--descriptor>src/main/assembly/flows.xml</descriptor-->
+                <descriptor>src/main/assembly/doc.xml</descriptor>
+                <descriptor>src/main/assembly/flows.xml</descriptor>
                 <descriptor>src/main/assembly/sources.xml</descriptor>
-                <!--descriptor>src/main/assembly/test-sources.xml</descriptor-->
+                <descriptor>src/main/assembly/test-sources.xml</descriptor>
               </descriptors>
             </configuration>
           </execution>
