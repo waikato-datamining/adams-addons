@@ -14,7 +14,7 @@
  */
 
 /**
- * Circulant.java
+ * BoofCVCirculant.java
  * Copyright (C) 2015 University of Waikato, Hamilton, NZ
  */
 
