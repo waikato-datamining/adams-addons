@@ -10,3 +10,7 @@
 # the ffmpeg plugins
 adams.flow.sink.ffmpeg.AbstractFFmpegPlugin=\
   adams.flow.sink.ffmpeg
+
+# the object trackers
+adams.flow.transformer.objecttracker.ObjectTracker=\
+  adams.flow.transformer.objecttracker
