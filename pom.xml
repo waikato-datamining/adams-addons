@@ -41,6 +41,7 @@
     <module>adams-meka</module>
     <module>adams-phmm4weka</module>
     <module>adams-rats</module>
+    <module>adams-video</module>
     <module>adams-webservice</module>
     <module>adams-weka-webservice</module>
   </modules>
