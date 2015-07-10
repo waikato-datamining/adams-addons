@@ -22,7 +22,6 @@ package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
-import adams.core.base.BaseURI;
 import adams.core.base.BaseURL;
 import adams.core.io.PlaceholderFile;
 import adams.data.boofcv.BoofCVImageContainer;
@@ -41,10 +40,13 @@ import boofcv.io.video.VideoMjpegCodec;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import org.apache.commons.codec.binary.Base64;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 
 /**
@@ -61,7 +63,6 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;java.lang.String<br>
  * &nbsp;&nbsp;&nbsp;java.io.File<br>
  * &nbsp;&nbsp;&nbsp;adams.core.base.BaseURL<br>
- * &nbsp;&nbsp;&nbsp;adams.core.base.BaseURI<br>
  * - generates:<br>
  * &nbsp;&nbsp;&nbsp;adams.data.image.BufferedImageContainer<br>
  * <br><br>
@@ -207,7 +208,7 @@ public class MjpegImageSequence
    * @return		the Class of objects that can be processed
    */
   public Class[] accepts() {
-    return new Class[]{String.class, File.class, BaseURL.class, BaseURI.class};
+    return new Class[]{String.class, File.class, BaseURL.class};
   }
 
   /**
@@ -242,6 +243,9 @@ public class MjpegImageSequence
     PlaceholderFile	file;
     VideoMjpegCodec 	codec;
     List<byte[]> 	data;
+    URL 		url;
+    URLConnection 	conn;
+    String 		basicAuth;
 
     result = null;
 
@@ -262,13 +266,16 @@ public class MjpegImageSequence
 	result = handleException("Failed to open video file: " + payload, e);
       }
     }
-    else if ((payload instanceof BaseURL) || (payload instanceof BaseURI)) {
+    else if (payload instanceof BaseURL) {
       try {
-	codec = new VideoMjpegCodec();
-	if (payload instanceof BaseURL)
-	  data = codec.read(((BaseURL) payload).urlValue().openStream());
-	else
-	  data = codec.read(((BaseURI) payload).uriValue().toURL().openStream());
+	url = ((BaseURL) payload).urlValue();
+	conn = url.openConnection();
+	if (url.getUserInfo() != null) {
+	  basicAuth = "Basic " + new String(new Base64().encode(url.getUserInfo().getBytes()));
+	  conn.setRequestProperty("Authorization", basicAuth);
+	}
+	codec   = new VideoMjpegCodec();
+	data    = codec.read(conn.getInputStream());
 	m_Video = new JpegByteImageSequence<ImageFloat32>(ImageFloat32.class, data, false);
       }
       catch (Exception e) {
