@@ -33,9 +33,11 @@ import adams.flow.provenance.ProvenanceSupporter;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
 import com.github.sarxos.webcam.Webcam;
 
+import java.util.List;
+
 /**
  <!-- globalinfo-start -->
- * Grabs a frame from the default webcam.
+ * Grabs a frame from the specified webcam.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -79,6 +81,11 @@ import com.github.sarxos.webcam.Webcam;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
+ * <pre>-webcam &lt;java.lang.String&gt; (property: webcam)
+ * &nbsp;&nbsp;&nbsp;The webcam name (leave empty for default one).
+ * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
  * <pre>-width &lt;int&gt; (property: width)
  * &nbsp;&nbsp;&nbsp;The width of the image.
  * &nbsp;&nbsp;&nbsp;default: 640
@@ -118,8 +125,11 @@ public class WebcamImage
   /** the conversion to perform. */
   protected BufferedImageToOtherFormatConversion m_Conversion;
 
+  /** the webcam to access. */
+  protected String m_Webcam;
+
   /** the webcam. */
-  protected transient Webcam m_Webcam;
+  protected transient Webcam m_Current;
 
   /**
    * Returns a string describing the object.
@@ -128,7 +138,7 @@ public class WebcamImage
    */
   @Override
   public String globalInfo() {
-    return "Grabs a frame from the default webcam.";
+    return "Grabs a frame from the specified webcam.";
   }
 
   /**
@@ -137,6 +147,10 @@ public class WebcamImage
   @Override
   public void defineOptions() {
     super.defineOptions();
+
+    m_OptionManager.add(
+      "webcam", "webcam",
+      "");
 
     m_OptionManager.add(
       "width", "width",
@@ -160,11 +174,41 @@ public class WebcamImage
   public String getQuickInfo() {
     String	result;
 
-    result  = QuickInfoHelper.toString(this, "width", m_Width);
+    result  = QuickInfoHelper.toString(this, "webcam", (m_Webcam.isEmpty() ? "-default-" : m_Webcam), "webcam: ");
+    result += QuickInfoHelper.toString(this, "width", m_Width, ", resolution: ");
     result += " x ";
     result += QuickInfoHelper.toString(this, "height", m_Height);
 
     return result;
+  }
+
+  /**
+   * Sets the webcam name (leave empty for default one).
+   *
+   * @param value	the webcam
+   */
+  public void setWebcam(String value) {
+    m_Webcam = value;
+    reset();
+  }
+
+  /**
+   * Returns the webcam name (leave empty for default one).
+   *
+   * @return		the webcam
+   */
+  public String getWebcam() {
+    return m_Webcam;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String webcamTipText() {
+    return "The webcam name (leave empty for default one).";
   }
 
   /**
@@ -293,13 +337,32 @@ public class WebcamImage
    */
   @Override
   protected String doExecute() {
-    String	result;
+    String		result;
+    List<Webcam> 	webcams;
 
     result = null;
 
-    if (m_Webcam == null) {
+    if (m_Current == null) {
       try {
-	m_Webcam = UtilWebcamCapture.openDefault(getWidth(), getHeight());
+	if (m_Webcam.trim().isEmpty()) {
+	  m_Current = Webcam.getDefault();
+	}
+	else {
+	  webcams = Webcam.getWebcams();
+	  for (Webcam webcam: webcams) {
+	    if (webcam.getName().equals(m_Webcam)) {
+	      m_Current = webcam;
+	      break;
+	    }
+	  }
+	  if (m_Current == null) {
+	    result = "Failed to locate webcam '" + m_Webcam + "'!";
+	  }
+	}
+	if (m_Current != null) {
+	  UtilWebcamCapture.adjustResolution(m_Current, getWidth(), getHeight());
+	  m_Current.open();
+	}
       }
       catch (Throwable e) {
 	result = handleException("Failed to access webcam:", e);
@@ -317,7 +380,7 @@ public class WebcamImage
    */
   @Override
   public boolean hasPendingOutput() {
-    return (m_Webcam != null);
+    return (m_Current != null);
   }
 
   /**
@@ -333,9 +396,9 @@ public class WebcamImage
 
     result = null;
 
-    if (m_Webcam != null) {
+    if (m_Current != null) {
       cont = new BufferedImageContainer();
-      cont.setImage(m_Webcam.getImage());
+      cont.setImage(m_Current.getImage());
 
       if (!(m_Conversion instanceof BufferedImageToBufferedImage)) {
 	m_Conversion.setInput(cont);
@@ -371,9 +434,9 @@ public class WebcamImage
    */
   @Override
   public void wrapUp() {
-    if (m_Webcam != null) {
-      m_Webcam.close();
-      m_Webcam = null;
+    if (m_Current != null) {
+      m_Current.close();
+      m_Current = null;
     }
     super.wrapUp();
   }
