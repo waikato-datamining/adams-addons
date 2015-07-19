@@ -14,13 +14,17 @@
  */
 
 /*
- * BaseString.java
- * Copyright (C) 2009-2012 University of Waikato, Hamilton, New Zealand
+ * QuadrilateralLocation.java
+ * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.core.base;
 
+import adams.data.statistics.StatUtils;
 import georegression.struct.shapes.Quadrilateral_F64;
+
+import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 
 /**
  * Wrapper for a quadrilateral location object to be editable in the GOE.
@@ -129,7 +133,7 @@ public class QuadrilateralLocation
   /**
    * Returns the quadrilateral location.
    *
-   * @return		the location
+   * @return		the quadrilateral
    */
   public Quadrilateral_F64 quadrilateralValue() {
     Quadrilateral_F64	result;
@@ -141,6 +145,66 @@ public class QuadrilateralLocation
       parts[2], parts[3],
       parts[4], parts[5],
       parts[6], parts[7]);
+
+    return result;
+  }
+
+  /**
+   * Returns the location as rectangle that the quadrilateral object fits in.
+   *
+   * @return		the rectangle
+   */
+  public Rectangle rectangleValue() {
+    Rectangle 		result;
+    double[]		parts;
+    double[]		x;
+    double[]		y;
+    double		left;
+    double		right;
+    double		top;
+    double		bottom;
+
+    parts  = doubleValue();
+    x      = new double[]{parts[0], parts[2], parts[4], parts[6]};
+    y      = new double[]{parts[1], parts[3], parts[5], parts[7]};
+    left   = StatUtils.min(x);
+    right  = StatUtils.max(x);
+    top    = StatUtils.min(y);
+    bottom = StatUtils.max(y);
+    result = new Rectangle(
+      (int) Math.round(left),
+      (int) Math.round(top),
+      (int) Math.round(right - left),
+      (int) Math.round(bottom - top));
+
+    return result;
+  }
+
+  /**
+   * Returns the center of the quadrilateral.
+   *
+   * @return		the center
+   */
+  public Point2D centerValue() {
+    Point2D		result;
+    double[]		parts;
+    double[]		x;
+    double[]		y;
+    double		left;
+    double		right;
+    double		top;
+    double		bottom;
+
+    parts  = doubleValue();
+    x      = new double[]{parts[0], parts[2], parts[4], parts[6]};
+    y      = new double[]{parts[1], parts[3], parts[5], parts[7]};
+    left   = StatUtils.min(x);
+    right  = StatUtils.max(x);
+    top    = StatUtils.min(y);
+    bottom = StatUtils.max(y);
+    result = new Point2D.Double(
+      left + (right - left) / 2,
+      top + (bottom - top) / 2);
 
     return result;
   }
