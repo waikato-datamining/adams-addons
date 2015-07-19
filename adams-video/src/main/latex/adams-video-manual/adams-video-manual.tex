@@ -65,17 +65,20 @@ The video module offers some actors for basic video support.
 \noindent Available sources:
 \begin{tight_itemize}
     \item \texttt{WebcamImage} -- outputs images from the default webcam
-    attached to the computer\footnote{adams-imaging-webcam.flow}.
+    attached to the computer\footnote{adams-video-webcam.flow}.
 \end{tight_itemize}
 
 \noindent Available transformers:
 \begin{tight_itemize}
 	\item \texttt{transformer.MjpegImageSequence} -- generates an image sequence
-	from MJPEG movies, one frame at a time\footnote{adams-imaging-play\_mjpeg\_video.flow}.
+	from MJPEG movies, one frame at a time\footnote{adams-video-play\_mjpeg\_video.flow}.
 	\item \texttt{transformer.MovieImageSequence} -- generates an image sequence
-	from movies, one frame at a time (uses Xuggle\cite{xuggle}\footnote{adams-imaging-play\_mp4\_video.flow}).
+	from movies, one frame at a time (uses Xuggle\cite{xuggle}\footnote{adams-video-play\_mp4\_video.flow}).
 	\item \texttt{transformer.TrackObjects} -- tracks objects in images sequences,
-	e.g., from movies\footnote{adams-imaging-play\_mp4\_video.flow}).
+	e.g., from movies\footnote{adams-video-track\_objects-predefined.flow, adams-video-track\_objects-predefined2.flow}.
+	\item \texttt{transformer.TransformTrackedObject} -- transforms a tracked
+	object in an image with a callable transformer, e.g., for blurring a
+	face\footnote{adams-video-track\_objects-predefined2.flow}.
 \end{tight_itemize}
 
 \noindent Available sinks:

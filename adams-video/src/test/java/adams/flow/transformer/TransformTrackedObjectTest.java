@@ -14,7 +14,7 @@
  */
 
 /*
- * TrackObjects.java
+ * TransformTrackedObject.java
  * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
  */
 
@@ -28,14 +28,14 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
- * Test for TrackObjects actor.
+ * Test for TransformTrackedObject actor.
  * <br>
  * NB: dummy test.
  *
  * @author fracpete
  * @version $Revision$
  */
-public class TrackObjectsTest
+public class TransformTrackedObjectTest
   extends AbstractFlowTest {
 
   /**
@@ -43,7 +43,7 @@ public class TrackObjectsTest
    *
    * @param name	the name of the test
    */
-  public TrackObjectsTest(String name) {
+  public TransformTrackedObjectTest(String name) {
     super(name);
   }
 
@@ -54,7 +54,7 @@ public class TrackObjectsTest
    * @return		the test suite
    */
   public static Test suite() {
-    return new TestSuite(TrackObjectsTest.class);
+    return new TestSuite(TransformTrackedObjectTest.class);
   }
 
   /**

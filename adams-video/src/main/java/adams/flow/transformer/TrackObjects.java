@@ -14,36 +14,20 @@
  */
 
 /*
- * MjpegImageSequence.java
+ * TrackObjects.java
  * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
 import adams.core.base.QuadrilateralLocation;
 import adams.data.image.AbstractImageContainer;
-import adams.data.image.BufferedImageContainer;
 import adams.data.report.DataType;
 import adams.data.report.Field;
-import adams.flow.core.AbstractActor;
-import adams.flow.core.ActorUtils;
-import adams.flow.core.CallableActorHelper;
-import adams.flow.core.CallableActorReference;
-import adams.flow.core.CallableActorUser;
-import adams.flow.core.Compatibility;
-import adams.flow.core.InputConsumer;
-import adams.flow.core.OutputProducer;
 import adams.flow.core.Token;
 import adams.flow.transformer.objecttracker.BoofCVCirculant;
 import adams.flow.transformer.objecttracker.ObjectTracker;
-
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
-import java.util.HashSet;
-import java.util.Hashtable;
 
 /**
  <!-- globalinfo-start -->
@@ -108,25 +92,16 @@ import java.util.Hashtable;
  * &nbsp;&nbsp;&nbsp;default: Tracker.Current[S]
  * </pre>
  * 
- * <pre>-transformer &lt;adams.flow.core.CallableActorReference&gt; (property: transformer)
- * &nbsp;&nbsp;&nbsp;The callable transformer to apply to the tracked object (optional).
- * &nbsp;&nbsp;&nbsp;default: unknown
- * </pre>
- * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
 public class TrackObjects
-  extends AbstractTransformer
-  implements CallableActorUser {
+  extends AbstractTransformer {
 
   /** for serialization. */
   private static final long serialVersionUID = 3690378527551302472L;
-
-  /** the key for backing up the callable actor. */
-  public final static String BACKUP_CALLABLEACTOR = "callable actor";
 
   /** the object tracker. */
   protected ObjectTracker m_Algorithm;
@@ -136,18 +111,6 @@ public class TrackObjects
 
   /** the report field to store the tracked location in. */
   protected Field m_Current;
-
-  /** the callable transformer to apply to the tracked object. */
-  protected CallableActorReference m_Transformer;
-
-  /** the helper class. */
-  protected CallableActorHelper m_Helper;
-
-  /** the callable actor. */
-  protected AbstractActor m_CallableActor;
-
-  /** for compatibility comparisons. */
-  protected Compatibility m_Compatibility;
 
   /**
    * Returns a string describing the object.
@@ -178,31 +141,6 @@ public class TrackObjects
     m_OptionManager.add(
       "current", "current",
       new Field("Tracker.Current", DataType.STRING));
-
-    m_OptionManager.add(
-      "transformer", "transformer",
-      new CallableActorReference("unknown"));
-  }
-
-  /**
-   * Initializes the members.
-   */
-  @Override
-  protected void initialize() {
-    super.initialize();
-
-    m_Helper = new CallableActorHelper();
-  }
-
-  /**
-   * Resets the scheme.
-   */
-  @Override
-  protected void reset() {
-    super.reset();
-
-    m_CallableActor = null;
-    m_Compatibility = null;
   }
 
   /**
@@ -293,37 +231,6 @@ public class TrackObjects
   }
 
   /**
-   * Sets the reference to the callable transformer to apply to tracked
-   * object (optional).
-   *
-   * @param value	the reference
-   */
-  public void setTransformer(CallableActorReference value) {
-    m_Transformer = value;
-    reset();
-  }
-
-  /**
-   * Returns the reference to the callable transformer to apply to tracked
-   * object (optional).
-   *
-   * @return		the reference
-   */
-  public CallableActorReference getTransformer() {
-    return m_Transformer;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String transformerTipText() {
-    return "The callable transformer to apply to the tracked object (optional).";
-  }
-
-  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -335,7 +242,6 @@ public class TrackObjects
     result  = QuickInfoHelper.toString(this, "algorithm", m_Algorithm, "algorithm: ");
     result += QuickInfoHelper.toString(this, "init", m_Init, ", init: ");
     result += QuickInfoHelper.toString(this, "current", m_Current, ", current: ");
-    result += QuickInfoHelper.toString(this, "transformer", m_Transformer, ", transformer: ");
 
     return result;
   }
@@ -360,205 +266,6 @@ public class TrackObjects
   }
 
   /**
-   * Tries to find the callable actor referenced by its callable name.
-   *
-   * @return		the callable actor or null if not found
-   */
-  protected AbstractActor findCallableActor() {
-    return m_Helper.findCallableActorRecursive(this, getTransformer());
-  }
-
-  /**
-   * Checks whether a reference to the callable actor is currently available.
-   *
-   * @return		true if a reference is available
-   * @see		#getCallableActor()
-   */
-  public boolean hasCallableActor() {
-    return (m_CallableActor != null);
-  }
-
-  /**
-   * Returns the currently set callable actor.
-   *
-   * @return		the actor, can be null
-   */
-  @Override
-  public AbstractActor getCallableActor() {
-    return m_CallableActor;
-  }
-
-  /**
-   * Removes entries from the backup.
-   */
-  @Override
-  protected void pruneBackup() {
-    super.pruneBackup();
-    pruneBackup(BACKUP_CALLABLEACTOR);
-  }
-
-  /**
-   * Backs up the current state of the actor before update the variables.
-   *
-   * @return		the backup
-   */
-  @Override
-  protected Hashtable<String,Object> backupState() {
-    Hashtable<String,Object>	result;
-
-    result = super.backupState();
-
-    if (m_CallableActor != null)
-      result.put(BACKUP_CALLABLEACTOR, m_CallableActor);
-
-    return result;
-  }
-
-  /**
-   * Restores the state of the actor before the variables got updated.
-   *
-   * @param state	the backup of the state to restore from
-   */
-  @Override
-  protected void restoreState(Hashtable<String,Object> state) {
-    super.restoreState(state);
-
-    if (state.containsKey(BACKUP_CALLABLEACTOR)) {
-      m_CallableActor = (AbstractActor) state.get(BACKUP_CALLABLEACTOR);
-      state.remove(BACKUP_CALLABLEACTOR);
-    }
-  }
-
-  /**
-   * Configures the callable actor.
-   *
-   * @return		null if successful, otherwise error message
-   */
-  protected String setUpCallableActor() {
-    String		result;
-    HashSet<String> 	variables;
-    Compatibility	comp;
-    Class[]		accepts;
-    Class[]		generates;
-    Class[]		acceptsExp;
-    Class[]		generatesExp;
-
-    result = null;
-
-    m_CallableActor = findCallableActor();
-    if (m_CallableActor != null) {
-      if (ActorUtils.isTransformer(m_CallableActor)) {
-	// compatible?
-	comp         = new Compatibility();
-	accepts      = ((InputConsumer) m_CallableActor).accepts();
-	generates    = ((OutputProducer) m_CallableActor).generates();
-	acceptsExp   = new Class[]{AbstractImageContainer.class, BufferedImageContainer.class};
-	generatesExp = new Class[]{AbstractImageContainer.class, BufferedImageContainer.class};
-	if (!comp.isCompatible(acceptsExp, accepts)) {
-	  result = "Callable actor '" + m_Transformer + "' does not accept "
-	    + Utils.classesToString(acceptsExp) + ", but "
-	    + Utils.classesToString(accepts) + ".";
-	}
-	else if (!comp.isCompatible(generates, generatesExp)) {
-	  result = "Callable actor '" + m_Transformer + "' does not generate "
-	    + Utils.classesToString(generatesExp) + ", but "
-	    + Utils.classesToString(generates) + ".";
-	}
-	// check for variables
-	if (result == null) {
-	  variables = findVariables(m_CallableActor);
-	  m_DetectedVariables.addAll(variables);
-	  if (m_DetectedVariables.size() > 0)
-	    getVariables().addVariableChangeListener(this);
-	}
-      }
-      else {
-	result = "Callable actor '" + getTransformer() + "' is not a transformer!";
-      }
-    }
-    else {
-      m_CallableActor = new PassThrough();
-    }
-
-    return result;
-  }
-
-  /**
-   * Initializes the item for flow execution.
-   *
-   * @return		null if everything is fine, otherwise error message
-   */
-  @Override
-  public String setUp() {
-    String	result;
-    String	variable;
-
-    result = super.setUp();
-
-    if (result == null) {
-      // do we have to wait till execution time because of attached variable?
-      variable = getOptionManager().getVariableForProperty("transformer");
-      if (variable == null)
-	result = setUpCallableActor();
-    }
-
-    return result;
-  }
-
-  /**
-   * Transforms the callable transformer to the tracked object and updates
-   * the container.
-   *
-   * @param cont	the image with the tracked object
-   * @param location	the location of the object
-   * @return		the updated container
-   */
-  protected AbstractImageContainer transformTrackedObject(AbstractImageContainer cont, QuadrilateralLocation location) {
-    AbstractImageContainer	result;
-    AbstractImageContainer	trans;
-    BufferedImageContainer	objCont;
-    BufferedImage 		objImg;
-    BufferedImage 		img;
-    Rectangle 			objLoc;
-    String			msg;
-    Graphics2D 			g;
-    int				x;
-    int				y;
-    int				width;
-    int				height;
-
-    objCont = new BufferedImageContainer();
-    img    = cont.toBufferedImage();
-    objLoc = location.rectangleValue();
-    x      = Math.max(0, objLoc.x);
-    y      = Math.max(0, objLoc.y);
-    width  = objLoc.width  - (x - objLoc.x);
-    height = objLoc.height - (y - objLoc.y);
-    objImg = img.getSubimage(x, y, width, height);
-    objCont.setImage(objImg);
-
-    ((InputConsumer) m_CallableActor).input(new Token(objCont));
-    msg = m_CallableActor.execute();
-    if (msg != null) {
-      getLogger().warning("Failed to apply transformer: " + msg);
-      result = cont;
-    }
-    else {
-      trans = (AbstractImageContainer) ((OutputProducer) m_CallableActor).output().getPayload();
-      objImg = trans.toBufferedImage();
-      g      = img.createGraphics();
-      g.drawImage(objImg, x, y, null);
-      g.dispose();
-      result = new BufferedImageContainer();
-      result.setImage(img);
-      result.setReport(cont.getReport().getClone());
-      result.setNotes(cont.getNotes().getClone());
-    }
-
-    return result;
-  }
-
-  /**
    * Executes the flow item.
    *
    * @return		null if everything is fine, otherwise error message
@@ -571,12 +278,7 @@ public class TrackObjects
 
     result = null;
 
-    // is variable attached?
-    if (m_CallableActor == null)
-      result = setUpCallableActor();
-
-    cont     = (AbstractImageContainer) m_InputToken.getPayload();
-    location = null;
+    cont = (AbstractImageContainer) m_InputToken.getPayload();
 
     // init?
     if (cont.getReport().hasValue(m_Init)) {
@@ -594,10 +296,6 @@ public class TrackObjects
 	cont.getReport().setValue(m_Current, location.toString());
       }
     }
-
-    // transform tracked object?
-    if (!(m_CallableActor instanceof PassThrough) && (location != null))
-      cont = transformTrackedObject(cont, location);
 
     m_OutputToken = new Token(cont);
 
