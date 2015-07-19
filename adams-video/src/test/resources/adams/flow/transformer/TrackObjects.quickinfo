@@ -1,1 +1,1 @@
-algorithm: BoofCVCirculant, init: Tracker.Init, current: Tracker.Current
+algorithm: BoofCVCirculant, init: Tracker.Init, current: Tracker.Current, transformer: unknown
