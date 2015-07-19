@@ -55,7 +55,7 @@
 \end{titlepage}
 
 \tableofcontents
-\listoffigures
+%\listoffigures
 %\listoftables
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -64,8 +64,12 @@ The video module offers some actors for basic video support.
 
 \noindent Available sources:
 \begin{tight_itemize}
-    \item \texttt{WebcamImage} -- outputs images from the default webcam
+    \item \texttt{ListWebcams} -- lists the names of all available webcams
+    attached to the computer\footnote{adams-video-list\_webcams.flow}.
+    \item \texttt{WebcamImage} -- outputs images from the selected webcam
     attached to the computer\footnote{adams-video-webcam.flow}.
+    \item \texttt{WebcamInfo} -- outputs images from the selected webcam
+    \footnote{adams-video-webcam\_info.flow}.
 \end{tight_itemize}
 
 \noindent Available transformers:

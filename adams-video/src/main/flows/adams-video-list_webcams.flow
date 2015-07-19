@@ -1,0 +1,14 @@
+# Project: adams
+# Date: 2015-07-20 09:45:57
+# User: fracpete
+#
+adams.flow.control.Flow
+	-actor
+		adams.flow.source.ListWebcams
+	-actor
+		adams.flow.sink.Display
+			-writer
+				adams.data.io.output.NullWriter
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+
