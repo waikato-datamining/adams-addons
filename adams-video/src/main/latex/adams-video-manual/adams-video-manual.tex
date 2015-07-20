@@ -60,7 +60,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
-The video module offers some actors for basic video support.
+The video module offers some actors for basic video display and processing support.
 
 \noindent Available sources:
 \begin{tight_itemize}
@@ -74,6 +74,9 @@ The video module offers some actors for basic video support.
 
 \noindent Available transformers:
 \begin{tight_itemize}
+	\item \texttt{transformer.ExtractTrackedObject} -- extracts a tracked
+	object in an image and forwards it as new image
+	container\footnote{adams-video-track\_objects-user\_selected\_object.flow}.
 	\item \texttt{transformer.MjpegImageSequence} -- generates an image sequence
 	from MJPEG movies, one frame at a time\footnote{adams-video-play\_mjpeg\_video.flow}.
 	\item \texttt{transformer.MovieImageSequence} -- generates an image sequence

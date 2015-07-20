@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2015-07-09 22:10:06
+# Date: 2015-07-20 16:48:17
 # User: fracpete
 #
 adams.flow.control.Flow
@@ -13,6 +13,24 @@ adams.flow.control.Flow
 					Frame
 					-short-title
 					true
+					-writer
+						adams.gui.print.NullWriter
+					-zoom
+					-1.0
+					-selection-processor
+						adams.gui.visualization.image.selection.NullProcessor
+					-image-overlay
+						adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport
+							-regexp
+							Tracker\\.Current
+			-actor
+				adams.flow.sink.ImageViewer
+					-name
+					Object
+					-short-title
+					true
+					-y
+					-3
 					-writer
 						adams.gui.print.NullWriter
 					-zoom
@@ -55,8 +73,6 @@ adams.flow.control.Flow
 								adams.gui.print.NullWriter
 							-selection-processor
 								adams.gui.visualization.image.selection.SelectObjectToTrack
-									-location
-									Tracker.Init[S]
 							-selection-box-color
 							#ff0000
 							-image-overlay
@@ -91,6 +107,16 @@ adams.flow.control.Flow
 								adams.flow.sink.CallableSink
 									-callable
 									Frame
+					-branch
+						adams.flow.control.Sequence
+							-name
+							object
+							-actor
+								adams.flow.transformer.ExtractTrackedObject
+							-actor
+								adams.flow.sink.CallableSink
+									-callable
+									Object
 					-branch
 						adams.flow.control.Sequence
 							-name
