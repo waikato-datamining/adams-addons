@@ -421,7 +421,7 @@ public class TransformTrackedObject
   }
 
   /**
-   * Transforms the callable transformer to the tracked object and updates
+   * Applies the callable transformer to the tracked object and updates
    * the container.
    *
    * @param cont	the image with the tracked object
