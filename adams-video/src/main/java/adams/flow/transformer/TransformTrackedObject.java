@@ -45,7 +45,7 @@ import java.util.Hashtable;
 
 /**
  <!-- globalinfo-start -->
- * Tracks objects in images using the provided tracker algorithm.
+ * Transforms the tracked object, as specified in the report, using the specified callable transformer.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -139,7 +139,8 @@ public class TransformTrackedObject
   @Override
   public String globalInfo() {
     return
-      "Tracks objects in images using the provided tracker algorithm.";
+      "Transforms the tracked object, as specified in the report, using the "
+	+ "specified callable transformer.";
   }
 
   /**
