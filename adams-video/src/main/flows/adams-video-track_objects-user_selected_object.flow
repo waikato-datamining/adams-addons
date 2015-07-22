@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2015-07-20 16:48:17
+# Date: 2015-07-23 11:08:19
 # User: fracpete
 #
 adams.flow.control.Flow
@@ -58,6 +58,16 @@ adams.flow.control.Flow
 			-output-type
 			FRAME
 	-actor
+		adams.flow.transformer.BufferedImageTransformer
+			-transformer
+				adams.data.jai.transformer.Brightness
+					-factor
+					1.5
+	-actor
+		adams.flow.transformer.Convert
+			-conversion
+				adams.data.conversion.BufferedImageToBoofCV
+	-actor
 		adams.flow.transformer.SetStorageValue
 			-storage-name
 			frame
@@ -81,10 +91,6 @@ adams.flow.control.Flow
 				adams.flow.transformer.SetStorageValue
 					-storage-name
 					frame
-	-actor
-		adams.flow.control.Sleep
-			-interval
-			10
 	-actor
 		adams.flow.control.Trigger
 			-name
