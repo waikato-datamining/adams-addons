@@ -15,22 +15,21 @@
 
 /**
  * Cron.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
-import java.util.Date;
-
+import adams.core.QuickInfoHelper;
+import adams.core.base.CronSchedule;
+import adams.flow.core.EventHelper;
 import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
-import org.quartz.impl.StdSchedulerFactory;
 
-import adams.core.QuickInfoHelper;
-import adams.core.base.CronSchedule;
+import java.util.Date;
 
 /**
  <!-- globalinfo-start -->
@@ -218,7 +217,7 @@ public class Cron
     
     try {
       if (m_Scheduler == null) {
-	m_Scheduler = StdSchedulerFactory.getDefaultScheduler();
+	m_Scheduler = EventHelper.getDefaultScheduler();
 	job         = new JobDetail(getFullName() + ".job", getFullName() + ".group", CronJob.class);
 	job.getJobDataMap().put(KEY_OWNER, this);
 	trigger     = new CronTrigger(
