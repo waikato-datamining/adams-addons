@@ -217,6 +217,9 @@ public class HeatmapPanel
     String			error;
     HeatmapToBufferedImage	hm2bi;
 
+    if (m_Heatmap.getWidth() == 0)
+      return null;
+
     errors = new StringBuilder();
     props  = getProperties();
 
