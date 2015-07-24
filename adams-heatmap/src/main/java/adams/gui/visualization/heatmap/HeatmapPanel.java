@@ -256,6 +256,9 @@ public class HeatmapPanel
     StringBuilder		errors;
     String			error;
 
+    if (value == null)
+      return;
+
     m_Heatmap = value.getClone();
     props     = getProperties();
     errors    = new StringBuilder();
