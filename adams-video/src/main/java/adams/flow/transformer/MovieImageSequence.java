@@ -45,6 +45,7 @@ import com.xuggle.xuggler.IError;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  <!-- globalinfo-start -->
@@ -276,7 +277,7 @@ public class MovieImageSequence
 	      field = new Field("Timestamp", DataType.STRING);
 	      DateFormat dformat = DateUtils.getTimestampFormatterMsecs();
 	      cont.getReport().addField(field);
-	      cont.getReport().setValue(field, dformat.format(new Date(event.getTimeStamp())));
+	      cont.getReport().setValue(field, dformat.format(new Date(event.getTimeStamp(TimeUnit.MILLISECONDS))));
 	      m_OutputToken = new Token(cont);
 	      // update last write time
 	      m_LastPtsWrite += m_MicroSecondsBetweenFrames;
