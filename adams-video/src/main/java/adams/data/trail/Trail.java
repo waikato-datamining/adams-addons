@@ -14,7 +14,7 @@
  */
 
 /**
- * Movement.java
+ * Trail.java
  * Copyright (C) 2015 University of Waikato, Hamilton, NZ
  */
 
@@ -27,6 +27,8 @@ import adams.data.NotesHandler;
 import adams.data.container.AbstractDataContainer;
 import adams.data.container.DataContainer;
 import adams.data.container.DataPointComparator;
+import adams.data.report.DataType;
+import adams.data.report.Field;
 import adams.data.report.MutableReportHandler;
 import adams.data.report.Report;
 import adams.data.spreadsheet.Row;
@@ -51,11 +53,11 @@ public class Trail
 
   private static final long serialVersionUID = 8721248965909493612L;
 
-  /** the width of the underlying canvas (null if not set). */
-  protected Float m_Width;
+  /** the report field for the width. */
+  public final static String FIELD_WIDTH = "Trail.Width";
 
-  /** the height of the underlying canvas (null if not set). */
-  protected Float m_Height;
+  /** the report field for the height. */
+  public final static String FIELD_HEIGHT = "Trail.Height";
 
   /** the attached report. */
   protected Report m_Report;
@@ -87,8 +89,6 @@ public class Trail
     m_ID     = "" + new Date();
     m_Report = new Report();
     m_Notes  = new Notes();
-    m_Width  = null;
-    m_Height = null;
     if (m_Comparator == null)
       m_Comparator = newComparator();
   }
@@ -237,7 +237,7 @@ public class Trail
    * @return		true if width is set
    */
   public boolean hasWidth() {
-    return (m_Width != null);
+    return (hasReport() && getReport().hasValue(FIELD_WIDTH));
   }
 
   /**
@@ -246,7 +246,12 @@ public class Trail
    * @param value	the width, null to unset
    */
   public void setWidth(Float value) {
-    m_Width = value;
+    if (hasReport()) {
+      if (value == null)
+	getReport().removeValue(new Field(FIELD_WIDTH, DataType.NUMERIC));
+      else
+	getReport().setNumericValue(FIELD_WIDTH, value.doubleValue());
+    }
   }
 
   /**
@@ -255,7 +260,10 @@ public class Trail
    * @return		the width, null if not set
    */
   public Float getWidth() {
-    return m_Width;
+    if (hasWidth())
+      return getReport().getDoubleValue(FIELD_WIDTH).floatValue();
+    else
+      return null;
   }
 
   /**
@@ -264,7 +272,7 @@ public class Trail
    * @return		true if height is set
    */
   public boolean hasHeight() {
-    return (m_Height != null);
+    return (hasReport() && getReport().hasValue(FIELD_HEIGHT));
   }
 
   /**
@@ -273,7 +281,12 @@ public class Trail
    * @param value	the height, null to unset
    */
   public void setHeight(Float value) {
-    m_Height = value;
+    if (hasReport()) {
+      if (value == null)
+	getReport().removeValue(new Field(FIELD_HEIGHT, DataType.NUMERIC));
+      else
+	getReport().setNumericValue(FIELD_HEIGHT, value.doubleValue());
+    }
   }
 
   /**
@@ -282,7 +295,10 @@ public class Trail
    * @return		the height, null if not set
    */
   public Float getHeight() {
-    return m_Height;
+    if (hasWidth())
+      return getReport().getDoubleValue(FIELD_HEIGHT).floatValue();
+    else
+      return null;
   }
 
   /**
@@ -303,6 +319,10 @@ public class Trail
   @Override
   public void setReport(Report value) {
     m_Report = value;
+    if (m_Report != null) {
+      m_Report.addField(new Field(FIELD_WIDTH, DataType.NUMERIC));
+      m_Report.addField(new Field(FIELD_HEIGHT, DataType.NUMERIC));
+    }
   }
 
   /**
