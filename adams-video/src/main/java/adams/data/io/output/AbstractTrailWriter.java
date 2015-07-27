@@ -35,6 +35,15 @@ public abstract class AbstractTrailWriter
   private static final long serialVersionUID = -6258698538028259568L;
 
   /**
+   * Initializes the members.
+   */
+  @Override
+  protected void initialize() {
+    super.initialize();
+    m_OutputIsFile = true;
+  }
+
+  /**
    * Returns a list with classnames of writers.
    *
    * @return the writer classnames
