@@ -25,12 +25,67 @@ import adams.flow.core.Token;
 
 /**
  <!-- globalinfo-start -->
+ * Generates an empty trail with the specified dimensions.
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
+ * Input&#47;output:<br>
+ * - generates:<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.trail.Trail<br>
+ * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-name &lt;java.lang.String&gt; (property: name)
+ * &nbsp;&nbsp;&nbsp;The name of the actor.
+ * &nbsp;&nbsp;&nbsp;default: NewTrail
+ * </pre>
+ * 
+ * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
+ * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
+ * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
+ * <pre>-skip &lt;boolean&gt; (property: skip)
+ * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
+ * &nbsp;&nbsp;&nbsp;as it is.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
+ * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-id &lt;java.lang.String&gt; (property: ID)
+ * &nbsp;&nbsp;&nbsp;The ID of the trail; ignored if empty.
+ * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
+ * <pre>-width &lt;float&gt; (property: width)
+ * &nbsp;&nbsp;&nbsp;The width of the trail.
+ * &nbsp;&nbsp;&nbsp;default: 800.0
+ * &nbsp;&nbsp;&nbsp;minimum: 1.0
+ * </pre>
+ * 
+ * <pre>-height &lt;float&gt; (property: height)
+ * &nbsp;&nbsp;&nbsp;The height of the trail.
+ * &nbsp;&nbsp;&nbsp;default: 600.0
+ * &nbsp;&nbsp;&nbsp;minimum: 1.0
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -41,6 +96,9 @@ public class NewTrail
 
   /** for serialization. */
   private static final long serialVersionUID = -5718059337341470131L;
+
+  /** the ID of the trail. */
+  protected String m_ID;
 
   /** the width of the trail. */
   protected float m_Width;
@@ -66,6 +124,10 @@ public class NewTrail
     super.defineOptions();
 
     m_OptionManager.add(
+      "id", "ID",
+      "");
+
+    m_OptionManager.add(
       "width", "width",
       getDefaultWidth(), 1f, null);
 
@@ -83,11 +145,41 @@ public class NewTrail
   public String getQuickInfo() {
     String	result;
 
-    result  = QuickInfoHelper.toString(this, "width", m_Width);
+    result  = QuickInfoHelper.toString(this, "ID", (m_ID.isEmpty() ? "-none-" : m_ID), "ID: ");
+    result += QuickInfoHelper.toString(this, "width", m_Width, ", ");
     result += " x ";
     result += QuickInfoHelper.toString(this, "height", m_Height);
 
     return result;
+  }
+
+  /**
+   * Sets the ID of the trail.
+   *
+   * @param value	the ID
+   */
+  public void setID(String value) {
+    m_ID = value;
+    reset();
+  }
+
+  /**
+   * Returns the ID of the trail.
+   *
+   * @return		the ID
+   */
+  public String getID() {
+    return m_ID;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String IDTipText() {
+    return "The ID of the trail; ignored if empty.";
   }
 
   /**
@@ -190,6 +282,8 @@ public class NewTrail
     Trail	trail;
 
     trail = new Trail();
+    if (!m_ID.isEmpty())
+      trail.setID(m_ID);
     trail.setWidth(m_Width);
     trail.setHeight(m_Height);
     m_OutputToken = new Token(trail);
