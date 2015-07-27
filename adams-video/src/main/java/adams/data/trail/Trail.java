@@ -31,6 +31,7 @@ import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.report.MutableReportHandler;
 import adams.data.report.Report;
+import adams.data.spreadsheet.DenseFloatDataRow;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.SpreadSheetSupporter;
@@ -357,6 +358,7 @@ public class Trail
     List<String> meta;
 
     result = new SpreadSheet();
+    result.setDataRowClass(DenseFloatDataRow.class);
     result.setName(getID());
 
     // header
