@@ -44,9 +44,26 @@ import java.util.List;
 
 /**
  <!-- globalinfo-start -->
+ * Reads trails in simple CSV-like format.
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-input &lt;adams.core.io.PlaceholderFile&gt; (property: input)
+ * &nbsp;&nbsp;&nbsp;The file to read and turn into a container.
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
+ * </pre>
+ * 
+ * <pre>-create-dummy-report &lt;boolean&gt; (property: createDummyReport)
+ * &nbsp;&nbsp;&nbsp;If true, then a dummy report is created if none present.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
