@@ -25,7 +25,9 @@ import adams.core.Properties;
 import adams.core.Range;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
+import adams.core.io.GzipUtils;
 import adams.data.DateFormatString;
+import adams.data.image.BufferedImageHelper;
 import adams.data.image.IntArrayMatrixView;
 import adams.data.report.Report;
 import adams.data.spreadsheet.DenseFloatDataRow;
@@ -33,6 +35,7 @@ import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.trail.Step;
 import adams.data.trail.Trail;
+import gnu.trove.list.array.TByteArrayList;
 
 import java.awt.image.BufferedImage;
 import java.io.StringReader;
@@ -109,9 +112,15 @@ public class SimpleTrailReader
     StringReader		sreader;
     int				x;
     int				y;
+    int				width;
+    int				height;
     IntArrayMatrixView		matrix;
     BufferedImage		image;
     String[]			pixels;
+    TByteArrayList		compressed;
+    byte[]			uncompressed;
+    int				offset;
+    int				pixel;
 
     lines      = FileUtils.loadFromFile(m_Input.getAbsoluteFile());
     comments   = new ArrayList<>();
@@ -161,15 +170,36 @@ public class SimpleTrailReader
     trail.setReport(report);
 
     if (background.size() > 0) {
-      matrix = new IntArrayMatrixView(background.get(0).split(",").length, background.size());
+      width  = Integer.parseInt(background.remove(0).trim());
+      height = Integer.parseInt(background.remove(0).trim());
+      compressed = new TByteArrayList();
       for (y = 0; y < background.size(); y++) {
 	pixels = background.get(y).split(",");
 	for (x = 0; x < pixels.length; x++)
-	  matrix.set(x, y, Integer.parseUnsignedInt(pixels[x], 16));
+	  compressed.add(Utils.fromHex(pixels[x]));
       }
-      image = new BufferedImage(matrix.getWidth(), matrix.getHeight(), BufferedImage.TYPE_INT_ARGB);
-      image.setRGB(0, 0, matrix.getWidth(), matrix.getHeight(), matrix.getData(), 0, matrix.getWidth());
-      trail.setBackground(image);
+      if (isLoggingEnabled())
+	getLogger().info("compressed bytes: " + compressed.size());
+      uncompressed = GzipUtils.decompress(compressed.toArray(), 1024);
+      if (uncompressed != null) {
+	if (isLoggingEnabled())
+	  getLogger().info("uncompressed bytes: " + uncompressed.length);
+	matrix = new IntArrayMatrixView(width, height);
+	for (y = 0; y < height; y++) {
+	  for (x = 0; x < width; x++) {
+	    offset = y * width * 4 + x * 4;
+	    pixel = BufferedImageHelper.combine(
+	      uncompressed[offset + 0],
+	      uncompressed[offset + 1],
+	      uncompressed[offset + 2],
+	      uncompressed[offset + 3]);
+	    matrix.set(x, y, pixel);
+	  }
+	}
+	image = new BufferedImage(matrix.getWidth(), matrix.getHeight(), BufferedImage.TYPE_INT_ARGB);
+	image.setRGB(0, 0, matrix.getWidth(), matrix.getHeight(), matrix.getData(), 0, matrix.getWidth());
+	trail.setBackground(image);
+      }
     }
     m_ReadData.add(trail);
   }

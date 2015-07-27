@@ -21,12 +21,14 @@
 package adams.data.io.output;
 
 import adams.core.Properties;
+import adams.core.Utils;
 import adams.core.io.FileUtils;
+import adams.core.io.GzipUtils;
 import adams.data.image.BufferedImageHelper;
-import adams.data.image.IntArrayMatrixView;
 import adams.data.io.input.SimpleTrailReader;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.trail.Trail;
+import gnu.trove.list.array.TByteArrayList;
 
 import java.awt.image.BufferedImage;
 import java.io.StringWriter;
@@ -74,7 +76,13 @@ public class SimpleTrailWriter
    */
   @Override
   public String globalInfo() {
-    return "Writes trails in the simple CSV-like format.";
+    return
+      "Writes trails in the simple CSV-like format.\n"
+	+ "The report and trail image come before the actual trail data.\n"
+	+ "The report data is prefixed with '" + SimpleTrailReader.COMMENT + "' and "
+	+ "the background is prefixed with '" + SimpleTrailReader.BACKGROUND + "'.\n"
+	+ "The background data are the gzipped RGBA bytes of the image (obtained "
+	+ "row-by-row from image).";
   }
 
   /**
@@ -164,9 +172,11 @@ public class SimpleTrailWriter
     CsvSpreadSheetWriter	writer;
     StringBuilder		row;
     BufferedImage		image;
-    IntArrayMatrixView		matrix;
     int				x;
     int				y;
+    int[][]			pixels;
+    TByteArrayList		uncompressed;
+    byte[]			compressed;
 
     if (data.size() == 0)
       return false;
@@ -180,17 +190,36 @@ public class SimpleTrailWriter
       swriter.write(props.toComment());
     }
 
-    // background
+    // background (gzipped, bytes in RGBA order)
     if (getStoreBackground() && trail.hasBackground()) {
+      swriter.append(SimpleTrailReader.BACKGROUND + trail.getBackground().getWidth() + "\n");
+      swriter.append(SimpleTrailReader.BACKGROUND + trail.getBackground().getHeight() + "\n");
       image  = BufferedImageHelper.convert(trail.getBackground(), BufferedImage.TYPE_INT_ARGB);
-      matrix = BufferedImageHelper.getPixelMatrix(image);
-      for (y = 0; y < matrix.getHeight(); y++) {
-	row = new StringBuilder(SimpleTrailReader.BACKGROUND);
-	for (x = 0; x < matrix.getWidth(); x++) {
-	  if (x > 0)
-	    row.append(",");
-	  row.append(Integer.toHexString(matrix.get(x, y)));
+      pixels = BufferedImageHelper.getRGBPixels(image);
+      uncompressed = new TByteArrayList();
+      for (y = 0; y < pixels.length; y++) {
+	for (x = 0; x < pixels[y].length; x++)
+	  uncompressed.add((byte) pixels[y][x]);
+      }
+      if (isLoggingEnabled())
+	getLogger().info("uncompressed bytes: " + uncompressed.size());
+      compressed = GzipUtils.compress(uncompressed.toArray());
+      if (isLoggingEnabled())
+	getLogger().info("compressed bytes: " + compressed.length);
+      row = new StringBuilder(SimpleTrailReader.BACKGROUND);
+      for (x = 0; x < compressed.length; x++) {
+	if (x % 1000 == 0) {
+	  if (row.length() > SimpleTrailReader.BACKGROUND.length()) {
+	    row.append("\n");
+	    swriter.append(row.toString());
+	  }
+	  row = new StringBuilder(SimpleTrailReader.BACKGROUND);
 	}
+	if (row.length() > SimpleTrailReader.BACKGROUND.length())
+	  row.append(",");
+	row.append(Utils.toHex(compressed[x]));
+      }
+      if (row.length() > SimpleTrailReader.BACKGROUND.length()) {
 	row.append("\n");
 	swriter.append(row.toString());
       }
