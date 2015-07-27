@@ -29,7 +29,7 @@ import adams.flow.core.Token;
 
 /**
  <!-- globalinfo-start -->
- * Adds a step tp the trail passing through.
+ * Adds a step to the trail passing through.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -127,7 +127,7 @@ public class AddTrailStep
    */
   @Override
   public String globalInfo() {
-    return "Adds a step tp the trail passing through.";
+    return "Adds a step to the trail passing through.";
   }
 
   /**
