@@ -14,3 +14,11 @@ adams.flow.sink.ffmpeg.AbstractFFmpegPlugin=\
 # the object trackers
 adams.flow.transformer.objecttracker.ObjectTracker=\
   adams.flow.transformer.objecttracker
+
+# the trail readers
+adams.data.io.input.AbstractTrailReader=\
+  adams.data.io.input
+
+# the trail writers
+adams.data.io.output.AbstractTrailWriter=\
+  adams.data.io.output
