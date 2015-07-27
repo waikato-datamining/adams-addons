@@ -23,13 +23,21 @@ package adams.data.io.input;
 import adams.core.Constants;
 import adams.core.Properties;
 import adams.core.Range;
+import adams.core.Utils;
+import adams.core.io.FileUtils;
 import adams.data.DateFormatString;
+import adams.data.image.IntArrayMatrixView;
 import adams.data.report.Report;
 import adams.data.spreadsheet.DenseFloatDataRow;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.trail.Step;
 import adams.data.trail.Trail;
+
+import java.awt.image.BufferedImage;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -45,6 +53,12 @@ public class SimpleTrailReader
   extends AbstractTrailReader {
 
   private static final long serialVersionUID = 1681189490537858223L;
+
+  /** the comment prefix. */
+  public final static String COMMENT = Properties.COMMENT;
+
+  /** the background prefix. */
+  public final static String BACKGROUND = "B ";
 
   /**
    * Returns a string describing the object.
@@ -83,28 +97,59 @@ public class SimpleTrailReader
   @Override
   protected void readData() {
     CsvSpreadSheetReader	reader;
+    List<String>		lines;
+    List<String>		comments;
+    List<String>		background;
+    List<String>		data;
     SpreadSheet 		sheet;
     Trail			trail;
     Report			report;
-    StringBuilder		comments;
     Step			step;
+    boolean			header;
+    StringReader		sreader;
+    int				x;
+    int				y;
+    IntArrayMatrixView		matrix;
+    BufferedImage		image;
+    String[]			pixels;
 
-    reader = new CsvSpreadSheetReader();
+    lines      = FileUtils.loadFromFile(m_Input.getAbsoluteFile());
+    comments   = new ArrayList<>();
+    background = new ArrayList<>();
+    data       = new ArrayList<>();
+    header     = true;
+    for (String line: lines) {
+      if (header) {
+	if (line.startsWith(COMMENT)) {
+	  comments.add(line);
+	}
+	else if (line.startsWith(BACKGROUND)) {
+	  background.add(line.substring(BACKGROUND.length()));
+	}
+	else {
+	  header = false;
+	  data.add(line);
+	}
+      }
+      else {
+	data.add(line);
+      }
+    }
+
+    sreader = new StringReader(Utils.flatten(data, "\n"));
+    reader  = new CsvSpreadSheetReader();
     reader.setDataRowType(new DenseFloatDataRow());
     reader.setComment("#");
     reader.setMissingValue("");
     reader.setDateTimeMsecColumns(new Range(Range.FIRST));
     reader.setDateTimeMsecLenient(true);
     reader.setDateTimeMsecFormat(new DateFormatString(Constants.TIMESTAMP_FORMAT_MSECS));
-    sheet = reader.read(m_Input.getAbsolutePath());
+    sheet = reader.read(sreader);
     if (sheet == null) {
       getLogger().severe("Failed to read file from: " + m_Input);
       return;
     }
-    comments = new StringBuilder();
-    for (String line: sheet.getComments())
-      comments.append(Properties.COMMENT + line + "\n");
-    report = Report.parseProperties(Properties.fromComment(comments.toString()));
+    report = Report.parseProperties(Properties.fromComment(Utils.flatten(comments, "\n")));
     trail = new Trail();
     for (Row row: sheet.rows()) {
       step = new Step(
@@ -114,6 +159,18 @@ public class SimpleTrailReader
       trail.add(step);
     }
     trail.setReport(report);
+
+    if (background.size() > 0) {
+      matrix = new IntArrayMatrixView(background.get(0).split(",").length, background.size());
+      for (y = 0; y < background.size(); y++) {
+	pixels = background.get(y).split(",");
+	for (x = 0; x < pixels.length; x++)
+	  matrix.set(x, y, Integer.parseUnsignedInt(pixels[x], 16));
+      }
+      image = new BufferedImage(matrix.getWidth(), matrix.getHeight(), BufferedImage.TYPE_INT_ARGB);
+      image.setRGB(0, 0, matrix.getWidth(), matrix.getHeight(), matrix.getData(), 0, matrix.getWidth());
+      trail.setBackground(image);
+    }
     m_ReadData.add(trail);
   }
 }

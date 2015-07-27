@@ -37,6 +37,7 @@ import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.SpreadSheetSupporter;
 import adams.data.statistics.InformativeStatisticSupporter;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -78,6 +79,9 @@ public class Trail
   /** the step with the maximum Y. */
   protected Step m_MaxY;
 
+  /** the background image. */
+  protected BufferedImage m_Background;
+
   /** the comparator to use. */
   protected static StepComparator m_Comparator;
 
@@ -87,9 +91,10 @@ public class Trail
   public Trail() {
     super();
 
-    m_ID     = "" + new Date();
-    m_Report = new Report();
-    m_Notes  = new Notes();
+    m_ID         = "" + new Date();
+    m_Report     = new Report();
+    m_Notes      = new Notes();
+    m_Background = null;
     if (m_Comparator == null)
       m_Comparator = newComparator();
   }
@@ -300,6 +305,33 @@ public class Trail
       return getReport().getDoubleValue(FIELD_HEIGHT).floatValue();
     else
       return null;
+  }
+
+  /**
+   * Checks whether a background is set.
+   *
+   * @return		true if background is set
+   */
+  public boolean hasBackground() {
+    return (m_Background != null);
+  }
+
+  /**
+   * Sets the optional background image.
+   *
+   * @param value	the background, null to unset
+   */
+  public void setBackground(BufferedImage value) {
+    m_Background = value;
+  }
+
+  /**
+   * Returns the optional background image.
+   *
+   * @return		the background, null if not set
+   */
+  public BufferedImage getBackground() {
+    return m_Background;
   }
 
   /**
