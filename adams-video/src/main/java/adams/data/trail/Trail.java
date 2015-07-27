@@ -20,7 +20,7 @@
 
 package adams.data.trail;
 
-import adams.core.DateTime;
+import adams.core.DateTimeMsec;
 import adams.core.option.OptionUtils;
 import adams.data.Notes;
 import adams.data.NotesHandler;
@@ -369,7 +369,7 @@ public class Trail
     // data
     for (Step step: this) {
       row = result.addRow();
-      row.addCell("T").setContent(new DateTime(step.getTimestamp()));
+      row.addCell("T").setContent(new DateTimeMsec(step.getTimestamp()));
       row.addCell("X").setContent(step.getX());
       row.addCell("Y").setContent(step.getY());
       if (step.hasMetaData()) {
