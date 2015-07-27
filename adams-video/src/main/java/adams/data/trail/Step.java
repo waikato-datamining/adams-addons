@@ -90,7 +90,9 @@ public class Step
     m_Timestamp = new Date(timestamp.getTime());
     m_X         = x;
     m_Y         = y;
-    m_MetaData  = new HashMap<>(metaData);
+    m_MetaData  = null;
+    if (metaData != null)
+      m_MetaData = new HashMap<>(metaData);
   }
 
   /**
