@@ -25,6 +25,7 @@ import adams.core.Properties;
 import adams.core.Range;
 import adams.data.DateFormatString;
 import adams.data.report.Report;
+import adams.data.spreadsheet.DenseFloatDataRow;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.trail.Step;
@@ -89,6 +90,7 @@ public class SimpleTrailReader
     Step			step;
 
     reader = new CsvSpreadSheetReader();
+    reader.setDataRowType(new DenseFloatDataRow());
     reader.setComment("#");
     reader.setMissingValue("");
     reader.setDateTimeMsecColumns(new Range(Range.FIRST));
@@ -106,7 +108,7 @@ public class SimpleTrailReader
     trail = new Trail();
     for (Row row: sheet.rows()) {
       step = new Step(
-	row.getCell(0).toAnyDateType(),
+	row.getCell(0).toDateTimeMsec(),
 	row.getCell(1).toDouble().floatValue(),
 	row.getCell(2).toDouble().floatValue());
       trail.add(step);
