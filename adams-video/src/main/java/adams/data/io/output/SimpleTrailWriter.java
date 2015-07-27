@@ -25,7 +25,6 @@ import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.core.io.GzipUtils;
 import adams.data.image.BufferedImageHelper;
-import adams.data.io.input.SimpleTrailReader;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.trail.Trail;
 import gnu.trove.list.array.TByteArrayList;
@@ -36,7 +35,10 @@ import java.util.List;
 
 /**
  <!-- globalinfo-start -->
- * Writes trails in the simple CSV-like format.
+ * Writes trails in the simple CSV-like format.<br>
+ * The report and trail image come before the actual trail data.<br>
+ * The report data is prefixed with '# ' and the background is prefixed with '% '.<br>
+ * The background data are the gzipped RGBA bytes of the image (obtained row-by-row from image).
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -66,6 +68,12 @@ public class SimpleTrailWriter
 
   private static final long serialVersionUID = -7138302129366743189L;
 
+  /** the comment prefix. */
+  public final static String COMMENT = Properties.COMMENT;
+
+  /** the background prefix. */
+  public final static String BACKGROUND = "% ";
+
   /** whether to save the background as well. */
   protected boolean m_StoreBackground;
 
@@ -79,8 +87,8 @@ public class SimpleTrailWriter
     return
       "Writes trails in the simple CSV-like format.\n"
 	+ "The report and trail image come before the actual trail data.\n"
-	+ "The report data is prefixed with '" + SimpleTrailReader.COMMENT + "' and "
-	+ "the background is prefixed with '" + SimpleTrailReader.BACKGROUND + "'.\n"
+	+ "The report data is prefixed with '" + COMMENT + "' and "
+	+ "the background is prefixed with '" + BACKGROUND + "'.\n"
 	+ "The background data are the gzipped RGBA bytes of the image (obtained "
 	+ "row-by-row from image).";
   }
@@ -133,7 +141,7 @@ public class SimpleTrailWriter
    */
   @Override
   public String getFormatDescription() {
-    return new SimpleTrailReader().getFormatDescription();
+    return "Simple trail format";
   }
 
   /**
@@ -143,7 +151,7 @@ public class SimpleTrailWriter
    */
   @Override
   public String[] getFormatExtensions() {
-    return new SimpleTrailReader().getFormatExtensions();
+    return new String[]{"trail"};
   }
 
   /**
@@ -192,8 +200,8 @@ public class SimpleTrailWriter
 
     // background (gzipped, bytes in RGBA order)
     if (getStoreBackground() && trail.hasBackground()) {
-      swriter.append(SimpleTrailReader.BACKGROUND + trail.getBackground().getWidth() + "\n");
-      swriter.append(SimpleTrailReader.BACKGROUND + trail.getBackground().getHeight() + "\n");
+      swriter.append(BACKGROUND + trail.getBackground().getWidth() + "\n");
+      swriter.append(BACKGROUND + trail.getBackground().getHeight() + "\n");
       image  = BufferedImageHelper.convert(trail.getBackground(), BufferedImage.TYPE_INT_ARGB);
       pixels = BufferedImageHelper.getRGBPixels(image);
       uncompressed = new TByteArrayList();
@@ -202,24 +210,22 @@ public class SimpleTrailWriter
 	  uncompressed.add((byte) pixels[y][x]);
       }
       if (isLoggingEnabled())
-	getLogger().info("uncompressed bytes: " + uncompressed.size());
+	getLogger().info("uncompressed background bytes: " + uncompressed.size());
       compressed = GzipUtils.compress(uncompressed.toArray());
       if (isLoggingEnabled())
-	getLogger().info("compressed bytes: " + compressed.length);
-      row = new StringBuilder(SimpleTrailReader.BACKGROUND);
+	getLogger().info("compressed background bytes: " + compressed.length);
+      row = new StringBuilder(BACKGROUND);
       for (x = 0; x < compressed.length; x++) {
 	if (x % 1000 == 0) {
-	  if (row.length() > SimpleTrailReader.BACKGROUND.length()) {
+	  if (row.length() > BACKGROUND.length()) {
 	    row.append("\n");
 	    swriter.append(row.toString());
 	  }
-	  row = new StringBuilder(SimpleTrailReader.BACKGROUND);
+	  row = new StringBuilder(BACKGROUND);
 	}
-	if (row.length() > SimpleTrailReader.BACKGROUND.length())
-	  row.append(",");
 	row.append(Utils.toHex(compressed[x]));
       }
-      if (row.length() > SimpleTrailReader.BACKGROUND.length()) {
+      if (row.length() > BACKGROUND.length()) {
 	row.append("\n");
 	swriter.append(row.toString());
       }

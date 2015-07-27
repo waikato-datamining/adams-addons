@@ -29,6 +29,7 @@ import adams.core.io.GzipUtils;
 import adams.data.DateFormatString;
 import adams.data.image.BufferedImageHelper;
 import adams.data.image.IntArrayMatrixView;
+import adams.data.io.output.SimpleTrailWriter;
 import adams.data.report.Report;
 import adams.data.spreadsheet.DenseFloatDataRow;
 import adams.data.spreadsheet.Row;
@@ -44,7 +45,8 @@ import java.util.List;
 
 /**
  <!-- globalinfo-start -->
- * Reads trails in simple CSV-like format.
+ * Reads trails in simple CSV-like format.<br>
+ * See adams.data.io.output.SimpleTrailWriter for more details on format.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -74,12 +76,6 @@ public class SimpleTrailReader
 
   private static final long serialVersionUID = 1681189490537858223L;
 
-  /** the comment prefix. */
-  public final static String COMMENT = Properties.COMMENT;
-
-  /** the background prefix. */
-  public final static String BACKGROUND = "B ";
-
   /**
    * Returns a string describing the object.
    *
@@ -87,7 +83,9 @@ public class SimpleTrailReader
    */
   @Override
   public String globalInfo() {
-    return "Reads trails in simple CSV-like format.";
+    return
+      "Reads trails in simple CSV-like format.\n"
+	+ "See " + SimpleTrailWriter.class.getName() + " for more details on format.";
   }
 
   /**
@@ -98,7 +96,7 @@ public class SimpleTrailReader
    */
   @Override
   public String getFormatDescription() {
-    return "Simple trail format";
+    return new SimpleTrailWriter().getFormatDescription();
   }
 
   /**
@@ -108,7 +106,7 @@ public class SimpleTrailReader
    */
   @Override
   public String[] getFormatExtensions() {
-    return new String[]{"trail"};
+    return new SimpleTrailWriter().getFormatExtensions();
   }
 
   /**
@@ -132,8 +130,7 @@ public class SimpleTrailReader
     int				width;
     int				height;
     IntArrayMatrixView		matrix;
-    BufferedImage		image;
-    String[]			pixels;
+    byte[]			pixels;
     TByteArrayList		compressed;
     byte[]			uncompressed;
     int				offset;
@@ -146,11 +143,11 @@ public class SimpleTrailReader
     header     = true;
     for (String line: lines) {
       if (header) {
-	if (line.startsWith(COMMENT)) {
+	if (line.startsWith(SimpleTrailWriter.COMMENT)) {
 	  comments.add(line);
 	}
-	else if (line.startsWith(BACKGROUND)) {
-	  background.add(line.substring(BACKGROUND.length()));
+	else if (line.startsWith(SimpleTrailWriter.BACKGROUND)) {
+	  background.add(line.substring(SimpleTrailWriter.BACKGROUND.length()));
 	}
 	else {
 	  header = false;
@@ -191,31 +188,28 @@ public class SimpleTrailReader
       height = Integer.parseInt(background.remove(0).trim());
       compressed = new TByteArrayList();
       for (y = 0; y < background.size(); y++) {
-	pixels = background.get(y).split(",");
-	for (x = 0; x < pixels.length; x++)
-	  compressed.add(Utils.fromHex(pixels[x]));
+	pixels = Utils.fromHexArray(background.get(y));
+	compressed.add(pixels);
       }
       if (isLoggingEnabled())
-	getLogger().info("compressed bytes: " + compressed.size());
+	getLogger().info("compressed background bytes: " + compressed.size());
       uncompressed = GzipUtils.decompress(compressed.toArray(), 1024);
       if (uncompressed != null) {
 	if (isLoggingEnabled())
-	  getLogger().info("uncompressed bytes: " + uncompressed.length);
+	  getLogger().info("uncompressed background bytes: " + uncompressed.length);
 	matrix = new IntArrayMatrixView(width, height);
 	for (y = 0; y < height; y++) {
 	  for (x = 0; x < width; x++) {
 	    offset = y * width * 4 + x * 4;
 	    pixel = BufferedImageHelper.combine(
-	      uncompressed[offset + 0],
+	      uncompressed[offset    ],
 	      uncompressed[offset + 1],
 	      uncompressed[offset + 2],
 	      uncompressed[offset + 3]);
 	    matrix.set(x, y, pixel);
 	  }
 	}
-	image = new BufferedImage(matrix.getWidth(), matrix.getHeight(), BufferedImage.TYPE_INT_ARGB);
-	image.setRGB(0, 0, matrix.getWidth(), matrix.getHeight(), matrix.getData(), 0, matrix.getWidth());
-	trail.setBackground(image);
+	trail.setBackground(matrix.toBufferedImage(BufferedImage.TYPE_INT_ARGB));
       }
     }
     m_ReadData.add(trail);
