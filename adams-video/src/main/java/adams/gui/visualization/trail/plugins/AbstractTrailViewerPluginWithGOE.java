@@ -14,7 +14,7 @@
  */
 
 /**
- * AbstractHeatmapViewerPluginWithGOE.java
+ * AbstractTrailViewerPluginWithGOE.java
  * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.trail.plugins;
@@ -29,7 +29,7 @@ import java.awt.Dialog.ModalityType;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public abstract class AbstractHeatmapViewerPluginWithGOE
+public abstract class AbstractTrailViewerPluginWithGOE
   extends AbstractTrailViewerPlugin {
 
   /** for serialization. */
@@ -60,7 +60,7 @@ public abstract class AbstractHeatmapViewerPluginWithGOE
   }
 
   /**
-   * Processes the heatmap.
+   * Processes the trail.
    */
   protected abstract String process();
   
