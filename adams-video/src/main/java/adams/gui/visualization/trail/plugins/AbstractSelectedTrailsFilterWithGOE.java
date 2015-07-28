@@ -29,13 +29,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Ancestor for heatmap filters that process the selected heatmaps using
+ * Ancestor for trail filters that process the selected trails using
  * a setup from a {@link GenericObjectEditor}.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public abstract class AbstractSelectedHeatmapsFilterWithGOE
+public abstract class AbstractSelectedTrailsFilterWithGOE
   extends AbstractSelectedTrailsFilter {
   
   /** for serialization. */

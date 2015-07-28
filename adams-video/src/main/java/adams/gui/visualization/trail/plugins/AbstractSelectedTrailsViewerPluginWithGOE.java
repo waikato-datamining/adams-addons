@@ -14,7 +14,7 @@
  */
 
 /**
- * AbstractSelectedHeatmapsViewerPluginWithGOE.java
+ * AbstractSelectedTrailsViewerPluginWithGOE.java
  * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.trail.plugins;
@@ -30,12 +30,12 @@ import java.awt.event.ActionListener;
 
 /**
  * Ancestor of plugins that use the {@link GenericObjectEditor} for the setup
- * that processes the selected heatmaps.
+ * that processes the selected trails.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public abstract class AbstractSelectedHeatmapsViewerPluginWithGOE
+public abstract class AbstractSelectedTrailsViewerPluginWithGOE
   extends AbstractSelectedTrailsViewerPlugin {
 
   /** for serialization. */
