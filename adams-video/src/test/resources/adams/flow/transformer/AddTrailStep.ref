@@ -1,0 +1,11 @@
+--> dumpfile.trail
+# Trail.Height\tDataType=N
+# Trail.Width\tDataType=N
+# Trail.Height=600.0
+# Parent\ ID=-1
+# Trail.Width=800.0
+Timestamp,X,Y,Meta-data
+"2014-12-31 23:59:22.240",1,1,""
+"2014-12-31 23:59:22.240",2,10,"""meta3=hello world"" meta2=0.0 meta1=data1"
+
+
