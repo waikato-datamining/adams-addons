@@ -22,3 +22,15 @@ adams.data.io.input.AbstractTrailReader=\
 # the trail writers
 adams.data.io.output.AbstractTrailWriter=\
   adams.data.io.output
+
+# the trail overlays
+adams.gui.visualization.trail.overlay.AbstractTrailOverlay=\
+  adams.gui.visualization.trail.overlay
+
+# viewer plugins
+adams.gui.visualization.trail.plugins.AbstractTrailViewerPlugin=\
+  adams.gui.visualization.trail.plugins
+
+# paintlets
+adams.gui.visualization.trail.paintlet.AbstractTrailPaintlet=\
+  adams.gui.visualization.trail.paintlet
