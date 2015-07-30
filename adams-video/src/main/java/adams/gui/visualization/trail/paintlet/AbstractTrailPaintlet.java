@@ -22,6 +22,8 @@ package adams.gui.visualization.trail.paintlet;
 
 import adams.gui.visualization.core.AbstractStrokePaintlet;
 
+import java.awt.Color;
+
 /**
  * Ancestor for trail paintlets.
  *
@@ -32,4 +34,47 @@ public abstract class AbstractTrailPaintlet
   extends AbstractStrokePaintlet {
 
   private static final long serialVersionUID = 8036940792107897639L;
+
+  /** Color of the stroke for the paintlet */
+  protected Color m_Color;
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+	"color", "color", Color.BLACK);
+  }
+
+  /**
+   * Set the stroke color for the paintlet.
+   *
+   * @param value	Color of the stroke
+   */
+  public void setColor(Color value) {
+    m_Color = value;
+    memberChanged();
+  }
+
+  /**
+   * Get the stroke color for the paintlet.
+   *
+   * @return		Color of the stroke
+   */
+  public Color getColor() {
+    return m_Color;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String colorTipText() {
+    return "The stroke color.";
+  }
 }
