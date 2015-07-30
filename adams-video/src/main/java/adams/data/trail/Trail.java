@@ -37,6 +37,8 @@ import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.SpreadSheetSupporter;
 import adams.data.statistics.InformativeStatisticSupporter;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Date;
@@ -335,6 +337,46 @@ public class Trail
   }
 
   /**
+   * Creates a new background image with white as background color.
+   * Uses either the width/height parameters stored in the report or if these
+   * are not present, ensures that the trail fits onto the image.
+   *
+   * @see		#newBackground(Color)
+   */
+  public void newBackground() {
+    newBackground(Color.WHITE);
+  }
+
+  /**
+   * Creates a new background image.
+   * Uses either the width/height parameters stored in the report or if these
+   * are not present, ensures that the trail fits onto the image.
+   *
+   * @param bgcolor	the background color
+   * @see 		BufferedImage#TYPE_INT_ARGB
+   */
+  public void newBackground(Color bgcolor) {
+    BufferedImage 	image;
+    int			width;
+    int			height;
+    Graphics 		g;
+
+    width  = getWidth().intValue();
+    if (width <= 0)
+      width = (int) getMaxX().getX() + 10;
+    height = getHeight().intValue();
+    if (height <= 0)
+      height = (int) getMaxY().getY() + 10;
+    image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    g     = image.getGraphics();
+    g.setColor(bgcolor);
+    g.fillRect(0, 0, image.getWidth(), image.getHeight());
+    g.dispose();
+
+    setBackground(image);
+  }
+
+  /**
    * Returns the currently stored notes.
    *
    * @return		the current notes
@@ -410,7 +452,7 @@ public class Trail
 	meta = new ArrayList<>();
 	for (String key: step.getMetaData().keySet())
 	  meta.add(key + "=" + step.getMetaData().get(key));
-	row.addCell("M").setContentAsString(OptionUtils.joinOptions(meta.toArray(new String[0])));
+	row.addCell("M").setContentAsString(OptionUtils.joinOptions(meta.toArray(new String[meta.size()])));
       }
     }
 
