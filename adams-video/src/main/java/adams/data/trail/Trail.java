@@ -27,6 +27,7 @@ import adams.data.NotesHandler;
 import adams.data.container.AbstractDataContainer;
 import adams.data.container.DataContainer;
 import adams.data.container.DataPointComparator;
+import adams.data.image.BufferedImageHelper;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.report.MutableReportHandler;
@@ -145,8 +146,16 @@ public class Trail
 
     trail = (Trail) other;
 
+    if (trail.hasBackground())
+      setBackground(BufferedImageHelper.deepCopy(trail.getBackground()));
+    else
+      setBackground(null);
+
     if (trail.hasReport())
       setReport(trail.getReport().getClone());
+    else
+      setReport(new Report());
+
     m_Notes = new Notes();
     m_Notes.mergeWith(trail.getNotes());
   }
