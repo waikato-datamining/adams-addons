@@ -224,6 +224,7 @@ public class HeatmapViewerPanel
     m_TabbedPane = new BaseTabbedPane();
     m_TabbedPane.setTabLayoutPolicy(BaseTabbedPane.SCROLL_TAB_LAYOUT);
     m_TabbedPane.setCloseTabsWithMiddelMouseButton(true);
+    m_TabbedPane.setShowCloseTabButton(true);
     m_TabbedPane.addChangeListener(new ChangeListener() {
       @Override
       public void stateChanged(ChangeEvent e) {
