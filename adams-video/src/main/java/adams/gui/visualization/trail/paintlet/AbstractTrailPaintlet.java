@@ -20,7 +20,12 @@
 
 package adams.gui.visualization.trail.paintlet;
 
-import adams.gui.visualization.core.AbstractStrokePaintlet;
+import adams.core.ClassLister;
+import adams.core.option.AbstractOptionConsumer;
+import adams.core.option.ArrayConsumer;
+import adams.core.option.OptionUtils;
+import adams.gui.visualization.image.paintlet.AbstractPaintlet;
+import adams.gui.visualization.trail.TrailPanel;
 
 import java.awt.Color;
 
@@ -31,9 +36,13 @@ import java.awt.Color;
  * @version $Revision$
  */
 public abstract class AbstractTrailPaintlet
-  extends AbstractStrokePaintlet {
+  extends AbstractPaintlet
+  implements TrailPaintlet {
 
   private static final long serialVersionUID = 8036940792107897639L;
+
+  /** the trail panel. */
+  protected TrailPanel m_TrailPanel;
 
   /** Color of the stroke for the paintlet */
   protected Color m_Color;
@@ -46,7 +55,17 @@ public abstract class AbstractTrailPaintlet
     super.defineOptions();
 
     m_OptionManager.add(
-	"color", "color", Color.BLACK);
+      "color", "color", Color.BLACK);
+  }
+
+  /**
+   * Initializes the members.
+   */
+  @Override
+  protected void initialize() {
+    super.initialize();
+
+    m_TrailPanel = null;
   }
 
   /**
@@ -76,5 +95,67 @@ public abstract class AbstractTrailPaintlet
    */
   public String colorTipText() {
     return "The stroke color.";
+  }
+
+  /**
+   * Sets the panel to use, null to disable painting.
+   *
+   * @param value	the panel to paint on
+   */
+  public void setPanel(TrailPanel value) {
+    m_TrailPanel = value;
+    setPanel(m_TrailPanel.getImagePanel());
+  }
+
+  /**
+   * Returns the underlying trail panel.
+   *
+   * @return		the panel, null if not set
+   */
+  public TrailPanel getTrailPanel() {
+    return m_TrailPanel;
+  }
+
+  /**
+   * Returns a list with classnames of paintlets.
+   *
+   * @return		the paintlet classnames
+   */
+  public static String[] getPaintlets() {
+    return ClassLister.getSingleton().getClassnames(TrailPaintlet.class);
+  }
+
+  /**
+   * Instantiates the paintlet with the given options.
+   *
+   * @param classname	the classname of the paintlet to instantiate
+   * @param options	the options for the paintlet
+   * @return		the instantiated paintlet or null if an error occurred
+   */
+  public static TrailPaintlet forName(String classname, String[] options) {
+    TrailPaintlet	result;
+
+    try {
+      result = (TrailPaintlet) OptionUtils.forName(TrailPaintlet.class, classname, options);
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      result = null;
+    }
+
+    return result;
+  }
+
+  /**
+   * Instantiates the paintlet from the given commandline
+   * (i.e., classname and optional options).
+   *
+   * @param cmdline	the classname (and optional options) of the
+   * 			paintlet to instantiate
+   * @return		the instantiated paintlet
+   * 			or null if an error occurred
+   */
+  public static TrailPaintlet forCommandLine(String cmdline) {
+    return (TrailPaintlet) AbstractOptionConsumer.fromString(ArrayConsumer.class, cmdline);
   }
 }

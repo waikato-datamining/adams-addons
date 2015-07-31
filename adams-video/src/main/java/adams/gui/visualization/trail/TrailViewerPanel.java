@@ -206,6 +206,7 @@ public class TrailViewerPanel
     m_TabbedPane = new BaseTabbedPane();
     m_TabbedPane.setTabLayoutPolicy(BaseTabbedPane.SCROLL_TAB_LAYOUT);
     m_TabbedPane.setCloseTabsWithMiddelMouseButton(true);
+    m_TabbedPane.setShowCloseTabButton(true);
     panel.add(m_TabbedPane, BorderLayout.CENTER);
 
     m_SearchPanel = new SearchPanel(LayoutType.HORIZONTAL, true, "_Search", true, null);

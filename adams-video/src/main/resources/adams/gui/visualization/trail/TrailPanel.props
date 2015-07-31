@@ -1,0 +1,23 @@
+# Configuration file for the Trail panel.
+#
+# Author: FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision$
+
+# The position of the divider (integer)
+Panel.DividerLocation=550
+
+# the default paintlet for trails
+Image.Paintlet=adams.gui.visualization.trail.paintlet.Circles
+
+# The initial scaling factor (1.0 == 100%; -1 for optimal fit)
+Image.Scale=-1.0
+
+# Whether to display the trail also as spreadsheet (true|false)
+SpreadSheet.Show=false
+
+# The number of decimals to show in the spreadsheet table (integer)
+SpreadSheet.NumDecimals=3
+
+# The size of the dialog for viewing the trails as spreadsheet
+View.SpreadSheet.Width=800
+View.SpreadSheet.Height=600

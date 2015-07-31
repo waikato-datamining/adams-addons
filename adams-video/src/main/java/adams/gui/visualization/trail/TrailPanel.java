@@ -40,6 +40,9 @@ import adams.gui.event.SearchListener;
 import adams.gui.visualization.image.ImagePanel;
 import adams.gui.visualization.report.ReportFactory;
 import adams.gui.visualization.trail.overlay.AbstractTrailOverlay;
+import adams.gui.visualization.trail.paintlet.AbstractTrailPaintlet;
+import adams.gui.visualization.trail.paintlet.Circles;
+import adams.gui.visualization.trail.paintlet.TrailPaintlet;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
@@ -94,6 +97,9 @@ public class TrailPanel
   /** the log panel. */
   protected BaseLogPanel m_PanelLog;
 
+  /** the default paintlet. */
+  protected TrailPaintlet m_TrailPaintlet;
+
   /**
    * Initializes the panel.
    *
@@ -110,11 +116,8 @@ public class TrailPanel
    */
   @Override
   protected void initialize() {
-    Properties	props;
-
     super.initialize();
 
-    props    = getProperties();
     m_Owner  = null;
     m_Trail  = new Trail();
     m_Reader = null;
@@ -159,6 +162,12 @@ public class TrailPanel
       m_SplitPane.setLeftComponent(m_TrailImage);
     }
 
+    m_TrailPaintlet = AbstractTrailPaintlet.forCommandLine(props.getProperty("Image.Paintlet", ""));
+    if (m_TrailPaintlet == null)
+      m_TrailPaintlet = new Circles();
+    m_TrailImage.addPaintlet(m_TrailPaintlet);
+    m_TrailPaintlet.setPanel(this);
+
     m_ReportTable = new ReportFactory.Table();
 
     m_SearchPanel = new SearchPanel(LayoutType.HORIZONTAL, true, "_Search", true, null);
@@ -199,6 +208,7 @@ public class TrailPanel
     if (m_Trail.getWidth() == 0)
       return null;
 
+    m_TrailImage.repaint();
     // TODO
 
     return null;
@@ -224,6 +234,9 @@ public class TrailPanel
     errors  = new StringBuilder();
 
     // image
+    if (!m_Trail.hasBackground())
+      m_Trail.newBackground();
+    m_TrailImage.setCurrentImage(m_Trail.getBackground());
     error = refresh();
     if (error != null)
       errors.append(error);
