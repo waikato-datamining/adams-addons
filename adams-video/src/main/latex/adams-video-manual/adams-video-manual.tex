@@ -74,11 +74,12 @@ The video module offers some actors for basic video display and processing suppo
 
 \noindent Available transformers:
 \begin{tight_itemize}
-	\item \textit{AddTrailBackground} -- adds a image as trail background
+	\item \textit{AddTrailBackground} -- adds a image as trail
+	background\footnote{adams-video-track\_objects-predefined3.flow}
 	\item \textit{AddTrailStep} -- adds an additional step to the trail
-	passing through.
+	passing through\footnote{adams-video-track\_objects-predefined3.flow}.
 	\item \textit{ExtractTrackedObject} -- extracts a tracked
-	object in an image and forwards it as new image
+	object in an image and forwards it as new image.
 	container\footnote{adams-video-track\_objects-user\_selected\_object.flow}.
 	\item \textit{GetTrailBackground} -- retrieves the trail background image, if any.
 	\item \textit{MjpegImageSequence} -- generates an image sequence
@@ -88,7 +89,7 @@ The video module offers some actors for basic video display and processing suppo
 	\item \textit{TrackObjects} -- tracks objects in images sequences,
 	e.g., from movies\footnote{adams-video-track\_objects-predefined.flow, adams-video-track\_objects-predefined2.flow}.
 	\item \textit{TrailFileReader} -- reads a trail from disk.
-	\item \textit{TrailFileWriter} -- writes a trail to disk.
+	\item \textit{TrailFileWriter} -- writes a trail to disk\footnote{adams-video-track\_objects-predefined3.flow}.
 	\item \textit{TrailFilter} -- applies a filter to the trail passing through.
 	\item \textit{TransformTrackedObject} -- transforms a tracked
 	object in an image with a callable transformer, e.g., for blurring a
@@ -99,7 +100,7 @@ The video module offers some actors for basic video display and processing suppo
 \begin{tight_itemize}
   \item \textit{FFmpeg} -- actor for processing videos using
   ffmpeg\cite{ffmpeg}\footnote{adams-video-ffmpeg.flow}.
-  \item \textit{TrailDisplay} -- displays trail objects\footnote{adams-video-display\_trail.flow}.
+  \item \textit{TrailDisplay} -- displays trail objects\footnote{adams-video-display\_trail.flow, adams-video-track\_objects-predefined3.flow}.
 \end{tight_itemize}
 
 \noindent Available conversions:
