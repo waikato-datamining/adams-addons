@@ -75,6 +75,8 @@ public class BoofCVSparseFlow
    */
   @Override
   protected TrackerObjectQuad newTracker() {
+    // TODO configuration
+
     switch (m_ImageType) {
       case FLOAT_32:
         return FactoryTrackerObjectQuad.sparseFlow(null, ImageFloat32.class, null);

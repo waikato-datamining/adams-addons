@@ -118,6 +118,8 @@ public class BoofCVTLD
    */
   @Override
   protected TrackerObjectQuad newTracker() {
+    // TODO configuration
+
     switch (m_ImageType) {
       case FLOAT_32:
         return FactoryTrackerObjectQuad.tld(null, ImageFloat32.class);
