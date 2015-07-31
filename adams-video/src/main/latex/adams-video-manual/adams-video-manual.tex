@@ -55,7 +55,7 @@
 \end{titlepage}
 
 \tableofcontents
-%\listoffigures
+\listoffigures
 %\listoftables
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -64,33 +64,33 @@ The video module offers some actors for basic video display and processing suppo
 
 \noindent Available sources:
 \begin{tight_itemize}
-    \item \texttt{ListWebcams} -- lists the names of all available webcams
+    \item \textit{ListWebcams} -- lists the names of all available webcams
     attached to the computer\footnote{adams-video-list\_webcams.flow}.
-    \item \texttt{WebcamImage} -- outputs images from the selected webcam
+    \item \textit{WebcamImage} -- outputs images from the selected webcam
     attached to the computer\footnote{adams-video-webcam.flow}.
-    \item \texttt{WebcamInfo} -- outputs images from the selected webcam
+    \item \textit{WebcamInfo} -- outputs images from the selected webcam
     \footnote{adams-video-webcam\_info.flow}.
 \end{tight_itemize}
 
 \noindent Available transformers:
 \begin{tight_itemize}
-	\item \texttt{AddTrailBackground} -- adds a image as trail background
-	\item \texttt{AddTrailStep} -- adds an additional step to the trail
+	\item \textit{AddTrailBackground} -- adds a image as trail background
+	\item \textit{AddTrailStep} -- adds an additional step to the trail
 	passing through.
-	\item \texttt{ExtractTrackedObject} -- extracts a tracked
+	\item \textit{ExtractTrackedObject} -- extracts a tracked
 	object in an image and forwards it as new image
 	container\footnote{adams-video-track\_objects-user\_selected\_object.flow}.
-	\item \texttt{GetTrailBackground} -- retrieves the trail background image, if any.
-	\item \texttt{MjpegImageSequence} -- generates an image sequence
+	\item \textit{GetTrailBackground} -- retrieves the trail background image, if any.
+	\item \textit{MjpegImageSequence} -- generates an image sequence
 	from MJPEG movies, one frame at a time\footnote{adams-video-play\_mjpeg\_video.flow}.
-	\item \texttt{MovieImageSequence} -- generates an image sequence
+	\item \textit{MovieImageSequence} -- generates an image sequence
 	from movies, one frame at a time (uses Xuggle\cite{xuggle}\footnote{adams-video-play\_mp4\_video.flow}).
-	\item \texttt{TrackObjects} -- tracks objects in images sequences,
+	\item \textit{TrackObjects} -- tracks objects in images sequences,
 	e.g., from movies\footnote{adams-video-track\_objects-predefined.flow, adams-video-track\_objects-predefined2.flow}.
-	\item \texttt{TrailFileReader} -- reads a trail from disk.
-	\item \texttt{TrailFileWriter} -- writes a trail to disk.
-	\item \texttt{TrailFilter} -- applies a filter to the trail passing through.
-	\item \texttt{TransformTrackedObject} -- transforms a tracked
+	\item \textit{TrailFileReader} -- reads a trail from disk.
+	\item \textit{TrailFileWriter} -- writes a trail to disk.
+	\item \textit{TrailFilter} -- applies a filter to the trail passing through.
+	\item \textit{TransformTrackedObject} -- transforms a tracked
 	object in an image with a callable transformer, e.g., for blurring a
 	face\footnote{adams-video-track\_objects-predefined2.flow}.
 \end{tight_itemize}
@@ -111,6 +111,56 @@ The video module offers some actors for basic video display and processing suppo
   locations.
 \end{tight_itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Tools}
+
+\section{Trail viewer}
+The \textit{Trail viewer} is a simple tool for viewing trails of objects that
+have been tracked using a flow. It can be used to apply filters to trails
+and save those trails back to disk. Figure \ref{trail_viewer} shows a screenshot.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=12.0cm]{images/trail_viewer.png}
+  \caption{Trail viewer displaying a mice trail overlayed on a background image.}
+  \label{trail_viewer}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Data}
+\section{.trail format}
+The \textit{.trail} format is a simple text format. In its essence it is
+spreadsheet-like format with a header and a body.
+
+The \textit{header} contains the meta-data for the trail. Most importantly,
+the width and the height of the trail. The format is in Java Properties format,
+each line prefixed with ``\# ''. Each stored value also defines in a separate
+property what data type it is (N = numeric, S = string, B = boolean).
+
+It is possible to store an optional background image in the header. The image
+data is stored as RGBA signed bytes, row-by-row. In order to produce smaller
+files, the data is compressed using gzip\cite{gzip}. The compressed bytes are
+then stored in a upper-case hexadecimal notation, with a maximum of 1000 bytes
+per line. The background data lines are prefixed with ``\% ''.
+
+The \textit{body} consists of four columns: timestamp (with milli-seconds), X position,
+Y position, meta-data for that step. The meta-data column is a blank-separated list of
+key-value pairs (``key=value"").
+
+Here is an example file, without a background:
+
+\begin{verbatim}
+# #Tue Jul 28 09:24:20 NZST 2015
+# Trail.Height\tDataType=N
+# Trail.Width\tDataType=N
+# Trail.Height=720.0
+# Parent\ ID=-1
+# Trail.Width=1280.0
+Timestamp,X,Y,Meta-data
+"1970-01-01 12:00:00.127",424,292,""
+"1970-01-01 12:00:00.224",423,285,""
+"1970-01-01 12:00:00.304",423,277,""
+\end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
