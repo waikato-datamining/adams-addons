@@ -55,7 +55,8 @@ public abstract class AbstractTrailPaintlet
     super.defineOptions();
 
     m_OptionManager.add(
-      "color", "color", Color.BLACK);
+      "color", "color",
+      getDefaultColor());
   }
 
   /**
@@ -69,13 +70,12 @@ public abstract class AbstractTrailPaintlet
   }
 
   /**
-   * Set the stroke color for the paintlet.
+   * Returns the default color for the stroke.
    *
-   * @param value	Color of the stroke
+   * @return		the default
    */
-  public void setColor(Color value) {
-    m_Color = value;
-    memberChanged();
+  protected Color getDefaultColor() {
+    return Color.RED;
   }
 
   /**
@@ -85,6 +85,16 @@ public abstract class AbstractTrailPaintlet
    */
   public Color getColor() {
     return m_Color;
+  }
+
+  /**
+   * Set the stroke color for the paintlet.
+   *
+   * @param value	Color of the stroke
+   */
+  public void setColor(Color value) {
+    m_Color = value;
+    memberChanged();
   }
 
   /**
