@@ -156,8 +156,9 @@ public class TrailStatistic
       firstTimestamp = points.get(0).getTimestamp();
       if (points.size() > 1)
 	lastTimestamp = points.get(points.size() - 1).getTimestamp();
-      deltaX = new Float[points.size() - 1];
-      deltaY = new Float[points.size() - 1];
+      deltaX         = new Float[points.size() - 1];
+      deltaY         = new Float[points.size() - 1];
+      deltaTimestamp = new Long[points.size() - 1];
       for (i = 0; i < points.size(); i++) {
 	if (i > 0) {
 	  deltaX[i - 1]         = points.get(i).getX() - points.get(i - 1).getX();
