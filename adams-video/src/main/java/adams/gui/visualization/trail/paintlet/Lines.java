@@ -38,6 +38,8 @@ public class Lines
   extends AbstractTrailPaintlet
   implements AntiAliasingSupporter {
 
+  private static final long serialVersionUID = -2398989327548617860L;
+
   /** whether anti-aliasing is enabled. */
   protected boolean m_AntiAliasingEnabled;
 

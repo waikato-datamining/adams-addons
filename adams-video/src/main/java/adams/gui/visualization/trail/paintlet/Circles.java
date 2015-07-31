@@ -38,6 +38,8 @@ public class Circles
   extends AbstractTrailPaintlet
   implements AntiAliasingSupporter {
 
+  private static final long serialVersionUID = 5930861236258148877L;
+
   /** the diameter of the circle. */
   protected int m_Diameter;
 
