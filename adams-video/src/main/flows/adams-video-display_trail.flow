@@ -1,0 +1,24 @@
+# Project: adams
+# Date: 2015-07-31 16:17:57
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Loads a trail and displays it.
+	-actor
+		adams.flow.source.FileSupplier
+			-file
+			${EXAMPLE_FLOWS}/data/mouse2.trail
+	-actor
+		adams.flow.transformer.TrailFileReader
+			-reader
+				adams.data.io.input.SimpleTrailReader
+	-actor
+		adams.flow.sink.TrailDisplay
+			-writer
+				adams.gui.print.NullWriter
+			-paintlet
+				adams.gui.visualization.trail.paintlet.Circles
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

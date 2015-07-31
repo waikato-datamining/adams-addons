@@ -201,6 +201,30 @@ public class TrailPanel
   }
 
   /**
+   * Sets the paintlet to use.
+   *
+   * @param value	the paintlet
+   */
+  public void setPaintlet(TrailPaintlet value) {
+    if (m_TrailPaintlet != null) {
+      m_TrailImage.removePaintlet(m_TrailPaintlet);
+      m_TrailPaintlet.setPanel((TrailPanel) null);
+    }
+    m_TrailPaintlet = value;
+    m_TrailImage.addPaintlet(m_TrailPaintlet);
+    m_TrailPaintlet.setPanel(this);
+  }
+
+  /**
+   * Returns the current paintlet in use.
+   *
+   * @return		the paintlet
+   */
+  public TrailPaintlet getPaintlet() {
+    return m_TrailPaintlet;
+  }
+
+  /**
    * Regenerates the image of the current trail and redisplays it.
    *
    * @return		null if everything OK, otherwiser error message

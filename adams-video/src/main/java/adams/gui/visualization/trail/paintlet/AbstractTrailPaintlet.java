@@ -116,7 +116,8 @@ public abstract class AbstractTrailPaintlet
    */
   public void setPanel(TrailPanel value) {
     m_TrailPanel = value;
-    setPanel(m_TrailPanel.getImagePanel());
+    if (m_TrailPanel != null)
+      setPanel(m_TrailPanel.getImagePanel());
   }
 
   /**
