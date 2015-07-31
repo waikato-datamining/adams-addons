@@ -24,10 +24,12 @@ import adams.core.ClassLister;
 import adams.core.option.AbstractOptionConsumer;
 import adams.core.option.ArrayConsumer;
 import adams.core.option.OptionUtils;
+import adams.data.trail.Trail;
 import adams.gui.visualization.image.paintlet.AbstractPaintlet;
 import adams.gui.visualization.trail.TrailPanel;
 
 import java.awt.Color;
+import java.awt.Graphics;
 
 /**
  * Ancestor for trail paintlets.
@@ -124,6 +126,30 @@ public abstract class AbstractTrailPaintlet
    */
   public TrailPanel getTrailPanel() {
     return m_TrailPanel;
+  }
+
+  /**
+   * Paints the given data.
+   *
+   * @param g		the graphics context to use for painting
+   * @param trail	the data to paint
+   */
+  public abstract void paintData(Graphics g, Trail trail);
+
+  /**
+   * The paint routine of the paintlet.
+   *
+   * @param g		the graphics context to use for painting
+   */
+  protected void performPaint(Graphics g) {
+    Trail	trail;
+
+    if (getTrailPanel() == null)
+      return;
+
+    trail = getTrailPanel().getTrail();
+    if (trail != null)
+      paintData(g, trail);
   }
 
   /**

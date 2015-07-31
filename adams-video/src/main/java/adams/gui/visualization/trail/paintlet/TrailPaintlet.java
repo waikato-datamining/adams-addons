@@ -20,8 +20,11 @@
 
 package adams.gui.visualization.trail.paintlet;
 
+import adams.data.trail.Trail;
 import adams.gui.visualization.image.paintlet.Paintlet;
 import adams.gui.visualization.trail.TrailPanel;
+
+import java.awt.Graphics;
 
 /**
  * Interface for trail paintlets.
@@ -45,4 +48,12 @@ public interface TrailPaintlet
    * @return		the panel, null if not set
    */
   public TrailPanel getTrailPanel();
+
+  /**
+   * Paints the given data.
+   *
+   * @param g		the graphics context to use for painting
+   * @param trail	the data to paint
+   */
+  public void paintData(Graphics g, Trail trail);
 }

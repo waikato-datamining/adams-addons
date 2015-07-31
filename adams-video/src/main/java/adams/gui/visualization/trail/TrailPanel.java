@@ -142,7 +142,8 @@ public class TrailPanel
     add(m_LogTabbedPane, BorderLayout.CENTER);
 
     m_SplitPane = new BaseSplitPane();
-    m_SplitPane.setDividerLocation(props.getInteger("Panel.DividerLocation", 600));
+    m_SplitPane.setResizeWeight(1.0);
+    m_SplitPane.setDividerLocation(props.getInteger("Panel.DividerLocation", 700));
     m_LogTabbedPane.addTab("Data", m_SplitPane);
 
     m_TrailImage = new ImagePanel();

@@ -67,7 +67,7 @@ public class TrailViewer
    */
   public void launch() {
     adams.gui.visualization.trail.TrailViewerPanel panel = new adams.gui.visualization.trail.TrailViewerPanel();
-    createChildFrame(panel, 1000, 800);
+    createChildFrame(panel, 1000, 600);
   }
 
   /**

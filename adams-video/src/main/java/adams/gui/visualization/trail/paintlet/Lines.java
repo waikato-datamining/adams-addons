@@ -14,7 +14,7 @@
  */
 
 /**
- * Circles.java
+ * Lines.java
  * Copyright (C) 2015 University of Waikato, Hamilton, NZ
  */
 
@@ -29,24 +29,21 @@ import java.awt.Graphics;
 import java.util.List;
 
 /**
- * Paints the step locations as circles.
+ * Connects the steps with lines.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class Circles
+public class Lines
   extends AbstractTrailPaintlet
   implements AntiAliasingSupporter {
-
-  /** the diameter of the circle. */
-  protected int m_Diameter;
 
   /** whether anti-aliasing is enabled. */
   protected boolean m_AntiAliasingEnabled;
 
   @Override
   public String globalInfo() {
-    return "Simple paints the trail steps as circles.";
+    return "Connects the step locations with lines.";
   }
 
   /**
@@ -57,41 +54,8 @@ public class Circles
     super.defineOptions();
 
     m_OptionManager.add(
-      "diameter", "diameter",
-      7, 1, null);
-
-    m_OptionManager.add(
       "anti-aliasing-enabled", "antiAliasingEnabled",
       GUIHelper.getBoolean(getClass(), "antiAliasingEnabled", true));
-  }
-
-  /**
-   * Sets the circle diameter.
-   *
-   * @param value	the diameter
-   */
-  public void setDiameter(int value) {
-    m_Diameter = value;
-    memberChanged();
-  }
-
-  /**
-   * Returns the diameter of the circle.
-   *
-   * @return		the diameter
-   */
-  public int getDiameter() {
-    return m_Diameter;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String diameterTipText() {
-    return "The diameter of the circle in pixels.";
   }
 
   /**
@@ -132,7 +96,10 @@ public class Circles
   @Override
   public void paintData(Graphics g, Trail trail) {
     List<Step> 		points;
+    Step		prev;
     Step		curr;
+    int			prevX;
+    int			prevY;
     int			currX;
     int			currY;
     int			i;
@@ -143,18 +110,18 @@ public class Circles
     g.setColor(m_Color);
     GUIHelper.configureAntiAliasing(g, m_AntiAliasingEnabled);
 
-    for (i = 0; i < points.size(); i++) {
+    for (i = 1; i < points.size(); i++) {
+      prev = points.get(i - 1);
       curr = points.get(i);
 
       // determine coordinates
+      prevX = (int) prev.getX();
+      prevY = (int) prev.getY();
       currX = (int) curr.getX();
       currY = (int) curr.getY();
 
-      currX -= (m_Diameter / 2);
-      currY -= (m_Diameter / 2);
-
-      // draw circle
-      g.drawOval(currX, currY, m_Diameter - 1, m_Diameter - 1);
+      // draw line
+      g.drawLine(prevX, prevY, currX, currY);
     }
   }
 }
