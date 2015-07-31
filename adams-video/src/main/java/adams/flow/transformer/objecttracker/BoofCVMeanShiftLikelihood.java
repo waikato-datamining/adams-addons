@@ -23,7 +23,14 @@ package adams.flow.transformer.objecttracker;
 import boofcv.abst.tracker.MeanShiftLikelihoodType;
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSInt64;
+import boofcv.struct.image.ImageSInt8;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -284,7 +291,33 @@ public class BoofCVMeanShiftLikelihood
    */
   @Override
   protected TrackerObjectQuad newTracker() {
-    return FactoryTrackerObjectQuad.meanShiftLikelihood(
-      m_MaxIterations, m_NumBins, m_MaxPixelValue, m_Type, ImageType.ms(m_NumBands, ImageUInt8.class));
+    switch (m_ImageType) {
+      case FLOAT_32:
+        return FactoryTrackerObjectQuad.meanShiftLikelihood(
+          m_MaxIterations, m_NumBins, m_MaxPixelValue, m_Type, ImageType.ms(m_NumBands, ImageFloat32.class));
+      case FLOAT_64:
+        return FactoryTrackerObjectQuad.meanShiftLikelihood(
+          m_MaxIterations, m_NumBins, m_MaxPixelValue, m_Type, ImageType.ms(m_NumBands, ImageFloat64.class));
+      case SIGNED_INT_16:
+        return FactoryTrackerObjectQuad.meanShiftLikelihood(
+          m_MaxIterations, m_NumBins, m_MaxPixelValue, m_Type, ImageType.ms(m_NumBands, ImageSInt16.class));
+      case SIGNED_INT_32:
+        return FactoryTrackerObjectQuad.meanShiftLikelihood(
+          m_MaxIterations, m_NumBins, m_MaxPixelValue, m_Type, ImageType.ms(m_NumBands, ImageSInt32.class));
+      case SIGNED_INT_64:
+        return FactoryTrackerObjectQuad.meanShiftLikelihood(
+          m_MaxIterations, m_NumBins, m_MaxPixelValue, m_Type, ImageType.ms(m_NumBands, ImageSInt64.class));
+      case SIGNED_INT_8:
+        return FactoryTrackerObjectQuad.meanShiftLikelihood(
+          m_MaxIterations, m_NumBins, m_MaxPixelValue, m_Type, ImageType.ms(m_NumBands, ImageSInt8.class));
+      case UNSIGNED_INT_16:
+        return FactoryTrackerObjectQuad.meanShiftLikelihood(
+          m_MaxIterations, m_NumBins, m_MaxPixelValue, m_Type, ImageType.ms(m_NumBands, ImageUInt16.class));
+      case UNSIGNED_INT_8:
+        return FactoryTrackerObjectQuad.meanShiftLikelihood(
+          m_MaxIterations, m_NumBins, m_MaxPixelValue, m_Type, ImageType.ms(m_NumBands, ImageUInt8.class));
+      default:
+        throw new IllegalStateException("Unhandled image type: " + m_ImageType);
+    }
   }
 }

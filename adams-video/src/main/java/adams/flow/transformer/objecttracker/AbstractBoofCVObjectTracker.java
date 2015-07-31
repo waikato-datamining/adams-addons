@@ -40,8 +40,52 @@ public abstract class AbstractBoofCVObjectTracker
 
   private static final long serialVersionUID = -8364076045858032972L;
 
+  /** the image type. */
+  protected BoofCVImageType m_ImageType;
+
   /** the tracker. */
   protected TrackerObjectQuad m_Tracker;
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "image-type", "imageType",
+      BoofCVImageType.UNSIGNED_INT_8);
+  }
+
+  /**
+   * Sets the image type to use.
+   *
+   * @param value	the type
+   */
+  public void setImageType(BoofCVImageType value) {
+    m_ImageType = value;
+    reset();
+  }
+
+  /**
+   * Returns the image type to use.
+   *
+   * @return		the type
+   */
+  public BoofCVImageType getImageType() {
+    return m_ImageType;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String imageTypeTipText() {
+    return "The image type to use.";
+  }
 
   /**
    * Instantiates a new tracker.
@@ -61,7 +105,7 @@ public abstract class AbstractBoofCVObjectTracker
     BoofCVImageContainer	bcont;
     ImageBase 			frame;
 
-    bcont     = BoofCVHelper.toBoofCVImageContainer(cont, BoofCVImageType.UNSIGNED_INT_8);
+    bcont     = BoofCVHelper.toBoofCVImageContainer(cont, m_ImageType);
     frame     = bcont.getImage();
     m_Tracker = newTracker();
     if (!m_Tracker.initialize(frame, location.quadrilateralValue()))
@@ -82,7 +126,7 @@ public abstract class AbstractBoofCVObjectTracker
     Quadrilateral_F64		location;
     boolean			visible;
 
-    bcont          = BoofCVHelper.toBoofCVImageContainer(cont, BoofCVImageType.UNSIGNED_INT_8);
+    bcont          = BoofCVHelper.toBoofCVImageContainer(cont, m_ImageType);
     frame          = bcont.getImage();
     location       = m_LastLocation.quadrilateralValue();
     visible        = m_Tracker.process(frame, location);

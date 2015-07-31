@@ -22,6 +22,13 @@ package adams.flow.transformer.objecttracker;
 
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSInt64;
+import boofcv.struct.image.ImageSInt8;
+import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -68,6 +75,25 @@ public class BoofCVSparseFlow
    */
   @Override
   protected TrackerObjectQuad newTracker() {
-    return FactoryTrackerObjectQuad.sparseFlow(null, ImageUInt8.class, null);
+    switch (m_ImageType) {
+      case FLOAT_32:
+        return FactoryTrackerObjectQuad.sparseFlow(null, ImageFloat32.class, null);
+      case FLOAT_64:
+        return FactoryTrackerObjectQuad.sparseFlow(null, ImageFloat64.class, null);
+      case SIGNED_INT_16:
+        return FactoryTrackerObjectQuad.sparseFlow(null, ImageSInt16.class, null);
+      case SIGNED_INT_32:
+        return FactoryTrackerObjectQuad.sparseFlow(null, ImageSInt32.class, null);
+      case SIGNED_INT_64:
+        return FactoryTrackerObjectQuad.sparseFlow(null, ImageSInt64.class, null);
+      case SIGNED_INT_8:
+        return FactoryTrackerObjectQuad.sparseFlow(null, ImageSInt8.class, null);
+      case UNSIGNED_INT_16:
+        return FactoryTrackerObjectQuad.sparseFlow(null, ImageUInt16.class, null);
+      case UNSIGNED_INT_8:
+        return FactoryTrackerObjectQuad.sparseFlow(null, ImageUInt8.class, null);
+      default:
+        throw new IllegalStateException("Unhandled image type: " + m_ImageType);
+    }
   }
 }

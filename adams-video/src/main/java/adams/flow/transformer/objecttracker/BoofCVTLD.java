@@ -26,6 +26,13 @@ import adams.core.TechnicalInformation.Type;
 import adams.core.TechnicalInformationHandler;
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSInt64;
+import boofcv.struct.image.ImageSInt8;
+import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -111,6 +118,25 @@ public class BoofCVTLD
    */
   @Override
   protected TrackerObjectQuad newTracker() {
-    return FactoryTrackerObjectQuad.tld(null,ImageUInt8.class);
+    switch (m_ImageType) {
+      case FLOAT_32:
+        return FactoryTrackerObjectQuad.tld(null, ImageFloat32.class);
+      case FLOAT_64:
+        return FactoryTrackerObjectQuad.tld(null, ImageFloat64.class);
+      case SIGNED_INT_16:
+        return FactoryTrackerObjectQuad.tld(null, ImageSInt16.class);
+      case SIGNED_INT_32:
+        return FactoryTrackerObjectQuad.tld(null, ImageSInt32.class);
+      case SIGNED_INT_64:
+        return FactoryTrackerObjectQuad.tld(null, ImageSInt64.class);
+      case SIGNED_INT_8:
+        return FactoryTrackerObjectQuad.tld(null, ImageSInt8.class);
+      case UNSIGNED_INT_16:
+        return FactoryTrackerObjectQuad.tld(null, ImageUInt16.class);
+      case UNSIGNED_INT_8:
+        return FactoryTrackerObjectQuad.tld(null, ImageUInt8.class);
+      default:
+        throw new IllegalStateException("Unhandled image type: " + m_ImageType);
+    }
   }
 }
