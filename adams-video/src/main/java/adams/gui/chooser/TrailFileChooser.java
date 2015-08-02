@@ -137,8 +137,7 @@ public class TrailFileChooser
 	    result = (AbstractDataContainerReader<Trail>) Class.forName(filter.getClassname()).newInstance();
 	  }
 	  catch (Exception e) {
-	    System.err.println("Failed to instantiate reader '" + filter.getClassname() + "':");
-	    e.printStackTrace();
+	    handleException("Failed to instantiate reader: " + filter.getClassname(), e);
 	  }
 	}
       }
@@ -152,8 +151,7 @@ public class TrailFileChooser
 	      result = (AbstractDataContainerReader<Trail>) Class.forName(filter.getClassname()).newInstance();
 	    }
 	    catch (Exception e) {
-	      System.err.println("Failed to instantiate reader '" + filter.getClassname() + "':");
-	      e.printStackTrace();
+	      handleException("Failed to instantiate reader: " + filter.getClassname(), e);
 	    }
 	  }
 	}
@@ -184,8 +182,7 @@ public class TrailFileChooser
 	    result = (AbstractDataContainerWriter<Trail>) Class.forName(filter.getClassname()).newInstance();
 	  }
 	  catch (Exception e) {
-	    System.err.println("Failed to instantiate writer '" + filter.getClassname() + "':");
-	    e.printStackTrace();
+	    handleException("Failed to instantiate writer: " + filter.getClassname(), e);
 	  }
 	}
       }
@@ -199,8 +196,7 @@ public class TrailFileChooser
 	      result = (AbstractDataContainerWriter<Trail>) Class.forName(filter.getClassname()).newInstance();
 	    }
 	    catch (Exception e) {
-	      System.err.println("Failed to instantiate writer '" + filter.getClassname() + "':");
-	      e.printStackTrace();
+	      handleException("Failed to instantiate writer: " + filter.getClassname(), e);
 	    }
 	  }
 	}
