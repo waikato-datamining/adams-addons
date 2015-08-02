@@ -13,7 +13,7 @@ Image.Paintlet=adams.gui.visualization.trail.paintlet.Circles
 Image.Scale=-1.0
 
 # Whether to display the trail also as spreadsheet (true|false)
-SpreadSheet.Show=false
+SpreadSheet.Show=true
 
 # The number of decimals to show in the spreadsheet table (integer)
 SpreadSheet.NumDecimals=3

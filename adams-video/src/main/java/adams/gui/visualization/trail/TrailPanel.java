@@ -153,11 +153,11 @@ public class TrailPanel
       m_TabbedPane = new BaseTabbedPane();
       m_SplitPane.setLeftComponent(m_TabbedPane);
 
-      m_TabbedPane.addTab("Image", m_TrailImage);
+      m_TabbedPane.addTab("View", m_TrailImage);
 
       m_TrailTable = new SpreadSheetTable(new SpreadSheet());
       m_TrailTable.setNumDecimals(props.getInteger("SpreadSheet.NumDecimals", 3));
-      m_TabbedPane.addTab("Raw", new BaseScrollPane(m_TrailTable));
+      m_TabbedPane.addTab("Trail", new BaseScrollPane(m_TrailTable));
     }
     else {
       m_SplitPane.setLeftComponent(m_TrailImage);
