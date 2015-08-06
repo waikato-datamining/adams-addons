@@ -15,16 +15,17 @@
 
 /**
  * FileMover.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
 
-import java.io.File;
-
+import adams.core.AtomicMoveSupporter;
 import adams.core.QuickInfoHelper;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
+
+import java.io.File;
 
 /**
  <!-- globalinfo-start -->
@@ -44,6 +45,12 @@ import adams.core.io.PlaceholderFile;
  * &nbsp;&nbsp;&nbsp;minimum: 0
  * </pre>
  * 
+ * <pre>-atomic-move &lt;boolean&gt; (property: atomicMove)
+ * &nbsp;&nbsp;&nbsp;If true, then an atomic move operation will be attempted (NB: not supported 
+ * &nbsp;&nbsp;&nbsp;by all operating systems).
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  * <pre>-target &lt;adams.core.io.PlaceholderDirectory&gt; (property: target)
  * &nbsp;&nbsp;&nbsp;The directory to move the files to.
  * &nbsp;&nbsp;&nbsp;default: ${CWD}
@@ -55,7 +62,8 @@ import adams.core.io.PlaceholderFile;
  * @version $Revision$
  */
 public class FileMover
-  extends AbstractRatOutput {
+  extends AbstractRatOutput
+  implements AtomicMoveSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = 5834627889486613248L;
@@ -65,6 +73,9 @@ public class FileMover
 
   /** the waiting period in msec before moving the files. */
   protected int m_WaitMove;
+
+  /** whether to perform an atomic move. */
+  protected boolean m_AtomicMove;
 
   /**
    * Returns a string describing the object.
@@ -84,12 +95,16 @@ public class FileMover
     super.defineOptions();
 
     m_OptionManager.add(
-	    "wait-move", "waitMove",
-	    0, 0, null);
+      "wait-move", "waitMove",
+      0, 0, null);
 
     m_OptionManager.add(
-	    "target", "target",
-	    new PlaceholderDirectory());
+      "atomic-move", "atomicMove",
+      false);
+
+    m_OptionManager.add(
+      "target", "target",
+      new PlaceholderDirectory());
   }
 
   /**
@@ -124,6 +139,37 @@ public class FileMover
    */
   public String waitMoveTipText() {
     return "The number of milli-seconds to wait before moving the files.";
+  }
+
+  /**
+   * Sets whether to attempt atomic move operation.
+   *
+   * @param value	if true then attempt atomic move operation
+   */
+  public void setAtomicMove(boolean value) {
+    m_AtomicMove = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to attempt atomic move operation.
+   *
+   * @return 		true if to attempt atomic move operation
+   */
+  public boolean getAtomicMove() {
+    return m_AtomicMove;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String atomicMoveTipText() {
+    return
+        "If true, then an atomic move operation will be attempted "
+	  + "(NB: not supported by all operating systems).";
   }
 
   /**
@@ -212,25 +258,23 @@ public class FileMover
     
     result = null;
     files  = FileUtils.toPlaceholderFileArray(m_Input);
-    
-    if (result == null) {
-      doWait(m_WaitMove);
-      for (File file: files) {
-	try {
-	  ok = FileUtils.move(file, m_Target);
-	  if (isLoggingEnabled())
-	    getLogger().fine("Moving " + (ok ? "succeeded" : "failed") + ": " + file + " -> " + m_Target);
-	}
-	catch (Exception e) {
-	  if (result == null)
-	    result = "";
-	  else
-	    result += "\n";
-	  result += handleException("Failed to move '" + file + "' to '" + m_Target + "'!", e);
-	}
+
+    doWait(m_WaitMove);
+    for (File file: files) {
+      try {
+	ok = FileUtils.move(file, m_Target, m_AtomicMove);
+	if (isLoggingEnabled())
+	  getLogger().fine("Moving " + (ok ? "succeeded" : "failed") + ": " + file + " -> " + m_Target);
+      }
+      catch (Exception e) {
+	if (result == null)
+	  result = "";
+	else
+	  result += "\n";
+	result += handleException("Failed to move '" + file + "' to '" + m_Target + "'!", e);
       }
     }
-    
+
     return result;
   }
 }

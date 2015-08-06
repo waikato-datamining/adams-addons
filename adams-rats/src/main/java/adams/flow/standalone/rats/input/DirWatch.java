@@ -15,9 +15,16 @@
 
 /**
  * DirWatch.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
+
+import adams.core.AtomicMoveSupporter;
+import adams.core.QuickInfoHelper;
+import adams.core.Utils;
+import adams.core.io.FileUtils;
+import adams.core.io.PlaceholderDirectory;
+import adams.core.io.PlaceholderFile;
 
 import java.io.File;
 import java.nio.file.FileSystems;
@@ -30,12 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
-
-import adams.core.QuickInfoHelper;
-import adams.core.Utils;
-import adams.core.io.FileUtils;
-import adams.core.io.PlaceholderDirectory;
-import adams.core.io.PlaceholderFile;
 
 /**
  <!-- globalinfo-start -->
@@ -78,6 +79,12 @@ import adams.core.io.PlaceholderFile;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
+ * <pre>-atomic-move &lt;boolean&gt; (property: atomicMove)
+ * &nbsp;&nbsp;&nbsp;If true, then an atomic move operation will be attempted (NB: not supported 
+ * &nbsp;&nbsp;&nbsp;by all operating systems).
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  * <pre>-target &lt;adams.core.io.PlaceholderDirectory&gt; (property: target)
  * &nbsp;&nbsp;&nbsp;The directory to move the files to before transmitting their names.
  * &nbsp;&nbsp;&nbsp;default: ${CWD}
@@ -89,7 +96,8 @@ import adams.core.io.PlaceholderFile;
  * @version $Revision$
  */
 public class DirWatch
-  extends AbstractRatInput {
+  extends AbstractRatInput
+  implements AtomicMoveSupporter {
   
   /** for serialization. */
   private static final long serialVersionUID = -6772954304997860394L;
@@ -141,7 +149,10 @@ public class DirWatch
 
   /** whether to move the files before transmitting them. */
   protected boolean m_MoveFiles;
-  
+
+  /** whether to perform an atomic move. */
+  protected boolean m_AtomicMove;
+
   /** the directory to move the files to. */
   protected PlaceholderDirectory m_Target;
 
@@ -169,28 +180,32 @@ public class DirWatch
     super.defineOptions();
 
     m_OptionManager.add(
-	    "source", "source",
-	    new PlaceholderDirectory());
+      "source", "source",
+      new PlaceholderDirectory());
 
     m_OptionManager.add(
-	    "event", "events",
-	    new WatchEventKind[]{WatchEventKind.CREATE});
+      "event", "events",
+      new WatchEventKind[]{WatchEventKind.CREATE});
 
     m_OptionManager.add(
-	    "wait-poll", "waitPoll",
-	    50, 0, null);
+      "wait-poll", "waitPoll",
+      50, 0, null);
 
     m_OptionManager.add(
-	    "wait-list", "waitList",
-	    0, 0, null);
+      "wait-list", "waitList",
+      0, 0, null);
 
     m_OptionManager.add(
-	    "move-files", "moveFiles",
-	    false);
+      "move-files", "moveFiles",
+      false);
 
     m_OptionManager.add(
-	    "target", "target",
-	    new PlaceholderDirectory());
+      "atomic-move", "atomicMove",
+      false);
+
+    m_OptionManager.add(
+      "target", "target",
+      new PlaceholderDirectory());
   }
 
   /**
@@ -373,6 +388,37 @@ public class DirWatch
   }
 
   /**
+   * Sets whether to attempt atomic move operation.
+   *
+   * @param value	if true then attempt atomic move operation
+   */
+  public void setAtomicMove(boolean value) {
+    m_AtomicMove = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to attempt atomic move operation.
+   *
+   * @return 		true if to attempt atomic move operation
+   */
+  public boolean getAtomicMove() {
+    return m_AtomicMove;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String atomicMoveTipText() {
+    return
+        "If true, then an atomic move operation will be attempted "
+	  + "(NB: not supported by all operating systems).";
+  }
+
+  /**
    * Sets the move-to directory.
    *
    * @param value	the move-to directory
@@ -532,7 +578,7 @@ public class DirWatch
       for (i = 0; i < files.size(); i++) {
 	file = new PlaceholderFile(files.get(i));
 	try {
-	  if (!FileUtils.move(file, m_Target))
+	  if (!FileUtils.move(file, m_Target, m_AtomicMove))
 	    result = "Failed to move '" + file + "' to '" + m_Target + "'!";
 	  else
 	    files.set(i, m_Target.getAbsolutePath() + File.separator + file.getName());
