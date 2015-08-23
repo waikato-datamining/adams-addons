@@ -23,6 +23,8 @@ package adams.flow.transformer.objecttracker;
 import adams.core.base.QuadrilateralLocation;
 import adams.data.image.AbstractImageContainer;
 
+import java.util.List;
+
 /**
  * Interface for object trackers.
  *
@@ -35,10 +37,9 @@ public interface ObjectTracker {
    * Initializes the tracker.
    *
    * @param cont	the image to use for initializing
-   * @param location	the initial location of the object
    * @return		null if successfully initialized, otherwise error message
    */
-  public String initTracking(AbstractImageContainer cont, QuadrilateralLocation location);
+  public String initTracking(AbstractImageContainer cont);
 
   /**
    * Returns whether the tracker has been initialized.
@@ -53,5 +54,5 @@ public interface ObjectTracker {
    * @param cont	the current image
    * @return		the location of the tracked image, null if failed to track
    */
-  public QuadrilateralLocation trackObject(AbstractImageContainer cont);
+  public List<QuadrilateralLocation> trackObjects(AbstractImageContainer cont);
 }

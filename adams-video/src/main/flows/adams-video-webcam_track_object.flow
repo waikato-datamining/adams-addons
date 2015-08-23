@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2015-07-09 22:35:24
+# Date: 2015-08-24 11:06:02
 # User: fracpete
 #
 adams.flow.control.Flow
@@ -33,6 +33,8 @@ adams.flow.control.Flow
 							#ff0000
 							-image-overlay
 								adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport
+					-close-dialog
+					true
 			-tee
 				adams.flow.transformer.SetStorageValue
 					-storage-name

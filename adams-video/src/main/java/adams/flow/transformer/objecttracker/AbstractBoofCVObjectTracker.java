@@ -29,6 +29,9 @@ import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.shapes.Quadrilateral_F64;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Ancestor for BoofCV object trackers.
  *
@@ -36,7 +39,7 @@ import georegression.struct.shapes.Quadrilateral_F64;
  * @version $Revision$
  */
 public abstract class AbstractBoofCVObjectTracker
-  extends AbstractObjectTracker {
+  extends AbstractSimpleReportBasedObjectTracker {
 
   private static final long serialVersionUID = -8364076045858032972L;
 
@@ -98,17 +101,17 @@ public abstract class AbstractBoofCVObjectTracker
    * Performs the actual initialization of the tracking.
    *
    * @param cont	the image to use for initializing
-   * @param location	the initial location of the object
+   * @param locations	the initial location(s) of the object(s)
    * @return		true if successfully initialized, error message otherwise
    */
-  protected String doInitTracking(AbstractImageContainer cont, QuadrilateralLocation location) {
+  protected String doInitTracking(AbstractImageContainer cont, List<QuadrilateralLocation> locations) {
     BoofCVImageContainer	bcont;
     ImageBase 			frame;
 
     bcont     = BoofCVHelper.toBoofCVImageContainer(cont, m_ImageType);
     frame     = bcont.getImage();
     m_Tracker = newTracker();
-    if (!m_Tracker.initialize(frame, location.quadrilateralValue()))
+    if (!m_Tracker.initialize(frame, locations.get(0).quadrilateralValue()))
       return "Failed to initialze tracker!";
 
     return null;
@@ -120,20 +123,21 @@ public abstract class AbstractBoofCVObjectTracker
    * @param cont	the current image
    * @return		the location of the tracked image, null if failed to track
    */
-  protected QuadrilateralLocation doTrackObject(AbstractImageContainer cont) {
+  protected List<QuadrilateralLocation> doTrackObjects(AbstractImageContainer cont) {
     BoofCVImageContainer	bcont;
     ImageBase 			frame;
     Quadrilateral_F64		location;
     boolean			visible;
 
-    bcont          = BoofCVHelper.toBoofCVImageContainer(cont, m_ImageType);
-    frame          = bcont.getImage();
-    location       = m_LastLocation.quadrilateralValue();
-    visible        = m_Tracker.process(frame, location);
-    m_LastLocation = new QuadrilateralLocation(location);
+    bcont           = BoofCVHelper.toBoofCVImageContainer(cont, m_ImageType);
+    frame           = bcont.getImage();
+    location        = m_LastLocations.get(0).quadrilateralValue();
+    visible         = m_Tracker.process(frame, location);
+    m_LastLocations = new ArrayList<>();
+    m_LastLocations.add(new QuadrilateralLocation(location));
     if (isLoggingEnabled())
       getLogger().info("visible=" + visible);
 
-    return m_LastLocation;
+    return m_LastLocations;
   }
 }

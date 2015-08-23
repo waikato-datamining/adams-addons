@@ -23,11 +23,11 @@ package adams.flow.transformer;
 import adams.core.QuickInfoHelper;
 import adams.core.base.QuadrilateralLocation;
 import adams.data.image.AbstractImageContainer;
-import adams.data.report.DataType;
-import adams.data.report.Field;
 import adams.flow.core.Token;
 import adams.flow.transformer.objecttracker.BoofCVCirculant;
 import adams.flow.transformer.objecttracker.ObjectTracker;
+
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -81,17 +81,7 @@ import adams.flow.transformer.objecttracker.ObjectTracker;
  * &nbsp;&nbsp;&nbsp;The object tracking algorithm to use.
  * &nbsp;&nbsp;&nbsp;default: adams.flow.transformer.objecttracker.BoofCVCirculant
  * </pre>
- * 
- * <pre>-init &lt;adams.data.report.Field&gt; (property: init)
- * &nbsp;&nbsp;&nbsp;The field with the initial object location.
- * &nbsp;&nbsp;&nbsp;default: Tracker.Init[S]
- * </pre>
- * 
- * <pre>-current &lt;adams.data.report.Field&gt; (property: current)
- * &nbsp;&nbsp;&nbsp;The field to store the current location of the object in.
- * &nbsp;&nbsp;&nbsp;default: Tracker.Current[S]
- * </pre>
- * 
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -105,12 +95,6 @@ public class TrackObjects
 
   /** the object tracker. */
   protected ObjectTracker m_Algorithm;
-
-  /** the report field with the location to initialize the tracker with. */
-  protected Field m_Init;
-
-  /** the report field to store the tracked location in. */
-  protected Field m_Current;
 
   /**
    * Returns a string describing the object.
@@ -133,14 +117,6 @@ public class TrackObjects
     m_OptionManager.add(
       "algorithm", "algorithm",
       new BoofCVCirculant());
-
-    m_OptionManager.add(
-      "init", "init",
-      new Field("Tracker.Init", DataType.STRING));
-
-    m_OptionManager.add(
-      "current", "current",
-      new Field("Tracker.Current", DataType.STRING));
   }
 
   /**
@@ -173,64 +149,6 @@ public class TrackObjects
   }
 
   /**
-   * Sets the field with the location for initializing the tracker.
-   *
-   * @param value	the field
-   */
-  public void setInit(Field value) {
-    m_Init = value;
-    reset();
-  }
-
-  /**
-   * Returns the field with the location for initializing the tracker.
-   *
-   * @return		the field
-   */
-  public Field getInit() {
-    return m_Init;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String initTipText() {
-    return "The field with the initial object location.";
-  }
-
-  /**
-   * Sets the field to store the current location of the object in.
-   *
-   * @param value	the field
-   */
-  public void setCurrent(Field value) {
-    m_Current = value;
-    reset();
-  }
-
-  /**
-   * Returns the field to store the current location of the object in.
-   *
-   * @return		the field
-   */
-  public Field getCurrent() {
-    return m_Current;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String currentTipText() {
-    return "The field to store the current location of the object in.";
-  }
-
-  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -240,8 +158,6 @@ public class TrackObjects
     String	result;
 
     result  = QuickInfoHelper.toString(this, "algorithm", m_Algorithm, "algorithm: ");
-    result += QuickInfoHelper.toString(this, "init", m_Init, ", init: ");
-    result += QuickInfoHelper.toString(this, "current", m_Current, ", current: ");
 
     return result;
   }
@@ -274,26 +190,21 @@ public class TrackObjects
   protected String doExecute() {
     String			result;
     AbstractImageContainer	cont;
-    QuadrilateralLocation	location;
+    List<QuadrilateralLocation> locations;
 
     result = null;
 
     cont = (AbstractImageContainer) m_InputToken.getPayload();
 
     // init?
-    if (cont.getReport().hasValue(m_Init)) {
-      location = new QuadrilateralLocation(cont.getReport().getStringValue(m_Init));
-      result = m_Algorithm.initTracking(cont, location);
+    if (!m_Algorithm.isInitialized()) {
+      result = m_Algorithm.initTracking(cont);
     }
     // track?
-    else if (m_Algorithm.isInitialized()) {
-      location = m_Algorithm.trackObject(cont);
-      if (location == null) {
-	result = "Failed to track object!";
-      }
-      else {
-	cont.getReport().addField(m_Current);
-	cont.getReport().setValue(m_Current, location.toString());
+    else {
+      locations = m_Algorithm.trackObjects(cont);
+      if (locations == null) {
+	result = "Failed to track object(s)!";
       }
     }
 

@@ -20,9 +20,13 @@
 
 package adams.flow.transformer.objecttracker;
 
+import adams.core.QuickInfoSupporter;
 import adams.core.base.QuadrilateralLocation;
 import adams.core.option.AbstractOptionHandler;
 import adams.data.image.AbstractImageContainer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Ancestor for object trackers.
@@ -32,15 +36,15 @@ import adams.data.image.AbstractImageContainer;
  */
 public abstract class AbstractObjectTracker
   extends AbstractOptionHandler
-  implements ObjectTracker {
+  implements ObjectTracker, QuickInfoSupporter {
 
   private static final long serialVersionUID = -7912135967034523506L;
 
   /** whether the tracker has been intialized. */
   protected boolean m_Initialized;
 
-  /** the last location. */
-  protected QuadrilateralLocation m_LastLocation;
+  /** the last location(s). */
+  protected List<QuadrilateralLocation> m_LastLocations;
 
   /**
    * Resets the scheme.
@@ -49,22 +53,42 @@ public abstract class AbstractObjectTracker
   protected void reset() {
     super.reset();
 
-    m_Initialized  = false;
-    m_LastLocation = null;
+    m_Initialized   = false;
+    m_LastLocations = new ArrayList<>();
   }
+
+  /**
+   * Returns a quick info about the actor, which will be displayed in the GUI.
+   * <br>
+   * Default implementation does nothing.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    return null;
+  }
+
+  /**
+   * Returns the initial object locations.
+   *
+   * @param cont	the current image container
+   * @return		the locations, null if failed to determine
+   */
+  protected abstract List<QuadrilateralLocation> getInitialLocations(AbstractImageContainer cont);
 
   /**
    * Performs checks before the tracking is initialized.
    *
    * @param cont	the image to use for initializing
-   * @param location	the initial location of the object
+   * @param locations	the initial location(s) of the object(s)
    * @return		true if successfully initialized, error message otherwise
    */
-  protected String checkInitTracking(AbstractImageContainer cont, QuadrilateralLocation location) {
+  protected String checkInitTracking(AbstractImageContainer cont, List<QuadrilateralLocation> locations) {
     if (cont == null)
       return "No image provided for tracking initialization!";
-    if (location == null)
-      return "No object location provided for tracking initialization!";
+    if ((locations == null) || (locations.size() == 0))
+      return "No initial object locations available!";
     return null;
   }
 
@@ -72,31 +96,40 @@ public abstract class AbstractObjectTracker
    * Performs the actual initialization of the tracking.
    *
    * @param cont	the image to use for initializing
-   * @param location	the initial location of the object
+   * @param locations	the initial location(s) of the object(s)
    * @return		true if successfully initialized, error message otherwise
    */
-  protected abstract String doInitTracking(AbstractImageContainer cont, QuadrilateralLocation location);
+  protected abstract String doInitTracking(AbstractImageContainer cont, List<QuadrilateralLocation> locations);
 
   /**
    * Initializes the tracker.
    *
    * @param cont	the image to use for initializing
-   * @param location	the initial location of the object
    * @return		true if successfully initialized, error message otherwise
    */
-  public String initTracking(AbstractImageContainer cont, QuadrilateralLocation location) {
-    String	result;
+  public String initTracking(AbstractImageContainer cont) {
+    String			result;
+    List<QuadrilateralLocation>	locations;
 
-    if (isLoggingEnabled())
-      getLogger().info("Initializing with location=" + m_LastLocation);
+    m_LastLocations.clear();
 
-    result = checkInitTracking(cont, location);
-    if (result == null)
-      result = doInitTracking(cont, location);
+    locations = getInitialLocations(cont);
+    result    = checkInitTracking(cont, locations);
+
+    if (result == null) {
+      if (isLoggingEnabled())
+	getLogger().info("Initializing with location=" + locations);
+      result = doInitTracking(cont, locations);
+    }
 
     m_Initialized = (result == null);
-    if (m_Initialized)
-      m_LastLocation = location;
+    if (!m_Initialized) {
+      m_LastLocations.clear();
+    }
+    else {
+      m_LastLocations.clear();
+      m_LastLocations.addAll(locations);
+    }
 
     if (result != null)
       getLogger().severe(result);
@@ -119,7 +152,7 @@ public abstract class AbstractObjectTracker
    * @param cont	the current image
    * @return		null if checks passed, otherwise error message
    */
-  protected String checkTrackObject(AbstractImageContainer cont) {
+  protected String checkTrackObjects(AbstractImageContainer cont) {
     if (cont == null)
       return "No image provided for tracking!";
     return null;
@@ -129,9 +162,20 @@ public abstract class AbstractObjectTracker
    * Performs the actual tracking of the object.
    *
    * @param cont	the current image
-   * @return		the location of the tracked image, null if failed to track
+   * @return		the location(s) of the tracked object(s), null if failed to track
    */
-  protected abstract QuadrilateralLocation doTrackObject(AbstractImageContainer cont);
+  protected abstract List<QuadrilateralLocation> doTrackObjects(AbstractImageContainer cont);
+
+  /**
+   * Hook method for post-processing the tracked objects.
+   *
+   * @param cont	the current image
+   * @param locations	the location(s) of the tracked object(s)
+   * @return		the (potentially) updated location(s) of the tracked object(s)
+   */
+  protected List<QuadrilateralLocation> postProcessTrackedObjects(AbstractImageContainer cont, List<QuadrilateralLocation> locations) {
+    return locations;
+  }
 
   /**
    * Performs the tracking of the object.
@@ -139,20 +183,25 @@ public abstract class AbstractObjectTracker
    * @param cont	the current image
    * @return		the location of the tracked image, null if failed to track
    */
-  public QuadrilateralLocation trackObject(AbstractImageContainer cont) {
-    QuadrilateralLocation	result;
+  public List<QuadrilateralLocation> trackObjects(AbstractImageContainer cont) {
+    List<QuadrilateralLocation>	result;
     String			msg;
 
-    msg = checkTrackObject(cont);
+    msg = checkTrackObjects(cont);
     if (msg != null) {
       getLogger().severe(msg);
       return null;
     }
 
-    result = doTrackObject(cont);
+    result = doTrackObjects(cont);
+
+    if (result != null) {
+      result          = postProcessTrackedObjects(cont, result);
+      m_LastLocations = result;
+    }
 
     if (isLoggingEnabled())
-      getLogger().info("Tracked location=" + result);
+      getLogger().info("Tracked locations=" + result);
 
     return result;
   }
