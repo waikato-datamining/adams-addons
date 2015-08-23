@@ -135,11 +135,11 @@ public class SelectObjectToTrack
       report.removeValue(m_Location);
     }
     else {
-      x1     = panel.mouseToPixelLocation(topLeft).x;
-      y1     = panel.mouseToPixelLocation(topLeft).y;
-      x2     = panel.mouseToPixelLocation(bottomRight).x;
-      y2     = panel.mouseToPixelLocation(bottomRight).y;
-      loc    = new QuadrilateralLocation(
+      x1  = panel.mouseToPixelLocation(topLeft).x;
+      y1  = panel.mouseToPixelLocation(topLeft).y;
+      x2  = panel.mouseToPixelLocation(bottomRight).x;
+      y2  = panel.mouseToPixelLocation(bottomRight).y;
+      loc = new QuadrilateralLocation(
 	x1, y1,
 	x2, y1,
 	x2, y2,
