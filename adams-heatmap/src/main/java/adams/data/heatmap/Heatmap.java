@@ -611,6 +611,59 @@ public class Heatmap
   }
 
   /**
+   * Compares this object with the specified object for order.  Returns a
+   * negative integer, zero, or a positive integer as this object is less
+   * than, equal to, or greater than the specified object.
+   *
+   * @param   o the object to be compared.
+   * @return  a negative integer, zero, or a positive integer as this object
+   *		is less than, equal to, or greater than the specified object.
+   * @throws ClassCastException if the specified object's type prevents it
+   *         from being compared to this object.
+   */
+  public int compareToData(Object o) {
+    int			result;
+    Heatmap 		c;
+    int			x;
+    int			y;
+
+    if (o == null)
+      return 1;
+
+    c = (Heatmap) o;
+
+    result = new Integer(getWidth()).compareTo(c.getWidth());
+
+    if (result == 0)
+      result = new Integer(getHeight()).compareTo(c.getHeight());
+
+    if (result == 0) {
+      for (y = 0; y < getHeight(); y++) {
+	for (x = 0; x < getWidth(); x++) {
+	  result = new Double(get(y, x)).compareTo(c.get(y, x));
+	  if (result != 0)
+	    break;
+	}
+	if (result != 0)
+	  break;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Indicates whether some other container's header is "equal to" this ones.
+   *
+   * @param obj		the reference object with which to compare.
+   * @return		true if this object is the same as the obj argument;
+   * 			false otherwise.
+   */
+  public boolean equalsData(Object obj) {
+    return (compareToData(obj) == 0);
+  }
+
+  /**
    * Checks whether the specified object has the same content as this one.
    * 
    * @param obj		the object to compare
@@ -619,10 +672,7 @@ public class Heatmap
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Heatmap)
-      return (compareTo(obj) == 0);
-    else
-      return false;
+    return (obj instanceof Heatmap) && (compareTo(obj) == 0);
   }
   
   /**
