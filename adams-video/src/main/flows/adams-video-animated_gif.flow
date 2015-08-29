@@ -1,0 +1,68 @@
+# Project: adams
+# Date: 2015-08-29 13:28:15
+# User: fracpete
+#
+adams.flow.control.Flow
+	-annotation
+	Generates an animated GIF from a sequence of images.
+	-actor
+		adams.flow.source.FileSupplier
+			-output-array
+			true
+			-file
+			${EXAMPLE_FLOWS}/data/day001.png
+			-file
+			${EXAMPLE_FLOWS}/data/day002.png
+			-file
+			${EXAMPLE_FLOWS}/data/day003.png
+			-file
+			${EXAMPLE_FLOWS}/data/day004.png
+			-file
+			${EXAMPLE_FLOWS}/data/day005.png
+			-file
+			${EXAMPLE_FLOWS}/data/day006.png
+			-file
+			${EXAMPLE_FLOWS}/data/day007.png
+			-file
+			${EXAMPLE_FLOWS}/data/day008.png
+			-file
+			${EXAMPLE_FLOWS}/data/day009.png
+			-file
+			${EXAMPLE_FLOWS}/data/day010.png
+			-file
+			${EXAMPLE_FLOWS}/data/day011.png
+			-file
+			${EXAMPLE_FLOWS}/data/day012.png
+			-file
+			${EXAMPLE_FLOWS}/data/day013.png
+			-file
+			${EXAMPLE_FLOWS}/data/day014.png
+			-file
+			${EXAMPLE_FLOWS}/data/day015.png
+			-file
+			${EXAMPLE_FLOWS}/data/day016.png
+			-file
+			${EXAMPLE_FLOWS}/data/day017.png
+			-file
+			${EXAMPLE_FLOWS}/data/day018.png
+			-file
+			${EXAMPLE_FLOWS}/data/day019.png
+			-file
+			${EXAMPLE_FLOWS}/data/day020.png
+			-file
+			${EXAMPLE_FLOWS}/data/day021.png
+			-file
+			${EXAMPLE_FLOWS}/data/day022.png
+			-file
+			${EXAMPLE_FLOWS}/data/day023.png
+	-actor
+		adams.flow.sink.AnimatedGifFileWriter
+			-output
+			${EXAMPLE_FLOWS}/output/days.gif
+			-delay
+			500
+			-loop
+			true
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+
