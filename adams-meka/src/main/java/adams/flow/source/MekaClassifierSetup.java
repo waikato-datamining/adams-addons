@@ -15,7 +15,7 @@
 
 /*
  * WekaClassifierSetup.java
- * Copyright (C) 2012-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2015 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.source;
@@ -168,7 +168,7 @@ public class MekaClassifierSetup
     result = null;
 
     try {
-      cls           = (meka.classifiers.multilabel.MultilabelClassifier) weka.classifiers.AbstractClassifier.makeCopy(m_Classifier);
+      cls           = (meka.classifiers.multilabel.MultilabelClassifier) OptionUtils.shallowCopy(m_Classifier);
       m_OutputToken = new Token(cls);
     }
     catch (Exception e) {
