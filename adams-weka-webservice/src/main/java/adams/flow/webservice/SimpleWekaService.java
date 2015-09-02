@@ -15,19 +15,26 @@
 
 /*
  * SimpleWekaService.java
- * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.webservice;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Random;
-
-import javax.activation.DataHandler;
-import javax.mail.util.ByteArrayDataSource;
-
+import adams.core.LRUCache;
+import adams.core.SerializationHelper;
+import adams.core.Utils;
+import adams.core.option.AbstractOptionHandler;
+import adams.core.option.OptionUtils;
+import adams.core.option.WekaCommandLineHandler;
+import adams.flow.core.AbstractActor;
+import adams.flow.core.ActorUtils;
+import adams.flow.core.CallableActorHelper;
+import adams.flow.core.CallableActorReference;
+import adams.flow.core.Compatibility;
+import adams.flow.core.DatasetHelper;
+import adams.flow.core.InputConsumer;
+import adams.flow.core.OutputProducer;
+import adams.flow.core.Token;
 import nz.ac.waikato.adams.webservice.weka.Attributes;
 import nz.ac.waikato.adams.webservice.weka.Body;
 import nz.ac.waikato.adams.webservice.weka.CrossValidateResponseObject;
@@ -52,25 +59,17 @@ import nz.ac.waikato.adams.webservice.weka.WekaService;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.meta.MultiSearch;
-import weka.classifiers.meta.multisearch.Performance;
+import weka.classifiers.meta.multisearch.DefaultEvaluationMetrics;
 import weka.clusterers.Clusterer;
 import weka.core.SelectedTag;
 import weka.core.setupgenerator.AbstractParameter;
-import adams.core.LRUCache;
-import adams.core.SerializationHelper;
-import adams.core.Utils;
-import adams.core.option.AbstractOptionHandler;
-import adams.core.option.OptionUtils;
-import adams.core.option.WekaCommandLineHandler;
-import adams.flow.core.AbstractActor;
-import adams.flow.core.ActorUtils;
-import adams.flow.core.CallableActorReference;
-import adams.flow.core.CallableActorHelper;
-import adams.flow.core.Compatibility;
-import adams.flow.core.DatasetHelper;
-import adams.flow.core.InputConsumer;
-import adams.flow.core.OutputProducer;
-import adams.flow.core.Token;
+
+import javax.activation.DataHandler;
+import javax.mail.util.ByteArrayDataSource;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Random;
 
 /**
  * Class that implements the weka web service.  
@@ -705,21 +704,21 @@ public class SimpleWekaService
       params[i] = (AbstractParameter) handler.fromCommandLine(searchParameters.get(i));
     search.setSearchParameters(params);
     if (evaluation.equals("ACC"))
-      search.setEvaluation(new SelectedTag(Performance.EVALUATION_ACC, MultiSearch.TAGS_EVALUATION));
+      search.setEvaluation(new SelectedTag(DefaultEvaluationMetrics.EVALUATION_ACC, new DefaultEvaluationMetrics().getTags()));
     else if (evaluation.equals("COMBINED"))
-      search.setEvaluation(new SelectedTag(Performance.EVALUATION_COMBINED, MultiSearch.TAGS_EVALUATION));
+      search.setEvaluation(new SelectedTag(DefaultEvaluationMetrics.EVALUATION_COMBINED, new DefaultEvaluationMetrics().getTags()));
     else if (evaluation.equals("CC"))
-      search.setEvaluation(new SelectedTag(Performance.EVALUATION_CC, MultiSearch.TAGS_EVALUATION));
+      search.setEvaluation(new SelectedTag(DefaultEvaluationMetrics.EVALUATION_CC, new DefaultEvaluationMetrics().getTags()));
     else if (evaluation.equals("KAPPA"))
-      search.setEvaluation(new SelectedTag(Performance.EVALUATION_KAPPA, MultiSearch.TAGS_EVALUATION));
+      search.setEvaluation(new SelectedTag(DefaultEvaluationMetrics.EVALUATION_KAPPA, new DefaultEvaluationMetrics().getTags()));
     else if (evaluation.equals("MAE"))
-      search.setEvaluation(new SelectedTag(Performance.EVALUATION_MAE, MultiSearch.TAGS_EVALUATION));
+      search.setEvaluation(new SelectedTag(DefaultEvaluationMetrics.EVALUATION_MAE, new DefaultEvaluationMetrics().getTags()));
     else if (evaluation.equals("RAE"))
-      search.setEvaluation(new SelectedTag(Performance.EVALUATION_RAE, MultiSearch.TAGS_EVALUATION));
+      search.setEvaluation(new SelectedTag(DefaultEvaluationMetrics.EVALUATION_RAE, new DefaultEvaluationMetrics().getTags()));
     else if (evaluation.equals("RMSE"))
-      search.setEvaluation(new SelectedTag(Performance.EVALUATION_RMSE, MultiSearch.TAGS_EVALUATION));
+      search.setEvaluation(new SelectedTag(DefaultEvaluationMetrics.EVALUATION_RMSE, new DefaultEvaluationMetrics().getTags()));
     else if (evaluation.equals("RRSE"))
-      search.setEvaluation(new SelectedTag(Performance.EVALUATION_RRSE, MultiSearch.TAGS_EVALUATION));
+      search.setEvaluation(new SelectedTag(DefaultEvaluationMetrics.EVALUATION_RRSE, new DefaultEvaluationMetrics().getTags()));
     else
       result.setErrorMessage("Unhandled evaluation: " + evaluation);
     search.setClassifier((weka.classifiers.Classifier) handler.fromCommandLine(classifier));
