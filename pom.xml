@@ -29,6 +29,7 @@
 
   <properties>
     <adams.version>0.4.11-SNAPSHOT</adams.version>
+    <boofcv.version>0.18</boofcv.version>
   </properties>
 
   <modules>

@@ -94,13 +94,13 @@
     <dependency>
       <groupId>org.boofcv</groupId>
       <artifactId>WebcamCapture</artifactId>
-      <version>0.18</version>
+      <version>${boofcv.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.boofcv</groupId>
       <artifactId>xuggler</artifactId>
-      <version>0.18</version>
+      <version>${boofcv.version}</version>
     </dependency>
   </dependencies>
 
