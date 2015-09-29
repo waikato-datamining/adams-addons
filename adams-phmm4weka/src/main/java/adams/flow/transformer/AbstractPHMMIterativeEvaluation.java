@@ -292,10 +292,15 @@ public abstract class AbstractPHMMIterativeEvaluation<T extends IterativeHMMClas
 
     // broadcast result
     if (m_CurrentStep != null) {
-      if (m_Output instanceof Null)
-	result = new Token(new WekaEvaluationContainer(m_CurrentStep.getEvaluation()));
-      else
-	result = new Token(m_Output.getBuffer().toString());
+      if (m_Output instanceof Null) {
+        m_OutputToken = new Token(new WekaEvaluationContainer(m_CurrentStep.getEvaluation()));
+      }
+      else {
+        if (m_AlwaysUseContainer)
+          m_OutputToken = new Token(new WekaEvaluationContainer(m_CurrentStep.getEvaluation(), null, m_Output.getBuffer().toString()));
+        else
+          m_OutputToken = new Token(m_Output.getBuffer().toString());
+      }
 
       if (m_OutputToken != null)
 	updateProvenance(result);
