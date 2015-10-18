@@ -19,16 +19,6 @@
  */
 package adams.flow.standalone;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JPanel;
-
 import adams.core.Pausable;
 import adams.flow.core.AbstractDisplay;
 import adams.flow.core.Actor;
@@ -37,6 +27,15 @@ import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.ParameterPanel;
+
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -376,7 +375,7 @@ public class RatControl
 
     result = new Runnable() {
       public void run() {
-	if (m_CreateFrame && !m_Frame.isVisible())
+	if (getCreateFrame() && !m_Frame.isVisible())
 	  m_Frame.setVisible(true);
 	for (AbstractControlPanel panel: m_ControlPanels)
 	  panel.updateButtons();
