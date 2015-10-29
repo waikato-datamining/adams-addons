@@ -21,6 +21,7 @@
 package adams.data.heatmapfeatures;
 
 import adams.core.CleanUpHandler;
+import adams.core.QuickInfoSupporter;
 import adams.core.ShallowCopySupporter;
 import adams.core.base.BaseString;
 import adams.core.option.AbstractOptionHandler;
@@ -44,7 +45,7 @@ import java.util.List;
  */
 public abstract class AbstractHeatmapFeatureGenerator
   extends AbstractOptionHandler
-  implements Comparable, CleanUpHandler, ShallowCopySupporter<AbstractHeatmapFeatureGenerator> {
+  implements Comparable, CleanUpHandler, ShallowCopySupporter<AbstractHeatmapFeatureGenerator>, QuickInfoSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = 4566948525813804085L;
@@ -175,7 +176,18 @@ public abstract class AbstractHeatmapFeatureGenerator
   public String notesTipText() {
     return "The notes to add as attributes to the generated data, eg 'PROCESS INFORMATION'.";
   }
-  
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   * <br>
+   * Default implementation returns null.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  public String getQuickInfo() {
+    return null;
+  }
+
   /**
    * Returns the class of the dataset that the converter generates.
    * 
