@@ -144,6 +144,11 @@ import java.awt.Color;
  * &nbsp;&nbsp;&nbsp;maximum: 1600.0
  * </pre>
  * 
+ * <pre>-show-report-table &lt;boolean&gt; (property: showReportTable)
+ * &nbsp;&nbsp;&nbsp;Determines the visibility of the report table.
+ * &nbsp;&nbsp;&nbsp;default: true
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -167,6 +172,9 @@ public class HeatmapDisplay
 
   /** the zoom level. */
   protected double m_Zoom;
+
+  /** whether to show the report table. */
+  protected boolean m_ShowReportTable;
 
   /**
    * Returns a string describing the object.
@@ -200,6 +208,10 @@ public class HeatmapDisplay
     m_OptionManager.add(
       "zoom", "zoom",
       100.0, -1.0, 1600.0);
+
+    m_OptionManager.add(
+      "show-report-table", "showReportTable",
+      true);
   }
 
   /**
@@ -344,6 +356,35 @@ public class HeatmapDisplay
   }
 
   /**
+   * Sets whether the report value is visible.
+   *
+   * @param value 	true if visible
+   */
+  public void setShowReportTable(boolean value) {
+    m_ShowReportTable = value;
+    reset();
+  }
+
+  /**
+   * Returns whether the report table is visible.
+   *
+   * @return 		true if visible
+   */
+  public boolean getShowReportTable() {
+    return m_ShowReportTable;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String showReportTableTipText() {
+    return "Determines the visibility of the report table.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -384,6 +425,7 @@ public class HeatmapDisplay
       result.addOverlay(overlay);
     result.setMissingValueColor(m_MissingValueColor);
     result.setZoom(m_Zoom / 100.0);
+    result.setReportVisible(m_ShowReportTable);
 
     return result;
   }
@@ -433,6 +475,7 @@ public class HeatmapDisplay
           m_HeatmapPanel.addOverlay(overlay);
 	m_HeatmapPanel.setMissingValueColor(m_MissingValueColor);
 	m_HeatmapPanel.setZoom(m_Zoom / 100.0);
+	m_HeatmapPanel.setReportVisible(m_ShowReportTable);
 	add(m_HeatmapPanel, BorderLayout.CENTER);
       }
       @Override

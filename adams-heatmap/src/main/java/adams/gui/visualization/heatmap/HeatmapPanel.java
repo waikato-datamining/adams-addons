@@ -531,4 +531,22 @@ public class HeatmapPanel
   public void log(String msg) {
     m_PanelLog.append(msg);
   }
+
+  /**
+   * Returns whether the report table is visible.
+   *
+   * @return		true if visible
+   */
+  public boolean isReportVisible() {
+    return !m_SplitPane.isRightComponentHidden();
+  }
+
+  /**
+   * Sets the visibility state of the report table.
+   *
+   * @param value	true if visible
+   */
+  public void setReportVisible(boolean value) {
+    m_SplitPane.setRightComponentHidden(!value);
+  }
 }
