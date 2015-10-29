@@ -383,7 +383,7 @@ public class CountValues
 	name = "[";
       else
 	name = "(";
-      name += m_Minimum + ";" + m_Maximum;
+      name += (Double.isNaN(m_Minimum) ? "-Inf" : m_Minimum) + ";" + (Double.isNaN(m_Maximum) ? "+Inf" : m_Maximum);
       if (m_MaximumIncluded)
 	name += "]";
       else
