@@ -33,6 +33,7 @@ import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseSplitPane;
 import adams.gui.core.BaseTabbedPane;
+import adams.gui.core.BaseTabbedPaneWithTabHiding;
 import adams.gui.core.ColorHelper;
 import adams.gui.core.SearchPanel;
 import adams.gui.core.SearchPanel.LayoutType;
@@ -84,7 +85,7 @@ public class HeatmapPanel
   protected SearchPanel m_SearchPanel;
 
   /** the tabbed pane for image/report and log. */
-  protected BaseTabbedPane m_LogTabbedPane;
+  protected BaseTabbedPaneWithTabHiding m_LogTabbedPane;
 
   /** the split pane for image/spreadsheet and report. */
   protected BaseSplitPane m_SplitPane;
@@ -149,7 +150,7 @@ public class HeatmapPanel
 
     setLayout(new BorderLayout());
 
-    m_LogTabbedPane = new BaseTabbedPane();
+    m_LogTabbedPane = new BaseTabbedPaneWithTabHiding();
     m_LogTabbedPane.setTabPlacement(BaseTabbedPane.BOTTOM);
     add(m_LogTabbedPane, BorderLayout.CENTER);
 
@@ -548,5 +549,26 @@ public class HeatmapPanel
    */
   public void setReportVisible(boolean value) {
     m_SplitPane.setRightComponentHidden(!value);
+  }
+
+  /**
+   * Returns whether the report table is visible.
+   *
+   * @return		true if visible
+   */
+  public boolean isLogVisible() {
+    return !m_LogTabbedPane.isHidden(m_PanelLog);
+  }
+
+  /**
+   * Sets the visibility state of the report table.
+   *
+   * @param value	true if visible
+   */
+  public void setLogVisible(boolean value) {
+    if (value)
+      m_LogTabbedPane.displayTab(m_PanelLog);
+    else
+      m_LogTabbedPane.hideTab(m_PanelLog);
   }
 }
