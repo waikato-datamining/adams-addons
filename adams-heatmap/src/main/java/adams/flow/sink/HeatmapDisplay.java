@@ -426,7 +426,7 @@ public class HeatmapDisplay
     result.setMissingValueColor(m_MissingValueColor);
     result.setZoom(m_Zoom / 100.0);
     result.setReportVisible(m_ShowReportTable);
-    result.getImagePanel().setShowLog(false);
+    result.setLogVisible(false);
 
     return result;
   }
@@ -477,7 +477,7 @@ public class HeatmapDisplay
 	m_HeatmapPanel.setMissingValueColor(m_MissingValueColor);
 	m_HeatmapPanel.setZoom(m_Zoom / 100.0);
 	m_HeatmapPanel.setReportVisible(m_ShowReportTable);
-	m_HeatmapPanel.getImagePanel().setShowLog(false);
+	m_HeatmapPanel.setLogVisible(false);
 	add(m_HeatmapPanel, BorderLayout.CENTER);
       }
       @Override
