@@ -204,7 +204,7 @@ public class FloatMatrixHeatmapReader
    */
   @Override
   public String[] getFormatExtensions() {
-    return new String[]{"dat"};
+    return new String[]{"dat", "raw"};
   }
 
   /**
