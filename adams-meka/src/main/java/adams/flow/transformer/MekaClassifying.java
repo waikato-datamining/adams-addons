@@ -15,7 +15,7 @@
 
 /*
  * MekaClassifying.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -95,7 +95,7 @@ import adams.flow.core.Token;
  * @version $Revision: 5878 $
  */
 public class MekaClassifying
-  extends AbstractProcessWekaInstanceWithModel<meka.classifiers.multilabel.MultilabelClassifier> {
+  extends AbstractProcessWekaInstanceWithModel<meka.classifiers.multilabel.MultiLabelClassifier> {
 
   /** for serialization. */
   private static final long serialVersionUID = -3019442578354930841L;

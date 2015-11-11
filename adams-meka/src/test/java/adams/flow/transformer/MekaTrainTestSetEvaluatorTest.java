@@ -174,7 +174,7 @@ public class MekaTrainTestSetEvaluatorTest
       // Flow.SubProcess.StringMatcher
       adams.flow.transformer.StringMatcher stringmatcher20 = new adams.flow.transformer.StringMatcher();
       argOption = (AbstractArgumentOption) stringmatcher20.getOptionManager().findByProperty("regExp");
-      stringmatcher20.setRegExp((adams.core.base.BaseRegExp) argOption.valueOf(".*time.*"));
+      stringmatcher20.setRegExp((adams.core.base.BaseRegExp) argOption.valueOf(".*Time.*"));
       stringmatcher20.setInvert(true);
 
       actors17[1] = stringmatcher20;

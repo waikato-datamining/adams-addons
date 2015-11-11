@@ -15,7 +15,7 @@
 
 /*
  * MekaResultValues.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -257,7 +257,7 @@ public class MekaResultValues
     for (BaseString value: m_MetricValues) {
       row = sheet.addRow();
       row.addCell("K").setContent(value.getValue());
-      row.addCell("V").setContent(res.getValue(value.getValue()));
+      row.addCell("V").setNative(res.output.get(value.getValue()));
     }
     
     m_OutputToken = new Token(sheet);

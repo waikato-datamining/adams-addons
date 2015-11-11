@@ -170,7 +170,7 @@ public class MekaResultSummaryTest
       // Flow.SubProcess.StringMatcher
       adams.flow.transformer.StringMatcher stringmatcher19 = new adams.flow.transformer.StringMatcher();
       argOption = (AbstractArgumentOption) stringmatcher19.getOptionManager().findByProperty("regExp");
-      stringmatcher19.setRegExp((adams.core.base.BaseRegExp) argOption.valueOf(".*time.*"));
+      stringmatcher19.setRegExp((adams.core.base.BaseRegExp) argOption.valueOf(".*Time.*"));
       stringmatcher19.setInvert(true);
 
       actors16[1] = stringmatcher19;

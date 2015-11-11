@@ -83,7 +83,7 @@ public class MekaClassifierSetup
   private static final long serialVersionUID = -3019442578354930841L;
 
   /** the weka classifier. */
-  protected meka.classifiers.multilabel.MultilabelClassifier m_Classifier;
+  protected meka.classifiers.multilabel.MultiLabelClassifier m_Classifier;
   
   /**
    * Returns a string describing the object.
@@ -112,7 +112,7 @@ public class MekaClassifierSetup
    *
    * @param value	the classifier
    */
-  public void setClassifier(meka.classifiers.multilabel.MultilabelClassifier value) {
+  public void setClassifier(meka.classifiers.multilabel.MultiLabelClassifier value) {
     m_Classifier = value;
     reset();
   }
@@ -122,7 +122,7 @@ public class MekaClassifierSetup
    *
    * @return		the classifier
    */
-  public meka.classifiers.multilabel.MultilabelClassifier getClassifier() {
+  public meka.classifiers.multilabel.MultiLabelClassifier getClassifier() {
     return m_Classifier;
   }
 
@@ -152,7 +152,7 @@ public class MekaClassifierSetup
    * @return		<!-- flow-generates-start -->meka.classifiers.multilabel.MultilabelClassifier.class<!-- flow-generates-end -->
    */
   public Class[] generates() {
-    return new Class[]{meka.classifiers.multilabel.MultilabelClassifier.class};
+    return new Class[]{meka.classifiers.multilabel.MultiLabelClassifier.class};
   }
 
   /**
@@ -163,12 +163,12 @@ public class MekaClassifierSetup
   @Override
   protected String doExecute() {
     String						result;
-    meka.classifiers.multilabel.MultilabelClassifier	cls;
+    meka.classifiers.multilabel.MultiLabelClassifier	cls;
 
     result = null;
 
     try {
-      cls           = (meka.classifiers.multilabel.MultilabelClassifier) OptionUtils.shallowCopy(m_Classifier);
+      cls           = (meka.classifiers.multilabel.MultiLabelClassifier) OptionUtils.shallowCopy(m_Classifier);
       m_OutputToken = new Token(cls);
     }
     catch (Exception e) {

@@ -15,7 +15,7 @@
 
 /*
  * MekaTrainClassifier.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -189,10 +189,10 @@ public class MekaTrainClassifier
    * @return		the classifier
    * @throws Exception  if fails to obtain classifier
    */
-  protected meka.classifiers.multilabel.MultilabelClassifier getClassifierInstance() throws Exception {
-    meka.classifiers.multilabel.MultilabelClassifier   result;
+  protected meka.classifiers.multilabel.MultiLabelClassifier getClassifierInstance() throws Exception {
+    meka.classifiers.multilabel.MultiLabelClassifier   result;
 
-    result = (meka.classifiers.multilabel.MultilabelClassifier) CallableActorHelper.getSetup(meka.classifiers.multilabel.MultilabelClassifier.class, m_Classifier, this);
+    result = (meka.classifiers.multilabel.MultiLabelClassifier) CallableActorHelper.getSetup(meka.classifiers.multilabel.MultiLabelClassifier.class, m_Classifier, this);
     if (result == null)
       throw new IllegalStateException("Failed to obtain classifier from '" + m_Classifier + "'!");
 
@@ -208,7 +208,7 @@ public class MekaTrainClassifier
   protected String doExecute() {
     String						result;
     Instances						data;
-    meka.classifiers.multilabel.MultilabelClassifier	cls;
+    meka.classifiers.multilabel.MultiLabelClassifier	cls;
 
     result = null;
 

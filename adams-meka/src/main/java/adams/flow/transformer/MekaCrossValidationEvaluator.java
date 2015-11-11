@@ -20,10 +20,6 @@
 
 package adams.flow.transformer;
 
-import meka.classifiers.multilabel.Evaluation;
-import meka.core.MLEvalUtils;
-import meka.core.Result;
-import weka.core.Instances;
 import adams.core.QuickInfoHelper;
 import adams.core.Randomizable;
 import adams.flow.container.MekaResultContainer;
@@ -33,6 +29,9 @@ import adams.flow.provenance.Provenance;
 import adams.flow.provenance.ProvenanceContainer;
 import adams.flow.provenance.ProvenanceInformation;
 import adams.flow.provenance.ProvenanceSupporter;
+import meka.classifiers.multilabel.Evaluation;
+import meka.core.Result;
+import weka.core.Instances;
 
 /**
  <!-- globalinfo-start -->
@@ -254,9 +253,9 @@ public class MekaCrossValidationEvaluator
   protected String doExecute() {
     String						result;
     Instances						data;
-    meka.classifiers.multilabel.MultilabelClassifier	cls;
+    meka.classifiers.multilabel.MultiLabelClassifier	cls;
     int							folds;
-    Result[] 						results;
+    Result 						results;
 
     result = null;
 
@@ -272,7 +271,7 @@ public class MekaCrossValidationEvaluator
 	folds = data.numInstances();
 
       results       = Evaluation.cvModel(cls, data, folds, "PCut1", "3");   // TODO options?
-      m_OutputToken = new Token(new MekaResultContainer(MLEvalUtils.averageResults(results)));
+      m_OutputToken = new Token(new MekaResultContainer(results));
     }
     catch (Exception e) {
       m_OutputToken = null;

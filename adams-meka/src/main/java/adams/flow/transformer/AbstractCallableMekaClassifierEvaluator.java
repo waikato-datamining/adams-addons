@@ -15,7 +15,7 @@
 
 /**
  * AbstractCallableMekaClassifierEvaluator.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.transformer;
 
@@ -116,7 +116,7 @@ public abstract class AbstractCallableMekaClassifierEvaluator
    *
    * @return		the classifier
    */
-  protected meka.classifiers.multilabel.MultilabelClassifier getClassifierInstance() {
-    return (meka.classifiers.multilabel.MultilabelClassifier) CallableActorHelper.getSetup(meka.classifiers.multilabel.MultilabelClassifier.class, m_Classifier, this);
+  protected meka.classifiers.multilabel.MultiLabelClassifier getClassifierInstance() {
+    return (meka.classifiers.multilabel.MultiLabelClassifier) CallableActorHelper.getSetup(meka.classifiers.multilabel.MultiLabelClassifier.class, m_Classifier, this);
   }
 }

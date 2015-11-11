@@ -1,38 +1,51 @@
 --> dumpfile.txt
-Classifier_name      : meka.classifiers.multilabel.BR
-Classifier_ops       : [-W, weka.classifiers.rules.ZeroR]
-Classifier_info      : 
-Dataset_name         : Music
-Type                 : CV
-Threshold            : 0.31647940074906367
-Verbosity            : 3
-N(test)              : 59.2 +/- 0.422
-L                    : 6     +/- 0    
-Accuracy             : 0.275 +/- 0.031
-Hamming score        : 0.61  +/- 0.034
-Exact match          : 0.005 +/- 0.008
-Jaccard dist         : 0.725 +/- 0.031
-Hamming loss         : 0.39  +/- 0.034
-ZeroOne loss         : 0.995 +/- 0.008
-Harmonic score       : 0.486 +/- 0.05 
-One error            : 0.554 +/- 0.06 
-Rank loss            : 0.418 +/- 0.046
-Avg precision        : 0.497 +/- 0.057
-Log Loss (max L)     : 0.614 +/- 0.024
-Log Loss (max D)     : 0.614 +/- 0.024
-F1 micro avg         : 0.396 +/- 0.037
-F1 macro avg, by ex. : 0.397 +/- 0.038
-F1 macro avg, by lbl : 0.182 +/- 0.013
-Percent no-labels    : 0     +/- 0    
-Accuracy[0]          : 0.708 +/- 0.063
-Accuracy[1]          : 0.72  +/- 0.055
-Accuracy[2]          : 0.446 +/- 0.06 
-Accuracy[3]          : 0.75  +/- 0.088
-Accuracy[4]          : 0.718 +/- 0.076
-Accuracy[5]          : 0.319 +/- 0.081
-LCard_pred           : 2     +/- 0    
-N_train              : 532.8 +/- 0.422
-N_test               : 59.2 +/- 0.422
-LCard_train          : 1.87  +/- 0.018
-LCard_test           : 1.87  +/- 0.163
+== Evaluation Info
+
+Classifier                     meka.classifiers.multilabel.BR
+Options                        [-W, weka.classifiers.rules.ZeroR]
+Additional Info                
+Dataset                        Music
+Number of labels (L)           6
+Type                           ML-CV
+Threshold                      0.5
+Verbosity                      3
+
+
+== Predictive Performance
+
+Number of test instances (N)   
+Accuracy                       0    
+Jaccard index                  0    
+Hamming score                  0.688
+Exact match                    0    
+Jaccard distance               1    
+Hamming loss                   0.312
+ZeroOne loss                   1    
+Harmonic score                 0    
+One error                      0.554
+Rank loss                      0.418
+Avg precision                  0.497
+Log Loss (lim. L)              0.614
+Log Loss (lim. D)              0.614
+F1 (micro averaged)            0    
+F1 (macro averaged by example) 0    
+F1 (macro averaged by label)   0    
+AUPRC (macro averaged)         0.27 
+AUROC (macro averaged)         0.411
+Curve Data                     
+Macro Curve Data               
+Micro Curve Data               
+Label indices                  [     0     1     2     3     4     5 ]
+Accuracy (per label)           [ 0.708 0.720 0.554 0.750 0.718 0.681 ]
+Empty labelvectors (predicted) 1    
+Label cardinality (predicted)  0    
+Levenshtein distance           0.312
+
+
+== Additional Measurements (averaged across folds)
+
+Number of training instances   592
+Number of test instances       592
+Label cardinality (train set)  1.87 
+Label cardinality (test set)   1.87 
 

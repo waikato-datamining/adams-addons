@@ -1,40 +1,51 @@
 --> dumpfile.txt
-Classifier_name      : meka.classifiers.multilabel.BR
-Classifier_ops       : [-W, weka.classifiers.rules.ZeroR]
-Classifier_info      : 
-Dataset_name         : Music
-Type                 : ML
-Threshold            : 0.30788804071246817
-Verbosity            : 3
+== Evaluation Info
 
-N(test)              : 201
-L                    : 6    
-Accuracy             : 0.228
-Hamming score        : 0.571
-Exact match          : 0.025
-Jaccard dist         : 0.772
-Hamming loss         : 0.429
-ZeroOne loss         : 0.975
-Harmonic score       : 0.356
-One error            : 0.607
-Rank loss            : 0.452
-Avg precision        : 0.524
-Log Loss (max L)     : 0.613
-Log Loss (max D)     : 0.613
-F1 micro avg         : 0.328
-F1 macro avg, by ex. : 0.307
-F1 macro avg, by lbl : 0.157
-Percent no-labels    : 0    
-Accuracy[0]          : 0.682
-Accuracy[1]          : 0.726
-Accuracy[2]          : 0.393
-Accuracy[3]          : 0.756
-Accuracy[4]          : 0.234
-Accuracy[5]          : 0.637
-LCard_pred           : 2    
+Classifier                     meka.classifiers.multilabel.BR
+Options                        [-W, weka.classifiers.rules.ZeroR]
+Additional Info                
+Dataset                        Music
+Number of labels (L)           6
+Type                           ML
+Threshold                      0.30788804071246817
+Verbosity                      3
 
-N_train              : 391
-N_test               : 201
-LCard_train          : 1.893
-LCard_test           : 1.826
+
+== Predictive Performance
+
+Number of test instances (N)   
+Accuracy                       0.228
+Jaccard index                  0.228
+Hamming score                  0.571
+Exact match                    0.025
+Jaccard distance               0.772
+Hamming loss                   0.429
+ZeroOne loss                   0.975
+Harmonic score                 0.356
+One error                      0.607
+Rank loss                      0.452
+Avg precision                  0.524
+Log Loss (lim. L)              0.613
+Log Loss (lim. D)              0.613
+F1 (micro averaged)            0.328
+F1 (macro averaged by example) 0.307
+F1 (macro averaged by label)   0.157
+AUPRC (macro averaged)         0.304
+AUROC (macro averaged)         0.5  
+Curve Data                     
+Macro Curve Data               
+Micro Curve Data               
+Label indices                  [     0     1     2     3     4     5 ]
+Accuracy (per label)           [ 0.682 0.726 0.393 0.756 0.234 0.637 ]
+Empty labelvectors (predicted) 0    
+Label cardinality (predicted)  2    
+Levenshtein distance           0.396
+
+
+== Additional Measurements
+
+Number of training instances   391
+Number of test instances       201
+Label cardinality (train set)  1.893
+Label cardinality (test set)   1.826
 

@@ -154,17 +154,19 @@ public class MekaResultValuesTest
       // Flow.MekaResultValues
       adams.flow.transformer.MekaResultValues mekaresultvalues14 = new adams.flow.transformer.MekaResultValues();
       argOption = (AbstractArgumentOption) mekaresultvalues14.getOptionManager().findByProperty("infoValues");
-      adams.core.base.BaseString[] infovalues15 = new adams.core.base.BaseString[9];
-      infovalues15[0] = (adams.core.base.BaseString) argOption.valueOf("Classifier_name");
-      infovalues15[1] = (adams.core.base.BaseString) argOption.valueOf("Classifier_ops");
-      infovalues15[2] = (adams.core.base.BaseString) argOption.valueOf("Dataset_name");
+      adams.core.base.BaseString[] infovalues15 = new adams.core.base.BaseString[5];
+      infovalues15[0] = (adams.core.base.BaseString) argOption.valueOf("Classifier");
+      infovalues15[1] = (adams.core.base.BaseString) argOption.valueOf("Options");
+      infovalues15[2] = (adams.core.base.BaseString) argOption.valueOf("Dataset");
       infovalues15[3] = (adams.core.base.BaseString) argOption.valueOf("Type");
       infovalues15[4] = (adams.core.base.BaseString) argOption.valueOf("Threshold");
-      infovalues15[5] = (adams.core.base.BaseString) argOption.valueOf("Accuracy");
-      infovalues15[6] = (adams.core.base.BaseString) argOption.valueOf("Hamming score");
-      infovalues15[7] = (adams.core.base.BaseString) argOption.valueOf("Exact match");
-      infovalues15[8] = (adams.core.base.BaseString) argOption.valueOf("Jaccard dist");
       mekaresultvalues14.setInfoValues(infovalues15);
+      adams.core.base.BaseString[] metricvalues = new adams.core.base.BaseString[4];
+      metricvalues[0] = (adams.core.base.BaseString) argOption.valueOf("Accuracy");
+      metricvalues[1] = (adams.core.base.BaseString) argOption.valueOf("Hamming score");
+      metricvalues[2] = (adams.core.base.BaseString) argOption.valueOf("Exact match");
+      metricvalues[3] = (adams.core.base.BaseString) argOption.valueOf("Jaccard distance");
+      mekaresultvalues14.setMetricValues(metricvalues);
       actors1[5] = mekaresultvalues14;
 
       // Flow.DumpFile

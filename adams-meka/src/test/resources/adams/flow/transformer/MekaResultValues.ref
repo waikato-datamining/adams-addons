@@ -1,13 +1,13 @@
 --> dumpfile.csv
 Key,Value
-Classifier_name,meka.classifiers.multilabel.BR
-Classifier_ops,"[-W, weka.classifiers.trees.J48, --, -C, 0.25, -M, 2]"
-Dataset_name,Music
-Type,CV
-Threshold,0.111111111111
-Accuracy,"0.428 +/- 0.06 "
-"Hamming score","0.716 +/- 0.055"
-"Exact match","0.138 +/- 0.06 "
-"Jaccard dist","0.572 +/- 0.06 "
+Classifier,meka.classifiers.multilabel.BR
+Options,"[-W, weka.classifiers.trees.J48, --, -C, 0.25, -M, 2]"
+Dataset,Music
+Type,ML-CV
+Threshold,0.5
+Accuracy,0.431137387387
+"Hamming score",0.743806306306
+"Exact match",0.173986486486
+"Jaccard distance",0.568862612613
 
 

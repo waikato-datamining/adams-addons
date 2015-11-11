@@ -15,7 +15,7 @@
 
 /*
  * MekaTrainTestSetEvaluator.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -140,7 +140,7 @@ public class MekaTrainTestSetEvaluator
     String						result;
     Instances						train;
     Instances						test;
-    meka.classifiers.multilabel.MultilabelClassifier	cls;
+    meka.classifiers.multilabel.MultiLabelClassifier	cls;
     WekaTrainTestSetContainer				cont;
     Result						res;
 

@@ -165,7 +165,7 @@ public class MekaCrossValidationEvaluatorTest
       split.setExpression("\\n");
       sub.add(split);
       StringMatcher match = new StringMatcher();
-      match.setRegExp(new BaseRegExp(".*time.*"));
+      match.setRegExp(new BaseRegExp(".*Time.*"));
       match.setInvert(true);
       sub.add(match);
       StringJoin join = new StringJoin();
