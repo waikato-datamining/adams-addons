@@ -81,7 +81,7 @@ public class MekaExperimenter
    */
   @Override
   public String getTitle() {
-    return "[MEKA] Experimenter";
+    return "MEKA Experimenter";
   }
 
   /**
