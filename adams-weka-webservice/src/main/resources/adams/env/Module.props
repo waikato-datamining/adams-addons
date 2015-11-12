@@ -9,6 +9,9 @@ Name=adams-weka-webservice
 # The version of the module
 Version=${project.version}
 
+# The build timestamp
+BuildTimestamp=${timestamp}
+
 # A short description of the module
 Description=Offers a webservice for training, testing and applying WEKA models.
 

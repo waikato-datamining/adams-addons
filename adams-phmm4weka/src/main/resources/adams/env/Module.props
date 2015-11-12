@@ -9,6 +9,9 @@ Name=adams-phmm4weka
 # The version of the module
 Version=${project.version}
 
+# The build timestamp
+BuildTimestamp=${timestamp}
+
 # A short description of the module
 Description=Adds phmm4weka (profile hidden markov model) support.
 

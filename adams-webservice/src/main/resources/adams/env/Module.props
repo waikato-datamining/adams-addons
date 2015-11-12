@@ -9,6 +9,9 @@ Name=adams-webservice
 # The version of the module
 Version=${project.version}
 
+# The build timestamp
+BuildTimestamp=${timestamp}
+
 # A short description of the module
 Description=Adds generic webservice support, client and server.
 
