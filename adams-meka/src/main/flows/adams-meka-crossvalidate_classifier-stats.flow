@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2014-06-23 10:11:38
+# Date: 2015-11-12 16:28:09
 # User: fracpete
 #
 adams.flow.control.Flow
@@ -33,23 +33,23 @@ adams.flow.control.Flow
 	-actor
 		adams.flow.transformer.MekaResultValues
 			-info-value
-			Classifier_name
+			Classifier
 			-info-value
-			Classifier_ops
+			Options
 			-info-value
-			Dataset_name
+			Dataset
 			-info-value
 			Type
 			-info-value
 			Threshold
-			-info-value
+			-metric-value
 			Accuracy
-			-info-value
+			-metric-value
 			Hamming score
-			-info-value
+			-metric-value
 			Exact match
-			-info-value
-			Jaccard dist
+			-metric-value
+			Jaccard distance
 	-actor
 		adams.flow.sink.SpreadSheetDisplay
 			-writer
