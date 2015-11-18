@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2015-07-08 16:31:12
+# Date: 2015-11-18 15:34:18
 # User: fracpete
 #
 adams.flow.control.Flow
@@ -17,6 +17,8 @@ adams.flow.control.Flow
 			600
 			-writer
 				adams.gui.print.NullWriter
+			-zoom
+			-1.0
 			-selection-processor
 				adams.gui.visualization.image.selection.NullProcessor
 			-image-overlay

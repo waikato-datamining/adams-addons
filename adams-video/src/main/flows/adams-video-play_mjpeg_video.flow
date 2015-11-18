@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2015-07-09 11:40:25
+# Date: 2015-11-18 15:35:40
 # User: fracpete
 #
 adams.flow.control.Flow
@@ -11,6 +11,8 @@ adams.flow.control.Flow
 			true
 			-file-chooser-title
 			Select MJPEG file
+			-initial-dir
+			${EXAMPLE_FLOWS}/data
 			-extension
 			mjpeg
 	-actor
@@ -37,6 +39,8 @@ adams.flow.control.Flow
 							true
 							-writer
 								adams.gui.print.NullWriter
+							-zoom
+							-1.0
 							-selection-processor
 								adams.gui.visualization.image.selection.NullProcessor
 							-image-overlay
@@ -59,6 +63,8 @@ adams.flow.control.Flow
 							-3
 							-writer
 								adams.gui.print.NullWriter
+							-zoom
+							-1.0
 							-selection-processor
 								adams.gui.visualization.image.selection.NullProcessor
 							-image-overlay

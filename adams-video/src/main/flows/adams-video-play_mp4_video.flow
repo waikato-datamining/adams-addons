@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2015-07-09 13:23:27
+# Date: 2015-11-18 15:31:26
 # User: fracpete
 #
 adams.flow.control.Flow
@@ -11,16 +11,18 @@ adams.flow.control.Flow
 			true
 			-file-chooser-title
 			Select MP4 file
+			-initial-dir
+			${EXAMPLE_FLOWS}/data
 			-extension
 			mp4
 	-actor
 		adams.flow.transformer.MovieImageSequence
 			-interval
-			200
+			100
 	-actor
 		adams.flow.control.Sleep
 			-interval
-			200
+			100
 	-actor
 		adams.flow.sink.ImageViewer
 			-short-title
