@@ -1,8 +1,10 @@
 # Project: adams
-# Date: 2014-10-09 12:46:41
+# Date: 2015-11-18 14:28:54
 # User: fracpete
 #
 adams.flow.control.Flow
+	-annotation
+	Uploads an image as blob to the BLOB Rats webservice.\nYou need to start \"adams-rats-blob_ws_server.flow\" for this to work.
 	-actor
 		adams.flow.source.FileSupplier
 			-file
@@ -25,6 +27,8 @@ adams.flow.control.Flow
 		adams.flow.sink.WSSink
 			-client
 				adams.flow.webservice.blob.Upload
+					-out-interceptor
+						adams.flow.webservice.interceptor.outgoing.NullGenerator
 	-flow-execution-listener
 		adams.flow.execution.NullListener
 

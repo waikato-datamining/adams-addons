@@ -1,8 +1,10 @@
 # Project: adams
-# Date: 2014-10-09 12:46:46
+# Date: 2015-11-18 14:28:09
 # User: fracpete
 #
 adams.flow.control.Flow
+	-annotation
+	Places uploaded files in ${EXAMPLE_FLOWS}/output
 	-actor
 		adams.flow.standalone.SetVariable
 			-var-name
@@ -18,9 +20,9 @@ adams.flow.control.Flow
 							-web-service
 								adams.flow.webservice.blob.RatsBlobServiceWS
 									-in-interceptor
-										adams.flow.webservice.interceptor.NullInInterceptorGenerator
+										adams.flow.webservice.interceptor.incoming.NullGenerator
 									-out-interceptor
-										adams.flow.webservice.interceptor.NullOutInterceptorGenerator
+										adams.flow.webservice.interceptor.outgoing.NullGenerator
 									-implementation
 										adams.flow.webservice.blob.SimpleRatsBlobService
 					-actor
