@@ -19,6 +19,7 @@
  */
 package adams.flow.source;
 
+import adams.core.QuickInfoHelper;
 import com.github.sarxos.webcam.Webcam;
 
 import java.util.List;
@@ -114,6 +115,16 @@ public class ListWebcams
   @Override
   public String outputArrayTipText() {
     return "If enabled, the webcams are output as array rather than one-by-one.";
+  }
+
+  /**
+   * Returns a quick info about the actor, which will be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    return QuickInfoHelper.toString(this, "outputArray", (m_OutputArray ? "as array" : "one by one"));
   }
 
   /**
