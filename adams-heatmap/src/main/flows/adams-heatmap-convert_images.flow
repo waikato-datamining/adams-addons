@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2014-04-14 14:27:07
+# Date: 2015-11-18 15:17:31
 # User: fracpete
 #
 adams.flow.control.Flow
@@ -29,8 +29,10 @@ adams.flow.control.Flow
 					entry
 	-actor
 		adams.flow.transformer.ImageReader
+			-reader
+				adams.data.io.input.JAIImageReader
 	-actor
-		adams.flow.transformer.JAITransformer
+		adams.flow.transformer.BufferedImageTransformer
 			-transformer
 				adams.data.jai.transformer.Resize
 					-width

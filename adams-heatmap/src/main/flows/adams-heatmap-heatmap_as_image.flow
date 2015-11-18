@@ -28,7 +28,7 @@ adams.flow.control.Flow
 					-generator
 						adams.gui.visualization.core.MultiColorGenerator
 	-actor
-		adams.flow.transformer.JAITransformer
+		adams.flow.transformer.BufferedImageTransformer
 			-transformer
 				adams.data.jai.transformer.Resize
 					-width
