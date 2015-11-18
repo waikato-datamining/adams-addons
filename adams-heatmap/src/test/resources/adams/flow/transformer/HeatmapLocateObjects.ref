@@ -3,82 +3,102 @@ Field,Type,Value
 "Parent ID",N,-1
 Filename,S,particles.jpg
 Object.1.height,N,66
+Object.1.location,S,"145.0 0.0 210.0 0.0 210.0 65.0 145.0 65.0"
 Object.1.width,N,66
 Object.1.x,N,145
 Object.1.y,N,0
 Object.10.height,N,66
+Object.10.location,S,"207.0 164.0 273.0 164.0 273.0 229.0 207.0 229.0"
 Object.10.width,N,67
 Object.10.x,N,207
 Object.10.y,N,164
 Object.11.height,N,66
+Object.11.location,S,"136.0 178.0 201.0 178.0 201.0 243.0 136.0 243.0"
 Object.11.width,N,66
 Object.11.x,N,136
 Object.11.y,N,178
 Object.12.height,N,100
+Object.12.location,S,"302.0 198.0 401.0 198.0 401.0 297.0 302.0 297.0"
 Object.12.width,N,100
 Object.12.x,N,302
 Object.12.y,N,198
 Object.13.height,N,67
+Object.13.location,S,"412.0 204.0 478.0 204.0 478.0 270.0 412.0 270.0"
 Object.13.width,N,67
 Object.13.x,N,412
 Object.13.y,N,204
 Object.14.height,N,67
+Object.14.location,S,"3.0 208.0 69.0 208.0 69.0 274.0 3.0 274.0"
 Object.14.width,N,67
 Object.14.x,N,3
 Object.14.y,N,208
 Object.15.height,N,100
+Object.15.location,S,"69.0 236.0 169.0 236.0 169.0 335.0 69.0 335.0"
 Object.15.width,N,101
 Object.15.x,N,69
 Object.15.y,N,236
 Object.16.height,N,100
+Object.16.location,S,"200.0 236.0 299.0 236.0 299.0 335.0 200.0 335.0"
 Object.16.width,N,100
 Object.16.x,N,200
 Object.16.y,N,236
 Object.17.height,N,97
+Object.17.location,S,"386.0 283.0 485.0 283.0 485.0 379.0 386.0 379.0"
 Object.17.width,N,100
 Object.17.x,N,386
 Object.17.y,N,283
 Object.18.height,N,66
+Object.18.location,S,"303.0 314.0 369.0 314.0 369.0 379.0 303.0 379.0"
 Object.18.width,N,67
 Object.18.x,N,303
 Object.18.y,N,314
 Object.19.height,N,50
+Object.19.location,S,"43.0 330.0 108.0 330.0 108.0 379.0 43.0 379.0"
 Object.19.width,N,66
 Object.19.x,N,43
 Object.19.y,N,330
 Object.2.height,N,78
+Object.2.location,S,"280.0 0.0 379.0 0.0 379.0 77.0 280.0 77.0"
 Object.2.width,N,100
 Object.2.x,N,280
 Object.2.y,N,0
 Object.20.height,N,48
+Object.20.location,S,"149.0 332.0 214.0 332.0 214.0 379.0 149.0 379.0"
 Object.20.width,N,66
 Object.20.x,N,149
 Object.20.y,N,332
 Object.3.height,N,100
+Object.3.location,S,"29.0 18.0 128.0 18.0 128.0 117.0 29.0 117.0"
 Object.3.width,N,100
 Object.3.x,N,29
 Object.3.y,N,18
 Object.4.height,N,66
+Object.4.location,S,"215.0 39.0 281.0 39.0 281.0 104.0 215.0 104.0"
 Object.4.width,N,67
 Object.4.x,N,215
 Object.4.y,N,39
 Object.5.height,N,66
+Object.5.location,S,"377.0 54.0 442.0 54.0 442.0 119.0 377.0 119.0"
 Object.5.width,N,66
 Object.5.x,N,377
 Object.5.y,N,54
 Object.6.height,N,99
+Object.6.location,S,"122.0 74.0 221.0 74.0 221.0 172.0 122.0 172.0"
 Object.6.width,N,100
 Object.6.x,N,122
 Object.6.y,N,74
 Object.7.height,N,100
+Object.7.location,S,"266.0 90.0 365.0 90.0 365.0 189.0 266.0 189.0"
 Object.7.width,N,100
 Object.7.x,N,266
 Object.7.y,N,90
 Object.8.height,N,66
+Object.8.location,S,"384.0 134.0 449.0 134.0 449.0 199.0 384.0 199.0"
 Object.8.width,N,66
 Object.8.x,N,384
 Object.8.y,N,134
 Object.9.height,N,67
+Object.9.location,S,"50.0 140.0 115.0 140.0 115.0 206.0 50.0 206.0"
 Object.9.width,N,66
 Object.9.x,N,50
 Object.9.y,N,140
