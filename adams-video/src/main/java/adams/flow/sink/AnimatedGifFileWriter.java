@@ -171,7 +171,7 @@ public class AnimatedGifFileWriter
     String	value;
 
     result  = super.getQuickInfo();
-    result += QuickInfoHelper.toString(this, "delay", m_Delay, ", delayt: ");
+    result += QuickInfoHelper.toString(this, "delay", m_Delay, ", delay: ");
     value   = QuickInfoHelper.toString(this, "loop", m_Loop, "loop", ", ");
     if (value != null)
       result += value;
