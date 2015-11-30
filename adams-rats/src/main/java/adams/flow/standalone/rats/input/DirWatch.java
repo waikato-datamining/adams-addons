@@ -25,6 +25,7 @@ import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
+import adams.core.io.WatchEventKind;
 
 import java.io.File;
 import java.nio.file.FileSystems;
