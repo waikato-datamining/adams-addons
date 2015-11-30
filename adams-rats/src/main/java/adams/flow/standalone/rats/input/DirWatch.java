@@ -102,39 +102,6 @@ public class DirWatch
   /** for serialization. */
   private static final long serialVersionUID = -6772954304997860394L;
 
-  /**
-   * The events to watch.
-   *
-   * @author  fracpete (fracpete at waikato dot ac dot nz)
-   * @version $Revision$
-   */
-  public enum WatchEventKind {
-    CREATE(StandardWatchEventKinds.ENTRY_CREATE),
-    MODIFY(StandardWatchEventKinds.ENTRY_MODIFY),
-    DELETE(StandardWatchEventKinds.ENTRY_DELETE);
-    
-    /** the associated kind. */
-    private WatchEvent.Kind<Path> m_EventKind;
-    
-    /**
-     * Initializes the event kind enum.
-     * 
-     * @param eventKind	the event kind
-     */
-    private WatchEventKind(WatchEvent.Kind<Path> eventKind) {
-      m_EventKind = eventKind;
-    }
-    
-    /**
-     * Returns the event kind.
-     * 
-     * @return		the event kind
-     */
-    public WatchEvent.Kind<Path> getEventKind() {
-      return m_EventKind;
-    }
-  }
-  
   /** the directory to watch. */
   protected PlaceholderDirectory m_Source;
 
