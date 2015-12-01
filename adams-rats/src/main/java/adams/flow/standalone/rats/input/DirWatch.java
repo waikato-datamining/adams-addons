@@ -22,12 +22,14 @@ package adams.flow.standalone.rats.input;
 import adams.core.AtomicMoveSupporter;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
+import adams.core.base.BaseRegExp;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
 import adams.core.io.WatchEventKind;
 
 import java.io.File;
+import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
@@ -108,12 +110,12 @@ public class DirWatch
 
   /** the events to look for. */
   protected WatchEventKind[] m_Events;
-  
+
   /** the waiting period in msec before polling again. */
   protected int m_WaitPoll;
 
-  /** the waiting period in msec after the files were picked up. */
-  protected int m_WaitList;
+  /** the regular expression to match the file names against. */
+  protected BaseRegExp m_RegExp;
 
   /** whether to move the files before transmitting them. */
   protected boolean m_MoveFiles;
@@ -160,8 +162,8 @@ public class DirWatch
       50, 0, null);
 
     m_OptionManager.add(
-      "wait-list", "waitList",
-      0, 0, null);
+      "reg-exp", "regExp",
+      new BaseRegExp(BaseRegExp.MATCH_ALL));
 
     m_OptionManager.add(
       "move-files", "moveFiles",
@@ -289,27 +291,22 @@ public class DirWatch
   }
 
   /**
-   * Sets the number of milli-seconds to wait after listing the files.
+   * Sets the regular expression to match the filenames against (name only, not path).
    *
-   * @param value	the number of milli-seconds
+   * @param value	the expression
    */
-  public void setWaitList(int value) {
-    if (value >= 0) {
-      m_WaitList = value;
-      reset();
-    }
-    else {
-      getLogger().warning("Number of milli-seconds to wait must be >=0, provided: " + value);
-    }
+  public void setRegExp(BaseRegExp value) {
+    m_RegExp = value;
+    reset();
   }
 
   /**
-   * Returns the number of milli-seconds to wait after listing the files.
+   * Returns the regular expression to match the filenames against (name only, not path).
    *
-   * @return		the number of milli-seconds
+   * @return		the expression
    */
-  public int getWaitList() {
-    return m_WaitList;
+  public BaseRegExp getRegExp() {
+    return m_RegExp;
   }
 
   /**
@@ -318,8 +315,8 @@ public class DirWatch
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String waitListTipText() {
-    return "The number of milli-seconds to wait after listing the files.";
+  public String regExpTipText() {
+    return "The regular expression that the file names must match (name only, not path).";
   }
 
   /**
@@ -425,8 +422,7 @@ public class DirWatch
     String	result;
     
     result  = QuickInfoHelper.toString(this, "source", getSource(), "source: ");
-    result  = QuickInfoHelper.toString(this, "events", Utils.flatten(getEvents(), "/"), ", events: ");
-    result += QuickInfoHelper.toString(this, "waitList", getWaitList(), ", wait-list: ");
+    result += QuickInfoHelper.toString(this, "events", Utils.flatten(getEvents(), "/"), ", events: ");
     result += QuickInfoHelper.toString(this, "moveFiles", (getMoveFiles() ? "move" : "keep"), ", ");
     result += QuickInfoHelper.toString(this, "target", getTarget(), ", target: ");
     
@@ -446,7 +442,7 @@ public class DirWatch
   /**
    * Hook method for performing checks. Makes sure that directories exist.
    * 
-   * @throws Exception	if checks fail
+   * @return		null if successful, otherwise error message
    */
   @Override
   public String check() {
@@ -516,6 +512,10 @@ public class DirWatch
 	  if (key == null)
 	    continue;
 	}
+        catch (ClosedWatchServiceException ce) {
+          result = "Watch service closed";
+          break;
+        }
 	catch (Exception e) {
 	  result = handleException("Failed to obtain files!", e);
 	  break;
@@ -529,6 +529,11 @@ public class DirWatch
 	  ev    = (WatchEvent<Path>) event;
           name  = ev.context();
           child = dir.resolve(name);
+	  if (!m_RegExp.isMatchAll()) {
+	    file = new PlaceholderFile(child.toFile().getAbsolutePath());
+	    if (!m_RegExp.isMatch(file.getName()))
+	      continue;
+	  }
           files.add(child.toFile().getAbsolutePath());
 	}
 	
