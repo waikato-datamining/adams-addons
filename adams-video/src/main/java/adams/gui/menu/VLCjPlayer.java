@@ -23,7 +23,6 @@ package adams.gui.menu;
 
 import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractMenuItemDefinition;
-import adams.gui.application.ChildFrame;
 import adams.gui.application.UserMode;
 import adams.gui.visualization.video.VLCjPlayer.VLCjPanel;
 
@@ -68,7 +67,7 @@ public class VLCjPlayer
    */
   public void launch() {
     VLCjPanel panel = new VLCjPanel();
-    ChildFrame child = createChildFrame(panel, 1000, 600);
+    createChildFrame(panel, 1000, 600);
   }
 
   /**
