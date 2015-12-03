@@ -14,8 +14,8 @@
  */
 
 /*
- * TrailViewer.java
- * Copyright (C) 2011 University of Waikato, Hamilton, New Zealand
+ * VLCjPlayer.java
+ * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -25,13 +25,12 @@ import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractMenuItemDefinition;
 import adams.gui.application.ChildFrame;
 import adams.gui.application.UserMode;
-import adams.gui.visualization.video.SimpleVideoPlayer.SimpleVideoPlayerPanel;
 import adams.gui.visualization.video.VLCjPlayer.VLCjPanel;
 
 /**
- * For displaying trails.
+ * For playing videos using VLCj.
  *
- * @author  fracpete (fracpete at waikato dot ac dot nz)
+ * @author  Steven Brown (sjb at students dot waikato dot ac dot nz)
  * @version $Revision: 11391 $
  */
 public class VLCjPlayer
