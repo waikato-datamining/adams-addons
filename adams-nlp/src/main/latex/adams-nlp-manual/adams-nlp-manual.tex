@@ -1,0 +1,125 @@
+% This work is made available under the terms of the
+% Creative Commons Attribution-ShareAlike 3.0 license, 
+% http://creativecommons.org/licenses/by-sa/3.0/. 
+%
+% Version: $Revision: 12016 $
+
+\documentclass[a4paper]{book}
+
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{scalefnt}
+\usepackage{tikz}
+
+% watermark -- for draft stage
+\usepackage[firstpage]{draftwatermark}
+\SetWatermarkLightness{0.9}
+\SetWatermarkScale{5}
+
+\input{latex_extensions}
+
+\title{
+  \textbf{ADAMS} \\
+  {\Large \textbf{A}dvanced \textbf{D}ata mining \textbf{A}nd \textbf{M}achine
+  learning \textbf{S}ystem} \\
+  {\Large Module: adams-nlp} \\
+  \vspace{1cm}
+  \includegraphics[width=2cm]{images/nlp-module.png} \\
+}
+\author{
+  Peter Reutemann
+}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+
+\thispagestyle{empty}
+\center
+\begin{table}[b]
+	\begin{tabular}{c l l}
+		\parbox[c][2cm]{2cm}{\copyright 2013-2015} &
+		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
+	\end{tabular}
+	\includegraphics[width=12cm]{images/cc.png} \\
+\end{table}
+
+\end{titlepage}
+
+\tableofcontents
+\listoffigures
+%\listoftables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introduction}
+\textit{The Stanford Parser} is a GPL-licensed\footnote{version 2 or later \url{http://www.gnu.org/licenses/gpl-2.0.html}{}} 
+library for natural language parsing.
+
+\noindent For instance, parsing this sentence:
+\begin{verbatim}
+  The quick brown fox jumps over the lazy dog
+\end{verbatim}
+will result in a parse tree like this:
+\begin{verbatim}
+  (ROOT (NP (NP (DT The) (JJ quick) (JJ brown) (NN fox)) (NP (NP (NNS jumps)) 
+    (PP (IN over) (NP (DT the) (JJ lazy) (NN dog))))))
+\end{verbatim}
+The same parse tree in graphical representation:
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=4.0cm]{images/parse-tree.png}
+  \caption{Graphical representation of Stanford parse tree.}
+  \label{parse-tree}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Flow}
+The following actors are available:
+\begin{tight_itemize}
+	\item \textit{CoNLLFileReader} -- transformer parsing text files in
+	CoNLL format with one or more token sequences and turning them into
+	spreadsheets.
+	\item \textit{DocumentToSentences} -- transformer for splitting document
+	strings into sentences using a specified
+	splitter/tokenizer.\footnote{adams-nlp-split\_document\_and\_parse.flow}
+	\item \textit{StanfordGrammaticalStructure} -- transformer for generating a 
+	grammatical structure from a parse tree.\footnote{adams-nlp-parse.flow}
+	\item \textit{StanfordLexicalizedParser} -- transformer for generating a 
+	parse tree from a string.\footnote{adams-nlp-parse.flow}
+	\item \textit{StanfordParseTreeDisplay} -- sink for displaying a parse 
+	tree.\footnote{adams-nlp-parse.flow}
+	\item \textit{Tokenize} -- transformer for splitting strings
+	into words.
+	\item \textit{TweeboParser} -- transformer for POS tagging tweets
+	(requires the external TweeboParser executables).
+	\item \textit{TweetNLPTagger} -- transformer for tokenizing/tagging
+	tweets.
+\end{tight_itemize}
+The following conversions are available:
+\begin{tight_itemize}
+   	\item \textit{StanfordParseTreeToSpreadSheet} -- turns the leaves of a
+   	parse tree into a spreadsheet.
+	\item \textit{StanfordParseTreeToXML} -- turns a parse tree into an
+	XML string.\footnote{adams-nlp-parse.flow}
+\end{tight_itemize}
+The following Weka tokenizers are available:
+\begin{tight_itemize}
+	\item \textit{TwitterNLPTokenizer} -- uses TwitterNLP's Twokenize.
+\end{tight_itemize}
+The following Weka filters are available:
+\begin{tight_itemize}
+	\item \textit{unsupervised.attribute.TwitterNLPPos} -- batch filter
+	that adds frequencies of tag terms as determined by the TwitterNLP
+	POS tagger.
+\end{tight_itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{bibliography}
+
+\end{document}

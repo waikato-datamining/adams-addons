@@ -1,0 +1,115 @@
+# Project: adams
+# Date: 2014-01-23 15:36:20
+# User: fracpete
+# Charset: UTF-8
+#
+adams.flow.control.Flow
+	-annotation
+	Shows how to apply a Stanford LexicalizedParser to a sentence\nand output tree and grammatical structure.
+	-actor
+		adams.flow.standalone.CallableActors
+			-actor
+				adams.flow.sink.HistoryDisplay
+					-entry-name-variable
+					name
+	-actor
+		adams.flow.source.StringConstants
+			-string
+			The quick brown fox jumps over the lazy dog
+	-actor
+		adams.flow.transformer.StanfordLexicalizedParser
+			-model
+			${EXAMPLE_FLOWS}/data/englishPCFG.ser.gz
+	-actor
+		adams.flow.control.Tee
+			-name
+			output tree
+			-tee
+				adams.flow.transformer.Convert
+					-conversion
+						adams.data.conversion.AnyToString
+			-tee
+				adams.flow.transformer.SetVariable
+					-var-name
+					name
+					-var-value
+					tree
+			-tee
+				adams.flow.sink.CallableSink
+					-callable
+					HistoryDisplay
+	-actor
+		adams.flow.control.Tee
+			-name
+			output tree as XML
+			-tee
+				adams.flow.transformer.Convert
+					-conversion
+						adams.data.conversion.StanfordParseTreeToXML
+							-output-scores
+							true
+			-tee
+				adams.flow.transformer.SetVariable
+					-var-name
+					name
+					-var-value
+					tree as xml
+			-tee
+				adams.flow.sink.CallableSink
+					-callable
+					HistoryDisplay
+	-actor
+		adams.flow.control.Tee
+			-name
+			display tree
+			-tee
+				adams.flow.sink.StanfordParseTreeDisplay
+					-x
+					-3
+					-writer
+						adams.gui.print.NullWriter
+					-expand
+					true
+	-actor
+		adams.flow.control.Tee
+			-name
+			turn leafs into spreadsheet
+			-tee
+				adams.flow.transformer.Convert
+					-conversion
+						adams.data.conversion.StanfordParseTreeToSpreadSheet
+			-tee
+				adams.flow.transformer.SetVariable
+					-var-name
+					name
+					-var-value
+					leaves as spreadsheet
+			-tee
+				adams.flow.sink.CallableSink
+					-callable
+					HistoryDisplay
+	-actor
+		adams.flow.transformer.StanfordGrammaticalStructure
+			-language-pack
+				edu.stanford.nlp.trees.PennTreebankLanguagePack
+	-actor
+		adams.flow.control.Tee
+			-name
+			output grammatical structure
+			-tee
+				adams.flow.transformer.Convert
+					-conversion
+						adams.data.conversion.AnyToString
+			-tee
+				adams.flow.transformer.SetVariable
+					-var-name
+					name
+					-var-value
+					grammar
+			-tee
+				adams.flow.sink.CallableSink
+					-callable
+					HistoryDisplay
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

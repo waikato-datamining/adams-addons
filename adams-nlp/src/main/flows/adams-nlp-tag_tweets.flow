@@ -1,0 +1,33 @@
+# Project: adams
+# Date: 2015-11-16 19:30:42
+# User: fracpete
+# Charset: UTF-8
+#
+adams.flow.control.Flow
+	-annotation
+	Replays a tweet archive and tokenizes/tags the tweet text using TweetNLP\'s Tagger.
+	-actor
+		adams.flow.source.TweetReplay
+			-replay
+				adams.data.io.input.SpreadSheetConverterArchive
+					-archive
+					${EXAMPLE_FLOWS}/data/tweet-archive.csv
+	-actor
+		adams.flow.transformer.TwitterConverter
+			-converter
+				adams.data.twitter.TextConverter
+					-separator
+					\t
+	-actor
+		adams.flow.transformer.TweetNLPTagger
+			-model
+			${EXAMPLE_FLOWS}/data/tweetnlp-model.ritter_ptb_alldata_fixed.20130723
+	-actor
+		adams.flow.sink.DisplayPanelManager
+			-provider
+				adams.flow.sink.SpreadSheetDisplay
+					-writer
+						adams.data.io.output.NullWriter
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

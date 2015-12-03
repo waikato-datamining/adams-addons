@@ -1,0 +1,39 @@
+# Project: adams
+# Date: 2014-02-21 02:04:34
+# User: fracpete
+# Charset: UTF-8
+#
+adams.flow.control.Flow
+	-actor
+		adams.flow.source.FileSupplier
+			-file
+			${EXAMPLE_FLOWS}/data/adams_andy-cattle_brands.txt
+	-actor
+		adams.flow.transformer.TextFileReader
+			-reader
+				adams.data.io.input.SingleStringTextReader
+	-actor
+		adams.flow.transformer.DocumentToSentences
+			-splitter
+				adams.flow.transformer.splitter.StanfordPTBTokenizer
+	-actor
+		adams.flow.transformer.SetVariable
+			-var-name
+			sentence
+	-actor
+		adams.flow.transformer.StanfordLexicalizedParser
+			-model
+			${EXAMPLE_FLOWS}/data/englishPCFG.ser.gz
+	-actor
+		adams.flow.sink.DisplayPanelManager
+			-provider
+				adams.flow.sink.StanfordParseTreeDisplay
+					-writer
+						adams.gui.print.NullWriter
+					-expand
+					true
+			-entry-name-variable
+			sentence
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

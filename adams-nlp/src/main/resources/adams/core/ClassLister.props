@@ -1,0 +1,26 @@
+# Configuration file listing the superclasses and the packages in which to
+# look for derived classes.
+#
+# Format:
+# class.name=package1,package2,...
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision: 12023 $
+
+# language packs
+edu.stanford.nlp.trees.TreebankLanguagePack=\
+  edu.stanford.nlp.trees,\
+  edu.stanford.nlp.trees.international.arabic,\
+  edu.stanford.nlp.trees.international.french,\
+  edu.stanford.nlp.trees.international.hebrew,\
+  edu.stanford.nlp.trees.international.negra,\
+  edu.stanford.nlp.trees.international.pennchinese,\
+  edu.stanford.nlp.trees.international.tuebadz
+
+# for splitting documents into sentences
+adams.flow.transformer.splitter.AbstractDocumentToSentences=\
+  adams.flow.transformer.splitter
+
+# for tokenizing strings
+adams.flow.transformer.tokenizer.AbstractTokenizer=\
+  adams.flow.transformer.tokenizer

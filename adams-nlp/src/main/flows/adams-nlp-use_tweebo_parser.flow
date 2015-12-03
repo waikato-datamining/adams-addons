@@ -1,0 +1,31 @@
+# Project: adams
+# Date: 2015-11-16 22:53:48
+# User: fracpete
+# Charset: UTF-8
+#
+adams.flow.control.Flow
+	-annotation
+	Uses the TweeboParser (https://sourceforge.net/projects/tweeboparser/)\nto parse tweet texts and generate CoNLL data (http://ilk.uvt.nl/conll/#dataformat).\n\nNB: You will need to point the script parameter of the TweeboParser actor\nto the right file on your system.
+	-actor
+		adams.flow.source.FileSupplier
+			-file
+			${EXAMPLE_FLOWS}/data/tweet-archive.txt
+	-actor
+		adams.flow.transformer.TextFileReader
+			-reader
+				adams.data.io.input.LineArrayTextReader
+	-actor
+		adams.flow.transformer.TweeboParser
+			-script
+			run.sh
+	-actor
+		adams.flow.sink.DisplayPanelManager
+			-width
+			900
+			-provider
+				adams.flow.sink.SpreadSheetDisplay
+					-writer
+						adams.data.io.output.NullWriter
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+

@@ -1,0 +1,137 @@
+# Project: adams
+# Date: 2015-11-19 23:55:02
+# User: fracpete
+# Charset: UTF-8
+#
+adams.flow.control.Flow
+	-annotation
+	Demonstrates how to tokenize and clean tweets.
+	-actor
+		adams.flow.standalone.CallableActors
+			-actor
+				adams.flow.sink.DisplayPanelManager
+					-width
+					740
+					-provider
+						adams.flow.sink.WekaInstancesDisplay
+							-writer
+								adams.gui.print.NullWriter
+					-entry-name-variable
+					entry
+	-actor
+		adams.flow.source.FileSupplier
+			-file
+			${EXAMPLE_FLOWS}/data/sanders.arff
+	-actor
+		adams.flow.transformer.WekaFileReader
+			-loader
+				weka.core.converters.AArffLoader
+	-actor
+		adams.flow.control.Branch
+			-branch
+				adams.flow.control.Sequence
+					-name
+					raw
+					-actor
+						adams.flow.transformer.SetVariable
+							-var-name
+							entry
+							-var-value
+							raw
+					-actor
+						adams.flow.transformer.WekaFilter
+							-filter
+								weka.filters.unsupervised.attribute.StringToWordVector
+									-R
+									first
+									-W
+									1000
+									-prune-rate
+									-1.0
+									-N
+									0
+									-stemmer
+									weka.core.stemmers.NullStemmer
+									-stopwords-handler
+									weka.core.stopwords.Null
+									-M
+									1
+									-tokenizer
+									weka.core.tokenizers.TwitterNLPTokenizer -use-lower-case -cleaner weka.core.tokenizers.cleaners.PassThrough
+					-actor
+						adams.flow.sink.CallableSink
+							-callable
+							DisplayPanelManager
+			-branch
+				adams.flow.control.Sequence
+					-name
+					clean
+					-actor
+						adams.flow.transformer.SetVariable
+							-var-name
+							entry
+							-var-value
+							clean
+					-actor
+						adams.flow.transformer.WekaFilter
+							-filter
+								weka.filters.unsupervised.attribute.StringToWordVector
+									-R
+									first
+									-W
+									1000
+									-prune-rate
+									-1.0
+									-N
+									0
+									-stemmer
+									weka.core.stemmers.NullStemmer
+									-stopwords-handler
+									weka.core.stopwords.Null
+									-M
+									1
+									-tokenizer
+									weka.core.tokenizers.TwitterNLPTokenizer -use-lower-case -cleaner "weka.core.tokenizers.cleaners.MultiCleaner -cleaner weka.core.tokenizers.cleaners.NormalizeDuplicateChars -cleaner weka.core.tokenizers.cleaners.NormalizeTwitterHashtag -cleaner weka.core.tokenizers.cleaners.NormalizeTwitterUsers -cleaner weka.core.tokenizers.cleaners.NormalizeURLs -cleaner \"weka.core.tokenizers.cleaners.RemoveEmoticons -model /home/fracpete/development/projects/adamsfamily/adams-incubator/adams-nlp/src/main/flows/data/AFINN-emoticon-8.txt\""
+					-actor
+						adams.flow.sink.CallableSink
+							-callable
+							DisplayPanelManager
+			-branch
+				adams.flow.control.Sequence
+					-name
+					word clusters
+					-actor
+						adams.flow.transformer.SetVariable
+							-var-name
+							entry
+							-var-value
+							word clusters
+					-actor
+						adams.flow.transformer.WekaFilter
+							-filter
+								weka.filters.unsupervised.attribute.StringToWordVector
+									-R
+									first
+									-W
+									1000
+									-prune-rate
+									-1.0
+									-N
+									0
+									-stemmer
+									weka.core.stemmers.NullStemmer
+									-stopwords-handler
+									weka.core.stopwords.Null
+									-M
+									1
+									-tokenizer
+									weka.core.tokenizers.TwitterNLPTokenizer -use-lower-case -cleaner "weka.core.tokenizers.cleaners.MultiCleaner -cleaner weka.core.tokenizers.cleaners.NormalizeDuplicateChars -cleaner weka.core.tokenizers.cleaners.NormalizeTwitterHashtag -cleaner weka.core.tokenizers.cleaners.NormalizeTwitterUsers -cleaner weka.core.tokenizers.cleaners.NormalizeURLs -cleaner \"weka.core.tokenizers.cleaners.RemoveEmoticons -model /home/fracpete/development/projects/adamsfamily/adams-incubator/adams-nlp/src/main/flows/data/AFINN-emoticon-8.txt\" -cleaner \"weka.core.tokenizers.cleaners.WordCluster -model /home/fracpete/development/projects/adamsfamily/adams-incubator/adams-nlp/src/main/flows/data/50mpaths2.txt\""
+					-actor
+						adams.flow.sink.CallableSink
+							-callable
+							DisplayPanelManager
+			-num-threads
+			1
+	-flow-execution-listener
+		adams.flow.execution.NullListener
+
