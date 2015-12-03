@@ -14,7 +14,7 @@
  */
 
 /**
- * VideoAnnotatorPanel.java
+ * VLCjPanel.java
  * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
  */
 
@@ -23,22 +23,29 @@ package adams.gui.visualization.video.VLCjPlayer;
 import adams.core.CleanUpHandler;
 import adams.core.logging.LoggingHelper;
 import adams.gui.chooser.BaseFileChooser;
-import adams.gui.core.*;
+import adams.gui.core.BasePanel;
+import adams.gui.core.GUIHelper;
+import adams.gui.core.MenuBarProvider;
+import adams.gui.core.RecentFilesHandler;
+import adams.gui.core.TitleGenerator;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.io.File;
-import java.lang.String;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * A basic video player. Allows a user to open, play, and pause video
  *
- * @author sjb90
+ * @author sjb90 (sjb90 at students dot waikato dot ac dot nz)
  * @version $Revision$
  */
 public class VLCjPanel
@@ -47,24 +54,22 @@ public class VLCjPanel
 
   private static final long serialVersionUID = -6333350276893620652L;
 
-
   /**
    * the file to store the recent files in.
    */
   public final static String SESSION_FILE = "VLCjVideoPlayerSession.props";
-
 
   /**
    * the menu bar, if used.
    */
   protected JMenuBar m_MenuBar;
 
-
   /**
    * the "load recent" submenu.
    */
   protected JMenu m_MenuFileLoadRecent;
 
+  /** for handling recent files. */
   protected RecentFilesHandler<JMenu> m_RecentFilesHandler;
 
   /**
@@ -97,12 +102,10 @@ public class VLCjPanel
    */
   protected JMenuItem m_MenuItemVideoPause;
 
-
   /**
    * The path to the file we're currently viewing
-   * TODO: Change to place holder file
    */
-  protected String m_CurrentFile;
+  protected File m_CurrentFile;
 
   /**
    * the mediaplayer componenet used to play video
@@ -133,27 +136,94 @@ public class VLCjPanel
    */
   protected JButton m_StopButton;
 
+  /** for generating the title. */
+  protected TitleGenerator m_TitleGenerator;
+
+  /**
+   * For initializing members.
+   */
+  @Override
+  protected void initialize() {
+    super.initialize();
+
+    m_Logger         = LoggingHelper.getLogger(getClass());
+    m_TitleGenerator = new TitleGenerator("VLCj Video Player", true);
+  }
+
+  /**
+   * For initializing the GUI.
+   */
   @Override
   public void initGUI() {
     super.initGUI();
-    m_Logger = LoggingHelper.getLogger(getClass());
+
     m_MediaPlayerComponent = new EmbeddedMediaPlayerComponent();
     add(m_MediaPlayerComponent, BorderLayout.CENTER);
 
     // Controls
     m_ControlsPanel = new BasePanel(new FlowLayout());
-    m_PlayButton  = new JButton("Play");
-    m_PauseButton = new JButton("Pause");
-    m_StopButton  = new JButton("Stop");
-    m_ControlsPanel.add(m_PlayButton);
-    m_ControlsPanel.add(m_PauseButton);
-    m_ControlsPanel.add(m_StopButton);
-
-    m_PlayButton.addActionListener(e -> m_MediaPlayerComponent.getMediaPlayer().play());
-    m_PauseButton.addActionListener(e -> m_MediaPlayerComponent.getMediaPlayer().pause());
-    m_StopButton.addActionListener(e -> m_MediaPlayerComponent.getMediaPlayer().stop());
     add(m_ControlsPanel, BorderLayout.SOUTH);
 
+    m_PlayButton = new JButton("Play", GUIHelper.getIcon("run.gif"));
+    m_PlayButton.addActionListener(e -> {
+      m_MediaPlayerComponent.getMediaPlayer().play();
+      updateButtons();
+    });
+    m_ControlsPanel.add(m_PlayButton);
+
+    m_PauseButton = new JButton("Pause", GUIHelper.getIcon("pause.gif"));
+    m_PauseButton.addActionListener(e -> {
+      m_MediaPlayerComponent.getMediaPlayer().pause();
+      updateButtons();
+    });
+    m_ControlsPanel.add(m_PauseButton);
+
+    m_StopButton  = new JButton("Stop", GUIHelper.getIcon("stop_blue.gif"));
+    m_StopButton.addActionListener(e -> {
+      m_MediaPlayerComponent.getMediaPlayer().stop();
+      updateButtons();
+    });
+    m_ControlsPanel.add(m_StopButton);
+
+  }
+
+  /**
+   * finishes the initialization.
+   */
+  @Override
+  protected void finishInit() {
+    super.finishInit();
+    updateButtons();
+  }
+
+  /**
+   * Sets the base title to use for the title generator.
+   *
+   * @param value	the title to use
+   * @see		#m_TitleGenerator
+   */
+  public void setTitle(String value) {
+    m_TitleGenerator.setTitle(value);
+    update();
+  }
+
+  /**
+   * Returns the base title in use by the title generator.
+   *
+   * @return		the title in use
+   * @see		#m_TitleGenerator
+   */
+  public String getTitle() {
+    return m_TitleGenerator.getTitle();
+  }
+
+  /**
+   * Returns the title generator in use.
+   *
+   * @return		the generator
+   */
+  public TitleGenerator getTitleGenerator() {
+    return m_TitleGenerator;
   }
 
   /**
@@ -175,15 +245,12 @@ public class VLCjPanel
       menu.setMnemonic('F');
       menu.addChangeListener(e -> updateMenu());
 
-
       // File/Open
       menuitem = new JMenuItem("Open...", GUIHelper.getIcon("open.gif"));
       menuitem.setMnemonic('O');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed O"));
       menuitem.addActionListener(e -> {
-        m_CurrentFile = open();
-        m_MediaPlayerComponent.getMediaPlayer().prepareMedia(m_CurrentFile);
-        m_RecentFilesHandler.addRecentItem(new File(m_CurrentFile));
+        open();
       });
       menu.add(menuitem);
       m_MenuItemFileOpen = menuitem;
@@ -191,8 +258,7 @@ public class VLCjPanel
       // File/Recent files
       submenu = new JMenu("Open recent");
       menu.add(submenu);
-      m_RecentFilesHandler = new RecentFilesHandler<>(
-        SESSION_FILE, 5, submenu);
+      m_RecentFilesHandler = new RecentFilesHandler<>(SESSION_FILE, 5, submenu);
       m_RecentFilesHandler.addRecentItemListener(new RecentItemListener<JMenu,File>() {
         @Override
         public void recentItemAdded(RecentItemEvent<JMenu,File> e) {
@@ -200,9 +266,7 @@ public class VLCjPanel
         }
         @Override
         public void recentItemSelected(RecentItemEvent<JMenu,File> e) {
-          m_CurrentFile = e.getItem().getAbsolutePath();
-          m_MediaPlayerComponent.getMediaPlayer().prepareMedia(m_CurrentFile);
-
+	  open(e.getItem());
         }
       });
       m_MenuFileLoadRecent = submenu;
@@ -213,6 +277,7 @@ public class VLCjPanel
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed Q"));
       menuitem.addActionListener(e -> close());
       m_MenuItemFileClose = menuitem;
+      menu.addSeparator();
       menu.add(menuitem);
 
       // Video
@@ -255,25 +320,43 @@ public class VLCjPanel
   }
 
   /**
-   * Pops up dialog to open a file.
+   * Returns the file chooser to use.
    *
-   * @return the path to the selected file.
+   * @return		the file chooser
    */
-  public String open() {
-    int retVal;
-
-    retVal = getFileChooser().showOpenDialog(this);
-    if (retVal != BaseFileChooser.APPROVE_OPTION)
-      return null;
-
-    return getFileChooser().getSelectedFile().getAbsolutePath();
-  }
-
-  public BaseFileChooser getFileChooser() {
+  protected BaseFileChooser getFileChooser() {
     if (m_FileChooser == null)
       m_FileChooser = new BaseFileChooser();
 
     return m_FileChooser;
+  }
+
+  /**
+   * Pops up dialog to open a file.
+   */
+  public void open() {
+    int retVal;
+
+    retVal = getFileChooser().showOpenDialog(this);
+    if (retVal != BaseFileChooser.APPROVE_OPTION)
+      return;
+
+    open(getFileChooser().getSelectedFile());
+  }
+
+  /**
+   * Opens the specified file.
+   *
+   * @param file	the file to open
+   */
+  public void open(File file) {
+    m_CurrentFile = file;
+
+    m_MediaPlayerComponent.getMediaPlayer().prepareMedia(m_CurrentFile.getAbsolutePath());
+    if (m_RecentFilesHandler != null)
+      m_RecentFilesHandler.addRecentItem(m_CurrentFile);
+
+    update();
   }
 
   /**
@@ -287,44 +370,78 @@ public class VLCjPanel
     cleanUp();
     closeParent();
   }
-
-
+  
+  /**
+   * Cleans up data structures, frees up memory.
+   */
   @Override
   public void cleanUp() {
     m_MediaPlayerComponent.release();
   }
 
   /**
-   * Updates the state of the menu items.
+   * Updates title and menu items.
    */
-  protected void updateMenu() {
-    System.out.println("Entering update!");
+  protected void update() {
+    updateTitle();
+    updateMenu();
+    updateButtons();
+  }
+
+  /**
+   * Updates the title of the dialog.
+   */
+  protected void updateTitle() {
     Runnable	run;
 
-    if (m_MenuBar == null)
+    if (!m_TitleGenerator.isEnabled())
       return;
 
-    run = () -> {
-      System.out.println("Updating menu");
-      // Video
-      if(m_MediaPlayerComponent.getMediaPlayer().isPlayable()){
-        System.out.println("enabling things");
-        m_MenuItemVideoPlay.setEnabled(true);
-        m_MenuItemVideoPause.setEnabled(true);
-      }
-      else {
-        System.out.println("Disabling things");
-        m_MenuItemVideoPlay.setEnabled(false);
-        m_MenuItemVideoPause.setEnabled(false);
+    run = new Runnable() {
+      @Override
+      public void run() {
+	String title = m_TitleGenerator.generate(m_CurrentFile);
+	setParentTitle(title);
       }
     };
     SwingUtilities.invokeLater(run);
   }
 
   /**
+   * Updates the state of the menu items.
+   */
+  protected void updateMenu() {
+    Runnable	run;
+
+    if (m_MenuBar == null)
+      return;
+
+    run = () -> {
+      // Video
+      if(m_MediaPlayerComponent.getMediaPlayer().isPlayable()){
+        m_MenuItemVideoPlay.setEnabled(true);
+        m_MenuItemVideoPause.setEnabled(true);
+      }
+      else {
+        m_MenuItemVideoPlay.setEnabled(false);
+        m_MenuItemVideoPause.setEnabled(false);
+      }
+      updateButtons();
+    };
+    SwingUtilities.invokeLater(run);
+  }
+
+  /**
+   * Updates the state of the buttons.
+   */
+  protected void updateButtons() {
+    // TODO
+  }
+
+  /**
    * Safely hides or shows the control panel
    */
-  private void showHideControls() {
+  protected void showHideControls() {
     Runnable run;
     if (m_ControlsPanel == null)
       return;
