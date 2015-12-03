@@ -67,6 +67,7 @@ public class VLCjPlayer
    */
   public void launch() {
     VLCjPanel panel = new VLCjPanel();
+    panel.setTitle(getTitle());
     createChildFrame(panel, 1000, 600);
   }
 
