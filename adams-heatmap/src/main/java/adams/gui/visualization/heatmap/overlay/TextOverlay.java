@@ -22,6 +22,7 @@ package adams.gui.visualization.heatmap.overlay;
 
 import adams.data.report.Field;
 import adams.data.report.Report;
+import adams.gui.core.Fonts;
 import adams.gui.visualization.image.ImagePanel.PaintPanel;
 
 import java.awt.Color;
@@ -170,7 +171,7 @@ public class TextOverlay
 
     m_OptionManager.add(
 	    "font", "font",
-	    new Font("helvetica", Font.PLAIN, 12));
+             Fonts.getSansFont());
   }
 
   /**
