@@ -33,14 +33,13 @@ import adams.gui.event.RecentItemListener;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 
-import javax.swing.JButton;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.SwingUtilities;
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 /**
@@ -70,7 +69,9 @@ public class VLCjPanel
    */
   protected JMenu m_MenuFileLoadRecent;
 
-  /** for handling recent files. */
+  /**
+   * for handling recent files.
+   */
   protected RecentFilesHandler<JMenu> m_RecentFilesHandler;
 
   /**
@@ -123,6 +124,17 @@ public class VLCjPanel
   protected BasePanel m_ControlsPanel;
 
   /**
+   * the panel for our buttons
+   */
+  protected BasePanel m_ButtonPanel;
+
+  /**
+   * slider for changing video position and a Jpanel to place it in
+   */
+  protected JPanel m_SliderPanel;
+  protected JSlider m_PositionSlider;
+
+  /**
    * the "play" button
    */
   protected JButton m_PlayButton;
@@ -132,23 +144,61 @@ public class VLCjPanel
    */
   protected JButton m_PauseButton;
 
-  /**
-   * the "stop" button
-   */
-  protected JButton m_StopButton;
 
-  /** for generating the title. */
+  /**
+   * for generating the title.
+   */
   protected TitleGenerator m_TitleGenerator;
 
-  /** flag to say if video is paused */
+  /**
+   * flag to say if video is paused
+   */
   protected boolean m_VideoPaused;
 
-  /** flag to say if video is loaded */
+  /**
+   * flag to say if video is loaded
+   */
   protected boolean m_VideoLoaded;
 
-  /** flag to check that VLC is installed. */
+  /**
+   * flag to check that VLC is installed.
+   */
   protected boolean m_VLCInstalled;
 
+  /**
+   * flag for player state, playing/not playing
+   */
+  protected boolean m_VideoPlaying;
+
+  /**
+   * a scheduler to deal with the slider
+   */
+  protected ScheduledExecutorService m_Executor;
+
+  /**
+   * the handler for the scheduled event
+   */
+  protected ScheduledFuture<?> m_ExecutorHandler;
+
+  /**
+   * label for time
+   */
+  protected JLabel m_PlaybackTimeLabel;
+
+  /**
+   * label for the length of the current media file
+   */
+  protected JLabel m_MediaLengthLabel;
+
+  /**
+   * current playback time
+   */
+  protected long m_PlaybackTime;
+
+  /**
+   * media length
+   */
+  protected long m_MediaLength;
 
   /**
    * For initializing members.
@@ -157,12 +207,18 @@ public class VLCjPanel
   protected void initialize() {
     super.initialize();
 
-    m_Logger         = LoggingHelper.getLogger(getClass());
+    m_Logger = LoggingHelper.getLogger(getClass());
     m_TitleGenerator = new TitleGenerator("VLCj Video Player", true);
 
-    m_VideoPaused    = false;
-    m_VideoLoaded    = false;
-    m_VLCInstalled   = new NativeDiscovery().discover();
+    m_VideoPaused = false;
+    m_VideoLoaded = false;
+    m_VideoPlaying = false;
+    m_VLCInstalled = new NativeDiscovery().discover();
+    if (!m_VLCInstalled) {
+      adams.gui.core.GUIHelper.showErrorMessage(this, "VLC native libraries not found. Please install VLC: " +
+	"http://www.videolan.org/vlc/ !");
+      close();
+    }
   }
 
   /**
@@ -171,35 +227,49 @@ public class VLCjPanel
   @Override
   public void initGUI() {
     super.initGUI();
-
-    m_MediaPlayerComponent = new EmbeddedMediaPlayerComponent();
-    add(m_MediaPlayerComponent, BorderLayout.CENTER);
+    if (m_VLCInstalled) {
+      m_MediaPlayerComponent = new EmbeddedMediaPlayerComponent();
+      add(m_MediaPlayerComponent, BorderLayout.CENTER);
+    }
 
     // Controls
-    m_ControlsPanel = new BasePanel(new FlowLayout());
+    m_ControlsPanel = new BasePanel();
     add(m_ControlsPanel, BorderLayout.SOUTH);
 
+    // Slider
+    m_SliderPanel = new BasePanel(new FlowLayout());
+    m_PositionSlider = new JSlider(0, 1000, 0);
+    m_PositionSlider.addChangeListener(e -> {
+      JSlider source = (JSlider) e.getSource();
+      if (source.getValueIsAdjusting())
+	m_MediaPlayerComponent.getMediaPlayer().setPosition(source.getValue() / 1000F);
+    });
+    m_SliderPanel.add(m_PositionSlider);
+    m_ControlsPanel.add(m_SliderPanel, BorderLayout.NORTH);
+
+    m_PlaybackTimeLabel = new JLabel("00:00:00 /");
+    m_SliderPanel.add(m_PlaybackTimeLabel);
+
+    m_MediaLengthLabel = new JLabel("00:00:00");
+    m_SliderPanel.add(m_MediaLengthLabel);
+
+    // Buttons
+    m_ButtonPanel = new BasePanel(new FlowLayout());
     m_PlayButton = new JButton("Play", GUIHelper.getIcon("run.gif"));
     m_PlayButton.addActionListener(e -> {
       play();
-      updateButtons();
+      updateControls();
     });
-    m_ControlsPanel.add(m_PlayButton);
+    m_ButtonPanel.add(m_PlayButton);
 
     m_PauseButton = new JButton("Pause", GUIHelper.getIcon("pause.gif"));
     m_PauseButton.addActionListener(e -> {
       pause();
-      updateButtons();
+      updateControls();
     });
-    m_ControlsPanel.add(m_PauseButton);
+    m_ButtonPanel.add(m_PauseButton);
 
-    m_StopButton  = new JButton("Stop", GUIHelper.getIcon("stop_blue.gif"));
-    m_StopButton.addActionListener(e -> {
-      stop();
-      updateButtons();
-    });
-    m_ControlsPanel.add(m_StopButton);
-
+    m_ControlsPanel.add(m_ButtonPanel);
   }
 
   /**
@@ -208,14 +278,23 @@ public class VLCjPanel
   @Override
   protected void finishInit() {
     super.finishInit();
-    updateButtons();
+    // Sets up a scheduled executor to update the slider position and keep the time labels up to date.
+    m_Executor = Executors.newSingleThreadScheduledExecutor();
+    m_ExecutorHandler = m_Executor.scheduleAtFixedRate(() -> {
+      int position = (int) (m_MediaPlayerComponent.getMediaPlayer().getPosition() * 1000.0F);
+      SwingUtilities.invokeLater(() -> m_PositionSlider.setValue(position));
+      // Update the current time in the video
+      m_PlaybackTime = m_MediaPlayerComponent.getMediaPlayer().getTime();
+      m_MediaLength  = m_MediaPlayerComponent.getMediaPlayer().getLength();
+      updateControls();
+    }, 0L, 1L, TimeUnit.SECONDS);
   }
 
   /**
    * Sets the base title to use for the title generator.
    *
-   * @param value	the title to use
-   * @see		#m_TitleGenerator
+   * @param value the title to use
+   * @see #m_TitleGenerator
    */
   public void setTitle(String value) {
     m_TitleGenerator.setTitle(value);
@@ -225,8 +304,8 @@ public class VLCjPanel
   /**
    * Returns the base title in use by the title generator.
    *
-   * @return		the title in use
-   * @see		#m_TitleGenerator
+   * @return the title in use
+   * @see #m_TitleGenerator
    */
   public String getTitle() {
     return m_TitleGenerator.getTitle();
@@ -235,7 +314,7 @@ public class VLCjPanel
   /**
    * Returns the title generator in use.
    *
-   * @return		the generator
+   * @return the generator
    */
   public TitleGenerator getTitleGenerator() {
     return m_TitleGenerator;
@@ -264,7 +343,7 @@ public class VLCjPanel
       menuitem = new JMenuItem("Open...", GUIHelper.getIcon("open.gif"));
       menuitem.setMnemonic('O');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed O"));
-      menuitem.addActionListener(e ->  open());
+      menuitem.addActionListener(e -> open());
       menu.add(menuitem);
       m_MenuItemFileOpen = menuitem;
 
@@ -272,15 +351,16 @@ public class VLCjPanel
       submenu = new JMenu("Open recent");
       menu.add(submenu);
       m_RecentFilesHandler = new RecentFilesHandler<>(SESSION_FILE, 5, submenu);
-      m_RecentFilesHandler.addRecentItemListener(new RecentItemListener<JMenu,File>() {
-        @Override
-        public void recentItemAdded(RecentItemEvent<JMenu,File> e) {
-          // ignored
-        }
-        @Override
-        public void recentItemSelected(RecentItemEvent<JMenu,File> e) {
+      m_RecentFilesHandler.addRecentItemListener(new RecentItemListener<JMenu, File>() {
+	@Override
+	public void recentItemAdded(RecentItemEvent<JMenu, File> e) {
+	  // ignored
+	}
+
+	@Override
+	public void recentItemSelected(RecentItemEvent<JMenu, File> e) {
 	  open(e.getItem());
-        }
+	}
       });
       m_MenuFileLoadRecent = submenu;
 
@@ -318,7 +398,8 @@ public class VLCjPanel
       menu.add(menuitem);
 
       //Video/Show/Hide Controls
-      menuitem = new JMenuItem(("Hide Controls"));
+      menuitem = new JCheckBoxMenuItem("Show Controls");
+      menuitem.setSelected(true);
       menuitem.setMnemonic('H');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed H"));
       menuitem.addActionListener(e -> showHideControls());
@@ -332,28 +413,41 @@ public class VLCjPanel
     return result;
   }
 
+  /**
+   * Pauses the video assuming there is a video loaded and playing
+   */
   protected void pause() {
-    m_MediaPlayerComponent.getMediaPlayer().pause();
-    m_VideoPaused = !m_VideoPaused;
-    update();
+    if(m_VideoLoaded && m_VideoPlaying) {
+      m_MediaPlayerComponent.getMediaPlayer().pause();
+      m_VideoPaused = !m_VideoPaused;
+      update();
+    }
   }
 
-  protected void play(){
-    m_MediaPlayerComponent.getMediaPlayer().play();
-    if(m_VideoPaused)
-      m_VideoPaused = false;
-    update();
-  }
-
-  protected void stop() {
-    m_MediaPlayerComponent.getMediaPlayer().stop();
+  /**
+   * Plays or stops the video depending on what state it's in currently. If there is no video loaded then
+   * nothing happens.
+   */
+  protected void play() {
+    if (m_VideoLoaded)
+      return;
+    if (m_VideoPlaying || m_VideoPaused) {
+      m_MediaPlayerComponent.getMediaPlayer().stop();
+      m_VideoPlaying = false;
+    } else {
+      m_MediaPlayerComponent.getMediaPlayer().play();
+      m_VideoPlaying = true;
+    }
     m_VideoPaused = false;
+
+    update();
   }
+
 
   /**
    * Returns the file chooser to use.
    *
-   * @return		the file chooser
+   * @return the file chooser
    */
   protected BaseFileChooser getFileChooser() {
     if (m_FileChooser == null)
@@ -378,13 +472,13 @@ public class VLCjPanel
   /**
    * Opens the specified file.
    *
-   * @param file	the file to open
+   * @param file the file to open
    */
   public void open(File file) {
     m_CurrentFile = file;
-    if(!m_VLCInstalled) {
+    if (!m_VLCInstalled) {
       adams.gui.core.GUIHelper.showErrorMessage(this, "VLC native libraries not found. Please install VLC: " +
-        "http://www.videolan.org/vlc/ !");
+	"http://www.videolan.org/vlc/ !");
       return;
     }
     m_MediaPlayerComponent.getMediaPlayer().prepareMedia(m_CurrentFile.getAbsolutePath());
@@ -405,13 +499,15 @@ public class VLCjPanel
     cleanUp();
     closeParent();
   }
-  
+
   /**
    * Cleans up data structures, frees up memory.
    */
   @Override
   public void cleanUp() {
-    m_MediaPlayerComponent.release();
+    if (m_MediaPlayerComponent != null)
+      m_MediaPlayerComponent.release();
+    m_ExecutorHandler.cancel(true);
   }
 
   /**
@@ -420,14 +516,14 @@ public class VLCjPanel
   protected void update() {
     updateTitle();
     updateMenu();
-    updateButtons();
+    updateControls();
   }
 
   /**
    * Updates the title of the dialog.
    */
   protected void updateTitle() {
-    Runnable	run;
+    Runnable run;
 
     if (!m_TitleGenerator.isEnabled())
       return;
@@ -443,17 +539,33 @@ public class VLCjPanel
    * Updates the state of the menu items.
    */
   protected void updateMenu() {
-    Runnable	run;
+    Runnable run;
 
     if (m_MenuBar == null)
       return;
 
     run = () -> {
       // Video
-        m_MenuItemVideoPlay.setEnabled(m_VideoLoaded);
-        m_MenuItemVideoPause.setEnabled(m_VideoLoaded);
+      m_MenuItemVideoPlay.setEnabled(m_VideoLoaded);
+      m_MenuItemVideoPause.setEnabled(m_VideoPlaying || m_VideoPaused);
+      if (m_VideoPlaying) {
+	m_MenuItemVideoPlay.setText("Stop");
+	m_MenuItemVideoPlay.setIcon(GUIHelper.getIcon("stop_blue.gif"));
+	m_MenuItemVideoPlay.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed S"));
+      } else {
+	m_MenuItemVideoPlay.setText("Play");
+	m_MenuItemVideoPlay.setIcon(GUIHelper.getIcon("play.gif"));
+	m_MenuItemVideoPlay.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed P"));
+      }
+      if (m_VideoPaused) {
+	m_MenuItemVideoPause.setIcon(GUIHelper.getIcon("resume.gif"));
+	m_MenuItemVideoPause.setText("Resume");
+      } else {
+	m_MenuItemVideoPause.setIcon(GUIHelper.getIcon("pause.gif"));
+	m_MenuItemVideoPause.setText("Pause");
+      }
 
-      updateButtons();
+      updateControls();
     };
     SwingUtilities.invokeLater(run);
   }
@@ -461,25 +573,36 @@ public class VLCjPanel
   /**
    * Updates the state of the buttons.
    */
-  protected void updateButtons() {
+  protected void updateControls() {
     Runnable run;
-    if (m_ControlsPanel == null || m_PauseButton == null || m_PlayButton == null || m_StopButton == null) {
+    if (m_ControlsPanel == null || m_PauseButton == null || m_PlayButton == null || m_PositionSlider == null) {
       return;
     }
     run = () -> {
-        m_StopButton.setEnabled(m_VideoLoaded);
-        m_PauseButton.setEnabled(m_VideoLoaded);
-        m_PlayButton.setEnabled(m_VideoLoaded);
+      m_PauseButton.setEnabled(m_VideoLoaded && m_VideoPlaying);
+      m_PlayButton.setEnabled(m_VideoLoaded);
 
-      if(m_VideoPaused) {
-        m_PauseButton.setText("Resume");
-        m_PauseButton.setIcon(GUIHelper.getIcon("resume.gif"));
+      // Toggle pause and resume button
+      if (m_VideoPaused) {
+	m_PauseButton.setText("Resume");
+	m_PauseButton.setIcon(GUIHelper.getIcon("resume.gif"));
+      } else {
+	m_PauseButton.setText("Pause");
+	m_PauseButton.setIcon(GUIHelper.getIcon("pause.gif"));
       }
-      else {
-        m_PauseButton.setText("Pause");
-        m_PauseButton.setIcon(GUIHelper.getIcon("pause.gif"));
+      // Toggle Play and Stop Button
+      if (m_VideoPlaying) {
+	m_PlayButton.setText("Stop");
+	m_PlayButton.setIcon(GUIHelper.getIcon("stop_blue.gif"));
+      } else {
+	m_PlayButton.setText("Play");
+	m_PlayButton.setIcon(GUIHelper.getIcon("play.gif"));
       }
 
+      // Enables or disables the slider
+      m_PositionSlider.setEnabled(m_VideoLoaded && m_VLCInstalled);
+      m_MediaLengthLabel.setText(makeTimeString(m_MediaLength));
+      m_PlaybackTimeLabel.setText(makeTimeString(m_PlaybackTime)  + " /");
     };
 
     SwingUtilities.invokeLater(run);
@@ -496,5 +619,17 @@ public class VLCjPanel
     run = () -> m_ControlsPanel.setVisible(!m_ControlsPanel.isVisible());
 
     SwingUtilities.invokeLater(run);
+  }
+
+
+  /**
+   * Formates a time given in milliseconds into a string using hours, minutes, seconds.
+   * @param time time to format in milliseconds
+   * @return the formatted string representing the given time in hh:mm:ss format
+   */
+  protected String makeTimeString(Long time) {
+    return String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(time),
+      TimeUnit.MILLISECONDS.toMinutes(time) % 60, TimeUnit.MILLISECONDS.toSeconds(time) % 60);
+
   }
 }
