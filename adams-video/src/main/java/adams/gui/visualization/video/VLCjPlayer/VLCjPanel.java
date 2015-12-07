@@ -21,6 +21,7 @@
 package adams.gui.visualization.video.VLCjPlayer;
 
 import adams.core.CleanUpHandler;
+import adams.core.Properties;
 import adams.core.logging.LoggingHelper;
 import adams.gui.chooser.BaseFileChooser;
 import adams.gui.core.BasePanel;
@@ -58,6 +59,12 @@ public class VLCjPanel
    * the file to store the recent files in.
    */
   public final static String SESSION_FILE = "VLCjVideoPlayerSession.props";
+
+  /** the properties file name. */
+  public final static String FILENAME = "adams/gui/visualization/video/vlcjplayer/VLCjVideoPlayer.props";
+
+  /** the properties to use. */
+  protected static Properties m_Properties;
 
   /**
    * the menu bar, if used.
@@ -215,9 +222,8 @@ public class VLCjPanel
     m_VideoPlaying = false;
     m_VLCInstalled = new NativeDiscovery().discover();
     if (!m_VLCInstalled) {
-      adams.gui.core.GUIHelper.showErrorMessage(this, "VLC native libraries not found. Please install VLC: " +
+      adams.gui.core.GUIHelper.showErrorMessage(this, "VLC native libraries not found. Please install VLC:\n" +
 	"http://www.videolan.org/vlc/ !");
-      close();
     }
   }
 
@@ -227,6 +233,7 @@ public class VLCjPanel
   @Override
   public void initGUI() {
     super.initGUI();
+
     if (m_VLCInstalled) {
       m_MediaPlayerComponent = new EmbeddedMediaPlayerComponent();
       add(m_MediaPlayerComponent, BorderLayout.CENTER);
@@ -399,7 +406,7 @@ public class VLCjPanel
 
       //Video/Show/Hide Controls
       menuitem = new JCheckBoxMenuItem("Show Controls");
-      menuitem.setSelected(true);
+      menuitem.setSelected(getProperties().getBoolean("ShowControls", true));
       menuitem.setMnemonic('H');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed H"));
       menuitem.addActionListener(e -> showHideControls());
@@ -429,7 +436,7 @@ public class VLCjPanel
    * nothing happens.
    */
   protected void play() {
-    if (m_VideoLoaded)
+    if (!m_VideoLoaded)
       return;
     if (m_VideoPlaying || m_VideoPaused) {
       m_MediaPlayerComponent.getMediaPlayer().stop();
@@ -631,5 +638,22 @@ public class VLCjPanel
     return String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(time),
       TimeUnit.MILLISECONDS.toMinutes(time) % 60, TimeUnit.MILLISECONDS.toSeconds(time) % 60);
 
+  }
+
+  /**
+   * Returns the properties to use for the video player.
+   *
+   * @return the properties
+   */
+  protected static synchronized Properties getProperties() {
+    if (m_Properties == null) {
+      try {
+        m_Properties = Properties.read(FILENAME);
+      }
+      catch (Exception e) {
+        m_Properties = new Properties();
+      }
+    }
+    return m_Properties;
   }
 }
