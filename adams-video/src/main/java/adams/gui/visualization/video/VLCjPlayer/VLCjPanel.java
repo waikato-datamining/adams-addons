@@ -21,8 +21,10 @@
 package adams.gui.visualization.video.VLCjPlayer;
 
 import adams.core.CleanUpHandler;
+import adams.core.DateFormat;
 import adams.core.Properties;
 import adams.core.logging.LoggingHelper;
+import adams.gui.action.AbstractBaseAction;
 import adams.gui.chooser.BaseFileChooser;
 import adams.gui.core.BasePanel;
 import adams.gui.core.GUIHelper;
@@ -36,7 +38,10 @@ import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -131,14 +136,8 @@ public class VLCjPanel
   protected BasePanel m_ControlsPanel;
 
   /**
-   * the panel for our buttons
+   * slider for changing video position
    */
-  protected BasePanel m_ButtonPanel;
-
-  /**
-   * slider for changing video position and a Jpanel to place it in
-   */
-  protected JPanel m_SliderPanel;
   protected JSlider m_PositionSlider;
 
   /**
@@ -151,7 +150,10 @@ public class VLCjPanel
    */
   protected JButton m_PauseButton;
 
-
+  /**
+   * Mute button
+   */
+  protected JButton m_MuteButton;
   /**
    * for generating the title.
    */
@@ -208,6 +210,26 @@ public class VLCjPanel
   protected long m_MediaLength;
 
   /**
+   * Mute action
+   */
+  AbstractBaseAction m_MuteAction;
+
+  /**
+   * Play action
+   */
+  AbstractBaseAction m_PlayAction;
+
+  /**
+   * Pause action
+   */
+  AbstractBaseAction m_PauseAction;
+
+  /**
+   * Date formater for outputing timestamps
+   */
+  DateFormat m_dateFormatter;
+
+  /**
    * For initializing members.
    */
   @Override
@@ -220,11 +242,58 @@ public class VLCjPanel
     m_VideoPaused = false;
     m_VideoLoaded = false;
     m_VideoPlaying = false;
+    m_dateFormatter = new DateFormat("HH:mm:ss");
     m_VLCInstalled = new NativeDiscovery().discover();
     if (!m_VLCInstalled) {
       adams.gui.core.GUIHelper.showErrorMessage(this, "VLC native libraries not found. Please install VLC:\n" +
 	"http://www.videolan.org/vlc/ !");
+      return;
     }
+    initActions();
+  }
+
+  /**
+   * for initializing actions
+   */
+  protected void initActions(){
+    AbstractBaseAction action;
+
+    // Mute action
+    action = new AbstractBaseAction("Mute", "mute.gif") {
+      @Override
+      protected void doActionPerformed(ActionEvent e) {
+        mute();
+        updateControls();
+      }
+    };
+
+    action.setMnemonic(KeyEvent.VK_M);
+    action.setAccelerator("ctrl pressed M");
+    m_MuteAction = action;
+
+    // Play action
+    action = new AbstractBaseAction("Play", "run.gif") {
+      @Override
+      protected void doActionPerformed(ActionEvent e) {
+        play();
+        updateControls();
+      }
+    };
+    action.setMnemonic(KeyEvent.VK_P);
+    action.setAccelerator("ctrl pressed P");
+    m_PlayAction = action;
+
+    // Pause action
+    action = new AbstractBaseAction() {
+      @Override
+      protected void doActionPerformed(ActionEvent e) {
+        pause();
+        updateControls();
+      }
+    };
+    action.setMnemonic(KeyEvent.VK_U);
+    action.setAccelerator("ctrl pressed U");
+    m_PauseAction = action;
   }
 
   /**
@@ -240,43 +309,34 @@ public class VLCjPanel
     }
 
     // Controls
-    m_ControlsPanel = new BasePanel();
+    m_ControlsPanel = new BasePanel(new FlowLayout());
     add(m_ControlsPanel, BorderLayout.SOUTH);
 
     // Slider
-    m_SliderPanel = new BasePanel(new FlowLayout());
     m_PositionSlider = new JSlider(0, 1000, 0);
     m_PositionSlider.addChangeListener(e -> {
       JSlider source = (JSlider) e.getSource();
       if (source.getValueIsAdjusting())
 	m_MediaPlayerComponent.getMediaPlayer().setPosition(source.getValue() / 1000F);
     });
-    m_SliderPanel.add(m_PositionSlider);
-    m_ControlsPanel.add(m_SliderPanel, BorderLayout.NORTH);
+    m_ControlsPanel.add(m_PositionSlider);
 
     m_PlaybackTimeLabel = new JLabel("00:00:00 /");
-    m_SliderPanel.add(m_PlaybackTimeLabel);
+    m_ControlsPanel.add(m_PlaybackTimeLabel);
 
     m_MediaLengthLabel = new JLabel("00:00:00");
-    m_SliderPanel.add(m_MediaLengthLabel);
+    m_ControlsPanel.add(m_MediaLengthLabel);
 
     // Buttons
-    m_ButtonPanel = new BasePanel(new FlowLayout());
-    m_PlayButton = new JButton("Play", GUIHelper.getIcon("run.gif"));
-    m_PlayButton.addActionListener(e -> {
-      play();
-      updateControls();
-    });
-    m_ButtonPanel.add(m_PlayButton);
+    m_PlayButton = new JButton(m_PlayAction);
+    m_ControlsPanel.add(m_PlayButton);
 
-    m_PauseButton = new JButton("Pause", GUIHelper.getIcon("pause.gif"));
-    m_PauseButton.addActionListener(e -> {
-      pause();
-      updateControls();
-    });
-    m_ButtonPanel.add(m_PauseButton);
+    m_PauseButton = new JButton(m_PauseAction);
+    m_ControlsPanel.add(m_PauseButton);
 
-    m_ControlsPanel.add(m_ButtonPanel);
+    m_MuteButton = new JButton(m_MuteAction);
+    m_ControlsPanel.add(m_MuteButton);
+
   }
 
   /**
@@ -450,6 +510,12 @@ public class VLCjPanel
     update();
   }
 
+  /**
+   * Mutes the video
+   */
+  protected void mute() {
+    m_MediaPlayerComponent.getMediaPlayer().mute();
+  }
 
   /**
    * Returns the file chooser to use.
@@ -561,7 +627,7 @@ public class VLCjPanel
 	m_MenuItemVideoPlay.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed S"));
       } else {
 	m_MenuItemVideoPlay.setText("Play");
-	m_MenuItemVideoPlay.setIcon(GUIHelper.getIcon("play.gif"));
+	m_MenuItemVideoPlay.setIcon(GUIHelper.getIcon("run.gif"));
 	m_MenuItemVideoPlay.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed P"));
       }
       if (m_VideoPaused) {
@@ -603,13 +669,20 @@ public class VLCjPanel
 	m_PlayButton.setIcon(GUIHelper.getIcon("stop_blue.gif"));
       } else {
 	m_PlayButton.setText("Play");
-	m_PlayButton.setIcon(GUIHelper.getIcon("play.gif"));
+	m_PlayButton.setIcon(GUIHelper.getIcon("run.gif"));
       }
 
       // Enables or disables the slider
       m_PositionSlider.setEnabled(m_VideoLoaded && m_VLCInstalled);
-      m_MediaLengthLabel.setText(makeTimeString(m_MediaLength));
-      m_PlaybackTimeLabel.setText(makeTimeString(m_PlaybackTime)  + " /");
+      // Updates the playback time labels to show the correct numbers
+      if(!m_MediaPlayerComponent.getMediaPlayer().isPlaying()) {
+        m_MediaLengthLabel.setText(m_dateFormatter.format(new Date(0)));
+        m_PlaybackTimeLabel.setText(m_dateFormatter.format(new Date(0)) + " /");
+      }
+      else {
+        m_MediaLengthLabel.setText(m_dateFormatter.format(new Date(m_MediaLength)));
+        m_PlaybackTimeLabel.setText(m_dateFormatter.format(new Date(m_PlaybackTime)) + " /");
+      }
     };
 
     SwingUtilities.invokeLater(run);
@@ -628,17 +701,6 @@ public class VLCjPanel
     SwingUtilities.invokeLater(run);
   }
 
-
-  /**
-   * Formates a time given in milliseconds into a string using hours, minutes, seconds.
-   * @param time time to format in milliseconds
-   * @return the formatted string representing the given time in hh:mm:ss format
-   */
-  protected String makeTimeString(Long time) {
-    return String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(time),
-      TimeUnit.MILLISECONDS.toMinutes(time) % 60, TimeUnit.MILLISECONDS.toSeconds(time) % 60);
-
-  }
 
   /**
    * Returns the properties to use for the video player.
