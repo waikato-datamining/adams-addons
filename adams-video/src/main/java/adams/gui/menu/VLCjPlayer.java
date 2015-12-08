@@ -14,7 +14,7 @@
  */
 
 /*
- * VLCjPlayer.java
+ * vlcjplayer.java
  * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
  *
  */
@@ -24,7 +24,7 @@ package adams.gui.menu;
 import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractMenuItemDefinition;
 import adams.gui.application.UserMode;
-import adams.gui.visualization.video.VLCjPlayer.VLCjPanel;
+import adams.gui.visualization.video.vlcjplayer.VLCjPanel;
 
 /**
  * For playing videos using VLCj.
