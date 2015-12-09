@@ -112,9 +112,9 @@ public class VLCjPanel
   protected JMenuItem m_MenuItemVideoPlay;
 
   /**
-   * the menu item "pause"
+   * the menu item "stop"
    */
-  protected JMenuItem m_MenuItemVideoPause;
+  protected JMenuItem m_MenuItemVideoStop;
 
   /**
    * The path to the file we're currently viewing
@@ -148,7 +148,7 @@ public class VLCjPanel
   /**
    * the "pause" button
    */
-  protected JButton m_PauseButton;
+  protected JButton m_StopButton;
 
   /**
    * Mute button
@@ -225,6 +225,11 @@ public class VLCjPanel
   AbstractBaseAction m_PauseAction;
 
   /**
+   * Stop action
+   */
+  AbstractBaseAction m_StopAction;
+
+  /**
    * Date formater for outputing timestamps
    */
   DateFormat m_dateFormatter;
@@ -284,7 +289,7 @@ public class VLCjPanel
     m_PlayAction = action;
 
     // Pause action
-    action = new AbstractBaseAction() {
+    action = new AbstractBaseAction("Pause", "pause.gif") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
         pause();
@@ -294,6 +299,17 @@ public class VLCjPanel
     action.setMnemonic(KeyEvent.VK_U);
     action.setAccelerator("ctrl pressed U");
     m_PauseAction = action;
+
+    // Stop action
+    action = new AbstractBaseAction("Stop", "stop_blue.gif" ) {
+      @Override
+      protected void doActionPerformed(ActionEvent e) {
+        stop();
+      }
+    };
+    action.setMnemonic(KeyEvent.VK_S);
+    action.setAccelerator("ctrl pressed S");
+    m_StopAction = action;
   }
 
   /**
@@ -331,8 +347,8 @@ public class VLCjPanel
     m_PlayButton = new JButton(m_PlayAction);
     m_ControlsPanel.add(m_PlayButton);
 
-    m_PauseButton = new JButton(m_PauseAction);
-    m_ControlsPanel.add(m_PauseButton);
+    m_StopButton = new JButton(m_StopAction);
+    m_ControlsPanel.add(m_StopButton);
 
     m_MuteButton = new JButton(m_MuteAction);
     m_ControlsPanel.add(m_MuteButton);
@@ -393,10 +409,11 @@ public class VLCjPanel
    * @return the menu bar
    */
   public JMenuBar getMenuBar() {
-    JMenuBar result;
-    JMenu menu;
-    JMenu submenu;
+    JMenuBar  result;
+    JMenu     menu;
+    JMenu     submenu;
     JMenuItem menuitem;
+
     if (m_MenuBar == null) {
       result = new JMenuBar();
 
@@ -447,21 +464,15 @@ public class VLCjPanel
       menu.addChangeListener(e -> updateMenu());
 
       // Video/Play
-      menuitem = new JMenuItem("Play", GUIHelper.getIcon("run.gif"));
-      menuitem.setMnemonic('P');
-      menuitem.setAccelerator((GUIHelper.getKeyStroke("ctrl pressed P")));
-      menuitem.addActionListener(e -> play());
+      menuitem = new JMenuItem(m_PlayAction);
       menuitem.setEnabled(false);
       m_MenuItemVideoPlay = menuitem;
       menu.add(menuitem);
 
-      // Video/Pause
-      menuitem = new JMenuItem("Pause", GUIHelper.getIcon("pause.gif"));
-      menuitem.setMnemonic('U');
-      menuitem.setAccelerator((GUIHelper.getKeyStroke("ctrl pressed U")));
-      menuitem.addActionListener(e -> pause());
+      // Video/Stop
+      menuitem = new JMenuItem(m_StopAction);
       menuitem.setEnabled(false);
-      m_MenuItemVideoPause = menuitem;
+      m_MenuItemVideoStop = menuitem;
       menu.add(menuitem);
 
       //Video/Show/Hide Controls
@@ -498,15 +509,26 @@ public class VLCjPanel
   protected void play() {
     if (!m_VideoLoaded)
       return;
-    if (m_VideoPlaying || m_VideoPaused) {
-      m_MediaPlayerComponent.getMediaPlayer().stop();
-      m_VideoPlaying = false;
+    if (m_VideoPlaying && !m_VideoPaused) {
+      pause();
+      return;
     } else {
       m_MediaPlayerComponent.getMediaPlayer().play();
       m_VideoPlaying = true;
+      m_VideoPaused = false;
     }
-    m_VideoPaused = false;
+    update();
+  }
 
+  /**
+   * Stops the video
+   */
+  protected void stop() {
+    if (!m_VideoLoaded)
+      return;
+    m_MediaPlayerComponent.getMediaPlayer().stop();
+    m_VideoPlaying = false;
+    m_VideoPaused  = false;
     update();
   }
 
@@ -620,23 +642,13 @@ public class VLCjPanel
     run = () -> {
       // Video
       m_MenuItemVideoPlay.setEnabled(m_VideoLoaded);
-      m_MenuItemVideoPause.setEnabled(m_VideoPlaying || m_VideoPaused);
-      if (m_VideoPlaying) {
-	m_MenuItemVideoPlay.setText("Stop");
-	m_MenuItemVideoPlay.setIcon(GUIHelper.getIcon("stop_blue.gif"));
-	m_MenuItemVideoPlay.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed S"));
+      m_MenuItemVideoStop.setEnabled(m_VideoPlaying);
+      if (m_VideoPlaying && !m_VideoPaused) {
+	m_MenuItemVideoPlay.setAction(m_PauseAction);
       } else {
-	m_MenuItemVideoPlay.setText("Play");
-	m_MenuItemVideoPlay.setIcon(GUIHelper.getIcon("run.gif"));
-	m_MenuItemVideoPlay.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed P"));
+	m_MenuItemVideoPlay.setAction(m_PlayAction);
       }
-      if (m_VideoPaused) {
-	m_MenuItemVideoPause.setIcon(GUIHelper.getIcon("resume.gif"));
-	m_MenuItemVideoPause.setText("Resume");
-      } else {
-	m_MenuItemVideoPause.setIcon(GUIHelper.getIcon("pause.gif"));
-	m_MenuItemVideoPause.setText("Pause");
-      }
+
 
       updateControls();
     };
@@ -648,28 +660,18 @@ public class VLCjPanel
    */
   protected void updateControls() {
     Runnable run;
-    if (m_ControlsPanel == null || m_PauseButton == null || m_PlayButton == null || m_PositionSlider == null) {
+    if (m_ControlsPanel == null || m_StopButton == null || m_PlayButton == null || m_PositionSlider == null) {
       return;
     }
     run = () -> {
-      m_PauseButton.setEnabled(m_VideoLoaded && m_VideoPlaying);
+      m_StopButton.setEnabled(m_VideoLoaded && m_VideoPlaying);
       m_PlayButton.setEnabled(m_VideoLoaded);
 
-      // Toggle pause and resume button
-      if (m_VideoPaused) {
-	m_PauseButton.setText("Resume");
-	m_PauseButton.setIcon(GUIHelper.getIcon("resume.gif"));
+      // Toggle Play and Pause Button
+      if (m_VideoPlaying && !m_VideoPaused) {
+	m_PlayButton.setAction(m_PauseAction);
       } else {
-	m_PauseButton.setText("Pause");
-	m_PauseButton.setIcon(GUIHelper.getIcon("pause.gif"));
-      }
-      // Toggle Play and Stop Button
-      if (m_VideoPlaying) {
-	m_PlayButton.setText("Stop");
-	m_PlayButton.setIcon(GUIHelper.getIcon("stop_blue.gif"));
-      } else {
-	m_PlayButton.setText("Play");
-	m_PlayButton.setIcon(GUIHelper.getIcon("run.gif"));
+	m_PlayButton.setAction(m_PlayAction);
       }
 
       // Enables or disables the slider
