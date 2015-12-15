@@ -232,6 +232,18 @@ public class Step
   }
 
   /**
+   * Checks whether the provided object is a Step with the same timestamp and X/Y.
+   *
+   * @param obj		the reference object with which to compare.
+   * @return		true if the same step
+   * @see		#compareTo(Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    return (obj instanceof Step) && (compareTo(obj) == 0);
+  }
+
+  /**
    * Returns a string representation of the point.
    *
    * @return		the string representation
