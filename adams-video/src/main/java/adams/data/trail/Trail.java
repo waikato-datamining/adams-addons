@@ -42,6 +42,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -427,6 +428,24 @@ public class Trail
   @Override
   public Report getReport() {
     return m_Report;
+  }
+
+  /**
+   * Returns the step associated with the given timestamp.
+   *
+   * @param timestamp 	the timestamp to get the step for
+   * @return		the associated step or null if none available for the timestamp
+   */
+  public Step getStep(Date timestamp) {
+    Step	result;
+    int		pos;
+
+    result = null;
+    pos    = Collections.binarySearch(m_Points, new Step(timestamp, 0f, 0f), m_Comparator);
+    if (pos >= 0)
+      result = m_Points.get(pos);
+
+    return result;
   }
 
   /**
