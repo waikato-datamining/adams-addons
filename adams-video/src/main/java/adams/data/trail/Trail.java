@@ -21,7 +21,6 @@
 package adams.data.trail;
 
 import adams.core.DateTimeMsec;
-import adams.core.option.OptionUtils;
 import adams.data.Notes;
 import adams.data.NotesHandler;
 import adams.data.container.AbstractDataContainer;
@@ -44,6 +43,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -64,6 +64,8 @@ public class Trail
 
   /** the report field for the height. */
   public final static String FIELD_HEIGHT = "Trail.Height";
+
+  public static final String PREFIX_META = "Meta-";
 
   /** the attached report. */
   protected Report m_Report;
@@ -457,7 +459,21 @@ public class Trail
   public SpreadSheet toSpreadSheet() {
     SpreadSheet		result;
     Row 		row;
-    List<String> meta;
+    HashSet<String>	keys;
+    List<String>	keysSorted;
+    boolean		hasPositions;
+
+    // collect meta-data keys, check x/y
+    keys         = new HashSet<>();
+    hasPositions = false;
+    for (Step step: m_Points) {
+      if (step.hasMetaData())
+	keys.addAll(step.getMetaData().keySet());
+      if ((step.getX() != 0) || (step.getY() != 0))
+	hasPositions = true;
+    }
+    keysSorted = new ArrayList<>(keys);
+    Collections.sort(keysSorted);
 
     result = new SpreadSheet();
     result.setDataRowClass(DenseDataRow.class);
@@ -466,21 +482,24 @@ public class Trail
     // header
     row = result.getHeaderRow();
     row.addCell("T").setContent("Timestamp");
-    row.addCell("X").setContent("X");
-    row.addCell("Y").setContent("Y");
-    row.addCell("M").setContent("Meta-data");
+    if (hasPositions) {
+      row.addCell("X").setContent("X");
+      row.addCell("Y").setContent("Y");
+    }
+    for (String key: keysSorted)
+      row.addCell("M-" + key).setContent(PREFIX_META + key);
 
     // data
     for (Step step: this) {
       row = result.addRow();
       row.addCell("T").setContent(new DateTimeMsec(step.getTimestamp()));
-      row.addCell("X").setContent(step.getX());
-      row.addCell("Y").setContent(step.getY());
+      if (hasPositions) {
+	row.addCell("X").setContent(step.getX());
+	row.addCell("Y").setContent(step.getY());
+      }
       if (step.hasMetaData()) {
-	meta = new ArrayList<>();
 	for (String key: step.getMetaData().keySet())
-	  meta.add(key + "=" + step.getMetaData().get(key));
-	row.addCell("M").setContentAsString(OptionUtils.joinOptions(meta.toArray(new String[meta.size()])));
+	  row.addCell("M-" + key).setNative(step.getMetaData().get(key));
       }
     }
 
