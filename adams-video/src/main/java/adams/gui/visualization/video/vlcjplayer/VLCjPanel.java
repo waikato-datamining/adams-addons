@@ -39,9 +39,11 @@ import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -66,7 +68,11 @@ public class VLCjPanel
   public final static String SESSION_FILE = "VLCjVideoPlayerSession.props";
 
   /** the properties file name. */
-  public final static String FILENAME = "adams/gui/visualization/video/vlcjplayer/VLCjVideoPlayer.props";
+  public final static String FILENAME    = "adams/gui/visualization/video/vlcjplayer/VLCjVideoPlayer.props";
+  public static final String EVENT_PLAY  = "play";
+  public static final String EVENT_PAUSE = "pause";
+  public static final String EVENT_STOP  = "stop";
+  public static final String EVENT_MUTE  = "mute";
 
   /** the properties to use. */
   protected static Properties m_Properties;
@@ -115,6 +121,10 @@ public class VLCjPanel
    * the menu item "stop"
    */
   protected JMenuItem m_MenuItemVideoStop;
+
+  public File getCurrentFile() {
+    return m_CurrentFile;
+  }
 
   /**
    * The path to the file we're currently viewing
@@ -212,27 +222,71 @@ public class VLCjPanel
   /**
    * Mute action
    */
-  AbstractBaseAction m_MuteAction;
+  protected AbstractBaseAction m_MuteAction;
 
   /**
    * Play action
    */
-  AbstractBaseAction m_PlayAction;
+  protected AbstractBaseAction m_PlayAction;
 
   /**
    * Pause action
    */
-  AbstractBaseAction m_PauseAction;
+  protected AbstractBaseAction m_PauseAction;
 
   /**
    * Stop action
    */
-  AbstractBaseAction m_StopAction;
+  protected AbstractBaseAction m_StopAction;
 
   /**
    * Date formater for outputing timestamps
    */
-  DateFormat m_dateFormatter;
+  protected DateFormat m_dateFormatter;
+
+  /** the listeners for the play event. */
+  protected HashSet<ActionListener> m_PlayListeners;
+
+  /** the listeners for the play event. */
+  protected HashSet<ActionListener> m_PauseListeners;
+
+  /** the listeners for the play event. */
+  protected HashSet<ActionListener> m_StopListeners;
+
+  /** the listeners for the play event. */
+  protected HashSet<ActionListener> m_MuteListeners;
+
+  /**
+   * Gets the paused status of the video
+   * @return true if video is paused
+   */
+  public boolean isVideoPaused() {
+    return m_VideoPaused;
+  }
+
+  /**
+   * Gets the loaded status of the video
+   * @return true if a media file is loaded
+   */
+  public boolean isVideoLoaded() {
+    return m_VideoLoaded;
+  }
+
+  /**
+   * Gets the playing status of the video
+   * @return returns true if the video is currently playing
+   */
+  public boolean isVideoPlaying() {
+    return m_VideoPlaying;
+  }
+
+  /**
+   * Gets the VLC install status
+   * @return true if VLC is installed.
+   */
+  public boolean isVLCInstalled() {
+    return m_VLCInstalled;
+  }
 
   /**
    * For initializing members.
@@ -244,11 +298,16 @@ public class VLCjPanel
     m_Logger = LoggingHelper.getLogger(getClass());
     m_TitleGenerator = new TitleGenerator("VLCj Video Player", true);
 
-    m_VideoPaused = false;
-    m_VideoLoaded = false;
-    m_VideoPlaying = false;
-    m_dateFormatter = new DateFormat("HH:mm:ss");
-    m_VLCInstalled = new NativeDiscovery().discover();
+    m_PlayListeners  = new HashSet<>();
+    m_PauseListeners = new HashSet<>();
+    m_StopListeners = new HashSet<>();
+    m_MuteListeners = new HashSet<>();
+
+    m_VideoPaused    = false;
+    m_VideoLoaded    = false;
+    m_VideoPlaying   = false;
+    m_dateFormatter  = new DateFormat("HH:mm:ss");
+    m_VLCInstalled   = new NativeDiscovery().discover();
     if (!m_VLCInstalled) {
       adams.gui.core.GUIHelper.showErrorMessage(this, "VLC native libraries not found. Please install VLC:\n" +
 	"http://www.videolan.org/vlc/ !");
@@ -494,10 +553,11 @@ public class VLCjPanel
   /**
    * Pauses the video assuming there is a video loaded and playing
    */
-  protected void pause() {
+  public void pause() {
     if(m_VideoLoaded && m_VideoPlaying) {
       m_MediaPlayerComponent.getMediaPlayer().pause();
       m_VideoPaused = !m_VideoPaused;
+      notifyPauseListeners();
       update();
     }
   }
@@ -506,7 +566,7 @@ public class VLCjPanel
    * Plays or stops the video depending on what state it's in currently. If there is no video loaded then
    * nothing happens.
    */
-  protected void play() {
+  public void play() {
     if (!m_VideoLoaded)
       return;
     if (m_VideoPlaying && !m_VideoPaused) {
@@ -516,27 +576,33 @@ public class VLCjPanel
       m_MediaPlayerComponent.getMediaPlayer().play();
       m_VideoPlaying = true;
       m_VideoPaused = false;
+      notifyPlayListeners();
     }
     update();
   }
 
+
+
   /**
    * Stops the video
    */
-  protected void stop() {
+  public void stop() {
+
     if (!m_VideoLoaded)
       return;
     m_MediaPlayerComponent.getMediaPlayer().stop();
     m_VideoPlaying = false;
     m_VideoPaused  = false;
+
     update();
   }
 
   /**
    * Mutes the video
    */
-  protected void mute() {
+  public void mute() {
     m_MediaPlayerComponent.getMediaPlayer().mute();
+    update();
   }
 
   /**
@@ -553,14 +619,15 @@ public class VLCjPanel
 
   /**
    * Pops up dialog to open a file.
+   * @return true if video got loaded
    */
-  public void open() {
+  public boolean open() {
     int retVal;
     retVal = getFileChooser().showOpenDialog(this);
     if (retVal != BaseFileChooser.APPROVE_OPTION)
-      return;
+      return false;
 
-    open(getFileChooser().getSelectedFile());
+    return open(getFileChooser().getSelectedFile());
   }
 
 
@@ -568,19 +635,21 @@ public class VLCjPanel
    * Opens the specified file.
    *
    * @param file the file to open
+   * @return true if video got loaded
    */
-  public void open(File file) {
+  public boolean open(File file) {
     m_CurrentFile = file;
     if (!m_VLCInstalled) {
       adams.gui.core.GUIHelper.showErrorMessage(this, "VLC native libraries not found. Please install VLC: " +
 	"http://www.videolan.org/vlc/ !");
-      return;
+      return false;
     }
     m_MediaPlayerComponent.getMediaPlayer().prepareMedia(m_CurrentFile.getAbsolutePath());
     if (m_RecentFilesHandler != null)
       m_RecentFilesHandler.addRecentItem(m_CurrentFile);
     m_VideoLoaded = true;
     update();
+    return true;
   }
 
   /**
@@ -693,7 +762,7 @@ public class VLCjPanel
   /**
    * Safely hides or shows the control panel
    */
-  protected void showHideControls() {
+  public void showHideControls() {
     Runnable run;
     if (m_ControlsPanel == null)
       return;
@@ -719,5 +788,133 @@ public class VLCjPanel
       }
     }
     return m_Properties;
+  }
+
+  /**
+   * Returns the current video time in milliseconds
+   */
+  public long getTimeStamp() {
+    return m_MediaPlayerComponent.getMediaPlayer().getTime();
+  }
+
+  /**
+   * Adds the listener for the play events.
+   *
+   * @param l   the listener to add
+   */
+  public void addPlayListener(ActionListener l) {
+    m_PlayListeners.add(l);
+  }
+
+  /**
+   * Removes the listener for the play events.
+   *
+   * @param l   the listener to remove
+   */
+  public void removePlayListener(ActionListener l) {
+    m_PlayListeners.remove(l);
+  }
+
+  /**
+   * Notifies all play listeners.
+   */
+  protected synchronized void notifyPlayListeners() {
+    ActionEvent e;
+
+    e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, EVENT_PLAY);
+
+    for (ActionListener l: m_PlayListeners)
+      l.actionPerformed(e);
+  }
+
+
+  /**
+   * Adds the listener for the pause events.
+   *
+   * @param l   the listener to add
+   */
+  public void addPauseListener(ActionListener l) {
+    m_PauseListeners.add(l);
+  }
+
+  /**
+   * Removes the listener for the pause events.
+   *
+   * @param l   the listener to remove
+   */
+  public void removePauseListener(ActionListener l) {
+    m_PauseListeners.remove(l);
+  }
+
+  /**
+   * Notifies all pause listeners.
+   */
+  protected synchronized void notifyPauseListeners() {
+    ActionEvent e;
+
+    e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, EVENT_PAUSE);
+
+    for (ActionListener l: m_StopListeners)
+      l.actionPerformed(e);
+  }
+
+  /**
+   * Adds the listener for the stop events.
+   *
+   * @param l   the listener to add
+   */
+  public void addStopListener(ActionListener l) {
+    m_StopListeners.add(l);
+  }
+
+  /**
+   * Removes the listener for the stop events.
+   *
+   * @param l   the listener to remove
+   */
+  public void removeStopListener(ActionListener l) {
+    m_StopListeners.remove(l);
+  }
+
+  /**
+   * Notifies all stop listeners.
+   */
+  protected synchronized void notifyStopListeners() {
+    ActionEvent e;
+
+    e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, EVENT_STOP);
+
+    for (ActionListener l: m_StopListeners)
+      l.actionPerformed(e);
+  }
+
+  /**
+   * Adds the listener for the mute events.
+   *
+   * @param l   the listener to add
+   */
+  public void addMuteListener(ActionListener l) {
+    m_MuteListeners.add(l);
+  }
+
+  /**
+   * Removes the listener for the mute events.
+   *
+   * @param l   the listener to remove
+   */
+  public void removeMuteListener(ActionListener l) {
+    m_MuteListeners.remove(l);
+  }
+
+  /**
+   * Notifies all mute listeners.
+   */
+  protected synchronized void notifyMuteListeners() {
+    ActionEvent e;
+
+    e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, EVENT_MUTE);
+
+    for (ActionListener l: m_MuteListeners)
+      l.actionPerformed(e);
   }
 }
