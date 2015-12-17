@@ -4,8 +4,8 @@
 # Trail.Height=600.0
 # Parent\ ID=-1
 # Trail.Width=800.0
-Timestamp,X,Y,Meta-data
-"2015-01-01 00:00:01.000",1,1,""
-"2015-01-01 00:00:01.100",2,10,"""meta3=hello world"" meta2=0.0 meta1=data1"
+Timestamp,X,Y,Meta-meta1,Meta-meta2,Meta-meta3
+11:00:01.000,1,1,"","",""
+11:00:01.100,2,10,data1,0.0,"hello world"
 
 
