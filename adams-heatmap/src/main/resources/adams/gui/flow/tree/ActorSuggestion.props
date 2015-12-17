@@ -12,28 +12,37 @@
 # Version: $Revision$
 
 adams-heatmap.HeatmapFileReader1=\
-  IF AFTER adams.flow.source.FileSupplier THEN adams.flow.transformer.HeatmapFileReader
+  IF AFTER adams.flow.source.FileSupplier \
+  THEN adams.flow.transformer.HeatmapFileReader
 
 adams-heatmap.HeatmapFileReader2=\
-  IF AFTER adams.flow.source.SelectFile THEN adams.flow.transformer.HeatmapFileReader
+  IF AFTER adams.flow.source.SelectFile \
+  THEN adams.flow.transformer.HeatmapFileReader
 
 adams-heatmap.HeatmapFileReader3=\
-  IF AFTER adams.flow.source.DirectoryLister THEN adams.flow.transformer.HeatmapFileReader
+  IF AFTER adams.flow.source.DirectoryLister \
+  THEN adams.flow.transformer.HeatmapFileReader
 
 adams-heatmap.HeatmapFileReader4=\
-  IF AFTER adams.flow.source.FileSystemSearch THEN adams.flow.transformer.HeatmapFileReader
+  IF AFTER adams.flow.source.FileSystemSearch \
+  THEN adams.flow.transformer.HeatmapFileReader
 
 adams-heatmap.HeatmapFilter1=\
-  IF AFTER adams.flow.transformer.HeatmapFileReader THEN adams.flow.transformer.HeatmapFilter
+  IF AFTER adams.flow.transformer.HeatmapFileReader \
+  THEN adams.flow.transformer.HeatmapFilter
 
 adams-heatmap.Convert1=\
-  IF AFTER adams.flow.transformer.HeatmapFilter THEN "adams.flow.transformer.Convert -conversion adams.data.conversion.HeatmapToBufferedImage"
+  IF AFTER adams.flow.transformer.HeatmapFilter \
+  THEN "adams.flow.transformer.Convert -conversion adams.data.conversion.HeatmapToBufferedImage"
 
 adams-heatmap.HeatmapInstanceGenerator1=\
-  IF AFTER adams.flow.transformer.HeatmapFilter THEN adams.flow.transformer.HeatmapInstanceGenerator
+  IF AFTER adams.flow.transformer.HeatmapFilter \
+  THEN adams.flow.transformer.HeatmapInstanceGenerator
 
 adams-heatmap.WekaInstanceDumper1=\
-  IF AFTER adams.flow.transformer.HeatmapInstanceGenerator THEN adams.flow.transformer.WekaInstanceDumper
+  IF AFTER adams.flow.transformer.HeatmapInstanceGenerator \
+  THEN adams.flow.transformer.WekaInstanceDumper
 
 adams-heatmap.WekaFilter1=\
-  IF AFTER adams.flow.transformer.HeatmapInstanceGenerator THEN adams.flow.transformer.WekaFilter
+  IF AFTER adams.flow.transformer.HeatmapInstanceGenerator \
+  THEN adams.flow.transformer.WekaFilter

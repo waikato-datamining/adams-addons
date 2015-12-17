@@ -12,4 +12,5 @@
 # Version: $Revision: 8698 $
 
 adams-jooq.JOOQGenerateCode=\
-  IF AFTER adams.flow.source.JOOQGenerateConfiguration THEN adams.flow.sink.JOOQGenerateCode
+  IF AFTER adams.flow.source.JOOQGenerateConfiguration \
+  THEN adams.flow.sink.JOOQGenerateCode

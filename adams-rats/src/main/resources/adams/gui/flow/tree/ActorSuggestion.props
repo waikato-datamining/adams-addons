@@ -12,17 +12,22 @@
 # Version: $Revision: 8916 $
 
 adams-rats.Rat1=\
-  IF PARENT IS adams.flow.standalone.Rats THEN adams.flow.standalone.Rat
+  IF PARENT IS adams.flow.standalone.Rats \
+  THEN adams.flow.standalone.Rat
 
 adams-rats.LabRat1=\
-  IF PARENT IS adams.flow.standalone.Rats THEN adams.flow.standalone.LabRat
+  IF PARENT IS adams.flow.standalone.Rats \
+  THEN adams.flow.standalone.LabRat
 
 adams-rats.Tee1=\
-  IF PARENT IS adams.flow.standalone.Rat THEN adams.flow.control.Tee
+  IF PARENT IS adams.flow.standalone.Rat \
+  THEN adams.flow.control.Tee
 
 adams-rats.Trigger1=\
-  IF PARENT IS adams.flow.standalone.Rat THEN adams.flow.control.Trigger
+  IF PARENT IS adams.flow.standalone.Rat \
+  THEN adams.flow.control.Trigger
 
 adams-rats.TryCatch1=\
-  IF PARENT IS adams.flow.standalone.Rat THEN adams.flow.control.TryCatch
+  IF PARENT IS adams.flow.standalone.Rat \
+  THEN adams.flow.control.TryCatch
   

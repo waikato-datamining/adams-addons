@@ -12,40 +12,53 @@
 # Version: $Revision: 8916 $
 
 adams-meka.MekaClassifierSetup=\
-  IF PARENT IS adams.flow.standalone.CallableActors THEN adams.flow.source.MekaClassifierSetup
+  IF PARENT IS adams.flow.standalone.CallableActors \
+  THEN adams.flow.source.MekaClassifierSetup
 
 adams-meka.MekaClassSelector1=\
-  IF AFTER adams.flow.transformer.WekaFileReader THEN adams.flow.transformer.MekaClassSelector
+  IF AFTER adams.flow.transformer.WekaFileReader \
+  THEN adams.flow.transformer.MekaClassSelector
 
 adams-meka.MekaCrossValidationEvaluator1=\
-  IF AFTER adams.flow.transformer.MekaPrepareData THEN adams.flow.transformer.MekaCrossValidationEvaluator
+  IF AFTER adams.flow.transformer.MekaPrepareData \
+  THEN adams.flow.transformer.MekaCrossValidationEvaluator
 
 adams-meka.MekaTrainClassifier1=\
-  IF AFTER adams.flow.transformer.MekaPrepareData THEN adams.flow.transformer.MekaTrainClassifier
+  IF AFTER adams.flow.transformer.MekaPrepareData \
+  THEN adams.flow.transformer.MekaTrainClassifier
 
 adams-meka.MekaEvaluationSummary1=\
-  IF AFTER adams.flow.transformer.MekaCrossValidationEvaluator THEN adams.flow.transformer.MekaResultSummary
+  IF AFTER adams.flow.transformer.MekaCrossValidationEvaluator \
+  THEN adams.flow.transformer.MekaResultSummary
 
 adams-meka.MekaEvaluationSummary2=\
-  IF AFTER adams.flow.transformer.MekaTrainTestSetEvaluator THEN adams.flow.transformer.MekaResultSummary
+  IF AFTER adams.flow.transformer.MekaTrainTestSetEvaluator \
+  THEN adams.flow.transformer.MekaResultSummary
 
 adams-meka.MekaEvaluationValues1=\
-  IF AFTER adams.flow.transformer.MekaCrossValidationEvaluator THEN adams.flow.transformer.MekaResultValues
+  IF AFTER adams.flow.transformer.MekaCrossValidationEvaluator \
+  THEN adams.flow.transformer.MekaResultValues
 
 adams-meka.MekaEvaluationValues2=\
-  IF AFTER adams.flow.transformer.MekaTrainTestSetEvaluator THEN adams.flow.transformer.MekaResultValues
+  IF AFTER adams.flow.transformer.MekaTrainTestSetEvaluator \
+  THEN adams.flow.transformer.MekaResultValues
 
 adams-meka.MekaTrainTestSetEvaluator1=\
-  IF AFTER adams.flow.transformer.WekaCrossValidationSplit THEN adams.flow.transformer.MekaTrainTestSetEvaluator
+  IF AFTER adams.flow.transformer.WekaCrossValidationSplit \
+  THEN adams.flow.transformer.MekaTrainTestSetEvaluator
 
 adams-meka.MekaTrainTestSetEvaluator2=\
-  IF AFTER adams.flow.transformer.WekaRandomSplit THEN adams.flow.transformer.MekaTrainTestSetEvaluator
+  IF AFTER adams.flow.transformer.WekaRandomSplit \
+  THEN adams.flow.transformer.MekaTrainTestSetEvaluator
 
 adams-meka.Display1=\
-  IF AFTER adams.flow.transformer.MekaResultSummary THEN adams.flow.sink.Display
+  IF AFTER adams.flow.transformer.MekaResultSummary \
+  THEN adams.flow.sink.Display
 
 adams-meka.SpreadSheetDisplay1=\
-  IF AFTER adams.flow.transformer.MekaResultValues THEN adams.flow.sink.SpreadSheetDisplay
+  IF AFTER adams.flow.transformer.MekaResultValues \
+  THEN adams.flow.sink.SpreadSheetDisplay
 
 adams-meka.WekaModelWriter1=\
-  IF AFTER adams.flow.transformer.MekaTrainClassifier THEN adams.flow.sink.WekaModelWriter
+  IF AFTER adams.flow.transformer.MekaTrainClassifier \
+  THEN adams.flow.sink.WekaModelWriter

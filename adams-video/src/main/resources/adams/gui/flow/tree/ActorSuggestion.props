@@ -12,61 +12,81 @@
 # Version: $Revision$
 
 adams-video.TrailFileReader1=\
-  IF AFTER adams.flow.source.FileSupplier THEN adams.flow.transformer.TrailFileReader
+  IF AFTER adams.flow.source.FileSupplier \
+  THEN adams.flow.transformer.TrailFileReader
 
 adams-video.TrailFileReader2=\
-  IF AFTER adams.flow.source.SelectFile THEN adams.flow.transformer.TrailFileReader
+  IF AFTER adams.flow.source.SelectFile \
+  THEN adams.flow.transformer.TrailFileReader
 
 adams-video.TrailFileReader3=\
-  IF AFTER adams.flow.source.DirectoryLister THEN adams.flow.transformer.TrailFileReader
+  IF AFTER adams.flow.source.DirectoryLister \
+  THEN adams.flow.transformer.TrailFileReader
 
 adams-video.TrailFileReader4=\
-  IF AFTER adams.flow.source.FileSystemSearch THEN adams.flow.transformer.TrailFileReader
+  IF AFTER adams.flow.source.FileSystemSearch \
+  THEN adams.flow.transformer.TrailFileReader
 
 adams-video.TrailFilter1=\
-  IF AFTER adams.flow.transformer.TrailFileReader THEN adams.flow.transformer.TrailFilter
+  IF AFTER adams.flow.transformer.TrailFileReader \
+  THEN adams.flow.transformer.TrailFilter
 
 adams-video.AddTrailBackground1=\
-  IF AFTER adams.flow.transformer.TrailFileReader THEN adams.flow.transformer.AddTrailBackground
+  IF AFTER adams.flow.transformer.TrailFileReader \
+  THEN adams.flow.transformer.AddTrailBackground
 
 adams-video.AddTrailStep1=\
-  IF AFTER adams.flow.transformer.TrailFileReader THEN adams.flow.transformer.AddTrailStep
+  IF AFTER adams.flow.transformer.TrailFileReader \
+  THEN adams.flow.transformer.AddTrailStep
 
 adams-video.AddTrailStep2=\
-  IF AFTER adams.flow.transformer.AddTrailStep THEN adams.flow.transformer.AddTrailStep
+  IF AFTER adams.flow.transformer.AddTrailStep \
+  THEN adams.flow.transformer.AddTrailStep
 
 adams-video.MjpegImageSequence1=\
-  IF AFTER adams.flow.source.FileSupplier THEN adams.flow.transformer.MjpegImageSequence
+  IF AFTER adams.flow.source.FileSupplier \
+  THEN adams.flow.transformer.MjpegImageSequence
 
 adams-video.MjpegImageSequence2=\
-  IF AFTER adams.flow.source.SelectFile THEN adams.flow.transformer.MjpegImageSequence
+  IF AFTER adams.flow.source.SelectFile \
+  THEN adams.flow.transformer.MjpegImageSequence
 
 adams-video.MjpegImageSequence3=\
-  IF AFTER adams.flow.source.DirectoryLister THEN adams.flow.transformer.MjpegImageSequence
+  IF AFTER adams.flow.source.DirectoryLister \
+  THEN adams.flow.transformer.MjpegImageSequence
 
 adams-video.MjpegImageSequence4=\
-  IF AFTER adams.flow.source.FileSystemSearch THEN adams.flow.transformer.MjpegImageSequence
+  IF AFTER adams.flow.source.FileSystemSearch \
+  THEN adams.flow.transformer.MjpegImageSequence
 
 adams-video.MovieImageSequence1=\
-  IF AFTER adams.flow.source.FileSupplier THEN adams.flow.transformer.MovieImageSequence
+  IF AFTER adams.flow.source.FileSupplier \
+  THEN adams.flow.transformer.MovieImageSequence
 
 adams-video.MovieImageSequence2=\
-  IF AFTER adams.flow.source.SelectFile THEN adams.flow.transformer.MovieImageSequence
+  IF AFTER adams.flow.source.SelectFile \
+  THEN adams.flow.transformer.MovieImageSequence
 
 adams-video.MovieImageSequence3=\
-  IF AFTER adams.flow.source.DirectoryLister THEN adams.flow.transformer.MovieImageSequence
+  IF AFTER adams.flow.source.DirectoryLister \
+  THEN adams.flow.transformer.MovieImageSequence
 
 adams-video.MovieImageSequence4=\
-  IF AFTER adams.flow.source.FileSystemSearch THEN adams.flow.transformer.MovieImageSequence
+  IF AFTER adams.flow.source.FileSystemSearch \
+  THEN adams.flow.transformer.MovieImageSequence
 
 adams-video.TrackObjects1=\
-  IF AFTER adams.flow.transformer.MjpegImageSequence THEN adams.flow.transformer.TrackObjects
+  IF AFTER adams.flow.transformer.MjpegImageSequence \
+  THEN adams.flow.transformer.TrackObjects
 
 adams-video.TrackObjects2=\
-  IF AFTER adams.flow.transformer.MovieImageSequence THEN adams.flow.transformer.TrackObjects
+  IF AFTER adams.flow.transformer.MovieImageSequence \
+  THEN adams.flow.transformer.TrackObjects
 
 adams-video.TransformTrackedObject=\
-  IF AFTER adams.flow.transformer.TrackObjects THEN adams.flow.transformer.TransformTrackedObject
+  IF AFTER adams.flow.transformer.TrackObjects \
+  THEN adams.flow.transformer.TransformTrackedObject
 
 adams-video.ExtractTrackedObject=\
-  IF AFTER adams.flow.transformer.TrackObjects THEN adams.flow.transformer.ExtractTrackedObject
+  IF AFTER adams.flow.transformer.TrackObjects \
+  THEN adams.flow.transformer.ExtractTrackedObject
