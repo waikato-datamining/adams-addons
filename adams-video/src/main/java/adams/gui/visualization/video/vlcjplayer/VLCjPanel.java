@@ -22,6 +22,7 @@ package adams.gui.visualization.video.vlcjplayer;
 
 import adams.core.CleanUpHandler;
 import adams.core.DateFormat;
+import adams.core.DateUtils;
 import adams.core.Properties;
 import adams.core.logging.LoggingHelper;
 import adams.gui.action.AbstractBaseAction;
@@ -306,7 +307,7 @@ public class VLCjPanel
     m_VideoPaused    = false;
     m_VideoLoaded    = false;
     m_VideoPlaying   = false;
-    m_dateFormatter  = new DateFormat("HH:mm:ss");
+    m_dateFormatter  = DateUtils.getTimeFormatter();
     m_VLCInstalled   = new NativeDiscovery().discover();
     if (!m_VLCInstalled) {
       adams.gui.core.GUIHelper.showErrorMessage(this, "VLC native libraries not found. Please install VLC:\n" +
