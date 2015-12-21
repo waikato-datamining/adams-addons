@@ -14,7 +14,7 @@
  */
 
 /*
- * vlcjplayer.java
+ * Annotator.java
  * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
  *
  */
@@ -25,7 +25,6 @@ import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractMenuItemDefinition;
 import adams.gui.application.UserMode;
 import adams.gui.visualization.annotator.AnnotatorPanel;
-import adams.gui.visualization.video.vlcjplayer.VLCjPanel;
 
 /**
  * For annotating videos
@@ -60,7 +59,7 @@ public class Annotator
    * @return		the filename or null if no icon available
    */
   public String getIconName() {
-    return null;
+    return "annotator.png";
   }
 
   /**

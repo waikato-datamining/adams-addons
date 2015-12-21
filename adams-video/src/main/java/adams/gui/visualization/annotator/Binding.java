@@ -22,6 +22,7 @@ package adams.gui.visualization.annotator;
 
 
 import adams.core.Properties;
+import adams.gui.core.GUIHelper;
 
 import javax.swing.*;
 
@@ -37,10 +38,6 @@ import javax.swing.*;
  */
 public class Binding {
 
-  /**
-   * the prefix number for the binding
-   */
-  int m_PrefixNumber;
   /**
    * the name of the binding
    */
@@ -59,21 +56,25 @@ public class Binding {
    */
   boolean m_Inverted;
 
-
-  public Binding(int prefixNumber, String name, String binding, boolean toggle, boolean inverted) {
-    this(prefixNumber, name, KeyStroke.getKeyStroke(binding), toggle, inverted);
+  /**
+   * Constructor for the binding class.
+   * @param name the name of the binding
+   * @param binding the key to bind to in String format
+   * @param toggle is this binding toggleable
+   * @param inverted is this binding inverted
+   */
+  public Binding(String name, String binding, boolean toggle, boolean inverted) {
+    this(name, GUIHelper.getKeyStroke(binding), toggle, inverted);
   }
 
   /**
    * Constructor for the binding class.
-   * @param prefixNumber the number to be prefixed onto this binding
    * @param name the name of the binding
-   * @param binding the key to bind to
+   * @param binding the key to bind to as a KeyStroke
    * @param toggle is this binding toggleable
    * @param inverted is this binding inverted
    */
-  public Binding(int prefixNumber, String name, KeyStroke binding, boolean toggle, boolean inverted) {
-    m_PrefixNumber	= prefixNumber;
+  public Binding(String name, KeyStroke binding, boolean toggle, boolean inverted) {
     m_Name        	= name;
     m_Binding 		= binding;
     m_Toggleable 	= toggle;
@@ -81,18 +82,34 @@ public class Binding {
 
   }
 
+  /**
+   * getter for the name of the binding
+   * @return the name of the binding
+   */
   public String getName() {
     return m_Name;
   }
 
+  /**
+   * getter for the keystroke of the binding
+   * @return the keystroke for this binding
+   */
   public KeyStroke getBinding() {
     return m_Binding;
   }
 
+  /**
+   * getter for the toggleable option
+   * @return true if this binding is toggleable
+   */
   public boolean isToggleable() {
     return m_Toggleable;
   }
 
+  /**
+   * getter for the inverted option
+   * @return true if this binding is inverted
+   */
   public boolean isInverted() {
     return m_Inverted;
   }
@@ -101,25 +118,20 @@ public class Binding {
    * Turns this Binding into a property
    * @return a Properties object representing this key binding.
    */
-  public Properties toProperty() {
+  public Properties toProperty(int prefix) {
     Properties props = new Properties();
 
-    props.setProperty(m_PrefixNumber + "Name", m_Name);
-    props.setProperty(m_PrefixNumber + "Name", m_Name);
-    props.setBoolean(m_PrefixNumber + "Toggleable", m_Toggleable);
-    props.setBoolean(m_PrefixNumber + "Inverted", m_Inverted);
+    props.setProperty(prefix + ".Name", m_Name);
+    props.setProperty(prefix + ".Binding", m_Binding.toString());
+    props.setBoolean(prefix + ".Toggleable", m_Toggleable);
+    props.setBoolean(prefix + ".Inverted", m_Inverted);
 
     return props;
 
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if(obj instanceof Binding) {
-      if (((Binding) obj).m_PrefixNumber == m_PrefixNumber) {
-	return true;
-      }
-    }
-    return false;
+  public String toString() {
+    return m_Name;
   }
 }

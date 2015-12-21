@@ -21,12 +21,10 @@
 package adams.gui.dialog;
 
 
-import adams.core.Properties;
 import adams.gui.visualization.annotator.Binding;
 import adams.gui.visualization.annotator.BindingsEditorPanel;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
 
 /**
@@ -138,14 +136,14 @@ public class EditBindingsDialog extends ApprovalDialog {
     m_BindignPanel = new BindingsEditorPanel();
     getContentPane().add(m_BindignPanel, BorderLayout.CENTER);
     setSize(600, 600);
-    setVisible(true);
+    setTitle("Edit bindings");
   }
 
-  public List getBindings() {
+  public List<Binding> getBindings() {
     return m_BindignPanel.getBindings();
   }
 
-  public void setBindings(java.util.List<Binding> bindings) {
+  public void setBindings(List<Binding> bindings) {
     m_BindignPanel.setBindings(bindings);
   }
 }

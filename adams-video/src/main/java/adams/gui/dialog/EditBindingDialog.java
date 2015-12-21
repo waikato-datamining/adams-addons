@@ -20,15 +20,11 @@
 
 package adams.gui.dialog;
 
-import adams.core.Properties;
-import adams.gui.clipboard.*;
-import adams.gui.core.ParameterPanel;
+import adams.gui.visualization.annotator.Binding;
 import adams.gui.visualization.annotator.BindingParameterPanel;
-import adams.gui.visualization.annotator.BindingsEditorPanel;
 
 import java.awt.*;
 import java.lang.String;
-import java.util.*;
 
 /**
  * TODO: what class does.
@@ -146,8 +142,8 @@ public class EditBindingDialog extends ApprovalDialog {
   }
 
 
-  public Properties getBinding(int bindingNumber) {
-    return m_EditorPanel.getBinding(bindingNumber);
+  public Binding getBinding() {
+    return m_EditorPanel.getBinding();
   }
 
 }

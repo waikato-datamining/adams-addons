@@ -20,13 +20,13 @@
 
 package adams.gui.visualization.annotator;
 
-import adams.core.Properties;
+import adams.gui.core.GUIHelper;
 import adams.gui.core.ParameterPanel;
 
 import javax.swing.*;
 
 /**
- * TODO: what class does.
+ * A Parameter Panel that does the work of taking user input and turning it into a binding
  *
  * @author sjb90
  * @version $Revision$
@@ -65,21 +65,12 @@ public class BindingParameterPanel extends ParameterPanel {
   }
 
   /**
-   * Adds the current data to the properties
+   * Returns the binding based on the currently entered info
    */
-  public void addBinding() {
-
-  }
-
-  public Properties getBinding(int bindingNumber) {
-    Properties prop = new Properties();
-    String prefix = bindingNumber + ".";
-
-    prop.setProperty(prefix + "Name", m_NameField.getText());
-    prop.setProperty(prefix + "Binding", m_BindingField.getText());
-    prop.setBoolean(prefix + "Toggleable", m_Toggleable.isSelected());
-    prop.setBoolean(prefix + "Inverted", m_Inverted.isSelected());
-
-    return prop;
+  public Binding getBinding() {
+    Binding b = new Binding(m_NameField.getText(), m_BindingField.getText(),m_Toggleable.isSelected(),
+      m_Inverted.isSelected());
+    clearFields();
+    return b;
   }
 }

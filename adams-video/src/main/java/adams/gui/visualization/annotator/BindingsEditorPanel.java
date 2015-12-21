@@ -41,11 +41,6 @@ import java.util.List;
 public class BindingsEditorPanel extends BasePanel{
 
   /**
-   * the bindings the user sets
-   */
-  protected List m_Bindings;
-
-  /**
    * the list of current bindings
    */
   protected BaseListWithButtons m_BindingsList;
@@ -84,6 +79,8 @@ public class BindingsEditorPanel extends BasePanel{
 
   protected AbstractBaseAction m_EditAction;
 
+  protected DefaultListModel<Binding> m_Model;
+
   protected void initActions() {
     m_AddAction = new AbstractBaseAction("Add", "add.gif") {
       @Override
@@ -99,8 +96,9 @@ public class BindingsEditorPanel extends BasePanel{
 	else {
 	  m_EditDialog.clearFields();
 	}
+	m_EditDialog.setLocationRelativeTo(BindingsEditorPanel.this);
 	m_EditDialog.setVisible(true);
-	updateListBox();
+	m_Model.addElement(m_EditDialog.getBinding());
       }
     };
 
@@ -114,8 +112,9 @@ public class BindingsEditorPanel extends BasePanel{
     m_DeleteAction = new AbstractBaseAction("Remove", "remove.gif") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
-	// TODO: Rebuild this
-	updateListBox();
+	int[] indices = m_BindingsList.getSelectedIndices();
+	for (int i = indices.length - 1; i >= 0; i--)
+	  m_Model.remove(indices[i]);
       }
     };
   }
@@ -123,22 +122,15 @@ public class BindingsEditorPanel extends BasePanel{
   @Override
   protected void initialize() {
     super.initialize();
-    m_Bindings = new ArrayList<>();
     initActions();
   }
 
   @Override
   protected void initGUI() {
     super.initGUI();
-    m_BindingsList       = new BaseListWithButtons(new DefaultListModel<>());
+    m_Model = new DefaultListModel<>();
+    m_BindingsList = new BaseListWithButtons(m_Model);
     setLayout(new GridLayout(1,2));
-
-    // Set up a List Selection Listener that we'll use to change the editor panel
-    m_BindingsList.addListSelectionListener(e -> {
-      if (!e.getValueIsAdjusting()) {
-	updateListBox();
-      }
-    });
 
     // Buttons for the list
 
@@ -152,29 +144,30 @@ public class BindingsEditorPanel extends BasePanel{
     m_EditButton.setEnabled(false);
     m_BindingsList.addToButtonsPanel(m_EditButton);
     add(m_BindingsList);
-
-    setVisible(true);
-  }
-
-  private void updateListBox() {
-    DefaultListModel model = (DefaultListModel)m_BindingsList.getModel();
-    // Set the update button to enabled or unenabled depending on if something is selected.
-    m_EditButton.setEnabled(m_BindingsList.getSelectedIndex() != -1);
   }
 
   /**
-   * A getter for the bindings
-   * @return some key bindings
+   * A getter for the m_Bindings
+   * @return some key m_Bindings
    */
-  public List getBindings() {
-    return m_Bindings;
+  public List<Binding> getBindings() {
+    List<Binding> result;
+    int i;
+
+    result = new ArrayList<>();
+    for (i = 0; i < m_Model.size(); i++)
+      result.add(m_Model.get(i));
+
+    return result;
   }
 
   /**
-   * Sets the bindings to the ones supplied
-   * @param bindings The bindings supplied
+   * Sets the m_Bindings to the ones supplied
+   * @param bindings The m_Bindings supplied
    */
-  public void setBindings(java.util.List<Binding> bindings) {
-    m_Bindings = bindings;
+  public void setBindings(List<Binding> bindings) {
+    m_Model.clear();
+    for (Binding binding: bindings)
+      m_Model.addElement(binding);
   }
 }

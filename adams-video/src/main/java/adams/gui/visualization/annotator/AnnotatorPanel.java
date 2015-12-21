@@ -20,11 +20,15 @@
 
 package adams.gui.visualization.annotator;
 
-import adams.core.CleanUpHandler;
-import adams.core.DateFormat;
+import adams.core.*;
+import adams.core.Properties;
+import adams.data.io.output.SpreadSheetWriter;
+import adams.data.spreadsheet.SpreadSheet;
 import adams.data.trail.Step;
 import adams.data.trail.Trail;
 import adams.gui.action.AbstractBaseAction;
+import adams.gui.chooser.BaseFileChooser;
+import adams.gui.chooser.SpreadSheetFileChooser;
 import adams.gui.core.*;
 import adams.gui.dialog.EditBindingsDialog;
 import adams.gui.event.RecentItemEvent;
@@ -37,6 +41,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.*;
+import java.util.List;
 
 /**
  * TODO: what class does.
@@ -55,7 +60,7 @@ public class AnnotatorPanel extends BasePanel
   private static final long serialVersionUID = 6965340882268141821L;
 
   /** the list to store the bindings */
-  private java.util.List<Binding> m_Bindings;
+  private List<Binding> m_Bindings;
 
   /** a title generator */
   private TitleGenerator m_TitleGenerator;
@@ -85,27 +90,42 @@ public class AnnotatorPanel extends BasePanel
   /**
    * Mute action
    */
-  protected AbstractBaseAction m_MuteAction;
+  protected AbstractBaseAction m_ActionMute;
 
   /**
    * Play action
    */
-  protected AbstractBaseAction m_PlayAction;
+  protected AbstractBaseAction m_ActionPlay;
 
   /**
    * Pause action
    */
-  protected AbstractBaseAction m_PauseAction;
+  protected AbstractBaseAction m_ActionPause;
 
   /**
    * Stop action
    */
-  protected AbstractBaseAction m_StopAction;
+  protected AbstractBaseAction m_ActionStop;
 
   /**
    * Edit Bindings action
    */
-  protected AbstractBaseAction m_EditBindingsAction;
+  protected AbstractBaseAction m_ActionEditBindings;
+
+  /**
+   * Export trail
+   */
+  protected AbstractBaseAction m_ActionExportTrail;
+
+  /**
+   * save bindings
+   */
+  protected AbstractBaseAction m_ActionSaveBindings;
+
+  /**
+   * open bindings
+   */
+  protected  AbstractBaseAction m_ActionLoadBindings;
 
   /**
    * Date formater for outputing timestamps
@@ -118,11 +138,24 @@ public class AnnotatorPanel extends BasePanel
   /** the trail for recording the events. */
   protected Trail m_Trail;
 
+  /** the file chooser for exporting trails. */
+  protected SpreadSheetFileChooser m_ExportFileChooser;
+
+  /** thefile chooser for saving bindings. */
+  protected BaseFileChooser m_SavePropertiesFileChooser;
+
+  /** thefile chooser for saving bindings. */
+  protected BaseFileChooser m_LoadPropertiesFileChooser;
+
   @Override
   protected void initialize() {
     super.initialize();
-    m_TitleGenerator = new TitleGenerator("Annotator", true);
-    m_dateFormatter  = new DateFormat("HH:mm:ss");
+    m_TitleGenerator 		= new TitleGenerator("Annotator", true);
+    m_dateFormatter  		= new DateFormat("HH:mm:ss");
+    m_Bindings 			= new ArrayList<>();
+    m_ExportFileChooser 	= new SpreadSheetFileChooser();
+    m_SavePropertiesFileChooser = new BaseFileChooser();
+    m_LoadPropertiesFileChooser = new BaseFileChooser();
     initActions();
   }
 
@@ -142,7 +175,7 @@ public class AnnotatorPanel extends BasePanel
 
     action.setMnemonic(KeyEvent.VK_M);
     action.setAccelerator("ctrl pressed M");
-    m_MuteAction = action;
+    m_ActionMute = action;
 
     // Play action
     action = new AbstractBaseAction("Play", "run.gif") {
@@ -153,7 +186,7 @@ public class AnnotatorPanel extends BasePanel
     };
     action.setMnemonic(KeyEvent.VK_P);
     action.setAccelerator("ctrl pressed P");
-    m_PlayAction = action;
+    m_ActionPlay = action;
 
     // Pause action
     action = new AbstractBaseAction("Pause", "pause.gif") {
@@ -164,7 +197,7 @@ public class AnnotatorPanel extends BasePanel
     };
     action.setMnemonic(KeyEvent.VK_U);
     action.setAccelerator("ctrl pressed U");
-    m_PauseAction = action;
+    m_ActionPause = action;
 
     // Stop action
     action = new AbstractBaseAction("Stop", "stop_blue.gif" ) {
@@ -177,22 +210,42 @@ public class AnnotatorPanel extends BasePanel
     };
     action.setMnemonic(KeyEvent.VK_S);
     action.setAccelerator("ctrl pressed S");
-    m_StopAction = action;
+    m_ActionStop = action;
 
     // Bindings editor
     action = new AbstractBaseAction("Edit Bindings...", "edit.gif") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
-	if(getParentDialog() != null)
-	  m_BindingsDialog = new EditBindingsDialog(getParentDialog(), Dialog.ModalityType.DOCUMENT_MODAL);
-	else
-	  m_BindingsDialog = new EditBindingsDialog(getParentFrame(), true);
-	m_BindingsDialog.setBindings(m_Bindings);
-	m_BindingPanel.setVisible(true);
-	updateBindingBar();
+	editBindings();
       }
     };
-    m_EditBindingsAction = action;
+    m_ActionEditBindings = action;
+
+    action = new AbstractBaseAction("Export...", "spreadsheet.png") {
+      @Override
+      protected void doActionPerformed(ActionEvent e) {
+	export();
+      }
+    };
+    m_ActionExportTrail = action;
+
+    // Save Bindings
+    action = new AbstractBaseAction("Save Bindings...", "save.gif") {
+      @Override
+      protected void doActionPerformed(ActionEvent e) {
+	saveBindings();
+      }
+    };
+    m_ActionSaveBindings = action;
+
+    // Save Bindings
+    action = new AbstractBaseAction("Load Bindings...", "load.gif") {
+      @Override
+      protected void doActionPerformed(ActionEvent e) {
+	loadBindings();
+      }
+    };
+    m_ActionLoadBindings = action;
   }
 
   @Override
@@ -260,14 +313,16 @@ public class AnnotatorPanel extends BasePanel
       menu.addSeparator();
 
       // File/Open Bindings
-      menuitem = new JMenuItem("Open Bindings...");
+      menuitem = new JMenuItem(m_ActionLoadBindings);
       menu.add(menuitem);
 
-      // File/Edit Bindings
-      menuitem = new JMenuItem(m_EditBindingsAction);
+      // File/Save Bindings
+      menuitem = new JMenuItem(m_ActionSaveBindings);
       menu.add(menuitem);
 
-      menuitem = new JMenuItem("Save Bindings...");
+      // File/Export
+      menuitem = new JMenuItem(m_ActionExportTrail);
+      menu.addSeparator();
       menu.add(menuitem);
 
       // File/Close
@@ -286,15 +341,25 @@ public class AnnotatorPanel extends BasePanel
       menu.addChangeListener(e -> updateMenu());
 
       // Video/Play
-      menuitem = new JMenuItem(m_PlayAction);
+      menuitem = new JMenuItem(m_ActionPlay);
       menuitem.setEnabled(false);
       m_MenuItemVideoPlay = menuitem;
       menu.add(menuitem);
 
       // Video/Stop
-      menuitem = new JMenuItem(m_StopAction);
+      menuitem = new JMenuItem(m_ActionStop);
       menuitem.setEnabled(false);
       m_MenuItemVideoStop = menuitem;
+      menu.add(menuitem);
+
+      // Bindings
+      menu = new JMenu("Bindings");
+      result.add(menu);
+      menu.setMnemonic('B');
+      menu.addChangeListener(e -> updateMenu());
+
+      // Bindings/Edit Bindings
+      menuitem = new JMenuItem(m_ActionEditBindings);
       menu.add(menuitem);
 
       m_MenuBar = result;
@@ -342,9 +407,9 @@ public class AnnotatorPanel extends BasePanel
       m_MenuItemVideoPlay.setEnabled(m_VideoPlayer.isVideoLoaded());
       m_MenuItemVideoStop.setEnabled(m_VideoPlayer.isVideoPlaying());
       if (m_VideoPlayer.isVideoPlaying() && !m_VideoPlayer.isVideoPaused()) {
-	m_MenuItemVideoPlay.setAction(m_PauseAction);
+	m_MenuItemVideoPlay.setAction(m_ActionPause);
       } else {
-	m_MenuItemVideoPlay.setAction(m_PlayAction);
+	m_MenuItemVideoPlay.setAction(m_ActionPlay);
       }
     };
     SwingUtilities.invokeLater(run);
@@ -365,7 +430,9 @@ public class AnnotatorPanel extends BasePanel
    * Updates the binding bar to contain an indicator for every binding
    */
   private void updateBindingBar() {
+    System.out.println("Updating the Binding Bar");
     Runnable run = () -> {
+      System.out.println("adding a binding label");
       for (Binding item : m_Bindings) {
 	m_BindingPanel.add(new JLabel(item.getName()));
 	m_BindingPanel.revalidate();
@@ -405,7 +472,7 @@ public class AnnotatorPanel extends BasePanel
       }
     };
     KeyStroke keyStroke = binding.getBinding();
-    System.out.println(keyStroke);
+    System.out.println("key " + keyStroke + " name " + binding.getName());
     getInputMap(WHEN_IN_FOCUSED_WINDOW).put(keyStroke, binding.getName());
     getActionMap().put(binding.getName(), action);
     return action;
@@ -432,5 +499,82 @@ public class AnnotatorPanel extends BasePanel
       getParentFrame().setVisible(false);
     cleanUp();
     closeParent();
+  }
+
+  /**
+   * Pops up dialog for editing bindings
+   */
+  public void editBindings() {
+    if(getParentDialog() != null)
+      m_BindingsDialog = new EditBindingsDialog(getParentDialog(), Dialog.ModalityType.DOCUMENT_MODAL);
+    else
+      m_BindingsDialog = new EditBindingsDialog(getParentFrame(), true);
+    m_BindingsDialog.setBindings(m_Bindings);
+    m_BindingsDialog.setLocationRelativeTo(this);
+    m_BindingsDialog.setVisible(true);
+    m_Bindings = m_BindingsDialog.getBindings();
+    updateBindingBar();
+  }
+
+  /**
+   * Exports the current trail to a spreadsheet file that the user selects.
+   */
+  public void export() {
+    int retVal;
+    SpreadSheet sheet;
+    SpreadSheetWriter writer;
+
+    if (m_Trail == null)
+      return;
+
+    retVal = m_ExportFileChooser.showSaveDialog(this);
+    if (retVal != SpreadSheetFileChooser.APPROVE_OPTION)
+      return;
+
+    sheet = m_Trail.toSpreadSheet();
+    writer = m_ExportFileChooser.getWriter();
+    if (!writer.write(sheet, m_ExportFileChooser.getSelectedFile()))
+      GUIHelper.showErrorMessage(this, "Failed to export data to: " + m_ExportFileChooser.getSelectedFile());
+  }
+
+  /**
+   * Loads bindings from a file selected by the user
+   */
+  public void loadBindings(){
+    int retVal;
+    Properties props = new Properties();
+
+    retVal = m_LoadPropertiesFileChooser.showOpenDialog(this);
+    if(retVal != BaseFileChooser.APPROVE_OPTION)
+      return;
+
+    props.load(m_LoadPropertiesFileChooser.getSelectedFile().getAbsolutePath());
+
+    // Convert to bindings
+    int count = props.getInteger("Count");
+    for( int i = 0; i < count; i++) {
+      m_Bindings.add(new Binding(props.getProperty(i + ".Name"),
+	props.getProperty(i + ".Binding"), props.getBoolean(i + ".Toggleable"), props.getBoolean(i + ".Inverted")));
+    }
+    updateBindingBar();
+  }
+
+  /**
+   * Saves the current bindings to a file selected by the user
+   */
+  public void saveBindings() {
+    int retVal;
+    int i;
+    Properties props = new Properties();
+
+    retVal = m_SavePropertiesFileChooser.showOpenDialog(this);
+    if(retVal != BaseFileChooser.APPROVE_OPTION)
+      return;
+
+    for(i = 0; i < m_Bindings.size(); i++) {
+      props.add(m_Bindings.get(i).toProperty(i));
+    }
+    props.setInteger("Count", i);
+    props.save(m_SavePropertiesFileChooser.getSelectedFile().getAbsolutePath());
   }
 }
