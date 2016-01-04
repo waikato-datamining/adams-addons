@@ -1,4 +1,4 @@
-% Copyright (c) 2014-2015 by the University of Waikato, Hamilton, NZ.
+% Copyright (c) 2014-2016 by the University of Waikato, Hamilton, NZ.
 % This work is made available under the terms of the 
 % Creative Commons Attribution-ShareAlike 3.0 license, 
 % http://creativecommons.org/licenses/by-sa/3.0/. 
@@ -45,7 +45,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2014-2015} &
+		\parbox[c][2cm]{2cm}{\copyright 2014-2016} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -90,11 +90,19 @@ The following transformers are available:
 	\item \textit{MekaResultSummary} -- turns the collected statistics from
 	a MEKA evaluation run into a string.
 	\item \textit{MekaResultValues} -- picks out selected statistics from a
-	MEKA evaluation and	generates a spreadsheet.
+	MEKA evaluation and generates a spreadsheet.
 	\item \textit{MekaTrainClassifier} -- builds a MEKA classifier on the
 	incoming dataset.
 	\item \textit{MekaTrainTestSetEvaluator} -- evaluates a MEKA classifier
 	on the incoming train/test split.
+\end{tight_itemize}
+The following sinks are available:
+\begin{tight_itemize}
+	\item \textit{MekaGraphVisualizer} -- displays graphs obtained from a model.
+	\item \textit{MekaMacroCurve} -- displays macro-averaged curve.
+	\item \textit{MekaMicroCurve} -- displays micro-averaged curve.
+	\item \textit{MekaPrecisionRecall} -- displays precision-recall plots.
+	\item \textit{MekaROC} -- displays ROC (receiver operator curve) plots.
 \end{tight_itemize}
 
 \newpage
