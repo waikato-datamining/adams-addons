@@ -27,7 +27,7 @@ package adams.data.video;
  * @version $Revision$
  */
 public abstract class AbstractVideoRecorder
-  extends AbstractRecorder {
+  extends AbstractFileBaseRecorder {
 
   private static final long serialVersionUID = -4437891144873073171L;
 

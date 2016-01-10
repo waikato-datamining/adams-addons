@@ -14,25 +14,27 @@
  */
 
 /**
- * AbstractSoundRecorder.java
+ * AbstractFileBaseRecorder.java
  * Copyright (C) 2016 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.video;
 
+import adams.core.io.PlaceholderFile;
+
 /**
- * Ancestor for sound recorders.
+ * Ancestor for file-based recorders.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public abstract class AbstractSoundRecorder
-  extends AbstractFileBaseRecorder {
+public abstract class AbstractFileBaseRecorder
+  extends AbstractRecorder {
 
-  private static final long serialVersionUID = -4437891144873073171L;
+  private static final long serialVersionUID = 5200164488272190578L;
 
-  /** the frequency to use. */
-  protected float m_Frequency;
+  /** the output file. */
+  protected PlaceholderFile m_Output;
 
   /**
    * Adds options to the internal list of options.
@@ -42,29 +44,34 @@ public abstract class AbstractSoundRecorder
     super.defineOptions();
 
     m_OptionManager.add(
-      "frequency", "frequency",
-      44100.0f, 1.0f, null);
+      "output", "output",
+      getDefaultOutput());
   }
 
   /**
-   * Sets the frequency.
+   * Returns the default output file to use.
    *
-   * @param value	the frequency
+   * @return		the default
    */
-  public void setFrequency(float value) {
-    if (getOptionManager().isValid("frequency", value)) {
-      m_Frequency = value;
-      reset();
-    }
+  protected abstract PlaceholderFile getDefaultOutput();
+
+  /**
+   * Sets the output file to use.
+   *
+   * @param value	the output file
+   */
+  public void setOutput(PlaceholderFile value) {
+    m_Output = value;
+    reset();
   }
 
   /**
-   * Returns the frequency.
+   * Returns the output file.
    *
-   * @return		the frequency
+   * @return		the output file
    */
-  public float getFrequency() {
-    return m_Frequency;
+  public PlaceholderFile getOutput() {
+    return m_Output;
   }
 
   /**
@@ -73,7 +80,7 @@ public abstract class AbstractSoundRecorder
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String frequencyTipText() {
-    return "The frequency to use.";
+  public String outputTipText() {
+    return "The file to store the recorded output in.";
   }
 }

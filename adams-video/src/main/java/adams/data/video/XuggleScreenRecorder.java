@@ -20,6 +20,7 @@
 
 package adams.data.video;
 
+import adams.core.io.PlaceholderFile;
 import com.github.fracpete.screencast4j.record.Recorder;
 
 /**
@@ -32,6 +33,11 @@ import com.github.fracpete.screencast4j.record.Recorder;
  * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-output &lt;adams.core.io.PlaceholderFile&gt; (property: output)
+ * &nbsp;&nbsp;&nbsp;The file to store the recorded output in.
+ * &nbsp;&nbsp;&nbsp;default: ${TMP}&#47;screen.mp4
  * </pre>
  * 
  * <pre>-frames-per-second &lt;int&gt; (property: framesPerSecond)
@@ -85,6 +91,16 @@ public class XuggleScreenRecorder
   }
 
   /**
+   * Returns the default output file to use.
+   *
+   * @return		the default
+   */
+  @Override
+  protected PlaceholderFile getDefaultOutput() {
+    return new PlaceholderFile("${TMP}/screen.mp4");
+  }
+
+  /**
    * Returns a fully configured recorder instance.
    *
    * @return		the new instance
@@ -100,6 +116,7 @@ public class XuggleScreenRecorder
     result.setWidth(m_Width);
     result.setHeight(m_Height);
     result.setCaptureMouse(m_CaptureMouse);
+    result.setOutput(m_Output.getAbsoluteFile());
 
     return result;
   }
