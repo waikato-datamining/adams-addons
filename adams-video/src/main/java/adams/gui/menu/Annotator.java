@@ -29,7 +29,7 @@ import adams.gui.visualization.annotator.AnnotatorPanel;
 /**
  * For annotating videos
  *
- * @author  Steven Brown (sjb at students dot waikato dot ac dot nz)
+ * @author  Steven Brown (sjb90 at students dot waikato dot ac dot nz)
  * @version $Revision: 11391 $
  */
 public class Annotator

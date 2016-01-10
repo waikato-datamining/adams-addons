@@ -24,8 +24,6 @@ import adams.core.*;
 import adams.core.Properties;
 import adams.data.io.output.SpreadSheetWriter;
 import adams.data.spreadsheet.SpreadSheet;
-import adams.data.trail.Step;
-import adams.data.trail.Trail;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.chooser.BaseFileChooser;
 import adams.gui.chooser.SpreadSheetFileChooser;
@@ -44,7 +42,7 @@ import java.util.*;
 import java.util.List;
 
 /**
- * TODO: what class does.
+ * Panel for viewing and annotating videos
  *
  * @author sjb90
  * @version $Revision$
@@ -135,9 +133,6 @@ public class AnnotatorPanel extends BasePanel
   protected JMenuItem m_MenuItemVideoPlay;
   protected JMenuItem m_MenuItemVideoStop;
 
-  /** the trail for recording the events. */
-  protected Trail m_Trail;
-
   /** the file chooser for exporting trails. */
   protected SpreadSheetFileChooser m_ExportFileChooser;
 
@@ -146,6 +141,7 @@ public class AnnotatorPanel extends BasePanel
 
   /** thefile chooser for saving bindings. */
   protected BaseFileChooser m_LoadPropertiesFileChooser;
+  private EventQueue m_EventQueue;
 
   @Override
   protected void initialize() {
@@ -156,6 +152,7 @@ public class AnnotatorPanel extends BasePanel
     m_ExportFileChooser 	= new SpreadSheetFileChooser();
     m_SavePropertiesFileChooser = new BaseFileChooser();
     m_LoadPropertiesFileChooser = new BaseFileChooser();
+    m_EventQueue		= new EventQueue();
     initActions();
   }
 
@@ -205,7 +202,6 @@ public class AnnotatorPanel extends BasePanel
       protected void doActionPerformed(ActionEvent e) {
 	m_VideoPlayer.stop();
 	// TODO
-	System.out.println(m_Trail);
       }
     };
     action.setMnemonic(KeyEvent.VK_S);
@@ -288,7 +284,7 @@ public class AnnotatorPanel extends BasePanel
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed O"));
       menuitem.addActionListener(e -> {
 	if (m_VideoPlayer.open())
-	  m_Trail = new Trail();
+	  m_EventQueue.resetTrail();
       });
       menu.add(menuitem);
       m_MenuItemFileOpen = menuitem;
@@ -424,6 +420,10 @@ public class AnnotatorPanel extends BasePanel
     if (m_VideoPlayer != null) {
       m_VideoPlayer.cleanUp();
     }
+    List<Component> comps = new ArrayList<>(Arrays.asList(m_BindingPanel.getComponents()));
+    comps.stream().filter(c -> c instanceof AnnotationPanel).forEach(c -> {
+      ((AnnotationPanel) c).cleanUp();
+    });
   }
 
   /**
@@ -432,51 +432,21 @@ public class AnnotatorPanel extends BasePanel
   private void updateBindingBar() {
     System.out.println("Updating the Binding Bar");
     Runnable run = () -> {
+      AnnotationPanel panel;
       System.out.println("adding a binding label");
       for (Binding item : m_Bindings) {
-	m_BindingPanel.add(new JLabel(item.getName()));
+	panel = new AnnotationPanel();
+	panel.configureAnnotationPanel(item, m_VideoPlayer);
+	m_BindingPanel.add(panel);
 	m_BindingPanel.revalidate();
-	addKeyBinding(item);
+	if(m_EventQueue != null)
+	  panel.addListener(m_EventQueue);
       }
     };
     SwingUtilities.invokeLater(run);
-
   }
 
-  /**
-   * Adds a binding to the window  TODO: Fill out the rest of this
-   * @param binding: binding to add
-   * @return
-   */
-  private AbstractBaseAction addKeyBinding(Binding binding) {
 
-    // The action that will be performed when the key is pressed
-    AbstractBaseAction action;
-    action = new AbstractBaseAction() {
-      @Override
-      protected void doActionPerformed(ActionEvent e) {
-	long msec = m_VideoPlayer.getTimeStamp();
-	if (msec == -1)
-	  return;
-	HashMap<String,Object> meta = new HashMap<>();
-	meta.put(binding.getName(), !binding.isInverted());
-	Date timestamp = new Date(msec);
-	Step step = new Step(timestamp, 0.0f, 0.0f, meta);
-	Step oldStep = m_Trail.getStep(timestamp);
-	if (oldStep != null) {
-	  if (oldStep.hasMetaData())
-	    step.getMetaData().putAll(oldStep.getMetaData());
-	}
-	m_Trail.add(step);
-	System.out.println(binding.getName() + " " + m_dateFormatter.format(new Date(m_VideoPlayer.getTimeStamp())));
-      }
-    };
-    KeyStroke keyStroke = binding.getBinding();
-    System.out.println("key " + keyStroke + " name " + binding.getName());
-    getInputMap(WHEN_IN_FOCUSED_WINDOW).put(keyStroke, binding.getName());
-    getActionMap().put(binding.getName(), action);
-    return action;
-  }
 
   /**
    * Sets the base title to use for the title generator.
@@ -524,14 +494,14 @@ public class AnnotatorPanel extends BasePanel
     SpreadSheet sheet;
     SpreadSheetWriter writer;
 
-    if (m_Trail == null)
+    if (m_EventQueue == null)
       return;
 
     retVal = m_ExportFileChooser.showSaveDialog(this);
     if (retVal != SpreadSheetFileChooser.APPROVE_OPTION)
       return;
 
-    sheet = m_Trail.toSpreadSheet();
+    sheet = m_EventQueue.toSpreadSheet();
     writer = m_ExportFileChooser.getWriter();
     if (!writer.write(sheet, m_ExportFileChooser.getSelectedFile()))
       GUIHelper.showErrorMessage(this, "Failed to export data to: " + m_ExportFileChooser.getSelectedFile());
@@ -552,9 +522,12 @@ public class AnnotatorPanel extends BasePanel
 
     // Convert to bindings
     int count = props.getInteger("Count");
+    Binding b;
     for( int i = 0; i < count; i++) {
-      m_Bindings.add(new Binding(props.getProperty(i + ".Name"),
-	props.getProperty(i + ".Binding"), props.getBoolean(i + ".Toggleable"), props.getBoolean(i + ".Inverted")));
+      b = new Binding(props.getProperty(i + ".Name"),
+	   props.getProperty(i + ".Binding"), props.getBoolean(i + ".Toggleable"), props.getLong(i + ".Interval") ,props.getBoolean(i + ".Inverted"));
+      System.out.println("Binding added with key = " + b.getBinding().toString() + " and name = " + b.getName());
+      m_Bindings.add(b);
     }
     updateBindingBar();
   }

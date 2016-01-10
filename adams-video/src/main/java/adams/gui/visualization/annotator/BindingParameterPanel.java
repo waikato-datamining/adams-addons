@@ -20,10 +20,9 @@
 
 package adams.gui.visualization.annotator;
 
-import adams.gui.core.GUIHelper;
 import adams.gui.core.ParameterPanel;
-
 import javax.swing.*;
+import java.text.NumberFormat;
 
 /**
  * A Parameter Panel that does the work of taking user input and turning it into a binding
@@ -37,6 +36,7 @@ public class BindingParameterPanel extends ParameterPanel {
   JTextField m_BindingField;
   JCheckBox m_Toggleable;
   JCheckBox m_Inverted;
+  JFormattedTextField m_Interval;
 
   @Override
   protected void initGUI() {
@@ -46,10 +46,13 @@ public class BindingParameterPanel extends ParameterPanel {
     m_BindingField = new JTextField();
     m_Toggleable = new JCheckBox();
     m_Inverted = new JCheckBox();
+    m_Interval = new JFormattedTextField(NumberFormat.getNumberInstance());
+    m_Interval.setValue(1);
 
     addParameter(false, "Name", m_NameField);
     addParameter(false, "Binding", m_BindingField);
     addParameter(false, "Toggleable", m_Toggleable);
+    addParameter(false, "Interval", m_Interval);
     addParameter(false, "Inverted", m_Inverted);
   }
 
@@ -61,16 +64,18 @@ public class BindingParameterPanel extends ParameterPanel {
     m_BindingField.setText("");
     m_Toggleable.setSelected(false);
     m_Inverted.setSelected(false);
-
+    m_Interval.setValue(1);
   }
 
   /**
    * Returns the binding based on the currently entered info
    */
   public Binding getBinding() {
+    long interval = ((Number)m_Interval.getValue()).longValue();
     Binding b = new Binding(m_NameField.getText(), m_BindingField.getText(),m_Toggleable.isSelected(),
-      m_Inverted.isSelected());
+      interval, m_Inverted.isSelected());
     clearFields();
+    System.out.println("Binding in Parameter Panel " + b.toString() + " Interval " + b.getInterval());
     return b;
   }
 }

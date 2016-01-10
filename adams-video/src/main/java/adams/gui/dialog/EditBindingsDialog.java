@@ -28,7 +28,7 @@ import java.awt.*;
 import java.util.List;
 
 /**
- * TODO: what class does.
+ * A dialog for editing key bindings
  *
  * @author sjb90
  * @version $Revision$

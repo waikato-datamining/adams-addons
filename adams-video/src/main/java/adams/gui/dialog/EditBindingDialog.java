@@ -27,7 +27,7 @@ import java.awt.*;
 import java.lang.String;
 
 /**
- * TODO: what class does.
+ * Dialog for editing an individual key binding
  *
  * @author sjb90
  * @version $Revision$

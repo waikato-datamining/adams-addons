@@ -38,6 +38,8 @@ import javax.swing.*;
  */
 public class Binding {
 
+  private static final long DEFAULT_INTERVAL = 0;
+
   /**
    * the name of the binding
    */
@@ -56,6 +58,9 @@ public class Binding {
    */
   boolean m_Inverted;
 
+  /** the interval to repete a toggleable binding */
+  private long m_Interval;
+
   /**
    * Constructor for the binding class.
    * @param name the name of the binding
@@ -63,8 +68,8 @@ public class Binding {
    * @param toggle is this binding toggleable
    * @param inverted is this binding inverted
    */
-  public Binding(String name, String binding, boolean toggle, boolean inverted) {
-    this(name, GUIHelper.getKeyStroke(binding), toggle, inverted);
+  public Binding(String name, String binding, boolean toggle, long interval, boolean inverted) {
+    this(name, GUIHelper.getKeyStroke(binding.toUpperCase()), toggle, interval, inverted);
   }
 
   /**
@@ -74,12 +79,12 @@ public class Binding {
    * @param toggle is this binding toggleable
    * @param inverted is this binding inverted
    */
-  public Binding(String name, KeyStroke binding, boolean toggle, boolean inverted) {
+  public Binding(String name, KeyStroke binding, boolean toggle, long interval, boolean inverted) {
     m_Name        	= name;
     m_Binding 		= binding;
     m_Toggleable 	= toggle;
     m_Inverted 		= inverted;
-
+    m_Interval		= interval;
   }
 
   /**
@@ -125,6 +130,7 @@ public class Binding {
     props.setProperty(prefix + ".Binding", m_Binding.toString());
     props.setBoolean(prefix + ".Toggleable", m_Toggleable);
     props.setBoolean(prefix + ".Inverted", m_Inverted);
+    props.setLong(prefix + ".Interval", m_Interval);
 
     return props;
 
@@ -132,6 +138,10 @@ public class Binding {
 
   @Override
   public String toString() {
-    return m_Name;
+    return "Name: " + m_Name + "Binding: " + m_Binding.toString();
+  }
+
+  public long getInterval() {
+    return m_Interval;
   }
 }

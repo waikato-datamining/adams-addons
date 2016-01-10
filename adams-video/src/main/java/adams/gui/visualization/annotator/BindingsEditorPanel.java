@@ -33,7 +33,7 @@ import java.util.*;
 import java.util.List;
 
 /**
- * TODO: what class does.
+ * Panel for editing key bindings
  *
  * @author sjb90
  * @version $Revision$
