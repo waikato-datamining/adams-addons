@@ -34,3 +34,7 @@ adams.gui.visualization.trail.plugins.AbstractTrailViewerPlugin=\
 # paintlets
 adams.gui.visualization.trail.paintlet.TrailPaintlet=\
   adams.gui.visualization.trail.paintlet
+
+# recorders
+adams.data.video.AbstractRecorder=\
+  adams.data.video
