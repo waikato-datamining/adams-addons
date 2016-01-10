@@ -70,6 +70,11 @@ import com.github.fracpete.screencast4j.record.Recorder;
  * &nbsp;&nbsp;&nbsp;minimum: -1
  * </pre>
  * 
+ * <pre>-capture-mouse &lt;boolean&gt; (property: captureMouse)
+ * &nbsp;&nbsp;&nbsp;If enabled, the mouse gets captured as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)

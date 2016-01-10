@@ -68,6 +68,10 @@ public abstract class AbstractScreenRecorder
     m_OptionManager.add(
       "height", "height",
       -1, -1, null);
+
+    m_OptionManager.add(
+      "capture-mouse", "captureMouse",
+      false);
   }
 
   /**
