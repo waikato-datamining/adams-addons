@@ -463,6 +463,7 @@ public class VLCjPanel
     return m_TitleGenerator;
   }
 
+
   /**
    * Creates a menu bar (singleton per panel object). Can be used in frames.
    *

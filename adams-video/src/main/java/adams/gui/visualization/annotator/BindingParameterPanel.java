@@ -37,7 +37,7 @@ public class BindingParameterPanel extends ParameterPanel {
 
   private static final int DEFAULT_TIMEOUT = 1000;
   JTextField m_NameField;
-  JTextField m_BindingField;
+  KeyPressTextField m_BindingField;
   JCheckBox m_Toggleable;
   JCheckBox m_Inverted;
   JFormattedTextField m_Interval;
@@ -54,7 +54,7 @@ public class BindingParameterPanel extends ParameterPanel {
     }
 
     m_NameField = new JTextField();
-    m_BindingField = new JFormattedTextField(m_MaskFormat);
+    m_BindingField = new KeyPressTextField();
     m_Toggleable = new JCheckBox();
     m_Inverted = new JCheckBox();
     m_Interval = new JFormattedTextField(NumberFormat.getNumberInstance());
@@ -85,7 +85,7 @@ public class BindingParameterPanel extends ParameterPanel {
   public Binding getBinding() {
     long interval = ((Number)m_Interval.getValue()).longValue();
     try {
-      Binding b = new Binding(m_NameField.getText(), m_BindingField.getText(), m_Toggleable.isSelected(),
+      Binding b = new Binding(m_NameField.getText(), m_BindingField.getLastPressed(), m_Toggleable.isSelected(),
 	interval, m_Inverted.isSelected());
       clearFields();
       System.out.println("Binding in Parameter Panel " + b.toString() + " Interval " + b.getInterval());
@@ -95,5 +95,17 @@ public class BindingParameterPanel extends ParameterPanel {
       System.err.println(e.getMessage());
       return null;
     }
+  }
+
+  /**
+   * Loads a binding into the panel for editing
+   * @param binding the binding to be edited
+   */
+  public void loadBinding(Binding binding) {
+    m_NameField.setText(binding.getName());
+    m_BindingField.setText(binding.getBinding().toString());
+    m_Toggleable.setSelected(binding.isToggleable());
+    m_Inverted.setSelected(binding.isInverted());
+    m_Interval.setValue(binding.getInterval());
   }
 }

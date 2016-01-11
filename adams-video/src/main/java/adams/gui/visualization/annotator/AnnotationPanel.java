@@ -20,14 +20,12 @@
 
 package adams.gui.visualization.annotator;
 
-import adams.data.image.XScreenMaskHelper;
 import adams.data.trail.Step;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.core.BasePanel;
 import adams.gui.visualization.video.vlcjplayer.VLCjPanel;
 
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -50,9 +48,6 @@ public class AnnotationPanel extends BasePanel {
 
   /** The thickness of the border around the button */
   private static final int BORDER_THICKNESS = 5;
-
-  /** the default dimension for our buttons */
-  private static final Dimension BUTTON_SIZE = new Dimension(50, 25);
 
   /** The list of listeners registered with this panel */
   protected List<AnnotationListener> m_Listeners;
@@ -97,6 +92,7 @@ public class AnnotationPanel extends BasePanel {
     m_Interval 		= binding.getInterval();
     m_IsToggleable	= binding.isToggleable();
     addKeyBinding(m_Binding);
+    start();
   }
 
   protected void makeStep() {
@@ -104,10 +100,9 @@ public class AnnotationPanel extends BasePanel {
     if (msec == -1)
       return;
     HashMap<String,Object> meta = new HashMap<>();
-    meta.put(m_Binding.getName(), !m_Binding.isInverted());
+    meta.put(m_Binding.getName(), (m_Binding.isInverted() ^ m_IsToggled));
     Date timestamp = new Date(msec);
     Step step = new Step(timestamp, 0.0f, 0.0f, meta);
-    System.out.println("Attempting to add step " + step.toString());
     notifyListeners(step);
   }
 
@@ -122,9 +117,9 @@ public class AnnotationPanel extends BasePanel {
   @Override
   protected void initGUI() {
     super.initGUI();
+    setLayout(new FlowLayout(FlowLayout.CENTER));
+    setBorder(new LineBorder(getBackground(), BORDER_THICKNESS));
     m_Button = new JButton();
-    m_Button.setBorder(new LineBorder(getBackground(),BORDER_THICKNESS));
-    m_Button.setPreferredSize(BUTTON_SIZE);
     add(m_Button);
   }
 
@@ -150,24 +145,21 @@ public class AnnotationPanel extends BasePanel {
    */
   private AbstractBaseAction addKeyBinding(Binding binding) {
     KeyStroke keyStroke = binding.getBinding();
-    System.out.println("key " + keyStroke + " name " + binding.getName());
     if(m_IsToggleable) {
-      m_Action = new AbstractBaseAction(binding.getName()) {
+      m_Action = new AbstractBaseAction(binding.getName()  +  " (" + binding.getBinding() + ")") {
 	@Override
 	protected void doActionPerformed(ActionEvent e) {
 	  m_IsToggled = !m_IsToggled;
 	  if(m_IsToggled) {
-	    start();
 	    Runnable run = () -> {
-	      m_Button.setBorder(new LineBorder(Color.YELLOW, BORDER_THICKNESS));
+	      setBorder(new LineBorder(Color.YELLOW, BORDER_THICKNESS));
 	      revalidate();
 	    };
 	    SwingUtilities.invokeLater(run);
 	  }
 	  else {
-	    m_ScheduleHandler.cancel(false);
 	    Runnable run = () -> {
-	      m_Button.setBorder(new LineBorder(getBackground(), BORDER_THICKNESS));
+	      setBorder(new LineBorder(getBackground(), BORDER_THICKNESS));
 	      revalidate();
 	    };
 	    SwingUtilities.invokeLater(run);
@@ -185,7 +177,6 @@ public class AnnotationPanel extends BasePanel {
     }
     // Set up the button for this binding
     m_Button.setAction(m_Action);
-
     getInputMap(WHEN_IN_FOCUSED_WINDOW).put(keyStroke, binding.getName());
     getActionMap().put(binding.getName(), m_Action);
     return m_Action;
@@ -205,17 +196,19 @@ public class AnnotationPanel extends BasePanel {
     }
   }
 
+  /**
+   * Starts the internal thread that handles adding events to the queue
+   */
   private void start() {
-    System.out.println("Starting toggle thread");
     Runnable run = () -> {
-      System.out.println("Thread is running");
       makeStep();
     };
     m_ScheduleHandler = m_Scheduler.scheduleAtFixedRate(run, 0, m_Interval, TimeUnit.MILLISECONDS);
-    System.out.println("toggle thread = " + m_ScheduleHandler.toString());
-
   }
 
+  /**
+   * Shuts down the
+   */
   public void cleanUp() {
     if(m_ScheduleHandler != null)
       m_ScheduleHandler.cancel(false);

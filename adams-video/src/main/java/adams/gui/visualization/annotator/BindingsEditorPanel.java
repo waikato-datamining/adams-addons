@@ -86,12 +86,12 @@ public class BindingsEditorPanel extends BasePanel{
       @Override
       protected void doActionPerformed(ActionEvent e) {
 	if(m_EditDialog == null) {
-	  if (getParentDialog() != null) {
+	  if (getParentDialog() != null)
 	    m_EditDialog = new EditBindingDialog(getParentDialog(), Dialog.ModalityType.DOCUMENT_MODAL);
-	    m_EditDialog.setSize(200,200);
-	  }
 	  else
 	    m_EditDialog = new EditBindingDialog(getParentFrame(), true);
+	  m_EditDialog.pack();
+	  m_EditDialog.setTitle("Add binding");
 	}
 	else {
 	  m_EditDialog.clearFields();
@@ -107,7 +107,27 @@ public class BindingsEditorPanel extends BasePanel{
     m_EditAction = new AbstractBaseAction("Edit", "edit.gif") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
-	// TODO: build this
+        int[] indices = m_BindingsList.getSelectedIndices();
+	if(m_EditDialog == null) {
+	  if (getParentDialog() != null)
+	    m_EditDialog = new EditBindingDialog(getParentDialog(), Dialog.ModalityType.DOCUMENT_MODAL);
+	  else
+	    m_EditDialog = new EditBindingDialog(getParentFrame(), true);
+	  m_EditDialog.pack();
+	  m_EditDialog.setTitle("Add binding");
+	  m_EditDialog.loadBinding(m_Model.get(indices[0]));
+	}
+	else {
+	  m_EditDialog.clearFields();
+	  m_EditDialog.loadBinding(m_Model.get(indices[0]));
+	}
+	m_EditDialog.setLocationRelativeTo(BindingsEditorPanel.this);
+	m_EditDialog.setVisible(true);
+	Binding binding = m_EditDialog.getBinding();
+	if(binding != null) {
+	  m_Model.remove(indices[0]);
+	  m_Model.addElement(binding);
+	}
       }
     };
 
@@ -146,6 +166,16 @@ public class BindingsEditorPanel extends BasePanel{
     m_EditButton.setEnabled(false);
     m_BindingsList.addToButtonsPanel(m_EditButton);
     add(m_BindingsList);
+
+    m_BindingsList.addListSelectionListener(e -> {
+      if(e.getValueIsAdjusting() == false) {
+
+	if (m_BindingsList.getSelectedIndex() == -1)
+	  m_EditButton.setEnabled(false);
+	else
+	  m_EditButton.setEnabled(true);
+      }
+    });
   }
 
   /**

@@ -23,6 +23,7 @@ package adams.gui.visualization.annotator;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.trail.Step;
 import adams.data.trail.Trail;
+import adams.flow.core.RunnableWithLogging;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -34,22 +35,26 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class EventQueue implements AnnotationListener {
 
+  private static final long SLEEP_TIME = 4000;
   /** the internal queue */
-  private ConcurrentLinkedQueue<Step> m_Steps;
+  protected ConcurrentLinkedQueue<Step> m_Steps;
 
   /** the trail we add the steps to */
-  private Trail m_Trail;
+  protected Trail m_Trail;
 
-  /** a bool to let the thread know when to stop */
-  private boolean m_Go;
+  /** the runable we use for the internal thread */
+  protected RunnableWithLogging m_Runnable;
+
+  /** a flag that says if we're paused or not */
+  protected boolean m_Playing;
 
   /**
    * Constructs a queue that adds steps to a trail.
    */
   public EventQueue() {
     m_Trail 	= new Trail();
-    m_Go	= true;
     m_Steps	= new ConcurrentLinkedQueue<>();
+    m_Playing = false;
     start();
   }
 
@@ -68,35 +73,31 @@ public class EventQueue implements AnnotationListener {
   }
 
   private void start() {
-    Runnable run;
-    run = () -> {
-      while(m_Go) {
-	if(m_Steps.peek() == null) {
-	  try {
-	    System.out.println("Sleeping for 4 seconds");
-	    Thread.sleep(4000);
+    m_Runnable = new RunnableWithLogging() {
+      @Override
+      protected void doRun() {
+	while(!m_Stopped) {
+	  if(m_Steps.peek() == null) {
+	    try {
+	      Thread.sleep(SLEEP_TIME);
+	    }
+	    catch (Exception e) {
+	      //don't care
+	    }
 	  }
-	  catch (Exception e) {
-	    //don't care
+	  else {
+	    Step step = m_Steps.poll();
+	    Step oldStep = m_Trail.getStep(step.getTimestamp());
+	    if (oldStep != null) {
+	      if (oldStep.hasMetaData())
+		step.getMetaData().putAll(oldStep.getMetaData());
+	    }
+	    m_Trail.add(step);
 	  }
-	}
-	else {
-	  System.out.println("Getting step from steps");
-	  Step step = m_Steps.poll();
-	  System.out.println("Step retrieved " + step.toString());
-
-	  Step oldStep = m_Trail.getStep(step.getTimestamp());
-	  if (oldStep != null) {
-	    if (oldStep.hasMetaData())
-	      step.getMetaData().putAll(oldStep.getMetaData());
-	  }
-	  m_Trail.add(step);
-	  System.out.println("Step added");
-
 	}
       }
     };
-    Thread t = new Thread(run);
+    Thread t = new Thread(m_Runnable);
     t.start();
   }
 
@@ -113,5 +114,7 @@ public class EventQueue implements AnnotationListener {
     m_Steps.add(e.getStep());
   }
 
-
+  public void cleanUp() {
+    m_Runnable.stopExecution();
+  }
 }

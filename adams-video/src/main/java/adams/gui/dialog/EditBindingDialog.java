@@ -146,5 +146,8 @@ public class EditBindingDialog extends ApprovalDialog {
     return m_EditorPanel.getBinding();
   }
 
+  public void loadBinding(Binding b) {
+    m_EditorPanel.loadBinding(b);
+  }
 }
 

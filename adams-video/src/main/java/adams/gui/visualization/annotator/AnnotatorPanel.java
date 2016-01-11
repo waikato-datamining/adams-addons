@@ -284,8 +284,11 @@ public class AnnotatorPanel extends BasePanel
       menuitem.setMnemonic('O');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed O"));
       menuitem.addActionListener(e -> {
-	if (m_VideoPlayer.open())
+	if (m_VideoPlayer.open()) {
 	  m_EventQueue.resetTrail();
+	  if(m_RecentFilesHandler != null)
+	    m_RecentFilesHandler.addRecentItem(m_VideoPlayer.getCurrentFile());
+	}
       });
       menu.add(menuitem);
       m_MenuItemFileOpen = menuitem;
@@ -425,16 +428,18 @@ public class AnnotatorPanel extends BasePanel
     comps.stream().filter(c -> c instanceof AnnotationPanel).forEach(c -> {
       ((AnnotationPanel) c).cleanUp();
     });
+
+    if (m_EventQueue != null)
+      m_EventQueue.cleanUp();
   }
 
   /**
    * Updates the binding bar to contain an indicator for every binding
    */
   private void updateBindingBar() {
-    System.out.println("Updating the Binding Bar");
     Runnable run = () -> {
       AnnotationPanel panel;
-      System.out.println("adding a binding label");
+      m_BindingPanel.removeAll();
       for (Binding item : m_Bindings) {
 	panel = new AnnotationPanel();
 	panel.configureAnnotationPanel(item, m_VideoPlayer);
@@ -528,7 +533,6 @@ public class AnnotatorPanel extends BasePanel
       try {
 	b = new Binding(props.getProperty(i + ".Name"),
 	  props.getProperty(i + ".Binding"), props.getBoolean(i + ".Toggleable"), props.getLong(i + ".Interval"), props.getBoolean(i + ".Inverted"));
-	System.out.println("Binding added with key = " + b.getBinding().toString() + " and name = " + b.getName());
 	m_Bindings.add(b);
       }
       catch(InvalidKeyException e) {
