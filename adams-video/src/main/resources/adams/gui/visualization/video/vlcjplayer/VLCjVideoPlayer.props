@@ -1,0 +1,10 @@
+# Defines default values for the VLCj Video Player
+#
+# Author: Steven Brown (sjb90 at students dot waikato dot ac dot nz)
+# Version: $Revision$
+
+# Show video controls (true|false)
+ShowControls=true
+
+# Mute status (true|false)
+Mute=false
