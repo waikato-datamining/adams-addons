@@ -22,6 +22,8 @@ package adams.gui.visualization.annotator;
 
 import adams.gui.core.ParameterPanel;
 import javax.swing.*;
+import javax.swing.text.MaskFormatter;
+import java.security.InvalidKeyException;
 import java.text.NumberFormat;
 
 /**
@@ -32,27 +34,36 @@ import java.text.NumberFormat;
  */
 public class BindingParameterPanel extends ParameterPanel {
 
+
+  private static final int DEFAULT_TIMEOUT = 1000;
   JTextField m_NameField;
   JTextField m_BindingField;
   JCheckBox m_Toggleable;
   JCheckBox m_Inverted;
   JFormattedTextField m_Interval;
+  MaskFormatter m_MaskFormat;
 
   @Override
   protected void initGUI() {
     super.initGUI();
+    try {
+      m_MaskFormat = new MaskFormatter("U");
+    }
+    catch (java.text.ParseException e) {
+      System.err.println("formatter is bad: " + e.getMessage());
+    }
 
     m_NameField = new JTextField();
-    m_BindingField = new JTextField();
+    m_BindingField = new JFormattedTextField(m_MaskFormat);
     m_Toggleable = new JCheckBox();
     m_Inverted = new JCheckBox();
     m_Interval = new JFormattedTextField(NumberFormat.getNumberInstance());
-    m_Interval.setValue(1);
+    m_Interval.setValue(DEFAULT_TIMEOUT);
 
     addParameter(false, "Name", m_NameField);
     addParameter(false, "Binding", m_BindingField);
     addParameter(false, "Toggleable", m_Toggleable);
-    addParameter(false, "Interval", m_Interval);
+    addParameter(false, "Interval (in milliseconds)", m_Interval);
     addParameter(false, "Inverted", m_Inverted);
   }
 
@@ -64,18 +75,25 @@ public class BindingParameterPanel extends ParameterPanel {
     m_BindingField.setText("");
     m_Toggleable.setSelected(false);
     m_Inverted.setSelected(false);
-    m_Interval.setValue(1);
+    m_Interval.setValue(DEFAULT_TIMEOUT);
   }
 
   /**
    * Returns the binding based on the currently entered info
+   * @return the binding generated or null if not valid inputs
    */
   public Binding getBinding() {
     long interval = ((Number)m_Interval.getValue()).longValue();
-    Binding b = new Binding(m_NameField.getText(), m_BindingField.getText(),m_Toggleable.isSelected(),
-      interval, m_Inverted.isSelected());
-    clearFields();
-    System.out.println("Binding in Parameter Panel " + b.toString() + " Interval " + b.getInterval());
-    return b;
+    try {
+      Binding b = new Binding(m_NameField.getText(), m_BindingField.getText(), m_Toggleable.isSelected(),
+	interval, m_Inverted.isSelected());
+      clearFields();
+      System.out.println("Binding in Parameter Panel " + b.toString() + " Interval " + b.getInterval());
+      return b;
+    }
+    catch(InvalidKeyException e) {
+      System.err.println(e.getMessage());
+      return null;
+    }
   }
 }

@@ -51,6 +51,9 @@ public class AnnotationPanel extends BasePanel {
   /** The thickness of the border around the button */
   private static final int BORDER_THICKNESS = 5;
 
+  /** the default dimension for our buttons */
+  private static final Dimension BUTTON_SIZE = new Dimension(50, 25);
+
   /** The list of listeners registered with this panel */
   protected List<AnnotationListener> m_Listeners;
 
@@ -120,8 +123,8 @@ public class AnnotationPanel extends BasePanel {
   protected void initGUI() {
     super.initGUI();
     m_Button = new JButton();
-    m_Button.setBorder(new LineBorder(getBackground(),5));
-    m_Button.setPreferredSize(new Dimension(50, 25));
+    m_Button.setBorder(new LineBorder(getBackground(),BORDER_THICKNESS));
+    m_Button.setPreferredSize(BUTTON_SIZE);
     add(m_Button);
   }
 

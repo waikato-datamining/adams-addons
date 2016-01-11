@@ -98,7 +98,9 @@ public class BindingsEditorPanel extends BasePanel{
 	}
 	m_EditDialog.setLocationRelativeTo(BindingsEditorPanel.this);
 	m_EditDialog.setVisible(true);
-	m_Model.addElement(m_EditDialog.getBinding());
+        Binding binding = m_EditDialog.getBinding();
+	if(binding != null)
+	  m_Model.addElement(binding);
       }
     };
 

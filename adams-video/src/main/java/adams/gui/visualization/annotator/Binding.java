@@ -25,6 +25,7 @@ import adams.core.Properties;
 import adams.gui.core.GUIHelper;
 
 import javax.swing.*;
+import java.security.InvalidKeyException;
 
 /**
  * Represents a key binding
@@ -68,7 +69,7 @@ public class Binding {
    * @param toggle is this binding toggleable
    * @param inverted is this binding inverted
    */
-  public Binding(String name, String binding, boolean toggle, long interval, boolean inverted) {
+  public Binding(String name, String binding, boolean toggle, long interval, boolean inverted) throws InvalidKeyException {
     this(name, GUIHelper.getKeyStroke(binding.toUpperCase()), toggle, interval, inverted);
   }
 
@@ -79,7 +80,9 @@ public class Binding {
    * @param toggle is this binding toggleable
    * @param inverted is this binding inverted
    */
-  public Binding(String name, KeyStroke binding, boolean toggle, long interval, boolean inverted) {
+  public Binding(String name, KeyStroke binding, boolean toggle, long interval, boolean inverted) throws InvalidKeyException {
+    if(binding == null)
+      throw new InvalidKeyException("Key entered is not valid");
     m_Name        	= name;
     m_Binding 		= binding;
     m_Toggleable 	= toggle;

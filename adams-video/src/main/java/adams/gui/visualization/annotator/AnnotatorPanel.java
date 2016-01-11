@@ -38,6 +38,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.security.InvalidKeyException;
 import java.util.*;
 import java.util.List;
 
@@ -524,10 +525,15 @@ public class AnnotatorPanel extends BasePanel
     int count = props.getInteger("Count");
     Binding b;
     for( int i = 0; i < count; i++) {
-      b = new Binding(props.getProperty(i + ".Name"),
-	   props.getProperty(i + ".Binding"), props.getBoolean(i + ".Toggleable"), props.getLong(i + ".Interval") ,props.getBoolean(i + ".Inverted"));
-      System.out.println("Binding added with key = " + b.getBinding().toString() + " and name = " + b.getName());
-      m_Bindings.add(b);
+      try {
+	b = new Binding(props.getProperty(i + ".Name"),
+	  props.getProperty(i + ".Binding"), props.getBoolean(i + ".Toggleable"), props.getLong(i + ".Interval"), props.getBoolean(i + ".Inverted"));
+	System.out.println("Binding added with key = " + b.getBinding().toString() + " and name = " + b.getName());
+	m_Bindings.add(b);
+      }
+      catch(InvalidKeyException e) {
+	System.err.println(e.getMessage());
+      }
     }
     updateBindingBar();
   }
