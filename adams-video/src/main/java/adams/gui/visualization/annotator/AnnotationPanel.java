@@ -92,7 +92,8 @@ public class AnnotationPanel extends BasePanel {
     m_Interval 		= binding.getInterval();
     m_IsToggleable	= binding.isToggleable();
     addKeyBinding(m_Binding);
-    start();
+    if (m_Binding.isToggleable())
+      start();
   }
 
   protected void makeStep() {
@@ -100,7 +101,10 @@ public class AnnotationPanel extends BasePanel {
     if (msec == -1)
       return;
     HashMap<String,Object> meta = new HashMap<>();
-    meta.put(m_Binding.getName(), (m_Binding.isInverted() ^ m_IsToggled));
+    if (m_IsToggleable)
+      meta.put(m_Binding.getName(), (m_Binding.isInverted() ^ m_IsToggled));
+    else
+      meta.put(m_Binding.getName(), (!m_Binding.isInverted()));
     Date timestamp = new Date(msec);
     Step step = new Step(timestamp, 0.0f, 0.0f, meta);
     notifyListeners(step);
@@ -168,7 +172,7 @@ public class AnnotationPanel extends BasePanel {
       };
     }
     else {
-      m_Action = new AbstractBaseAction(binding.getName()) {
+      m_Action = new AbstractBaseAction(binding.getName()  +  " (" + binding.getBinding() + ")") {
 	@Override
 	protected void doActionPerformed(ActionEvent e) {
 	  makeStep();

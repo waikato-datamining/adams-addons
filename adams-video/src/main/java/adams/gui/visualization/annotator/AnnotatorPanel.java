@@ -52,9 +52,13 @@ public class AnnotatorPanel extends BasePanel
   implements MenuBarProvider, CleanUpHandler {
 
   /**
-   * the file to store the recent files in.
+   * the file to store the recent video files in.
    */
-  public final static String SESSION_FILE = "AnnotatorSession.props";
+  public final static String VIDEO_SESSION_FILE = "AnnotatorVideoSession.props";
+
+
+  public final static String BINDINGS_SESSION_FILE = "AnnotatorBindingSession.props";
+
 
   private static final long serialVersionUID = 6965340882268141821L;
 
@@ -82,8 +86,8 @@ public class AnnotatorPanel extends BasePanel
   /**
    * for handling recent files.
    */
-  protected RecentFilesHandler<JMenu> m_RecentFilesHandler;
-  protected JMenu m_MenuFileLoadRecent;
+  protected RecentFilesHandler<JMenu> m_RecentVideosHandler;
+  protected JMenu m_MenuFileLoadRecentVideos;
   protected JMenuItem m_MenuItemFileClose;
 
   /**
@@ -112,6 +116,11 @@ public class AnnotatorPanel extends BasePanel
   protected AbstractBaseAction m_ActionEditBindings;
 
   /**
+   * New Trail action
+   */
+  protected AbstractBaseAction m_ActionNewTrail;
+
+  /**
    * Export trail
    */
   protected AbstractBaseAction m_ActionExportTrail;
@@ -137,12 +146,21 @@ public class AnnotatorPanel extends BasePanel
   /** the file chooser for exporting trails. */
   protected SpreadSheetFileChooser m_ExportFileChooser;
 
-  /** thefile chooser for saving bindings. */
+  /** the file chooser for saving bindings. */
   protected BaseFileChooser m_SavePropertiesFileChooser;
 
-  /** thefile chooser for saving bindings. */
+  /** the file chooser for saving bindings. */
   protected BaseFileChooser m_LoadPropertiesFileChooser;
-  private EventQueue m_EventQueue;
+
+  /** the queue that handles binding events */
+  protected EventQueue m_EventQueue;
+
+  /** handler for recent bindings */
+  protected RecentFilesHandler<JMenu> m_RecentBindingsHandler;
+
+  /** recent bindings menu */
+  protected JMenu m_MenuFileLoadRecentBindings;
+
 
   @Override
   protected void initialize() {
@@ -152,7 +170,15 @@ public class AnnotatorPanel extends BasePanel
     m_Bindings 			= new ArrayList<>();
     m_ExportFileChooser 	= new SpreadSheetFileChooser();
     m_SavePropertiesFileChooser = new BaseFileChooser();
+    m_SavePropertiesFileChooser.setAcceptAllFileFilterUsed(false);
+    m_SavePropertiesFileChooser.setAutoAppendExtension(true);
+    m_SavePropertiesFileChooser.addChoosableFileFilter(ExtensionFileFilter.getPropertiesFileFilter());
+    m_SavePropertiesFileChooser.setDefaultExtension("props");
     m_LoadPropertiesFileChooser = new BaseFileChooser();
+    m_LoadPropertiesFileChooser.setAcceptAllFileFilterUsed(false);
+    m_LoadPropertiesFileChooser.setAutoAppendExtension(true);
+    m_LoadPropertiesFileChooser.addChoosableFileFilter(ExtensionFileFilter.getPropertiesFileFilter());
+    m_LoadPropertiesFileChooser.setDefaultExtension("props");
     m_EventQueue		= new EventQueue();
     initActions();
   }
@@ -202,7 +228,6 @@ public class AnnotatorPanel extends BasePanel
       @Override
       protected void doActionPerformed(ActionEvent e) {
 	m_VideoPlayer.stop();
-	// TODO
       }
     };
     action.setMnemonic(KeyEvent.VK_S);
@@ -210,7 +235,7 @@ public class AnnotatorPanel extends BasePanel
     m_ActionStop = action;
 
     // Bindings editor
-    action = new AbstractBaseAction("Edit Bindings...", "edit.gif") {
+    action = new AbstractBaseAction("Edit...", "edit.gif") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
 	editBindings();
@@ -227,7 +252,7 @@ public class AnnotatorPanel extends BasePanel
     m_ActionExportTrail = action;
 
     // Save Bindings
-    action = new AbstractBaseAction("Save Bindings...", "save.gif") {
+    action = new AbstractBaseAction("Save as...", "save.gif") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
 	saveBindings();
@@ -235,14 +260,23 @@ public class AnnotatorPanel extends BasePanel
     };
     m_ActionSaveBindings = action;
 
-    // Save Bindings
-    action = new AbstractBaseAction("Load Bindings...", "load.gif") {
+    // open Bindings
+    action = new AbstractBaseAction("Open...", "load.gif") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
 	loadBindings();
       }
     };
     m_ActionLoadBindings = action;
+
+    // New Trail
+    action = new AbstractBaseAction("New") {
+      @Override
+      protected void doActionPerformed(ActionEvent e) {
+	m_EventQueue.resetTrail();
+      }
+    };
+    m_ActionNewTrail = action;
   }
 
   @Override
@@ -273,31 +307,31 @@ public class AnnotatorPanel extends BasePanel
     if (m_MenuBar == null) {
       result = new JMenuBar();
 
-      // File
-      menu = new JMenu("File");
+      // Video
+      menu = new JMenu("Video");
       result.add(menu);
-      menu.setMnemonic('F');
+      menu.setMnemonic('V');
       menu.addChangeListener(e -> updateMenu());
 
-      // File/Open
+      // Video/Open
       menuitem = new JMenuItem("Open...", GUIHelper.getIcon("open.gif"));
       menuitem.setMnemonic('O');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed O"));
       menuitem.addActionListener(e -> {
 	if (m_VideoPlayer.open()) {
 	  m_EventQueue.resetTrail();
-	  if(m_RecentFilesHandler != null)
-	    m_RecentFilesHandler.addRecentItem(m_VideoPlayer.getCurrentFile());
+	  if(m_RecentVideosHandler != null)
+	    m_RecentVideosHandler.addRecentItem(m_VideoPlayer.getCurrentFile());
 	}
       });
       menu.add(menuitem);
       m_MenuItemFileOpen = menuitem;
 
-      // File/Recent files
+      // Video/Recent files
       submenu = new JMenu("Open recent");
       menu.add(submenu);
-      m_RecentFilesHandler = new RecentFilesHandler<>(SESSION_FILE, 5, submenu);
-      m_RecentFilesHandler.addRecentItemListener(new RecentItemListener<JMenu, File>() {
+      m_RecentVideosHandler = new RecentFilesHandler<>(VIDEO_SESSION_FILE, 5, submenu);
+      m_RecentVideosHandler.addRecentItemListener(new RecentItemListener<JMenu, File>() {
 	@Override
 	public void recentItemAdded(RecentItemEvent<JMenu, File> e) {
 	  // ignored
@@ -308,48 +342,44 @@ public class AnnotatorPanel extends BasePanel
 	  m_VideoPlayer.open(e.getItem());
 	}
       });
-      m_MenuFileLoadRecent = submenu;
+      m_MenuFileLoadRecentVideos = submenu;
 
-      menu.addSeparator();
+      //menu.addSeparator();
 
-      // File/Open Bindings
-      menuitem = new JMenuItem(m_ActionLoadBindings);
-      menu.add(menuitem);
+//      // Video/Play
+//      menuitem = new JMenuItem(m_ActionPlay);
+//      menuitem.setEnabled(false);
+//      m_MenuItemVideoPlay = menuitem;
+//      menu.add(menuitem);
+//
+//      // Video/Stop
+//      menuitem = new JMenuItem(m_ActionStop);
+//      menuitem.setEnabled(false);
+//      m_MenuItemVideoStop = menuitem;
+//      menu.add(menuitem);
+//
+//      menu.addSeparator();
 
-      // File/Save Bindings
-      menuitem = new JMenuItem(m_ActionSaveBindings);
-      menu.add(menuitem);
-
-      // File/Export
-      menuitem = new JMenuItem(m_ActionExportTrail);
-      menu.addSeparator();
-      menu.add(menuitem);
-
-      // File/Close
-      menuitem = new JMenuItem("Close", GUIHelper.getIcon("exit.png"));
-      menuitem.setMnemonic('C');
+      // Video/Quit
+      menuitem = new JMenuItem("Quit", GUIHelper.getIcon("exit.png"));
+      menuitem.setMnemonic('Q');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed Q"));
       menuitem.addActionListener(e -> close());
       m_MenuItemFileClose = menuitem;
       menu.addSeparator();
       menu.add(menuitem);
 
-      // Video
-      menu = new JMenu("Video");
+      menu = new JMenu("Annotations");
       result.add(menu);
-      menu.setMnemonic('V');
+      menu.setMnemonic('A');
       menu.addChangeListener(e -> updateMenu());
 
-      // Video/Play
-      menuitem = new JMenuItem(m_ActionPlay);
-      menuitem.setEnabled(false);
-      m_MenuItemVideoPlay = menuitem;
+      // Annotations/New
+      menuitem = new JMenuItem(m_ActionNewTrail);
       menu.add(menuitem);
 
-      // Video/Stop
-      menuitem = new JMenuItem(m_ActionStop);
-      menuitem.setEnabled(false);
-      m_MenuItemVideoStop = menuitem;
+      // Annotations/Export
+      menuitem = new JMenuItem(m_ActionExportTrail);
       menu.add(menuitem);
 
       // Bindings
@@ -358,8 +388,33 @@ public class AnnotatorPanel extends BasePanel
       menu.setMnemonic('B');
       menu.addChangeListener(e -> updateMenu());
 
+      // Bindings/Open Bindings
+      menuitem = new JMenuItem(m_ActionLoadBindings);
+      menu.add(menuitem);
+
+      // Bindings/Recent files
+      submenu = new JMenu("Open recent");
+      menu.add(submenu);
+      m_RecentBindingsHandler = new RecentFilesHandler<>(BINDINGS_SESSION_FILE, 5, submenu);
+      m_RecentBindingsHandler.addRecentItemListener(new RecentItemListener<JMenu, File>() {
+	@Override
+	public void recentItemAdded(RecentItemEvent<JMenu, File> e) {
+	  // ignored
+	}
+
+	@Override
+	public void recentItemSelected(RecentItemEvent<JMenu, File> e) {
+	  loadBindings(e.getItem().getAbsolutePath());
+	}
+      });
+      m_MenuFileLoadRecentBindings = submenu;
+
       // Bindings/Edit Bindings
       menuitem = new JMenuItem(m_ActionEditBindings);
+      menu.add(menuitem);
+
+      // Bindings/Save Bindings
+      menuitem = new JMenuItem(m_ActionSaveBindings);
       menu.add(menuitem);
 
       m_MenuBar = result;
@@ -403,14 +458,14 @@ public class AnnotatorPanel extends BasePanel
       return;
 
     run = () -> {
-      // Video
-      m_MenuItemVideoPlay.setEnabled(m_VideoPlayer.isVideoLoaded());
-      m_MenuItemVideoStop.setEnabled(m_VideoPlayer.isVideoPlaying());
-      if (m_VideoPlayer.isVideoPlaying() && !m_VideoPlayer.isVideoPaused()) {
-	m_MenuItemVideoPlay.setAction(m_ActionPause);
-      } else {
-	m_MenuItemVideoPlay.setAction(m_ActionPlay);
-      }
+//      // Video
+//      m_MenuItemVideoPlay.setEnabled(m_VideoPlayer.isVideoLoaded());
+//      m_MenuItemVideoStop.setEnabled(m_VideoPlayer.isVideoPlaying());
+//      if (m_VideoPlayer.isVideoPlaying() && !m_VideoPlayer.isVideoPaused()) {
+//	m_MenuItemVideoPlay.setAction(m_ActionPause);
+//      } else {
+//	m_MenuItemVideoPlay.setAction(m_ActionPlay);
+//      }
     };
     SwingUtilities.invokeLater(run);
   }
@@ -516,23 +571,34 @@ public class AnnotatorPanel extends BasePanel
   /**
    * Loads bindings from a file selected by the user
    */
-  public void loadBindings(){
+  public void loadBindings() {
     int retVal;
-    Properties props = new Properties();
 
     retVal = m_LoadPropertiesFileChooser.showOpenDialog(this);
     if(retVal != BaseFileChooser.APPROVE_OPTION)
       return;
 
-    props.load(m_LoadPropertiesFileChooser.getSelectedFile().getAbsolutePath());
+    String bindingPath = m_LoadPropertiesFileChooser.getSelectedFile().getAbsolutePath();
+    loadBindings(bindingPath);
+  }
 
+  /**
+   * Loads bindings from a file selected by the user
+   */
+  public void loadBindings(String bindingPath){
+    Properties props = new Properties();
+    props.load(bindingPath);
+
+    // Clear the current bindings
+    m_Bindings = new ArrayList<>();
     // Convert to bindings
     int count = props.getInteger("Count");
     Binding b;
     for( int i = 0; i < count; i++) {
       try {
+	KeyStroke keyStroke = GUIHelper.getKeyStroke(props.getProperty(i + ".Binding"));
 	b = new Binding(props.getProperty(i + ".Name"),
-	  props.getProperty(i + ".Binding"), props.getBoolean(i + ".Toggleable"), props.getLong(i + ".Interval"), props.getBoolean(i + ".Inverted"));
+	  keyStroke, props.getBoolean(i + ".Toggleable"), props.getLong(i + ".Interval"), props.getBoolean(i + ".Inverted"));
 	m_Bindings.add(b);
       }
       catch(InvalidKeyException e) {
@@ -540,6 +606,9 @@ public class AnnotatorPanel extends BasePanel
       }
     }
     updateBindingBar();
+
+    if(m_RecentBindingsHandler != null)
+      m_RecentBindingsHandler.addRecentItem(new File(bindingPath));
   }
 
   /**
@@ -550,7 +619,7 @@ public class AnnotatorPanel extends BasePanel
     int i;
     Properties props = new Properties();
 
-    retVal = m_SavePropertiesFileChooser.showOpenDialog(this);
+    retVal = m_SavePropertiesFileChooser.showSaveDialog(this);
     if(retVal != BaseFileChooser.APPROVE_OPTION)
       return;
 

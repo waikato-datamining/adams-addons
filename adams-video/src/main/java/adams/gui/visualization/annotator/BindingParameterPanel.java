@@ -20,6 +20,7 @@
 
 package adams.gui.visualization.annotator;
 
+import adams.gui.core.GUIHelper;
 import adams.gui.core.ParameterPanel;
 import javax.swing.*;
 import javax.swing.text.MaskFormatter;
@@ -104,6 +105,7 @@ public class BindingParameterPanel extends ParameterPanel {
   public void loadBinding(Binding binding) {
     m_NameField.setText(binding.getName());
     m_BindingField.setText(binding.getBinding().toString());
+    m_BindingField.setLastPressed(binding.getBinding());
     m_Toggleable.setSelected(binding.isToggleable());
     m_Inverted.setSelected(binding.isInverted());
     m_Interval.setValue(binding.getInterval());

@@ -20,7 +20,6 @@
 
 package adams.gui.visualization.annotator;
 
-import adams.core.Properties;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.core.BaseListWithButtons;
 import adams.gui.core.BasePanel;
@@ -77,10 +76,19 @@ public class BindingsEditorPanel extends BasePanel{
    */
   protected AbstractBaseAction m_DeleteAction;
 
+  /**
+   * the action 'edit'
+   */
   protected AbstractBaseAction m_EditAction;
 
+  /**
+   * the model list for the listbox
+   */
   protected DefaultListModel<Binding> m_Model;
 
+  /**
+   * Initializes the actions used by buttons and so-forth
+   */
   protected void initActions() {
     m_AddAction = new AbstractBaseAction("Add", "add.gif") {
       @Override

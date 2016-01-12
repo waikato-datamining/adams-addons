@@ -66,4 +66,8 @@ public class KeyPressTextField extends JTextField {
   public KeyStroke getLastPressed() {
     return m_LastPressed;
   }
+
+  public void setLastPressed(KeyStroke lastPressed) {
+    m_LastPressed = lastPressed;
+  }
 }

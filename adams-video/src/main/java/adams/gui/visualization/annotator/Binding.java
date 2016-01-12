@@ -141,7 +141,7 @@ public class Binding {
 
   @Override
   public String toString() {
-    return "Name: " + m_Name + "Binding: " + m_Binding.toString();
+    return "Name: " + m_Name + " Binding: " + m_Binding.toString() + " Toggleable: " + m_Toggleable;
   }
 
   public long getInterval() {
