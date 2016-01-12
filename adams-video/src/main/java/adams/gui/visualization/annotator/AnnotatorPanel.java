@@ -235,7 +235,7 @@ public class AnnotatorPanel extends BasePanel
     m_ActionStop = action;
 
     // Bindings editor
-    action = new AbstractBaseAction("Edit...", "edit.gif") {
+    action = new AbstractBaseAction("Edit...", "properties.gif") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
 	editBindings();
@@ -261,7 +261,7 @@ public class AnnotatorPanel extends BasePanel
     m_ActionSaveBindings = action;
 
     // open Bindings
-    action = new AbstractBaseAction("Open...", "load.gif") {
+    action = new AbstractBaseAction("Open...", "open.gif") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
 	loadBindings();
@@ -270,7 +270,7 @@ public class AnnotatorPanel extends BasePanel
     m_ActionLoadBindings = action;
 
     // New Trail
-    action = new AbstractBaseAction("New") {
+    action = new AbstractBaseAction("New", "new.gif") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
 	m_EventQueue.resetTrail();
