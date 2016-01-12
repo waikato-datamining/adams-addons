@@ -470,9 +470,6 @@ public class AnnotatorPanel extends BasePanel
   protected void updateMenu() {
     if (m_MenuBar == null)
       return;
-
-    invalidate();
-    validate();
   }
 
   @Override
