@@ -110,6 +110,9 @@ public class AnnotatorPanel extends BasePanel
    */
   protected AbstractBaseAction m_ActionStop;
 
+  /** New Bindings action. */
+  protected AbstractBaseAction m_ActionNewBindings;
+
   /**
    * Edit Bindings action
    */
@@ -233,6 +236,15 @@ public class AnnotatorPanel extends BasePanel
     action.setMnemonic(KeyEvent.VK_S);
     action.setAccelerator("ctrl pressed S");
     m_ActionStop = action;
+
+    // New Bindings
+    action = new AbstractBaseAction("New", "new.gif") {
+      @Override
+      protected void doActionPerformed(ActionEvent e) {
+	newBindings();
+      }
+    };
+    m_ActionNewBindings = action;
 
     // Bindings editor
     action = new AbstractBaseAction("Edit...", "properties.gif") {
@@ -388,6 +400,10 @@ public class AnnotatorPanel extends BasePanel
       menu.setMnemonic('B');
       menu.addChangeListener(e -> updateMenu());
 
+      // Bindings/New Bindings
+      menuitem = new JMenuItem(m_ActionNewBindings);
+      menu.add(menuitem);
+
       // Bindings/Open Bindings
       menuitem = new JMenuItem(m_ActionLoadBindings);
       menu.add(menuitem);
@@ -530,6 +546,14 @@ public class AnnotatorPanel extends BasePanel
       getParentFrame().setVisible(false);
     cleanUp();
     closeParent();
+  }
+
+  /**
+   * Resets the bindings.
+   */
+  public void newBindings() {
+    m_Bindings = new ArrayList<>();
+    updateBindingBar();
   }
 
   /**
