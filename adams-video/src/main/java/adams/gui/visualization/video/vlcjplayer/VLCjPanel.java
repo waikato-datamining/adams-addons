@@ -131,6 +131,7 @@ public class VLCjPanel
    */
   protected JMenuItem m_MenuItemVideoStop;
 
+
   public File getCurrentFile() {
     return m_CurrentFile;
   }
@@ -188,6 +189,10 @@ public class VLCjPanel
    */
   protected boolean m_VideoLoaded;
 
+  /**
+   * flag to say if sound is muted
+   */
+  protected boolean m_SoundMuted;
   /**
    * flag to check that VLC is installed.
    */
@@ -296,6 +301,15 @@ public class VLCjPanel
   public boolean isVLCInstalled() {
     return m_VLCInstalled;
   }
+
+  /**
+   * Gets the muted state of the sound
+   * @return true if the sound is muted
+   */
+  public boolean isSoundMuted() {
+    return m_SoundMuted;
+  }
+
 
   /**
    * For initializing members.
@@ -429,6 +443,8 @@ public class VLCjPanel
   @Override
   protected void finishInit() {
     super.finishInit();
+    // Make sure our mute status is correct
+    m_SoundMuted = m_MediaPlayerComponent.getMediaPlayer().isMute();
     // Sets up a scheduled executor to update the slider position and keep the time labels up to date.
     m_Executor = Executors.newSingleThreadScheduledExecutor();
     m_ExecutorHandler = m_Executor.scheduleAtFixedRate(() -> {
@@ -611,7 +627,8 @@ public class VLCjPanel
    * Mutes the video
    */
   public void mute() {
-    m_MediaPlayerComponent.getMediaPlayer().mute();
+    m_SoundMuted = m_MediaPlayerComponent.getMediaPlayer().mute();
+
     update();
   }
 
@@ -753,7 +770,7 @@ public class VLCjPanel
 	m_PlayButton.setAction(m_PlayAction);
       }
 
-      if (m_MediaPlayerComponent.getMediaPlayer().isMute()) {
+      if (!m_SoundMuted) {
         m_MuteButton.setText("Unmute");
         m_MuteButton.setIcon(GUIHelper.getIcon("unmute.png"));
       }

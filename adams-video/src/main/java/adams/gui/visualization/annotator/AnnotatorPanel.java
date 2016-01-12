@@ -639,6 +639,9 @@ public class AnnotatorPanel extends BasePanel
       props.add(m_Bindings.get(i).toProperty(i));
     }
     props.setInteger("Count", i);
-    props.save(m_SavePropertiesFileChooser.getSelectedFile().getAbsolutePath());
+    String savePath = m_SavePropertiesFileChooser.getSelectedFile().getAbsolutePath();
+    props.save(savePath);
+    if(m_RecentBindingsHandler != null)
+      m_RecentBindingsHandler.addRecentItem(new File(savePath));
   }
 }
