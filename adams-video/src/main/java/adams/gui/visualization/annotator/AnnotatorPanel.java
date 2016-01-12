@@ -468,22 +468,11 @@ public class AnnotatorPanel extends BasePanel
    * Updates the state of the menu items.
    */
   protected void updateMenu() {
-    Runnable run;
-
     if (m_MenuBar == null)
       return;
 
-    run = () -> {
-//      // Video
-//      m_MenuItemVideoPlay.setEnabled(m_VideoPlayer.isVideoLoaded());
-//      m_MenuItemVideoStop.setEnabled(m_VideoPlayer.isVideoPlaying());
-//      if (m_VideoPlayer.isVideoPlaying() && !m_VideoPlayer.isVideoPaused()) {
-//	m_MenuItemVideoPlay.setAction(m_ActionPause);
-//      } else {
-//	m_MenuItemVideoPlay.setAction(m_ActionPlay);
-//      }
-    };
-    SwingUtilities.invokeLater(run);
+    invalidate();
+    validate();
   }
 
   @Override
@@ -519,6 +508,8 @@ public class AnnotatorPanel extends BasePanel
 	if(m_EventQueue != null)
 	  panel.addListener(m_EventQueue);
       }
+      invalidate();
+      revalidate();
     };
     SwingUtilities.invokeLater(run);
   }
