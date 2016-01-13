@@ -62,6 +62,11 @@ public class Binding {
   /** the interval to repete a toggleable binding */
   private long m_Interval;
 
+  public Binding(Properties props, String prefix) throws InvalidKeyException{
+      this(props.getProperty(prefix + ".Name"),	GUIHelper.getKeyStroke(props.getProperty(prefix + ".Binding")),
+	props.getBoolean(prefix + ".Toggleable"), props.getLong(prefix + ".Interval"),
+	props.getBoolean(prefix + ".Inverted"));
+  }
   /**
    * Constructor for the binding class.
    * @param name the name of the binding

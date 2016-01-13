@@ -20,6 +20,7 @@
 
 package adams.gui.visualization.annotator;
 
+import adams.core.CleanUpHandler;
 import adams.data.trail.Step;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.core.BasePanel;
@@ -36,7 +37,6 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  * An Annotation panel that allows for the manual, i.e. non-toggleable, input from a binding
@@ -44,10 +44,16 @@ import java.util.concurrent.TimeUnit;
  * @author sjb90
  * @version $Revision$
  */
-public class AnnotationPanel extends BasePanel {
+public class AnnotationPanel extends BasePanel implements TickListener {
 
   /** The thickness of the border around the button */
   private static final int BORDER_THICKNESS = 5;
+
+  /** the off colour for a togglable button's boarder */
+  private static final java.awt.Color OFF_COLOUR = Color.RED;
+
+  /** the on colour for a togglable button's boarder */
+  private static final java.awt.Color ON_COLOUR = Color.GREEN;
 
   /** The list of listeners registered with this panel */
   protected List<AnnotationListener> m_Listeners;
@@ -64,23 +70,14 @@ public class AnnotationPanel extends BasePanel {
   /** The Interval which this toggle runs at */
   protected long m_Interval;
 
-  /** A scheduler to execute our command */
-  protected ScheduledExecutorService m_Scheduler;
-
   /** a bool to say if this is a toggleable binding or not */
   protected boolean m_IsToggleable;
 
   /** a bool to say if this binding is currently toggled on */
   protected boolean m_IsToggled;
 
-  /** A scheduled future to keep track of our task */
-  protected ScheduledFuture<?> m_ScheduleHandler;
-
   /** a button to indicate when a binding is pressed or toggled on */
   protected JButton m_Button;
-
-  /** Listener for the button to change boarder */
-  protected AnnotationListener m_Listener;
 
   /**
    * Constructs a AnnotationPanel
@@ -92,20 +89,14 @@ public class AnnotationPanel extends BasePanel {
     m_Interval 		= binding.getInterval();
     m_IsToggleable	= binding.isToggleable();
     addKeyBinding(m_Binding);
-    if (m_Binding.isToggleable())
-      start();
   }
 
-  protected void makeStep() {
-    long msec = m_VideoPlayer.getTimeStamp();
-    if (msec == -1)
-      return;
+  protected void makeStep(Date timestamp) {
     HashMap<String,Object> meta = new HashMap<>();
     if (m_IsToggleable)
       meta.put(m_Binding.getName(), (m_Binding.isInverted() ^ m_IsToggled));
     else
       meta.put(m_Binding.getName(), (!m_Binding.isInverted()));
-    Date timestamp = new Date(msec);
     Step step = new Step(timestamp, 0.0f, 0.0f, meta);
     notifyListeners(step);
   }
@@ -115,14 +106,12 @@ public class AnnotationPanel extends BasePanel {
     super.initialize();
     m_IsToggled		= false;
     m_Listeners 	= new ArrayList<>();
-    m_Scheduler 	= Executors.newScheduledThreadPool(1);
   }
 
   @Override
   protected void initGUI() {
     super.initGUI();
     setLayout(new FlowLayout(FlowLayout.CENTER));
-    setBorder(new LineBorder(getBackground(), BORDER_THICKNESS));
     m_Button = new JButton();
     add(m_Button);
   }
@@ -150,20 +139,21 @@ public class AnnotationPanel extends BasePanel {
   private AbstractBaseAction addKeyBinding(Binding binding) {
     KeyStroke keyStroke = binding.getBinding();
     if(m_IsToggleable) {
+      setBorder(new LineBorder(OFF_COLOUR, BORDER_THICKNESS));
       m_Action = new AbstractBaseAction(binding.getName()  +  " (" + binding.getBinding() + ")") {
 	@Override
 	protected void doActionPerformed(ActionEvent e) {
 	  m_IsToggled = !m_IsToggled;
 	  if(m_IsToggled) {
 	    Runnable run = () -> {
-	      setBorder(new LineBorder(Color.YELLOW, BORDER_THICKNESS));
+	      setBorder(new LineBorder(ON_COLOUR, BORDER_THICKNESS));
 	      revalidate();
 	    };
 	    SwingUtilities.invokeLater(run);
 	  }
 	  else {
 	    Runnable run = () -> {
-	      setBorder(new LineBorder(getBackground(), BORDER_THICKNESS));
+	      setBorder(new LineBorder(OFF_COLOUR, BORDER_THICKNESS));
 	      revalidate();
 	    };
 	    SwingUtilities.invokeLater(run);
@@ -172,13 +162,16 @@ public class AnnotationPanel extends BasePanel {
       };
     }
     else {
+      setBorder(new LineBorder(getBackground(), BORDER_THICKNESS));
       m_Action = new AbstractBaseAction(binding.getName()  +  " (" + binding.getBinding() + ")") {
 	@Override
 	protected void doActionPerformed(ActionEvent e) {
-	  makeStep();
+	  Date timestamp = new Date(m_VideoPlayer.getTimeStamp());
+	  makeStep(timestamp);
 	}
       };
     }
+
     // Set up the button for this binding
     m_Button.setAction(m_Action);
     getInputMap(WHEN_IN_FOCUSED_WINDOW).put(keyStroke, binding.getName());
@@ -200,21 +193,13 @@ public class AnnotationPanel extends BasePanel {
     }
   }
 
-  /**
-   * Starts the internal thread that handles adding events to the queue
-   */
-  private void start() {
-    Runnable run = () -> {
-      makeStep();
-    };
-    m_ScheduleHandler = m_Scheduler.scheduleAtFixedRate(run, 0, m_Interval, TimeUnit.MILLISECONDS);
+  @Override
+  public void tickHappened(TickEvent e) {
+    makeStep(e.getTimeStamp());
   }
 
-  /**
-   * Shuts down the
-   */
-  public void cleanUp() {
-    if(m_ScheduleHandler != null)
-      m_ScheduleHandler.cancel(false);
+  @Override
+  public long getInterval() {
+    return m_Interval;
   }
 }

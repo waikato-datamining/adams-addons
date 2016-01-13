@@ -22,12 +22,15 @@ package adams.gui.visualization.annotator;
 
 import adams.core.*;
 import adams.core.Properties;
+import adams.core.io.PlaceholderFile;
+import adams.data.io.output.SimpleTrailWriter;
 import adams.data.io.output.SpreadSheetWriter;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.chooser.BaseFileChooser;
 import adams.gui.chooser.SpreadSheetFileChooser;
 import adams.gui.core.*;
+import adams.gui.dialog.ApprovalDialog;
 import adams.gui.dialog.EditBindingsDialog;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
@@ -80,7 +83,7 @@ public class AnnotatorPanel extends BasePanel
   /** menu bad */
   protected JMenuBar m_MenuBar;
 
-  /** menu item for 'open */
+  /** menu item for 'open' */
   protected JMenuItem m_MenuItemFileOpen;
 
   /**
@@ -163,6 +166,9 @@ public class AnnotatorPanel extends BasePanel
 
   /** recent bindings menu */
   protected JMenu m_MenuFileLoadRecentBindings;
+
+  /** the ticker that takes care of toggleable bindigns */
+  protected Ticker m_Ticker;
 
 
   @Override
@@ -294,8 +300,10 @@ public class AnnotatorPanel extends BasePanel
   @Override
   protected void initGUI() {
     super.initGUI();
-    m_VideoPlayer    = new VLCjPanel();
-    m_BindingPanel   = new BasePanel(new FlowLayout());
+    m_VideoPlayer	= new VLCjPanel();
+    m_BindingPanel	= new BasePanel(new FlowLayout());
+    m_Ticker		= new Ticker(m_VideoPlayer);
+
     add(m_VideoPlayer, BorderLayout.CENTER);
     add(m_BindingPanel, BorderLayout.SOUTH);
   }
@@ -481,11 +489,6 @@ public class AnnotatorPanel extends BasePanel
     if (m_VideoPlayer != null) {
       m_VideoPlayer.cleanUp();
     }
-    List<Component> comps = new ArrayList<>(Arrays.asList(m_BindingPanel.getComponents()));
-    comps.stream().filter(c -> c instanceof AnnotationPanel).forEach(c -> {
-      ((AnnotationPanel) c).cleanUp();
-    });
-
     if (m_EventQueue != null)
       m_EventQueue.cleanUp();
   }
@@ -496,7 +499,7 @@ public class AnnotatorPanel extends BasePanel
   private void updateBindingBar() {
     Runnable run = () -> {
       AnnotationPanel panel;
-      m_BindingPanel.removeAll();
+      resetBindingBar();
       for (Binding item : m_Bindings) {
 	panel = new AnnotationPanel();
 	panel.configureAnnotationPanel(item, m_VideoPlayer);
@@ -504,6 +507,8 @@ public class AnnotatorPanel extends BasePanel
 	m_BindingPanel.revalidate();
 	if(m_EventQueue != null)
 	  panel.addListener(m_EventQueue);
+	if(m_Ticker != null && item.isToggleable())
+	  m_Ticker.addListener(panel);
       }
       invalidate();
       revalidate();
@@ -511,6 +516,10 @@ public class AnnotatorPanel extends BasePanel
     SwingUtilities.invokeLater(run);
   }
 
+  private void resetBindingBar() {
+    m_BindingPanel.removeAll();
+    m_Ticker.removeAll();
+  }
 
 
   /**
@@ -555,6 +564,8 @@ public class AnnotatorPanel extends BasePanel
     m_BindingsDialog.setBindings(m_Bindings);
     m_BindingsDialog.setLocationRelativeTo(this);
     m_BindingsDialog.setVisible(true);
+    if(m_BindingsDialog.getOption() == ApprovalDialog.CANCEL_OPTION)
+      return;
     m_Bindings = m_BindingsDialog.getBindings();
     updateBindingBar();
   }
@@ -573,7 +584,9 @@ public class AnnotatorPanel extends BasePanel
     retVal = m_ExportFileChooser.showSaveDialog(this);
     if (retVal != SpreadSheetFileChooser.APPROVE_OPTION)
       return;
-
+    SimpleTrailWriter tWriter = new SimpleTrailWriter();
+    tWriter.setOutput(new PlaceholderFile("${HOME}/test.trail"));
+    tWriter.write(m_EventQueue.getTrail());
     sheet = m_EventQueue.toSpreadSheet();
     writer = m_ExportFileChooser.getWriter();
     if (!writer.write(sheet, m_ExportFileChooser.getSelectedFile()))
@@ -608,9 +621,9 @@ public class AnnotatorPanel extends BasePanel
     Binding b;
     for( int i = 0; i < count; i++) {
       try {
-	KeyStroke keyStroke = GUIHelper.getKeyStroke(props.getProperty(i + ".Binding"));
-	b = new Binding(props.getProperty(i + ".Name"),
-	  keyStroke, props.getBoolean(i + ".Toggleable"), props.getLong(i + ".Interval"), props.getBoolean(i + ".Inverted"));
+	String prefix = Integer.toString(i);
+	Properties subset = props.subset(prefix);
+	b = new Binding(subset, prefix);
 	m_Bindings.add(b);
       }
       catch(InvalidKeyException e) {
