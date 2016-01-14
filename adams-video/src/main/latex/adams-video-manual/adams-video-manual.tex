@@ -31,7 +31,8 @@
   \includegraphics[width=2cm]{images/video-module.png} \\
 }
 \author{
-  Peter Reutemann
+  Peter Reutemann \\
+  Steven Brown
 }
 
 \setcounter{secnumdepth}{3}
@@ -138,6 +139,105 @@ and save those trails back to disk. Figure \ref{trail_viewer} shows a screenshot
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Annotator}
+
+The annotator has three menus which we will cover in the following sections.
+
+\subsection{Video Menu}
+The video menu (see Figure \ref{AnnotatorVideoMenu}) lets you open video
+files or quit the program. It also provides a list of recently opened videos.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=12.0cm]{images/AnnotatorVideoMenu.png}
+  \caption{Video menu.}
+  \label{AnnotatorVideoMenu}
+\end{figure}
+
+\subsection{Annotations Menu}
+This menu lets you create a new set of annotations or export the current
+set to a spreadsheet file, e.g., CSV or, depending on modules present,
+MS Excel (see Figure \ref{AnnotatorAnnotationMenu}).
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=12.0cm]{images/AnnotatorAnnotationMenu.png}
+  \caption{Annotations menu.}
+  \label{AnnotatorAnnotationMenu}
+\end{figure}
+
+\subsection{Bindings menu}
+The bindings menu, as depicted in Figure \ref{AnnotatorBindingsMenu}, allows
+for the creation of a new set of bindings, loading or saving bindings, and
+editing the current bindings.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=12.0cm]{images/AnnotatorBindingsMenu.png}
+  \caption{Bindings menu.}
+  \label{AnnotatorBindingsMenu}
+\end{figure}
+
+\subsubsection{Edit Bindings}
+When editing bindings you can add new bindings, edit a current binding or
+remove selected bindings (see Figure \ref{AnnotationEditBindingsDialog}).
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=7.0cm]{images/AnnotationEditBindingsDialog.png}
+  \caption{Edit bindings dialog.}
+  \label{AnnotationEditBindingsDialog}
+\end{figure}
+
+When editing a binding there are various options for customizing the output
+from the binding.
+
+The output from a binding is made up of a header and \textit{true} or
+\textit{false} along with a timestamp:
+
+\begin{verbatim}
+Timestamp,Meta-Binding1,Meta-Binding2
+00:00:00.000,false,false
+00:00:01.000,false,true
+\end{verbatim}
+
+In this case the name of the binding shows up as \textit{Binding1} and
+\textit{Binding2}. Figure \ref{add_binding} shows the dialog for editing a
+binding.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=4.0cm]{images/add_binding.png}
+  \caption{Dialog for editing a binding.}
+  \label{add_binding}
+\end{figure}
+
+In the following, an description of what each of the binding parameters is
+used for:
+\begin{tight_itemize}
+  \item \textbf{Name} -- This is what gets output as the header of the
+  annotation file when it is exported
+  \item \textbf{Binding} -- The key for this binding. It is entered by
+  selecting the text box and then pressing the desired key or key combination
+  -- i.e. \texttt{ctrl + B} or just \texttt{B}
+  \item \textbf{Toggleable} -- If this is checked then the binding always
+  outputs a value, usually \textit{false}, and when it is toggled switches
+  that output to \textit{true}.
+  \item \textbf{Interval} -- Only relevant for toggleable bindings. This is
+  the interval at which the values will be output. By default it is 1,000
+  milliseconds (= 1 second) but it can be changed to any number. Intervals
+  below 1 second tend to become less accurate, so if set at 10 ms it might
+  output a value between 1 - 20 ms rather than 10 depending on CPU load and
+  scheduling. It is recommended to use times of a second or above.
+  \item \textbf{Inverted} -- This allows you to invert the values output
+  by the binding. Usually a binding outputs \textit{true} when pressed or, in the
+  case of toggleable bindings, toggled on. This will invert that so when
+  it is pressed it will output \textit{false} and in the case of a toggleable it
+  will output a value of \textit{true} when it is toggled off and \textit{false} when toggled on.
+\end{tight_itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Data}
 \section{.trail format}
 The \textit{.trail} format is a simple text format. In its essence it is
@@ -168,10 +268,11 @@ Here is an example file, without a background:
 # Parent\ ID=-1
 # Trail.Width=1280.0
 Timestamp,X,Y,Meta-data
-"1970-01-01 12:00:00.127",424,292,""
-"1970-01-01 12:00:00.224",423,285,""
-"1970-01-01 12:00:00.304",423,277,""
+"00:00:00.127",424,292,""
+"00:00:00.224",423,285,""
+"00:00:00.304",423,277,""
 \end{verbatim}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
