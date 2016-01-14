@@ -20,29 +20,38 @@
 
 package adams.gui.visualization.annotator;
 
-import adams.core.*;
+import adams.core.CleanUpHandler;
+import adams.core.DateFormat;
 import adams.core.Properties;
-import adams.core.io.PlaceholderFile;
-import adams.data.io.output.SimpleTrailWriter;
 import adams.data.io.output.SpreadSheetWriter;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.chooser.BaseFileChooser;
 import adams.gui.chooser.SpreadSheetFileChooser;
-import adams.gui.core.*;
+import adams.gui.core.BasePanel;
+import adams.gui.core.ExtensionFileFilter;
+import adams.gui.core.GUIHelper;
+import adams.gui.core.MenuBarProvider;
+import adams.gui.core.RecentFilesHandler;
+import adams.gui.core.TitleGenerator;
 import adams.gui.dialog.ApprovalDialog;
 import adams.gui.dialog.EditBindingsDialog;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
 import adams.gui.visualization.video.vlcjplayer.VLCjPanel;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
+import java.awt.BorderLayout;
+import java.awt.Dialog;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.security.InvalidKeyException;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -584,9 +593,6 @@ public class AnnotatorPanel extends BasePanel
     retVal = m_ExportFileChooser.showSaveDialog(this);
     if (retVal != SpreadSheetFileChooser.APPROVE_OPTION)
       return;
-    SimpleTrailWriter tWriter = new SimpleTrailWriter();
-    tWriter.setOutput(new PlaceholderFile("${HOME}/test.trail"));
-    tWriter.write(m_EventQueue.getTrail());
     sheet = m_EventQueue.toSpreadSheet();
     writer = m_ExportFileChooser.getWriter();
     if (!writer.write(sheet, m_ExportFileChooser.getSelectedFile()))
