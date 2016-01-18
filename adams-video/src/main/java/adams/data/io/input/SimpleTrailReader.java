@@ -15,7 +15,7 @@
 
 /**
  * SimpleTrailReader.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -41,6 +41,7 @@ import gnu.trove.list.array.TByteArrayList;
 import java.awt.image.BufferedImage;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -135,6 +136,11 @@ public class SimpleTrailReader
     byte[]			uncompressed;
     int				offset;
     int				pixel;
+    boolean			hasX;
+    boolean			hasY;
+    int				i;
+    String			col;
+    HashMap<Integer,String> metaCols;
 
     lines      = FileUtils.loadFromFile(m_Input.getAbsoluteFile());
     comments   = new ArrayList<>();
@@ -172,13 +178,30 @@ public class SimpleTrailReader
       getLogger().severe("Failed to read file from: " + m_Input);
       return;
     }
+    hasX     = false;
+    hasY     = false;
+    metaCols = new HashMap<>();
+    for (i = 0; i < sheet.getColumnNames().size(); i++) {
+      col = sheet.getColumnNames().get(i);
+      if (col.equals("X"))
+	hasX = true;
+      if (col.equals("Y"))
+	hasY = true;
+      if (col.startsWith(Trail.PREFIX_META))
+	metaCols.put(i, col.substring(Trail.PREFIX_META.length()));
+    }
     report = Report.parseProperties(Properties.fromComment(Utils.flatten(comments, "\n")));
-    trail = new Trail();
+    trail  = new Trail();
     for (Row row: sheet.rows()) {
       step = new Step(
-	row.getCell(0).toDateTimeMsec(),
-	row.getCell(1).toDouble().floatValue(),
-	row.getCell(2).toDouble().floatValue());
+	row.getCell(0).toTimeMsec(),
+	hasX ? row.getCell(1).toDouble().floatValue() : 0f,
+	hasY ? row.getCell(2).toDouble().floatValue() : 0f);
+      // meta-data?
+      for (int n: metaCols.keySet()) {
+	if (row.hasCell(n) && !row.getCell(n).isMissing())
+	  step.addMetaData(metaCols.get(n), row.getCell(n).getNative());
+      }
       trail.add(step);
     }
     trail.setReport(report);
