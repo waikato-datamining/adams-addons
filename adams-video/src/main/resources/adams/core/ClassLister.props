@@ -23,6 +23,10 @@ adams.data.io.input.AbstractTrailReader=\
 adams.data.io.output.AbstractTrailWriter=\
   adams.data.io.output
 
+# the movie image samplers
+adams.flow.transformer.movieimagesampler.AbstractMovieImageSampler=\
+  adams.flow.transformer.movieimagesampler
+
 # the trail overlays
 adams.gui.visualization.trail.overlay.AbstractTrailOverlay=\
   adams.gui.visualization.trail.overlay
