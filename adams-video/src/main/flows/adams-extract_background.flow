@@ -1,11 +1,11 @@
 # Project: adams
-# Date: 2016-01-19 12:19:39
+# Date: 2016-01-19 12:37:33
 # User: fracpete
 # Charset: UTF-8
 #
 adams.flow.control.Flow
 	-annotation
-	Samples a number of images from a movie, computes the\nmedian from it and displays the result.\nThis only works to extract the background, if the camera\nis stationery and objects are moving through it.
+	Samples a number of images from a movie, computes the\nmedian from it and displays the result.\nExtracting the background only works, if the camera\nis stationery and objects are moving through it.
 	-actor
 		adams.flow.standalone.GridView
 			-width
@@ -16,8 +16,6 @@ adams.flow.control.Flow
 					Background
 					-writer
 						adams.gui.print.NullWriter
-					-zoom
-					-1.0
 					-selection-processor
 						adams.gui.visualization.image.selection.NullProcessor
 					-image-overlay
@@ -28,8 +26,6 @@ adams.flow.control.Flow
 					First frame
 					-writer
 						adams.gui.print.NullWriter
-					-zoom
-					-1.0
 					-selection-processor
 						adams.gui.visualization.image.selection.NullProcessor
 					-image-overlay
@@ -80,16 +76,12 @@ adams.flow.control.Flow
 			first frame
 			-tee
 				adams.flow.transformer.MovieImageSequence
+					-max-images
+					1
 			-tee
-				adams.flow.control.Tee
-					-name
-					display
-					-tee
-						adams.flow.sink.CallableSink
-							-callable
-							First frame
-			-tee
-				adams.flow.control.Stop
+				adams.flow.sink.CallableSink
+					-callable
+					First frame
 	-flow-execution-listener
 		adams.flow.execution.NullListener
 
