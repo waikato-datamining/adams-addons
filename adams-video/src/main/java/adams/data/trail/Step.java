@@ -15,7 +15,7 @@
 
 /**
  * Step.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.trail;
@@ -54,7 +54,7 @@ public class Step
   /** for formatting the timestamp. */
   protected static DateFormat m_DateFormat;
   static {
-    m_DateFormat = DateUtils.getTimestampFormatterMsecs();
+    m_DateFormat = DateUtils.getTimeFormatterMsecs();
   }
 
   /**
