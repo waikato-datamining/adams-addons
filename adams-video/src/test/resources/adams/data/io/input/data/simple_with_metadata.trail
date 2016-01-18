@@ -1,0 +1,10 @@
+# #Mon Dec 21 16:39:47 NZDT 2015
+# Trail.Height\tDataType=N
+# Trail.Width\tDataType=N
+# Trail.Height=480.0
+# Parent\ ID=-1
+# Trail.Width=640.0
+Timestamp,X,Y,Meta-signal1,Meta-signal2
+03:39:29.519,255.039764404297,166.773391723633,,yes
+03:39:29.542,252.403564453125,166.608154296875,yes,yes
+03:39:29.565,252.22509765625,166.645401000977,yes,
