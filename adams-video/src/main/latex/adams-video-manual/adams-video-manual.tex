@@ -138,10 +138,45 @@ and save those trails back to disk. Figure \ref{trail_viewer} shows a screenshot
   \label{trail_viewer}
 \end{figure}
 
+\section{vlcj Video Player}
+A simple video player used to play video or audio files in real time. To use this tool, or any other tools
+that incorpoate it, a user must have VLC player installed on their computer.
+The bitness of the VLC player install and the Java install must be the same, that is
+they must both either be 32 bit installs or 64 bit installs. Figure \ref{VideoPlayerInUse} shows the player
+being used.
+
+ \begin{figure}[htb]
+   \centering
+   \includegraphics[width=12.0cm]{images/video_player_in_use.png}
+   \caption{Video Player in use.}
+   \label{VideoPlayerInUse}
+ \end{figure}
+
+\section{Video Annotator}
+The \textit{Video Annotator} is a tool for creating annotations for a video. A user can
+create their own personalized key bindings which they can then use to add annotations at a given time stamp.
+The annotations can be exported for use in a spreadsheet or other post processing. Figure \ref{annotator_in_use}
+shows a screen shot. The video annotator incorporates the vlcj Video Player and has the same requirements, i.e. --- VLC
+player must be installed and the bitness of the installs must match.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width= 12.0cm]{images/trail_viewer.png}
+  \caption{Annotator showing a video and key bindings}
+  \label{annotator_in_use}
+\end{figure}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Annotator}
 
 The annotator has three menus which we will cover in the following sections.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=12.0cm]{images/AnnotatorVideoMenu.png}
+  \caption{Video menu.}
+  \label{AnnotatorVideoMenu}
+\end{figure}
 
 \subsection{Video Menu}
 The video menu (see Figure \ref{AnnotatorVideoMenu}) lets you open video
@@ -273,6 +308,11 @@ Timestamp,X,Y,Meta-data
 "00:00:00.304",423,277,""
 \end{verbatim}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Video Annotator}
+\section{Useage}
+The annotator has three menus which we will cover here
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}

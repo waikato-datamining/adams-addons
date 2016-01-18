@@ -37,14 +37,7 @@ import adams.gui.event.RecentItemListener;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JSlider;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -82,6 +75,13 @@ public class VLCjPanel
   public static final String EVENT_PAUSE = "pause";
   public static final String EVENT_STOP  = "stop";
   public static final String EVENT_MUTE  = "mute";
+
+  /** the values used for playback rate */
+  protected static final double DEFAULT_RATE 	= 1.0d;
+  protected static final double MAX_RATE	= 4.0d;
+  protected static final double MIN_RATE	= 0.25d;
+  protected static final double RATE_STEP	= 0.25d;
+
 
   /** the properties to use. */
   protected static Properties m_Properties;
@@ -142,7 +142,7 @@ public class VLCjPanel
   protected File m_CurrentFile;
 
   /**
-   * the mediaplayer componenet used to play video
+   * the media player component used to play video
    */
   protected EmbeddedMediaPlayerComponent m_MediaPlayerComponent;
   /**
@@ -159,6 +159,12 @@ public class VLCjPanel
    * slider for changing video position
    */
   protected JSlider m_PositionSlider;
+
+  /** spinner for setting the playback rate */
+  protected JSpinner m_RateSpinner;
+
+  /** the model for our spinner */
+  protected SpinnerNumberModel m_SpinnerModel;
 
   /**
    * the "play" button
@@ -336,6 +342,9 @@ public class VLCjPanel
 	"http://www.videolan.org/vlc/ !");
       return;
     }
+
+    m_SpinnerModel = new SpinnerNumberModel(DEFAULT_RATE, MIN_RATE, MAX_RATE, RATE_STEP);
+
     initActions();
   }
 
@@ -409,6 +418,15 @@ public class VLCjPanel
     // Controls
     m_ControlsPanel = new BasePanel(new FlowLayout());
     add(m_ControlsPanel, BorderLayout.SOUTH);
+
+    // Rate spinner
+    m_RateSpinner = new JSpinner(m_SpinnerModel);
+    m_RateSpinner.addChangeListener(e -> {
+      JSpinner source = (JSpinner)e.getSource();
+      double rate = (double)source.getValue();
+      m_MediaPlayerComponent.getMediaPlayer().setRate((float)rate);
+    });
+    m_ControlsPanel.add(m_RateSpinner);
 
     // Slider
     m_PositionSlider = new JSlider(0, 1000, 0);

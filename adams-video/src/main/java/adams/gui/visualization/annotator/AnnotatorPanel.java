@@ -23,11 +23,16 @@ package adams.gui.visualization.annotator;
 import adams.core.CleanUpHandler;
 import adams.core.DateFormat;
 import adams.core.Properties;
+import adams.core.io.PlaceholderFile;
+import adams.data.io.input.AbstractTrailReader;
+import adams.data.io.output.AbstractDataContainerWriter;
 import adams.data.io.output.SpreadSheetWriter;
 import adams.data.spreadsheet.SpreadSheet;
+import adams.data.trail.Trail;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.chooser.BaseFileChooser;
 import adams.gui.chooser.SpreadSheetFileChooser;
+import adams.gui.chooser.TrailFileChooser;
 import adams.gui.core.BasePanel;
 import adams.gui.core.ExtensionFileFilter;
 import adams.gui.core.GUIHelper;
@@ -39,6 +44,7 @@ import adams.gui.dialog.EditBindingsDialog;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
 import adams.gui.visualization.video.vlcjplayer.VLCjPanel;
+import com.aetrion.flickr.places.Place;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -71,6 +77,8 @@ public class AnnotatorPanel extends BasePanel
 
   public final static String BINDINGS_SESSION_FILE = "AnnotatorBindingSession.props";
 
+  public final static String ANNOTATION_SESSION_FILE = "AnnotatorAnnotationSession.props";
+
 
   private static final long serialVersionUID = 6965340882268141821L;
 
@@ -100,7 +108,13 @@ public class AnnotatorPanel extends BasePanel
    */
   protected RecentFilesHandler<JMenu> m_RecentVideosHandler;
   protected JMenu m_MenuFileLoadRecentVideos;
-  protected JMenuItem m_MenuItemFileClose;
+  protected RecentFilesHandler<JMenu> m_RecentAnnotationsHandler;
+  protected JMenu m_MenuAnnotationLoadRecentAnnotations;
+
+  /**
+   * for closing the program
+   */
+  protected JMenuItem m_MenuItemVideoClose;
 
   /**
    * Mute action
@@ -179,25 +193,37 @@ public class AnnotatorPanel extends BasePanel
   /** the ticker that takes care of toggleable bindigns */
   protected Ticker m_Ticker;
 
+  private AbstractBaseAction m_ActionOpenAnnotations;
+
+
+  private TrailFileChooser m_AnnotationsFileChooser;
+
+  private JMenuItem m_MenuItemAnnotationsOpen;
+
+  private AbstractBaseAction m_ActionSaveAnnotations;
+
 
   @Override
   protected void initialize() {
     super.initialize();
-    m_TitleGenerator 		= new TitleGenerator("Annotator", true);
-    m_dateFormatter  		= new DateFormat("HH:mm:ss");
-    m_Bindings 			= new ArrayList<>();
-    m_ExportFileChooser 	= new SpreadSheetFileChooser();
-    m_SavePropertiesFileChooser = new BaseFileChooser();
+    m_TitleGenerator 			= new TitleGenerator("Annotator", true);
+    m_dateFormatter  			= new DateFormat("HH:mm:ss");
+    m_Bindings 				= new ArrayList<>();
+    m_ExportFileChooser 		= new SpreadSheetFileChooser();
+    m_SavePropertiesFileChooser 	= new BaseFileChooser();
+    m_AnnotationsFileChooser = new TrailFileChooser();
+    m_LoadPropertiesFileChooser 	= new BaseFileChooser();
+
     m_SavePropertiesFileChooser.setAcceptAllFileFilterUsed(false);
     m_SavePropertiesFileChooser.setAutoAppendExtension(true);
     m_SavePropertiesFileChooser.addChoosableFileFilter(ExtensionFileFilter.getPropertiesFileFilter());
     m_SavePropertiesFileChooser.setDefaultExtension("props");
-    m_LoadPropertiesFileChooser = new BaseFileChooser();
     m_LoadPropertiesFileChooser.setAcceptAllFileFilterUsed(false);
     m_LoadPropertiesFileChooser.setAutoAppendExtension(true);
     m_LoadPropertiesFileChooser.addChoosableFileFilter(ExtensionFileFilter.getPropertiesFileFilter());
     m_LoadPropertiesFileChooser.setDefaultExtension("props");
-    m_EventQueue		= new EventQueue();
+
+    m_EventQueue			= new EventQueue();
     initActions();
   }
 
@@ -304,6 +330,24 @@ public class AnnotatorPanel extends BasePanel
       }
     };
     m_ActionNewTrail = action;
+
+    // Open annotations
+    action = new AbstractBaseAction("Open...", "open.gif") {
+      @Override
+      protected void doActionPerformed(ActionEvent e) {
+	openAnnotations();
+      }
+    };
+    m_ActionOpenAnnotations = action;
+
+    // Save annotations
+    action = new AbstractBaseAction("Save As...", "save.gif") {
+      @Override
+      protected void doActionPerformed(ActionEvent e) {
+	saveAnnotations();
+      }
+    };
+    m_ActionSaveAnnotations = action;
   }
 
   @Override
@@ -373,28 +417,11 @@ public class AnnotatorPanel extends BasePanel
       });
       m_MenuFileLoadRecentVideos = submenu;
 
-      //menu.addSeparator();
-
-//      // Video/Play
-//      menuitem = new JMenuItem(m_ActionPlay);
-//      menuitem.setEnabled(false);
-//      m_MenuItemVideoPlay = menuitem;
-//      menu.add(menuitem);
-//
-//      // Video/Stop
-//      menuitem = new JMenuItem(m_ActionStop);
-//      menuitem.setEnabled(false);
-//      m_MenuItemVideoStop = menuitem;
-//      menu.add(menuitem);
-//
-//      menu.addSeparator();
-
-      // Video/Quit
       menuitem = new JMenuItem("Quit", GUIHelper.getIcon("exit.png"));
       menuitem.setMnemonic('Q');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed Q"));
       menuitem.addActionListener(e -> close());
-      m_MenuItemFileClose = menuitem;
+      m_MenuItemVideoClose = menuitem;
       menu.addSeparator();
       menu.add(menuitem);
 
@@ -405,6 +432,32 @@ public class AnnotatorPanel extends BasePanel
 
       // Annotations/New
       menuitem = new JMenuItem(m_ActionNewTrail);
+      menu.add(menuitem);
+
+      // Annotations/Open
+      menuitem = new JMenuItem(m_ActionOpenAnnotations);
+      menu.add(menuitem);
+      m_MenuItemAnnotationsOpen = menuitem;
+
+      // Annotations/Open Recent
+      submenu = new JMenu("Open recent");
+      menu.add(submenu);
+      m_RecentAnnotationsHandler = new RecentFilesHandler<>(ANNOTATION_SESSION_FILE, 5, submenu);
+      m_RecentAnnotationsHandler.addRecentItemListener(new RecentItemListener<JMenu, File>() {
+	@Override
+	public void recentItemAdded(RecentItemEvent<JMenu, File> e) {
+	  // ignored
+	}
+
+	@Override
+	public void recentItemSelected(RecentItemEvent<JMenu, File> e) {
+	  openAnnotations(new PlaceholderFile(e.getItem()));
+	}
+      });
+      m_MenuAnnotationLoadRecentAnnotations = submenu;
+
+      // Annotations/Save As...
+      menuitem = new JMenuItem(m_ActionSaveAnnotations);
       menu.add(menuitem);
 
       // Annotations/Export
@@ -611,6 +664,59 @@ public class AnnotatorPanel extends BasePanel
 
     String bindingPath = m_LoadPropertiesFileChooser.getSelectedFile().getAbsolutePath();
     loadBindings(bindingPath);
+  }
+
+  /**
+   * Saves the current annotation to a trail file
+   */
+  private void saveAnnotations() {
+    Trail trail;
+    PlaceholderFile file;
+    AbstractDataContainerWriter writer;
+
+    int retVal;
+    retVal = m_AnnotationsFileChooser.showSaveDialog(this);
+    if(retVal != TrailFileChooser.APPROVE_OPTION)
+      return;
+    file 	= m_AnnotationsFileChooser.getSelectedPlaceholderFile();
+    trail 	= m_EventQueue.getTrail();
+    writer 	= m_AnnotationsFileChooser.getWriter();
+
+    writer.setOutput(file);
+    if (!writer.write(trail))
+      GUIHelper.showErrorMessage(this, "Failed to write trail to '" + file + "'!\nCheck console for error message.");
+  }
+
+  /**
+   * Loads annotations from a trail file
+   */
+  private void openAnnotations() {
+    int retVal;
+
+    retVal = m_AnnotationsFileChooser.showOpenDialog(this);
+    if(retVal != TrailFileChooser.APPROVE_OPTION)
+      return;
+
+    openAnnotations(m_AnnotationsFileChooser.getSelectedPlaceholderFile());
+
+  }
+
+
+  /**
+   * Loads annotations from a trail file
+   */
+  private void openAnnotations(PlaceholderFile file) {
+    List<Trail> readTrail;
+    AbstractTrailReader reader = (AbstractTrailReader) m_AnnotationsFileChooser.getReader();
+
+    reader.setInput(file);
+
+    readTrail = reader.read();
+    if(readTrail.size() == 0)
+      return;
+    m_EventQueue.loadTrail(readTrail.get(0));
+    m_RecentAnnotationsHandler.addRecentItem(file);
+
   }
 
   /**

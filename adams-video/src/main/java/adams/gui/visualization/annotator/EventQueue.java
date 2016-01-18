@@ -59,17 +59,34 @@ public class EventQueue implements AnnotationListener {
   }
 
   /**
-   * Resets the trail to an empty one.
+   * Resets the trail to an empty one. Clears the queue so any left over steps are not added mistakenly to the new
+   * trail.
    */
   public void resetTrail() {
+    clearQueue();
     m_Trail 	= new Trail();
   }
+
   /**
    * A getter for the trail EventQueue adds steps to
    * @return The trail we've been adding steps to
    */
   public Trail getTrail() {
     return m_Trail;
+  }
+
+  /**
+   * Loads a saved trail EventQueue adds steps to. Clears the steps queue so any remaining steps are not mistakenly
+   * added to the newly loaded queue.
+   * @param trail The trail we're loading in
+   */
+  public void loadTrail(Trail trail) {
+    m_Trail = trail;
+    clearQueue();
+  }
+
+  private void clearQueue() {
+    m_Steps.clear();
   }
 
   private void start() {
@@ -117,4 +134,5 @@ public class EventQueue implements AnnotationListener {
   public void cleanUp() {
     m_Runnable.stopExecution();
   }
+
 }
