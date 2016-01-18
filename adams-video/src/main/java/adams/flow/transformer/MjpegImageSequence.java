@@ -15,7 +15,7 @@
 
 /*
  * MjpegImageSequence.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -106,6 +106,12 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: GUIIMAGE
  * </pre>
  * 
+ * <pre>-max-images &lt;int&gt; (property: maxImages)
+ * &nbsp;&nbsp;&nbsp;The maximum number of images to extract; -1 for all.
+ * &nbsp;&nbsp;&nbsp;default: -1
+ * &nbsp;&nbsp;&nbsp;minimum: -1
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -136,6 +142,12 @@ public class MjpegImageSequence
   /** the output type. */
   protected OutputType m_OutputType;
 
+  /** the maximum number of images to output (-1 = all). */
+  protected int m_MaxImages;
+
+  /** the current of images. */
+  protected int m_Count;
+
   /**
    * Returns a string describing the object.
    *
@@ -161,6 +173,10 @@ public class MjpegImageSequence
     m_OptionManager.add(
       "output-type", "outputType",
       OutputType.GUIIMAGE);
+
+    m_OptionManager.add(
+      "max-images", "maxImages",
+      -1, -1, null);
   }
 
   /**
@@ -193,13 +209,49 @@ public class MjpegImageSequence
   }
 
   /**
+   * Sets the maximum number of images to extract.
+   *
+   * @param value	the maximum, -1 for all
+   */
+  public void setMaxImages(int value) {
+    if (getOptionManager().isValid("maxImages", value)) {
+      m_MaxImages = value;
+      reset();
+    }
+  }
+
+  /**
+   * Returns the maximum number of images to extract.
+   *
+   * @return		the maximum, -1 for all
+   */
+  public int getMaxImages() {
+    return m_MaxImages;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String maxImagesTipText() {
+    return "The maximum number of images to extract; -1 for all.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "outputType", m_OutputType);
+    String	result;
+
+    result  = QuickInfoHelper.toString(this, "outputType", m_OutputType, "output: ");
+    result +=  QuickInfoHelper.toString(this, "maxImages", (m_MaxImages <= 0 ? "all" : "" + m_MaxImages), ", # of images: ");
+
+    return result;
   }
 
   /**
@@ -249,6 +301,7 @@ public class MjpegImageSequence
 
     result = null;
 
+    m_Count = 0;
     payload = m_InputToken.getPayload();
     if ((payload instanceof String) || (payload instanceof File)) {
       if (payload instanceof String)
@@ -336,6 +389,10 @@ public class MjpegImageSequence
       result = new Token(boofcont);
     else
       result = new Token(bicont);
+
+    m_Count++;
+    if ((m_MaxImages > 0) && (m_Count >= m_MaxImages))
+      m_Video = null;
 
     updateProvenance(result);
 

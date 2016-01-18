@@ -103,6 +103,12 @@ import java.util.concurrent.TimeUnit;
  * &nbsp;&nbsp;&nbsp;minimum: 1
  * </pre>
  * 
+ * <pre>-max-images &lt;int&gt; (property: maxImages)
+ * &nbsp;&nbsp;&nbsp;The maximum number of images to extract; -1 for all.
+ * &nbsp;&nbsp;&nbsp;default: -1
+ * &nbsp;&nbsp;&nbsp;minimum: -1
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -123,6 +129,9 @@ public class MovieImageSequence
   /** the interval in milli-seconds. */
   protected int m_Interval;
 
+  /** the maximum number of images to output (-1 = all). */
+  protected int m_MaxImages;
+
   /** the reader to use. */
   protected transient IMediaReader m_Reader;
 
@@ -138,6 +147,9 @@ public class MovieImageSequence
   /** The video stream index, used to ensure we display frames from one
    * and only one video stream from the media container. */
   protected int m_VideoStreamIndex;
+
+  /** the current of images. */
+  protected int m_Count;
 
   /**
    * Returns a string describing the object.
@@ -161,6 +173,10 @@ public class MovieImageSequence
     m_OptionManager.add(
       "interval", "interval",
       1000, 1, null);
+
+    m_OptionManager.add(
+      "max-images", "maxImages",
+      -1, -1, null);
   }
 
   /**
@@ -195,13 +211,49 @@ public class MovieImageSequence
   }
 
   /**
+   * Sets the maximum number of images to extract.
+   *
+   * @param value	the maximum, -1 for all
+   */
+  public void setMaxImages(int value) {
+    if (getOptionManager().isValid("maxImages", value)) {
+      m_MaxImages = value;
+      reset();
+    }
+  }
+
+  /**
+   * Returns the maximum number of images to extract.
+   *
+   * @return		the maximum, -1 for all
+   */
+  public int getMaxImages() {
+    return m_MaxImages;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String maxImagesTipText() {
+    return "The maximum number of images to extract; -1 for all.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "interval", m_Interval) + "ms";
+    String	result;
+
+    result  = QuickInfoHelper.toString(this, "interval", m_Interval) + "ms";
+    result +=  QuickInfoHelper.toString(this, "maxImages", (m_MaxImages <= 0 ? "all" : "" + m_MaxImages), ", # of images: ");
+
+    return result;
   }
 
   /**
@@ -239,6 +291,7 @@ public class MovieImageSequence
     result = null;
 
     // reset
+    m_Count                     = 0;
     m_LastPtsWrite              = Global.NO_PTS;
     m_VideoStreamIndex          = -1;
     m_MicroSecondsBetweenFrames = Global.DEFAULT_PTS_PER_SECOND * m_Interval / 1000;
@@ -284,6 +337,10 @@ public class MovieImageSequence
 	      m_OutputToken = new Token(cont);
 	      // update last write time
 	      m_LastPtsWrite += m_MicroSecondsBetweenFrames;
+	      // reached max images?
+	      m_Count++;
+	      if ((m_MaxImages > 0) && (m_Count >= m_MaxImages))
+		m_Reader.close();
 	    }
 	  }
 	  catch (Exception e) {
@@ -311,7 +368,7 @@ public class MovieImageSequence
    */
   @Override
   public boolean hasPendingOutput() {
-    return (m_Reader != null) && (m_Reader.isOpen());
+    return (m_Reader != null) && (m_Reader.isOpen()) || (m_OutputToken != null);
   }
 
   /**
@@ -325,7 +382,7 @@ public class MovieImageSequence
 
     result = null;
 
-    while ((m_Reader.readPacket() == null) && (m_OutputToken == null)) {
+    while ((m_OutputToken == null) && (m_Reader.readPacket() == null)) {
     }
 
     if (m_OutputToken != null) {
