@@ -169,8 +169,10 @@ public class MovieImageSequence
    * @param value	the interval
    */
   public void setInterval(int value) {
-    m_Interval = value;
-    reset();
+    if (getOptionManager().isValid("interval", value)) {
+      m_Interval = value;
+      reset();
+    }
   }
 
   /**
