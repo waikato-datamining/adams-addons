@@ -15,7 +15,7 @@
 
 /**
  * ErrorContainer.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.container;
 
@@ -63,6 +63,17 @@ public class ErrorContainer
     store(VALUE_PAYLOAD, payload);
     store(VALUE_ERROR, error);
     store(VALUE_SOURCE, source);
+  }
+
+  /**
+   * Initializes the help strings.
+   */
+  protected void initHelp() {
+    super.initHelp();
+
+    addHelp(VALUE_PAYLOAD, "generic payload; " + Object.class.getName());
+    addHelp(VALUE_ERROR, "error message; " + String.class.getName());
+    addHelp(VALUE_SOURCE, "source of error; " + String.class.getName());
   }
 
   /**

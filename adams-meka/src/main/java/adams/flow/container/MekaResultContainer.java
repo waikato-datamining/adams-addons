@@ -15,16 +15,16 @@
 
 /*
  * MekaResultContainer.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.container;
 
+import meka.core.Result;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import meka.core.Result;
 
 /**
  * A container for {@link Result} objects, with optional trained model.
@@ -73,6 +73,16 @@ public class MekaResultContainer
 
     store(VALUE_RESULT, result);
     store(VALUE_MODEL,  model);
+  }
+
+  /**
+   * Initializes the help strings.
+   */
+  protected void initHelp() {
+    super.initHelp();
+
+    addHelp(VALUE_RESULT, "result container; " + Result.class.getName());
+    addHelp(VALUE_MODEL, "model object; " + Object.class.getName());
   }
 
   /**
