@@ -136,8 +136,8 @@ public class SimpleTrailReader
     byte[]			uncompressed;
     int				offset;
     int				pixel;
-    boolean			hasX;
-    boolean			hasY;
+    int				colX;
+    int				colY;
     int				i;
     String			col;
     HashMap<Integer,String> metaCols;
@@ -178,15 +178,15 @@ public class SimpleTrailReader
       getLogger().severe("Failed to read file from: " + m_Input);
       return;
     }
-    hasX     = false;
-    hasY     = false;
+    colX     = -1;
+    colY     = -1;
     metaCols = new HashMap<>();
     for (i = 0; i < sheet.getColumnNames().size(); i++) {
       col = sheet.getColumnNames().get(i);
       if (col.equals("X"))
-	hasX = true;
+	colX = i;
       if (col.equals("Y"))
-	hasY = true;
+	colY = i;
       if (col.startsWith(Trail.PREFIX_META))
 	metaCols.put(i, col.substring(Trail.PREFIX_META.length()));
     }
@@ -194,9 +194,9 @@ public class SimpleTrailReader
     trail  = new Trail();
     for (Row row: sheet.rows()) {
       step = new Step(
-	row.getCell(0).toTimeMsec(),
-	hasX ? row.getCell(1).toDouble().floatValue() : 0f,
-	hasY ? row.getCell(2).toDouble().floatValue() : 0f);
+	row.getCell(0).toAnyDateType(),
+	(colX > -1) ? row.getCell(colX).toDouble().floatValue() : 0f,
+	(colY > -1) ? row.getCell(colY).toDouble().floatValue() : 0f);
       // meta-data?
       for (int n: metaCols.keySet()) {
 	if (row.hasCell(n) && !row.getCell(n).isMissing())
