@@ -417,6 +417,9 @@ public class AnnotatorPanel extends BasePanel
       });
       m_MenuFileLoadRecentVideos = submenu;
 
+      menuitem = new JMenuItem(m_VideoPlayer.getSetSpeedAction());
+      menu.add(menuitem);
+
       menuitem = new JMenuItem("Quit", GUIHelper.getIcon("exit.png"));
       menuitem.setMnemonic('Q');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed Q"));

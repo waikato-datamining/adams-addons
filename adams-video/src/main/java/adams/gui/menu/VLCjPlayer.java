@@ -24,6 +24,7 @@ package adams.gui.menu;
 import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractMenuItemDefinition;
 import adams.gui.application.UserMode;
+import adams.gui.visualization.video.vlcjplayer.VLCjDirectRenderPanel;
 import adams.gui.visualization.video.vlcjplayer.VLCjPanel;
 
 /**
@@ -66,7 +67,7 @@ public class VLCjPlayer
    * Launches the functionality of the menu item.
    */
   public void launch() {
-    VLCjPanel panel = new VLCjPanel();
+    VLCjDirectRenderPanel panel = new VLCjDirectRenderPanel();
     panel.setTitle(getTitle());
     createChildFrame(panel, 1000, 600);
   }

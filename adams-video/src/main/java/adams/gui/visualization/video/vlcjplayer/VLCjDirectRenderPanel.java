@@ -27,25 +27,23 @@ import adams.core.Properties;
 import adams.core.logging.LoggingHelper;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.chooser.BaseFileChooser;
-import adams.gui.core.BasePanel;
-import adams.gui.core.GUIHelper;
-import adams.gui.core.MenuBarProvider;
-import adams.gui.core.RecentFilesHandler;
-import adams.gui.core.TitleGenerator;
+import adams.gui.core.*;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
-import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
+import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
+import uk.co.caprica.vlcj.player.direct.*;
+import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 
 import javax.swing.*;
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Date;
 import java.util.HashSet;
@@ -61,7 +59,7 @@ import java.util.logging.Logger;
  * @author sjb90 (sjb90 at students dot waikato dot ac dot nz)
  * @version $Revision$
  */
-public class VLCjPanel
+public class VLCjDirectRenderPanel
   extends BasePanel
   implements MenuBarProvider, CleanUpHandler {
 
@@ -152,7 +150,7 @@ public class VLCjPanel
   /**
    * the media player component used to play video
    */
-  protected EmbeddedMediaPlayerComponent m_MediaPlayerComponent;
+  protected DirectMediaPlayerComponent m_MediaPlayerComponent;
   /**
    * the logger used to output information to the adams console
    */
@@ -289,6 +287,80 @@ public class VLCjPanel
   /** the listeners for the play event. */
   protected HashSet<ActionListener> m_MuteListeners;
 
+  /*******************************************************************************************
+   * Direct rendering additions
+   */
+  protected DirectMediaPlayerComponent m_DirectVideoPlayer;
+
+  protected BasePanel m_VideoSurface;
+
+  protected final int width = 800; //getWidth();
+  protected final int height = 600; //getHeight();
+  protected BufferedImage m_Image;
+
+
+  protected void initDirectRenderingComponent() {
+
+    BufferFormatCallback bufferFormatCallback = new BufferFormatCallback() {
+      @Override
+      public BufferFormat getBufferFormat(int sourceWidth, int sourceHeight) {
+        return new RV32BufferFormat(width, height);
+      }
+    };
+
+    m_MediaPlayerComponent = new DirectMediaPlayerComponent(bufferFormatCallback) {
+      @Override
+      protected RenderCallback onGetRenderCallback() {
+        return new VideoPlayerRenderCallbackAdapter();
+      }
+    };
+
+    m_Image = GraphicsEnvironment
+      .getLocalGraphicsEnvironment()
+      .getDefaultScreenDevice()
+      .getDefaultConfiguration()
+      .createCompatibleImage(width, height);
+
+    m_VideoSurface = new VideoSurfacePanel();
+  }
+
+  private class VideoPlayerRenderCallbackAdapter extends RenderCallbackAdapter {
+
+    public VideoPlayerRenderCallbackAdapter() {
+      super(new int[width * height]);
+    }
+
+    @Override
+    protected void onDisplay(DirectMediaPlayer directMediaPlayer, int[] rgbBuffer) {
+      // Copy buffer to the image and repaint
+      m_Image.setRGB(0, 0, width, height, rgbBuffer, 0, width);
+      m_VideoSurface.repaint();
+    }
+  }
+
+  private class VideoSurfacePanel extends BasePanel {
+    private VideoSurfacePanel() {
+      setBackground(Color.black);
+      setOpaque(true);
+      setPreferredSize(new Dimension(width,height));
+      setMinimumSize(new Dimension(width, height));
+      setMaximumSize(new Dimension(width, height));
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+      Graphics2D g2 = (Graphics2D)g;
+      g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+      g2.drawImage(m_Image,0,0,getWidth(),getHeight(),null);
+    }
+  }
+
+  /*******************************************************************************************
+   * Direct rendering additions end
+   */
+
+
+
   /**
    * Gets the paused status of the video
    * @return true if video is paused
@@ -359,13 +431,16 @@ public class VLCjPanel
     m_dateFormatter  = DateUtils.getTimeFormatter();
     m_VLCInstalled   = new NativeDiscovery().discover();
     if (!m_VLCInstalled) {
-      adams.gui.core.GUIHelper.showErrorMessage(this, "VLC native libraries not found. Please install VLC:\n" +
+      GUIHelper.showErrorMessage(this, "VLC native libraries not found. Please install VLC:\n" +
 	"http://www.videolan.org/vlc/ !");
       return;
     }
 
     m_SpinnerModel = new SpinnerNumberModel(DEFAULT_RATE, MIN_RATE, MAX_RATE, RATE_STEP);
 
+    //if (m_VLCInstalled) {
+    initDirectRenderingComponent();
+    //}
     initActions();
   }
 
@@ -428,7 +503,7 @@ public class VLCjPanel
       @Override
       protected void doActionPerformed(ActionEvent e) {
 	String currentRate = Float.toString(m_MediaPlayerComponent.getMediaPlayer().getRate());
-	String rateString = GUIHelper.showInputDialog(VLCjPanel.this, "Enter Playback Speed", currentRate);
+	String rateString = GUIHelper.showInputDialog(VLCjDirectRenderPanel.this, "Enter Playback Speed", currentRate);
 	setPlaybackRate(rateString);
       }
     };
@@ -445,10 +520,10 @@ public class VLCjPanel
       m_MediaPlayerComponent.getMediaPlayer().setRate(rate);
     }
     catch (NumberFormatException numberFormatException) {
-      GUIHelper.showErrorMessage(VLCjPanel.this, "Number Format Exception: " + numberFormatException.getMessage());
+      GUIHelper.showErrorMessage(VLCjDirectRenderPanel.this, "Number Format Exception: " + numberFormatException.getMessage());
     }
     catch(NullPointerException nullException ) {
-      GUIHelper.showErrorMessage(VLCjPanel.this, "Null Pointer Exception: " + nullException.getMessage());
+      GUIHelper.showErrorMessage(VLCjDirectRenderPanel.this, "Null Pointer Exception: " + nullException.getMessage());
     }
     catch(Exception ex) {
       //Ignore
@@ -462,10 +537,7 @@ public class VLCjPanel
   public void initGUI() {
     super.initGUI();
 
-    if (m_VLCInstalled) {
-      m_MediaPlayerComponent = new EmbeddedMediaPlayerComponent();
-      add(m_MediaPlayerComponent, BorderLayout.CENTER);
-    }
+    add(m_VideoSurface, BorderLayout.CENTER);
 
     // Controls
     m_ControlsPanel = new BasePanel(new FlowLayout());
@@ -478,7 +550,7 @@ public class VLCjPanel
       double rate = (double)source.getValue();
       m_MediaPlayerComponent.getMediaPlayer().setRate((float)rate);
     });
-    //m_ControlsPanel.add(m_RateSpinner);
+    m_ControlsPanel.add(m_RateSpinner);
 
     // Slider
     m_PositionSlider = new JSlider(0, 1000, 0);
@@ -931,7 +1003,7 @@ public class VLCjPanel
   public boolean open(File file) {
     m_CurrentFile = file;
     if (!m_VLCInstalled) {
-      adams.gui.core.GUIHelper.showErrorMessage(this, "VLC native libraries not found. Please install VLC: " +
+      GUIHelper.showErrorMessage(this, "VLC native libraries not found. Please install VLC: " +
 	"http://www.videolan.org/vlc/ !");
       return false;
     }
