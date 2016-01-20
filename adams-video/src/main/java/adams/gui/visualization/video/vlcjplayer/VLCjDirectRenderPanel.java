@@ -24,16 +24,20 @@ import adams.core.CleanUpHandler;
 import adams.core.DateFormat;
 import adams.core.DateUtils;
 import adams.core.Properties;
+import adams.core.io.PlaceholderFile;
 import adams.core.logging.LoggingHelper;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.chooser.BaseFileChooser;
 import adams.gui.core.*;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
+import com.xuggle.xuggler.IContainer;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
+import uk.co.caprica.vlcj.log.NativeLog;
 import uk.co.caprica.vlcj.player.MediaPlayer;
+import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
 import uk.co.caprica.vlcj.player.direct.*;
 import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
@@ -349,10 +353,28 @@ public class VLCjDirectRenderPanel
 
     @Override
     protected void paintComponent(Graphics g) {
+      // Scaling code borrowed from ImagePanel
+      double	result;
+      double	scaleW;
+      double	scaleH;
+      int		newWidth;
+      int		newHeight;
       Graphics2D g2 = (Graphics2D)g;
       g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-      g2.drawImage(m_Image,0,0,getWidth(),getHeight(),null);
+      newWidth  = getWidth()  - 20;
+      newHeight = getHeight() - 20;
+      scaleW = (double) newWidth / (double) m_Image.getWidth();
+      scaleH = (double) newHeight / (double) m_Image.getHeight();
+      result = Math.min(scaleW, scaleH);
+      g2.scale(result, result);
+      g2.drawImage(m_Image,null,0,0);
     }
+  }
+
+  protected void getVideoDimensions(String fileName) {
+    IContainer container = IContainer.make();
+    if(container.open(fileName, IContainer.Type.READ, null) < 0)
+      return;
   }
 
   /*******************************************************************************************
@@ -596,191 +618,11 @@ public class VLCjDirectRenderPanel
       m_PlaybackTime = m_MediaPlayerComponent.getMediaPlayer().getTime();
       m_MediaLength  = m_MediaPlayerComponent.getMediaPlayer().getLength();
       m_MediaPlayerComponent.getMediaPlayer().addMediaPlayerEventListener(
-	new MediaPlayerEventListener() {
-	  @Override
-	  public void mediaChanged(MediaPlayer mediaPlayer, libvlc_media_t libvlc_media_t, String s) {
-
-	  }
-
-	  @Override
-	  public void opening(MediaPlayer mediaPlayer) {
-
-	  }
-
-	  @Override
-	  public void buffering(MediaPlayer mediaPlayer, float v) {
-
-	  }
-
-	  @Override
-	  public void playing(MediaPlayer mediaPlayer) {
-
-	  }
-
-	  @Override
-	  public void paused(MediaPlayer mediaPlayer) {
-
-	  }
-
-	  @Override
-	  public void stopped(MediaPlayer mediaPlayer) {
-
-	  }
-
-	  @Override
-	  public void forward(MediaPlayer mediaPlayer) {
-
-	  }
-
-	  @Override
-	  public void backward(MediaPlayer mediaPlayer) {
-
-	  }
-
+	new MediaPlayerEventAdapter() {
 	  @Override
 	  public void finished(MediaPlayer mediaPlayer) {
 	    m_VideoPlaying = false;
 	    updateControls();
-	  }
-
-	  @Override
-	  public void timeChanged(MediaPlayer mediaPlayer, long l) {
-
-	  }
-
-	  @Override
-	  public void positionChanged(MediaPlayer mediaPlayer, float v) {
-
-	  }
-
-	  @Override
-	  public void seekableChanged(MediaPlayer mediaPlayer, int i) {
-
-	  }
-
-	  @Override
-	  public void pausableChanged(MediaPlayer mediaPlayer, int i) {
-
-	  }
-
-	  @Override
-	  public void titleChanged(MediaPlayer mediaPlayer, int i) {
-
-	  }
-
-	  @Override
-	  public void snapshotTaken(MediaPlayer mediaPlayer, String s) {
-
-	  }
-
-	  @Override
-	  public void lengthChanged(MediaPlayer mediaPlayer, long l) {
-
-	  }
-
-	  @Override
-	  public void videoOutput(MediaPlayer mediaPlayer, int i) {
-
-	  }
-
-	  @Override
-	  public void scrambledChanged(MediaPlayer mediaPlayer, int i) {
-
-	  }
-
-	  @Override
-	  public void elementaryStreamAdded(MediaPlayer mediaPlayer, int i, int i1) {
-
-	  }
-
-	  @Override
-	  public void elementaryStreamDeleted(MediaPlayer mediaPlayer, int i, int i1) {
-
-	  }
-
-	  @Override
-	  public void elementaryStreamSelected(MediaPlayer mediaPlayer, int i, int i1) {
-
-	  }
-
-	  @Override
-	  public void corked(MediaPlayer mediaPlayer, boolean b) {
-
-	  }
-
-	  @Override
-	  public void muted(MediaPlayer mediaPlayer, boolean b) {
-
-	  }
-
-	  @Override
-	  public void volumeChanged(MediaPlayer mediaPlayer, float v) {
-
-	  }
-
-	  @Override
-	  public void audioDeviceChanged(MediaPlayer mediaPlayer, String s) {
-
-	  }
-
-	  @Override
-	  public void error(MediaPlayer mediaPlayer) {
-
-	  }
-
-	  @Override
-	  public void mediaMetaChanged(MediaPlayer mediaPlayer, int i) {
-
-	  }
-
-	  @Override
-	  public void mediaSubItemAdded(MediaPlayer mediaPlayer, libvlc_media_t libvlc_media_t) {
-
-	  }
-
-	  @Override
-	  public void mediaDurationChanged(MediaPlayer mediaPlayer, long l) {
-
-	  }
-
-	  @Override
-	  public void mediaParsedChanged(MediaPlayer mediaPlayer, int i) {
-
-	  }
-
-	  @Override
-	  public void mediaFreed(MediaPlayer mediaPlayer) {
-
-	  }
-
-	  @Override
-	  public void mediaStateChanged(MediaPlayer mediaPlayer, int i) {
-
-	  }
-
-	  @Override
-	  public void mediaSubItemTreeAdded(MediaPlayer mediaPlayer, libvlc_media_t libvlc_media_t) {
-
-	  }
-
-	  @Override
-	  public void newMedia(MediaPlayer mediaPlayer) {
-
-	  }
-
-	  @Override
-	  public void subItemPlayed(MediaPlayer mediaPlayer, int i) {
-
-	  }
-
-	  @Override
-	  public void subItemFinished(MediaPlayer mediaPlayer, int i) {
-
-	  }
-
-	  @Override
-	  public void endOfSubItems(MediaPlayer mediaPlayer) {
-
 	  }
 	}
       );
