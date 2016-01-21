@@ -44,7 +44,6 @@ import adams.gui.dialog.EditBindingsDialog;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
 import adams.gui.visualization.video.vlcjplayer.VLCjPanel;
-import com.aetrion.flickr.places.Place;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -446,6 +445,7 @@ public class AnnotatorPanel extends BasePanel
       submenu = new JMenu("Open recent");
       menu.add(submenu);
       m_RecentAnnotationsHandler = new RecentFilesHandler<>(ANNOTATION_SESSION_FILE, 5, submenu);
+      m_RecentAnnotationsHandler.setAddShortcuts(false);
       m_RecentAnnotationsHandler.addRecentItemListener(new RecentItemListener<JMenu, File>() {
 	@Override
 	public void recentItemAdded(RecentItemEvent<JMenu, File> e) {
@@ -485,6 +485,7 @@ public class AnnotatorPanel extends BasePanel
       submenu = new JMenu("Open recent");
       menu.add(submenu);
       m_RecentBindingsHandler = new RecentFilesHandler<>(BINDINGS_SESSION_FILE, 5, submenu);
+      m_RecentBindingsHandler.setAddShortcuts(false);
       m_RecentBindingsHandler.addRecentItemListener(new RecentItemListener<JMenu, File>() {
 	@Override
 	public void recentItemAdded(RecentItemEvent<JMenu, File> e) {
