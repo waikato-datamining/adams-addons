@@ -15,7 +15,7 @@
 
 /**
  * AnnotatorPanel.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.annotator;
@@ -68,33 +68,28 @@ import java.util.List;
 public class AnnotatorPanel extends BasePanel
   implements MenuBarProvider, CleanUpHandler {
 
-  /**
-   * the file to store the recent video files in.
-   */
-  public final static String VIDEO_SESSION_FILE = "AnnotatorVideoSession.props";
+  private static final long serialVersionUID = 6965340882268141821L;
 
+  public final static String VIDEO_SESSION_FILE = "AnnotatorVideoSession.props";
 
   public final static String BINDINGS_SESSION_FILE = "AnnotatorBindingSession.props";
 
   public final static String ANNOTATION_SESSION_FILE = "AnnotatorAnnotationSession.props";
 
-
-  private static final long serialVersionUID = 6965340882268141821L;
-
   /** the list to store the bindings */
-  private List<Binding> m_Bindings;
+  protected List<Binding> m_Bindings;
 
   /** a title generator */
-  private TitleGenerator m_TitleGenerator;
+  protected TitleGenerator m_TitleGenerator;
 
   /** a video player panel */
-  private VLCjPanel m_VideoPlayer;
+  protected VLCjPanel m_VideoPlayer;
 
   /** a panel for the annotation bindings */
-  private BasePanel m_BindingPanel;
+  protected BasePanel m_BindingPanel;
 
   /** dialog */
-  private EditBindingsDialog m_BindingsDialog;
+  protected EditBindingsDialog m_BindingsDialog;
 
   /** menu bad */
   protected JMenuBar m_MenuBar;
@@ -144,14 +139,20 @@ public class AnnotatorPanel extends BasePanel
   protected AbstractBaseAction m_ActionEditBindings;
 
   /**
-   * New Trail action
+   * New annotations action
    */
-  protected AbstractBaseAction m_ActionNewTrail;
+  protected AbstractBaseAction m_ActionNewAnnotations;
+
+  protected AbstractBaseAction m_ActionOpenAnnotations;
+
+  protected JMenuItem m_MenuItemAnnotationsOpen;
+
+  protected AbstractBaseAction m_ActionSaveAnnotations;
 
   /**
-   * Export trail
+   * Export annotations
    */
-  protected AbstractBaseAction m_ActionExportTrail;
+  protected AbstractBaseAction m_ActionExportAnnotations;
 
   /**
    * save bindings
@@ -169,6 +170,7 @@ public class AnnotatorPanel extends BasePanel
   protected DateFormat m_dateFormatter;
 
   protected JMenuItem m_MenuItemVideoPlay;
+
   protected JMenuItem m_MenuItemVideoStop;
 
   /** the file chooser for exporting trails. */
@@ -192,26 +194,21 @@ public class AnnotatorPanel extends BasePanel
   /** the ticker that takes care of toggleable bindigns */
   protected Ticker m_Ticker;
 
-  private AbstractBaseAction m_ActionOpenAnnotations;
+  protected TrailFileChooser m_AnnotationsFileChooser;
 
-
-  private TrailFileChooser m_AnnotationsFileChooser;
-
-  private JMenuItem m_MenuItemAnnotationsOpen;
-
-  private AbstractBaseAction m_ActionSaveAnnotations;
-
-
+  /**
+   * Initializes the members.
+   */
   @Override
   protected void initialize() {
     super.initialize();
-    m_TitleGenerator 			= new TitleGenerator("Annotator", true);
-    m_dateFormatter  			= new DateFormat("HH:mm:ss");
-    m_Bindings 				= new ArrayList<>();
-    m_ExportFileChooser 		= new SpreadSheetFileChooser();
-    m_SavePropertiesFileChooser 	= new BaseFileChooser();
-    m_AnnotationsFileChooser = new TrailFileChooser();
-    m_LoadPropertiesFileChooser 	= new BaseFileChooser();
+    m_TitleGenerator 		= new TitleGenerator("Annotator", true);
+    m_dateFormatter  		= new DateFormat("HH:mm:ss");
+    m_Bindings 			= new ArrayList<>();
+    m_ExportFileChooser 	= new SpreadSheetFileChooser();
+    m_SavePropertiesFileChooser = new BaseFileChooser();
+    m_AnnotationsFileChooser    = new TrailFileChooser();
+    m_LoadPropertiesFileChooser = new BaseFileChooser();
 
     m_SavePropertiesFileChooser.setAcceptAllFileFilterUsed(false);
     m_SavePropertiesFileChooser.setAutoAppendExtension(true);
@@ -222,13 +219,14 @@ public class AnnotatorPanel extends BasePanel
     m_LoadPropertiesFileChooser.addChoosableFileFilter(ExtensionFileFilter.getPropertiesFileFilter());
     m_LoadPropertiesFileChooser.setDefaultExtension("props");
 
-    m_EventQueue			= new EventQueue();
+    m_EventQueue		= new EventQueue();
     initActions();
   }
 
   /**
    * for initializing actions
    */
+  @SuppressWarnings("serial")
   protected void initActions(){
     AbstractBaseAction action;
 
@@ -301,7 +299,7 @@ public class AnnotatorPanel extends BasePanel
 	export();
       }
     };
-    m_ActionExportTrail = action;
+    m_ActionExportAnnotations = action;
 
     // Save Bindings
     action = new AbstractBaseAction("Save as...", "save.gif") {
@@ -328,7 +326,7 @@ public class AnnotatorPanel extends BasePanel
 	m_EventQueue.resetTrail();
       }
     };
-    m_ActionNewTrail = action;
+    m_ActionNewAnnotations = action;
 
     // Open annotations
     action = new AbstractBaseAction("Open...", "open.gif") {
@@ -349,6 +347,9 @@ public class AnnotatorPanel extends BasePanel
     m_ActionSaveAnnotations = action;
   }
 
+  /**
+   * Initializes the widgets.
+   */
   @Override
   protected void initGUI() {
     super.initGUI();
@@ -360,6 +361,9 @@ public class AnnotatorPanel extends BasePanel
     add(m_BindingPanel, BorderLayout.SOUTH);
   }
 
+  /**
+   * Finishes up the initialization.
+   */
   @Override
   protected void finishInit() {
     super.finishInit();
@@ -427,13 +431,14 @@ public class AnnotatorPanel extends BasePanel
       menu.addSeparator();
       menu.add(menuitem);
 
+      // Annotations
       menu = new JMenu("Annotations");
       result.add(menu);
       menu.setMnemonic('A');
       menu.addChangeListener(e -> updateMenu());
 
       // Annotations/New
-      menuitem = new JMenuItem(m_ActionNewTrail);
+      menuitem = new JMenuItem(m_ActionNewAnnotations);
       menu.add(menuitem);
 
       // Annotations/Open
@@ -464,7 +469,7 @@ public class AnnotatorPanel extends BasePanel
       menu.add(menuitem);
 
       // Annotations/Export
-      menuitem = new JMenuItem(m_ActionExportTrail);
+      menuitem = new JMenuItem(m_ActionExportAnnotations);
       menu.add(menuitem);
 
       // Bindings
@@ -508,9 +513,11 @@ public class AnnotatorPanel extends BasePanel
       menu.add(menuitem);
 
       m_MenuBar = result;
-    } else {
+    }
+    else {
       result = m_MenuBar;
     }
+
     return result;
   }
 
@@ -562,7 +569,7 @@ public class AnnotatorPanel extends BasePanel
   /**
    * Updates the binding bar to contain an indicator for every binding
    */
-  private void updateBindingBar() {
+  protected void updateBindingBar() {
     Runnable run = () -> {
       AnnotationPanel panel;
       resetBindingBar();
@@ -582,11 +589,10 @@ public class AnnotatorPanel extends BasePanel
     SwingUtilities.invokeLater(run);
   }
 
-  private void resetBindingBar() {
+  protected void resetBindingBar() {
     m_BindingPanel.removeAll();
     m_Ticker.removeAll();
   }
-
 
   /**
    * Sets the base title to use for the title generator.
@@ -673,7 +679,7 @@ public class AnnotatorPanel extends BasePanel
   /**
    * Saves the current annotation to a trail file
    */
-  private void saveAnnotations() {
+  protected void saveAnnotations() {
     Trail trail;
     PlaceholderFile file;
     AbstractDataContainerWriter writer;
@@ -694,7 +700,7 @@ public class AnnotatorPanel extends BasePanel
   /**
    * Loads annotations from a trail file
    */
-  private void openAnnotations() {
+  protected void openAnnotations() {
     int retVal;
 
     retVal = m_AnnotationsFileChooser.showOpenDialog(this);
@@ -702,14 +708,12 @@ public class AnnotatorPanel extends BasePanel
       return;
 
     openAnnotations(m_AnnotationsFileChooser.getSelectedPlaceholderFile());
-
   }
-
 
   /**
    * Loads annotations from a trail file
    */
-  private void openAnnotations(PlaceholderFile file) {
+  protected void openAnnotations(PlaceholderFile file) {
     List<Trail> readTrail;
     AbstractTrailReader reader = (AbstractTrailReader) m_AnnotationsFileChooser.getReader();
 
