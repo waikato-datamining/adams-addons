@@ -15,7 +15,7 @@
 
 /**
  * VLCjPanel.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.video.vlcjplayer;
@@ -24,26 +24,47 @@ import adams.core.CleanUpHandler;
 import adams.core.DateFormat;
 import adams.core.DateUtils;
 import adams.core.Properties;
-import adams.core.io.PlaceholderFile;
+import adams.core.Utils;
 import adams.core.logging.LoggingHelper;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.chooser.BaseFileChooser;
-import adams.gui.core.*;
+import adams.gui.core.BasePanel;
+import adams.gui.core.GUIHelper;
+import adams.gui.core.MenuBarProvider;
+import adams.gui.core.RecentFilesHandler;
+import adams.gui.core.TitleGenerator;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
 import com.xuggle.xuggler.IContainer;
-import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
-import uk.co.caprica.vlcj.log.NativeLog;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
-import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
-import uk.co.caprica.vlcj.player.direct.*;
+import uk.co.caprica.vlcj.player.direct.BufferFormat;
+import uk.co.caprica.vlcj.player.direct.BufferFormatCallback;
+import uk.co.caprica.vlcj.player.direct.DirectMediaPlayer;
+import uk.co.caprica.vlcj.player.direct.RenderCallback;
+import uk.co.caprica.vlcj.player.direct.RenderCallbackAdapter;
 import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -526,7 +547,8 @@ public class VLCjDirectRenderPanel
       protected void doActionPerformed(ActionEvent e) {
 	String currentRate = Float.toString(m_MediaPlayerComponent.getMediaPlayer().getRate());
 	String rateString = GUIHelper.showInputDialog(VLCjDirectRenderPanel.this, "Enter Playback Speed", currentRate);
-	setPlaybackRate(rateString);
+        if (rateString != null)
+          setPlaybackRate(rateString);
       }
     };
     m_SetSpeedAction = action;
@@ -534,21 +556,16 @@ public class VLCjDirectRenderPanel
 
   /**
    * Sets the playback rate to the given rate
-   * @param rateString
+   *
+   * @param rateString		the playback rate (1.0 is normal speed)
    */
   public void setPlaybackRate(String rateString) {
     try {
       Float rate = Float.parseFloat(rateString);
       m_MediaPlayerComponent.getMediaPlayer().setRate(rate);
     }
-    catch (NumberFormatException numberFormatException) {
-      GUIHelper.showErrorMessage(VLCjDirectRenderPanel.this, "Number Format Exception: " + numberFormatException.getMessage());
-    }
-    catch(NullPointerException nullException ) {
-      GUIHelper.showErrorMessage(VLCjDirectRenderPanel.this, "Null Pointer Exception: " + nullException.getMessage());
-    }
-    catch(Exception ex) {
-      //Ignore
+    catch (Exception e) {
+      GUIHelper.showErrorMessage(this, "Failed to parse: " + rateString + "\n" + Utils.throwableToString(e));
     }
   }
 
