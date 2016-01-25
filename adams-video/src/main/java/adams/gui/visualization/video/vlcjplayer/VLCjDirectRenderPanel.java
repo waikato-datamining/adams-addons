@@ -35,17 +35,9 @@ import adams.gui.core.RecentFilesHandler;
 import adams.gui.core.TitleGenerator;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
-import com.xuggle.xuggler.IContainer;
-import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
-import uk.co.caprica.vlcj.player.direct.BufferFormat;
-import uk.co.caprica.vlcj.player.direct.BufferFormatCallback;
-import uk.co.caprica.vlcj.player.direct.DirectMediaPlayer;
-import uk.co.caprica.vlcj.player.direct.RenderCallback;
-import uk.co.caprica.vlcj.player.direct.RenderCallbackAdapter;
-import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -58,17 +50,10 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
-import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Date;
 import java.util.HashSet;
@@ -175,7 +160,7 @@ public class VLCjDirectRenderPanel
   /**
    * the media player component used to play video
    */
-  protected DirectMediaPlayerComponent m_MediaPlayerComponent;
+  protected DirectRenderMediaPlayerPanel m_MediaPlayerComponent;
   /**
    * the logger used to output information to the adams console
    */
@@ -312,98 +297,6 @@ public class VLCjDirectRenderPanel
   /** the listeners for the play event. */
   protected HashSet<ActionListener> m_MuteListeners;
 
-  /*******************************************************************************************
-   * Direct rendering additions
-   */
-  protected DirectMediaPlayerComponent m_DirectVideoPlayer;
-
-  protected BasePanel m_VideoSurface;
-
-  protected final int width = 800; //getWidth();
-  protected final int height = 600; //getHeight();
-  protected BufferedImage m_Image;
-
-
-  protected void initDirectRenderingComponent() {
-
-    BufferFormatCallback bufferFormatCallback = new BufferFormatCallback() {
-      @Override
-      public BufferFormat getBufferFormat(int sourceWidth, int sourceHeight) {
-        return new RV32BufferFormat(width, height);
-      }
-    };
-
-    m_MediaPlayerComponent = new DirectMediaPlayerComponent(bufferFormatCallback) {
-      @Override
-      protected RenderCallback onGetRenderCallback() {
-        return new VideoPlayerRenderCallbackAdapter();
-      }
-    };
-
-    m_Image = GraphicsEnvironment
-      .getLocalGraphicsEnvironment()
-      .getDefaultScreenDevice()
-      .getDefaultConfiguration()
-      .createCompatibleImage(width, height);
-
-    m_VideoSurface = new VideoSurfacePanel();
-  }
-
-  private class VideoPlayerRenderCallbackAdapter extends RenderCallbackAdapter {
-
-    public VideoPlayerRenderCallbackAdapter() {
-      super(new int[width * height]);
-    }
-
-    @Override
-    protected void onDisplay(DirectMediaPlayer directMediaPlayer, int[] rgbBuffer) {
-      // Copy buffer to the image and repaint
-      m_Image.setRGB(0, 0, width, height, rgbBuffer, 0, width);
-      m_VideoSurface.repaint();
-    }
-  }
-
-  private class VideoSurfacePanel extends BasePanel {
-    private VideoSurfacePanel() {
-      setBackground(Color.black);
-      setOpaque(true);
-      setPreferredSize(new Dimension(width,height));
-      setMinimumSize(new Dimension(width, height));
-      setMaximumSize(new Dimension(width, height));
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-      // Scaling code borrowed from ImagePanel
-      double	result;
-      double	scaleW;
-      double	scaleH;
-      int		newWidth;
-      int		newHeight;
-      Graphics2D g2 = (Graphics2D)g;
-      g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-      newWidth  = getWidth()  - 20;
-      newHeight = getHeight() - 20;
-      scaleW = (double) newWidth / (double) m_Image.getWidth();
-      scaleH = (double) newHeight / (double) m_Image.getHeight();
-      result = Math.min(scaleW, scaleH);
-      g2.scale(result, result);
-      g2.drawImage(m_Image,null,0,0);
-    }
-  }
-
-  protected void getVideoDimensions(String fileName) {
-    IContainer container = IContainer.make();
-    if(container.open(fileName, IContainer.Type.READ, null) < 0)
-      return;
-  }
-
-  /*******************************************************************************************
-   * Direct rendering additions end
-   */
-
-
-
   /**
    * Gets the paused status of the video
    * @return true if video is paused
@@ -481,9 +374,6 @@ public class VLCjDirectRenderPanel
 
     m_SpinnerModel = new SpinnerNumberModel(DEFAULT_RATE, MIN_RATE, MAX_RATE, RATE_STEP);
 
-    //if (m_VLCInstalled) {
-    initDirectRenderingComponent();
-    //}
     initActions();
   }
 
@@ -545,7 +435,7 @@ public class VLCjDirectRenderPanel
     action = new AbstractBaseAction("Set Playback Speed...") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
-	String currentRate = Float.toString(m_MediaPlayerComponent.getMediaPlayer().getRate());
+	String currentRate = Float.toString(m_MediaPlayerComponent.getRate());
 	String rateString = GUIHelper.showInputDialog(VLCjDirectRenderPanel.this, "Enter Playback Speed", currentRate);
         if (rateString != null)
           setPlaybackRate(rateString);
@@ -562,7 +452,12 @@ public class VLCjDirectRenderPanel
   public void setPlaybackRate(String rateString) {
     try {
       Float rate = Float.parseFloat(rateString);
-      m_MediaPlayerComponent.getMediaPlayer().setRate(rate);
+      if (rate > MAX_RATE)
+        rate = (float)MAX_RATE;
+      else if (rate < MIN_RATE)
+        rate = (float)MIN_RATE;
+      m_MediaPlayerComponent.setRate(rate);
+      updateControls();
     }
     catch (Exception e) {
       GUIHelper.showErrorMessage(this, "Failed to parse: " + rateString + "\n" + Utils.throwableToString(e));
@@ -575,8 +470,8 @@ public class VLCjDirectRenderPanel
   @Override
   public void initGUI() {
     super.initGUI();
-
-    add(m_VideoSurface, BorderLayout.CENTER);
+    m_MediaPlayerComponent = new DirectRenderMediaPlayerPanel();
+    add(m_MediaPlayerComponent, BorderLayout.CENTER);
 
     // Controls
     m_ControlsPanel = new BasePanel(new FlowLayout());
@@ -587,7 +482,7 @@ public class VLCjDirectRenderPanel
     m_RateSpinner.addChangeListener(e -> {
       JSpinner source = (JSpinner)e.getSource();
       double rate = (double)source.getValue();
-      m_MediaPlayerComponent.getMediaPlayer().setRate((float)rate);
+      m_MediaPlayerComponent.setRate((float)rate);
     });
     m_ControlsPanel.add(m_RateSpinner);
 
@@ -596,7 +491,7 @@ public class VLCjDirectRenderPanel
     m_PositionSlider.addChangeListener(e -> {
       JSlider source = (JSlider) e.getSource();
       if (source.getValueIsAdjusting())
-	m_MediaPlayerComponent.getMediaPlayer().setPosition(source.getValue() / 1000F);
+	m_MediaPlayerComponent.setPosition(source.getValue() / 1000F);
     });
     m_ControlsPanel.add(m_PositionSlider);
 
@@ -624,17 +519,15 @@ public class VLCjDirectRenderPanel
   @Override
   protected void finishInit() {
     super.finishInit();
-    // Make sure our mute status is correct
-    m_SoundMuted = m_MediaPlayerComponent.getMediaPlayer().isMute();
     // Sets up a scheduled executor to update the slider position and keep the time labels up to date.
     m_Executor = Executors.newSingleThreadScheduledExecutor();
     m_ExecutorHandler = m_Executor.scheduleAtFixedRate(() -> {
-      int position = (int) (m_MediaPlayerComponent.getMediaPlayer().getPosition() * 1000.0F);
+      int position = (int) (m_MediaPlayerComponent.getPosition() * 1000.0F);
       SwingUtilities.invokeLater(() -> m_PositionSlider.setValue(position));
       // Update the current time in the video
-      m_PlaybackTime = m_MediaPlayerComponent.getMediaPlayer().getTime();
-      m_MediaLength  = m_MediaPlayerComponent.getMediaPlayer().getLength();
-      m_MediaPlayerComponent.getMediaPlayer().addMediaPlayerEventListener(
+      m_PlaybackTime = m_MediaPlayerComponent.getTime();
+      m_MediaLength  = m_MediaPlayerComponent.getLength();
+      m_MediaPlayerComponent.addMediaPlayerEventListener(
 	new MediaPlayerEventAdapter() {
 	  @Override
 	  public void finished(MediaPlayer mediaPlayer) {
@@ -776,7 +669,7 @@ public class VLCjDirectRenderPanel
    */
   public void pause() {
     if(m_VideoLoaded && m_VideoPlaying) {
-      m_MediaPlayerComponent.getMediaPlayer().pause();
+      m_MediaPlayerComponent.pause();
       m_VideoPaused = !m_VideoPaused;
       notifyPauseListeners();
       update();
@@ -794,7 +687,7 @@ public class VLCjDirectRenderPanel
       pause();
       return;
     } else {
-      m_MediaPlayerComponent.getMediaPlayer().play();
+      m_MediaPlayerComponent.play();
       m_VideoPlaying = true;
       m_VideoPaused = false;
       notifyPlayListeners();
@@ -811,7 +704,7 @@ public class VLCjDirectRenderPanel
 
     if (!m_VideoLoaded)
       return;
-    m_MediaPlayerComponent.getMediaPlayer().stop();
+    m_MediaPlayerComponent.stop();
     m_VideoPlaying = false;
     m_VideoPaused  = false;
 
@@ -822,7 +715,7 @@ public class VLCjDirectRenderPanel
    * Mutes the video
    */
   public void mute() {
-    m_SoundMuted = m_MediaPlayerComponent.getMediaPlayer().mute();
+    m_SoundMuted = m_MediaPlayerComponent.mute();
 
     update();
   }
@@ -866,7 +759,7 @@ public class VLCjDirectRenderPanel
 	"http://www.videolan.org/vlc/ !");
       return false;
     }
-    m_MediaPlayerComponent.getMediaPlayer().prepareMedia(m_CurrentFile.getAbsolutePath());
+    m_MediaPlayerComponent.open(m_CurrentFile.getAbsolutePath());
     if (m_RecentFilesHandler != null)
       m_RecentFilesHandler.addRecentItem(m_CurrentFile);
     m_VideoLoaded = true;
@@ -977,7 +870,7 @@ public class VLCjDirectRenderPanel
       // Enables or disables the slider
       m_PositionSlider.setEnabled(m_VideoLoaded && m_VLCInstalled);
       // Updates the playback time labels to show the correct numbers
-      if(!m_MediaPlayerComponent.getMediaPlayer().isPlaying()) {
+      if(!m_MediaPlayerComponent.isPlaying()) {
         m_MediaLengthLabel.setText(m_dateFormatter.format(new Date(0)));
         m_PlaybackTimeLabel.setText(m_dateFormatter.format(new Date(0)) + " /");
       }
@@ -985,6 +878,9 @@ public class VLCjDirectRenderPanel
         m_MediaLengthLabel.setText(m_dateFormatter.format(new Date(m_MediaLength)));
         m_PlaybackTimeLabel.setText(m_dateFormatter.format(new Date(m_PlaybackTime)) + " /");
       }
+
+      // Makes sure the spinner has the correct playback rate
+      m_RateSpinner.setValue((double)m_MediaPlayerComponent.getRate());
     };
 
     SwingUtilities.invokeLater(run);
@@ -1025,7 +921,7 @@ public class VLCjDirectRenderPanel
    * Returns the current video time in milliseconds
    */
   public long getTimeStamp() {
-    return m_MediaPlayerComponent.getMediaPlayer().getTime();
+    return m_MediaPlayerComponent.getTime();
   }
 
   /**

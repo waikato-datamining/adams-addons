@@ -43,6 +43,7 @@ import adams.gui.dialog.ApprovalDialog;
 import adams.gui.dialog.EditBindingsDialog;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
+import adams.gui.visualization.video.vlcjplayer.VLCjDirectRenderPanel;
 import adams.gui.visualization.video.vlcjplayer.VLCjPanel;
 
 import javax.swing.JMenu;
@@ -83,7 +84,7 @@ public class AnnotatorPanel extends BasePanel
   protected TitleGenerator m_TitleGenerator;
 
   /** a video player panel */
-  protected VLCjPanel m_VideoPlayer;
+  protected VLCjDirectRenderPanel m_VideoPlayer;
 
   /** a panel for the annotation bindings */
   protected BasePanel m_BindingPanel;
@@ -353,7 +354,7 @@ public class AnnotatorPanel extends BasePanel
   @Override
   protected void initGUI() {
     super.initGUI();
-    m_VideoPlayer	= new VLCjPanel();
+    m_VideoPlayer	= new VLCjDirectRenderPanel();
     m_BindingPanel	= new BasePanel(new FlowLayout());
     m_Ticker		= new Ticker(m_VideoPlayer);
 

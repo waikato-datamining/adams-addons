@@ -20,6 +20,7 @@
 
 package adams.gui.visualization.annotator;
 
+import adams.gui.visualization.video.vlcjplayer.VLCjDirectRenderPanel;
 import adams.gui.visualization.video.vlcjplayer.VLCjPanel;
 
 import java.util.ArrayList;
@@ -49,9 +50,9 @@ public class Ticker {
   HashMap<Long, Tick> m_Ticks;
 
   /** the media player to get timestamps from */
-  VLCjPanel m_VideoPlayer;
+  VLCjDirectRenderPanel m_VideoPlayer;
 
-  public Ticker(VLCjPanel videoPlayer) {
+  public Ticker(VLCjDirectRenderPanel videoPlayer) {
     m_Scheduler = Executors.newScheduledThreadPool(1);
     m_Handlers  = new ArrayList<>();
     m_Ticks 	= new HashMap<>();

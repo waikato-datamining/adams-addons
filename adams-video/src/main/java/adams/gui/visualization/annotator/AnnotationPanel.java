@@ -24,6 +24,7 @@ import adams.core.CleanUpHandler;
 import adams.data.trail.Step;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.core.BasePanel;
+import adams.gui.visualization.video.vlcjplayer.VLCjDirectRenderPanel;
 import adams.gui.visualization.video.vlcjplayer.VLCjPanel;
 
 import javax.swing.*;
@@ -62,7 +63,7 @@ public class AnnotationPanel extends BasePanel implements TickListener {
   protected Binding m_Binding;
 
   /** The video player we're annotating for */
-  protected VLCjPanel m_VideoPlayer;
+  protected VLCjDirectRenderPanel m_VideoPlayer;
 
   /** the action to perform when the binding is activate */
   protected AbstractBaseAction m_Action;
@@ -83,7 +84,7 @@ public class AnnotationPanel extends BasePanel implements TickListener {
    * Constructs a AnnotationPanel
    * @param binding the binding this panel manages
    */
-  public void configureAnnotationPanel(Binding binding, VLCjPanel videoPlayer) {
+  public void configureAnnotationPanel(Binding binding, VLCjDirectRenderPanel videoPlayer) {
     m_Binding 		= binding;
     m_VideoPlayer	= videoPlayer;
     m_Interval 		= binding.getInterval();
