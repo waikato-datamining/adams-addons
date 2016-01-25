@@ -79,8 +79,12 @@ public class DirectRenderMediaPlayerPanel extends BasePanel {
     double	result;
     double	scaleW;
     double	scaleH;
+    double	widthDiff;
+    double	heightDiff;
     int		newWidth;
     int		newHeight;
+    int		x = 0;
+    int		y = 0;
     Graphics2D g2 = (Graphics2D)g;
     g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
     newWidth  = getWidth();
@@ -88,8 +92,12 @@ public class DirectRenderMediaPlayerPanel extends BasePanel {
     scaleW = (double) newWidth / (double) m_VideoWidth;
     scaleH = (double) newHeight / (double) m_VideoHeight;
     result = Math.min(scaleW, scaleH);
+    widthDiff  = newWidth - (m_VideoWidth*result);
+    heightDiff = newHeight - (m_VideoHeight*result);
+    if(widthDiff > 0)
+      x = (int)(widthDiff /2);
     g2.scale(result, result);
-    g2.drawImage(m_Image,null,0,0);
+    g2.drawImage(m_Image,null,x,y);
   }
 
   public void open(String fileName) {
