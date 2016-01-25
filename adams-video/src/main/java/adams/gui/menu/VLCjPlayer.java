@@ -25,7 +25,6 @@ import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractMenuItemDefinition;
 import adams.gui.application.UserMode;
 import adams.gui.visualization.video.vlcjplayer.VLCjDirectRenderPanel;
-import adams.gui.visualization.video.vlcjplayer.VLCjPanel;
 
 /**
  * For playing videos using VLCj.
