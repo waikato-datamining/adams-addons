@@ -20,12 +20,10 @@
 
 package adams.gui.visualization.annotator;
 
-import adams.core.CleanUpHandler;
 import adams.data.trail.Step;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.core.BasePanel;
 import adams.gui.visualization.video.vlcjplayer.VLCjDirectRenderPanel;
-import adams.gui.visualization.video.vlcjplayer.VLCjPanel;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -35,9 +33,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
+
 
 /**
  * An Annotation panel that allows for the manual, i.e. non-toggleable, input from a binding

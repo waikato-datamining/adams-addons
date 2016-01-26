@@ -21,6 +21,7 @@
 package adams.gui.visualization.video.vlcjplayer;
 
 import adams.gui.core.BasePanel;
+import adams.gui.core.GUIHelper;
 import com.xuggle.xuggler.ICodec;
 import com.xuggle.xuggler.IContainer;
 import com.xuggle.xuggler.IStream;
@@ -34,7 +35,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * TODO: what class does.
+ * A panel that is a self contained Direct rendering video player.
  *
  * @author sjb90
  * @version $Revision$
@@ -74,7 +75,9 @@ public class DirectRenderMediaPlayerPanel extends BasePanel {
   }
 
   @Override
-  protected void paintComponent(Graphics g) {
+  public void paint(Graphics g) {
+    // Turns on resizing
+    boolean resize = false;
     // Scaling code borrowed from ImagePanel
     double	result;
     double	scaleW;
@@ -94,8 +97,12 @@ public class DirectRenderMediaPlayerPanel extends BasePanel {
     result = Math.min(scaleW, scaleH);
     widthDiff  = newWidth - (m_VideoWidth*result);
     heightDiff = newHeight - (m_VideoHeight*result);
-    if(widthDiff > 0)
-      x = (int)(widthDiff /2);
+    if(resize) {
+      x = (int) (widthDiff / 2);
+      y = (int) (heightDiff / 2);
+    }
+
+
     g2.scale(result, result);
     g2.drawImage(m_Image,null,x,y);
   }

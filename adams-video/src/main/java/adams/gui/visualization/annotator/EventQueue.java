@@ -25,6 +25,7 @@ import adams.data.trail.Step;
 import adams.data.trail.Trail;
 import adams.flow.core.RunnableWithLogging;
 
+import java.awt.image.BufferedImage;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -135,4 +136,11 @@ public class EventQueue implements AnnotationListener {
     m_Runnable.stopExecution();
   }
 
+  public void setBackgroundImage(BufferedImage backgroundImage) {
+    m_Trail.setBackground(backgroundImage);
+  }
+
+  public BufferedImage getBackgroundImage() {
+    return m_Trail.getBackground();
+  }
 }

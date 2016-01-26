@@ -41,10 +41,10 @@ import adams.gui.core.RecentFilesHandler;
 import adams.gui.core.TitleGenerator;
 import adams.gui.dialog.ApprovalDialog;
 import adams.gui.dialog.EditBindingsDialog;
+import adams.gui.dialog.ExtractBackgroundDialog;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
 import adams.gui.visualization.video.vlcjplayer.VLCjDirectRenderPanel;
-import adams.gui.visualization.video.vlcjplayer.VLCjPanel;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -55,6 +55,7 @@ import java.awt.Dialog;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
@@ -150,6 +151,9 @@ public class AnnotatorPanel extends BasePanel
 
   protected AbstractBaseAction m_ActionSaveAnnotations;
 
+  /** extract background action */
+  protected AbstractBaseAction m_ActionExtractBackground;
+
   /**
    * Export annotations
    */
@@ -196,6 +200,14 @@ public class AnnotatorPanel extends BasePanel
   protected Ticker m_Ticker;
 
   protected TrailFileChooser m_AnnotationsFileChooser;
+
+  /** the dialog for extracting the background image */
+  protected ExtractBackgroundDialog m_ExtractDialog;
+
+  /** the extracted background image */
+  protected BufferedImage m_BackgroundImage;
+
+
 
   /**
    * Initializes the members.
@@ -346,6 +358,21 @@ public class AnnotatorPanel extends BasePanel
       }
     };
     m_ActionSaveAnnotations = action;
+
+    action = new AbstractBaseAction("Extract Background") {
+      @Override
+      protected void doActionPerformed(ActionEvent e) {
+	m_ExtractDialog.setLocationRelativeTo(AnnotatorPanel.this);
+	m_ExtractDialog.setCurrentFile(new PlaceholderFile(m_VideoPlayer.getCurrentFile()));
+	m_ExtractDialog.setVisible(true);
+	if(m_ExtractDialog.getOption() == ApprovalDialog.APPROVE_OPTION) {
+	  m_BackgroundImage = m_ExtractDialog.getBackgroundImage();
+	  m_EventQueue.setBackgroundImage(m_BackgroundImage);
+	}
+
+      }
+    };
+    m_ActionExtractBackground = action;
   }
 
   /**
@@ -357,7 +384,7 @@ public class AnnotatorPanel extends BasePanel
     m_VideoPlayer	= new VLCjDirectRenderPanel();
     m_BindingPanel	= new BasePanel(new FlowLayout());
     m_Ticker		= new Ticker(m_VideoPlayer);
-
+    m_ExtractDialog 	= new ExtractBackgroundDialog(getParentFrame());
     add(m_VideoPlayer, BorderLayout.CENTER);
     add(m_BindingPanel, BorderLayout.SOUTH);
   }
@@ -471,6 +498,10 @@ public class AnnotatorPanel extends BasePanel
 
       // Annotations/Export
       menuitem = new JMenuItem(m_ActionExportAnnotations);
+      menu.add(menuitem);
+
+      // Annotations/Extract Background
+      menuitem = new JMenuItem(m_ActionExtractBackground);
       menu.add(menuitem);
 
       // Bindings
