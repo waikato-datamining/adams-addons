@@ -380,7 +380,7 @@ public class AnnotatorPanel extends BasePanel
     };
     m_ActionSaveAnnotations = action;
 
-    action = new AbstractBaseAction("Extract") {
+    action = new AbstractBaseAction("Extract...") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
 	if(getParentDialog() != null)
@@ -398,7 +398,6 @@ public class AnnotatorPanel extends BasePanel
 	m_ExtractDialog.setVisible(true);
 	if(m_ExtractDialog.getOption() == ApprovalDialog.APPROVE_OPTION) {
 	  m_BackgroundImage = m_ExtractDialog.getBackgroundImage();
-	  System.out.println("Image is there? " + m_BackgroundImage);
 	  m_EventQueue.setBackgroundImage(m_BackgroundImage);
 	}
 
@@ -406,7 +405,7 @@ public class AnnotatorPanel extends BasePanel
     };
     m_ActionExtractBackground = action;
 
-    action = new AbstractBaseAction("Clear") {
+    action = new AbstractBaseAction("Clear", "new.gif") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
 	clearBackground();
@@ -415,7 +414,7 @@ public class AnnotatorPanel extends BasePanel
 
     m_ActionClearBackground = action;
 
-    action = new AbstractBaseAction("Save As...") {
+    action = new AbstractBaseAction("Save As...", "save.gif") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
 	saveBackground();
@@ -424,7 +423,7 @@ public class AnnotatorPanel extends BasePanel
 
     m_ActionSaveBackground = action;
 
-    action = new AbstractBaseAction("Open...") {
+    action = new AbstractBaseAction("Open...", "open.gif") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
 	openBackground();
@@ -433,7 +432,7 @@ public class AnnotatorPanel extends BasePanel
 
     m_ActionOpenBackground = action;
 
-    action = new AbstractBaseAction("View...") {
+    action = new AbstractBaseAction("View...", "landscape.gif") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
 	viewBackground();
@@ -567,6 +566,7 @@ public class AnnotatorPanel extends BasePanel
 	  m_EventQueue.resetTrail();
 	  if(m_RecentVideosHandler != null)
 	    m_RecentVideosHandler.addRecentItem(m_VideoPlayer.getCurrentFile());
+	  revalidate();
 	}
       });
       menu.add(menuitem);
@@ -643,6 +643,7 @@ public class AnnotatorPanel extends BasePanel
 
       // Background
       menu = new JMenu("Background");
+      menu.addChangeListener(e -> updateMenu());
       result.add(menu);
       // TODO: Set a mnemonic
       // Background/Clear

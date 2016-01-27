@@ -22,9 +22,11 @@ package adams.gui.dialog;
 
 import adams.core.io.PlaceholderFile;
 import adams.data.image.BufferedImageContainer;
+import adams.data.image.multiimageoperation.AbstractBufferedImageMultiImageOperation;
 import adams.data.image.multiimageoperation.Median;
 import adams.flow.transformer.movieimagesampler.AbstractBufferedImageMovieImageSampler;
 import adams.flow.transformer.movieimagesampler.FixedIntervalBufferedImageSampler;
+import adams.gui.core.ParameterPanel;
 import adams.gui.goe.GenericObjectEditorPanel;
 import adams.gui.visualization.image.ImagePanel;
 
@@ -41,22 +43,29 @@ import java.awt.image.BufferedImage;
 public class ExtractBackgroundDialog extends ApprovalDialog {
 
   /** the sampler we're going to use */
-  AbstractBufferedImageMovieImageSampler m_ImageSampler;
+  protected AbstractBufferedImageMovieImageSampler m_ImageSampler;
+
+  /** the multi image operation we're going to use */
+  protected AbstractBufferedImageMultiImageOperation m_ImageOperation;
 
   /** preview button */
-  JButton m_ButtonPreview;
+  protected JButton m_ButtonPreview;
 
   /** Image Panel for displaying the preview */
-  ImagePanel m_ImagePanel;
+  protected ImagePanel m_ImagePanel;
 
   /** editor panel */
-  GenericObjectEditorPanel m_EditorPanel;
+  protected GenericObjectEditorPanel m_ImageSamplerSelectionPanel;
 
+  /** image operation selection panel */
+  protected GenericObjectEditorPanel m_MultiImageOperationSelectionPanel;
   /** current file */
-  PlaceholderFile m_CurrentFile;
+  protected PlaceholderFile m_CurrentFile;
 
   /** the background image extracted */
-  java.awt.image.BufferedImage m_Background;
+  protected BufferedImage m_Background;
+
+
 
   /**
    * Creates a modeless dialog without a title with the specified Dialog as
@@ -152,22 +161,35 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
    */
   @Override
   protected void initGUI() {
+    ParameterPanel ppanel;
     JPanel  panel;
     JButton button;
     super.initGUI();
 
+    ppanel = new ParameterPanel();
+
     panel = new GenericObjectEditorPanel(AbstractBufferedImageMovieImageSampler.class,
       new FixedIntervalBufferedImageSampler(),true);
-    add(panel, BorderLayout.NORTH);
-    m_EditorPanel = (GenericObjectEditorPanel)panel;
-    m_ImageSampler = (AbstractBufferedImageMovieImageSampler)m_EditorPanel.getCurrent();
+    ppanel.addParameter("Image Sampler", panel);
+    m_ImageSamplerSelectionPanel = (GenericObjectEditorPanel)panel;
+    m_ImageSampler = (AbstractBufferedImageMovieImageSampler) m_ImageSamplerSelectionPanel.getCurrent();
+    m_ImageSamplerSelectionPanel.addChangeListener(e -> m_ImageSampler =
+      (AbstractBufferedImageMovieImageSampler) m_ImageSamplerSelectionPanel.getCurrent());
 
+    panel = new GenericObjectEditorPanel(AbstractBufferedImageMultiImageOperation.class, new Median(), true);
+    ppanel.addParameter("Image Operation", panel);
+    m_MultiImageOperationSelectionPanel = (GenericObjectEditorPanel)panel;
+    m_ImageOperation = (AbstractBufferedImageMultiImageOperation)m_MultiImageOperationSelectionPanel.getCurrent();
+    m_MultiImageOperationSelectionPanel.addChangeListener(e -> m_ImageOperation =
+      (AbstractBufferedImageMultiImageOperation)m_MultiImageOperationSelectionPanel.getCurrent());
+    add(ppanel, BorderLayout.NORTH);
     panel = new ImagePanel();
     add(panel, BorderLayout.CENTER);
     m_ImagePanel = (ImagePanel) panel;
 
     button = new JButton("Preview");
-    getButtonsPanel().add(button);
+    getButtonsPanel(false).add(button);
+    getButtonsPanel(false).setComponentZOrder(button,0);
     button.addActionListener( e -> {
       extractBackground();
       m_ImagePanel.setCurrentImage(m_Background);
@@ -182,7 +204,7 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
    */
   protected void extractBackground() {
     BufferedImageContainer[] imageContainers = m_ImageSampler.sample(m_CurrentFile);
-    BufferedImageContainer bufferedImageContainer = new Median().process(imageContainers)[0];
+    BufferedImageContainer bufferedImageContainer = m_ImageOperation.process(imageContainers)[0];
     m_Background = bufferedImageContainer.getImage();
   }
 
