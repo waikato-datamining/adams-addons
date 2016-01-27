@@ -39,6 +39,8 @@ import java.util.List;
  */
 public class BindingsEditorPanel extends BasePanel{
 
+  private static final long serialVersionUID = -6197003075039879606L;
+
   /**
    * the list of current bindings
    */

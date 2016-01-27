@@ -43,14 +43,16 @@ import java.util.List;
  */
 public class AnnotationPanel extends BasePanel implements TickListener {
 
+  private static final long serialVersionUID = -8145795884307782157L;
+
   /** The thickness of the border around the button */
-  private static final int BORDER_THICKNESS = 5;
+  public static final int BORDER_THICKNESS = 5;
 
   /** the off colour for a togglable button's boarder */
-  private static final java.awt.Color OFF_COLOUR = Color.RED;
+  public static final java.awt.Color OFF_COLOUR = Color.RED;
 
   /** the on colour for a togglable button's boarder */
-  private static final java.awt.Color ON_COLOUR = Color.GREEN;
+  public static final java.awt.Color ON_COLOUR = Color.GREEN;
 
   /** The list of listeners registered with this panel */
   protected List<AnnotationListener> m_Listeners;
@@ -133,7 +135,7 @@ public class AnnotationPanel extends BasePanel implements TickListener {
    * @param binding: binding to add
    * @return
    */
-  private AbstractBaseAction addKeyBinding(Binding binding) {
+  protected AbstractBaseAction addKeyBinding(Binding binding) {
     KeyStroke keyStroke = binding.getBinding();
     if(m_IsToggleable) {
       setBorder(new LineBorder(OFF_COLOUR, BORDER_THICKNESS));
@@ -180,7 +182,7 @@ public class AnnotationPanel extends BasePanel implements TickListener {
    * Notifies all listeners
    * @param step the step to send in the notification
    */
-  private void notifyListeners(Step step) {
+  protected void notifyListeners(Step step) {
     if(m_Listeners == null) {
       return;
     }

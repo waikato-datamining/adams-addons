@@ -511,7 +511,7 @@ public class AnnotatorPanel extends BasePanel
   /**
    * Clears the current background.
    */
-  private void clearBackground() {
+  protected void clearBackground() {
     m_BackgroundImage = null;
     m_EventQueue.setBackgroundImage(null);
   }

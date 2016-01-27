@@ -31,7 +31,7 @@ import java.util.Date;
 public class TickEvent {
 
   /** the timestamp */
-  Date m_TimeStamp;
+  protected Date m_TimeStamp;
 
   /**
    * Constructor for the basic tick event

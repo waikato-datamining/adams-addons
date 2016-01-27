@@ -36,7 +36,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class EventQueue implements AnnotationListener {
 
-  private static final long SLEEP_TIME = 4000;
+  public static final long SLEEP_TIME = 4000;
+
   /** the internal queue */
   protected ConcurrentLinkedQueue<Step> m_Steps;
 
@@ -86,11 +87,11 @@ public class EventQueue implements AnnotationListener {
     clearQueue();
   }
 
-  private void clearQueue() {
+  protected void clearQueue() {
     m_Steps.clear();
   }
 
-  private void start() {
+  protected void start() {
     m_Runnable = new RunnableWithLogging() {
       @Override
       protected void doRun() {

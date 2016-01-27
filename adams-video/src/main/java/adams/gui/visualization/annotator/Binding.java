@@ -39,28 +39,28 @@ import java.security.InvalidKeyException;
  */
 public class Binding {
 
-  private static final long DEFAULT_INTERVAL = 0;
+  public static final long DEFAULT_INTERVAL = 0;
 
   /**
    * the name of the binding
    */
-  String m_Name;
+  protected String m_Name;
   /**
    * the keystroke the name is bound to
    */
-  KeyStroke m_Binding;
+  protected KeyStroke m_Binding;
   /**
    * is the binding toggleable?
    */
-  boolean m_Toggleable;
+  protected boolean m_Toggleable;
 
   /**
    * is the binding inverted
    */
-  boolean m_Inverted;
+  protected boolean m_Inverted;
 
   /** the interval to repete a toggleable binding */
-  private long m_Interval;
+  protected long m_Interval;
 
   public Binding(Properties props, String prefix) throws InvalidKeyException{
       this(props.getProperty(prefix + ".Name"),	GUIHelper.getKeyStroke(props.getProperty(prefix + ".Binding")),

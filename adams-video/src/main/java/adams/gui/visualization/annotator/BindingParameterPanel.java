@@ -20,9 +20,11 @@
 
 package adams.gui.visualization.annotator;
 
-import adams.gui.core.GUIHelper;
 import adams.gui.core.ParameterPanel;
-import javax.swing.*;
+
+import javax.swing.JCheckBox;
+import javax.swing.JFormattedTextField;
+import javax.swing.JTextField;
 import javax.swing.text.MaskFormatter;
 import java.security.InvalidKeyException;
 import java.text.NumberFormat;
@@ -35,14 +37,21 @@ import java.text.NumberFormat;
  */
 public class BindingParameterPanel extends ParameterPanel {
 
+  private static final long serialVersionUID = -3909613160168503521L;
 
   private static final int DEFAULT_TIMEOUT = 1000;
-  JTextField m_NameField;
-  KeyPressTextField m_BindingField;
-  JCheckBox m_Toggleable;
-  JCheckBox m_Inverted;
-  JFormattedTextField m_Interval;
-  MaskFormatter m_MaskFormat;
+
+  protected JTextField m_NameField;
+
+  protected KeyPressTextField m_BindingField;
+
+  protected JCheckBox m_Toggleable;
+
+  protected JCheckBox m_Inverted;
+
+  protected JFormattedTextField m_Interval;
+
+  protected MaskFormatter m_MaskFormat;
 
   @Override
   protected void initGUI() {

@@ -20,9 +20,8 @@
 
 package adams.gui.visualization.annotator;
 
-import adams.gui.core.GUIHelper;
-
-import javax.swing.*;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -34,11 +33,12 @@ import java.awt.event.KeyListener;
  */
 public class KeyPressTextField extends JTextField {
 
+  private static final long serialVersionUID = -1292173919485929114L;
+
   /** Store the last pressed key */
   protected KeyStroke m_LastPressed;
 
   protected KeyListener m_KeyListener;
-
 
   public KeyPressTextField() {
     setEditable(false);
