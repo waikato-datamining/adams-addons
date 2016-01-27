@@ -24,13 +24,18 @@ import adams.core.CleanUpHandler;
 import adams.core.DateFormat;
 import adams.core.Properties;
 import adams.core.io.PlaceholderFile;
+import adams.data.image.AbstractImageContainer;
+import adams.data.image.BufferedImageContainer;
+import adams.data.io.input.AbstractImageReader;
 import adams.data.io.input.AbstractTrailReader;
 import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.output.AbstractImageWriter;
 import adams.data.io.output.SpreadSheetWriter;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.trail.Trail;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.chooser.BaseFileChooser;
+import adams.gui.chooser.ImageFileChooser;
 import adams.gui.chooser.SpreadSheetFileChooser;
 import adams.gui.chooser.TrailFileChooser;
 import adams.gui.core.BasePanel;
@@ -44,15 +49,14 @@ import adams.gui.dialog.EditBindingsDialog;
 import adams.gui.dialog.ExtractBackgroundDialog;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
+import adams.gui.visualization.image.ImagePanel;
 import adams.gui.visualization.video.vlcjplayer.VLCjDirectRenderPanel;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
-import java.awt.BorderLayout;
-import java.awt.Dialog;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -174,10 +178,6 @@ public class AnnotatorPanel extends BasePanel
    */
   protected DateFormat m_dateFormatter;
 
-  protected JMenuItem m_MenuItemVideoPlay;
-
-  protected JMenuItem m_MenuItemVideoStop;
-
   /** the file chooser for exporting trails. */
   protected SpreadSheetFileChooser m_ExportFileChooser;
 
@@ -207,6 +207,26 @@ public class AnnotatorPanel extends BasePanel
   /** the extracted background image */
   protected BufferedImage m_BackgroundImage;
 
+  /** clear background action */
+  protected AbstractBaseAction m_ActionClearBackground;
+  /** open background action */
+  protected AbstractBaseAction m_ActionOpenBackground;
+  /** save background action */
+  protected AbstractBaseAction m_ActionSaveBackground;
+  /** view background action */
+  protected AbstractBaseAction m_ActionViewBackground;
+
+  /** file chooser for images */
+  protected ImageFileChooser m_BackgroundFileChooser;
+
+  /** menu item for background extract */
+  protected JMenuItem m_MenuItemBackgroundExtract;
+  /** menu item for bindings save as */
+  protected JMenuItem m_MenuItemBackgroundSaveAs;
+  protected JMenuItem m_MenuItemBackgroundView;
+  protected JMenuItem m_MenuItemExtract;
+
+
 
 
   /**
@@ -222,6 +242,7 @@ public class AnnotatorPanel extends BasePanel
     m_SavePropertiesFileChooser = new BaseFileChooser();
     m_AnnotationsFileChooser    = new TrailFileChooser();
     m_LoadPropertiesFileChooser = new BaseFileChooser();
+    m_BackgroundFileChooser	= new ImageFileChooser();
 
     m_SavePropertiesFileChooser.setAcceptAllFileFilterUsed(false);
     m_SavePropertiesFileChooser.setAutoAppendExtension(true);
@@ -359,20 +380,141 @@ public class AnnotatorPanel extends BasePanel
     };
     m_ActionSaveAnnotations = action;
 
-    action = new AbstractBaseAction("Extract Background") {
+    action = new AbstractBaseAction("Extract") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
+	if(getParentDialog() != null)
+	  m_ExtractDialog = new ExtractBackgroundDialog(getParentDialog(), Dialog.ModalityType.DOCUMENT_MODAL);
+	else
+	  m_ExtractDialog = new ExtractBackgroundDialog(getParentFrame(), true);
+
+
 	m_ExtractDialog.setLocationRelativeTo(AnnotatorPanel.this);
 	m_ExtractDialog.setCurrentFile(new PlaceholderFile(m_VideoPlayer.getCurrentFile()));
+	if(m_BackgroundImage != null)
+	  m_ExtractDialog.setSize(m_BackgroundImage.getWidth(), m_BackgroundImage.getHeight());
+	else
+	  m_ExtractDialog.setSize(600, 400);
 	m_ExtractDialog.setVisible(true);
 	if(m_ExtractDialog.getOption() == ApprovalDialog.APPROVE_OPTION) {
 	  m_BackgroundImage = m_ExtractDialog.getBackgroundImage();
+	  System.out.println("Image is there? " + m_BackgroundImage);
 	  m_EventQueue.setBackgroundImage(m_BackgroundImage);
 	}
 
       }
     };
     m_ActionExtractBackground = action;
+
+    action = new AbstractBaseAction("Clear") {
+      @Override
+      protected void doActionPerformed(ActionEvent e) {
+	clearBackground();
+      }
+    };
+
+    m_ActionClearBackground = action;
+
+    action = new AbstractBaseAction("Save As...") {
+      @Override
+      protected void doActionPerformed(ActionEvent e) {
+	saveBackground();
+      }
+    };
+
+    m_ActionSaveBackground = action;
+
+    action = new AbstractBaseAction("Open...") {
+      @Override
+      protected void doActionPerformed(ActionEvent e) {
+	openBackground();
+      }
+    };
+
+    m_ActionOpenBackground = action;
+
+    action = new AbstractBaseAction("View...") {
+      @Override
+      protected void doActionPerformed(ActionEvent e) {
+	viewBackground();
+      }
+    };
+
+    m_ActionViewBackground = action;
+
+  }
+
+  /**
+   * shows the current background image in a dialog
+   */
+  protected void viewBackground() {
+    ApprovalDialog d;
+    ImagePanel p;
+    p = new ImagePanel();
+    if(getParentDialog() != null)
+      d = ApprovalDialog.getInformationDialog(getParentDialog());
+    else
+      d = ApprovalDialog.getInformationDialog(getParentFrame());
+    p.setCurrentImage(m_BackgroundImage);
+    d.add(p,BorderLayout.CENTER);
+    d.setLocationRelativeTo(this);
+    if(m_BackgroundImage == null)
+      System.out.println("Background image is null");
+    d.setSize(new Dimension(m_BackgroundImage.getWidth(), m_BackgroundImage.getHeight()));
+    d.setVisible(true);
+  }
+
+  /**
+   * loads a background from a file
+   */
+  protected void openBackground() {
+    int retVal;
+
+    retVal = m_AnnotationsFileChooser.showOpenDialog(this);
+    if(retVal != TrailFileChooser.APPROVE_OPTION)
+      return;
+
+    openBackground(m_AnnotationsFileChooser.getSelectedPlaceholderFile());
+
+  }
+
+  protected void openBackground(PlaceholderFile file) {
+    AbstractImageContainer container;
+    AbstractImageReader reader = m_BackgroundFileChooser.getReader();
+
+    container = reader.read(file);
+
+    m_BackgroundImage = (BufferedImage)container.getImage();
+    m_EventQueue.setBackgroundImage(m_BackgroundImage);
+  }
+
+  /**
+   * Saves the background to the selected file
+   */
+  protected void saveBackground() {
+    PlaceholderFile file;
+    AbstractImageWriter writer;
+    BufferedImageContainer container;
+    String error;
+    int retVal;
+    retVal = m_BackgroundFileChooser.showSaveDialog(this);
+    container = new BufferedImageContainer();
+    container.setImage(m_BackgroundImage);
+    if(retVal != TrailFileChooser.APPROVE_OPTION)
+      return;
+    file 	= m_BackgroundFileChooser.getSelectedPlaceholderFile();
+    writer 	= m_BackgroundFileChooser.getWriter();
+    error = writer.write(file, container);
+    if ( error == null )
+      GUIHelper.showErrorMessage(this, "Failed to write image to '" + file + "'!");
+  }
+
+  /**
+   * Clears the current background.
+   */
+  private void clearBackground() {
+    m_BackgroundImage = null;
+    m_EventQueue.setBackgroundImage(null);
   }
 
   /**
@@ -384,7 +526,6 @@ public class AnnotatorPanel extends BasePanel
     m_VideoPlayer	= new VLCjDirectRenderPanel();
     m_BindingPanel	= new BasePanel(new FlowLayout());
     m_Ticker		= new Ticker(m_VideoPlayer);
-    m_ExtractDialog 	= new ExtractBackgroundDialog(getParentFrame());
     add(m_VideoPlayer, BorderLayout.CENTER);
     add(m_BindingPanel, BorderLayout.SOUTH);
   }
@@ -500,9 +641,34 @@ public class AnnotatorPanel extends BasePanel
       menuitem = new JMenuItem(m_ActionExportAnnotations);
       menu.add(menuitem);
 
+      // Background
+      menu = new JMenu("Background");
+      result.add(menu);
+      // TODO: Set a mnemonic
+      // Background/Clear
+      menuitem = new JMenuItem(m_ActionClearBackground);
+      menu.add(menuitem);
+      // Background/Open
+      menuitem = new JMenuItem((m_ActionOpenBackground));
+      menu.add(menuitem);
+
+      // Background/Save As
+      menuitem = new JMenuItem((m_ActionSaveBackground));
+      menu.add(menuitem);
+      m_MenuItemBackgroundSaveAs = menuitem;
+      menuitem.setEnabled(false);
+
+      // Background/View
+      menuitem = new JMenuItem((m_ActionViewBackground));
+      menu.add(menuitem);
+      m_MenuItemBackgroundView = menuitem;
+      menuitem.setEnabled(false);
+
       // Annotations/Extract Background
       menuitem = new JMenuItem(m_ActionExtractBackground);
       menu.add(menuitem);
+      m_MenuItemBackgroundExtract = menuitem;
+      menuitem.setEnabled(false);
 
       // Bindings
       menu = new JMenu("Bindings");
@@ -583,6 +749,20 @@ public class AnnotatorPanel extends BasePanel
   protected void updateMenu() {
     if (m_MenuBar == null)
       return;
+    if(m_VideoPlayer.isVideoLoaded()) {
+      m_MenuItemBackgroundExtract.setEnabled(true);
+    }
+    else {
+      m_MenuItemBackgroundExtract.setEnabled(false);
+    }
+    if(m_BackgroundImage != null) {
+      m_MenuItemBackgroundSaveAs.setEnabled(true);
+      m_MenuItemBackgroundView.setEnabled(true);
+    }
+    else {
+      m_MenuItemBackgroundSaveAs.setEnabled(false);
+      m_MenuItemBackgroundView.setEnabled(false);
+    }
   }
 
   @Override

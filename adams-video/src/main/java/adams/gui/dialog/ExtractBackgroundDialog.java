@@ -25,12 +25,12 @@ import adams.data.image.BufferedImageContainer;
 import adams.data.image.multiimageoperation.Median;
 import adams.flow.transformer.movieimagesampler.AbstractBufferedImageMovieImageSampler;
 import adams.flow.transformer.movieimagesampler.FixedIntervalBufferedImageSampler;
-import adams.gui.clipboard.BufferedImage;
 import adams.gui.goe.GenericObjectEditorPanel;
 import adams.gui.visualization.image.ImagePanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /**
  * Extracts the background from a video and stores it as an image
@@ -171,16 +171,26 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
     button.addActionListener( e -> {
       extractBackground();
       m_ImagePanel.setCurrentImage(m_Background);
+      setSize(m_Background.getWidth(), m_Background.getHeight());
     });
+
+    getApproveButton().addActionListener(e -> extractBackground());
   }
 
+  /**
+   * Extracts the background from a given video
+   */
   protected void extractBackground() {
     BufferedImageContainer[] imageContainers = m_ImageSampler.sample(m_CurrentFile);
     BufferedImageContainer bufferedImageContainer = new Median().process(imageContainers)[0];
     m_Background = bufferedImageContainer.getImage();
   }
 
-  public java.awt.image.BufferedImage getBackgroundImage() {
+  /**
+   * a getter for the background image
+   * @return the calculated background fro the current video
+   */
+  public BufferedImage getBackgroundImage() {
     return m_Background;
   }
 
