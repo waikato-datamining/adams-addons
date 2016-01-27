@@ -18,7 +18,7 @@
  * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
  */
 
-package adams.gui.dialog;
+package adams.gui.visualization.annotator;
 
 import adams.core.io.PlaceholderFile;
 import adams.data.image.BufferedImageContainer;
@@ -27,6 +27,7 @@ import adams.data.image.multiimageoperation.Median;
 import adams.flow.transformer.movieimagesampler.AbstractBufferedImageMovieImageSampler;
 import adams.flow.transformer.movieimagesampler.FixedIntervalBufferedImageSampler;
 import adams.gui.core.ParameterPanel;
+import adams.gui.dialog.ApprovalDialog;
 import adams.gui.goe.GenericObjectEditorPanel;
 import adams.gui.visualization.image.ImagePanel;
 
