@@ -383,24 +383,21 @@ public class AnnotatorPanel extends BasePanel
     action = new AbstractBaseAction("Extract...") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
-	if(getParentDialog() != null)
-	  m_ExtractDialog = new ExtractBackgroundDialog(getParentDialog(), Dialog.ModalityType.DOCUMENT_MODAL);
-	else
-	  m_ExtractDialog = new ExtractBackgroundDialog(getParentFrame(), true);
-
-
-	m_ExtractDialog.setLocationRelativeTo(AnnotatorPanel.this);
-	m_ExtractDialog.setCurrentFile(new PlaceholderFile(m_VideoPlayer.getCurrentFile()));
-	if(m_BackgroundImage != null)
-	  m_ExtractDialog.setSize(m_BackgroundImage.getWidth(), m_BackgroundImage.getHeight());
-	else
+	if (m_ExtractDialog == null) {
+	  if (getParentDialog() != null)
+	    m_ExtractDialog = new ExtractBackgroundDialog(getParentDialog(), Dialog.ModalityType.DOCUMENT_MODAL);
+	  else
+	    m_ExtractDialog = new ExtractBackgroundDialog(getParentFrame(), true);
 	  m_ExtractDialog.setSize(600, 400);
+	  m_ExtractDialog.setLocationRelativeTo(AnnotatorPanel.this);
+	}
+
+	m_ExtractDialog.setCurrentFile(new PlaceholderFile(m_VideoPlayer.getCurrentFile()));
 	m_ExtractDialog.setVisible(true);
 	if(m_ExtractDialog.getOption() == ApprovalDialog.APPROVE_OPTION) {
 	  m_BackgroundImage = m_ExtractDialog.getBackgroundImage();
 	  m_EventQueue.setBackgroundImage(m_BackgroundImage);
 	}
-
       }
     };
     m_ActionExtractBackground = action;
@@ -779,6 +776,10 @@ public class AnnotatorPanel extends BasePanel
     if (m_EventQueue != null) {
       m_EventQueue.cleanUp();
       m_EventQueue = null;
+    }
+    if (m_ExtractDialog != null) {
+      m_ExtractDialog.dispose();
+      m_ExtractDialog = null;
     }
   }
 

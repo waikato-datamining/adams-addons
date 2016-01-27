@@ -42,6 +42,8 @@ import java.awt.image.BufferedImage;
  */
 public class ExtractBackgroundDialog extends ApprovalDialog {
 
+  private static final long serialVersionUID = 9156143578421221640L;
+
   /** the sampler we're going to use */
   protected AbstractBufferedImageMovieImageSampler m_ImageSampler;
 
@@ -156,6 +158,7 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
   public void setCurrentFile(PlaceholderFile file) {
     m_CurrentFile = file;
   }
+
   /**
    * Initializes the widgets.
    */
@@ -163,8 +166,10 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
   protected void initGUI() {
     ParameterPanel ppanel;
     JPanel  panel;
-    JButton button;
+
     super.initGUI();
+
+    setTitle("Extract background");
 
     ppanel = new ParameterPanel();
 
@@ -183,17 +188,16 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
     m_MultiImageOperationSelectionPanel.addChangeListener(e -> m_ImageOperation =
       (AbstractBufferedImageMultiImageOperation)m_MultiImageOperationSelectionPanel.getCurrent());
     add(ppanel, BorderLayout.NORTH);
-    panel = new ImagePanel();
-    add(panel, BorderLayout.CENTER);
-    m_ImagePanel = (ImagePanel) panel;
+    m_ImagePanel = new ImagePanel();
+    add(m_ImagePanel, BorderLayout.CENTER);
 
-    button = new JButton("Preview");
-    getButtonsPanel(false).add(button);
-    getButtonsPanel(false).setComponentZOrder(button,0);
-    button.addActionListener( e -> {
+    m_ButtonPreview = new JButton("Preview");
+    getButtonsPanel(false).add(m_ButtonPreview);
+    getButtonsPanel(false).setComponentZOrder(m_ButtonPreview,0);
+    m_ButtonPreview.addActionListener( e -> {
       extractBackground();
       m_ImagePanel.setCurrentImage(m_Background);
-      setSize(m_Background.getWidth(), m_Background.getHeight());
+      SwingUtilities.invokeLater(() -> m_ImagePanel.setScale(-1));
     });
 
     getApproveButton().addActionListener(e -> extractBackground());
@@ -214,13 +218,5 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
    */
   public BufferedImage getBackgroundImage() {
     return m_Background;
-  }
-
-  /**
-   * Initializes the members.
-   */
-  @Override
-  protected void initialize() {
-    super.initialize();
   }
 }
