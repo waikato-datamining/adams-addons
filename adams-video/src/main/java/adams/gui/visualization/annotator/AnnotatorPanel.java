@@ -593,9 +593,12 @@ public class AnnotatorPanel extends BasePanel
     }
     if (m_VideoPlayer != null) {
       m_VideoPlayer.cleanUp();
+      m_VideoPlayer = null;
     }
-    if (m_EventQueue != null)
+    if (m_EventQueue != null) {
       m_EventQueue.cleanUp();
+      m_EventQueue = null;
+    }
   }
 
   /**

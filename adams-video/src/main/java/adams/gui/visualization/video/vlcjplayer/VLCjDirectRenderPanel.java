@@ -473,7 +473,7 @@ public class VLCjDirectRenderPanel
     m_RateSpinner.addChangeListener(e -> {
       JSpinner source = (JSpinner)e.getSource();
       double rate = (double)source.getValue();
-      m_MediaPlayerComponent.setRate((float)rate);
+      m_MediaPlayerComponent.setRate((float) rate);
     });
     m_ControlsPanel.add(m_RateSpinner);
 
@@ -775,9 +775,14 @@ public class VLCjDirectRenderPanel
    */
   @Override
   public void cleanUp() {
-    if (m_MediaPlayerComponent != null)
+    if (m_MediaPlayerComponent != null) {
       m_MediaPlayerComponent.release();
-    m_ExecutorHandler.cancel(true);
+      m_MediaPlayerComponent = null;
+    }
+    if (m_ExecutorHandler != null) {
+      m_ExecutorHandler.cancel(true);
+      m_ExecutorHandler = null;
+    }
   }
 
   /**
@@ -835,7 +840,7 @@ public class VLCjDirectRenderPanel
    */
   protected void updateControls() {
     Runnable run;
-    if (m_ControlsPanel == null || m_StopButton == null || m_PlayButton == null || m_PositionSlider == null) {
+    if (m_ControlsPanel == null || m_StopButton == null || m_PlayButton == null || m_PositionSlider == null || m_MediaPlayerComponent == null) {
       return;
     }
     run = () -> {
