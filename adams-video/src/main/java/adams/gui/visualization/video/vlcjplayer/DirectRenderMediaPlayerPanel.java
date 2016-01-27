@@ -21,17 +21,23 @@
 package adams.gui.visualization.video.vlcjplayer;
 
 import adams.gui.core.BasePanel;
-import adams.gui.core.GUIHelper;
 import com.xuggle.xuggler.ICodec;
 import com.xuggle.xuggler.IContainer;
 import com.xuggle.xuggler.IStream;
 import com.xuggle.xuggler.IStreamCoder;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
-import uk.co.caprica.vlcj.player.direct.*;
+import uk.co.caprica.vlcj.player.direct.BufferFormatCallback;
+import uk.co.caprica.vlcj.player.direct.DirectMediaPlayer;
+import uk.co.caprica.vlcj.player.direct.RenderCallback;
+import uk.co.caprica.vlcj.player.direct.RenderCallbackAdapter;
 import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
 /**
@@ -124,6 +130,10 @@ public class DirectRenderMediaPlayerPanel extends BasePanel {
       }
     };
     m_MediaComponent.getMediaPlayer().prepareMedia(fileName);
+
+    invalidate();
+    revalidate();
+    repaint();
   }
 
   protected int getVideoDimensions(String fileName) {
