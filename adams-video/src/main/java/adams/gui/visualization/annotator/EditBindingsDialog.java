@@ -18,9 +18,10 @@
  * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
  */
 
-package adams.gui.dialog;
+package adams.gui.visualization.annotator;
 
 
+import adams.gui.dialog.ApprovalDialog;
 import adams.gui.visualization.annotator.Binding;
 import adams.gui.visualization.annotator.BindingsEditorPanel;
 

@@ -23,7 +23,6 @@ package adams.gui.visualization.annotator;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.core.BaseListWithButtons;
 import adams.gui.core.BasePanel;
-import adams.gui.dialog.EditBindingDialog;
 
 import javax.swing.*;
 import java.awt.*;
