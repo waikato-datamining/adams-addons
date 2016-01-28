@@ -518,17 +518,17 @@ public class VLCjDirectRenderPanel
       // Update the current time in the video
       m_PlaybackTime = m_MediaPlayerComponent.getTime();
       m_MediaLength  = m_MediaPlayerComponent.getLength();
-      m_MediaPlayerComponent.addMediaPlayerEventListener(
-	new MediaPlayerEventAdapter() {
-	  @Override
-	  public void finished(MediaPlayer mediaPlayer) {
-	    m_VideoPlaying = false;
-	    updateControls();
-	  }
-	}
-      );
       updateControls();
     }, 0L, 1L, TimeUnit.SECONDS);
+    m_MediaPlayerComponent.addMediaPlayerEventListener(
+      new MediaPlayerEventAdapter() {
+        @Override
+        public void finished(MediaPlayer mediaPlayer) {
+          m_VideoPlaying = false;
+          updateControls();
+        }
+      }
+    );
   }
 
   /**
@@ -866,7 +866,7 @@ public class VLCjDirectRenderPanel
       // Enables or disables the slider
       m_PositionSlider.setEnabled(m_VideoLoaded && m_VLCInstalled);
       // Updates the playback time labels to show the correct numbers
-      if(!m_MediaPlayerComponent.isPlaying()) {
+      if(!(m_MediaPlayerComponent.isPlaying() || m_VideoPaused)) {
         m_MediaLengthLabel.setText(m_dateFormatter.format(new Date(0)));
         m_PlaybackTimeLabel.setText(m_dateFormatter.format(new Date(0)) + " /");
       }
