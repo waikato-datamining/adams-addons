@@ -105,13 +105,23 @@ public class AnnotatorPanel extends BasePanel
   /** menu item for 'open' */
   protected JMenuItem m_MenuItemFileOpen;
 
-  /**
-   * for handling recent files.
-   */
+  /** Recent file handler for videos */
   protected RecentFilesHandler<JMenu> m_RecentVideosHandler;
+
+  /** recent files menu for videos */
   protected JMenu m_MenuFileLoadRecentVideos;
+
+  /** Recent file handler for Annotations */
   protected RecentFilesHandler<JMenu> m_RecentAnnotationsHandler;
+
+  /** recent files menu for Annotations */
   protected JMenu m_MenuAnnotationLoadRecentAnnotations;
+
+  /** Recent file handler for backgrounds */
+  protected RecentFilesHandler<JMenu> m_RecentBackgroundHandler;
+
+  /** recent files menu for backgrounds */
+  protected JMenu m_MenuBackgroundLoadRecentBackground;
 
   /**
    * for closing the program
@@ -227,8 +237,6 @@ public class AnnotatorPanel extends BasePanel
   protected JMenuItem m_MenuItemBackgroundSaveAs;
   protected JMenuItem m_MenuItemBackgroundView;
   protected JMenuItem m_MenuItemExtract;
-  private JMenu m_MenuBackgroundLoadRecentAnnotations;
-  private RecentFilesHandler<JMenu> m_RecentBackgroundHandler;
 
 
   /**
@@ -382,7 +390,7 @@ public class AnnotatorPanel extends BasePanel
     };
     m_ActionSaveAnnotations = action;
 
-    action = new AbstractBaseAction("Extract...") {
+    action = new AbstractBaseAction("Extract...", "preferences.png") {
       @Override
       protected void doActionPerformed(ActionEvent e) {
 	if (m_ExtractDialog == null) {
@@ -668,7 +676,7 @@ public class AnnotatorPanel extends BasePanel
 	  openBackground(new PlaceholderFile(e.getItem()));
 	}
       });
-      m_MenuBackgroundLoadRecentAnnotations = submenu;
+      m_MenuBackgroundLoadRecentBackground = submenu;
 
 
       // Background/Save As

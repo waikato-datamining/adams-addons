@@ -135,7 +135,7 @@ public class EditBindingsDialog extends ApprovalDialog {
 
     m_BindignPanel = new BindingsEditorPanel();
     getContentPane().add(m_BindignPanel, BorderLayout.CENTER);
-    setSize(600, 600);
+    setSize(300, 200);
     setTitle("Edit bindings");
   }
 
