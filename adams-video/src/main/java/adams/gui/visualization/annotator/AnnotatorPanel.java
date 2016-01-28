@@ -46,7 +46,6 @@ import adams.gui.core.RecentFilesHandler;
 import adams.gui.core.TitleGenerator;
 import adams.gui.dialog.ApprovalDialog;
 import adams.gui.dialog.EditBindingsDialog;
-import adams.gui.dialog.ExtractBackgroundDialog;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
 import adams.gui.visualization.image.ImagePanel;
