@@ -68,8 +68,6 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
   /** the background image extracted */
   protected BufferedImage m_Background;
 
-
-
   /**
    * Creates a modeless dialog without a title with the specified Dialog as
    * its owner.
@@ -156,10 +154,6 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
     super(owner, title, modal);
   }
 
-  public void setCurrentFile(PlaceholderFile file) {
-    m_CurrentFile = file;
-  }
-
   /**
    * Initializes the widgets.
    */
@@ -197,20 +191,55 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
     getButtonsPanel(false).setComponentZOrder(m_ButtonPreview,0);
     m_ButtonPreview.addActionListener( e -> {
       extractBackground();
-      m_ImagePanel.setCurrentImage(m_Background);
-      SwingUtilities.invokeLater(() -> m_ImagePanel.setScale(-1));
     });
+  }
 
-    getApproveButton().addActionListener(e -> extractBackground());
+  /**
+   * The current video file.
+   *
+   * @param file	the file
+   */
+  public void setCurrentFile(PlaceholderFile file) {
+    m_CurrentFile = file;
+    m_Background  = null;
+    updateButtons();
+  }
+
+  /**
+   * Returns the current video file.
+   *
+   * @return		the file
+   */
+  public PlaceholderFile getCurrentFile() {
+    return m_CurrentFile;
   }
 
   /**
    * Extracts the background from a given video
    */
   protected void extractBackground() {
-    BufferedImageContainer[] imageContainers = m_ImageSampler.sample(m_CurrentFile);
-    BufferedImageContainer bufferedImageContainer = m_ImageOperation.process(imageContainers)[0];
-    m_Background = bufferedImageContainer.getImage();
+    SwingWorker 	worker;
+
+    worker = new SwingWorker() {
+      @Override
+      protected Object doInBackground() throws Exception {
+	setCursor(new Cursor(Cursor.WAIT_CURSOR));
+	BufferedImageContainer[] imageContainers = m_ImageSampler.sample(m_CurrentFile);
+	BufferedImageContainer bufferedImageContainer = m_ImageOperation.process(imageContainers)[0];
+	m_Background = bufferedImageContainer.getImage();
+	m_ImagePanel.setCurrentImage(m_Background);
+	SwingUtilities.invokeLater(() -> m_ImagePanel.setScale(-1));
+	return null;
+      }
+
+      @Override
+      protected void done() {
+	super.done();
+	setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+	updateButtons();
+      }
+    };
+    worker.execute();
   }
 
   /**
@@ -219,5 +248,12 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
    */
   public BufferedImage getBackgroundImage() {
     return m_Background;
+  }
+
+  /**
+   * Updates the state of the buttons.
+   */
+  protected void updateButtons() {
+    m_ButtonApprove.setEnabled(m_Background != null);
   }
 }

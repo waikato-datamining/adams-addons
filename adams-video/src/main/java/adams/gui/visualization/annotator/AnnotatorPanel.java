@@ -656,9 +656,10 @@ public class AnnotatorPanel extends BasePanel
 
       // Background
       menu = new JMenu("Background");
+      menu.setMnemonic('g');
       menu.addChangeListener(e -> updateMenu());
       result.add(menu);
-      // TODO: Set a mnemonic
+
       // Background/Clear
       menuitem = new JMenuItem(m_ActionClearBackground);
       menu.add(menuitem);
