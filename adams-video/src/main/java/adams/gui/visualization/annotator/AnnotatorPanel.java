@@ -453,20 +453,27 @@ public class AnnotatorPanel extends BasePanel
    * shows the current background image in a dialog
    */
   protected void viewBackground() {
-    ApprovalDialog d;
-    ImagePanel p;
-    p = new ImagePanel();
+    ApprovalDialog dlg;
+    ImagePanel panel;
+
+    if (m_BackgroundImage == null) {
+      GUIHelper.showErrorMessage(this, "No background image available!");
+      return;
+    }
+
     if(getParentDialog() != null)
-      d = ApprovalDialog.getInformationDialog(getParentDialog());
+      dlg = ApprovalDialog.getInformationDialog(getParentDialog());
     else
-      d = ApprovalDialog.getInformationDialog(getParentFrame());
-    p.setCurrentImage(m_BackgroundImage);
-    d.add(p,BorderLayout.CENTER);
-    d.setLocationRelativeTo(this);
-    if(m_BackgroundImage == null)
-      System.out.println("Background image is null");
-    d.setSize(new Dimension(m_BackgroundImage.getWidth(), m_BackgroundImage.getHeight()));
-    d.setVisible(true);
+      dlg = ApprovalDialog.getInformationDialog(getParentFrame());
+    dlg.setDefaultCloseOperation(ApprovalDialog.DISPOSE_ON_CLOSE);
+    dlg.setTitle("Background");
+    panel = new ImagePanel();
+    panel.setCurrentImage(m_BackgroundImage);
+    panel.setScale(-1);
+    dlg.add(panel, BorderLayout.CENTER);
+    dlg.setSize(640, 480);
+    dlg.setLocationRelativeTo(this);
+    dlg.setVisible(true);
   }
 
   /**
