@@ -46,6 +46,7 @@ import adams.gui.core.RecentFilesHandler;
 import adams.gui.core.TitleGenerator;
 import adams.gui.dialog.ApprovalDialog;
 import adams.gui.dialog.EditBindingsDialog;
+import adams.gui.dialog.ExtractBackgroundDialog;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
 import adams.gui.visualization.image.ImagePanel;
@@ -80,6 +81,8 @@ public class AnnotatorPanel extends BasePanel
   public final static String BINDINGS_SESSION_FILE = "AnnotatorBindingSession.props";
 
   public final static String ANNOTATION_SESSION_FILE = "AnnotatorAnnotationSession.props";
+
+  public final static String BACKGROUND_SESSION_FILE = "AnnotatorBackgroundSession.props";
 
   /** the list to store the bindings */
   protected List<Binding> m_Bindings;
@@ -224,8 +227,8 @@ public class AnnotatorPanel extends BasePanel
   protected JMenuItem m_MenuItemBackgroundSaveAs;
   protected JMenuItem m_MenuItemBackgroundView;
   protected JMenuItem m_MenuItemExtract;
-
-
+  private JMenu m_MenuBackgroundLoadRecentAnnotations;
+  private RecentFilesHandler<JMenu> m_RecentBackgroundHandler;
 
 
   /**
@@ -465,11 +468,11 @@ public class AnnotatorPanel extends BasePanel
   protected void openBackground() {
     int retVal;
 
-    retVal = m_AnnotationsFileChooser.showOpenDialog(this);
-    if(retVal != TrailFileChooser.APPROVE_OPTION)
+    retVal = m_BackgroundFileChooser.showOpenDialog(this);
+    if(retVal != ImageFileChooser.APPROVE_OPTION)
       return;
 
-    openBackground(m_AnnotationsFileChooser.getSelectedPlaceholderFile());
+    openBackground(m_BackgroundFileChooser.getSelectedPlaceholderFile());
 
   }
 
@@ -648,6 +651,25 @@ public class AnnotatorPanel extends BasePanel
       // Background/Open
       menuitem = new JMenuItem((m_ActionOpenBackground));
       menu.add(menuitem);
+
+      // Background/OpenRecent
+      submenu = new JMenu("Open recent");
+      menu.add(submenu);
+      m_RecentBackgroundHandler = new RecentFilesHandler<>(BACKGROUND_SESSION_FILE, 5, submenu);
+      m_RecentBackgroundHandler.setAddShortcuts(false);
+      m_RecentBackgroundHandler.addRecentItemListener(new RecentItemListener<JMenu, File>() {
+	@Override
+	public void recentItemAdded(RecentItemEvent<JMenu, File> e) {
+	  // ignored
+	}
+
+	@Override
+	public void recentItemSelected(RecentItemEvent<JMenu, File> e) {
+	  openBackground(new PlaceholderFile(e.getItem()));
+	}
+      });
+      m_MenuBackgroundLoadRecentAnnotations = submenu;
+
 
       // Background/Save As
       menuitem = new JMenuItem((m_ActionSaveBackground));
