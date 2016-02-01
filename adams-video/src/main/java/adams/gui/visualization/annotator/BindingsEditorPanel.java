@@ -100,12 +100,12 @@ public class BindingsEditorPanel extends BasePanel{
 	  else
 	    m_EditDialog = new EditBindingDialog(getParentFrame(), true);
 	  m_EditDialog.pack();
-	  m_EditDialog.setTitle("Add binding");
 	}
 	else {
 	  m_EditDialog.clearFields();
 	}
-	m_EditDialog.setLocationRelativeTo(BindingsEditorPanel.this);
+        m_EditDialog.setTitle("Add Shortcut");
+        m_EditDialog.setLocationRelativeTo(BindingsEditorPanel.this);
 	m_EditDialog.setVisible(true);
         Binding binding = m_EditDialog.getBinding();
 	if(binding != null)
@@ -123,14 +123,14 @@ public class BindingsEditorPanel extends BasePanel{
 	  else
 	    m_EditDialog = new EditBindingDialog(getParentFrame(), true);
 	  m_EditDialog.pack();
-	  m_EditDialog.setTitle("Add binding");
 	  m_EditDialog.loadBinding(m_Model.get(indices[0]));
 	}
 	else {
 	  m_EditDialog.clearFields();
 	  m_EditDialog.loadBinding(m_Model.get(indices[0]));
 	}
-	m_EditDialog.setLocationRelativeTo(BindingsEditorPanel.this);
+        m_EditDialog.setTitle("Edit Shortcut");
+        m_EditDialog.setLocationRelativeTo(BindingsEditorPanel.this);
 	m_EditDialog.setVisible(true);
 	Binding binding = m_EditDialog.getBinding();
 	if(binding != null) {

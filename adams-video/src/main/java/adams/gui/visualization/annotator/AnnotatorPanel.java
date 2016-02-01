@@ -703,21 +703,21 @@ public class AnnotatorPanel extends BasePanel
       m_MenuItemBackgroundExtract = menuitem;
       menuitem.setEnabled(false);
 
-      // Bindings
-      menu = new JMenu("Bindings");
+      // Shortcuts
+      menu = new JMenu("Shortcuts");
       result.add(menu);
-      menu.setMnemonic('B');
+      menu.setMnemonic('H');
       menu.addChangeListener(e -> updateMenu());
 
-      // Bindings/New Bindings
+      // Shortcuts/New Shortcuts
       menuitem = new JMenuItem(m_ActionNewBindings);
       menu.add(menuitem);
 
-      // Bindings/Open Bindings
+      // Shortcuts/Open Shortcuts
       menuitem = new JMenuItem(m_ActionLoadBindings);
       menu.add(menuitem);
 
-      // Bindings/Recent files
+      // Shortcuts/Recent files
       submenu = new JMenu("Open recent");
       menu.add(submenu);
       m_RecentBindingsHandler = new RecentFilesHandler<>(BINDINGS_SESSION_FILE, 5, submenu);
@@ -735,11 +735,11 @@ public class AnnotatorPanel extends BasePanel
       });
       m_MenuFileLoadRecentBindings = submenu;
 
-      // Bindings/Edit Bindings
+      // Shortcuts/Edit Shortcuts
       menuitem = new JMenuItem(m_ActionEditBindings);
       menu.add(menuitem);
 
-      // Bindings/Save Bindings
+      // Shortcuts/Save Shortcuts
       menuitem = new JMenuItem(m_ActionSaveBindings);
       menu.add(menuitem);
 

@@ -23,9 +23,18 @@ package adams.gui.visualization.annotator;
 import adams.core.base.BaseTimeMsec;
 import adams.data.image.BufferedImageContainer;
 import adams.flow.transformer.movieimagesampler.AbstractBufferedImageMovieImageSampler;
+import com.sun.jna.Memory;
+import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
+import uk.co.caprica.vlcj.player.condition.Condition;
+import uk.co.caprica.vlcj.player.condition.conditions.PlayingCondition;
+import uk.co.caprica.vlcj.player.direct.BufferFormat;
+import uk.co.caprica.vlcj.player.direct.BufferFormatCallback;
+import uk.co.caprica.vlcj.player.direct.DirectMediaPlayer;
+import uk.co.caprica.vlcj.player.direct.RenderCallback;
+import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 import uk.co.caprica.vlcj.player.headless.HeadlessMediaPlayer;
 
 import java.awt.image.BufferedImage;
@@ -53,7 +62,7 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
   protected int m_Interval;
 
   /** headless media player */
-  protected HeadlessMediaPlayer m_MediaPlayer;
+  protected DirectMediaPlayer m_MediaPlayer;
 
   /** the samples. */
   protected List<BufferedImageContainer> m_Samples;
@@ -193,33 +202,28 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
     List<BufferedImageContainer> result = new ArrayList<>();
     BufferedImageContainer container;
     m_Factory = new MediaPlayerFactory();
-    m_MediaPlayer = (m_Factory.newHeadlessMediaPlayer());
-    m_MediaPlayer.addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
-      @Override
-      public void playing(MediaPlayer mediaPlayer) {
-	super.playing(mediaPlayer);
-	//int width = (int)m_MediaPlayer.getVideoDimension().getWidth();
-	//int height = (int)m_MediaPlayer.getVideoDimension().getHeight();
-	for (int i = 0; i < m_NumSamples; i++) {
-	  //BufferedImage image = m_MediaPlayer.getSnapshot(width, height);
-	  //System.out.println("Loop: " + i + "image: " + image);
-	  //container = new BufferedImageContainer();
-	  //container.setImage(image);
-	  //result.add(container);
-	  m_MediaPlayer.skip(m_Interval);
-	}
-	m_MediaPlayer.stop();
-	m_Factory.release();
-	m_MediaPlayer.release();
-      }
-    });
-    m_MediaPlayer.playMedia(file.getAbsolutePath());
+    BufferFormatCallback bufferFormatCallback= (i, i1) -> new RV32BufferFormat(0, 0);
+    m_MediaPlayer = m_Factory.newDirectMediaPlayer(bufferFormatCallback, new BlankRenderCallback());
 
-    while(m_MediaPlayer.isPlaying());
+    Condition<?> playingCondition = new PlayingCondition(m_MediaPlayer) {
+      @Override
+      protected boolean onBefore() {
+	return m_MediaPlayer.startMedia(file.getAbsolutePath());
+      }
+    };
+
+    //playingCondition.await();
 
 
 
     return result.toArray(new BufferedImageContainer[result.size()]);
   }
 
+  private class BlankRenderCallback implements RenderCallback {
+
+    @Override
+    public void display(DirectMediaPlayer directMediaPlayer, Memory[] memories, BufferFormat bufferFormat) {
+      return;
+    }
+  }
 }
