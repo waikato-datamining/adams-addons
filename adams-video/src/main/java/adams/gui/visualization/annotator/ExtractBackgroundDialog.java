@@ -25,6 +25,7 @@ import adams.data.image.BufferedImageContainer;
 import adams.data.image.multiimageoperation.AbstractBufferedImageMultiImageOperation;
 import adams.data.image.multiimageoperation.Median;
 import adams.flow.transformer.movieimagesampler.AbstractBufferedImageMovieImageSampler;
+import adams.flow.transformer.movieimagesampler.AbstractMovieImageSampler;
 import adams.flow.transformer.movieimagesampler.FixedIntervalBufferedImageSampler;
 import adams.gui.core.ParameterPanel;
 import adams.gui.dialog.ApprovalDialog;
@@ -168,7 +169,7 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
 
     ppanel = new ParameterPanel();
 
-    panel = new GenericObjectEditorPanel(AbstractBufferedImageMovieImageSampler.class,
+    panel = new GenericObjectEditorPanel(AbstractMovieImageSampler.class,
       new FixedIntervalBufferedImageSampler(),true);
     ppanel.addParameter("Image Sampler", panel);
     m_ImageSamplerSelectionPanel = (GenericObjectEditorPanel)panel;

@@ -26,11 +26,8 @@ import com.xuggle.xuggler.IContainer;
 import com.xuggle.xuggler.IStream;
 import com.xuggle.xuggler.IStreamCoder;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
-import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
-import uk.co.caprica.vlcj.player.direct.BufferFormatCallback;
-import uk.co.caprica.vlcj.player.direct.DirectMediaPlayer;
-import uk.co.caprica.vlcj.player.direct.RenderCallback;
-import uk.co.caprica.vlcj.player.direct.RenderCallbackAdapter;
+import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
+import uk.co.caprica.vlcj.player.direct.*;
 import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 
 import java.awt.Color;
@@ -47,7 +44,6 @@ import java.awt.image.BufferedImage;
  * @version $Revision$
  */
 public class DirectRenderMediaPlayerPanel extends BasePanel {
-
 
   /** The width of the video */
   protected int m_VideoWidth;
@@ -113,6 +109,10 @@ public class DirectRenderMediaPlayerPanel extends BasePanel {
     g2.drawImage(m_Image,null,x,y);
   }
 
+  /**
+   * opens a file for playing
+   * @param fileName the file to be played
+   */
   public void open(String fileName) {
     getVideoDimensions(fileName);
     m_Image = GraphicsEnvironment
@@ -136,6 +136,11 @@ public class DirectRenderMediaPlayerPanel extends BasePanel {
     repaint();
   }
 
+  /**
+   * Retrieves the dimensions of a video contained in the given file
+   * @param fileName the file to use
+   * @return
+   */
   protected int getVideoDimensions(String fileName) {
     IContainer container = IContainer.make();
     if(container.open(fileName, IContainer.Type.READ, null) < 0)
@@ -161,96 +166,157 @@ public class DirectRenderMediaPlayerPanel extends BasePanel {
     return -1;
   }
 
+  /**
+   * Sets the playback rate
+   * @param rate the rate play back at
+   */
   public void setRate(float rate) {
     if(m_MediaComponent == null)
       return;
     m_MediaComponent.getMediaPlayer().setRate(rate);
   }
 
+  /**
+   * Sets the position in the video
+   * @param v the position to go to
+   */
   public void setPosition(float v) {
     if(m_MediaComponent == null)
       return;
   m_MediaComponent.getMediaPlayer().setPosition(v);
   }
 
+  /**
+   * A getter for the playback rate
+   * @return the current playback rate
+   */
   public float getRate() {
     if(m_MediaComponent == null)
       return 1;
     return m_MediaComponent.getMediaPlayer().getRate();
   }
 
+  /**
+   * checks to see if the player is muted
+   * @return true if the player is muted, false otherwise
+   */
   public boolean isMute() {
     if(m_MediaComponent == null)
       return false;
     return m_MediaComponent.getMediaPlayer().isMute();
   }
 
+  /**
+   * a getter for the current position in the video playback
+   * @return the current position
+   */
   public float getPosition() {
     if(m_MediaComponent == null)
       return 0;
     return m_MediaComponent.getMediaPlayer().getPosition();
   }
 
+  /**
+   * Retruns the current playback time
+   * @return the current playback time
+   */
   public long getTime() {
     if(m_MediaComponent == null)
       return 0;
     return m_MediaComponent.getMediaPlayer().getTime();
   }
 
+  /**
+   * Gets the length of the media
+   * @return the length
+   */
   public long getLength() {
     if(m_MediaComponent == null)
       return 0;
     return m_MediaComponent.getMediaPlayer().getLength();
   }
 
-  public void addMediaPlayerEventListener(MediaPlayerEventAdapter mediaPlayerEventAdapter) {
+  /**
+   * adds a media player event listener to our media player
+   * @param mediaPlayerEventListener the listener to add
+   */
+  public void addMediaPlayerEventListener(MediaPlayerEventListener mediaPlayerEventListener) {
     if(m_MediaComponent == null)
       return;
-    m_MediaComponent.getMediaPlayer().addMediaPlayerEventListener(mediaPlayerEventAdapter);
+    m_MediaComponent.getMediaPlayer().addMediaPlayerEventListener(mediaPlayerEventListener);
   }
 
+  /**
+   * Pauses the video playback
+   */
   public void pause() {
     if(m_MediaComponent == null)
       return;
     m_MediaComponent.getMediaPlayer().pause();
   }
 
+  /**
+   * Plays the current media
+   */
   public void play() {
     if(m_MediaComponent == null)
       return;
     m_MediaComponent.getMediaPlayer().play();
   }
 
+  /**
+   * Stops playback
+   */
   public void stop() {
     if(m_MediaComponent == null)
       return;
     m_MediaComponent.getMediaPlayer().stop();
   }
 
+  /**
+   * mutes the player
+   * @return true if the player is muted, otherwise false.
+   */
   public boolean mute() {
     if(m_MediaComponent == null)
       return false;
     return m_MediaComponent.getMediaPlayer().mute();
   }
 
+  /**
+   * Pre prepares a media file for playing
+   * @param absolutePath the file name and path to prepare
+   */
   public void prepareMedia(String absolutePath) {
     if(m_MediaComponent == null)
       return;
     m_MediaComponent.getMediaPlayer().prepareMedia(absolutePath);
   }
 
+  /**
+   * releases the media player to clean up memory usage
+   */
   public void release() {
     if(m_MediaComponent == null)
       return;
     m_MediaComponent.release();
+    m_MediaComponent = null;
   }
 
+  /**
+   * A getter for the playing state of the player
+   * @return true if the media is playing
+   */
   public boolean isPlaying() {
     if(m_MediaComponent == null)
       return false;
     return m_MediaComponent.getMediaPlayer().isPlaying();
   }
 
+  /**
+   * Private class required for direct rendering. Simply copies the buffer into the image we're
+   * using for storage and then calls a repaint on the panel.
+   */
   private class VideoPlayerRenderCallbackAdapter extends RenderCallbackAdapter {
 
     public VideoPlayerRenderCallbackAdapter() {
@@ -259,7 +325,6 @@ public class DirectRenderMediaPlayerPanel extends BasePanel {
 
     @Override
     protected void onDisplay(DirectMediaPlayer directMediaPlayer, int[] rgbBuffer) {
-      // Copy buffer to the image and repaint
       m_Image.setRGB(0, 0, m_VideoWidth, m_VideoHeight, rgbBuffer, 0, m_VideoWidth);
       DirectRenderMediaPlayerPanel.this.repaint();
     }

@@ -18,26 +18,23 @@
  * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
  */
 
-package adams.gui.visualization.annotator;
+package adams.flow.transformer.movieimagesampler;
 
 import adams.core.base.BaseTimeMsec;
 import adams.data.image.BufferedImageContainer;
-import adams.flow.transformer.movieimagesampler.AbstractBufferedImageMovieImageSampler;
 import com.sun.jna.Memory;
-import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
-import uk.co.caprica.vlcj.player.MediaPlayer;
-import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.condition.Condition;
+import uk.co.caprica.vlcj.player.condition.conditions.PausedCondition;
 import uk.co.caprica.vlcj.player.condition.conditions.PlayingCondition;
+import uk.co.caprica.vlcj.player.condition.conditions.SnapshotTakenCondition;
+import uk.co.caprica.vlcj.player.condition.conditions.TimeReachedCondition;
 import uk.co.caprica.vlcj.player.direct.BufferFormat;
 import uk.co.caprica.vlcj.player.direct.BufferFormatCallback;
 import uk.co.caprica.vlcj.player.direct.DirectMediaPlayer;
 import uk.co.caprica.vlcj.player.direct.RenderCallback;
 import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
-import uk.co.caprica.vlcj.player.headless.HeadlessMediaPlayer;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -193,30 +190,81 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
 
   /**
    * Samples images from a movie file.
+   * Code adapted from
+   * https://github.com/caprica/vlcj/blob/vlcj-3.0.1/src/test/java/uk/co/caprica/vlcj/test/condition/ConditionTest.java
    *
    * @param file the movie to sample
    * @return the samples, null if failed to sample
    */
   @Override
   protected BufferedImageContainer[] doSample(File file) {
-    List<BufferedImageContainer> result = new ArrayList<>();
-    BufferedImageContainer container;
     m_Factory = new MediaPlayerFactory();
-    BufferFormatCallback bufferFormatCallback= (i, i1) -> new RV32BufferFormat(0, 0);
+    BufferFormatCallback bufferFormatCallback= (i, i1) -> new RV32BufferFormat(200, 200);
     m_MediaPlayer = m_Factory.newDirectMediaPlayer(bufferFormatCallback, new BlankRenderCallback());
+    m_Samples = new ArrayList<>();
 
-    Condition<?> playingCondition = new PlayingCondition(m_MediaPlayer) {
-      @Override
-      protected boolean onBefore() {
-	return m_MediaPlayer.startMedia(file.getAbsolutePath());
+    try {
+      Condition<?> playingCondition = new PlayingCondition(m_MediaPlayer) {
+	@Override
+	protected boolean onBefore() {
+	  return m_MediaPlayer.startMedia(file.getAbsolutePath());
+	}
+      };
+
+      playingCondition.await();
+      long time = 0;
+      for (int i = 0; i < m_NumSamples; i++) {
+	System.out.println("Loop number: " + (i+1));
+	System.out.println("number of samples: " + m_NumSamples);
+
+	Condition<?> timeReachedCondition = new TimeReachedCondition(m_MediaPlayer, time ) {
+	  @Override
+	  protected boolean onBefore() {
+	    m_MediaPlayer.setTime(targetTime);
+	    return true;
+	  }
+	};
+	timeReachedCondition.await();
+
+	Condition<?> pausedCondition = new PausedCondition(m_MediaPlayer) {
+	  @Override
+	  protected boolean onBefore() {
+	    m_MediaPlayer.pause();
+	    return true;
+	  }
+	};
+	pausedCondition.await();
+
+	Condition<?> snapshotTakenCondition = new SnapshotTakenCondition(m_MediaPlayer) {
+	  @Override
+	  protected boolean onBefore() {
+	    BufferedImageContainer container = new BufferedImageContainer();
+	    container.setImage(m_MediaPlayer.getSnapshot());
+	    m_Samples.add(container);
+	    return true;
+	  }
+	};
+	snapshotTakenCondition.await();
+
+	playingCondition = new PlayingCondition(m_MediaPlayer) {
+	  @Override
+	  protected boolean onBefore() {
+	    m_MediaPlayer.play();
+	    return true;
+	  }
+	};
+	playingCondition.await();
+
+	time += m_Interval;
       }
-    };
+    }
+    catch(Exception e) {
+      //ignore
+    }
 
-    //playingCondition.await();
-
-
-
-    return result.toArray(new BufferedImageContainer[result.size()]);
+    m_MediaPlayer.release();
+    m_Factory.release();
+    return m_Samples.toArray(new BufferedImageContainer[m_Samples.size()]);
   }
 
   private class BlankRenderCallback implements RenderCallback {
