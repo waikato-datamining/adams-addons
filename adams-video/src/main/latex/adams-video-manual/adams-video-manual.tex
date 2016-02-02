@@ -155,7 +155,7 @@ being used.
 
 \section{Video Annotator}
 The \textit{Video Annotator} is a tool for creating annotations for a video. A user can
-create their own personalized key bindings which they can then use to add annotations at a given time stamp.
+create their own personalized key shortcuts which they can then use to add annotations at a given time stamp.
 The annotations can be exported for use in a spreadsheet or other post processing. Figure \ref{annotator_in_use}
 shows a screen shot. The video annotator incorporates the vlcj Video Player and has the same requirements, i.e. --- VLC
 player must be installed and the bitness of the installs must match.
@@ -163,7 +163,7 @@ player must be installed and the bitness of the installs must match.
 \begin{figure}[htb]
   \centering
   \includegraphics[width= 12.0cm]{images/trail_viewer.png}
-  \caption{Annotator showing a video and key bindings}
+  \caption{Annotator showing a video and key shortcuts}
   \label{annotator_in_use}
 \end{figure}
 
@@ -229,72 +229,72 @@ Extracting the background is done in the dialog seen in Figure \ref{AnnotatorExt
 Here a user can select an image sampler and image operation to use to generate the background. Usually the defaults
 should be sufficient.
 
-\subsection{Bindings Menu}
-The bindings menu, as depicted in Figure \ref{AnnotatorBindingsMenu}, allows
-for the creation of a new set of bindings, loading or saving bindings, and
-editing the current bindings.
+\subsection{Shortcuts Menu}
+The shortcuts menu, as depicted in Figure \ref{AnnotatorShortcutsMenu}, allows
+for the creation of a new set of shortcuts, loading or saving shortcuts, and
+editing the current shortcuts.
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=12.0cm]{images/AnnotatorBindingsMenu.png}
-  \caption{Bindings menu.}
-  \label{AnnotatorBindingsMenu}
+  \includegraphics[width=12.0cm]{images/AnnotatorShortcutsMenu.png}
+  \caption{Shortcuts menu.}
+  \label{AnnotatorShortcutsMenu}
 \end{figure}
 
-\subsubsection{Edit Bindings}
-When editing bindings you can add new bindings, edit a current binding or
-remove selected bindings (see Figure \ref{AnnotationEditBindingsDialog}).
+\subsubsection{Edit Shortcuts}
+When editing shortcuts you can add new shortcuts, edit a current shortcut or
+remove selected shortcuts (see Figure \ref{AnnotationEditShortcuts}).
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=7.0cm]{images/AnnotationEditBindingsDialog.png}
-  \caption{Edit bindings dialog.}
-  \label{AnnotationEditBindingsDialog}
+  \includegraphics[width=7.0cm]{images/AnnotationEditShortcuts.png}
+  \caption{Edit shortcuts dialog.}
+  \label{AnnotationEditShortcuts}
 \end{figure}
 
-When editing a binding there are various options for customizing the output
-from the binding.
+When editing a shortcut there are various options for customizing the output
+from the shortcut.
 
-The output from a binding is made up of a header and \textit{true} or
+The output from a shortcut is made up of a header and \textit{true} or
 \textit{false} along with a timestamp:
 
 \begin{verbatim}
-Timestamp,Meta-Binding1,Meta-Binding2
+Timestamp,Meta-Shortcut1,Meta-Shortcut2
 00:00:00.000,false,false
 00:00:01.000,false,true
 \end{verbatim}
 
-In this case the name of the binding shows up as \textit{Binding1} and
-\textit{Binding2}. Figure \ref{add_binding} shows the dialog for editing a
-binding.
+In this case the name of the shortcut shows up as \textit{Shortcut1} and
+\textit{Shortcut2}. Figure \ref{AnnotatorAddShortcut} shows the dialog for editing a
+shortcut.
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=4.0cm]{images/add_binding.png}
-  \caption{Dialog for editing a binding.}
-  \label{add_binding}
+  \includegraphics[width=4.0cm]{images/AnnotatorAddShortcut.png}
+  \caption{Dialog for editing a shortcut.}
+  \label{AnnotatorAddShortcut}
 \end{figure}
 
-In the following, an description of what each of the binding parameters is
+In the following, an description of what each of the shortcut parameters is
 used for:
 \begin{tight_itemize}
   \item \textbf{Name} -- This is what gets output as the header of the
   annotation file when it is exported
-  \item \textbf{Binding} -- The key for this binding. It is entered by
+  \item \textbf{Shortcut} -- The key for this shortcut. It is entered by
   selecting the text box and then pressing the desired key or key combination
   -- i.e. \texttt{ctrl + B} or just \texttt{B}
-  \item \textbf{Toggleable} -- If this is checked then the binding always
+  \item \textbf{Toggleable} -- If this is checked then the shortcut always
   outputs a value, usually \textit{false}, and when it is toggled switches
   that output to \textit{true}.
-  \item \textbf{Interval} -- Only relevant for toggleable bindings. This is
+  \item \textbf{Interval} -- Only relevant for toggleable shortcuts. This is
   the interval at which the values will be output. By default it is 1,000
   milliseconds (= 1 second) but it can be changed to any number. Intervals
   below 1 second tend to become less accurate, so if set at 10 ms it might
   output a value between 1 - 20 ms rather than 10 depending on CPU load and
   scheduling. It is recommended to use times of a second or above.
   \item \textbf{Inverted} -- This allows you to invert the values output
-  by the binding. Usually a binding outputs \textit{true} when pressed or, in the
-  case of toggleable bindings, toggled on. This will invert that so when
+  by the shortcut. Usually a shortcut outputs \textit{true} when pressed or, in the
+  case of toggleable shortcuts, toggled on. This will invert that so when
   it is pressed it will output \textit{false} and in the case of a toggleable it
   will output a value of \textit{true} when it is toggled off and \textit{false} when toggled on.
 \end{tight_itemize}
