@@ -220,7 +220,10 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
 	Condition<?> timeReachedCondition = new TimeReachedCondition(m_MediaPlayer, time ) {
 	  @Override
 	  protected boolean onBefore() {
-	    m_MediaPlayer.setTime(targetTime);
+            if(targetTime > 0)
+              m_MediaPlayer.setTime(targetTime - 10);
+            else
+              m_MediaPlayer.setTime(targetTime);
 	    return true;
 	  }
 	};
@@ -254,8 +257,9 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
 	  }
 	};
 	playingCondition.await();
-
 	time += m_Interval;
+	if(time > m_MediaPlayer.getLength())
+	  break;
       }
     }
     catch(Exception e) {
