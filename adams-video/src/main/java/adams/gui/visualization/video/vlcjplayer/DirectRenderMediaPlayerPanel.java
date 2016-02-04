@@ -30,11 +30,7 @@ import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
 import uk.co.caprica.vlcj.player.direct.*;
 import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -114,7 +110,9 @@ public class DirectRenderMediaPlayerPanel extends BasePanel {
    * @param fileName the file to be played
    */
   public void open(String fileName) {
-    getVideoDimensions(fileName);
+    Dimension d = VideoUtilities.getVideoDimensions(fileName);
+    m_VideoHeight = (int)d.getHeight();
+    m_VideoWidth  = (int)d.getWidth();
     m_Image = GraphicsEnvironment
       .getLocalGraphicsEnvironment()
       .getDefaultScreenDevice()
@@ -136,35 +134,7 @@ public class DirectRenderMediaPlayerPanel extends BasePanel {
     repaint();
   }
 
-  /**
-   * Retrieves the dimensions of a video contained in the given file
-   * @param fileName the file to use
-   * @return
-   */
-  protected int getVideoDimensions(String fileName) {
-    IContainer container = IContainer.make();
-    if(container.open(fileName, IContainer.Type.READ, null) < 0)
-      return -1;
-    int max = container.getNumStreams();
-    if(max == 0)
-      return -1;
-    IStream stream;
-    IStreamCoder coder;
-    m_VideoHeight = 0;
-    m_VideoWidth = 0;
-    for (int i = 0; i < max; i++) {
-      stream = container.getStream(i);
-      coder = stream.getStreamCoder();
-      if (coder.getCodecType() == ICodec.Type.CODEC_TYPE_VIDEO) {
-        if (coder.getWidth() > m_VideoWidth || coder.getHeight() > m_VideoHeight) {
-          m_VideoHeight = coder.getHeight();
-          m_VideoWidth 	= coder.getWidth();
-        }
-      }
 
-    }
-    return -1;
-  }
 
   /**
    * Sets the playback rate

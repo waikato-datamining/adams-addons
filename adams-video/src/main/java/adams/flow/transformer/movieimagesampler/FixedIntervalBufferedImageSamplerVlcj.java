@@ -22,22 +22,22 @@ package adams.flow.transformer.movieimagesampler;
 
 import adams.core.base.BaseTimeMsec;
 import adams.data.image.BufferedImageContainer;
-import com.sun.jna.Memory;
+import adams.gui.visualization.video.vlcjplayer.VideoUtilities;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.condition.Condition;
 import uk.co.caprica.vlcj.player.condition.conditions.PausedCondition;
 import uk.co.caprica.vlcj.player.condition.conditions.PlayingCondition;
-import uk.co.caprica.vlcj.player.condition.conditions.SnapshotTakenCondition;
 import uk.co.caprica.vlcj.player.condition.conditions.TimeReachedCondition;
-import uk.co.caprica.vlcj.player.direct.BufferFormat;
-import uk.co.caprica.vlcj.player.direct.BufferFormatCallback;
-import uk.co.caprica.vlcj.player.direct.DirectMediaPlayer;
-import uk.co.caprica.vlcj.player.direct.RenderCallback;
+import uk.co.caprica.vlcj.player.direct.*;
 import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * TODO: what class does.
@@ -49,27 +49,55 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
 
   private static final long serialVersionUID = -577020017132279115L;
 
-  /** the number of samples to generate. */
+  /**
+   * the number of samples to generate.
+   */
   protected int m_NumSamples;
 
-  /** the offset. */
+  /**
+   * the offset.
+   */
   protected BaseTimeMsec m_Offset;
 
-  /** the interval in msec between the . */
+  /**
+   * the interval in msec between the .
+   */
   protected int m_Interval;
 
-  /** headless media player */
+  /**
+   * headless media player
+   */
   protected DirectMediaPlayer m_MediaPlayer;
 
-  /** the samples. */
+  /**
+   * the samples.
+   */
   protected List<BufferedImageContainer> m_Samples;
 
   protected MediaPlayerFactory m_Factory;
 
+  protected Dimension m_VideoDimension;
+
+  protected BufferedImage m_Image;
+
+  protected BufferedImageContainer m_CurrentImage;
+
+  protected BufferedImageContainer m_PreviousImage;
+
+  protected boolean m_CaptureScreenShot;
+
+  private long m_TargetTime;
+
+  /**
+   * a lock object to make sure we wait till the screenshot is taken before continuing
+   */
+  Lock lock;
+
+
   /**
    * Returns a string describing the object.
    *
-   * @return 			a description suitable for displaying in the gui
+   * @return a description suitable for displaying in the gui
    */
   @Override
   public String globalInfo() {
@@ -99,7 +127,7 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
   /**
    * Sets the offset for the samples.
    *
-   * @param value	the offset
+   * @param value the offset
    */
   public void setOffset(BaseTimeMsec value) {
     m_Offset = value;
@@ -109,7 +137,7 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
   /**
    * Returns the offset for the samples.
    *
-   * @return		the offset
+   * @return the offset
    */
   public BaseTimeMsec getOffset() {
     return m_Offset;
@@ -118,8 +146,8 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
   /**
    * Returns the tip text for this property.
    *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
+   * @return tip text for this property suitable for
+   * displaying in the GUI or for listing the options.
    */
   public String offsetTipText() {
     return "The offset for the samples, i.e., before starting the sampling.";
@@ -128,7 +156,7 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
   /**
    * Sets the interval in milli-seconds between samples.
    *
-   * @param value	the interval
+   * @param value the interval
    */
   public void setInterval(int value) {
     if (getOptionManager().isValid("interval", value)) {
@@ -140,7 +168,7 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
   /**
    * Returns the interval between samples in milli-seconds.
    *
-   * @return		the interval
+   * @return the interval
    */
   public int getInterval() {
     return m_Interval;
@@ -149,8 +177,8 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
   /**
    * Returns the tip text for this property.
    *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
+   * @return tip text for this property suitable for
+   * displaying in the GUI or for listing the options.
    */
   public String intervalTipText() {
     return "The interval in milli-seconds between samples.";
@@ -159,7 +187,7 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
   /**
    * Sets the number of samples to take.
    *
-   * @param value	the number
+   * @param value the number
    */
   public void setNumSamples(int value) {
     if (getOptionManager().isValid("numSamples", value)) {
@@ -171,7 +199,7 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
   /**
    * Returns the number of samples to take.
    *
-   * @return		the number
+   * @return the number
    */
   public int getNumSamples() {
     return m_NumSamples;
@@ -180,8 +208,8 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
   /**
    * Returns the tip text for this property.
    *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
+   * @return tip text for this property suitable for
+   * displaying in the GUI or for listing the options.
    */
   public String numSamplesTipText() {
     return "The number of samples to take.";
@@ -198,10 +226,18 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
    */
   @Override
   protected BufferedImageContainer[] doSample(File file) {
+    lock = new ReentrantLock();
+    m_CurrentImage = new BufferedImageContainer();
+    m_PreviousImage = new BufferedImageContainer();
+    m_VideoDimension = VideoUtilities.getVideoDimensions(file.getAbsolutePath());
+    m_Image = new BufferedImage((int) m_VideoDimension.getWidth(), (int) m_VideoDimension.getHeight(),
+      BufferedImage.TYPE_INT_RGB);
     m_Factory = new MediaPlayerFactory();
-    BufferFormatCallback bufferFormatCallback= (i, i1) -> new RV32BufferFormat(200, 200);
+    BufferFormatCallback bufferFormatCallback = (i, i1) -> new RV32BufferFormat((int) m_VideoDimension.getWidth(),
+      (int) m_VideoDimension.getHeight());
     m_MediaPlayer = m_Factory.newDirectMediaPlayer(bufferFormatCallback, new BlankRenderCallback());
     m_Samples = new ArrayList<>();
+    m_CaptureScreenShot = false;
 
     try {
       Condition<?> playingCondition = new PlayingCondition(m_MediaPlayer) {
@@ -212,18 +248,15 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
       };
 
       playingCondition.await();
-      long time = 0;
+      m_TargetTime = 0;
       for (int i = 0; i < m_NumSamples; i++) {
-	System.out.println("Loop number: " + (i+1));
+	System.out.println("Loop number: " + (i + 1));
 	System.out.println("number of samples: " + m_NumSamples);
 
-	Condition<?> timeReachedCondition = new TimeReachedCondition(m_MediaPlayer, time ) {
+	Condition<?> timeReachedCondition = new TimeReachedCondition(m_MediaPlayer, m_TargetTime) {
 	  @Override
 	  protected boolean onBefore() {
-            if(targetTime > 0)
-              m_MediaPlayer.setTime(targetTime - 10);
-            else
-              m_MediaPlayer.setTime(targetTime);
+	    m_MediaPlayer.setTime(targetTime);
 	    return true;
 	  }
 	};
@@ -238,16 +271,6 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
 	};
 	pausedCondition.await();
 
-	Condition<?> snapshotTakenCondition = new SnapshotTakenCondition(m_MediaPlayer) {
-	  @Override
-	  protected boolean onBefore() {
-	    BufferedImageContainer container = new BufferedImageContainer();
-	    container.setImage(m_MediaPlayer.getSnapshot());
-	    m_Samples.add(container);
-	    return true;
-	  }
-	};
-	snapshotTakenCondition.await();
 
 	playingCondition = new PlayingCondition(m_MediaPlayer) {
 	  @Override
@@ -257,25 +280,44 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
 	  }
 	};
 	playingCondition.await();
-	time += m_Interval;
-	if(time > m_MediaPlayer.getLength())
+	m_TargetTime += m_Interval;
+	if (m_TargetTime > m_MediaPlayer.getLength())
 	  break;
       }
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       //ignore
     }
+
+    System.out.println("Releasing media player");
 
     m_MediaPlayer.release();
     m_Factory.release();
     return m_Samples.toArray(new BufferedImageContainer[m_Samples.size()]);
   }
 
-  private class BlankRenderCallback implements RenderCallback {
+  private class BlankRenderCallback extends RenderCallbackAdapter {
+
+    BlankRenderCallback() {
+      super(new int[((int) m_VideoDimension.getWidth()) * ((int) m_VideoDimension.getHeight())]);
+    }
 
     @Override
-    public void display(DirectMediaPlayer directMediaPlayer, Memory[] memories, BufferFormat bufferFormat) {
-      return;
+    protected void onDisplay(DirectMediaPlayer directMediaPlayer, int[] rgbBuffer) {
+      m_Image = new BufferedImage((int) m_VideoDimension.getWidth(), (int) m_VideoDimension.getHeight(),
+	BufferedImage.TYPE_INT_RGB);
+      m_CurrentImage = new BufferedImageContainer();
+      m_Image.setRGB(0, 0, (int) m_VideoDimension.getWidth(), (int) m_VideoDimension.getHeight(), rgbBuffer, 0,
+	(int) m_VideoDimension.getWidth());
+
+      m_CurrentImage.setImage(m_Image);
+      long currentTime = directMediaPlayer.getTime();
+
+      if (currentTime == m_TargetTime)
+	m_Samples.add(m_CurrentImage);
+      else if (currentTime > m_TargetTime)
+	m_Samples.add(m_PreviousImage);
+      m_PreviousImage = new BufferedImageContainer();
+      m_PreviousImage.setImage(m_CurrentImage.getImage());
     }
   }
 }
