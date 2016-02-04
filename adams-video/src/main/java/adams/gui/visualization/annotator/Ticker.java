@@ -52,6 +52,10 @@ public class Ticker {
   /** the media player to get timestamps from */
   VLCjDirectRenderPanel m_VideoPlayer;
 
+  /**
+   * Constructer for the ticker class. Takes a Direct Render panel.
+   * @param videoPlayer
+   */
   public Ticker(VLCjDirectRenderPanel videoPlayer) {
     m_Scheduler = Executors.newScheduledThreadPool(1);
     m_Handlers  = new ArrayList<>();
@@ -59,6 +63,10 @@ public class Ticker {
     m_VideoPlayer = videoPlayer;
   }
 
+  /**
+   * adds a listener to the ticker
+   * @param tickListener the listener to add.
+   */
   public void addListener(TickListener tickListener) {
     Long key = tickListener.getInterval();
     if (m_Ticks.containsKey(key)) {
@@ -85,6 +93,9 @@ public class Ticker {
     m_Ticks = new HashMap<>();
   }
 
+  /**
+   * private class which represents an event that happens at a given interval
+   */
   private class Tick implements Runnable {
 
     private List<TickListener> m_Listeners;

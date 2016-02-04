@@ -41,16 +41,22 @@ public class BindingParameterPanel extends ParameterPanel {
 
   private static final int DEFAULT_TIMEOUT = 1000;
 
+  /** a text field for the name */
   protected JTextField m_NameField;
 
+  /** a text field for the key press */
   protected KeyPressTextField m_BindingField;
 
+  /** a checkbox to indicate if the binding is toggleable or not */
   protected JCheckBox m_Toggleable;
 
+  /** a checkbox to indicate if the binding is inverted */
   protected JCheckBox m_Inverted;
 
+  /** an input field for the interval for this binding */
   protected JFormattedTextField m_Interval;
 
+  /** a mask formatter to make sure the input is valid */
   protected MaskFormatter m_MaskFormat;
 
   @Override

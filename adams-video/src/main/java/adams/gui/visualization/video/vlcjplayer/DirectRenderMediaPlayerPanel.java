@@ -21,10 +21,6 @@
 package adams.gui.visualization.video.vlcjplayer;
 
 import adams.gui.core.BasePanel;
-import com.xuggle.xuggler.ICodec;
-import com.xuggle.xuggler.IContainer;
-import com.xuggle.xuggler.IStream;
-import com.xuggle.xuggler.IStreamCoder;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
 import uk.co.caprica.vlcj.player.direct.*;
@@ -47,7 +43,7 @@ public class DirectRenderMediaPlayerPanel extends BasePanel {
   /** The height of the video */
   protected int m_VideoHeight;
 
-  /** Media componant for playing the video */
+  /** Media component for playing the video */
   protected DirectMediaPlayerComponent m_MediaComponent;
 
   /** an image to fill with the video frame */

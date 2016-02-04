@@ -149,6 +149,10 @@ public class Binding {
     return "Name: " + m_Name + " Binding: " + m_Binding.toString() + " Toggleable: " + m_Toggleable;
   }
 
+  /**
+   * a getter for the interval for this binding
+   * @return the interval for this binding
+   */
   public long getInterval() {
     return m_Interval;
   }

@@ -28,7 +28,7 @@ import com.xuggle.xuggler.IStreamCoder;
 import java.awt.*;
 
 /**
- * TODO: what class does.
+ * A utility class that contains helpful methods for working with videos
  *
  * @author sjb90
  * @version $Revision$

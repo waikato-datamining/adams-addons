@@ -231,10 +231,10 @@ public class AnnotatorPanel extends BasePanel
 
   /** menu item for background extract */
   protected JMenuItem m_MenuItemBackgroundExtract;
-  /** menu item for bindings save as */
+  /** menu item for background save as */
   protected JMenuItem m_MenuItemBackgroundSaveAs;
+  /** menu item for background view */
   protected JMenuItem m_MenuItemBackgroundView;
-  protected JMenuItem m_MenuItemExtract;
 
 
   /**

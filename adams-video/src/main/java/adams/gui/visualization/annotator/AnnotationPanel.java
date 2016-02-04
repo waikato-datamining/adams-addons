@@ -90,6 +90,10 @@ public class AnnotationPanel extends BasePanel implements TickListener {
     addKeyBinding(m_Binding);
   }
 
+  /**
+   * Creates a step for a given timestamp and alerts the listeners
+   * @param timestamp the timestamp for the step
+   */
   protected void makeStep(Date timestamp) {
     HashMap<String,Object> meta = new HashMap<>();
     if (m_IsToggleable)

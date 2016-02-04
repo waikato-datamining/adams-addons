@@ -51,6 +51,10 @@ public class AnnotationEvent extends EventObject{
     m_Step = step;
   }
 
+  /**
+   * A getter for the step this event is for
+   * @return the step associated with this event
+   */
   public Step getStep() {
     return m_Step;
   }

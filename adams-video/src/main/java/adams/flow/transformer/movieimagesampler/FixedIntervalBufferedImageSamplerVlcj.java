@@ -36,13 +36,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * TODO: what class does.
+ * Generates a specified number of image samples at fixed intervals.
  *
- * @author sjb90
+ * @author sjb90 at waikato dot ac dot nz
  * @version $Revision$
  */
 public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImageMovieImageSampler {
@@ -74,24 +72,23 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
    */
   protected List<BufferedImageContainer> m_Samples;
 
+  /** a media player factory for getting the media player */
   protected MediaPlayerFactory m_Factory;
 
+  /** the dimensions of the video */
   protected Dimension m_VideoDimension;
 
+  /** an image to feed the buffer into */
   protected BufferedImage m_Image;
 
+  /** a container for storing the current image */
   protected BufferedImageContainer m_CurrentImage;
 
+  /** a container for storing the previous image */
   protected BufferedImageContainer m_PreviousImage;
 
-  protected boolean m_CaptureScreenShot;
-
+  /** the target time we want to reach before taking a screen shot */
   private long m_TargetTime;
-
-  /**
-   * a lock object to make sure we wait till the screenshot is taken before continuing
-   */
-  Lock lock;
 
 
   /**
@@ -217,6 +214,16 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
 
 
   /**
+   * Initializes the members.
+   */
+  @Override
+  protected void initialize() {
+    super.initialize();
+    m_CurrentImage = new BufferedImageContainer();
+    m_PreviousImage = new BufferedImageContainer();
+  }
+
+  /**
    * Samples images from a movie file.
    * Code adapted from
    * https://github.com/caprica/vlcj/blob/vlcj-3.0.1/src/test/java/uk/co/caprica/vlcj/test/condition/ConditionTest.java
@@ -226,19 +233,17 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
    */
   @Override
   protected BufferedImageContainer[] doSample(File file) {
-    lock = new ReentrantLock();
-    m_CurrentImage = new BufferedImageContainer();
-    m_PreviousImage = new BufferedImageContainer();
     m_VideoDimension = VideoUtilities.getVideoDimensions(file.getAbsolutePath());
     m_Image = new BufferedImage((int) m_VideoDimension.getWidth(), (int) m_VideoDimension.getHeight(),
       BufferedImage.TYPE_INT_RGB);
     m_Factory = new MediaPlayerFactory();
     BufferFormatCallback bufferFormatCallback = (i, i1) -> new RV32BufferFormat((int) m_VideoDimension.getWidth(),
       (int) m_VideoDimension.getHeight());
-    m_MediaPlayer = m_Factory.newDirectMediaPlayer(bufferFormatCallback, new BlankRenderCallback());
+    m_MediaPlayer = m_Factory.newDirectMediaPlayer(bufferFormatCallback, new SnapshotRenderCallback());
     m_Samples = new ArrayList<>();
-    m_CaptureScreenShot = false;
 
+    // Uses the vlcj conditions to make sure the steps happen in sequence. the onBefore method ensures that
+    // anything called inside the method happens AFTER the temporary listener has been added to the media player.
     try {
       Condition<?> playingCondition = new PlayingCondition(m_MediaPlayer) {
 	@Override
@@ -288,16 +293,18 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
       //ignore
     }
 
-    System.out.println("Releasing media player");
-
+    // make sure to clean up the media player and factory
     m_MediaPlayer.release();
     m_Factory.release();
     return m_Samples.toArray(new BufferedImageContainer[m_Samples.size()]);
   }
 
-  private class BlankRenderCallback extends RenderCallbackAdapter {
+  /**
+   * Internal RenderCallback class. Needed for the direct render media player
+   */
+  private class SnapshotRenderCallback extends RenderCallbackAdapter {
 
-    BlankRenderCallback() {
+    SnapshotRenderCallback() {
       super(new int[((int) m_VideoDimension.getWidth()) * ((int) m_VideoDimension.getHeight())]);
     }
 

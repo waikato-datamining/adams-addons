@@ -21,8 +21,6 @@
 package adams.gui.visualization.annotator;
 
 import adams.gui.dialog.ApprovalDialog;
-import adams.gui.visualization.annotator.Binding;
-import adams.gui.visualization.annotator.BindingParameterPanel;
 
 import java.awt.*;
 import java.lang.String;
@@ -35,6 +33,7 @@ import java.lang.String;
  */
 public class EditBindingDialog extends ApprovalDialog {
 
+  /** the editor panel that does the actual work */
   BindingParameterPanel m_EditorPanel;
 
   /**
@@ -143,10 +142,18 @@ public class EditBindingDialog extends ApprovalDialog {
   }
 
 
+  /**
+   * a getter for the binding
+   * @return a binding made from the last info entered
+   */
   public Binding getBinding() {
     return m_EditorPanel.getBinding();
   }
 
+  /**
+   * loads a binding into the edit binding panel
+   * @param b the binding to load in
+   */
   public void loadBinding(Binding b) {
     m_EditorPanel.loadBinding(b);
   }

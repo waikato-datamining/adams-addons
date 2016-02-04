@@ -36,6 +36,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class EventQueue implements AnnotationListener {
 
+  /** a constant defining the amount of time to sleep for */
   public static final long SLEEP_TIME = 4000;
 
   /** the internal queue */
@@ -133,14 +134,25 @@ public class EventQueue implements AnnotationListener {
     m_Steps.add(e.getStep());
   }
 
+  /**
+   * Cleans up any loose ends
+   */
   public void cleanUp() {
     m_Runnable.stopExecution();
   }
 
+  /**
+   * sets the background image to be stored with the trail.
+   * @param backgroundImage
+   */
   public void setBackgroundImage(BufferedImage backgroundImage) {
     m_Trail.setBackground(backgroundImage);
   }
 
+  /**
+   * a getter for the background image stored with the trail
+   * @return the image
+   */
   public BufferedImage getBackgroundImage() {
     return m_Trail.getBackground();
   }

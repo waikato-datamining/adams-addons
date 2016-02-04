@@ -28,6 +28,10 @@ package adams.gui.visualization.annotator;
  */
 public interface TickListener {
 
+  /**
+   * Called by the object the listener is registered with to aleart the Ticklistener that a tick has happened
+   * @param e an event that contains information about the tick
+   */
   void tickHappened(TickEvent e);
 
   long getInterval();

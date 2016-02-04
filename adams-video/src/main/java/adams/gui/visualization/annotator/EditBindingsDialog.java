@@ -22,9 +22,6 @@ package adams.gui.visualization.annotator;
 
 
 import adams.gui.dialog.ApprovalDialog;
-import adams.gui.visualization.annotator.Binding;
-import adams.gui.visualization.annotator.BindingsEditorPanel;
-
 import java.awt.*;
 import java.util.List;
 
@@ -140,10 +137,18 @@ public class EditBindingsDialog extends ApprovalDialog {
     setTitle("Edit Shortcuts");
   }
 
+  /**
+   * a getter for all current bindings
+   * @return a list of all current bindings
+   */
   public List<Binding> getBindings() {
     return m_BindignPanel.getBindings();
   }
 
+  /**
+   * loads in a list of bindings
+   * @param bindings the list of bindigns to load
+   */
   public void setBindings(List<Binding> bindings) {
     m_BindignPanel.setBindings(bindings);
   }

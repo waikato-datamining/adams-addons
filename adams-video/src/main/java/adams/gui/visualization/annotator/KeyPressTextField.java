@@ -38,6 +38,7 @@ public class KeyPressTextField extends JTextField {
   /** Store the last pressed key */
   protected KeyStroke m_LastPressed;
 
+  /** the listener that retrieves the keypress */
   protected KeyListener m_KeyListener;
 
   public KeyPressTextField() {
@@ -63,10 +64,18 @@ public class KeyPressTextField extends JTextField {
     addKeyListener(m_KeyListener);
   }
 
+  /**
+   * a getter for the keypress currently stored in the text field
+   * @return the last key pressed
+   */
   public KeyStroke getLastPressed() {
     return m_LastPressed;
   }
 
+  /**
+   * a setter for the keypress stored in the field
+   * @param lastPressed the key to use as the last pressed.
+   */
   public void setLastPressed(KeyStroke lastPressed) {
     m_LastPressed = lastPressed;
   }
