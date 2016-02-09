@@ -139,38 +139,103 @@ and save those trails back to disk. Figure \ref{trail_viewer} shows a screenshot
   \label{trail_viewer}
 \end{figure}
 
-\section{vlcj Video Player}
-A simple video player used to play video or audio files in real time. To use this tool, or any other tools
-that incorpoate it, a user must have VLC player installed on their computer.
-The bitness of the VLC player install and the Java install must be the same, that is
-they must both either be 32 bit installs or 64 bit installs. Figure \ref{VideoPlayerInUse} shows the player
-being used.
-
- \begin{figure}[htb]
-   \centering
-   \includegraphics[width=12.0cm]{images/video_player_in_use.png}
-   \caption{Video Player in use.}
-   \label{VideoPlayerInUse}
- \end{figure}
-
-\section{Video Annotator}
-The \textit{Video Annotator} is a tool for creating annotations for a video. A user can
-create their own personalized key shortcuts which they can then use to add annotations at a given time stamp.
-The annotations can be exported for use in a spreadsheet or other post processing. Figure \ref{annotator_in_use}
-shows a screen shot. The video annotator incorporates the vlcj Video Player and has the same requirements, i.e. --- VLC
-player must be installed and the bitness of the installs must match.
+\section{VLCj Video Player}
+A simple video player used to play video or audio files in real time. To use
+this tool, or any other tools that incorpoate it, a user must have VLC player
+installed on their computer (see section \ref{bitness} for details on correct
+installation). Figure \ref{VideoPlayerInUse} shows the player being used.
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width= 12.0cm]{images/trail_viewer.png}
+  \includegraphics[width=12.0cm]{images/video_player_in_use.png}
+  \caption{Video Player in use.}
+  \label{VideoPlayerInUse}
+\end{figure}
+
+\subsection{Bitness}
+\label{bitness}
+The bitness of the VLC player installation and the Java installation must be
+the same, i.e., they must both either be 32-bit or 64-bit.
+
+\subsubsection{Windows}
+In order to determine whether you have a 64-bit version of Windows, you can simply
+right-click on your computer (could be called \textit{My Computer} or
+\textit {This PC}) and select \textit{Properties}. If the dialog mentions
+\textit{64-bit} as in Figure \ref{windows64bit}, then you are indeed on
+a 64-bit operating system.
+
+To determine the bitness of Java, simply open a command prompt and run
+the command \textit{java -version}. If the output shows \textit{64-bit} as
+in Figure \ref{java64bit}, then you have a 64-bit version installed.
+
+Finally, if you have a 64-bit version of Windows then you will find a
+\textit{Program Files} and \textit{Program Files (x86)} directory.
+If you installed a 64-bit version of VLC, it will get installed in the
+\textit{Program Files} directory (see Figure \ref{vlc64bit}), a 32-bit
+version will end up in the \textit{Program Files (x86)} directory.
+
+Unfortunately, VLC offers the 32-bit version for download by default and
+you have to explicitly select the 64-bit version.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=12.0cm]{images/windows64bit.png}
+  \caption{Windows 64-bit.}
+  \label{windows64bit}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=12.0cm]{images/java64bit.png}
+  \caption{Java 64-bit.}
+  \label{java64bit}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=12.0cm]{images/vlc64bit.png}
+  \caption{VLC 64-bit.}
+  \label{vlc64bit}
+\end{figure}
+
+\subsubsection{Linux}
+You can easily determine the bitness of your operating system by executing
+the following command in a terminal:
+\begin{verbatim}
+arch
+\end{verbatim}
+If it states \textit{x86\_64}, you have a 64-bit operating system.
+
+Use the following command in a terminal to determine the bitness of your
+Java installation:
+\begin{verbatim}
+java -version
+\end{verbatim}
+It should produce similar output as in Figure \ref{java64bit}. If it states
+64-bit then you have a 64-bit version installed.
+
+Installing VLC through your package manager should already install the same
+bitness as your operating system.
+
+\subsubsection{Mac OSX}
+Mac OSX only comes in 64-bit, so there shouldn't be any issues with the bitness.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+\newpage
+\section{Annotator}
+
+The Annotator tool allows you to annotate videos with meta-data. Just like
+the \textit{VLCj Video Player}, it uses VLC as well for playing the videos.
+Therefore please ensure that you setup if correct -- see section \ref{bitness}.
+Figure \ref{annotator_in_use} shows a screenshot of the Annotator in action.
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width= 12.0cm]{images/AnnotatorInUse.png}
   \caption{Annotator showing a video and key shortcuts}
   \label{annotator_in_use}
 \end{figure}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Annotator}
-
-The annotator has three menus which we will cover in the following sections.
+The tool has three menus which we will cover in the following sections.
 
 \begin{figure}[htb]
   \centering
@@ -342,12 +407,6 @@ Timestamp,X,Y,Meta-data
 "00:00:00.224",423,285,""
 "00:00:00.304",423,277,""
 \end{verbatim}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Video Annotator}
-\section{Useage}
-The annotator has three menus which we will cover here
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
