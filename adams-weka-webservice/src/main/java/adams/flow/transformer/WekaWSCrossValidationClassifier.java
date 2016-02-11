@@ -15,11 +15,12 @@
 
 /*
  * WekaWSCrossValidationClassifier.java
- * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
+import adams.core.MessageCollection;
 import nz.ac.waikato.adams.webservice.weka.CrossValidateClassifier;
 import nz.ac.waikato.adams.webservice.weka.Dataset;
 import weka.core.Instances;
@@ -237,7 +238,17 @@ extends AbstractTransformer {
    * @return Classifier object
    */
   protected weka.classifiers.Classifier getClassifierInstance() {
-    return (weka.classifiers.Classifier) CallableActorHelper.getSetup(
-	weka.classifiers.Classifier.class, m_ClassifierActor, this);
+    weka.classifiers.Classifier		result;
+    MessageCollection			errors;
+
+    errors = new MessageCollection();
+    result = (weka.classifiers.Classifier) CallableActorHelper.getSetup(
+	weka.classifiers.Classifier.class, m_ClassifierActor, this, errors);
+    if (result == null) {
+      if (!errors.isEmpty())
+	getLogger().severe(errors.toString());
+    }
+
+    return result;
   }
 }

@@ -15,11 +15,13 @@
 
 /**
  * AbstractGlobalPHMMClassifierEvaluator.java
- * Copyright (C) 2009-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.transformer;
 
+import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
+import adams.flow.container.WekaModelContainer;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.CallableActorHelper;
 
@@ -93,6 +95,24 @@ public abstract class AbstractGlobalPHMMClassifierEvaluator<T extends weka.class
    * @return		the classifier
    */
   protected T getClassifierInstance() {
-    return (T) CallableActorHelper.getSetup(null, m_Classifier, this);
+    T			result;
+    Object		obj;
+    MessageCollection 	errors;
+
+    result = null;
+    errors = new MessageCollection();
+    obj    = CallableActorHelper.getSetup(null, m_Classifier, this, errors);
+    if (obj == null) {
+      if (!errors.isEmpty())
+	getLogger().severe(errors.toString());
+    }
+    else {
+      if (obj instanceof WekaModelContainer)
+	result = (T) ((WekaModelContainer) obj).getValue(WekaModelContainer.VALUE_MODEL);
+      else
+	result = (T) obj;
+    }
+
+    return result;
   }
 }

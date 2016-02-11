@@ -15,11 +15,12 @@
 
 /*
  * MekaTrainClassifier.java
- * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
+import adams.core.MessageCollection;
 import weka.core.Instances;
 import adams.core.QuickInfoHelper;
 import adams.flow.container.WekaModelContainer;
@@ -190,11 +191,17 @@ public class MekaTrainClassifier
    * @throws Exception  if fails to obtain classifier
    */
   protected meka.classifiers.multilabel.MultiLabelClassifier getClassifierInstance() throws Exception {
-    meka.classifiers.multilabel.MultiLabelClassifier   result;
+    meka.classifiers.multilabel.MultiLabelClassifier	result;
+    MessageCollection					errors;
 
-    result = (meka.classifiers.multilabel.MultiLabelClassifier) CallableActorHelper.getSetup(meka.classifiers.multilabel.MultiLabelClassifier.class, m_Classifier, this);
-    if (result == null)
-      throw new IllegalStateException("Failed to obtain classifier from '" + m_Classifier + "'!");
+    errors = new MessageCollection();
+    result = (meka.classifiers.multilabel.MultiLabelClassifier) CallableActorHelper.getSetup(meka.classifiers.multilabel.MultiLabelClassifier.class, m_Classifier, this, errors);
+    if (result == null) {
+      if (errors.isEmpty())
+	throw new IllegalStateException("Failed to obtain classifier from '" + m_Classifier + "'!");
+      else
+	throw new IllegalStateException("Failed to obtain classifier from '" + m_Classifier + "':\n" + errors);
+    }
 
     return result;
   }

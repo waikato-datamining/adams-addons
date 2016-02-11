@@ -15,10 +15,11 @@
 
 /**
  * AbstractCallableMekaClassifierEvaluator.java
- * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.transformer;
 
+import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
@@ -117,6 +118,17 @@ public abstract class AbstractCallableMekaClassifierEvaluator
    * @return		the classifier
    */
   protected meka.classifiers.multilabel.MultiLabelClassifier getClassifierInstance() {
-    return (meka.classifiers.multilabel.MultiLabelClassifier) CallableActorHelper.getSetup(meka.classifiers.multilabel.MultiLabelClassifier.class, m_Classifier, this);
+    meka.classifiers.multilabel.MultiLabelClassifier	result;
+    MessageCollection					errors;
+
+    errors = new MessageCollection();
+    result = (meka.classifiers.multilabel.MultiLabelClassifier) CallableActorHelper.getSetup(
+      meka.classifiers.multilabel.MultiLabelClassifier.class, m_Classifier, this, errors);
+    if (result == null) {
+      if (!errors.isEmpty())
+	getLogger().severe(errors.toString());
+    }
+
+    return result;
   }
 }

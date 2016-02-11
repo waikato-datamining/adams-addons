@@ -15,11 +15,12 @@
 
 /*
  * AddTrailBackground.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
+import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.data.image.AbstractImageContainer;
 import adams.data.trail.Trail;
@@ -186,10 +187,16 @@ public class AddTrailBackground
   protected BufferedImage getBackgroundInstance() {
     BufferedImage	result;
     Object		obj;
+    MessageCollection	errors;
 
     result = null;
-    obj    = CallableActorHelper.getSetupFromSource(Object.class, m_Background, this);
-    if (obj != null) {
+    errors = new MessageCollection();
+    obj    = CallableActorHelper.getSetupFromSource(Object.class, m_Background, this, errors);
+    if (obj == null) {
+      if (!errors.isEmpty())
+	getLogger().severe(errors.toString());
+    }
+    else {
       if (obj instanceof BufferedImage)
 	result = (BufferedImage) obj;
       else if (obj instanceof AbstractImageContainer)
