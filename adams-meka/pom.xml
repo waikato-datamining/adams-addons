@@ -93,6 +93,12 @@
       <groupId>net.sf.meka.thirdparty</groupId>
       <artifactId>mulan</artifactId>
       <version>1.4.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>nz.ac.waikato.cms.weka</groupId>
+          <artifactId>weka-dev</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
