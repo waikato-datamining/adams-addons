@@ -1,60 +1,13 @@
 # Project: adams
-# Date: 2015-11-12 16:28:09
+# Date: 2016-02-15 14:36:14
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Demonstrates how to load and prepare data for \na MEKA classifier that then gets cross-validated.\nOnly the user-specified info values get turned \ninto a spreadsheet and displayed.
-	-actor
-		adams.flow.standalone.CallableActors
-			-actor
-				adams.flow.source.MekaClassifierSetup
-					-classifier
-						meka.classifiers.multilabel.BR
-							-W
-							weka.classifiers.trees.J48
-							--
-							-C
-							0.25
-							-M
-							2
-	-actor
-		adams.flow.source.FileSupplier
-			-file
-			${EXAMPLE_FLOWS}/data/Music.arff
-	-actor
-		adams.flow.transformer.WekaFileReader
-			-loader
-				weka.core.converters.ArffLoader
-	-actor
-		adams.flow.transformer.MekaPrepareData
-	-actor
-		adams.flow.transformer.MekaCrossValidationEvaluator
-	-actor
-		adams.flow.transformer.MekaResultValues
-			-info-value
-			Classifier
-			-info-value
-			Options
-			-info-value
-			Dataset
-			-info-value
-			Type
-			-info-value
-			Threshold
-			-metric-value
-			Accuracy
-			-metric-value
-			Hamming score
-			-metric-value
-			Exact match
-			-metric-value
-			Jaccard distance
-	-actor
-		adams.flow.sink.SpreadSheetDisplay
-			-writer
-				adams.data.io.output.NullWriter
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Demonstrates how to load and prepare data for \\na MEKA classifier that then gets cross-validated.\\nOnly the user-specified info values get turned \\ninto a spreadsheet and displayed." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.source.MekaClassifierSetup -classifier "meka.classifiers.multilabel.BR -W weka.classifiers.trees.J48 -- -C 0.25 -M 2"
+ adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/Music.arff
+ adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
+ adams.flow.transformer.MekaPrepareData
+ adams.flow.transformer.MekaCrossValidationEvaluator
+ adams.flow.transformer.MekaResultValues -info-value Classifier -info-value Options -info-value Dataset -info-value Type -info-value Threshold -metric-value Accuracy -metric-value "Hamming score" -metric-value "Exact match" -metric-value "Jaccard distance"
+ adams.flow.sink.SpreadSheetDisplay -writer adams.data.io.output.NullWriter

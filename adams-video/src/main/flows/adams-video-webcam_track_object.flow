@@ -1,73 +1,15 @@
 # Project: adams
-# Date: 2015-08-24 11:06:02
+# Date: 2016-02-15 15:10:20
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Displays frames obtained from the default webcam, till you stop the flow.\nThe first frame is used to select the object to track, for instance, your head.
-	-actor
-		adams.flow.source.WebcamImage
-			-conversion
-				adams.data.conversion.BufferedImageToBufferedImage
-	-actor
-		adams.flow.transformer.Convert
-			-conversion
-				adams.data.conversion.BufferedImageToBoofCV
-	-actor
-		adams.flow.transformer.SetStorageValue
-			-storage-name
-			frame
-	-actor
-		adams.flow.control.Once
-			-name
-			select object
-			-tee
-				adams.flow.control.Inspect
-					-provider
-						adams.flow.sink.ImageViewer
-							-writer
-								adams.gui.print.NullWriter
-							-selection-processor
-								adams.gui.visualization.image.selection.SelectObjectToTrack
-							-selection-box-color
-							#ff0000
-							-image-overlay
-								adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport
-					-close-dialog
-					true
-			-tee
-				adams.flow.transformer.SetStorageValue
-					-storage-name
-					frame
-	-actor
-		adams.flow.control.Trigger
-			-name
-			track
-			-tee
-				adams.flow.source.StorageValue
-					-storage-name
-					frame
-			-tee
-				adams.flow.transformer.TrackObjects
-					-algorithm
-						adams.flow.transformer.objecttracker.BoofCVCirculant
-			-tee
-				adams.flow.sink.ImageViewer
-					-name
-					Frame
-					-short-title
-					true
-					-writer
-						adams.gui.print.NullWriter
-					-zoom
-					-1.0
-					-selection-processor
-						adams.gui.visualization.image.selection.NullProcessor
-					-image-overlay
-						adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport
-							-regexp
-							Tracker\\.Current
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Displays frames obtained from the default webcam, till you stop the flow.\\nThe first frame is used to select the object to track, for instance, your head." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.WebcamImage -conversion adams.data.conversion.BufferedImageToBufferedImage
+ adams.flow.transformer.Convert -conversion adams.data.conversion.BufferedImageToBoofCV
+ adams.flow.transformer.SetStorageValue -storage-name frame
+ adams.flow.control.Once -name "select object"
+  adams.flow.control.Inspect -provider "adams.flow.sink.ImageViewer -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.SelectObjectToTrack -selection-box-color #ff0000 -image-overlay adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport" -close-dialog true
+  adams.flow.transformer.SetStorageValue -storage-name frame
+ adams.flow.control.Trigger -name track
+  adams.flow.source.StorageValue -storage-name frame
+  adams.flow.transformer.TrackObjects -algorithm adams.flow.transformer.objecttracker.BoofCVCirculant
+  adams.flow.sink.ImageViewer -name Frame -short-title true -writer adams.gui.print.NullWriter -zoom -1.0 -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay "adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport -regexp Tracker\\\\.Current"

@@ -15,7 +15,7 @@
 
 /**
  * Rat.java
- * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
@@ -30,7 +30,6 @@ import adams.flow.container.ErrorContainer;
 import adams.flow.control.LocalScopeTransformer;
 import adams.flow.control.ScopeHandler.ScopeHandling;
 import adams.flow.control.StorageName;
-import adams.flow.core.AbstractActor;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorHandlerInfo;
 import adams.flow.core.ActorUtils;
@@ -51,7 +50,6 @@ import adams.flow.standalone.rats.output.RatOutput;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -95,7 +93,7 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: adams.flow.standalone.rats.DummyInput
  * </pre>
  * 
- * <pre>-actor &lt;adams.flow.core.AbstractActor&gt; [-actor ...] (property: actors)
+ * <pre>-actor &lt;adams.flow.core.Actor&gt; [-actor ...] (property: actors)
  * &nbsp;&nbsp;&nbsp;The actors for transforming the data obtained by the receiver before sending 
  * &nbsp;&nbsp;&nbsp;it to the transmitter.
  * &nbsp;&nbsp;&nbsp;default: 
@@ -160,7 +158,7 @@ import java.util.List;
  * @version $Revision$
  */
 public class Rat
-  extends AbstractStandaloneGroupItem
+  extends AbstractStandaloneGroupItem<Rats>
   implements MutableActorHandler, InternalActorHandler, CallableActorUser,
              Pausable {
 
@@ -180,7 +178,7 @@ public class Rat
   protected CallableActorReference m_Log;
 
   /** the callable log actor. */
-  protected AbstractActor m_LogActor;
+  protected Actor m_LogActor;
 
   /** the helper class. */
   protected CallableActorHelper m_Helper;
@@ -217,7 +215,7 @@ public class Rat
 
     m_OptionManager.add(
 	    "actor", "actors",
-	    new AbstractActor[0]);
+	    new Actor[0]);
 
     m_OptionManager.add(
 	    "transmitter", "transmitter",
@@ -316,7 +314,7 @@ public class Rat
    *
    * @param value 	the sequence items
    */
-  public void setActors(AbstractActor[] value) {
+  public void setActors(Actor[] value) {
     m_Actors.setActors(value);
     reset();
   }
@@ -326,7 +324,7 @@ public class Rat
    *
    * @return 		the sequence items
    */
-  public AbstractActor[] getActors() {
+  public Actor[] getActors() {
     return m_Actors.getActors();
   }
 
@@ -676,7 +674,7 @@ public class Rat
    * @param value	the new parent
    */
   @Override
-  public void setParent(AbstractActor value) {
+  public void setParent(Actor value) {
     super.setParent(value);
     m_Actors.setParent(null);
     m_Actors.setParent(this);
@@ -703,7 +701,7 @@ public class Rat
    * @return		always null
    */
   @Override
-  public String handleError(AbstractActor source, String type, String msg) {
+  public String handleError(Actor source, String type, String msg) {
     LogEntry		entry;
     Properties		props;
     
@@ -753,7 +751,7 @@ public class Rat
    * @return		the actor
    */
   @Override
-  public AbstractActor get(int index) {
+  public Actor get(int index) {
     return m_Actors.get(index);
   }
 
@@ -764,7 +762,7 @@ public class Rat
    * @param actor	the actor to set at this position
    */
   @Override
-  public void set(int index, AbstractActor actor) {
+  public void set(int index, Actor actor) {
     m_Actors.set(index, actor);
   }
 
@@ -785,7 +783,7 @@ public class Rat
    * @return		the first 'active' actor, null if none available
    */
   @Override
-  public AbstractActor firstActive() {
+  public Actor firstActive() {
     return m_Actors.firstActive();
   }
 
@@ -795,7 +793,7 @@ public class Rat
    * @return		the last 'active' actor, null if none available
    */
   @Override
-  public AbstractActor lastActive() {
+  public Actor lastActive() {
     return m_Actors.lastActive();
   }
 
@@ -805,7 +803,7 @@ public class Rat
    * @param actor	the actor to insert
    */
   @Override
-  public void add(AbstractActor actor) {
+  public void add(Actor actor) {
     m_Actors.add(actor);
   }
 
@@ -816,7 +814,7 @@ public class Rat
    * @param actor	the actor to insert
    */
   @Override
-  public void add(int index, AbstractActor actor) {
+  public void add(int index, Actor actor) {
     m_Actors.add(index, actor);
   }
 
@@ -827,7 +825,7 @@ public class Rat
    * @return		the removed actor
    */
   @Override
-  public AbstractActor remove(int index) {
+  public Actor remove(int index) {
     return m_Actors.remove(index);
   }
 
@@ -866,7 +864,7 @@ public class Rat
    *
    * @return		the callable actor or null if not found
    */
-  protected AbstractActor findCallableActor() {
+  protected Actor findCallableActor() {
     return m_Helper.findCallableActorRecursive(this, getLog());
   }
 
@@ -885,7 +883,7 @@ public class Rat
    *
    * @return		the actor, can be null
    */
-  public AbstractActor getCallableActor() {
+  public Actor getCallableActor() {
     return m_LogActor;
   }
   
@@ -963,8 +961,7 @@ public class Rat
     Compatibility	comp;
     String		msg;
     HashSet<String>	variables;
-    List<AbstractActor>	breakpoints;
-    
+
     result = super.setUp();
 
     if (result == null)

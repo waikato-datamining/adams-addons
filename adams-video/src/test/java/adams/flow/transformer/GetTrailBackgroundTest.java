@@ -26,7 +26,7 @@ import adams.data.io.input.SimpleTrailReader;
 import adams.env.Environment;
 import adams.flow.AbstractFlowTest;
 import adams.flow.control.Flow;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 import adams.flow.execution.NullListener;
 import adams.flow.sink.ImageViewer;
 import adams.flow.source.FileSupplier;
@@ -90,15 +90,15 @@ public class GetTrailBackgroundTest
   /**
    * Used to create an instance of a specific actor.
    *
-   * @return a suitably configured <code>AbstractActor</code> value
+   * @return a suitably configured <code>Actor</code> value
    */
-  public AbstractActor getActor() {
+  public Actor getActor() {
     AbstractArgumentOption    argOption;
     
     Flow flow = new Flow();
     
     try {
-      List<AbstractActor> actors = new ArrayList<AbstractActor>();
+      List<Actor> actors = new ArrayList<Actor>();
 
       // Flow.FileSupplier
       FileSupplier filesupplier = new FileSupplier();
@@ -123,7 +123,7 @@ public class GetTrailBackgroundTest
       ImageViewer viewer = new ImageViewer();
       actors.add(viewer);
 
-      flow.setActors(actors.toArray(new AbstractActor[0]));
+      flow.setActors(actors.toArray(new Actor[0]));
 
       NullListener nulllistener = new NullListener();
       flow.setFlowExecutionListener(nulllistener);

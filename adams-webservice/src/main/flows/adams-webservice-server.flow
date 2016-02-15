@@ -1,27 +1,10 @@
 # Project: adams
-# Date: 2014-01-23 15:46:27
+# Date: 2016-02-15 15:12:42
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Runs the webservice of the Apache CXF \"WSDL first\" example:\nhttp://cxf.apache.org/docs/sample-projects.html
-	-actor
-		adams.flow.standalone.WSServer
-			-web-service
-				com.example.customerservice.flow.CustomerServiceWS
-	-actor
-		adams.flow.source.Start
-	-actor
-		adams.flow.control.WhileLoop
-			-name
-			keep going
-			-condition
-				adams.flow.condition.bool.True
-			-loop
-				adams.flow.source.Start
-			-loop
-				adams.flow.control.Sleep
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Runs the webservice of the Apache CXF \\\"WSDL first\\\" example:\\nhttp://cxf.apache.org/docs/sample-projects.html" -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.WSServer -web-service "com.example.customerservice.flow.CustomerServiceWS -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator"
+ adams.flow.source.Start
+ adams.flow.control.WhileLoop -name "keep going" -condition adams.flow.condition.bool.True
+  adams.flow.source.Start
+  adams.flow.control.Sleep

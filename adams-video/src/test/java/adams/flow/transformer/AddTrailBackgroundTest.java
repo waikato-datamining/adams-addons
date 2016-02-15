@@ -28,7 +28,7 @@ import adams.data.io.output.SimpleTrailWriter;
 import adams.env.Environment;
 import adams.flow.AbstractFlowTest;
 import adams.flow.control.Flow;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 import adams.flow.core.CallableActorReference;
 import adams.flow.execution.NullListener;
 import adams.flow.source.FileSupplier;
@@ -118,25 +118,25 @@ public class AddTrailBackgroundTest
   /**
    * Used to create an instance of a specific actor.
    *
-   * @return a suitably configured <code>AbstractActor</code> value
+   * @return a suitably configured <code>Actor</code> value
    */
-  public AbstractActor getActor() {
+  public Actor getActor() {
     AbstractArgumentOption    argOption;
     
     Flow flow = new Flow();
     
     try {
-      List<AbstractActor> actors = new ArrayList<AbstractActor>();
+      List<Actor> actors = new ArrayList<Actor>();
 
       // Flow.CallableActors
       CallableActors callableactors = new CallableActors();
-      List<AbstractActor> actors2 = new ArrayList<AbstractActor>();
+      List<Actor> actors2 = new ArrayList<Actor>();
 
       // Flow.CallableActors.bg
       SequenceSource sequencesource = new SequenceSource();
       argOption = (AbstractArgumentOption) sequencesource.getOptionManager().findByProperty("name");
       sequencesource.setName((String) argOption.valueOf("bg"));
-      List<AbstractActor> actors3 = new ArrayList<AbstractActor>();
+      List<Actor> actors3 = new ArrayList<Actor>();
 
       // Flow.CallableActors.bg.FileSupplier
       FileSupplier filesupplier = new FileSupplier();
@@ -152,10 +152,10 @@ public class AddTrailBackgroundTest
       imagereader.setReader(jaiimagereader);
 
       actors3.add(imagereader);
-      sequencesource.setActors(actors3.toArray(new AbstractActor[0]));
+      sequencesource.setActors(actors3.toArray(new Actor[0]));
 
       actors2.add(sequencesource);
-      callableactors.setActors(actors2.toArray(new AbstractActor[0]));
+      callableactors.setActors(actors2.toArray(new Actor[0]));
 
       actors.add(callableactors);
 
@@ -185,7 +185,7 @@ public class AddTrailBackgroundTest
       argOption = (AbstractArgumentOption) trailfilewriter.getOptionManager().findByProperty("suppliedFileName");
       trailfilewriter.setSuppliedFileName((String) argOption.valueOf("dumpfile.trail"));
       actors.add(trailfilewriter);
-      flow.setActors(actors.toArray(new AbstractActor[0]));
+      flow.setActors(actors.toArray(new Actor[0]));
 
       NullListener nulllistener = new NullListener();
       flow.setFlowExecutionListener(nulllistener);

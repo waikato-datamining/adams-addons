@@ -1,17 +1,7 @@
 # Project: adams
-# Date: 2015-07-20 11:30:24
+# Date: 2016-02-15 15:09:58
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Outputs the supported resolutions of the default webcam.
-	-actor
-		adams.flow.source.WebcamInfo
-	-actor
-		adams.flow.sink.Display
-			-writer
-				adams.data.io.output.NullWriter
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Outputs the supported resolutions of the default webcam." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.WebcamInfo
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter

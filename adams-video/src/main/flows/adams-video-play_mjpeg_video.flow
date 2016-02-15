@@ -1,75 +1,15 @@
 # Project: adams
-# Date: 2015-11-18 15:35:40
+# Date: 2016-02-15 15:08:40
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Displays the images obtained from a MJPEG movie file.
-	-actor
-		adams.flow.source.SelectFile
-			-stop-if-canceled
-			true
-			-file-chooser-title
-			Select MJPEG file
-			-initial-dir
-			${EXAMPLE_FLOWS}/data
-			-extension
-			mjpeg
-	-actor
-		adams.flow.transformer.MjpegImageSequence
-			-output-type
-			BOTH
-	-actor
-		adams.flow.control.Sleep
-			-interval
-			20
-	-actor
-		adams.flow.control.Branch
-			-branch
-				adams.flow.control.Sequence
-					-name
-					frame
-					-actor
-						adams.flow.transformer.GetArrayElement
-					-actor
-						adams.flow.sink.ImageViewer
-							-name
-							Frame
-							-short-title
-							true
-							-writer
-								adams.gui.print.NullWriter
-							-zoom
-							-1.0
-							-selection-processor
-								adams.gui.visualization.image.selection.NullProcessor
-							-image-overlay
-								adams.gui.visualization.image.NullOverlay
-			-branch
-				adams.flow.control.Sequence
-					-name
-					gui image
-					-actor
-						adams.flow.transformer.GetArrayElement
-							-index
-							2
-					-actor
-						adams.flow.sink.ImageViewer
-							-name
-							GUI Image
-							-short-title
-							true
-							-x
-							-3
-							-writer
-								adams.gui.print.NullWriter
-							-zoom
-							-1.0
-							-selection-processor
-								adams.gui.visualization.image.selection.NullProcessor
-							-image-overlay
-								adams.gui.visualization.image.NullOverlay
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Displays the images obtained from a MJPEG movie file." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select MJPEG file" -initial-dir ${EXAMPLE_FLOWS}/data -extension mjpeg
+ adams.flow.transformer.MjpegImageSequence -output-type BOTH
+ adams.flow.control.Sleep -interval 20
+ adams.flow.control.Branch
+  adams.flow.control.Sequence -name frame
+   adams.flow.transformer.GetArrayElement
+   adams.flow.sink.ImageViewer -name Frame -short-title true -writer adams.gui.print.NullWriter -zoom -1.0 -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay adams.gui.visualization.image.NullOverlay
+  adams.flow.control.Sequence -name "gui image"
+   adams.flow.transformer.GetArrayElement -index 2
+   adams.flow.sink.ImageViewer -name "GUI Image" -short-title true -x -3 -writer adams.gui.print.NullWriter -zoom -1.0 -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay adams.gui.visualization.image.NullOverlay

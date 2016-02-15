@@ -1,114 +1,24 @@
 # Project: adams
-# Date: 2016-01-04 20:12:58
+# Date: 2016-02-15 14:36:03
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Evaluates a MEKA classifier on a train/test split and displays:\n- ROC\n- Precision-Recall\n- Macro-averaged curve\n- Micro-averaged curve\n- Graphs
-	-actor
-		adams.flow.standalone.TabView
-			-actor
-				adams.flow.sink.MekaROC
-					-name
-					ROC
-					-short-title
-					true
-					-writer
-						adams.gui.print.NullWriter
-			-actor
-				adams.flow.sink.MekaPrecisionRecall
-					-name
-					PRC
-					-short-title
-					true
-					-x
-					-2
-					-writer
-						adams.gui.print.NullWriter
-			-actor
-				adams.flow.sink.MekaMacroCurve
-					-name
-					Macro
-					-short-title
-					true
-					-writer
-						adams.gui.print.NullWriter
-			-actor
-				adams.flow.sink.MekaMicroCurve
-					-name
-					Micro
-					-short-title
-					true
-					-writer
-						adams.gui.print.NullWriter
-			-actor
-				adams.flow.sink.MekaGraphVisualizer
-					-name
-					Graphs
-					-short-title
-					true
-					-writer
-						adams.gui.print.NullWriter
-	-actor
-		adams.flow.standalone.CallableActors
-			-actor
-				adams.flow.source.MekaClassifierSetup
-					-classifier
-						meka.classifiers.multilabel.BR
-							-W
-							weka.classifiers.trees.J48
-							--
-							-C
-							0.25
-							-M
-							2
-	-actor
-		adams.flow.source.FileSupplier
-			-file
-			${EXAMPLE_FLOWS}/data/Music.arff
-	-actor
-		adams.flow.transformer.WekaFileReader
-			-loader
-				weka.core.converters.ArffLoader
-	-actor
-		adams.flow.transformer.MekaPrepareData
-	-actor
-		adams.flow.transformer.WekaRandomSplit
-	-actor
-		adams.flow.transformer.MekaTrainTestSetEvaluator
-	-actor
-		adams.flow.control.Branch
-			-branch
-				adams.flow.sink.CallableSink
-					-name
-					ROC
-					-callable
-					ROC
-			-branch
-				adams.flow.sink.CallableSink
-					-name
-					PRC
-					-callable
-					PRC
-			-branch
-				adams.flow.sink.CallableSink
-					-name
-					Macro
-					-callable
-					Macro
-			-branch
-				adams.flow.sink.CallableSink
-					-name
-					Micro
-					-callable
-					Micro
-			-branch
-				adams.flow.sink.CallableSink
-					-name
-					Graphs
-					-callable
-					Graphs
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Evaluates a MEKA classifier on a train/test split and displays:\\n- ROC\\n- Precision-Recall\\n- Macro-averaged curve\\n- Micro-averaged curve\\n- Graphs" -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.TabView
+  adams.flow.sink.MekaROC -name ROC -short-title true -writer adams.gui.print.NullWriter
+  adams.flow.sink.MekaPrecisionRecall -name PRC -short-title true -x -2 -writer adams.gui.print.NullWriter
+  adams.flow.sink.MekaMacroCurve -name Macro -short-title true -writer adams.gui.print.NullWriter
+  adams.flow.sink.MekaMicroCurve -name Micro -short-title true -writer adams.gui.print.NullWriter
+  adams.flow.sink.MekaGraphVisualizer -name Graphs -short-title true -writer adams.gui.print.NullWriter
+ adams.flow.standalone.CallableActors
+  adams.flow.source.MekaClassifierSetup -classifier "meka.classifiers.multilabel.BR -W weka.classifiers.trees.J48 -- -C 0.25 -M 2"
+ adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/Music.arff
+ adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
+ adams.flow.transformer.MekaPrepareData
+ adams.flow.transformer.WekaRandomSplit
+ adams.flow.transformer.MekaTrainTestSetEvaluator
+ adams.flow.control.Branch
+  adams.flow.sink.CallableSink -name ROC -callable ROC
+  adams.flow.sink.CallableSink -name PRC -callable PRC
+  adams.flow.sink.CallableSink -name Macro -callable Macro
+  adams.flow.sink.CallableSink -name Micro -callable Micro
+  adams.flow.sink.CallableSink -name Graphs -callable Graphs

@@ -1,35 +1,10 @@
 # Project: adams
-# Date: 2015-11-18 14:28:54
+# Date: 2016-02-15 14:55:07
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Uploads an image as blob to the BLOB Rats webservice.\nYou need to start \"adams-rats-blob_ws_server.flow\" for this to work.
-	-actor
-		adams.flow.source.FileSupplier
-			-file
-			${EXAMPLE_FLOWS}/0_data/3666455665_18795f0741.jpg
-	-actor
-		adams.flow.transformer.SetVariable
-			-var-name
-			file
-	-actor
-		adams.flow.transformer.BinaryFileReader
-			-output-array
-			true
-	-actor
-		adams.flow.transformer.Convert
-			-conversion
-				adams.data.conversion.ByteArrayToBlobContainer
-					-id
-					@{file}
-	-actor
-		adams.flow.sink.WSSink
-			-client
-				adams.flow.webservice.blob.Upload
-					-out-interceptor
-						adams.flow.webservice.interceptor.outgoing.NullGenerator
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Uploads an image as blob to the BLOB Rats webservice.\\nYou need to start \\\"adams-rats-blob_ws_server.flow\\\" for this to work." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/0_data/3666455665_18795f0741.jpg
+ adams.flow.transformer.SetVariable -var-name file
+ adams.flow.transformer.BinaryFileReader -output-array true
+ adams.flow.transformer.Convert -conversion "adams.data.conversion.ByteArrayToBlobContainer -id @{file}"
+ adams.flow.sink.WSSink -client "adams.flow.webservice.blob.Upload -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator"

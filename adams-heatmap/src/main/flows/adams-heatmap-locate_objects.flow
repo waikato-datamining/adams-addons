@@ -1,37 +1,9 @@
 # Project: adams
-# Date: 2015-02-09 16:56:39
+# Date: 2016-02-15 14:23:55
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Demonstrates how to locate objects in a heatmap.
-	-actor
-		adams.flow.source.FileSupplier
-			-file
-			${EXAMPLE_FLOWS}/data/particles.jpg
-	-actor
-		adams.flow.transformer.HeatmapFileReader
-			-reader
-				adams.data.io.input.SimpleImageHeatmapReader
-					-reader
-						adams.data.io.input.JAIImageReader
-	-actor
-		adams.flow.transformer.HeatmapLocateObjects
-			-conversion
-				adams.data.conversion.HeatmapToBufferedImage
-					-generator
-						adams.gui.visualization.core.BiColorGenerator
-			-locator
-				adams.flow.transformer.locateobjects.BinaryContours
-	-actor
-		adams.flow.sink.DisplayPanelManager
-			-provider
-				adams.flow.sink.HeatmapDisplay
-					-writer
-						adams.gui.print.NullWriter
-					-color-generator
-						adams.gui.visualization.core.BiColorGenerator
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Demonstrates how to locate objects in a heatmap." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/particles.jpg
+ adams.flow.transformer.HeatmapFileReader -reader "adams.data.io.input.SimpleImageHeatmapReader -reader adams.data.io.input.JAIImageReader"
+ adams.flow.transformer.HeatmapLocateObjects -conversion "adams.data.conversion.HeatmapToBufferedImage -generator adams.gui.visualization.core.BiColorGenerator" -locator adams.flow.transformer.locateobjects.BinaryContours
+ adams.flow.sink.DisplayPanelManager -provider "adams.flow.sink.HeatmapDisplay -writer adams.gui.print.NullWriter -color-generator adams.gui.visualization.core.BiColorGenerator"

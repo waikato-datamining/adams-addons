@@ -1,295 +1,68 @@
 # Project: adams
-# Date: 2015-08-24 11:05:27
+# Date: 2016-02-15 15:09:27
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Tracks an object throughout a movie using a predefined, initial location.\nSaves and displays the generated trail object.
-	-actor
-		adams.flow.standalone.TabView
-			-width
-			1000
-			-x
-			-3
-			-actor
-				adams.flow.sink.SpreadSheetDisplay
-					-name
-					Data
-					-short-title
-					true
-					-writer
-						adams.data.io.output.NullWriter
-			-actor
-				adams.flow.sink.TrailDisplay
-					-name
-					Trail
-					-short-title
-					true
-					-writer
-						adams.gui.print.NullWriter
-					-paintlet
-						adams.gui.visualization.trail.paintlet.Circles
-	-actor
-		adams.flow.standalone.CallableActors
-			-actor
-				adams.flow.sink.ImageViewer
-					-name
-					Frame
-					-short-title
-					true
-					-writer
-						adams.gui.print.NullWriter
-					-zoom
-					-1.0
-					-selection-processor
-						adams.gui.visualization.image.selection.NullProcessor
-					-image-overlay
-						adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport
-							-regexp
-							Tracker\\.Current
-			-actor
-				adams.flow.source.StorageValue
-					-name
-					background
-					-storage-name
-					image
-	-actor
-		adams.flow.source.Start
-	-actor
-		adams.flow.control.Trigger
-			-name
-			load initial position
-			-tee
-				adams.flow.source.FileSupplier
-					-file
-					${EXAMPLE_FLOWS}/data/track_peter_rect.txt
-			-tee
-				adams.flow.transformer.TextFileReader
-					-reader
-						adams.data.io.input.SingleStringTextReader
-			-tee
-				adams.flow.transformer.StringTrim
-			-tee
-				adams.flow.transformer.SetVariable
-					-var-name
-					pos
-	-actor
-		adams.flow.control.Trigger
-			-name
-			track
-			-tee
-				adams.flow.source.FileSupplier
-					-file
-					${EXAMPLE_FLOWS}/data/track_peter.mjpeg
-			-tee
-				adams.flow.control.Tee
-					-name
-					id
-					-tee
-						adams.flow.transformer.BaseName
-							-remove-extensions
-							true
-					-tee
-						adams.flow.transformer.SetVariable
-							-var-name
-							id
-			-tee
-				adams.flow.transformer.MjpegImageSequence
-					-output-type
-					FRAME
-			-tee
-				adams.flow.control.Sleep
-					-interval
-					10
-			-tee
-				adams.flow.transformer.SetStorageValue
-					-storage-name
-					image
-			-tee
-				adams.flow.control.Once
-					-name
-					init position
-					-tee
-						adams.flow.transformer.SetReportValue
-							-field
-							Tracker.Init[S]
-							-value
-							@{pos}
-			-tee
-				adams.flow.control.Once
-					-name
-					create new trail
-					-tee
-						adams.flow.control.Tee
-							-name
-							width
-							-tee
-								adams.flow.transformer.ImageInfo
-							-tee
-								adams.flow.transformer.SetVariable
-									-var-name
-									width
-					-tee
-						adams.flow.control.Tee
-							-name
-							height
-							-tee
-								adams.flow.transformer.ImageInfo
-									-type
-									HEIGHT
-							-tee
-								adams.flow.transformer.SetVariable
-									-var-name
-									height
-					-tee
-						adams.flow.control.Trigger
-							-name
-							new trail
-							-tee
-								adams.flow.source.NewTrail
-									-id
-									@{id}
-									-width
-									@{width}
-									-height
-									@{height}
-							-tee
-								adams.flow.transformer.AddTrailBackground
-									-background
-									background
-							-tee
-								adams.flow.transformer.SetStorageValue
-									-storage-name
-									trail
-			-tee
-				adams.flow.transformer.TrackObjects
-					-algorithm
-						adams.flow.transformer.objecttracker.BoofCVCirculant
-			-tee
-				adams.flow.control.Tee
-					-name
-					get location
-					-tee
-						adams.flow.transformer.GetReportValue
-							-field
-							Tracker.Current[S]
-					-tee
-						adams.flow.transformer.SetVariable
-							-var-name
-							current
-					-tee
-						adams.flow.transformer.Convert
-							-conversion
-								adams.data.conversion.MultiConversion
-									-conversion
-										adams.data.conversion.StringToQuadrilateralLocation
-									-conversion
-										adams.data.conversion.QuadrilateralLocationCenter
-									-conversion
-										adams.data.conversion.Point2DToString
-					-tee
-						adams.flow.transformer.StringSplit
-							-expression
-							 
-					-tee
-						adams.flow.control.Tee
-							-name
-							x
-							-tee
-								adams.flow.transformer.GetArrayElement
-							-tee
-								adams.flow.transformer.SetVariable
-									-var-name
-									x
-					-tee
-						adams.flow.control.Tee
-							-name
-							y
-							-tee
-								adams.flow.transformer.GetArrayElement
-									-index
-									2
-							-tee
-								adams.flow.transformer.SetVariable
-									-var-name
-									y
-					-tee
-						adams.flow.control.Trigger
-							-name
-							add step
-							-tee
-								adams.flow.source.StorageValue
-									-storage-name
-									trail
-							-tee
-								adams.flow.transformer.AddTrailStep
-									-x
-									@{x}
-									-y
-									@{y}
-							-tee
-								adams.flow.transformer.SetStorageValue
-									-storage-name
-									trail
-			-tee
-				adams.flow.control.Branch
-					-branch
-						adams.flow.control.Trigger
-							-name
-							image
-							-tee
-								adams.flow.source.StorageValue
-									-storage-name
-									image
-							-tee
-								adams.flow.transformer.SetReportValue
-									-field
-									Tracker.Current[S]
-									-value
-									@{current}
-							-tee
-								adams.flow.control.Cast
-									-classname
-									adams.data.image.AbstractImageContainer
-							-tee
-								adams.flow.sink.CallableSink
-									-callable
-									Frame
-	-actor
-		adams.flow.control.Trigger
-			-name
-			display trail
-			-tee
-				adams.flow.source.StorageValue
-					-storage-name
-					trail
-			-tee
-				adams.flow.control.Branch
-					-branch
-						adams.flow.control.Sequence
-							-name
-							data
-							-actor
-								adams.flow.transformer.Convert
-									-conversion
-										adams.data.conversion.TrailToSpreadSheet
-							-actor
-								adams.flow.sink.CallableSink
-									-callable
-									Data
-					-branch
-						adams.flow.sink.CallableSink
-							-callable
-							Trail
-					-branch
-						adams.flow.transformer.TrailFileWriter
-							-writer
-								adams.data.io.output.SimpleTrailWriter
-							-dir
-							${EXAMPLE_FLOWS}/output
-							-file-name-generation
-							ID
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Tracks an object throughout a movie using a predefined, initial location.\\nSaves and displays the generated trail object." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.TabView -width 1000 -x -3
+  adams.flow.sink.SpreadSheetDisplay -name Data -short-title true -writer adams.data.io.output.NullWriter
+  adams.flow.sink.TrailDisplay -name Trail -short-title true -writer adams.gui.print.NullWriter -paintlet adams.gui.visualization.trail.paintlet.Circles
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.ImageViewer -name Frame -short-title true -writer adams.gui.print.NullWriter -zoom -1.0 -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay "adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport -regexp Tracker\\\\.Current"
+  adams.flow.source.StorageValue -name background -storage-name image
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "load initial position"
+  adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/track_peter_rect.txt
+  adams.flow.transformer.TextFileReader -reader adams.data.io.input.SingleStringTextReader
+  adams.flow.transformer.StringTrim
+  adams.flow.transformer.SetVariable -var-name pos
+ adams.flow.control.Trigger -name track
+  adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/track_peter.mjpeg
+  adams.flow.control.Tee -name id
+   adams.flow.transformer.BaseName -remove-extensions true
+   adams.flow.transformer.SetVariable -var-name id
+  adams.flow.transformer.MjpegImageSequence -output-type FRAME
+  adams.flow.control.Sleep -interval 10
+  adams.flow.transformer.SetStorageValue -storage-name image
+  adams.flow.control.Once -name "init position"
+   adams.flow.transformer.SetReportValue -field Tracker.Init[S] -value @{pos}
+  adams.flow.control.Once -name "create new trail"
+   adams.flow.control.Tee -name width
+    adams.flow.transformer.ImageInfo
+    adams.flow.transformer.SetVariable -var-name width
+   adams.flow.control.Tee -name height
+    adams.flow.transformer.ImageInfo -type HEIGHT
+    adams.flow.transformer.SetVariable -var-name height
+   adams.flow.control.Trigger -name "new trail"
+    adams.flow.source.NewTrail -id @{id} -width @{width} -height @{height}
+    adams.flow.transformer.AddTrailBackground -background background
+    adams.flow.transformer.SetStorageValue -storage-name trail
+  adams.flow.transformer.TrackObjects -algorithm adams.flow.transformer.objecttracker.BoofCVCirculant
+  adams.flow.control.Tee -name "get location"
+   adams.flow.transformer.GetReportValue -field Tracker.Current[S]
+   adams.flow.transformer.SetVariable -var-name current
+   adams.flow.transformer.Convert -conversion "adams.data.conversion.MultiConversion -conversion adams.data.conversion.StringToQuadrilateralLocation -conversion adams.data.conversion.QuadrilateralLocationCenter -conversion adams.data.conversion.Point2DToString"
+   adams.flow.transformer.StringSplit -expression " "
+   adams.flow.control.Tee -name x
+    adams.flow.transformer.GetArrayElement
+    adams.flow.transformer.SetVariable -var-name x
+   adams.flow.control.Tee -name y
+    adams.flow.transformer.GetArrayElement -index 2
+    adams.flow.transformer.SetVariable -var-name y
+   adams.flow.control.Trigger -name "add step"
+    adams.flow.source.StorageValue -storage-name trail
+    adams.flow.transformer.AddTrailStep -x @{x} -y @{y}
+    adams.flow.transformer.SetStorageValue -storage-name trail
+  adams.flow.control.Branch
+   adams.flow.control.Trigger -name image
+    adams.flow.source.StorageValue -storage-name image
+    adams.flow.transformer.SetReportValue -field Tracker.Current[S] -value @{current}
+    adams.flow.control.Cast -classname adams.data.image.AbstractImageContainer
+    adams.flow.sink.CallableSink -callable Frame
+ adams.flow.control.Trigger -name "display trail"
+  adams.flow.source.StorageValue -storage-name trail
+  adams.flow.control.Branch
+   adams.flow.control.Sequence -name data
+    adams.flow.transformer.Convert -conversion adams.data.conversion.TrailToSpreadSheet
+    adams.flow.sink.CallableSink -callable Data
+   adams.flow.sink.CallableSink -callable Trail
+   adams.flow.transformer.TrailFileWriter -writer adams.data.io.output.SimpleTrailWriter -dir ${EXAMPLE_FLOWS}/output -file-name-generation ID

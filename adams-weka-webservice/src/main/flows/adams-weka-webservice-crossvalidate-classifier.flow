@@ -1,73 +1,14 @@
 # Project: adams
-# Date: 2014-01-31 08:59:55
+# Date: 2016-02-15 15:28:46
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Cross-validates a J48 classifier on a dataset that the user chooses through \nthe referenced webservice.\nSee flow defined in \"adams-weka-webservice-weka-webservice.flow\" for running the webservice.
-	-actor
-		adams.flow.standalone.CallableActors
-			-actor
-				adams.flow.source.WekaClassifierSetup
-					-classifier
-						weka.classifiers.trees.J48
-							-C
-							0.25
-							-M
-							2
-							
-							
-							
-							
-							
-							
-							
-							
-							
-							
-							
-							
-	-actor
-		adams.flow.source.SelectFile
-			-stop-if-canceled
-			true
-			-custom-stop-message
-			User canceled dataset selection!
-			-file-chooser-title
-			Select dataset to cross-validate
-			-initial-dir
-			${EXAMPLE_FLOWS}/data
-			-extension
-			ARFF
-			-extension
-			CSV
-			-initial-file
-			${EXAMPLE_FLOWS}/data/anneal.arff
-	-actor
-		adams.flow.transformer.WekaFileReader
-			-loader
-				weka.core.converters.ArffLoader
-	-actor
-		adams.flow.transformer.WekaClassSelector
-	-actor
-		adams.flow.transformer.WekaWSCrossValidationClassifier
-	-actor
-		adams.flow.transformer.WSTransformer
-			-logging-level
-			INFO
-			-client
-				adams.flow.webservice.CrossValidationClassifier
-	-actor
-		adams.flow.transformer.Convert
-			-conversion
-				adams.data.conversion.DatasetToWekaInstances
-	-actor
-		adams.flow.sink.DisplayPanelManager
-			-provider
-				adams.flow.sink.WekaInstancesDisplay
-					-writer
-						adams.gui.print.NullWriter
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Cross-validates a J48 classifier on a dataset that the user chooses through \\nthe referenced webservice.\\nSee flow defined in \\\"adams-weka-webservice-weka-webservice.flow\\\" for running the webservice." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.source.WekaClassifierSetup -classifier "weka.classifiers.trees.J48 -C 0.25 -M 2"
+ adams.flow.source.SelectFile -stop-if-canceled true -custom-stop-message "User canceled dataset selection!" -file-chooser-title "Select dataset to cross-validate" -initial-dir ${EXAMPLE_FLOWS}/data -extension ARFF -extension CSV -initial-file ${EXAMPLE_FLOWS}/data/anneal.arff
+ adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
+ adams.flow.transformer.WekaClassSelector
+ adams.flow.transformer.WekaWSCrossValidationClassifier
+ adams.flow.transformer.WSTransformer -logging-level INFO -client "adams.flow.webservice.CrossValidationClassifier -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator"
+ adams.flow.transformer.Convert -conversion adams.data.conversion.DatasetToWekaInstances
+ adams.flow.sink.DisplayPanelManager -provider "adams.flow.sink.WekaInstancesDisplay -writer adams.gui.print.NullWriter"

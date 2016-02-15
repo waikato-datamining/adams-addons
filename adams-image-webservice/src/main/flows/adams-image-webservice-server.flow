@@ -1,33 +1,10 @@
 # Project: adams
-# Date: 2014-09-12 09:29:13
+# Date: 2016-02-15 14:24:25
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	The webservice that allows clients to upload images to the specified upload directory.
-	-actor
-		adams.flow.standalone.WSServer
-			-logging-level
-			INFO
-			-web-service
-				adams.flow.webservice.ImageServiceWS
-					-implementation
-						adams.flow.webservice.SimpleImageService
-							-upload-dir
-							${EXAMPLE_FLOWS}/upload
-	-actor
-		adams.flow.source.Start
-	-actor
-		adams.flow.control.WhileLoop
-			-name
-			keep going
-			-condition
-				adams.flow.condition.bool.True
-			-loop
-				adams.flow.source.Start
-			-loop
-				adams.flow.control.Sleep
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "The webservice that allows clients to upload images to the specified upload directory." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.WSServer -logging-level INFO -web-service "adams.flow.webservice.ImageServiceWS -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -implementation \"adams.flow.webservice.SimpleImageService -upload-dir ${EXAMPLE_FLOWS}/upload\""
+ adams.flow.source.Start
+ adams.flow.control.WhileLoop -name "keep going" -condition adams.flow.condition.bool.True
+  adams.flow.source.Start
+  adams.flow.control.Sleep

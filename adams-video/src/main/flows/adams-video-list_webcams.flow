@@ -1,15 +1,7 @@
 # Project: adams
-# Date: 2015-07-20 09:45:57
+# Date: 2016-02-15 15:08:18
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-actor
-		adams.flow.source.ListWebcams
-	-actor
-		adams.flow.sink.Display
-			-writer
-				adams.data.io.output.NullWriter
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.ListWebcams
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter

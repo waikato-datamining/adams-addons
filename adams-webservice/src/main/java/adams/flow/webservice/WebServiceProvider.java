@@ -15,12 +15,12 @@
 
 /**
  * WebServiceProvider.java
- * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
 import adams.core.CleanUpHandler;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
 
@@ -38,14 +38,14 @@ public interface WebServiceProvider
    * 
    * @param value	the owner
    */
-  public void setOwner(AbstractActor value);
+  public void setOwner(Actor value);
   
   /**
    * Returns the owning actor.
    * 
    * @return		the owner
    */
-  public AbstractActor getOwner();
+  public Actor getOwner();
   
   /**
    * Sets the interceptor for incoming messages 

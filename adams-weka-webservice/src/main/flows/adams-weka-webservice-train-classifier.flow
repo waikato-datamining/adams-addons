@@ -1,67 +1,13 @@
 # Project: adams
-# Date: 2014-01-31 09:00:46
+# Date: 2016-02-15 15:27:39
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Trains a J48 classifier on a dataset that the user chooses through the referenced \nwebservice and stores the model there as well.\nSee flow defined in \"adams-weka-webservice-weka-webservice.flow\" for running the webservice.
-	-actor
-		adams.flow.standalone.CallableActors
-			-actor
-				adams.flow.source.WekaClassifierSetup
-					-classifier
-						weka.classifiers.trees.J48
-							-C
-							0.25
-							-M
-							2
-							
-							
-							
-							
-							
-							
-							
-							
-							
-							
-							
-							
-	-actor
-		adams.flow.source.SelectFile
-			-stop-if-canceled
-			true
-			-custom-stop-message
-			User canceled dataset selection!
-			-file-chooser-title
-			Select dataset to cross-validate
-			-initial-dir
-			${EXAMPLE_FLOWS}/data
-			-extension
-			ARFF
-			-extension
-			CSV
-			-initial-file
-			${EXAMPLE_FLOWS}/data/anneal_train.arff
-	-actor
-		adams.flow.transformer.WekaFileReader
-			-loader
-				weka.core.converters.ArffLoader
-	-actor
-		adams.flow.transformer.WekaClassSelector
-	-actor
-		adams.flow.transformer.WekaWSTrainClassifier
-			-model-name
-			j48
-	-actor
-		adams.flow.transformer.WSTransformer
-			-logging-level
-			INFO
-			-client
-				adams.flow.webservice.TrainClassifier
-	-actor
-		adams.flow.sink.Display
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Trains a J48 classifier on a dataset that the user chooses through the referenced \\nwebservice and stores the model there as well.\\nSee flow defined in \\\"adams-weka-webservice-weka-webservice.flow\\\" for running the webservice." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.source.WekaClassifierSetup -classifier "weka.classifiers.trees.J48 -C 0.25 -M 2"
+ adams.flow.source.SelectFile -stop-if-canceled true -custom-stop-message "User canceled dataset selection!" -file-chooser-title "Select dataset to cross-validate" -initial-dir ${EXAMPLE_FLOWS}/data -extension ARFF -extension CSV -initial-file ${EXAMPLE_FLOWS}/data/anneal_train.arff
+ adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
+ adams.flow.transformer.WekaClassSelector
+ adams.flow.transformer.WekaWSTrainClassifier -model-name j48
+ adams.flow.transformer.WSTransformer -logging-level INFO -client "adams.flow.webservice.TrainClassifier -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator"
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter

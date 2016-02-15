@@ -1,89 +1,17 @@
 # Project: adams
-# Date: 2014-10-09 12:47:03
+# Date: 2016-02-15 14:55:52
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Simple demonstration that shows how to move files around\nusing the Reception And Transmission System (RATS).\n\nThe first RAT is monitoring the \"1_incoming\" directory and moves\nfiles to \"2_processing\".\nThe second RAT is monitoring the \"2_processing\" directory and \nmoves files to \"3_outgoing\".\n\nIn a real-world scenario, \"transmission\" wouldn\'t monitor \"2_processing\", \nbut the actual application processing the files. Instead, it would\nmonitor another directory altogether before moving it to \"3_outgoing\".
-	-actor
-		adams.flow.standalone.CallableActors
-			-actor
-				adams.flow.transformer.PassThrough
-					-name
-					nothing1
-			-actor
-				adams.flow.transformer.PassThrough
-					-name
-					nothing2
-	-actor
-		adams.flow.standalone.Rats
-			-rat
-				adams.flow.standalone.Rat
-					-logging-level
-					FINER
-					-name
-					incoming -> processing
-					-receiver
-						adams.flow.standalone.rats.input.InputPolling
-							-input
-								adams.flow.standalone.rats.input.InputWithCallableTransformer
-									-input
-										adams.flow.standalone.rats.input.FileLister
-											-source
-											${EXAMPLE_FLOWS}/1_incoming
-									-callable
-									nothing1
-							-wait-poll
-							2000
-					-actor
-						adams.flow.transformer.PassThrough
-					-transmitter
-						adams.flow.standalone.rats.output.FileMover
-							-wait-move
-							500
-							-target
-							${EXAMPLE_FLOWS}/2_processing
-			-rat
-				adams.flow.standalone.Rat
-					-logging-level
-					FINER
-					-name
-					processing -> outgoing
-					-receiver
-						adams.flow.standalone.rats.input.InputPolling
-							-input
-								adams.flow.standalone.rats.input.FileLister
-									-source
-									${EXAMPLE_FLOWS}/2_processing
-							-wait-poll
-							2000
-					-actor
-						adams.flow.transformer.PassThrough
-							-skip
-							true
-					-transmitter
-						adams.flow.standalone.rats.output.OutputWithCallableTransformer
-							-output
-								adams.flow.standalone.rats.output.FileMover
-									-wait-move
-									500
-									-target
-									${EXAMPLE_FLOWS}/3_outgoing
-							-callable
-							nothing2
-	-actor
-		adams.flow.source.Start
-	-actor
-		adams.flow.control.WhileLoop
-			-name
-			keep going
-			-condition
-				adams.flow.condition.bool.True
-			-loop
-				adams.flow.source.Start
-			-loop
-				adams.flow.control.Sleep
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Simple demonstration that shows how to move files around\\nusing the Reception And Transmission System (RATS).\\n\\nThe first RAT is monitoring the \\\"1_incoming\\\" directory and moves\\nfiles to \\\"2_processing\\\".\\nThe second RAT is monitoring the \\\"2_processing\\\" directory and \\nmoves files to \\\"3_outgoing\\\".\\n\\nIn a real-world scenario, \\\"transmission\\\" wouldn\\\'t monitor \\\"2_processing\\\", \\nbut the actual application processing the files. Instead, it would\\nmonitor another directory altogether before moving it to \\\"3_outgoing\\\"." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.transformer.PassThrough -name nothing1
+  adams.flow.transformer.PassThrough -name nothing2
+ adams.flow.standalone.Rats
+  adams.flow.standalone.Rat -logging-level FINER -name "incoming -> processing" -receiver "adams.flow.standalone.rats.input.InputPolling -input \"adams.flow.standalone.rats.input.InputWithCallableTransformer -input \\\"adams.flow.standalone.rats.input.FileLister -source ${EXAMPLE_FLOWS}/1_incoming\\\" -callable nothing1\" -wait-poll 2000" -transmitter "adams.flow.standalone.rats.output.FileMover -wait-move 500 -target ${EXAMPLE_FLOWS}/2_processing"
+   adams.flow.transformer.PassThrough
+  adams.flow.standalone.Rat -logging-level FINER -name "processing -> outgoing" -receiver "adams.flow.standalone.rats.input.InputPolling -input \"adams.flow.standalone.rats.input.FileLister -source ${EXAMPLE_FLOWS}/2_processing\" -wait-poll 2000" -transmitter "adams.flow.standalone.rats.output.OutputWithCallableTransformer -output \"adams.flow.standalone.rats.output.FileMover -wait-move 500 -target ${EXAMPLE_FLOWS}/3_outgoing\" -callable nothing2"
+   adams.flow.transformer.PassThrough -skip true
+ adams.flow.source.Start
+ adams.flow.control.WhileLoop -name "keep going" -condition adams.flow.condition.bool.True
+  adams.flow.source.Start
+  adams.flow.control.Sleep

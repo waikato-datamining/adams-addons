@@ -29,7 +29,7 @@ import adams.env.Environment;
 import adams.flow.AbstractFlowTest;
 import adams.flow.control.Flow;
 import adams.flow.control.SubProcess;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 import adams.test.TmpFile;
 
 /**
@@ -100,22 +100,22 @@ public class MekaCrossValidationEvaluatorTest
   /**
    * Used to create an instance of a specific actor.
    *
-   * @return a suitably configured <code>AbstractActor</code> value
+   * @return a suitably configured <code>Actor</code> value
    */
   @Override
-  public AbstractActor getActor() {
+  public Actor getActor() {
     AbstractArgumentOption    argOption;
     
     Flow flow = new Flow();
     
     try {
       argOption = (AbstractArgumentOption) flow.getOptionManager().findByProperty("actors");
-      adams.flow.core.AbstractActor[] actors1 = new adams.flow.core.AbstractActor[8];
+      adams.flow.core.Actor[] actors1 = new adams.flow.core.Actor[8];
 
       // Flow.CallableActors
       adams.flow.standalone.CallableActors callableactors2 = new adams.flow.standalone.CallableActors();
       argOption = (AbstractArgumentOption) callableactors2.getOptionManager().findByProperty("actors");
-      adams.flow.core.AbstractActor[] actors3 = new adams.flow.core.AbstractActor[1];
+      adams.flow.core.Actor[] actors3 = new adams.flow.core.Actor[1];
 
       // Flow.CallableActors.MekaClassifierSetup
       adams.flow.source.MekaClassifierSetup mekaclassifiersetup4 = new adams.flow.source.MekaClassifierSetup();

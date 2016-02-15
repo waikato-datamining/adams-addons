@@ -15,14 +15,12 @@
 
 /**
  * CallableActor.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
 
-import java.util.HashSet;
-
 import adams.core.QuickInfoHelper;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.ActorVariablesFinder;
 import adams.flow.core.CallableActorHelper;
@@ -31,6 +29,8 @@ import adams.flow.core.CallableActorUser;
 import adams.flow.core.InputConsumer;
 import adams.flow.core.Token;
 import adams.flow.core.Unknown;
+
+import java.util.HashSet;
 
 /**
  <!-- globalinfo-start -->
@@ -71,7 +71,7 @@ public class CallableActor
   protected CallableActorReference m_CallableName;
 
   /** the callable actor. */
-  protected AbstractActor m_CallableActor;
+  protected Actor m_CallableActor;
 
   /** whether the callable actor has been configured. */
   protected boolean m_Configured;
@@ -209,8 +209,8 @@ public class CallableActor
    *
    * @return		the callable actor or null if not found
    */
-  protected AbstractActor findCallableActor() {
-    AbstractActor	result;
+  protected Actor findCallableActor() {
+    Actor	result;
     
     result = m_Helper.findCallableActorRecursive(m_Owner, getCallableName());
     
@@ -240,7 +240,7 @@ public class CallableActor
    * @return		the actor, can be null
    */
   @Override
-  public AbstractActor getCallableActor() {
+  public Actor getCallableActor() {
     return m_CallableActor;
   }
 
@@ -250,7 +250,7 @@ public class CallableActor
    * @param actor	the actor to search
    * @return		the variables that were found
    */
-  protected HashSet<String> findVariables(AbstractActor actor) {
+  protected HashSet<String> findVariables(Actor actor) {
     ActorVariablesFinder	finder;
     HashSet<String>		result;
 

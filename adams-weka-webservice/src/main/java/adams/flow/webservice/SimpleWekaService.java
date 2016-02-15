@@ -15,7 +15,7 @@
 
 /*
  * SimpleWekaService.java
- * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.webservice;
@@ -26,7 +26,7 @@ import adams.core.Utils;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.OptionUtils;
 import adams.core.option.WekaCommandLineHandler;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
@@ -415,8 +415,8 @@ public class SimpleWekaService
   @Override
   public TransformResponseObject transform(nz.ac.waikato.adams.webservice.weka.Dataset dataset,java.lang.String actorName) { 
     TransformResponseObject	result;
-    CallableActorHelper	helper;
-    AbstractActor		callable;
+    CallableActorHelper		helper;
+    Actor 			callable;
     Compatibility		comp;
     weka.core.Instances		data;
     String			msg;

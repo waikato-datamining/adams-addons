@@ -27,7 +27,7 @@ import adams.core.option.OptionUtils;
 import adams.env.Environment;
 import adams.flow.AbstractFlowTest;
 import adams.flow.control.Flow;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 import adams.test.TmpFile;
 
 /**
@@ -98,22 +98,22 @@ public class MekaTrainTestSetEvaluatorTest
   /**
    * Used to create an instance of a specific actor.
    *
-   * @return a suitably configured <code>AbstractActor</code> value
+   * @return a suitably configured <code>Actor</code> value
    */
   @Override
-  public AbstractActor getActor() {
+  public Actor getActor() {
     AbstractArgumentOption    argOption;
     
     Flow flow = new Flow();
     
     try {
       argOption = (AbstractArgumentOption) flow.getOptionManager().findByProperty("actors");
-      adams.flow.core.AbstractActor[] actors1 = new adams.flow.core.AbstractActor[9];
+      adams.flow.core.Actor[] actors1 = new adams.flow.core.Actor[9];
 
       // Flow.CallableActors
       adams.flow.standalone.CallableActors callableactors2 = new adams.flow.standalone.CallableActors();
       argOption = (AbstractArgumentOption) callableactors2.getOptionManager().findByProperty("actors");
-      adams.flow.core.AbstractActor[] actors3 = new adams.flow.core.AbstractActor[1];
+      adams.flow.core.Actor[] actors3 = new adams.flow.core.Actor[1];
 
       // Flow.CallableActors.MekaClassifierSetup
       adams.flow.source.MekaClassifierSetup mekaclassifiersetup4 = new adams.flow.source.MekaClassifierSetup();
@@ -163,7 +163,7 @@ public class MekaTrainTestSetEvaluatorTest
       // Flow.SubProcess
       adams.flow.control.SubProcess subprocess16 = new adams.flow.control.SubProcess();
       argOption = (AbstractArgumentOption) subprocess16.getOptionManager().findByProperty("actors");
-      adams.flow.core.AbstractActor[] actors17 = new adams.flow.core.AbstractActor[3];
+      adams.flow.core.Actor[] actors17 = new adams.flow.core.Actor[3];
 
       // Flow.SubProcess.StringSplit
       adams.flow.transformer.StringSplit stringsplit18 = new adams.flow.transformer.StringSplit();

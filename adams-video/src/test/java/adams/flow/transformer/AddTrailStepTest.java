@@ -28,7 +28,7 @@ import adams.data.io.output.SimpleTrailWriter;
 import adams.env.Environment;
 import adams.flow.AbstractFlowTest;
 import adams.flow.control.Flow;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 import adams.flow.execution.NullListener;
 import adams.flow.source.NewTrail;
 import adams.flow.transformer.AbstractDataContainerFileWriter.FileNameGeneration;
@@ -112,15 +112,15 @@ public class AddTrailStepTest
   /**
    * Used to create an instance of a specific actor.
    *
-   * @return a suitably configured <code>AbstractActor</code> value
+   * @return a suitably configured <code>Actor</code> value
    */
-  public AbstractActor getActor() {
+  public Actor getActor() {
     AbstractArgumentOption    argOption;
     
     Flow flow = new Flow();
     
     try {
-      List<AbstractActor> actors = new ArrayList<AbstractActor>();
+      List<Actor> actors = new ArrayList<Actor>();
 
       // Flow.NewTrail
       NewTrail newtrail = new NewTrail();
@@ -168,7 +168,7 @@ public class AddTrailStepTest
       argOption = (AbstractArgumentOption) trailfilewriter.getOptionManager().findByProperty("suppliedFileName");
       trailfilewriter.setSuppliedFileName((String) argOption.valueOf("dumpfile.trail"));
       actors.add(trailfilewriter);
-      flow.setActors(actors.toArray(new AbstractActor[0]));
+      flow.setActors(actors.toArray(new Actor[0]));
 
       NullListener nulllistener = new NullListener();
       flow.setFlowExecutionListener(nulllistener);

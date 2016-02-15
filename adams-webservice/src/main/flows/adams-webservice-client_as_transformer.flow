@@ -1,23 +1,8 @@
 # Project: adams
-# Date: 2014-01-23 15:46:24
+# Date: 2016-02-15 15:12:40
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Queries the webservice for \"CustomersByName\", defined in \nthe Apache CXF \"WSDL first\" example:\nhttp://cxf.apache.org/docs/sample-projects.html\nUses the names coming from the StringConstants source as\nparameters for querying the webservice.
-	-actor
-		adams.flow.source.StringConstants
-			-string
-			Smith
-			-string
-			Jones
-	-actor
-		adams.flow.transformer.WSTransformer
-			-client
-				com.example.customerservice.flow.CustomersByName
-	-actor
-		adams.flow.sink.Display
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Queries the webservice for \\\"CustomersByName\\\", defined in \\nthe Apache CXF \\\"WSDL first\\\" example:\\nhttp://cxf.apache.org/docs/sample-projects.html\\nUses the names coming from the StringConstants source as\\nparameters for querying the webservice." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.StringConstants -string Smith -string Jones
+ adams.flow.transformer.WSTransformer -client "com.example.customerservice.flow.CustomersByName -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator"
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter

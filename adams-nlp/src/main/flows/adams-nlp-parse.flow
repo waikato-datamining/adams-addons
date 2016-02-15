@@ -1,115 +1,28 @@
 # Project: adams
-# Date: 2014-01-23 15:36:20
+# Date: 2016-02-15 14:45:01
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Shows how to apply a Stanford LexicalizedParser to a sentence\nand output tree and grammatical structure.
-	-actor
-		adams.flow.standalone.CallableActors
-			-actor
-				adams.flow.sink.HistoryDisplay
-					-entry-name-variable
-					name
-	-actor
-		adams.flow.source.StringConstants
-			-string
-			The quick brown fox jumps over the lazy dog
-	-actor
-		adams.flow.transformer.StanfordLexicalizedParser
-			-model
-			${EXAMPLE_FLOWS}/data/englishPCFG.ser.gz
-	-actor
-		adams.flow.control.Tee
-			-name
-			output tree
-			-tee
-				adams.flow.transformer.Convert
-					-conversion
-						adams.data.conversion.AnyToString
-			-tee
-				adams.flow.transformer.SetVariable
-					-var-name
-					name
-					-var-value
-					tree
-			-tee
-				adams.flow.sink.CallableSink
-					-callable
-					HistoryDisplay
-	-actor
-		adams.flow.control.Tee
-			-name
-			output tree as XML
-			-tee
-				adams.flow.transformer.Convert
-					-conversion
-						adams.data.conversion.StanfordParseTreeToXML
-							-output-scores
-							true
-			-tee
-				adams.flow.transformer.SetVariable
-					-var-name
-					name
-					-var-value
-					tree as xml
-			-tee
-				adams.flow.sink.CallableSink
-					-callable
-					HistoryDisplay
-	-actor
-		adams.flow.control.Tee
-			-name
-			display tree
-			-tee
-				adams.flow.sink.StanfordParseTreeDisplay
-					-x
-					-3
-					-writer
-						adams.gui.print.NullWriter
-					-expand
-					true
-	-actor
-		adams.flow.control.Tee
-			-name
-			turn leafs into spreadsheet
-			-tee
-				adams.flow.transformer.Convert
-					-conversion
-						adams.data.conversion.StanfordParseTreeToSpreadSheet
-			-tee
-				adams.flow.transformer.SetVariable
-					-var-name
-					name
-					-var-value
-					leaves as spreadsheet
-			-tee
-				adams.flow.sink.CallableSink
-					-callable
-					HistoryDisplay
-	-actor
-		adams.flow.transformer.StanfordGrammaticalStructure
-			-language-pack
-				edu.stanford.nlp.trees.PennTreebankLanguagePack
-	-actor
-		adams.flow.control.Tee
-			-name
-			output grammatical structure
-			-tee
-				adams.flow.transformer.Convert
-					-conversion
-						adams.data.conversion.AnyToString
-			-tee
-				adams.flow.transformer.SetVariable
-					-var-name
-					name
-					-var-value
-					grammar
-			-tee
-				adams.flow.sink.CallableSink
-					-callable
-					HistoryDisplay
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Shows how to apply a Stanford LexicalizedParser to a sentence\\nand output tree and grammatical structure." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.HistoryDisplay -entry-name-variable name
+ adams.flow.source.StringConstants -string "The quick brown fox jumps over the lazy dog"
+ adams.flow.transformer.StanfordLexicalizedParser -model ${EXAMPLE_FLOWS}/data/englishPCFG.ser.gz
+ adams.flow.control.Tee -name "output tree"
+  adams.flow.transformer.Convert -conversion adams.data.conversion.AnyToString
+  adams.flow.transformer.SetVariable -var-name name -var-value tree
+  adams.flow.sink.CallableSink -callable HistoryDisplay
+ adams.flow.control.Tee -name "output tree as XML"
+  adams.flow.transformer.Convert -conversion "adams.data.conversion.StanfordParseTreeToXML -output-scores true"
+  adams.flow.transformer.SetVariable -var-name name -var-value "tree as xml"
+  adams.flow.sink.CallableSink -callable HistoryDisplay
+ adams.flow.control.Tee -name "display tree"
+  adams.flow.sink.StanfordParseTreeDisplay -x -3 -writer adams.gui.print.NullWriter -expand true
+ adams.flow.control.Tee -name "turn leafs into spreadsheet"
+  adams.flow.transformer.Convert -conversion adams.data.conversion.StanfordParseTreeToSpreadSheet
+  adams.flow.transformer.SetVariable -var-name name -var-value "leaves as spreadsheet"
+  adams.flow.sink.CallableSink -callable HistoryDisplay
+ adams.flow.transformer.StanfordGrammaticalStructure -language-pack edu.stanford.nlp.trees.PennTreebankLanguagePack
+ adams.flow.control.Tee -name "output grammatical structure"
+  adams.flow.transformer.Convert -conversion adams.data.conversion.AnyToString
+  adams.flow.transformer.SetVariable -var-name name -var-value grammar
+  adams.flow.sink.CallableSink -callable HistoryDisplay

@@ -1,213 +1,34 @@
 # Project: adams
-# Date: 2015-12-21 16:21:04
+# Date: 2016-02-15 14:44:32
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Demonstrates how to tokenize and clean tweets.
-	-actor
-		adams.flow.standalone.CallableActors
-			-actor
-				adams.flow.sink.DisplayPanelManager
-					-width
-					740
-					-provider
-						adams.flow.sink.WekaInstancesDisplay
-							-writer
-								adams.gui.print.NullWriter
-					-entry-name-variable
-					entry
-	-actor
-		adams.flow.source.FileSupplier
-			-file
-			${EXAMPLE_FLOWS}/data/sanders.arff
-	-actor
-		adams.flow.transformer.WekaFileReader
-			-loader
-				weka.core.converters.AArffLoader
-	-actor
-		adams.flow.control.Trigger
-			-name
-			emoticon file
-			-annotation
-			Weka has no notion of placeholders in files, hence we need to construct/update the file
-			-tee
-				adams.flow.source.StringConstants
-					-string
-					${EXAMPLE_FLOWS}/data/AFINN-emoticon-8.txt
-			-tee
-				adams.flow.transformer.Convert
-					-conversion
-						adams.data.conversion.StringToFile
-							-placeholderfile
-							true
-			-tee
-				adams.flow.transformer.Convert
-					-name
-					Convert-1
-					-conversion
-						adams.data.conversion.FileToString
-							-absolute
-							true
-			-tee
-				adams.flow.transformer.SetVariable
-					-var-name
-					emoticons
-	-actor
-		adams.flow.control.Trigger
-			-name
-			cluster file
-			-annotation
-			Weka has no notion of placeholders in files, hence we need to construct/update the file
-			-tee
-				adams.flow.source.StringConstants
-					-string
-					${EXAMPLE_FLOWS}/data/50mpaths2.txt
-			-tee
-				adams.flow.transformer.Convert
-					-conversion
-						adams.data.conversion.StringToFile
-							-placeholderfile
-							true
-			-tee
-				adams.flow.transformer.Convert
-					-name
-					Convert-1
-					-conversion
-						adams.data.conversion.FileToString
-							-absolute
-							true
-			-tee
-				adams.flow.transformer.SetVariable
-					-var-name
-					clusters
-	-actor
-		adams.flow.control.Branch
-			-branch
-				adams.flow.control.Sequence
-					-name
-					raw
-					-actor
-						adams.flow.transformer.SetVariable
-							-var-name
-							entry
-							-var-value
-							raw
-					-actor
-						adams.flow.transformer.WekaFilter
-							-filter
-								weka.filters.unsupervised.attribute.StringToWordVector
-									-R
-									first
-									-W
-									1000
-									-prune-rate
-									-1.0
-									-N
-									0
-									-stemmer
-									weka.core.stemmers.NullStemmer
-									-stopwords-handler
-									weka.core.stopwords.Null
-									-M
-									1
-									-tokenizer
-									weka.core.tokenizers.TwitterNLPTokenizer -use-lower-case -cleaner weka.core.tokenizers.cleaners.PassThrough
-					-actor
-						adams.flow.sink.CallableSink
-							-callable
-							DisplayPanelManager
-			-branch
-				adams.flow.control.Sequence
-					-name
-					clean
-					-actor
-						adams.flow.transformer.SetVariable
-							-var-name
-							entry
-							-var-value
-							clean
-					-actor
-						adams.flow.control.UpdateProperties
-							-annotation
-							update the emoticon file
-							-property
-							filter.tokenizer.cleaner.cleaners[4].model
-							-variable
-							emoticons
-							-sub-actor
-								adams.flow.transformer.WekaFilter
-									-filter
-										weka.filters.unsupervised.attribute.StringToWordVector
-											-R
-											first
-											-W
-											1000
-											-prune-rate
-											-1.0
-											-N
-											0
-											-stemmer
-											weka.core.stemmers.NullStemmer
-											-stopwords-handler
-											weka.core.stopwords.Null
-											-M
-											1
-											-tokenizer
-											weka.core.tokenizers.TwitterNLPTokenizer -use-lower-case -cleaner "weka.core.tokenizers.cleaners.MultiCleaner -cleaner weka.core.tokenizers.cleaners.NormalizeDuplicateChars -cleaner weka.core.tokenizers.cleaners.NormalizeTwitterHashtag -cleaner weka.core.tokenizers.cleaners.NormalizeTwitterUsers -cleaner weka.core.tokenizers.cleaners.NormalizeURLs -cleaner \"weka.core.tokenizers.cleaners.RemoveEmoticons -model /home/fracpete/development/projects/adamsfamily/adams-incubator/adams-nlp/src/main/flows/data/AFINN-emoticon-8.txt\""
-					-actor
-						adams.flow.sink.CallableSink
-							-callable
-							DisplayPanelManager
-			-branch
-				adams.flow.control.Sequence
-					-name
-					word clusters
-					-actor
-						adams.flow.transformer.SetVariable
-							-var-name
-							entry
-							-var-value
-							word clusters
-					-actor
-						adams.flow.control.UpdateProperties
-							-annotation
-							update the emoticon/cluster file
-							-property
-							filter.tokenizer.cleaner.cleaners[4].model
-							-property
-							filter.tokenizer.cleaner.cleaners[5].model
-							-variable
-							emoticons
-							-variable
-							clusters
-							-sub-actor
-								adams.flow.transformer.WekaFilter
-									-filter
-										weka.filters.unsupervised.attribute.StringToWordVector
-											-R
-											first
-											-W
-											1000
-											-prune-rate
-											-1.0
-											-N
-											0
-											-stemmer
-											weka.core.stemmers.NullStemmer
-											-stopwords-handler
-											weka.core.stopwords.Null
-											-M
-											1
-											-tokenizer
-											weka.core.tokenizers.TwitterNLPTokenizer -use-lower-case -cleaner "weka.core.tokenizers.cleaners.MultiCleaner -cleaner weka.core.tokenizers.cleaners.NormalizeDuplicateChars -cleaner weka.core.tokenizers.cleaners.NormalizeTwitterHashtag -cleaner weka.core.tokenizers.cleaners.NormalizeTwitterUsers -cleaner weka.core.tokenizers.cleaners.NormalizeURLs -cleaner \"weka.core.tokenizers.cleaners.RemoveEmoticons -model /home/fracpete/development/projects/adamsfamily/adams-incubator/adams-nlp/src/main/flows/data/AFINN-emoticon-8.txt\" -cleaner \"weka.core.tokenizers.cleaners.WordCluster -model /home/fracpete/development/projects/adamsfamily/adams-incubator/adams-nlp/src/main/flows/data/50mpaths2.txt\""
-					-actor
-						adams.flow.sink.CallableSink
-							-callable
-							DisplayPanelManager
-			-num-threads
-			1
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Demonstrates how to tokenize and clean tweets." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.DisplayPanelManager -width 740 -provider "adams.flow.sink.WekaInstancesDisplay -writer adams.gui.print.NullWriter" -entry-name-variable entry
+ adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/sanders.arff
+ adams.flow.transformer.WekaFileReader -loader weka.core.converters.AArffLoader
+ adams.flow.control.Trigger -name "emoticon file" -annotation "Weka has no notion of placeholders in files, hence we need to construct/update the file"
+  adams.flow.source.StringConstants -string ${EXAMPLE_FLOWS}/data/AFINN-emoticon-8.txt
+  adams.flow.transformer.Convert -conversion "adams.data.conversion.StringToFile -placeholderfile true"
+  adams.flow.transformer.Convert -name Convert-1 -conversion "adams.data.conversion.FileToString -absolute true"
+  adams.flow.transformer.SetVariable -var-name emoticons
+ adams.flow.control.Trigger -name "cluster file" -annotation "Weka has no notion of placeholders in files, hence we need to construct/update the file"
+  adams.flow.source.StringConstants -string ${EXAMPLE_FLOWS}/data/50mpaths2.txt
+  adams.flow.transformer.Convert -conversion "adams.data.conversion.StringToFile -placeholderfile true"
+  adams.flow.transformer.Convert -name Convert-1 -conversion "adams.data.conversion.FileToString -absolute true"
+  adams.flow.transformer.SetVariable -var-name clusters
+ adams.flow.control.Branch -num-threads 1
+  adams.flow.control.Sequence -name raw
+   adams.flow.transformer.SetVariable -var-name entry -var-value raw
+   adams.flow.transformer.WekaFilter -filter "weka.filters.unsupervised.attribute.StringToWordVector -R first -W 1000 -prune-rate -1.0 -N 0 -stemmer weka.core.stemmers.NullStemmer -stopwords-handler weka.core.stopwords.Null -M 1 -tokenizer \"weka.core.tokenizers.TwitterNLPTokenizer -use-lower-case -cleaner weka.core.tokenizers.cleaners.PassThrough\""
+   adams.flow.sink.CallableSink -callable DisplayPanelManager
+  adams.flow.control.Sequence -name clean
+   adams.flow.transformer.SetVariable -var-name entry -var-value clean
+   adams.flow.control.UpdateProperties -annotation "update the emoticon file" -property filter.tokenizer.cleaner.cleaners[4].model -variable emoticons -sub-actor adams.flow.transformer.PassThrough
+    adams.flow.transformer.WekaFilter -filter "weka.filters.unsupervised.attribute.StringToWordVector -R first -W 1000 -prune-rate -1.0 -N 0 -stemmer weka.core.stemmers.NullStemmer -stopwords-handler weka.core.stopwords.Null -M 1 -tokenizer \"weka.core.tokenizers.TwitterNLPTokenizer -use-lower-case -cleaner \\\"weka.core.tokenizers.cleaners.MultiCleaner -cleaner weka.core.tokenizers.cleaners.NormalizeDuplicateChars -cleaner weka.core.tokenizers.cleaners.NormalizeTwitterHashtag -cleaner weka.core.tokenizers.cleaners.NormalizeTwitterUsers -cleaner weka.core.tokenizers.cleaners.NormalizeURLs -cleaner \\\\\\\"weka.core.tokenizers.cleaners.RemoveEmoticons -model /home/fracpete/development/projects/adamsfamily/adams-incubator/adams-nlp/src/main/flows/data/AFINN-emoticon-8.txt\\\\\\\"\\\"\""
+   adams.flow.sink.CallableSink -callable DisplayPanelManager
+  adams.flow.control.Sequence -name "word clusters"
+   adams.flow.transformer.SetVariable -var-name entry -var-value "word clusters"
+   adams.flow.control.UpdateProperties -annotation "update the emoticon/cluster file" -property filter.tokenizer.cleaner.cleaners[4].model -property filter.tokenizer.cleaner.cleaners[5].model -variable emoticons -variable clusters -sub-actor adams.flow.transformer.PassThrough
+    adams.flow.transformer.WekaFilter -filter "weka.filters.unsupervised.attribute.StringToWordVector -R first -W 1000 -prune-rate -1.0 -N 0 -stemmer weka.core.stemmers.NullStemmer -stopwords-handler weka.core.stopwords.Null -M 1 -tokenizer \"weka.core.tokenizers.TwitterNLPTokenizer -use-lower-case -cleaner \\\"weka.core.tokenizers.cleaners.MultiCleaner -cleaner weka.core.tokenizers.cleaners.NormalizeDuplicateChars -cleaner weka.core.tokenizers.cleaners.NormalizeTwitterHashtag -cleaner weka.core.tokenizers.cleaners.NormalizeTwitterUsers -cleaner weka.core.tokenizers.cleaners.NormalizeURLs -cleaner \\\\\\\"weka.core.tokenizers.cleaners.RemoveEmoticons -model /home/fracpete/development/projects/adamsfamily/adams-incubator/adams-nlp/src/main/flows/data/AFINN-emoticon-8.txt\\\\\\\" -cleaner \\\\\\\"weka.core.tokenizers.cleaners.WordCluster -model /home/fracpete/development/projects/adamsfamily/adams-incubator/adams-nlp/src/main/flows/data/50mpaths2.txt\\\\\\\"\\\"\""
+   adams.flow.sink.CallableSink -callable DisplayPanelManager

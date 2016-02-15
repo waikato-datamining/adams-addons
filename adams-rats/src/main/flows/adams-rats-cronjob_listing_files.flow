@@ -1,43 +1,13 @@
 # Project: adams
-# Date: 2014-10-28 14:31:05
+# Date: 2016-02-15 14:55:21
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Uses a cronjob to list the files in a directory every 15 seconds.
-	-actor
-		adams.flow.standalone.CallableActors
-			-actor
-				adams.flow.sink.Display
-					-writer
-						adams.data.io.output.NullWriter
-	-actor
-		adams.flow.standalone.Rats
-			-rat
-				adams.flow.standalone.Rat
-					-receiver
-						adams.flow.standalone.rats.input.Cron
-							-input
-								adams.flow.standalone.rats.input.FileLister
-									-source
-									${TMP}
-							-schedule
-							0/15 * * * * ?
-					-transmitter
-						adams.flow.standalone.rats.output.CallableActor
-							-callable
-							Display
-	-actor
-		adams.flow.source.Start
-	-actor
-		adams.flow.control.WhileLoop
-			-condition
-				adams.flow.condition.bool.True
-			-loop
-				adams.flow.source.Start
-			-loop
-				adams.flow.control.Sleep
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Uses a cronjob to list the files in a directory every 15 seconds." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.Rats
+  adams.flow.standalone.Rat -receiver "adams.flow.standalone.rats.input.Cron -input \"adams.flow.standalone.rats.input.FileLister -source ${TMP}\" -schedule \"0/15 * * * * ?\"" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display"
+ adams.flow.source.Start
+ adams.flow.control.WhileLoop -condition adams.flow.condition.bool.True
+  adams.flow.source.Start
+  adams.flow.control.Sleep

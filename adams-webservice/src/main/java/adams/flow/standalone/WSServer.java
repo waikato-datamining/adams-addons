@@ -15,18 +15,16 @@
 
 /**
  * WSServer.java
- * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
-
-import java.util.HashSet;
 
 import adams.core.Properties;
 import adams.core.QuickInfoHelper;
 import adams.core.option.OptionHandler;
 import adams.db.LogEntry;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.CallableActorUser;
@@ -34,8 +32,9 @@ import adams.flow.core.Compatibility;
 import adams.flow.core.InputConsumer;
 import adams.flow.core.Token;
 import adams.flow.webservice.WebServiceProvider;
-
 import com.example.customerservice.flow.CustomerServiceWS;
+
+import java.util.HashSet;
 
 /**
  <!-- globalinfo-start -->
@@ -104,7 +103,7 @@ public class WSServer
   protected CallableActorReference m_Log;
 
   /** the callable log actor. */
-  protected AbstractActor m_LogActor;
+  protected Actor m_LogActor;
 
   /** the helper class. */
   protected CallableActorHelper m_Helper;
@@ -233,7 +232,7 @@ public class WSServer
    *
    * @return		the callable actor or null if not found
    */
-  protected AbstractActor findCallableActor() {
+  protected Actor findCallableActor() {
     return m_Helper.findCallableActorRecursive(this, getLog());
   }
 
@@ -252,7 +251,7 @@ public class WSServer
    *
    * @return		the actor, can be null
    */
-  public AbstractActor getCallableActor() {
+  public Actor getCallableActor() {
     return m_LogActor;
   }
 

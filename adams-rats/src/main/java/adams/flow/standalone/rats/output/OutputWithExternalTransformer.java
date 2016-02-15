@@ -15,14 +15,14 @@
 
 /**
  * OutputWithExternalTransformer.java
- * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
 
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.io.FlowFile;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.ExternalActorHandler;
 import adams.flow.core.InputConsumer;
@@ -71,7 +71,7 @@ public class OutputWithExternalTransformer
   protected FlowFile m_ActorFile;
 
   /** the external actor itself. */
-  protected AbstractActor m_ExternalActor;
+  protected Actor m_ExternalActor;
 
   /**
    * Returns a string describing the object.
@@ -214,7 +214,7 @@ public class OutputWithExternalTransformer
    * @return		the actor, null if not available
    */
   @Override
-  public AbstractActor getExternalActor() {
+  public Actor getExternalActor() {
     return m_ExternalActor;
   }
 

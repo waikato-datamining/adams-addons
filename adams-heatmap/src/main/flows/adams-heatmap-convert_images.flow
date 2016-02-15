@@ -1,81 +1,16 @@
 # Project: adams
-# Date: 2015-11-18 15:17:31
+# Date: 2016-02-15 14:23:33
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Converts JPG images into heatmaps and displays them.
-	-actor
-		adams.flow.source.DirectoryLister
-			-dir
-			${EXAMPLE_FLOWS}/data
-			-list-files
-			true
-			-regexp
-			.*.jpg
-			-sorting
-			SORT_BY_NAME
-	-actor
-		adams.flow.control.Tee
-			-name
-			get filename
-			-tee
-				adams.flow.transformer.BaseName
-					-remove-extensions
-					true
-			-tee
-				adams.flow.transformer.SetVariable
-					-var-name
-					entry
-	-actor
-		adams.flow.transformer.ImageReader
-			-reader
-				adams.data.io.input.JAIImageReader
-	-actor
-		adams.flow.transformer.BufferedImageTransformer
-			-transformer
-				adams.data.jai.transformer.Resize
-					-width
-					0.1
-					-height
-					0.1
-	-actor
-		adams.flow.transformer.Convert
-			-conversion
-				adams.data.conversion.BufferedImageToHeatmap
-	-actor
-		adams.flow.control.Tee
-			-tee
-				adams.flow.transformer.Convert
-					-conversion
-						adams.data.conversion.HeatmapToSpreadSheet
-			-tee
-				adams.flow.sink.DisplayPanelManager
-					-x
-					-3
-					-provider
-						adams.flow.sink.SpreadSheetDisplay
-							-writer
-								adams.data.io.output.NullWriter
-					-entry-name-variable
-					entry
-	-actor
-		adams.flow.sink.DisplayPanelManager
-			-width
-			1200
-			-height
-			750
-			-provider
-				adams.flow.sink.HeatmapDisplay
-					-writer
-						adams.gui.print.NullWriter
-					-color-generator
-						adams.gui.visualization.core.MultiColorGenerator
-					-zoom
-					400.0
-			-entry-name-variable
-			entry
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Converts JPG images into heatmaps and displays them." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.DirectoryLister -dir ${EXAMPLE_FLOWS}/data -list-files true -regexp .*.jpg -sorting SORT_BY_NAME
+ adams.flow.control.Tee -name "get filename"
+  adams.flow.transformer.BaseName -remove-extensions true
+  adams.flow.transformer.SetVariable -var-name entry
+ adams.flow.transformer.ImageReader -reader adams.data.io.input.JAIImageReader
+ adams.flow.transformer.BufferedImageTransformer -transformer "adams.data.jai.transformer.Resize -width 0.1 -height 0.1"
+ adams.flow.transformer.Convert -conversion adams.data.conversion.BufferedImageToHeatmap
+ adams.flow.control.Tee
+  adams.flow.transformer.Convert -conversion adams.data.conversion.HeatmapToSpreadSheet
+  adams.flow.sink.DisplayPanelManager -x -3 -provider "adams.flow.sink.SpreadSheetDisplay -writer adams.data.io.output.NullWriter" -entry-name-variable entry
+ adams.flow.sink.DisplayPanelManager -width 1200 -height 750 -provider "adams.flow.sink.HeatmapDisplay -writer adams.gui.print.NullWriter -color-generator adams.gui.visualization.core.MultiColorGenerator -zoom 400.0" -entry-name-variable entry

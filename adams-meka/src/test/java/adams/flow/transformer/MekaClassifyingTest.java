@@ -27,7 +27,7 @@ import adams.core.option.OptionUtils;
 import adams.env.Environment;
 import adams.flow.AbstractFlowTest;
 import adams.flow.control.Flow;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 import adams.test.TmpFile;
 
 /**
@@ -98,22 +98,22 @@ public class MekaClassifyingTest
   /**
    * Used to create an instance of a specific actor.
    *
-   * @return a suitably configured <code>AbstractActor</code> value
+   * @return a suitably configured <code>Actor</code> value
    */
   @Override
-  public AbstractActor getActor() {
+  public Actor getActor() {
     AbstractArgumentOption    argOption;
     
     Flow flow = new Flow();
     
     try {
       argOption = (AbstractArgumentOption) flow.getOptionManager().findByProperty("actors");
-      adams.flow.core.AbstractActor[] actors1 = new adams.flow.core.AbstractActor[4];
+      adams.flow.core.Actor[] actors1 = new adams.flow.core.Actor[4];
 
       // Flow.CallableActors
       adams.flow.standalone.CallableActors callableactors2 = new adams.flow.standalone.CallableActors();
       argOption = (AbstractArgumentOption) callableactors2.getOptionManager().findByProperty("actors");
-      adams.flow.core.AbstractActor[] actors3 = new adams.flow.core.AbstractActor[2];
+      adams.flow.core.Actor[] actors3 = new adams.flow.core.Actor[2];
 
       // Flow.CallableActors.setup
       adams.flow.source.MekaClassifierSetup mekaclassifiersetup4 = new adams.flow.source.MekaClassifierSetup();
@@ -148,7 +148,7 @@ public class MekaClassifyingTest
       argOption = (AbstractArgumentOption) trigger12.getOptionManager().findByProperty("name");
       trigger12.setName((java.lang.String) argOption.valueOf("train classifier"));
       argOption = (AbstractArgumentOption) trigger12.getOptionManager().findByProperty("actors");
-      adams.flow.core.AbstractActor[] actors14 = new adams.flow.core.AbstractActor[6];
+      adams.flow.core.Actor[] actors14 = new adams.flow.core.Actor[6];
 
       // Flow.train classifier.FileSupplier
       adams.flow.source.FileSupplier filesupplier15 = new adams.flow.source.FileSupplier();
@@ -199,7 +199,7 @@ public class MekaClassifyingTest
       argOption = (AbstractArgumentOption) trigger27.getOptionManager().findByProperty("name");
       trigger27.setName((java.lang.String) argOption.valueOf("perform classification"));
       argOption = (AbstractArgumentOption) trigger27.getOptionManager().findByProperty("actors");
-      adams.flow.core.AbstractActor[] actors29 = new adams.flow.core.AbstractActor[8];
+      adams.flow.core.Actor[] actors29 = new adams.flow.core.Actor[8];
 
       // Flow.perform classification.FileSupplier
       adams.flow.source.FileSupplier filesupplier30 = new adams.flow.source.FileSupplier();

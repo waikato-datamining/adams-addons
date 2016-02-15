@@ -15,21 +15,20 @@
 
 /**
  * AbstractWebServiceProvider.java
- * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
-import java.net.URL;
-import java.util.logging.Level;
-
-import org.apache.cxf.jaxws.EndpointImpl;
-
 import adams.core.Utils;
 import adams.core.option.AbstractOptionHandler;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 import adams.flow.standalone.WSServer;
 import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
+import org.apache.cxf.jaxws.EndpointImpl;
+
+import java.net.URL;
+import java.util.logging.Level;
 
 /**
  * Ancestor for servers providing webservices.
@@ -45,7 +44,7 @@ public abstract class AbstractWebServiceProvider
   private static final long serialVersionUID = 5989094825183495544L;
 
   /** the owning actor. */
-  protected AbstractActor m_Owner;
+  protected Actor m_Owner;
 
   /** the URL of the webservice. */
   protected String m_URL;
@@ -85,7 +84,7 @@ public abstract class AbstractWebServiceProvider
    * @param value	the owner
    */
   @Override
-  public void setOwner(AbstractActor value) {
+  public void setOwner(Actor value) {
     m_Owner = value;
   }
   
@@ -95,7 +94,7 @@ public abstract class AbstractWebServiceProvider
    * @return		the owner
    */
   @Override
-  public AbstractActor getOwner() {
+  public Actor getOwner() {
     return m_Owner;
   }
   

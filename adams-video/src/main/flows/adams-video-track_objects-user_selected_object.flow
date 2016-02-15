@@ -1,145 +1,29 @@
 # Project: adams
-# Date: 2015-09-26 16:29:57
+# Date: 2016-02-15 15:09:33
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Let\'s the user select an initial object to be tracked.\nIn this case, select the head of the person.
-	-actor
-		adams.flow.standalone.CallableActors
-			-actor
-				adams.flow.sink.ImageViewer
-					-name
-					Frame
-					-short-title
-					true
-					-writer
-						adams.gui.print.NullWriter
-					-zoom
-					-1.0
-					-selection-processor
-						adams.gui.visualization.image.selection.NullProcessor
-					-image-overlay
-						adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport
-							-regexp
-							Tracker\\.Current
-			-actor
-				adams.flow.sink.ImageViewer
-					-name
-					Object
-					-short-title
-					true
-					-y
-					-3
-					-writer
-						adams.gui.print.NullWriter
-					-zoom
-					-1.0
-					-selection-processor
-						adams.gui.visualization.image.selection.NullProcessor
-					-image-overlay
-						adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport
-							-regexp
-							Tracker\\.Current
-			-actor
-				adams.flow.sink.Display
-					-name
-					Locations
-					-x
-					-3
-					-writer
-						adams.data.io.output.NullWriter
-	-actor
-		adams.flow.source.FileSupplier
-			-file
-			${EXAMPLE_FLOWS}/data/track_peter.mjpeg
-	-actor
-		adams.flow.transformer.MjpegImageSequence
-			-output-type
-			FRAME
-	-actor
-		adams.flow.transformer.BufferedImageTransformer
-			-transformer
-				adams.data.jai.transformer.Brightness
-					-factor
-					1.5
-	-actor
-		adams.flow.transformer.Convert
-			-conversion
-				adams.data.conversion.BufferedImageToBoofCV
-	-actor
-		adams.flow.transformer.SetStorageValue
-			-storage-name
-			frame
-	-actor
-		adams.flow.control.Once
-			-name
-			select object
-			-tee
-				adams.flow.control.Inspect
-					-stop-if-canceled
-					true
-					-provider
-						adams.flow.sink.ImageViewer
-							-writer
-								adams.gui.print.NullWriter
-							-selection-processor
-								adams.gui.visualization.image.selection.SelectObjectToTrack
-							-selection-box-color
-							#ff0000
-							-image-overlay
-								adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport
-					-close-dialog
-					true
-			-tee
-				adams.flow.transformer.SetStorageValue
-					-storage-name
-					frame
-	-actor
-		adams.flow.control.Trigger
-			-name
-			track
-			-tee
-				adams.flow.source.StorageValue
-					-storage-name
-					frame
-			-tee
-				adams.flow.transformer.TrackObjects
-					-algorithm
-						adams.flow.transformer.objecttracker.BoofCVCirculant
-			-tee
-				adams.flow.control.Branch
-					-branch
-						adams.flow.control.Sequence
-							-name
-							image
-							-actor
-								adams.flow.sink.CallableSink
-									-callable
-									Frame
-					-branch
-						adams.flow.control.Sequence
-							-name
-							object
-							-actor
-								adams.flow.transformer.ExtractTrackedObject
-							-actor
-								adams.flow.sink.CallableSink
-									-callable
-									Object
-					-branch
-						adams.flow.control.Sequence
-							-name
-							location
-							-actor
-								adams.flow.transformer.GetReportValue
-									-field
-									Tracker.Current[S]
-							-actor
-								adams.flow.sink.CallableSink
-									-callable
-									Locations
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Let\\\'s the user select an initial object to be tracked.\\nIn this case, select the head of the person." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.ImageViewer -name Frame -short-title true -writer adams.gui.print.NullWriter -zoom -1.0 -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay "adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport -regexp Tracker\\\\.Current"
+  adams.flow.sink.ImageViewer -name Object -short-title true -y -3 -writer adams.gui.print.NullWriter -zoom -1.0 -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay "adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport -regexp Tracker\\\\.Current"
+  adams.flow.sink.Display -name Locations -x -3 -writer adams.data.io.output.NullWriter
+ adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/track_peter.mjpeg
+ adams.flow.transformer.MjpegImageSequence -output-type FRAME
+ adams.flow.transformer.BufferedImageTransformer -transformer "adams.data.jai.transformer.Brightness -factor 1.5"
+ adams.flow.transformer.Convert -conversion adams.data.conversion.BufferedImageToBoofCV
+ adams.flow.transformer.SetStorageValue -storage-name frame
+ adams.flow.control.Once -name "select object"
+  adams.flow.control.Inspect -stop-if-canceled true -provider "adams.flow.sink.ImageViewer -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.SelectObjectToTrack -selection-box-color #ff0000 -image-overlay adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport" -close-dialog true
+  adams.flow.transformer.SetStorageValue -storage-name frame
+ adams.flow.control.Trigger -name track
+  adams.flow.source.StorageValue -storage-name frame
+  adams.flow.transformer.TrackObjects -algorithm adams.flow.transformer.objecttracker.BoofCVCirculant
+  adams.flow.control.Branch
+   adams.flow.control.Sequence -name image
+    adams.flow.sink.CallableSink -callable Frame
+   adams.flow.control.Sequence -name object
+    adams.flow.transformer.ExtractTrackedObject
+    adams.flow.sink.CallableSink -callable Object
+   adams.flow.control.Sequence -name location
+    adams.flow.transformer.GetReportValue -field Tracker.Current[S]
+    adams.flow.sink.CallableSink -callable Locations

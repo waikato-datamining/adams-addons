@@ -15,13 +15,13 @@
 
 /**
  * WebServiceClient.java
- * Copyright (C) 2012-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
 import adams.core.CleanUpHandler;
 import adams.core.option.OptionHandler;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 
 /**
  * Interface for classes that use webservices.
@@ -37,14 +37,14 @@ public interface WebServiceClient
    * 
    * @param value	the owner
    */
-  public void setOwner(AbstractActor value);
+  public void setOwner(Actor value);
   
   /**
    * Returns the owning actor.
    * 
    * @return		the owner
    */
-  public AbstractActor getOwner();
+  public Actor getOwner();
   
   /**
    * Sets the timeout for the http connection in msec.

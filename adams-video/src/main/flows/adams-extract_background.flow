@@ -1,87 +1,16 @@
 # Project: adams
-# Date: 2016-01-19 12:37:33
+# Date: 2016-02-15 15:07:01
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Samples a number of images from a movie, computes the\nmedian from it and displays the result.\nExtracting the background only works, if the camera\nis stationery and objects are moving through it.
-	-actor
-		adams.flow.standalone.GridView
-			-width
-			1200
-			-actor
-				adams.flow.sink.ImageViewer
-					-name
-					Background
-					-writer
-						adams.gui.print.NullWriter
-					-selection-processor
-						adams.gui.visualization.image.selection.NullProcessor
-					-image-overlay
-						adams.gui.visualization.image.NullOverlay
-			-actor
-				adams.flow.sink.ImageViewer
-					-name
-					First frame
-					-writer
-						adams.gui.print.NullWriter
-					-selection-processor
-						adams.gui.visualization.image.selection.NullProcessor
-					-image-overlay
-						adams.gui.visualization.image.NullOverlay
-			-num-cols
-			2
-			-writer
-				adams.gui.print.NullWriter
-	-actor
-		adams.flow.source.SelectFile
-			-stop-if-canceled
-			true
-			-file-chooser-title
-			Select movie file
-			-initial-dir
-			${EXAMPLE_FLOWS}/data
-			-extension
-			mp4
-			-extension
-			mkv
-			-extension
-			avi
-			-initial-file
-			${EXAMPLE_FLOWS}/data/mouse.mp4
-	-actor
-		adams.flow.control.Tee
-			-name
-			extract background
-			-tee
-				adams.flow.transformer.MovieImageSampler
-					-output-array
-					true
-					-sampler
-						adams.flow.transformer.movieimagesampler.FixedIntervalBufferedImageSampler
-							-interval
-							20000
-			-tee
-				adams.flow.transformer.BufferedImageMultiImageOperation
-					-operation
-						adams.data.image.multiimageoperation.Median
-			-tee
-				adams.flow.sink.CallableSink
-					-callable
-					Background
-	-actor
-		adams.flow.control.Tee
-			-name
-			first frame
-			-tee
-				adams.flow.transformer.MovieImageSequence
-					-max-images
-					1
-			-tee
-				adams.flow.sink.CallableSink
-					-callable
-					First frame
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Samples a number of images from a movie, computes the\\nmedian from it and displays the result.\\nExtracting the background only works, if the camera\\nis stationery and objects are moving through it." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.GridView -width 1200 -num-cols 2 -writer adams.gui.print.NullWriter
+  adams.flow.sink.ImageViewer -name Background -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay adams.gui.visualization.image.NullOverlay
+  adams.flow.sink.ImageViewer -name "First frame" -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay adams.gui.visualization.image.NullOverlay
+ adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select movie file" -initial-dir ${EXAMPLE_FLOWS}/data -extension mp4 -extension mkv -extension avi -initial-file ${EXAMPLE_FLOWS}/data/mouse.mp4
+ adams.flow.control.Tee -name "extract background"
+  adams.flow.transformer.MovieImageSampler -output-array true -sampler "adams.flow.transformer.movieimagesampler.FixedIntervalBufferedImageSampler -interval 20000"
+  adams.flow.transformer.BufferedImageMultiImageOperation -operation adams.data.image.multiimageoperation.Median
+  adams.flow.sink.CallableSink -callable Background
+ adams.flow.control.Tee -name "first frame"
+  adams.flow.transformer.MovieImageSequence -max-images 1
+  adams.flow.sink.CallableSink -callable "First frame"

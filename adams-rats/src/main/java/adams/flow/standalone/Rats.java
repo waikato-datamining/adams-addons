@@ -15,17 +15,17 @@
 
 /**
  * Rats.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import adams.core.Pausable;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 import adams.flow.core.ActorExecution;
 import adams.flow.core.ActorHandlerInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -64,7 +64,7 @@ import adams.flow.core.ActorHandlerInfo;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
- * <pre>-rat &lt;adams.flow.core.AbstractActor&gt; [-rat ...] (property: rats)
+ * <pre>-rat &lt;adams.flow.core.Actor&gt; [-rat ...] (property: rats)
  * &nbsp;&nbsp;&nbsp;The reception&#47;transmission setups.
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
@@ -103,7 +103,7 @@ public class Rats
 
     m_OptionManager.add(
 	    "rat", "rats",
-	    new AbstractActor[0]);
+	    new Actor[0]);
   }
 
   /**
@@ -131,7 +131,7 @@ public class Rats
    *
    * @param value	the receptions
    */
-  public void setRats(AbstractActor[] value) {
+  public void setRats(Actor[] value) {
     int		i;
     String	msg;
     
@@ -144,7 +144,7 @@ public class Rats
     }
     
     m_Actors.clear();
-    for (AbstractActor actor: value)
+    for (Actor actor: value)
       m_Actors.add((Rat) actor);
     reset();
     updateParent();
@@ -155,8 +155,8 @@ public class Rats
    *
    * @return		the receptions
    */
-  public AbstractActor[] getRats() {
-    return m_Actors.toArray(new AbstractActor[m_Actors.size()]);
+  public Actor[] getRats() {
+    return m_Actors.toArray(new Actor[m_Actors.size()]);
   }
 
   /**
@@ -188,7 +188,7 @@ public class Rats
    * @return		null if OK, otherwise the error message
    */
   @Override
-  protected String checkActor(AbstractActor actor, int index) {
+  protected String checkActor(Actor actor, int index) {
     if (!(actor instanceof Rat) && !(actor instanceof LabRat))
       return 
 	  "Actor" + (index > -1 ? (" #" + (index+1)) : "") + " is neither " 

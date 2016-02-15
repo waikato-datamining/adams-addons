@@ -15,18 +15,18 @@
 
 /**
  * AbstractWebServiceClientSink.java
- * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
-
-import java.net.URL;
-import java.util.logging.Level;
 
 import adams.core.QuickInfoHelper;
 import adams.core.QuickInfoSupporter;
 import adams.core.option.AbstractOptionHandler;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
+
+import java.net.URL;
+import java.util.logging.Level;
 
 /**
  * Ancestor for webservice clients.
@@ -44,7 +44,7 @@ public abstract class AbstractWebServiceClientSink<I>
   private static final long serialVersionUID = 3420305488797791952L;
 
   /** the owner. */
-  protected AbstractActor m_Owner;
+  protected Actor m_Owner;
   
   /** the connection timeout. */
   protected int m_ConnectionTimeout;
@@ -298,7 +298,7 @@ public abstract class AbstractWebServiceClientSink<I>
    * 
    * @param value	the owner
    */
-  public void setOwner(AbstractActor value) {
+  public void setOwner(Actor value) {
     m_Owner = value;
   }
   
@@ -307,7 +307,7 @@ public abstract class AbstractWebServiceClientSink<I>
    * 
    * @return		the owner
    */
-  public AbstractActor getOwner() {
+  public Actor getOwner() {
     return m_Owner;
   }
   

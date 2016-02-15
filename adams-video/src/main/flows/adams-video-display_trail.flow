@@ -1,25 +1,8 @@
 # Project: adams
-# Date: 2015-07-31 16:17:57
+# Date: 2016-02-15 15:07:59
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Loads a trail and displays it.
-	-actor
-		adams.flow.source.FileSupplier
-			-file
-			${EXAMPLE_FLOWS}/data/mouse2.trail
-	-actor
-		adams.flow.transformer.TrailFileReader
-			-reader
-				adams.data.io.input.SimpleTrailReader
-	-actor
-		adams.flow.sink.TrailDisplay
-			-writer
-				adams.gui.print.NullWriter
-			-paintlet
-				adams.gui.visualization.trail.paintlet.Circles
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Loads a trail and displays it." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/mouse2.trail
+ adams.flow.transformer.TrailFileReader -reader adams.data.io.input.SimpleTrailReader
+ adams.flow.sink.TrailDisplay -writer adams.gui.print.NullWriter -paintlet adams.gui.visualization.trail.paintlet.Circles

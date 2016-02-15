@@ -1,42 +1,13 @@
 # Project: adams
-# Date: 2014-05-27 15:25:46
+# Date: 2016-02-15 14:36:22
 # User: fracpete
 # Charset: UTF-8
-#
-adams.flow.control.Flow
-	-annotation
-	Demonstrates how to load and prepare data for \na MEKA classifier that then gets cross-validated.
-	-actor
-		adams.flow.standalone.CallableActors
-			-actor
-				adams.flow.source.MekaClassifierSetup
-					-classifier
-						meka.classifiers.multilabel.BR
-							-W
-							weka.classifiers.trees.J48
-							--
-							-C
-							0.25
-							-M
-							2
-	-actor
-		adams.flow.source.FileSupplier
-			-file
-			${EXAMPLE_FLOWS}/data/Music.arff
-	-actor
-		adams.flow.transformer.WekaFileReader
-			-loader
-				weka.core.converters.ArffLoader
-	-actor
-		adams.flow.transformer.MekaPrepareData
-	-actor
-		adams.flow.transformer.MekaCrossValidationEvaluator
-	-actor
-		adams.flow.transformer.MekaResultSummary
-	-actor
-		adams.flow.sink.Display
-			-writer
-				adams.data.io.output.NullWriter
-	-flow-execution-listener
-		adams.flow.execution.NullListener
-
+adams.flow.control.Flow -annotation "Demonstrates how to load and prepare data for \\na MEKA classifier that then gets cross-validated." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.source.MekaClassifierSetup -classifier "meka.classifiers.multilabel.BR -W weka.classifiers.trees.J48 -- -C 0.25 -M 2"
+ adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/Music.arff
+ adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
+ adams.flow.transformer.MekaPrepareData
+ adams.flow.transformer.MekaCrossValidationEvaluator
+ adams.flow.transformer.MekaResultSummary
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter

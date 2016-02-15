@@ -24,7 +24,7 @@ import adams.core.option.AbstractArgumentOption;
 import adams.env.Environment;
 import adams.flow.AbstractFlowTest;
 import adams.flow.control.Flow;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 import adams.test.TmpFile;
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -95,16 +95,16 @@ public class HeatmapInfoTest
   /**
    * Used to create an instance of a specific actor.
    *
-   * @return a suitably configured <code>AbstractActor</code> value
+   * @return a suitably configured <code>Actor</code> value
    */
-  public AbstractActor getActor() {
+  public Actor getActor() {
     AbstractArgumentOption    argOption;
     
     Flow flow = new Flow();
     
     try {
       argOption = (AbstractArgumentOption) flow.getOptionManager().findByProperty("actors");
-      adams.flow.core.AbstractActor[] actors1 = new adams.flow.core.AbstractActor[7];
+      adams.flow.core.Actor[] actors1 = new adams.flow.core.Actor[7];
 
       // Flow.FileSupplier
       adams.flow.source.FileSupplier filesupplier2 = new adams.flow.source.FileSupplier();
@@ -131,7 +131,7 @@ public class HeatmapInfoTest
       argOption = (AbstractArgumentOption) tee9.getOptionManager().findByProperty("name");
       tee9.setName((java.lang.String) argOption.valueOf("width"));
       argOption = (AbstractArgumentOption) tee9.getOptionManager().findByProperty("actors");
-      adams.flow.core.AbstractActor[] actors11 = new adams.flow.core.AbstractActor[4];
+      adams.flow.core.Actor[] actors11 = new adams.flow.core.Actor[4];
 
       // Flow.width.HeatmapInfo
       adams.flow.transformer.HeatmapInfo heatmapinfo12 = new adams.flow.transformer.HeatmapInfo();
@@ -169,7 +169,7 @@ public class HeatmapInfoTest
       argOption = (AbstractArgumentOption) tee21.getOptionManager().findByProperty("name");
       tee21.setName((java.lang.String) argOption.valueOf("height"));
       argOption = (AbstractArgumentOption) tee21.getOptionManager().findByProperty("actors");
-      adams.flow.core.AbstractActor[] actors23 = new adams.flow.core.AbstractActor[4];
+      adams.flow.core.Actor[] actors23 = new adams.flow.core.Actor[4];
 
       // Flow.height.HeatmapInfo
       adams.flow.transformer.HeatmapInfo heatmapinfo24 = new adams.flow.transformer.HeatmapInfo();
@@ -209,7 +209,7 @@ public class HeatmapInfoTest
       argOption = (AbstractArgumentOption) tee34.getOptionManager().findByProperty("name");
       tee34.setName((java.lang.String) argOption.valueOf("min"));
       argOption = (AbstractArgumentOption) tee34.getOptionManager().findByProperty("actors");
-      adams.flow.core.AbstractActor[] actors36 = new adams.flow.core.AbstractActor[4];
+      adams.flow.core.Actor[] actors36 = new adams.flow.core.Actor[4];
 
       // Flow.min.HeatmapInfo
       adams.flow.transformer.HeatmapInfo heatmapinfo37 = new adams.flow.transformer.HeatmapInfo();
@@ -253,7 +253,7 @@ public class HeatmapInfoTest
       argOption = (AbstractArgumentOption) tee48.getOptionManager().findByProperty("name");
       tee48.setName((java.lang.String) argOption.valueOf("max"));
       argOption = (AbstractArgumentOption) tee48.getOptionManager().findByProperty("actors");
-      adams.flow.core.AbstractActor[] actors50 = new adams.flow.core.AbstractActor[4];
+      adams.flow.core.Actor[] actors50 = new adams.flow.core.Actor[4];
 
       // Flow.max.HeatmapInfo
       adams.flow.transformer.HeatmapInfo heatmapinfo51 = new adams.flow.transformer.HeatmapInfo();
@@ -297,7 +297,7 @@ public class HeatmapInfoTest
       argOption = (AbstractArgumentOption) tee62.getOptionManager().findByProperty("name");
       tee62.setName((java.lang.String) argOption.valueOf("values"));
       argOption = (AbstractArgumentOption) tee62.getOptionManager().findByProperty("actors");
-      adams.flow.core.AbstractActor[] actors64 = new adams.flow.core.AbstractActor[5];
+      adams.flow.core.Actor[] actors64 = new adams.flow.core.Actor[5];
 
       // Flow.values.HeatmapInfo
       adams.flow.transformer.HeatmapInfo heatmapinfo65 = new adams.flow.transformer.HeatmapInfo();
@@ -310,7 +310,7 @@ public class HeatmapInfoTest
       // Flow.values.ArrayProcess
       adams.flow.control.ArrayProcess arrayprocess67 = new adams.flow.control.ArrayProcess();
       argOption = (AbstractArgumentOption) arrayprocess67.getOptionManager().findByProperty("actors");
-      adams.flow.core.AbstractActor[] actors68 = new adams.flow.core.AbstractActor[1];
+      adams.flow.core.Actor[] actors68 = new adams.flow.core.Actor[1];
 
       // Flow.values.ArrayProcess.Convert
       adams.flow.transformer.Convert convert69 = new adams.flow.transformer.Convert();

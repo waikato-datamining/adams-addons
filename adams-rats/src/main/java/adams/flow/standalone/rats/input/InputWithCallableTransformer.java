@@ -15,14 +15,12 @@
 
 /**
  * InputWithCallableTransformer.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
-import java.util.ArrayList;
-
 import adams.core.QuickInfoHelper;
-import adams.flow.core.AbstractActor;
+import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
@@ -31,6 +29,8 @@ import adams.flow.core.InputConsumer;
 import adams.flow.core.OutputProducer;
 import adams.flow.core.Token;
 import adams.flow.core.Unknown;
+
+import java.util.ArrayList;
 
 /**
  <!-- globalinfo-start -->
@@ -70,7 +70,7 @@ public class InputWithCallableTransformer
   protected CallableActorReference m_CallableName;
 
   /** the callable actor. */
-  protected AbstractActor m_CallableActor;
+  protected Actor m_CallableActor;
 
   /** the helper class. */
   protected CallableActorHelper m_Helper;
@@ -154,7 +154,7 @@ public class InputWithCallableTransformer
    * @return		the actor, can be null
    */
   @Override
-  public AbstractActor getCallableActor() {
+  public Actor getCallableActor() {
     return m_CallableActor;
   }
 
@@ -163,8 +163,8 @@ public class InputWithCallableTransformer
    *
    * @return		the callable actor or null if not found
    */
-  protected AbstractActor findCallableActor() {
-    AbstractActor	result;
+  protected Actor findCallableActor() {
+    Actor	result;
     
     result = m_Helper.findCallableActorRecursive(getOwner(), getCallableName());
     if (!(ActorUtils.isTransformer(result))) {
