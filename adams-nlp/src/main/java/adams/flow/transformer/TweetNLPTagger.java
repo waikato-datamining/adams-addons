@@ -15,12 +15,13 @@
 
 /**
  * TweetNLPTagger.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.transformer;
 
 import adams.core.io.PlaceholderFile;
+import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.flow.core.Token;
@@ -205,7 +206,7 @@ public class TweetNLPTagger
 
     if (result == null) {
       tokens = m_Tagger.tokenizeAndTag((String) m_InputToken.getPayload());
-      sheet  = new SpreadSheet();
+      sheet  = new DefaultSpreadSheet();
       sheet.setName(getName());
       // header
       row = sheet.getHeaderRow();

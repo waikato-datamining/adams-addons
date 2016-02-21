@@ -15,11 +15,12 @@
 
 /**
  * StanfordParseTreeToSpreadSheet.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.conversion;
 
 import adams.core.Utils;
+import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import edu.stanford.nlp.trees.Tree;
@@ -118,7 +119,7 @@ public class StanfordParseTreeToSpreadSheet
     Tree		tree;
     Row			row;
     
-    result = new SpreadSheet();
+    result = new DefaultSpreadSheet();
     row    = result.getHeaderRow();
     row.addCell("W").setContent("Word");
     row.addCell("T").setContent("Type");

@@ -15,19 +15,20 @@
 
 /*
  * MekaResultValues.java
- * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
-import meka.core.Result;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.base.BaseString;
+import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.flow.container.MekaResultContainer;
 import adams.flow.core.Token;
+import meka.core.Result;
 
 /**
  <!-- globalinfo-start -->
@@ -241,7 +242,7 @@ public class MekaResultValues
     else
       res = (Result) m_InputToken.getPayload();
 
-    sheet = new SpreadSheet();
+    sheet = new DefaultSpreadSheet();
     
     // header
     row = sheet.getHeaderRow();

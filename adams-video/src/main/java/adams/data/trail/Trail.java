@@ -15,7 +15,7 @@
 
 /**
  * Trail.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.trail;
@@ -31,6 +31,7 @@ import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.report.MutableReportHandler;
 import adams.data.report.Report;
+import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.DenseDataRow;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
@@ -475,7 +476,7 @@ public class Trail
     keysSorted = new ArrayList<>(keys);
     Collections.sort(keysSorted);
 
-    result = new SpreadSheet();
+    result = new DefaultSpreadSheet();
     result.setDataRowClass(DenseDataRow.class);
     result.setName(getID());
 

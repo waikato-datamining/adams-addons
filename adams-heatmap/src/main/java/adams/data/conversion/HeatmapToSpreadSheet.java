@@ -15,12 +15,13 @@
 
 /**
  * HeatmapToSpreadSheet.java
- * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.conversion;
 
 import adams.data.heatmap.Heatmap;
 import adams.data.report.AbstractField;
+import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 
@@ -101,7 +102,7 @@ public class HeatmapToSpreadSheet
     Row			row;
     List<AbstractField>	fields;
 
-    result = new SpreadSheet();
+    result = new DefaultSpreadSheet();
     map    = (Heatmap) m_Input;
 
     // comments

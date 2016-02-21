@@ -15,15 +15,16 @@
 
 /**
  * SpreadSheetHeatmapWriter.java
- * Copyright (C) 2012-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.output;
 
-import java.util.List;
-
 import adams.data.heatmap.Heatmap;
+import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
+
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -165,7 +166,7 @@ public class SpreadSheetHeatmapWriter
     result = false;
 
     map   = data.get(0);
-    sheet = new SpreadSheet();
+    sheet = new DefaultSpreadSheet();
     
     // header
     row = sheet.getHeaderRow();

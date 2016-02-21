@@ -15,7 +15,7 @@
 
 /**
  * HeatmapPanel.java
- * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.heatmap;
 
@@ -27,6 +27,7 @@ import adams.data.heatmap.Heatmap;
 import adams.data.image.AbstractImageContainer;
 import adams.data.io.input.AbstractHeatmapReader;
 import adams.data.report.Report;
+import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.gui.core.BaseLogPanel;
 import adams.gui.core.BasePanel;
@@ -167,7 +168,7 @@ public class HeatmapPanel
 
       m_TabbedPane.addTab("Image", m_HeatmapImage);
 
-      m_HeatmapTable = new SpreadSheetTable(new SpreadSheet());
+      m_HeatmapTable = new SpreadSheetTable(new DefaultSpreadSheet());
       m_HeatmapTable.setNumDecimals(props.getInteger("SpreadSheet.NumDecimals", 3));
       m_TabbedPane.addTab("Raw", new BaseScrollPane(m_HeatmapTable));
     }

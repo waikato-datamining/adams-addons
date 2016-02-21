@@ -15,7 +15,7 @@
 
 /**
  * TrailPanel.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.trail;
 
@@ -24,6 +24,7 @@ import adams.core.io.PlaceholderFile;
 import adams.data.conversion.TrailToSpreadSheet;
 import adams.data.io.input.AbstractTrailReader;
 import adams.data.report.Report;
+import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.trail.Trail;
 import adams.gui.core.BaseLogPanel;
@@ -155,7 +156,7 @@ public class TrailPanel
 
       m_TabbedPane.addTab("View", m_TrailImage);
 
-      m_TrailTable = new SpreadSheetTable(new SpreadSheet());
+      m_TrailTable = new SpreadSheetTable(new DefaultSpreadSheet());
       m_TrailTable.setNumDecimals(props.getInteger("SpreadSheet.NumDecimals", 3));
       m_TabbedPane.addTab("Trail", new BaseScrollPane(m_TrailTable));
     }

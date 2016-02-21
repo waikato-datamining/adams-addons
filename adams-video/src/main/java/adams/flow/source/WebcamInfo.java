@@ -15,11 +15,12 @@
 
 /**
  * WebcamInfo.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.source;
 
 import adams.core.QuickInfoHelper;
+import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.flow.core.DataInfoActor;
@@ -265,7 +266,7 @@ public class WebcamInfo
       if (cam != null) {
 	switch (m_Type) {
 	  case RESOLUTION:
-	    sheet = new SpreadSheet();
+	    sheet = new DefaultSpreadSheet();
 	    row   = sheet.getHeaderRow();
 	    row.addCell("W").setContent("Width");
 	    row.addCell("H").setContent("Height");
@@ -282,7 +283,7 @@ public class WebcamInfo
 	    break;
 
 	  case AVAILABLE_RESOLUTIONS:
-	    sheet = new SpreadSheet();
+	    sheet = new DefaultSpreadSheet();
 	    row   = sheet.getHeaderRow();
 	    row.addCell("W").setContent("Width");
 	    row.addCell("H").setContent("Height");

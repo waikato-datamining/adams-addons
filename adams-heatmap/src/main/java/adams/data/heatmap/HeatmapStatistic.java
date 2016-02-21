@@ -15,10 +15,11 @@
 
 /**
  * HeatmapStatistic.java
- * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.heatmap;
 
+import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.statistics.InformativeStatistic;
@@ -218,7 +219,7 @@ public class HeatmapStatistic
     Iterator<String>	names;
     String		name;
 
-    result = new SpreadSheet();
+    result = new DefaultSpreadSheet();
 
     // header
     row = result.getHeaderRow();
