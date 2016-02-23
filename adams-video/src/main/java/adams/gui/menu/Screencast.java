@@ -22,7 +22,7 @@
 package adams.gui.menu;
 
 import adams.gui.application.AbstractApplicationFrame;
-import adams.gui.application.AbstractMenuItemDefinition;
+import adams.gui.application.AbstractBasicMenuItemDefinition;
 import adams.gui.application.UserMode;
 import adams.gui.core.MenuBarProvider;
 
@@ -35,7 +35,7 @@ import javax.swing.JMenuBar;
  * @version $Revision: 11391 $
  */
 public class Screencast
-  extends AbstractMenuItemDefinition {
+  extends AbstractBasicMenuItemDefinition {
 
   private static final long serialVersionUID = -5728838990494794944L;
 
