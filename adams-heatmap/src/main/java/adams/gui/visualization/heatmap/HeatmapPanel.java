@@ -40,12 +40,17 @@ import adams.gui.core.SearchPanel;
 import adams.gui.core.SearchPanel.LayoutType;
 import adams.gui.core.SpreadSheetTable;
 import adams.gui.core.SpreadSheetTableModel;
+import adams.gui.event.HeatmapPanelSelectionEvent;
+import adams.gui.event.HeatmapPanelSelectionListener;
+import adams.gui.event.ImagePanelSelectionEvent;
+import adams.gui.event.ImagePanelSelectionListener;
 import adams.gui.event.SearchEvent;
 import adams.gui.event.SearchListener;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
 import adams.gui.visualization.heatmap.overlay.AbstractHeatmapOverlay;
 import adams.gui.visualization.image.ImagePanel;
+import adams.gui.visualization.image.ImagePanel.PaintPanel;
 import adams.gui.visualization.report.ReportFactory;
 
 import javax.swing.JPanel;
@@ -53,6 +58,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -62,7 +68,8 @@ import java.util.List;
  * @version $Revision$
  */
 public class HeatmapPanel
-  extends BasePanel {
+  extends BasePanel
+  implements ImagePanelSelectionListener {
 
   /** for serialization. */
   private static final long serialVersionUID = 1897625268125110563L;
@@ -109,6 +116,9 @@ public class HeatmapPanel
   /** the log panel. */
   protected BaseLogPanel m_PanelLog;
 
+  /** the selection listeners. */
+  protected HashSet<HeatmapPanelSelectionListener> m_SelectionListeners;
+
   /**
    * Initializes the panel.
    *
@@ -135,6 +145,7 @@ public class HeatmapPanel
     m_Reader             = null;
     m_ColorGenerator     = AbstractColorGradientGenerator.forCommandLine(props.getProperty("Image.GradientColorGenerator", new BiColorGenerator().toCommandLine()));
     m_MissingValueColor  = props.getColor("Image.MissingValueColor", ColorHelper.valueOf("#88ff0000"));
+    m_SelectionListeners = new HashSet<HeatmapPanelSelectionListener>();
   }
 
   /**
@@ -160,6 +171,9 @@ public class HeatmapPanel
     m_LogTabbedPane.addTab("Data", m_SplitPane);
 
     m_HeatmapImage = new ImagePanel();
+    m_HeatmapImage.setSelectionEnabled(true);
+    m_HeatmapImage.setSelectionBoxColor(Color.RED);
+    m_HeatmapImage.addSelectionListener(this);
     m_HeatmapTable = null;
 
     if (props.getBoolean("SpreadSheet.Show", true)) {
@@ -571,5 +585,64 @@ public class HeatmapPanel
       m_LogTabbedPane.displayTab(m_PanelLog);
     else
       m_LogTabbedPane.hideTab(m_PanelLog);
+  }
+
+  /**
+   * Adds the given listener to the internal list of selection listeners.
+   *
+   * @param l		the listener to add
+   */
+  public void addSelectionListener(HeatmapPanelSelectionListener l) {
+    synchronized(m_SelectionListeners) {
+      m_SelectionListeners.add(l);
+    }
+  }
+
+  /**
+   * Removes the given listener from the internal list of selection listeners.
+   *
+   * @param l		the listener to remove
+   */
+  public void removeSelectionListener(HeatmapPanelSelectionListener l) {
+    synchronized(m_SelectionListeners) {
+      m_SelectionListeners.remove(l);
+    }
+  }
+
+  /**
+   * Removes all listeners from the internal list of selection listeners.
+   */
+  public void removeSelectionListeners() {
+    synchronized(m_SelectionListeners) {
+      m_SelectionListeners.clear();
+    }
+  }
+
+  /**
+   * Notifies the overlay that the image has changed.
+   *
+   * @param panel	the panel this overlay belongs to
+   */
+  public void imageChanged(PaintPanel panel) {
+    synchronized (m_SelectionListeners) {
+      for (HeatmapPanelSelectionListener l : m_SelectionListeners)
+	l.heatmapChanged(this);
+    }
+  }
+
+  /**
+   * Invoked when a selection happened in a {@link ImagePanel}.
+   *
+   * @param e		the event
+   */
+  public void selected(ImagePanelSelectionEvent e) {
+    HeatmapPanelSelectionEvent	he;
+
+    he = new HeatmapPanelSelectionEvent(this, e.getTopLeft(), e.getBottomRight(), e.getModifiersEx());
+
+    synchronized (m_SelectionListeners) {
+      for (HeatmapPanelSelectionListener l : m_SelectionListeners)
+	l.selected(he);
+    }
   }
 }

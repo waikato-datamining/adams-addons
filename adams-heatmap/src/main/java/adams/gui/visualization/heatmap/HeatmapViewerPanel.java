@@ -42,6 +42,7 @@ import adams.gui.core.SearchPanel;
 import adams.gui.core.SearchPanel.LayoutType;
 import adams.gui.event.FilterEvent;
 import adams.gui.event.FilterListener;
+import adams.gui.event.HeatmapPanelSelectionListener;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
 import adams.gui.event.SearchEvent;
@@ -55,6 +56,8 @@ import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.heatmap.overlay.AbstractHeatmapOverlay;
 import adams.gui.visualization.heatmap.overlay.Centroid;
 import adams.gui.visualization.heatmap.plugins.HeatmapViewerPluginManager;
+import adams.gui.visualization.heatmap.selection.AbstractSelectionProcessor;
+import adams.gui.visualization.heatmap.selection.NullProcessor;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -130,13 +133,19 @@ public class HeatmapViewerPanel
   protected JMenuItem m_MenuItemProcessFilterAllHeatmaps;
 
   /** whether to apply overlay changes to all panels. */
-  protected JMenuItem m_MenuItemViewOverlaysApplyAll;
+  protected JMenuItem m_MenuItemViewApplyAll;
 
   /** the remove overlays menu item. */
   protected JMenuItem m_MenuItemViewRemoveOverlays;
 
   /** the add overlay menu item. */
   protected JMenuItem m_MenuItemViewAddOverlay;
+
+  /** the remove selection processors menu item. */
+  protected JMenuItem m_MenuItemViewRemoveSelectionProcessors;
+
+  /** the selection processor menu item. */
+  protected JMenuItem m_MenuItemViewAddSelectionProcessor;
 
   /** the menu "zoom". */
   protected JMenu m_MenuViewZoom;
@@ -174,6 +183,9 @@ public class HeatmapViewerPanel
   /** the dialog for selecting an overlay. */
   protected GenericObjectEditorDialog m_DialogOverlay;
 
+  /** the dialog for selecting an selection processor. */
+  protected GenericObjectEditorDialog m_DialogSelectionProcessor;
+
   /** the search panel for the heatmap report. */
   protected SearchPanel m_SearchPanel;
   
@@ -195,15 +207,16 @@ public class HeatmapViewerPanel
 
     super.initialize();
 
-    props                     = getProperties();
-    m_FileChooser             = new HeatmapFileChooser(props.getPath("InitialDir", "%h"));
-    m_CurrentFilter           = new HeatmapNormalize();
-    m_FilterAll               = false;
-    m_DialogOverlay           = null;
-    m_DialogColorGenerator    = null;
-    m_DialogMissingValueColor = null;
-    m_RecentFilesHandler      = null;
-    m_PluginManager           = new HeatmapViewerPluginManager(this);
+    props                      = getProperties();
+    m_FileChooser              =  new HeatmapFileChooser(props.getPath("InitialDir", "%h"));
+    m_CurrentFilter            = new HeatmapNormalize();
+    m_FilterAll                = false;
+    m_DialogOverlay            = null;
+    m_DialogSelectionProcessor = null;
+    m_DialogColorGenerator     = null;
+    m_DialogMissingValueColor  = null;
+    m_RecentFilesHandler       = null;
+    m_PluginManager            = new HeatmapViewerPluginManager(this);
   }
 
   /**
@@ -538,7 +551,7 @@ public class HeatmapViewerPanel
       menuitem.setSelected(false);
       menuitem.setMnemonic('A');
       menuitem.setIcon(GUIHelper.getEmptyIcon());
-      m_MenuItemViewOverlaysApplyAll = menuitem;
+      m_MenuItemViewApplyAll = menuitem;
 
       // View/Remove all overlays
       menuitem = new JMenuItem("Remove overlays");
@@ -549,7 +562,7 @@ public class HeatmapViewerPanel
       menuitem.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-          if (m_MenuItemViewOverlaysApplyAll.isSelected()) {
+          if (m_MenuItemViewApplyAll.isSelected()) {
             for (int i = 0; i < getPanelCount(); i++)
               getPanelAt(i).removeOverlays();
           }
@@ -572,7 +585,7 @@ public class HeatmapViewerPanel
           AbstractHeatmapOverlay overlay = selectOverlay();
           if (overlay == null)
             return;
-          if (m_MenuItemViewOverlaysApplyAll.isSelected()) {
+          if (m_MenuItemViewApplyAll.isSelected()) {
             for (int i = 0; i < getPanelCount(); i++)
               getPanelAt(i).addOverlay(overlay);
           }
@@ -582,6 +595,49 @@ public class HeatmapViewerPanel
         }
       });
       m_MenuItemViewAddOverlay = menuitem;
+
+      // View/Remove all selection processors
+      menuitem = new JMenuItem("Remove selection processors");
+      menu.add(menuitem);
+      menuitem.setSelected(false);
+      menuitem.setMnemonic('R');
+      menuitem.setIcon(GUIHelper.getEmptyIcon());
+      menuitem.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          if (m_MenuItemViewApplyAll.isSelected()) {
+            for (int i = 0; i < getPanelCount(); i++)
+              getPanelAt(i).removeSelectionListeners();
+          }
+          else {
+            getCurrentPanel().removeSelectionListeners();
+          }
+        }
+      });
+      m_MenuItemViewRemoveSelectionProcessors = menuitem;
+
+      // View/Add overlay
+      menuitem = new JMenuItem("Add selection processor...");
+      menu.add(menuitem);
+      menuitem.setSelected(false);
+      menuitem.setMnemonic('d');
+      menuitem.setIcon(GUIHelper.getEmptyIcon());
+      menuitem.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          HeatmapPanelSelectionListener processor = selectSelectionProcessor();
+          if (processor == null)
+            return;
+          if (m_MenuItemViewApplyAll.isSelected()) {
+            for (int i = 0; i < getPanelCount(); i++)
+              getPanelAt(i).addSelectionListener(processor);
+          }
+          else {
+            getCurrentPanel().addSelectionListener(processor);
+          }
+        }
+      });
+      m_MenuItemViewAddSelectionProcessor = menuitem;
 
       // View/Color generator
       menuitem = new JMenuItem("Color generator...");
@@ -693,9 +749,11 @@ public class HeatmapViewerPanel
     m_MenuViewZoom.setEnabled(dataLoaded);
     m_MenuItemViewZoomIn.setEnabled(dataLoaded);
     m_MenuItemViewZoomOut.setEnabled(dataLoaded);
+    m_MenuItemViewApplyAll.setEnabled(dataLoaded);
     m_MenuItemViewAddOverlay.setEnabled(dataLoaded);
-    m_MenuItemViewOverlaysApplyAll.setEnabled(dataLoaded);
     m_MenuItemViewRemoveOverlays.setEnabled(dataLoaded);
+    m_MenuItemViewAddSelectionProcessor.setEnabled(dataLoaded);
+    m_MenuItemViewRemoveSelectionProcessors.setEnabled(dataLoaded);
     m_MenuItemViewColorGenerator.setEnabled(dataLoaded);
     m_MenuItemViewMissingValueColor.setEnabled(dataLoaded);
 
@@ -760,6 +818,22 @@ public class HeatmapViewerPanel
     result.setHeatmap(map);
 
     return result;
+  }
+
+  /**
+   * Adds a new tab using the heatmap and adds the comment to the log.
+   *
+   * @param map		the map to add in a new tab
+   * @param comment	the log comment
+   */
+  public void newTab(Heatmap map, String comment) {
+    SwingUtilities.invokeLater(() -> {
+      HeatmapPanel panel = newPanel(map);
+      panel.log(comment);
+      m_TabbedPane.addTab(panel.getTitle(), panel);
+      m_TabbedPane.setSelectedComponent(panel);
+      showStatus("");
+    });
   }
 
   /**
@@ -978,6 +1052,32 @@ public class HeatmapViewerPanel
   }
 
   /**
+   * Lets the user select a selection processor from a dialog. Returns the
+   * selection processor if successfully chosen (ie not dialog aborted).
+   *
+   * @return            the chosen selection processor, null if none selected
+   */
+  protected AbstractSelectionProcessor selectSelectionProcessor() {
+    if (m_DialogSelectionProcessor == null) {
+      if (getParentDialog() != null)
+	m_DialogSelectionProcessor = new GenericObjectEditorDialog(getParentDialog(), ModalityType.DOCUMENT_MODAL);
+      else
+	m_DialogSelectionProcessor = new GenericObjectEditorDialog(getParentFrame(), true);
+      m_DialogSelectionProcessor.setTitle("Select overlay");
+      m_DialogSelectionProcessor.getGOEEditor().setClassType(AbstractSelectionProcessor.class);
+      m_DialogSelectionProcessor.getGOEEditor().setCanChangeClassInDialog(true);
+      m_DialogSelectionProcessor.setCurrent(new NullProcessor());
+      m_DialogSelectionProcessor.setLocationRelativeTo(this);
+    }
+
+    m_DialogSelectionProcessor.setVisible(true);
+    if (m_DialogSelectionProcessor.getResult() != GenericObjectEditorDialog.APPROVE_OPTION)
+      return null;
+
+    return (AbstractSelectionProcessor) m_DialogSelectionProcessor.getCurrent();
+  }
+
+  /**
    * Lets the user select a new color generator.
    */
   protected void selectColorGenerator() {
@@ -1108,6 +1208,10 @@ public class HeatmapViewerPanel
     if (m_DialogOverlay != null) {
       m_DialogOverlay.dispose();
       m_DialogOverlay = null;
+    }
+    if (m_DialogSelectionProcessor != null) {
+      m_DialogSelectionProcessor.dispose();
+      m_DialogSelectionProcessor = null;
     }
     if (m_DialogFilter != null) {
       m_DialogFilter.dispose();

@@ -42,3 +42,7 @@ adams.data.filter.heatmapcrop.AbstractHeatmapCrop=\
 # the threshold algorithms
 adams.data.filter.heatmapthreshold.AbstractHeatmapThreshold=\
   adams.data.filter.heatmapthreshold
+
+# the selection processors for the heatmap viewer
+adams.gui.visualization.heatmap.selection.AbstractSelectionProcessor=\
+  adams.gui.visualization.heatmap.selection
