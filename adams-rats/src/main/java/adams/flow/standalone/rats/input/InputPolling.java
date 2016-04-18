@@ -15,10 +15,12 @@
 
 /**
  * InputPolling.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
+
+import adams.core.QuickInfoHelper;
 
 /**
  <!-- globalinfo-start -->
@@ -112,6 +114,21 @@ public class InputPolling
    */
   public String waitPollTipText() {
     return "The number of milli-seconds to wait before polling again.";
+  }
+
+  /**
+   * Returns a quick info about the actor, which will be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    String	result;
+
+    result = super.getQuickInfo();
+    result += QuickInfoHelper.toString(this, "waitPoll", m_WaitPoll, ", wait poll: ");
+
+    return result;
   }
 
   /**
