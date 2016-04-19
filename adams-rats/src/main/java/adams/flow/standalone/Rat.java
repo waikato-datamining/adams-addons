@@ -250,12 +250,12 @@ public class Rat
 	    new BaseRegExp(BaseRegExp.MATCH_ALL));
 
     m_OptionManager.add(
-	    "send-error-queue", "sendErrorQueue",
-	    new StorageName("senderrors"));
+      "send-error-queue", "sendErrorQueue",
+      new StorageName("senderrors"));
 
     m_OptionManager.add(
-	    "show-in-control", "showInControl",
-	    false);
+      "show-in-control", "showInControl",
+      false);
   }
 
   /**
@@ -717,7 +717,9 @@ public class Rat
       ((InputConsumer) m_LogActor).input(new Token(entry));
       m_LogActor.execute();
     }
-    
+
+    source.getLogger().severe(msg);
+
     if (m_StopFlowOnError)
       stopIfNecessary();
     
