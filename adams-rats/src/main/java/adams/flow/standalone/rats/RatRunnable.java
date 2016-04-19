@@ -161,6 +161,9 @@ public class RatRunnable
 		    }
 		  }
 		}
+		else {
+		  getOwner().queueFlowError(data, result);
+		}
 	      }
 	    }
 	    else {

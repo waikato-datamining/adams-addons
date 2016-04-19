@@ -88,9 +88,15 @@ import java.util.HashSet;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
- * <pre>-receiver &lt;adams.flow.standalone.rats.RatInput&gt; (property: receiver)
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing 
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-receiver &lt;adams.flow.standalone.rats.input.RatInput&gt; (property: receiver)
  * &nbsp;&nbsp;&nbsp;The receiver to use.
- * &nbsp;&nbsp;&nbsp;default: adams.flow.standalone.rats.DummyInput
+ * &nbsp;&nbsp;&nbsp;default: adams.flow.standalone.rats.input.DummyInput
  * </pre>
  * 
  * <pre>-actor &lt;adams.flow.core.Actor&gt; [-actor ...] (property: actors)
@@ -99,9 +105,9 @@ import java.util.HashSet;
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
  * 
- * <pre>-transmitter &lt;adams.flow.standalone.rats.RatOutput&gt; (property: transmitter)
+ * <pre>-transmitter &lt;adams.flow.standalone.rats.output.RatOutput&gt; (property: transmitter)
  * &nbsp;&nbsp;&nbsp;The transmitter to use.
- * &nbsp;&nbsp;&nbsp;default: adams.flow.standalone.rats.DummyOutput
+ * &nbsp;&nbsp;&nbsp;default: adams.flow.standalone.rats.output.DummyOutput
  * </pre>
  * 
  * <pre>-log &lt;adams.flow.core.CallableActorReference&gt; (property: log)
@@ -147,9 +153,20 @@ import java.util.HashSet;
  * &nbsp;&nbsp;&nbsp;default: .*
  * </pre>
  * 
+ * <pre>-flow-error-queue &lt;adams.flow.control.StorageName&gt; (property: flowErrorQueue)
+ * &nbsp;&nbsp;&nbsp;The name of the (optional) queue in internal storage to feed with flow errors.
+ * &nbsp;&nbsp;&nbsp;default: flowerrors
+ * </pre>
+ * 
  * <pre>-send-error-queue &lt;adams.flow.control.StorageName&gt; (property: sendErrorQueue)
  * &nbsp;&nbsp;&nbsp;The name of the (optional) queue in internal storage to feed with send errors.
  * &nbsp;&nbsp;&nbsp;default: senderrors
+ * </pre>
+ * 
+ * <pre>-show-in-control &lt;boolean&gt; (property: showInControl)
+ * &nbsp;&nbsp;&nbsp;If enabled, this Rat will be displayed in the adams.flow.standalone.RatControl 
+ * &nbsp;&nbsp;&nbsp;control panel.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
  <!-- options-end -->
@@ -186,12 +203,15 @@ public class Rat
   /** the runnable doing the work. */
   protected RatRunnable m_Runnable;
 
+  /** the name of the (optional) queue in internal storage for sending flow error to. */
+  protected StorageName m_FlowErrorQueue;
+
   /** the name of the (optional) queue in internal storage for sending send error to. */
   protected StorageName m_SendErrorQueue;
   
   /** whether to show in {@link RatControl}. */
   protected boolean m_ShowInControl;
-  
+
   /**
    * Returns a string describing the object.
    *
@@ -210,44 +230,48 @@ public class Rat
     super.defineOptions();
 
     m_OptionManager.add(
-	    "receiver", "receiver",
-	    new DummyInput());
+      "receiver", "receiver",
+      new DummyInput());
 
     m_OptionManager.add(
-	    "actor", "actors",
-	    new Actor[0]);
+      "actor", "actors",
+      new Actor[0]);
 
     m_OptionManager.add(
-	    "transmitter", "transmitter",
-	    new DummyOutput());
+      "transmitter", "transmitter",
+      new DummyOutput());
 
     m_OptionManager.add(
-	    "log", "log",
-	    new CallableActorReference("unknown"));
+      "log", "log",
+      new CallableActorReference("unknown"));
 
     m_OptionManager.add(
-	    "scope-handling-variables", "scopeHandlingVariables",
-	    ScopeHandling.EMPTY);
+      "scope-handling-variables", "scopeHandlingVariables",
+      ScopeHandling.EMPTY);
 
     m_OptionManager.add(
-	    "propagate-variables", "propagateVariables",
-	    false);
+      "propagate-variables", "propagateVariables",
+      false);
 
     m_OptionManager.add(
-	    "variables-regexp", "variablesRegExp",
-	    new BaseRegExp(BaseRegExp.MATCH_ALL));
+      "variables-regexp", "variablesRegExp",
+      new BaseRegExp(BaseRegExp.MATCH_ALL));
 
     m_OptionManager.add(
-	    "scope-handling-storage", "scopeHandlingStorage",
-	    ScopeHandling.EMPTY);
+      "scope-handling-storage", "scopeHandlingStorage",
+      ScopeHandling.EMPTY);
 
     m_OptionManager.add(
-	    "propagate-storage", "propagateStorage",
-	    false);
+      "propagate-storage", "propagateStorage",
+      false);
 
     m_OptionManager.add(
-	    "storage-regexp", "storageRegExp",
-	    new BaseRegExp(BaseRegExp.MATCH_ALL));
+      "storage-regexp", "storageRegExp",
+      new BaseRegExp(BaseRegExp.MATCH_ALL));
+
+    m_OptionManager.add(
+      "flow-error-queue", "flowErrorQueue",
+      new StorageName("flowerrors"));
 
     m_OptionManager.add(
       "send-error-queue", "sendErrorQueue",
@@ -578,6 +602,35 @@ public class Rat
   }
 
   /**
+   * Sets the name for the queue in internal storage to feed with flow errors.
+   *
+   * @param value	the name
+   */
+  public void setFlowErrorQueue(StorageName value) {
+    m_FlowErrorQueue = value;
+    reset();
+  }
+
+  /**
+   * Returns the name for the queue in internal storage to feed with flow errors.
+   *
+   * @return		the name
+   */
+  public StorageName getFlowErrorQueue() {
+    return m_FlowErrorQueue;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String flowErrorQueueTipText() {
+    return "The name of the (optional) queue in internal storage to feed with flow errors.";
+  }
+
+  /**
    * Sets the name for the queue in internal storage to feed with send errors.
    *
    * @param value	the name
@@ -648,6 +701,7 @@ public class Rat
     result  = QuickInfoHelper.toString(this, "receiver", m_Receiver, "receiver: ");
     result += QuickInfoHelper.toString(this, "transmitter", m_Transmitter, ", transmitter: ");
     result += QuickInfoHelper.toString(this, "log", m_Log, ", log: ");
+    result += QuickInfoHelper.toString(this, "flowErrorQueue", m_FlowErrorQueue, ", flow errors: ");
     result += QuickInfoHelper.toString(this, "sendErrorQueue", m_SendErrorQueue, ", send errors: ");
     value   = QuickInfoHelper.toString(this, "showInControl", m_ShowInControl, "control", ", ");
     if (value != null)
@@ -950,6 +1004,24 @@ public class Rat
     
     cont = new ErrorContainer(payload, error, getFullName() + "#send");
     return QueueHelper.enqueue(this, m_SendErrorQueue, cont);
+  }
+
+  /**
+   * Creates an {@link ErrorContainer} with the provided data and puts it
+   * in the {@link #m_FlowErrorQueue} (if the queue is available).
+   *
+   * @param payload	the payload to forward
+   * @param error	the associated error
+   * @return		true if successfully queued
+   */
+  public boolean queueFlowError(Object payload, String error) {
+    ErrorContainer	cont;
+
+    if (!getStorageHandler().getStorage().has(m_FlowErrorQueue))
+      return false;
+
+    cont = new ErrorContainer(payload, error, getFullName() + "#flow");
+    return QueueHelper.enqueue(this, m_FlowErrorQueue, cont);
   }
 
   /**
