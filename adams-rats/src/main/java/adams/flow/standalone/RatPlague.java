@@ -72,74 +72,75 @@ import adams.flow.standalone.rats.output.EnQueue;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
- * <pre>-receiver &lt;adams.flow.standalone.rats.input.RatInput&gt; (property: receiver)
- * &nbsp;&nbsp;&nbsp;The receiver to use.
- * &nbsp;&nbsp;&nbsp;default: adams.flow.standalone.rats.input.DummyInput
- * </pre>
- * 
  * <pre>-actor &lt;adams.flow.core.Actor&gt; [-actor ...] (property: actors)
- * &nbsp;&nbsp;&nbsp;The actors for transforming the data obtained by the receiver before sending 
+ * &nbsp;&nbsp;&nbsp;The actors for transforming the data obtained by the receiver before sending
  * &nbsp;&nbsp;&nbsp;it to the transmitter.
- * &nbsp;&nbsp;&nbsp;default: 
+ * &nbsp;&nbsp;&nbsp;default:
  * </pre>
- * 
- * <pre>-transmitter &lt;adams.flow.standalone.rats.output.RatOutput&gt; (property: transmitter)
- * &nbsp;&nbsp;&nbsp;The transmitter to use.
- * &nbsp;&nbsp;&nbsp;default: adams.flow.standalone.rats.output.DummyOutput
- * </pre>
- * 
+ *
  * <pre>-log &lt;adams.flow.core.CallableActorReference&gt; (property: log)
- * &nbsp;&nbsp;&nbsp;The name of the callable log actor to use (logging disabled if actor not 
+ * &nbsp;&nbsp;&nbsp;The name of the callable log actor to use (logging disabled if actor not
  * &nbsp;&nbsp;&nbsp;found).
  * &nbsp;&nbsp;&nbsp;default: unknown
  * </pre>
- * 
+ *
  * <pre>-scope-handling-variables &lt;EMPTY|COPY|SHARE&gt; (property: scopeHandlingVariables)
- * &nbsp;&nbsp;&nbsp;Defines how variables are handled in the local scope; whether to start with 
- * &nbsp;&nbsp;&nbsp;empty set, a copy of the outer scope variables or share variables with the 
+ * &nbsp;&nbsp;&nbsp;Defines how variables are handled in the local scope; whether to start with
+ * &nbsp;&nbsp;&nbsp;empty set, a copy of the outer scope variables or share variables with the
  * &nbsp;&nbsp;&nbsp;outer scope.
  * &nbsp;&nbsp;&nbsp;default: EMPTY
  * </pre>
- * 
+ *
  * <pre>-propagate-variables &lt;boolean&gt; (property: propagateVariables)
- * &nbsp;&nbsp;&nbsp;If enabled, variables that match the specified regular expression get propagated 
+ * &nbsp;&nbsp;&nbsp;If enabled, variables that match the specified regular expression get propagated
  * &nbsp;&nbsp;&nbsp;to the outer scope.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-variables-regexp &lt;adams.core.base.BaseRegExp&gt; (property: variablesRegExp)
  * &nbsp;&nbsp;&nbsp;The regular expression that variable names must match in order to get propagated.
  * &nbsp;&nbsp;&nbsp;default: .*
  * </pre>
- * 
+ *
  * <pre>-scope-handling-storage &lt;EMPTY|COPY|SHARE&gt; (property: scopeHandlingStorage)
- * &nbsp;&nbsp;&nbsp;Defines how storage is handled in the local scope; whether to start with 
- * &nbsp;&nbsp;&nbsp;empty set, a (deep) copy of the outer scope storage or share the storage 
+ * &nbsp;&nbsp;&nbsp;Defines how storage is handled in the local scope; whether to start with
+ * &nbsp;&nbsp;&nbsp;empty set, a (deep) copy of the outer scope storage or share the storage
  * &nbsp;&nbsp;&nbsp;with the outer scope.
  * &nbsp;&nbsp;&nbsp;default: EMPTY
  * </pre>
- * 
+ *
  * <pre>-propagate-storage &lt;boolean&gt; (property: propagateStorage)
- * &nbsp;&nbsp;&nbsp;If enabled, storage items which names match the specified regular expression 
+ * &nbsp;&nbsp;&nbsp;If enabled, storage items which names match the specified regular expression
  * &nbsp;&nbsp;&nbsp;get propagated to the outer scope.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
  * <pre>-storage-regexp &lt;adams.core.base.BaseRegExp&gt; (property: storageRegExp)
- * &nbsp;&nbsp;&nbsp;The regular expression that the names of storage items must match in order 
+ * &nbsp;&nbsp;&nbsp;The regular expression that the names of storage items must match in order
  * &nbsp;&nbsp;&nbsp;to get propagated.
  * &nbsp;&nbsp;&nbsp;default: .*
  * </pre>
- * 
+ *
+ * <pre>-flow-error-queue &lt;adams.flow.control.StorageName&gt; (property: flowErrorQueue)
+ * &nbsp;&nbsp;&nbsp;The name of the (optional) queue in internal storage to feed with flow errors.
+ * &nbsp;&nbsp;&nbsp;default: flowerrors
+ * </pre>
+ *
  * <pre>-send-error-queue &lt;adams.flow.control.StorageName&gt; (property: sendErrorQueue)
  * &nbsp;&nbsp;&nbsp;The name of the (optional) queue in internal storage to feed with send errors.
  * &nbsp;&nbsp;&nbsp;default: senderrors
  * </pre>
- * 
+ *
  * <pre>-show-in-control &lt;boolean&gt; (property: showInControl)
- * &nbsp;&nbsp;&nbsp;If enabled, this Rat will be displayed in the adams.flow.standalone.RatControl 
+ * &nbsp;&nbsp;&nbsp;If enabled, this Rat will be displayed in the adams.flow.standalone.RatControl
  * &nbsp;&nbsp;&nbsp;control panel.
  * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-wait-poll &lt;int&gt; (property: waitPoll)
+ * &nbsp;&nbsp;&nbsp;The number of milli-seconds to wait before polling again.
+ * &nbsp;&nbsp;&nbsp;default: 100
+ * &nbsp;&nbsp;&nbsp;minimum: 0
  * </pre>
  * 
  * <pre>-input &lt;adams.flow.control.StorageName&gt; [-input ...] (property: input)
