@@ -21,7 +21,6 @@ package adams.flow.standalone;
 
 import adams.core.QuickInfoHelper;
 import adams.flow.control.StorageName;
-import adams.flow.core.ActorUtils;
 import adams.flow.core.MutableActorHandler;
 import adams.flow.standalone.rats.input.DeQueue;
 import adams.flow.standalone.rats.input.DummyInput;
@@ -342,6 +341,7 @@ public class RatPlague
     InputPolling	polling;
     EnQueue		enqueue;
     DeQueue		dequeue;
+    MutableActorHandler parent;
 
     result = super.setUp();
 
@@ -353,7 +353,8 @@ public class RatPlague
     }
 
     if (result == null) {
-      index = index();
+      index  = index();
+      parent = (MutableActorHandler) getParent();
       for (i = 0; i < m_Input.length; i++) {
 	rat = new Rat();
 	rat.setName(getName() + "-" + m_Input[i].getValue());
@@ -376,22 +377,17 @@ public class RatPlague
 	rat.setSendErrorQueue(getSendErrorQueue());
 	rat.setShowInControl(getShowInControl());
 
-	removeAll();
+	rat.removeAll();
 	for (n = 0; n < size(); n++)
 	  rat.add(get(n).shallowCopy());
 
 	rat.setVariables(getVariables());
 	if (i == 0)
-	  ((MutableActorHandler) getParent()).set(index, rat);
+	  parent.set(index, rat);
 	else
-	  ((MutableActorHandler) getParent()).add(index + i, rat);
-	result = rat.setUp();
-	if (getErrorHandler() != this)
-	  ActorUtils.updateErrorHandler(rat, getErrorHandler(), isLoggingEnabled());
-	// make sure we've got the current state of the variables
-	if (result == null)
-	  rat.getOptionManager().updateVariableValues(true);
+	  parent.add(index + i, rat);
       }
+      result = parent.setUp();
       setParent(null);
       cleanUp();
     }
