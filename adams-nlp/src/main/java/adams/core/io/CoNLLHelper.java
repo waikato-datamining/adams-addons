@@ -15,12 +15,13 @@
 
 /**
  * CoNLLHelper.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, NZ
  */
 
 package adams.core.io;
 
 import adams.core.Utils;
+import adams.core.base.BaseRegExp;
 import adams.data.io.input.CsvSpreadSheetReader;
 import adams.data.spreadsheet.SpreadSheet;
 
@@ -55,7 +56,7 @@ public class CoNLLHelper {
     StringReader 		sreader;
 
     reader  = new CsvSpreadSheetReader();
-    reader.setMissingValue("");
+    reader.setMissingValue(new BaseRegExp(""));
     reader.setSeparator("\\t");
     reader.setNoHeader(true);
     reader.setCustomColumnHeaders(Utils.flatten(HEADERS, ","));

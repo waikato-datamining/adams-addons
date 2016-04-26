@@ -24,6 +24,7 @@ import adams.core.Constants;
 import adams.core.Properties;
 import adams.core.Range;
 import adams.core.Utils;
+import adams.core.base.BaseRegExp;
 import adams.core.io.FileUtils;
 import adams.core.io.GzipUtils;
 import adams.data.DateFormatString;
@@ -169,7 +170,7 @@ public class SimpleTrailReader
     reader  = new CsvSpreadSheetReader();
     reader.setDataRowType(new DenseFloatDataRow());
     reader.setComment("#");
-    reader.setMissingValue("");
+    reader.setMissingValue(new BaseRegExp(""));
     reader.setDateTimeMsecColumns(new Range(Range.FIRST));
     reader.setDateTimeMsecLenient(true);
     reader.setDateTimeMsecFormat(new DateFormatString(Constants.TIMESTAMP_FORMAT_MSECS));
