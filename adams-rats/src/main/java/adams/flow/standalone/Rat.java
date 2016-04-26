@@ -212,6 +212,9 @@ public class Rat
   /** whether to show in {@link RatControl}. */
   protected boolean m_ShowInControl;
 
+  /** whether the rat is currently being stopped. */
+  protected boolean m_Stopping;
+
   /**
    * Returns a string describing the object.
    *
@@ -1152,7 +1155,10 @@ public class Rat
    * Stops the execution if necessary.
    */
   protected synchronized void stopIfNecessary() {
+    if (m_Stopping)
+      return;
     if (!m_Stopped) {
+      m_Stopping = true;
       m_Receiver.stopExecution();
       m_Actors.stopExecution();
       m_Transmitter.stopExecution();
@@ -1170,6 +1176,7 @@ public class Rat
 	}
 	m_Runnable = null;
       }
+      m_Stopping = false;
     }
   }
   
