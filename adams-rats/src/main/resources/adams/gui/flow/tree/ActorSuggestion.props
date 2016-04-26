@@ -19,6 +19,10 @@ adams-rats.LabRat1=\
   IF PARENT IS adams.flow.standalone.Rats \
   THEN adams.flow.standalone.LabRat
 
+adams-rats.RatPlague1=\
+  IF PARENT IS adams.flow.standalone.Rats \
+  THEN adams.flow.standalone.RatPlague
+
 adams-rats.Tee1=\
   IF PARENT IS adams.flow.standalone.Rat \
   THEN adams.flow.control.Tee

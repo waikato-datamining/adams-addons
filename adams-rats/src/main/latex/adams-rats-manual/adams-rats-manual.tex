@@ -1,5 +1,4 @@
-% Copyright (c) 2014 by the University of Waikato, Hamilton, NZ. 
-% This work is made available under the terms of the 
+% This work is made available under the terms of the
 % Creative Commons Attribution-ShareAlike 3.0 license, 
 % http://creativecommons.org/licenses/by-sa/3.0/. 
 %
@@ -78,7 +77,9 @@ The following standalone actors are available:
 	\item \textit{Rat} -- Definition of how to receive data and how to transmit 
 	it, based on the specified \textit{RatInput} (= receiver) and 
 	\textit{RatOutput} (= transmitter).
-	\item \textit{LabRat} -- the actual Rat setup gets generated at runtime 
+	\item \textit{RatPlague} -- creates copies of itself, one for each of
+	the defined input queues, feeding into the same output queue.
+	\item \textit{LabRat} -- the actual Rat setup gets generated at runtime
 	using a generator.
 \end{itemize}
 
