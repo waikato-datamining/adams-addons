@@ -20,10 +20,16 @@
 
 package adams.HonoursPackage;
 
+import adams.core.base.BaseTimeMsec;
+import adams.core.io.PlaceholderFile;
+import adams.data.io.input.SimpleTrailReader;
+import adams.data.io.output.SimpleTrailWriter;
+import adams.data.trail.Step;
+import adams.data.trail.Trail;
 import adams.env.Environment;
 
 /**
- * TODO: what class does.
+ * Takes two trail files and combines them into one
  *
  * @author steven
  * @version $Revision$
@@ -31,6 +37,31 @@ import adams.env.Environment;
 public class Test {
   public static void main(String[] args) throws Exception {
     Environment.setEnvironmentClass(Environment.class);
-    //
+    // read in trail files
+    Trail trackingTrail;
+    Trail annotationTrail;
+    Trail result = new Trail();
+    SimpleTrailReader tReader = new SimpleTrailReader();
+    tReader.setInput(new PlaceholderFile(args[0]));
+    trackingTrail = tReader.read().get(0);
+    tReader.setInput(new PlaceholderFile(args[1]));
+    annotationTrail = tReader.read().get(0);
+    // Correct timestamps for trackingTrail
+//    for (Step s : trackingTrail) {
+//      Date
+//      BaseTimeMsec b = new BaseTimeMsec(d);
+//
+//    }
+    // Combine trail files
+    result.addAll(trackingTrail);
+    result.addAll(annotationTrail);
+    SimpleTrailWriter tWriter = new SimpleTrailWriter();
+    // Write out the combined trails
+    tWriter.setOutput(new PlaceholderFile(args[2]));
+    tWriter.write(result);
+    for(Step s : result) {
+      System.out.println(s.getTimestamp().toString());
+    }
+
   }
 }

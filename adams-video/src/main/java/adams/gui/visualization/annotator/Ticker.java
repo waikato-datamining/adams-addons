@@ -21,8 +21,6 @@
 package adams.gui.visualization.annotator;
 
 import adams.gui.visualization.video.vlcjplayer.VLCjDirectRenderPanel;
-import adams.gui.visualization.video.vlcjplayer.VLCjPanel;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
