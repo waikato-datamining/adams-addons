@@ -15,15 +15,21 @@
 
 /*
  * TrailDisplay.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
 
 import adams.core.QuickInfoHelper;
+import adams.core.Utils;
+import adams.core.io.FileUtils;
+import adams.core.io.PlaceholderFile;
+import adams.core.io.TempUtils;
+import adams.data.io.output.SimpleTrailWriter;
 import adams.data.trail.Trail;
 import adams.flow.core.Token;
 import adams.gui.core.BasePanel;
+import adams.gui.core.ExtensionFileFilter;
 import adams.gui.visualization.trail.TrailPanel;
 import adams.gui.visualization.trail.overlay.AbstractTrailOverlay;
 import adams.gui.visualization.trail.paintlet.Circles;
@@ -31,6 +37,7 @@ import adams.gui.visualization.trail.paintlet.TrailPaintlet;
 
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -145,7 +152,7 @@ import java.awt.BorderLayout;
  */
 public class TrailDisplay
   extends AbstractGraphicalDisplay
-  implements DisplayPanelProvider {
+  implements DisplayPanelProvider, TextSupplier {
 
   /** for serialization. */
   private static final long serialVersionUID = -5963541661512220421L;
@@ -426,5 +433,44 @@ public class TrailDisplay
   @Override
   public boolean displayPanelRequiresScrollPane() {
     return false;
+  }
+
+  /**
+   * Returns a custom file filter for the file chooser.
+   *
+   * @return		the file filter, null if to use default one
+   */
+  public ExtensionFileFilter getCustomTextFileFilter() {
+    return new ExtensionFileFilter(new SimpleTrailWriter().getFormatDescription(), new SimpleTrailWriter().getFormatExtensions());
+  }
+
+  /**
+   * Supplies the text.
+   *
+   * @return		the text, null if none available
+   */
+  public String supplyText() {
+    List<String>	lines;
+    TrailPanel		panel;
+    SimpleTrailWriter	writer;
+    PlaceholderFile	outfile;
+
+    panel = (TrailPanel) m_Panel;
+    if ((panel == null) || (panel.getTrail() == null))
+      return null;
+
+    outfile = new PlaceholderFile(TempUtils.createTempFile("adams", "trail"));
+    writer  = new SimpleTrailWriter();
+    writer.setOutput(outfile);
+    if (!writer.write(panel.getTrail()))
+      return null;
+
+    lines = FileUtils.loadFromFile(outfile);
+    outfile.delete();
+
+    if (lines != null)
+      return Utils.flatten(lines, "\n");
+    else
+      return null;
   }
 }
