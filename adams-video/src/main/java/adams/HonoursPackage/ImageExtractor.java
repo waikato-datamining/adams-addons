@@ -84,6 +84,7 @@ public class ImageExtractor {
     BufferedImageContainer[] images = extractor.extract();
     try {
       for (int i = 0; i < images.length; i++) {
+        System.out.println("Image");
         ImageIO.write(images[i].getImage(), "png", new File("/home/sjb90/Pictures/testImage" + i + ".png"));
       }
     }

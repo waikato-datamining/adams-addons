@@ -206,7 +206,7 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
 	playingCondition.await();
       }
     } catch (Exception e) {
-      //ignore
+      System.out.println(e.getMessage());
     }
 
     // make sure to clean up the media player and factory

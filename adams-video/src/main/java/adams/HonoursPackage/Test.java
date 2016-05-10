@@ -20,7 +20,6 @@
 
 package adams.HonoursPackage;
 
-import adams.core.base.BaseTimeMsec;
 import adams.core.io.PlaceholderFile;
 import adams.data.io.input.SimpleTrailReader;
 import adams.data.io.output.SimpleTrailWriter;
@@ -46,15 +45,18 @@ public class Test {
     trackingTrail = tReader.read().get(0);
     tReader.setInput(new PlaceholderFile(args[1]));
     annotationTrail = tReader.read().get(0);
-    // Correct timestamps for trackingTrail
-//    for (Step s : trackingTrail) {
-//      Date
-//      BaseTimeMsec b = new BaseTimeMsec(d);
-//
-//    }
     // Combine trail files
-    result.addAll(trackingTrail);
     result.addAll(annotationTrail);
+    for(Step s : trackingTrail) {
+      Step match = result.getStep(s.getTimestamp());
+      if(match != null) {
+	if(match.hasMetaData()) {
+	  s.getMetaData().putAll(match.getMetaData());
+	}
+      }
+	result.add(s);
+    }
+    //result.addAll(annotationTrail);
     SimpleTrailWriter tWriter = new SimpleTrailWriter();
     // Write out the combined trails
     tWriter.setOutput(new PlaceholderFile(args[2]));
