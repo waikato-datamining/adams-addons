@@ -121,6 +121,12 @@
       <groupId>org.openimaj</groupId>
       <artifactId>video-processing</artifactId>
       <version>${openimaj.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>jama</groupId>
+          <artifactId>jama</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>

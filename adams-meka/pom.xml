@@ -86,6 +86,10 @@
           <groupId>nz.ac.waikato.cms.weka</groupId>
           <artifactId>weka-dev</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>com.github.fracpete</groupId>
+          <artifactId>jfilechooser-bookmarks</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
