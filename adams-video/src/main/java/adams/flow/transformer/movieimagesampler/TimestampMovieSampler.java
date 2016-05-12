@@ -22,6 +22,8 @@ package adams.flow.transformer.movieimagesampler;
 
 import adams.core.base.BaseTimeMsec;
 import adams.data.image.BufferedImageContainer;
+import adams.data.report.DataType;
+import adams.data.report.Field;
 import adams.gui.visualization.video.vlcjplayer.VideoUtilities;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.condition.Condition;
@@ -36,7 +38,7 @@ import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -51,14 +53,17 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
   /**
    * List of time stamps to sample
    */
-  BaseTimeMsec[] m_TimeStampsToSample;
+  protected long[] m_TimeStampsLong;
+
+  /** the timestamps to grab. */
+  protected BaseTimeMsec[] m_Timestamps;
 
   /**
    * headless media player
    */
   protected DirectMediaPlayer m_MediaPlayer;
 
-  long m_TargetTime;
+  protected long m_TargetTime;
 
   /**
    * the samples.
@@ -80,12 +85,13 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
   /** a container for storing the previous image */
   protected BufferedImageContainer m_PreviousImage;
 
-  /**
-   * Returns the array of timestamps in BaseTimeMsec
-   * @return the array of timestamps
-   */
-  public BaseTimeMsec[] getTimeStamps() {
-    return m_TimeStampsToSample;
+  protected long m_TimeOffset;
+
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_TimeStampsLong = null;
   }
 
   /**
@@ -93,8 +99,47 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
    * @param timeStamps
    */
   public void setTimeStamps(BaseTimeMsec[] timeStamps) {
-    m_TimeStampsToSample = timeStamps;
+    m_Timestamps = timeStamps;
     reset();
+  }
+
+  /**
+   * Returns the timestamps to sample.
+   *
+   * @return		the timestamps
+   */
+  public BaseTimeMsec[] getTimeStamps() {
+    return m_Timestamps;
+  }
+
+  public void setTimeStampsAsLong(long[] timeStamps) {
+    m_TimeStampsLong = timeStamps;
+  }
+
+  public long[] getTimeStampsAsLong() {
+    if (m_TimeStampsLong == null) {
+      m_TimeOffset = new BaseTimeMsec(BaseTimeMsec.INF_PAST_DATE).dateValue().getTime();
+      Calendar calendar = Calendar.getInstance();
+      long hours = 0;
+      long minutes = 0;
+      long seconds = 0;
+      long mseconds = 0;
+      m_TimeStampsLong = new long[m_Timestamps.length];
+      for (int i = 0; i < m_Timestamps.length; i++) {
+	calendar.setTime(m_Timestamps[i].dateValue());
+	hours = calendar.get(Calendar.HOUR_OF_DAY);
+	minutes = calendar.get(Calendar.MINUTE);
+	seconds = calendar.get(Calendar.SECOND);
+	mseconds = calendar.get(Calendar.MILLISECOND);
+
+	//Convert everything to miliseconds and add it to the long array
+	m_TimeStampsLong[i] += hours * 3600000;
+	m_TimeStampsLong[i] += minutes * 60000;
+	m_TimeStampsLong[i] += seconds * 1000;
+	m_TimeStampsLong[i] += mseconds;
+      }
+    }
+    return m_TimeStampsLong;
   }
 
   /**
@@ -125,12 +170,9 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
     super.defineOptions();
 
     m_OptionManager.add(
-      "time-stamps", "timeStamps",
-      new BaseTimeMsec[0], 1, null);
+      "timestamp", "timeStamps",
+      new BaseTimeMsec[0]);
   }
-
-
-
 
   /**
    * Initializes the members.
@@ -140,7 +182,6 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
     super.initialize();
     m_CurrentImage = new BufferedImageContainer();
     m_PreviousImage = new BufferedImageContainer();
-    m_TimeStampsToSample = new BaseTimeMsec[0];
   }
 
   /**
@@ -153,6 +194,7 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
    */
   @Override
   protected BufferedImageContainer[] doSample(File file) {
+    long[] timestamps = getTimeStampsAsLong();
     m_VideoDimension = VideoUtilities.getVideoDimensions(file.getAbsolutePath());
     m_Image = new BufferedImage((int) m_VideoDimension.getWidth(), (int) m_VideoDimension.getHeight(),
       BufferedImage.TYPE_INT_RGB);
@@ -173,8 +215,8 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
       };
 
       playingCondition.await();
-      for (int i = 0; i < m_TimeStampsToSample.length; i++) {
-	m_TargetTime = m_TimeStampsToSample[i].dateValue().getTime();
+      for (int i = 0; i < timestamps.length; i++) {
+	m_TargetTime = timestamps[i];
 	if (m_TargetTime > m_MediaPlayer.getLength())
 	  break;
 	Condition<?> timeReachedCondition = new TimeReachedCondition(m_MediaPlayer, m_TargetTime) {
@@ -185,6 +227,7 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
 	  }
 	};
 	timeReachedCondition.await();
+
 
 	Condition<?> pausedCondition = new PausedCondition(m_MediaPlayer) {
 	  @Override
@@ -204,6 +247,7 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
 	  }
 	};
 	playingCondition.await();
+	System.out.println("\n************************************ " + m_MediaPlayer.getTime() + "\n");
       }
     } catch (Exception e) {
       System.out.println(e.getMessage());
@@ -234,13 +278,17 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
 
       m_CurrentImage.setImage(m_Image);
       long currentTime = directMediaPlayer.getTime();
-
+      System.out.println("*********************" + m_TargetTime);
+      String ts = new BaseTimeMsec(new Date(currentTime)).getValue();
+      if (ts.equals(BaseTimeMsec.INF_PAST))
+	ts = BaseTimeMsec.INF_PAST_DATE;
+      m_CurrentImage.getReport().setValue(new Field("Timestamp", DataType.STRING), ts);
+      System.out.println("*********************" + m_CurrentImage.getReport().getStringValue("Timestamp"));
       if (currentTime == m_TargetTime)
 	m_Samples.add(m_CurrentImage);
       else if (currentTime > m_TargetTime)
 	m_Samples.add(m_PreviousImage);
-      m_PreviousImage = new BufferedImageContainer();
-      m_PreviousImage.setImage(m_CurrentImage.getImage());
+      m_PreviousImage = m_CurrentImage;
     }
   }
 }

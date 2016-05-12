@@ -23,11 +23,13 @@ package adams.HonoursPackage;
 import adams.core.base.BaseTimeMsec;
 import adams.core.io.PlaceholderFile;
 import adams.data.image.BufferedImageContainer;
+import adams.data.io.output.DefaultSimpleReportWriter;
 import adams.env.Environment;
 import adams.flow.transformer.movieimagesampler.TimestampMovieSampler;
 
 import javax.imageio.ImageIO;
 import java.io.File;
+import java.util.Date;
 
 /**
  * Extract images given a list of timestamps
@@ -76,22 +78,33 @@ public class ImageExtractor {
     Environment.setEnvironmentClass(Environment.class);
     ImageExtractor extractor = new ImageExtractor();
     extractor.setFile(new PlaceholderFile(args[0]));
-    BaseTimeMsec[] ts = new BaseTimeMsec[2];
-    for (int i = 0; i < ts.length; i++) {
-      ts[i] = new BaseTimeMsec("00:0" + i +":00");
+    BaseTimeMsec[] ts = new BaseTimeMsec[6];
+    for (int i = 0; i < ts.length / 2; i++) {
+      for (int j = 0; j < 2; j++) {
+	String time = "00:0" + i + ":" + j * 3 + "0.000";
+	ts[i*2+j] = new BaseTimeMsec(time);
+	System.out.println(ts[i*2+j]);
+	System.out.println(ts[i*2+j].dateValue());
+	System.out.println(ts[i*2+j].dateValue().getTime());
+      }
     }
     extractor.setimestamps(ts);
+
     BufferedImageContainer[] images = extractor.extract();
     try {
+      DefaultSimpleReportWriter reportWriter = new DefaultSimpleReportWriter();
       for (int i = 0; i < images.length; i++) {
-        System.out.println("Image");
-        ImageIO.write(images[i].getImage(), "png", new File("/home/sjb90/Pictures/testImage" + i + ".png"));
+        System.out.println("Image " + images[i].getReport().getStringValue("Timestamp"));
+        ImageIO.write(images[i].getImage(), "png", new File("/home/sjb90/Pictures/testImage" +
+          images[i].getReport().getStringValue("Timestamp") + ".png"));
+	reportWriter.setOutput(new PlaceholderFile("/home/sjb90/Pictures/testImage" +
+	  images[i].getReport().getStringValue("Timestamp") + ".report"));
+	reportWriter.write(images[i].getReport());
       }
     }
     catch (Exception e) {
 
     }
+
   }
-
-
 }

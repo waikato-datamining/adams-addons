@@ -255,9 +255,6 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
       playingCondition.await();
       m_TargetTime = 0;
       for (int i = 0; i < m_NumSamples; i++) {
-	System.out.println("Loop number: " + (i + 1));
-	System.out.println("number of samples: " + m_NumSamples);
-
 	Condition<?> timeReachedCondition = new TimeReachedCondition(m_MediaPlayer, m_TargetTime) {
 	  @Override
 	  protected boolean onBefore() {
@@ -318,7 +315,7 @@ public class FixedIntervalBufferedImageSamplerVlcj extends AbstractBufferedImage
 
       m_CurrentImage.setImage(m_Image);
       long currentTime = directMediaPlayer.getTime();
-
+      System.out.println("\nTIME: " + currentTime + "\n");
       if (currentTime == m_TargetTime)
 	m_Samples.add(m_CurrentImage);
       else if (currentTime > m_TargetTime)
