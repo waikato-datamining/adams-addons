@@ -15,7 +15,7 @@
 
 /**
  * HeatmapViewerPanel.java
- * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.heatmap;
 
@@ -23,7 +23,7 @@ import adams.core.CleanUpHandler;
 import adams.core.Properties;
 import adams.core.StatusMessageHandler;
 import adams.core.io.PlaceholderFile;
-import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
 import adams.data.filter.HeatmapNormalize;
 import adams.data.heatmap.Heatmap;
 import adams.data.io.input.AbstractHeatmapReader;
@@ -169,7 +169,7 @@ public class HeatmapViewerPanel
   protected HeatmapFileChooser m_FileChooser;
 
   /** the current filter. */
-  protected AbstractFilter<Heatmap> m_CurrentFilter;
+  protected Filter<Heatmap> m_CurrentFilter;
 
   /** the filter dialog. */
   protected FilterDialog m_DialogFilter;
@@ -984,7 +984,7 @@ public class HeatmapViewerPanel
       run = new Runnable() {
 	@Override
 	public void run() {
-	  AbstractFilter<Heatmap> filter = e.getFilter().shallowCopy();
+	  Filter<Heatmap> filter = e.getFilter().shallowCopy();
 	  HeatmapPanel panel = getPanelAt(index);
 	  Heatmap filtered = filter.filter(panel.getHeatmap());
 	  filter.cleanUp();

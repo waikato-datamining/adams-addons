@@ -15,7 +15,7 @@
 
 /**
  * HeatmapCropTest.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.filter;
 
@@ -63,7 +63,7 @@ public class HeatmapCropTest
    * @return		the setups
    */
   @Override
-  protected AbstractFilter[] getRegressionSetups() {
+  protected Filter[] getRegressionSetups() {
     HeatmapCrop[]	result;
     CropToCentroid	crop2centr;
     

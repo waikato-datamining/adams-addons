@@ -15,7 +15,7 @@
 
 /**
  * HeatmapNormalizeTest.java
- * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.filter;
 
@@ -61,8 +61,8 @@ public class HeatmapNormalizeTest
    * @return		the setups
    */
   @Override
-  protected AbstractFilter[] getRegressionSetups() {
-    return new AbstractFilter[]{
+  protected Filter[] getRegressionSetups() {
+    return new Filter[]{
 	new HeatmapNormalize()
     };
   }

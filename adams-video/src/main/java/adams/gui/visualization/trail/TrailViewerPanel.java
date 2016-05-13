@@ -15,7 +15,7 @@
 
 /**
  * TrailViewerPanel.java
- * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.trail;
 
@@ -23,7 +23,7 @@ import adams.core.CleanUpHandler;
 import adams.core.Properties;
 import adams.core.StatusMessageHandler;
 import adams.core.io.PlaceholderFile;
-import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
 import adams.data.filter.TrailWindow;
 import adams.data.io.input.AbstractTrailReader;
 import adams.data.io.output.AbstractDataContainerWriter;
@@ -150,7 +150,7 @@ public class TrailViewerPanel
   protected TrailFileChooser m_FileChooser;
 
   /** the current filter. */
-  protected AbstractFilter<Trail> m_CurrentFilter;
+  protected Filter<Trail> m_CurrentFilter;
 
   /** the filter dialog. */
   protected FilterDialog m_DialogFilter;
@@ -859,7 +859,7 @@ public class TrailViewerPanel
       run = new Runnable() {
 	@Override
 	public void run() {
-	  AbstractFilter<Trail> filter = e.getFilter().shallowCopy();
+	  Filter<Trail> filter = e.getFilter().shallowCopy();
 	  TrailPanel panel = getPanelAt(index);
 	  Trail filtered = filter.filter(panel.getTrail());
 	  filter.cleanUp();

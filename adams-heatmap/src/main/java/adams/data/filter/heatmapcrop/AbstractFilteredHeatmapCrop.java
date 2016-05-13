@@ -15,12 +15,12 @@
 
 /**
  * AbstractFilteredHeatmapCrop.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.filter.heatmapcrop;
 
-import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
 import adams.data.filter.PassThrough;
 import adams.data.heatmap.Heatmap;
 
@@ -34,8 +34,10 @@ import adams.data.heatmap.Heatmap;
 public abstract class AbstractFilteredHeatmapCrop
   extends AbstractHeatmapCrop {
 
+  private static final long serialVersionUID = 640739274022270372L;
+
   /** the filter to apply to the data first. */
-  protected AbstractFilter m_Filter;
+  protected Filter m_Filter;
 
   /**
    * Adds options to the internal list of options.
@@ -53,7 +55,7 @@ public abstract class AbstractFilteredHeatmapCrop
    *
    * @return		the default
    */
-  protected AbstractFilter getDefaultFilter() {
+  protected Filter getDefaultFilter() {
     return new PassThrough();
   }
 
@@ -62,7 +64,7 @@ public abstract class AbstractFilteredHeatmapCrop
    *
    * @param value 	the filter
    */
-  public void setFilter(AbstractFilter value) {
+  public void setFilter(Filter value) {
     m_Filter = value;
     reset();
   }
@@ -72,7 +74,7 @@ public abstract class AbstractFilteredHeatmapCrop
    *
    * @return 		the filter
    */
-  public AbstractFilter getFilter() {
+  public Filter getFilter() {
     return m_Filter;
   }
 
@@ -103,11 +105,11 @@ public abstract class AbstractFilteredHeatmapCrop
    * @return		the filtered data
    */
   protected Heatmap doCrop(Heatmap data) {
-    Heatmap			result;
-    Heatmap			filtered;
-    AbstractFilter<Heatmap>	filter;
+    Heatmap		result;
+    Heatmap		filtered;
+    Filter<Heatmap>	filter;
 
-    filter   = (AbstractFilter<Heatmap>) m_Filter.shallowCopy(true);
+    filter   = (Filter<Heatmap>) m_Filter.shallowCopy(true);
     filtered = filter.filter(data);
     filter.destroy();
 

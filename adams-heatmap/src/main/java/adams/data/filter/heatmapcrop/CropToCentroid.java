@@ -15,12 +15,12 @@
 
 /**
  * CropToCentroid.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.filter.heatmapcrop;
 
-import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
 import adams.data.filter.HeatmapCentroid;
 import adams.data.filter.HeatmapThreshold;
 import adams.data.heatmap.Heatmap;
@@ -120,7 +120,7 @@ public class CropToCentroid
    * @return		the default
    */
   @Override
-  protected AbstractFilter getDefaultFilter() {
+  protected Filter getDefaultFilter() {
     return new HeatmapThreshold();
   }
 

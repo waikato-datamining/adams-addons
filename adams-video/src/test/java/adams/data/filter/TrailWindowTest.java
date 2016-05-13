@@ -15,7 +15,7 @@
 
 /**
  * TrailWindowTest.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.filter;
 
@@ -49,7 +49,7 @@ public class TrailWindowTest
    *
    * @return		the filter
    */
-  public AbstractFilter<Trail> getFilter() {
+  public Filter<Trail> getFilter() {
     return new TrailWindow();
   }
 
@@ -74,7 +74,7 @@ public class TrailWindowTest
    * @return		the setups
    */
   @Override
-  protected AbstractFilter[] getRegressionSetups() {
+  protected Filter[] getRegressionSetups() {
     TrailWindow[]	result;
 
     result = new TrailWindow[3];

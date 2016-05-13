@@ -15,16 +15,16 @@
 
 /**
  * AbstractHeatmapFilterTestCase.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.filter;
-
-import java.util.List;
 
 import adams.data.heatmap.Heatmap;
 import adams.data.io.input.SpreadSheetHeatmapReader;
 import adams.data.report.Report;
 import adams.test.TmpFile;
+
+import java.util.List;
 
 /**
  * Ancestor for heatmap filter test cases.
@@ -33,7 +33,7 @@ import adams.test.TmpFile;
  * @version $Revision$
  */
 public abstract class AbstractHeatmapFilterTestCase
-  extends adams.data.filter.AbstractFilterTestCase<AbstractFilter, Heatmap> {
+  extends adams.data.filter.AbstractFilterTestCase<Filter, Heatmap> {
 
   /**
    * Constructs the test case. Called by subclasses.

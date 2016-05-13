@@ -15,12 +15,12 @@
 
 /*
  * FilteredFeatureGenerator.java
- * Copyright (C) 2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.featuregenerator;
 
-import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
 import adams.data.heatmap.Heatmap;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.DatabaseConnection;
@@ -70,7 +70,7 @@ public class FilteredFeatureGenerator
   private static final long serialVersionUID = 8646651693938769168L;
 
   /** the pre-filter for filtering the data. */
-  protected AbstractFilter m_Filter;
+  protected Filter m_Filter;
 
   /** the actual feature generator. */
   protected AbstractFeatureGenerator m_Generator;
@@ -117,7 +117,7 @@ public class FilteredFeatureGenerator
    *
    * @param value	the filter
    */
-  public void setFilter(AbstractFilter value) {
+  public void setFilter(Filter value) {
     m_Filter = value;
     updateDatabaseConnection();
     reset();
@@ -128,7 +128,7 @@ public class FilteredFeatureGenerator
    *
    * @return		the filter
    */
-  public AbstractFilter getFilter() {
+  public Filter getFilter() {
     return m_Filter;
   }
 
