@@ -1,0 +1,7 @@
+# Project: adams
+# Date: 2016-05-18 15:49:13
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Simply reads the iris UCI dataset." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.DL4JDatasetIterator -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.CSVRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.SingleFileSplitConfigurator -source ${EXAMPLE_FLOWS}/data/iris.csv\\\" -skip-num-lines 1\" -batch-size 150 -label-index 4 -num-possible-labels 3" -preprocessor "adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorWithScriptedConfiguration -handler adams.core.scripting.Dummy"
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter

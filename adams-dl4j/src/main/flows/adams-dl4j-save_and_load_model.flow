@@ -1,0 +1,19 @@
+# Project: adams
+# Date: 2016-05-19 14:21:10
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Builds a simple model on the iris UCI dataset\\nand saves it to disk." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.source.DL4JModelConfigurator -model-configurator adams.ml.dl4j.model.SimpleMultiLayerNetwork
+ adams.flow.standalone.SetVariable -var-name model -var-value ${EXAMPLE_FLOWS}/output/simple.model
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "build and save"
+  adams.flow.source.DL4JDatasetIterator -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.CSVRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.SingleFileSplitConfigurator -source ${EXAMPLE_FLOWS}/data/iris.csv\\\" -skip-num-lines 1\" -batch-size 150 -label-index 4 -num-possible-labels 3" -preprocessor "adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorWithScriptedConfiguration -handler adams.core.scripting.Dummy" -normalize-zero-mean-zero-unit-variance true
+  adams.flow.transformer.DL4JTrainModel
+  adams.flow.sink.DL4JModelWriter -output @{model}
+ adams.flow.control.Trigger -name "load and use"
+  adams.flow.source.DL4JDatasetIterator -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.CSVRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.SingleFileSplitConfigurator -source ${EXAMPLE_FLOWS}/data/iris.csv\\\" -skip-num-lines 1\" -batch-size 150 -label-index 4 -num-possible-labels 3" -preprocessor "adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorWithScriptedConfiguration -handler adams.core.scripting.Dummy" -normalize-zero-mean-zero-unit-variance true
+  adams.flow.transformer.DL4JScoring -model @{model} -on-the-fly true -add-regularization-terms true
+  adams.flow.control.ContainerValuePicker -value Scores -switch-outputs true
+  adams.flow.transformer.Convert -conversion adams.data.conversion.NDArrayToSpreadSheet
+  adams.flow.sink.SpreadSheetDisplay -writer adams.data.io.output.NullWriter

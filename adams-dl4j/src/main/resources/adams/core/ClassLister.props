@@ -1,0 +1,72 @@
+# Configuration file listing the superclasses and the packages in which to
+# look for derived classes.
+#
+# Format:
+# class.name=package1,package2,...
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision$
+
+# record readers
+org.canova.api.records.reader.RecordReader=\
+  adams.ml.dl4j.recordreader,\
+  org.canova.api.records.reader,\
+  org.canova.api.records.reader.impl,\
+  org.canova.codec.reader,\
+  org.canova.image.recordreader
+
+# record reader configurators
+adams.ml.dl4j.recordreader.RecordReaderConfigurator=\
+  adams.ml.dl4j.recordreader
+
+# models
+org.deeplearning4j.nn.api.Model=\
+  adams.ml.dl4j.model,\
+  org.deeplearning4j.nn.api,\
+  org.deeplearning4j.nn.multilayer,\
+  org.deeplearning4j.nn.layers,\
+  org.deeplearning4j.nn.layers.convolution,\
+  org.deeplearning4j.nn.layers.convolution.subsampling,\
+  org.deeplearning4j.nn.layers.feedforward.dense,\
+  org.deeplearning4j.nn.layers.feedforward.rbm,\
+  org.deeplearning4j.nn.layers.feedforward.autoencoder,\
+  org.deeplearning4j.nn.layers.feedforward.autoencoder.recursive,\
+  org.deeplearning4j.nn.layers.normalization,\
+  org.deeplearning4j.nn.layers.recurrent,\
+  org.deeplearning4j.plot
+
+# model configurators
+adams.ml.dl4j.model.ModelConfigurator=\
+  adams.ml.dl4j.model
+
+# dataset iterators
+org.deeplearning4j.datasets.iterator.DataSetIterator=\
+  adams.ml.dl4j.datasetiterator,\
+  org.deeplearning4j.datasets.iterator,\
+  org.deeplearning4j.datasets.iterator.impl,\
+  org.deeplearning4j.datasets.canova,\
+  org.deeplearning4j.datasets.iterator.impl,\
+  org.deeplearning4j.datasets.test
+
+# dataset iterator configurators
+  adams.ml.dl4j.datasetiterator.DataSetIteratorConfigurator=\
+  adams.ml.dl4j.datasetiterator
+
+# the dataset preprocessors
+org.nd4j.linalg.dataset.api.DataSetPreProcessor=\
+  adams.ml.dl4j.datasetpreprocessor,\
+  org.nd4j.linalg.dataset.api,\
+  org.deeplearning4j.datasets.iterator
+
+# the dataset preprocessor configurators
+adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorConfigurator=\
+  adams.ml.dl4j.datasetpreprocessor
+
+# the input splitters
+org.canova.api.split.InputSplit=\
+  adams.ml.dl4j.inputsplit,\
+  org.canova.api.split
+
+# the input splitter configurators
+adams.ml.dl4j.inputsplit.InputSplitConfigurator=\
+  adams.ml.dl4j.inputsplit

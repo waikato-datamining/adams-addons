@@ -1,0 +1,124 @@
+% This work is made available under the terms of the
+% Creative Commons Attribution-ShareAlike 4.0 license,
+% http://creativecommons.org/licenses/by-sa/4.0/.
+%
+% Version: $Revision$
+
+\documentclass[a4paper]{book}
+
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{scalefnt}
+\usepackage{tikz}
+
+% watermark -- for draft stage
+\usepackage[firstpage]{draftwatermark}
+\SetWatermarkLightness{0.9}
+\SetWatermarkScale{5}
+
+\input{latex_extensions}
+
+\title{
+  \textbf{ADAMS} \\
+  {\Large \textbf{A}dvanced \textbf{D}ata mining \textbf{A}nd \textbf{M}achine
+  learning \textbf{S}ystem} \\
+  {\Large Module: adams-dl4j} \\
+  \vspace{1cm}
+  \includegraphics[width=2cm]{images/dl4j-module.png} \\
+}
+\author{
+  Peter Reutemann
+}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+
+\thispagestyle{empty}
+\center
+\begin{table}[b]
+	\begin{tabular}{c l l}
+		\parbox[c][2cm]{2cm}{\copyright 2016} &
+		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
+	\end{tabular}
+	\includegraphics[width=12cm]{images/cc.png} \\
+\end{table}
+
+\end{titlepage}
+
+\tableofcontents
+%\listoffigures
+%\listoftables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introduction}
+The \textit{dl4j} module makes the deeplearning4j\cite{dl4j} library available
+within ADAMS.
+
+Due to the complex nature of configuring deep belief networks and such
+multi-layered neural networks, there is no graphical support for configuring
+networks as such. Instead, a so-called \textit{model configurator} is used
+to return a configured model. This can be achieved in two ways:
+\begin{tight_itemize}
+  \item \textit{Custom Java code} -- you can subclass
+  \textit{AbstractModelConfigurator} (located in package \textit{adams.ml.dl4j.model})
+  and implement your own parameters that are necessary for tweaking your network. This is
+  done by the \textit{SimpleMultiLayerNetwork} class in that package, which
+  is just a configurable version of the network describe by deeplearning4j's
+  tutorial on the iris dataset.
+  \item \textit{Scripting} -- taking advantage of either Groovy or Jython,
+  you can use the \textit{ModelWithScriptedConfiguration} class pointing
+  to your script file that generates the actual network to be trained and used.
+\end{tight_itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Flow}
+
+The following sources are available:
+\begin{tight_itemize}
+  \item \textit{DL4JDatasetIterator} -- outputs datasets using the specified
+  dataset iterator.
+  \item \textit{DL4JModelConfigurator} -- defines a deeplearning model.
+\end{tight_itemize}
+
+The following transformers are available:
+\begin{tight_itemize}
+  \item \textit{DL4JRandomSplit} -- generates a random split on the incoming dataset.
+  \item \textit{DL4JDatasetInfo} -- outputs information about a dataset.
+  \item \textit{DL4JEvaluationSummary} -- generates a summary from an Evaluation
+  object/container.
+  \item \textit{DL4JEvaluationValues} -- retrieves statistics from an Evaluation
+  object/container and places them in a spreadsheet.
+  \item \textit{DL4JModelReader} -- reads a serialized model from disk.
+  \item \textit{DL4JScoring} -- generates scores (= predictions) for a dataset
+  using a built model.
+  \item \textit{DL4JTestSetEvaluator} -- evaluates an incoming built model on a
+  callable dataset.
+  \item \textit{DL4JTrainModel} -- builds a model obtained from a callable model
+  configurator on the incoming dataset.
+  \item \textit{DL4JTrainTestSetEvaluator} -- trains and evaluates a model obtained
+  from a callable model configurator on the incoming train/test set container.
+\end{tight_itemize}
+
+The following sinks are available:
+\begin{tight_itemize}
+  \item \textit{DL4JModelWriter} -- saves a model to disk using serialization.
+\end{tight_itemize}
+
+The following conversions are available:
+\begin{tight_itemize}
+  \item \textit{DL4JModelToJson} -- turns a model into its JSON\cite{json} representation.
+  \item \textit{DL4JModelToYaml} -- turns a model into its YAML\cite{yaml} representation.
+  \item \textit{NDArrayToSpreadSheet} -- turns a NDArray into a spreadsheet.
+\end{tight_itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{bibliography}
+
+\end{document}

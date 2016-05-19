@@ -1,0 +1,12 @@
+# Project: adams
+# Date: 2016-05-19 12:32:26
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Here we train a model on the iris UCI dataset and \\nthen test it against this dataset as well." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.source.DL4JModelConfigurator -model-configurator adams.ml.dl4j.model.SimpleMultiLayerNetwork
+  adams.flow.source.DL4JDatasetIterator -name Testset -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.CSVRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.SingleFileSplitConfigurator -source ${EXAMPLE_FLOWS}/data/iris.csv\\\" -skip-num-lines 1\" -batch-size 150 -label-index 4 -num-possible-labels 3" -preprocessor "adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorWithScriptedConfiguration -handler adams.core.scripting.Dummy" -normalize-zero-mean-zero-unit-variance true
+ adams.flow.source.DL4JDatasetIterator -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.CSVRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.SingleFileSplitConfigurator -source ${EXAMPLE_FLOWS}/data/iris.csv\\\" -skip-num-lines 1\" -batch-size 150 -label-index 4 -num-possible-labels 3" -preprocessor "adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorWithScriptedConfiguration -handler adams.core.scripting.Dummy" -normalize-zero-mean-zero-unit-variance true
+ adams.flow.transformer.DL4JTrainModel
+ adams.flow.transformer.DL4JTestSetEvaluator
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter

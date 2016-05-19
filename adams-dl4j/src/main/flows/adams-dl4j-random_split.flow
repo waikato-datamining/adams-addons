@@ -1,0 +1,15 @@
+# Project: adams
+# Date: 2016-05-18 16:47:24
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Reads the iris UCI dataset and generates a train/test split." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.HistoryDisplay -entry-name-variable entry
+ adams.flow.source.DL4JDatasetIterator -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.CSVRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.SingleFileSplitConfigurator -source ${EXAMPLE_FLOWS}/data/iris.csv\\\" -skip-num-lines 1\" -batch-size 150 -label-index 4 -num-possible-labels 3" -preprocessor "adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorWithScriptedConfiguration -handler adams.core.scripting.Dummy"
+ adams.flow.transformer.DL4JRandomSplit
+ adams.flow.control.ContainerValuePicker -value Train
+  adams.flow.transformer.SetVariable -var-name entry -var-value train
+  adams.flow.sink.CallableSink -callable HistoryDisplay
+ adams.flow.control.ContainerValuePicker -name ContainerValuePicker-1 -value Test
+  adams.flow.transformer.SetVariable -var-name entry -var-value test
+  adams.flow.sink.CallableSink -callable HistoryDisplay
