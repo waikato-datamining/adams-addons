@@ -42,13 +42,6 @@
     </developer>
   </developers>
 
-  <properties>
-    <nd4j.version>0.4-rc3.9</nd4j.version>
-    <dl4j.version>0.4-rc3.9</dl4j.version>
-    <canova.version>0.0.0.15</canova.version>
-    <jackson.version>2.5.1</jackson.version>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
