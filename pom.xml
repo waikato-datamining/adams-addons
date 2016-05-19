@@ -39,13 +39,21 @@
     <module>adams-addons-all</module>
     <!-- individual modules -->
     <module>adams-dl4j</module>
+    <module>adams-gnuplot</module>
     <module>adams-heatmap</module>
     <module>adams-image-webservice</module>
     <module>adams-jooq</module>
+    <module>adams-latex</module>
+    <module>adams-maps</module>
     <module>adams-meka</module>
+    <module>adams-moa</module>
     <module>adams-nlp</module>
+    <module>adams-osm</module>
     <module>adams-phmm4weka</module>
+    <module>adams-r</module>
+    <module>adams-random</module>
     <module>adams-rats</module>
+    <module>adams-twitter</module>
     <module>adams-video</module>
     <module>adams-webservice</module>
     <module>adams-weka-webservice</module>
