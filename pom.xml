@@ -28,8 +28,6 @@
   </scm>
 
   <properties>
-    <adams.version>0.4.13-SNAPSHOT</adams.version>
-    <boofcv.version>0.18</boofcv.version>
     <timestamp>${maven.build.timestamp}</timestamp>
     <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
   </properties>
