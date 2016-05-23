@@ -160,6 +160,12 @@
         <artifactId>maven-jar-plugin</artifactId>
       </plugin>
 
+      <!-- generates list of dependent modules -->
+      <plugin>
+        <groupId>com.github.fracpete</groupId>
+        <artifactId>maven-dependency-list-plugin</artifactId>
+      </plugin>
+
       <!-- native libraries, filtering happens in bin.xml/component-native.xml -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
