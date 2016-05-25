@@ -96,9 +96,9 @@ public class ImageExtractor {
       for (int i = 0; i < images.length; i++) {
         System.out.println("Image " + images[i].getReport().getStringValue("Timestamp"));
         ImageIO.write(images[i].getImage(), "png", new File("/home/sjb90/Pictures/testImage" +
-          images[i].getReport().getStringValue("Timestamp") + ".png"));
+          images[i].getReport().getStringValue("Timestamp") + "-" + i + ".png"));
 	reportWriter.setOutput(new PlaceholderFile("/home/sjb90/Pictures/testImage" +
-	  images[i].getReport().getStringValue("Timestamp") + ".report"));
+          images[i].getReport().getStringValue("Timestamp") + "-" + i+ ".report"));
 	reportWriter.write(images[i].getReport());
       }
     }

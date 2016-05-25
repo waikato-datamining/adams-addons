@@ -24,8 +24,12 @@ import adams.core.io.PlaceholderFile;
 import adams.data.io.input.SimpleTrailReader;
 import adams.data.io.output.SimpleTrailWriter;
 import adams.data.trail.Step;
+import adams.data.trail.StepComparator;
 import adams.data.trail.Trail;
 import adams.env.Environment;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Takes two trail files and combines them into one
@@ -47,14 +51,23 @@ public class Test {
     annotationTrail = tReader.read().get(0);
     // Combine trail files
     result.addAll(annotationTrail);
+    // We need to find the closest matching timestamp
+    List<Step> annotationList = annotationTrail.toList();
+    StepComparator comp = new StepComparator();
     for(Step s : trackingTrail) {
-      Step match = result.getStep(s.getTimestamp());
-      if(match != null) {
-	if(match.hasMetaData()) {
-	  s.getMetaData().putAll(match.getMetaData());
-	}
+      // Find the position this should fit in the annotationList
+      int index = -Collections.binarySearch( annotationList, s, comp);
+      System.out.println(index);
+      // next compare to the index and the index + 1
+      // Check that index +1 is not out of bound
+      int next = index + 1;
+      if(next < annotationList.size()) {
+	// If it is not out of bounds then find out which is the closest timestamp
+	Step closest = getClosest(s, annotationList.get(index + 1), annotationList.get(index));
+	// then add the metadata to the tracking step
+
       }
-	result.add(s);
+
     }
     //result.addAll(annotationTrail);
     SimpleTrailWriter tWriter = new SimpleTrailWriter();
@@ -62,8 +75,20 @@ public class Test {
     tWriter.setOutput(new PlaceholderFile(args[2]));
     tWriter.write(result);
     for(Step s : result) {
-      System.out.println(s.getTimestamp().toString());
+      //System.out.println(s.getTimestamp().toString());
     }
 
+  }
+
+  private static Step getClosest(Step trackingStep, Step currentAnnotation, Step nextAnnotation ) {
+    Step closest = null;
+    long trackingTime	= trackingStep.getTimestamp().getTime();
+    long nextTime 	= nextAnnotation.getTimestamp().getTime();
+    long currentTime	= currentAnnotation.getTimestamp().getTime();
+    if(Math.abs(currentTime - trackingTime) < Math.abs(nextTime - trackingTime))
+      closest = currentAnnotation;
+    else
+      closest = nextAnnotation;
+    return closest;
   }
 }
