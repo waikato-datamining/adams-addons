@@ -286,9 +286,9 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
       System.out.println("*********************" + m_CurrentImage.getReport().getStringValue("Timestamp"));
       if (currentTime == m_TargetTime)
 	m_Samples.add(m_CurrentImage);
-      else if (currentTime > m_TargetTime)
-	m_Samples.add(m_PreviousImage);
-      m_PreviousImage = m_CurrentImage;
+//      else if (currentTime > m_TargetTime)
+//	m_Samples.add(m_PreviousImage);
+//      m_PreviousImage = m_CurrentImage;
     }
   }
 }
