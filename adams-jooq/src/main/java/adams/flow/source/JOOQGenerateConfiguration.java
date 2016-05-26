@@ -15,7 +15,7 @@
 
 /**
  * JOOQGenerateConfiguration.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.source;
 
@@ -86,9 +86,6 @@ public class JOOQGenerateConfiguration
   
   /** the generator to use. */
   protected AbstractJOOQConfigurationGenerator m_Generator;
-
-  /** the database connection. */
-  protected adams.db.AbstractDatabaseConnection m_DatabaseConnection;
 
   /**
    * Returns a string describing the object.
@@ -176,23 +173,6 @@ public class JOOQGenerateConfiguration
   }
 
   /**
-   * Initializes the item for flow execution.
-   *
-   * @return		null if everything is fine, otherwise error message
-   */
-  @Override
-  public String setUp() {
-    String	result;
-
-    result = super.setUp();
-
-    if (result == null)
-      m_DatabaseConnection = getDatabaseConnection();
-
-    return result;
-  }
-
-  /**
    * Executes the flow item.
    *
    * @return		null if everything is fine, otherwise error message
@@ -205,7 +185,7 @@ public class JOOQGenerateConfiguration
     result = null;
     
     try {
-      m_Generator.setDatabaseConnection(m_DatabaseConnection);
+      m_Generator.setDatabaseConnection(getDatabaseConnection());
       file = m_Generator.generate();
       if (file == null)
 	result = "Failed to generate XML configuration file!";
