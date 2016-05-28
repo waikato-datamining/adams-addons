@@ -66,9 +66,6 @@ public class JOOQResultToSpreadSheet
   /** the data row type to use. */
   protected DataRow m_DataRowType;
 
-  /** whether to use time with msec. */
-  protected boolean m_TimeWithMsec;
-
   /** the reader currently in use. */
   protected Reader m_Reader;
 
@@ -92,10 +89,6 @@ public class JOOQResultToSpreadSheet
     m_OptionManager.add(
       "data-row-type", "dataRowType",
       new DenseDataRow());
-
-    m_OptionManager.add(
-      "time-with-msec", "timeWithMsec",
-      false);
   }
 
   /**
@@ -138,35 +131,6 @@ public class JOOQResultToSpreadSheet
   }
 
   /**
-   * Sets whether time values will have msec.
-   *
-   * @param value	true if to use msec
-   */
-  public void setTimeWithMsec(boolean value) {
-    m_TimeWithMsec = value;
-    reset();
-  }
-
-  /**
-   * Returns whether time values will have msec.
-   *
-   * @return		true if to use msec
-   */
-  public boolean getTimeWithMsec() {
-    return m_TimeWithMsec;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String timeWithMsecTipText() {
-    return "If enabled, time is output with msec, otherwise just with with sec.";
-  }
-
-  /**
    * Returns the class that is accepted as input.
    *
    * @return		the class
@@ -200,7 +164,7 @@ public class JOOQResultToSpreadSheet
     
     jooq     = (Result) m_Input;
     rs       = jooq.intoResultSet();
-    m_Reader = new Reader(m_DataRowType.getClass(), m_TimeWithMsec);
+    m_Reader = new Reader(m_DataRowType.getClass());
     result   = m_Reader.read(rs);
     m_Reader = null;
     
