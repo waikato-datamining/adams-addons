@@ -108,7 +108,7 @@ public class TrailFileWriterTest
    * @return		the test suite
    */
   public static Test suite() {
-    return new TestSuite(TrailFileReaderTest.class);
+    return new TestSuite(TrailFileWriterTest.class);
   }
 
   /**
