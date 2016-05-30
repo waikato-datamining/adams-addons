@@ -119,6 +119,25 @@ The following conversions are available:
 \end{tight_itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{CUDA Support}
+By default, dl4j (actually nd4j\cite{nd4j}) uses the CPU for linear algebra.
+However, if you have CUDA installed, you can switch to GPU computation by
+adding another dependency in your \textit{pom.xml} file.
+
+The current version of JCuda\cite{jcuda} supports the CUDA\cite{cuda} versions
+5.5, 6.0, 6.5 and 7, and requires you to specify which one you have. For example,
+if you have CUDA v6.0 installed, then you need to define the \textit{artifactId}
+like this:
+
+\begin{verbatim}
+    <dependency>
+     <groupId>org.nd4j</groupId>
+     <artifactId>nd4j-cuda-6.0</artifactId>
+     <version>${nd4j.version}</version>
+    </dependency>
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
 
 \end{document}
