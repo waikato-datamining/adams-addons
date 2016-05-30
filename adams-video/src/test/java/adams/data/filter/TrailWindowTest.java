@@ -19,7 +19,7 @@
  */
 package adams.data.filter;
 
-import adams.core.base.BaseDateTimeMsec;
+import adams.core.base.BaseTimeMsec;
 import adams.data.trail.Trail;
 import adams.env.Environment;
 import junit.framework.Test;
@@ -82,12 +82,12 @@ public class TrailWindowTest
     result[0] = new TrailWindow();
 
     result[1] = new TrailWindow();
-    result[1].setStart(new BaseDateTimeMsec("1970-01-01 12:01:00.000"));
-    result[1].setEnd(new BaseDateTimeMsec("1970-01-01 12:02:59.999"));
+    result[1].setStart(new BaseTimeMsec("00:01:00.000"));
+    result[1].setEnd(new BaseTimeMsec("00:02:59.999"));
 
     result[2] = new TrailWindow();
-    result[2].setStart(new BaseDateTimeMsec("1970-01-01 12:02:00.000"));
-    result[2].setEnd(new BaseDateTimeMsec("1970-01-01 12:10:59.999"));
+    result[2].setStart(new BaseTimeMsec("00:02:00.000"));
+    result[2].setEnd(new BaseTimeMsec("00:10:59.999"));
     result[2].setInvert(true);
 
     return result;

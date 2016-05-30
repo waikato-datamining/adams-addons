@@ -20,10 +20,12 @@
 
 package adams.data.io.output;
 
+import adams.core.Constants;
 import adams.core.Properties;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.core.io.GzipUtils;
+import adams.data.DateFormatString;
 import adams.data.image.BufferedImageHelper;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.trail.Trail;
@@ -234,6 +236,8 @@ public class SimpleTrailWriter
     // data
     sheet = trail.toSpreadSheet();
     writer = new CsvSpreadSheetWriter();
+    writer.setTimeMsecFormat(new DateFormatString(Constants.TIME_FORMAT_MSECS));
+    //writer.setTimeZone(TimeZone.getTimeZone("GMT"));
     writer.setMissingValue("");
     result = writer.write(sheet, swriter);
 

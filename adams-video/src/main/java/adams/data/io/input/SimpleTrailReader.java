@@ -171,9 +171,10 @@ public class SimpleTrailReader
     reader.setDataRowType(new DenseFloatDataRow());
     reader.setComment("#");
     reader.setMissingValue(new BaseRegExp(""));
-    reader.setDateTimeMsecColumns(new Range(Range.FIRST));
-    reader.setDateTimeMsecLenient(true);
-    reader.setDateTimeMsecFormat(new DateFormatString(Constants.TIMESTAMP_FORMAT_MSECS));
+    reader.setTimeMsecColumns(new Range(Range.FIRST));
+    reader.setTimeMsecLenient(true);
+    reader.setTimeMsecFormat(new DateFormatString(Constants.TIME_FORMAT_MSECS));
+    //reader.setTimeZone(TimeZone.getTimeZone("GMT"));
     sheet = reader.read(sreader);
     if (sheet == null) {
       getLogger().severe("Failed to read file from: " + m_Input);

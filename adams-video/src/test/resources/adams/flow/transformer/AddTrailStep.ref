@@ -5,7 +5,7 @@
 # Parent\ ID=-1
 # Trail.Width=800.0
 Timestamp,X,Y,Meta-meta1,Meta-meta2,Meta-meta3
-11:00:01.000,1,1,"","",""
-11:00:01.100,2,10,data1,0.0,"hello world"
+00:00:01.000,1,1,"","",""
+00:00:01.100,2,10,data1,0.0,"hello world"
 
 

@@ -15,12 +15,12 @@
 
 /*
  * TrailFilterTest.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
-import adams.core.base.BaseDateTimeMsec;
+import adams.core.base.BaseTimeMsec;
 import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
 import adams.core.option.AbstractArgumentOption;
@@ -145,9 +145,9 @@ public class TrailFilterTest
       TrailFilter trailfilter = new TrailFilter();
       TrailWindow trailwindow = new TrailWindow();
       argOption = (AbstractArgumentOption) trailwindow.getOptionManager().findByProperty("start");
-      trailwindow.setStart((BaseDateTimeMsec) argOption.valueOf("1970-01-01 12:01:25.200"));
+      trailwindow.setStart((BaseTimeMsec) argOption.valueOf("00:01:25.200"));
       argOption = (AbstractArgumentOption) trailwindow.getOptionManager().findByProperty("end");
-      trailwindow.setEnd((BaseDateTimeMsec) argOption.valueOf("1970-01-01 12:01:38.831"));
+      trailwindow.setEnd((BaseTimeMsec) argOption.valueOf("00:01:38.831"));
       trailfilter.setFilter(trailwindow);
 
       actors.add(trailfilter);

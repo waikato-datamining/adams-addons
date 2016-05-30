@@ -15,12 +15,12 @@
 
 /**
  * TrailWindow.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.filter;
 
 import adams.core.DateUtils;
-import adams.core.base.BaseDateTimeMsec;
+import adams.core.base.BaseTimeMsec;
 import adams.data.trail.Step;
 import adams.data.trail.Trail;
 
@@ -43,10 +43,10 @@ public class TrailWindow
   private static final long serialVersionUID = 2616498525816421178L;
   
   /** the starting point. */
-  protected BaseDateTimeMsec m_Start;
+  protected BaseTimeMsec m_Start;
   
   /** the end point. */
-  protected BaseDateTimeMsec m_End;
+  protected BaseTimeMsec m_End;
   
   /** whether to invert the matching. */
   protected boolean m_Invert;
@@ -72,11 +72,11 @@ public class TrailWindow
 
     m_OptionManager.add(
 	    "start", "start",
-	    new BaseDateTimeMsec(BaseDateTimeMsec.INF_PAST));
+	    new BaseTimeMsec(BaseTimeMsec.INF_PAST));
 
     m_OptionManager.add(
 	    "end", "end",
-	    new BaseDateTimeMsec(BaseDateTimeMsec.INF_FUTURE));
+	    new BaseTimeMsec(BaseTimeMsec.INF_FUTURE));
 
     m_OptionManager.add(
 	    "invert", "invert",
@@ -88,7 +88,7 @@ public class TrailWindow
    *
    * @param value	the timestamp
    */
-  public void setStart(BaseDateTimeMsec value) {
+  public void setStart(BaseTimeMsec value) {
     m_Start = value;
     reset();
   }
@@ -98,7 +98,7 @@ public class TrailWindow
    *
    * @return		the timestamp
    */
-  public BaseDateTimeMsec getStart() {
+  public BaseTimeMsec getStart() {
     return m_Start;
   }
 
@@ -117,7 +117,7 @@ public class TrailWindow
    *
    * @param value	the timestamp
    */
-  public void setEnd(BaseDateTimeMsec value) {
+  public void setEnd(BaseTimeMsec value) {
     m_End = value;
     reset();
   }
@@ -127,7 +127,7 @@ public class TrailWindow
    *
    * @return		the timestamp
    */
-  public BaseDateTimeMsec getEnd() {
+  public BaseTimeMsec getEnd() {
     return m_End;
   }
 
