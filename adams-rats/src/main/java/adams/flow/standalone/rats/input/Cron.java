@@ -15,7 +15,7 @@
 
 /**
  * Cron.java
- * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
@@ -66,6 +66,9 @@ public class Cron
 
   /** for serialization. */
   private static final long serialVersionUID = 1143927005847523885L;
+
+  /** the dummy data to feed into the flow. */
+  public static final String CRONDUMMY = "crondummy";
 
   /**
    * Encapsulates a job to run.
@@ -193,9 +196,14 @@ public class Cron
     String	result;
     
     result = m_Input.receive();
-    if (result != null) {
-      while (m_Input.hasPendingOutput())
-	m_Data.add(m_Input.output());
+    if (result == null) {
+      if (m_Input instanceof DummyCronInput) {
+	m_Data.add(CRONDUMMY);
+      }
+      else {
+	while (m_Input.hasPendingOutput())
+	  m_Data.add(m_Input.output());
+      }
     }
     
     return result;
