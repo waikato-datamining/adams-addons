@@ -23,6 +23,8 @@ import moa.MOAObject;
 import weka.core.MOAUtils;
 import adams.core.ClassLocator;
 
+import java.util.logging.Level;
+
 /**
  * Handles objects of classes that implement the weka.core.OptionHandler
  * interface.
@@ -51,8 +53,7 @@ public class MOACommandLineHandler
       result = MOAUtils.fromCommandLine(Object.class, cmd);
     }
     catch (Exception e) {
-      System.err.println("Failed to process commandline '" + cmd + "':");
-      e.printStackTrace();
+      getLogger().log(Level.SEVERE, "Failed to process commandline '" + cmd + "':", e);
       result = null;
     }
 
@@ -166,6 +167,7 @@ public class MOACommandLineHandler
       result = OptionUtils.splitOptions(cmdline);
     }
     catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to split options (splitOptions):", e);
       result = new String[0];
     }
 
