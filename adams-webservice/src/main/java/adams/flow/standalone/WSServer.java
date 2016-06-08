@@ -273,7 +273,7 @@ public class WSServer
       m_LogActor = findCallableActor();
       if (m_LogActor == null) {
         msg = "Couldn't find callable log actor '" + getLog() + "' - logging disabled!";
-        getLogger().severe(msg);
+        getLogger().warning(msg);
       }
       else {
 	comp = new Compatibility();
