@@ -1,8 +1,8 @@
 # Project: adams
-# Date: 2016-02-15 14:45:08
+# Date: 2016-06-15 20:23:45
 # User: fracpete
 # Charset: UTF-8
-adams.flow.control.Flow -flow-execution-listener adams.flow.execution.NullListener
+adams.flow.control.Flow -annotation "Reads in a document, splits it into sentences and performs lexical analysis on each sentence." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/adams_andy-cattle_brands.txt
  adams.flow.transformer.TextFileReader -reader adams.data.io.input.SingleStringTextReader
  adams.flow.transformer.DocumentToSentences -splitter adams.flow.transformer.splitter.StanfordPTBTokenizer
