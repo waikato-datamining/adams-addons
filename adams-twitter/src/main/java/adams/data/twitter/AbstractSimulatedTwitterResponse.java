@@ -1,6 +1,21 @@
 /*
- * ManualTwitterResponse.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * AbstractSimulatedTwitterResponse.java
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.twitter;
@@ -47,10 +62,6 @@ public abstract class AbstractSimulatedTwitterResponse
       private static final long serialVersionUID = -8963524970513688810L;
       @Override
       public int getRemaining() {
-	return 0;
-      }
-      @Override
-      public int getRemainingHits() {
 	return 0;
       }
       @Override

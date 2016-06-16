@@ -24,7 +24,6 @@ import twitter4j.Status;
 import twitter4j.URLEntity;
 import twitter4j.User;
 
-import java.net.URL;
 import java.util.Date;
 
 /**
@@ -184,6 +183,15 @@ public class SimulatedUser
   /** whether verified. */
   protected boolean m_Verified;
 
+  /** the countries in which withheld. */
+  protected String[] m_WithheldInCountries;
+
+  /** whether it is the default profile image. */
+  protected boolean m_DefaultProfileImage;
+
+  /** whether it is the default profile. */
+  protected boolean m_DefaultProfile;
+
   /**
    * Initializes the members.
    */
@@ -239,6 +247,8 @@ public class SimulatedUser
     m_ShowAllInlineMedia             = false;
     m_Translator                     = false;
     m_Verified                       = false;
+    m_DefaultProfileImage            = false;
+    m_DefaultProfile                 = false;
   }
 
   /**
@@ -584,6 +594,25 @@ public class SimulatedUser
   }
 
   /**
+   * Sets if the user has not uploaded their own avatar
+   *
+   * @param value true if the user has not uploaded their own avatar
+   */
+  public void setDefaultProfileImage(boolean value) {
+    m_DefaultProfileImage = value;
+  }
+
+  /**
+   * Tests if the user has not uploaded their own avatar
+   *
+   * @return if the user has not uploaded their own avatar
+   */
+  @Override
+  public boolean isDefaultProfileImage() {
+    return m_DefaultProfileImage;
+  }
+
+  /**
    * Sets the profile background color.
    *
    * @param value	the color
@@ -619,14 +648,6 @@ public class SimulatedUser
   @Override
   public String getProfileBackgroundImageURL() {
     return m_ProfileBackgroundImageURL;
-  }
-
-  /**
-   * @see #getProfileBackgroundImageURL()
-   */
-  @Override
-  public String getProfileBackgroundImageUrl() {
-    return getProfileBackgroundImageURL();
   }
 
   /**
@@ -789,15 +810,6 @@ public class SimulatedUser
   @Override
   public String getProfileImageURLHttps() {
     return m_ProfileImageURLHttps;
-  }
-
-  /**
-   * @return		always null
-   * @see		#getProfileImageURLHttps()
-   */
-  @Override
-  public URL getProfileImageUrlHttps() {
-    return null;
   }
 
   /**
@@ -991,6 +1003,25 @@ public class SimulatedUser
   }
 
   /**
+   *  Sets the list of country codes where the user is withheld
+   *
+   *  @param value list of country codes where the tweet is withheld - null if not withheld
+   */
+  public void setWithheldInCountries(String[] value) {
+    m_WithheldInCountries = value;
+  }
+
+  /**
+   *  Returns the list of country codes where the user is withheld
+   *
+   *  @return list of country codes where the tweet is withheld - null if not withheld
+   */
+  @Override
+  public String[] getWithheldInCountries() {
+    return m_WithheldInCountries;
+  }
+
+  /**
    * Sets the UTC offset.
    *
    * @param value	the offset
@@ -1102,6 +1133,25 @@ public class SimulatedUser
   @Override
   public boolean isProfileUseBackgroundImage() {
     return m_ProfileUseBackgroundImage;
+  }
+
+  /**
+   * Sets if the user has not altered the theme or background
+   *
+   * @param value true if the user has not altered the theme or background
+   */
+  public void setDefaultProfile(boolean value) {
+    m_DefaultProfile = value;
+  }
+
+  /**
+   * Tests if the user has not altered the theme or background
+   *
+   * @return if the user has not altered the theme or background
+   */
+  @Override
+  public boolean isDefaultProfile() {
+    return m_DefaultProfile;
   }
 
   /**

@@ -87,5 +87,11 @@ public enum TwitterField {
   /** the language of the status. */
   STATUS_LANG,
   /** the scopes. */
-  SCOPES
+  SCOPES,
+  /** the countries in which the tweets has been withheld. */
+  WITHHELD_IN_COUNTRIES,
+  /** the ID of the quoted status. */
+  QUOTED_STATUS_ID,
+  /** the quoted status. */
+  QUOTED_STATUS,
 }

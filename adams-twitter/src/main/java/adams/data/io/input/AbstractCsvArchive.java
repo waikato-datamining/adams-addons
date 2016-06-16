@@ -232,6 +232,10 @@ public abstract class AbstractCsvArchive
       result.setRetweetedStatus(new SimulatedStatus());
       ((SimulatedStatus) result.getRetweetedStatus()).setUser(new SimulatedUser());
     }
+    if (   m_Columns.containsKey(TwitterField.QUOTED_STATUS_ID)
+	|| m_Columns.containsKey(TwitterField.QUOTED_STATUS)) {
+      result.setQuotedStatus(new SimulatedStatus());
+    }
     for (TwitterField field: m_Columns.keySet()) {
       index = m_Columns.get(field);
       try {
@@ -364,6 +368,16 @@ public abstract class AbstractCsvArchive
 	    scopes = new SimulatedScopes();
 	    ((SimulatedScopes) scopes).setPlaceIds(parts);
 	    result.setScopes(scopes);
+	    break;
+	  case WITHHELD_IN_COUNTRIES:
+	    result.setWithheldInCountries(cell.getContent().split(","));
+	    break;
+	  case QUOTED_STATUS_ID:
+	    result.setQuotedStatusId(cell.toLong());
+	    ((SimulatedStatus) result.getQuotedStatus()).setId(cell.toLong());
+	    break;
+	  case QUOTED_STATUS:
+	    ((SimulatedStatus) result.getQuotedStatus()).setText(cell.getContent());
 	    break;
 	  default:
 	    throw new IllegalStateException("Unhandled twitter field: " + field);

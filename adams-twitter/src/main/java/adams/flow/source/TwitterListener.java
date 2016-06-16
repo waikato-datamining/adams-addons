@@ -15,26 +15,26 @@
 
 /*
  * TwitterListener.java
- * Copyright (C) 2010-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2016 University of Waikato, Hamilton, New Zealand
  * Copyright (c) 2007-2010, Yusuke Yamamoto
  */
 
 package adams.flow.source;
 
-import java.io.IOException;
-import java.util.logging.Level;
-
+import adams.core.License;
+import adams.core.Pausable;
+import adams.core.QuickInfoHelper;
+import adams.core.Stoppable;
+import adams.core.annotation.MixedCopyright;
+import adams.core.net.TwitterHelper;
+import adams.flow.core.Token;
 import twitter4j.StallWarning;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
 import twitter4j.StatusListener;
-import twitter4j.StatusStream;
-import twitter4j.TwitterException;
-import adams.core.License;
-import adams.core.QuickInfoHelper;
-import adams.core.annotation.MixedCopyright;
-import adams.core.net.TwitterHelper;
-import adams.flow.core.Token;
+
+import java.io.Serializable;
+import java.util.logging.Level;
 
 /**
  <!-- globalinfo-start -->
@@ -51,40 +51,40 @@ import adams.flow.core.Token;
  *
  <!-- options-start -->
  * Valid options are: <br><br>
- * 
+ *
  * <pre>-D &lt;int&gt; (property: debugLevel)
  * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to 
  * &nbsp;&nbsp;&nbsp;the console (0 = off).
  * &nbsp;&nbsp;&nbsp;default: 0
  * &nbsp;&nbsp;&nbsp;minimum: 0
  * </pre>
- * 
+ *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
  * &nbsp;&nbsp;&nbsp;default: TwitterListener
  * </pre>
- * 
+ *
  * <pre>-annotation &lt;adams.core.base.BaseText&gt; (property: annotations)
  * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
- * 
+ *
  * <pre>-skip (property: skip)
  * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
  * &nbsp;&nbsp;&nbsp;as it is.
  * </pre>
- * 
+ *
  * <pre>-stop-flow-on-error (property: stopFlowOnError)
  * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
  * &nbsp;&nbsp;&nbsp; useful for critical actors.
  * </pre>
- * 
+ *
  * <pre>-max-updates &lt;int&gt; (property: maxStatusUpdates)
  * &nbsp;&nbsp;&nbsp;The maximum number of status updates to output; use &lt;=0 for unlimited.
  * &nbsp;&nbsp;&nbsp;default: 100
  * &nbsp;&nbsp;&nbsp;minimum: -1
  * </pre>
- * 
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -92,73 +92,62 @@ import adams.flow.core.Token;
  * @version $Revision$
  */
 @MixedCopyright(
-    author = "Yusuke Yamamoto",
-    copyright = "2007-2010 Yusuke Yamamoto",
-    license = License.APACHE2,
-    url = "http://twitter4j.org/en/code-examples.html"
+        author = "Yusuke Yamamoto",
+        copyright = "2007-2010 Yusuke Yamamoto",
+        license = License.APACHE2,
+        url = "http://twitter4j.org/en/code-examples.html"
 )
 public class TwitterListener
-  extends AbstractSource {
+        extends AbstractSource {
 
   /** for serialization. */
   private static final long serialVersionUID = -7777610085728160967L;
 
   /**
-   * Thread for listening to Twitter status updates.
+   * Listener for a twitter stream.
    *
    * @author  fracpete (fracpete at waikato dot ac dot nz)
    * @version $Revision$
    */
   public static class Listener
-    extends Thread
-    implements StatusListener {
+    implements Serializable, Pausable, Stoppable, StatusListener {
 
-    public static final int TCP_ERROR_INITIAL_WAIT = 250;
+    private static final long serialVersionUID = 5406360301457780558L;
 
-    public static final int TCP_ERROR_WAIT_CAP = 16 * 1000;
-
-    public static final int HTTP_ERROR_INITIAL_WAIT = 10 * 1000;
-
-    public static final int HTTP_ERROR_WAIT_CAP = 240 * 1000;
-
-    /** the owning actor. */
+    /** the owner. */
     protected TwitterListener m_Owner;
 
     /** for accessing the twitter streaming API. */
     protected twitter4j.TwitterStream m_Twitter;
 
-    /** for listening to tweets. */
-    protected StatusListener m_TwitterListener;
-
-    /** whether the thread is still listening for updates. */
-    protected boolean m_Listening;
-
-    /** the number of status received so far. */
+    /** the counter for tweets. */
     protected int m_Count;
 
-    /** the status stream. */
-    protected StatusStream m_Stream;
-
-    /** the time to sleep for the thread. */
-    protected int m_TimeToSleep;
-
-    /** the next status update. */
+    /** the next available Status. */
     protected Status m_Next;
 
+    /** the listener is paused. */
+    protected boolean m_Paused;
+
+    /** whether the listener is running. */
+    protected boolean m_Listening;
+
     /**
-     * Initializes the listener thread.
+     * Initializes the listener.
      *
      * @param owner	the owning actor
      */
     public Listener(TwitterListener owner) {
-      super();
+      if (owner == null)
+	throw new IllegalArgumentException("Owner cannot be null!");
 
-      m_Owner = owner;
-      m_Next  = null;
+      m_Owner   = owner;
+      m_Count   = 0;
+      m_Twitter = TwitterHelper.getTwitterStreamConnection(getOwner());
     }
 
     /**
-     * Returns the owning actor.
+     * Returns the owner.
      *
      * @return		the owner
      */
@@ -169,142 +158,151 @@ public class TwitterListener
     /**
      * Starts the listening.
      */
-    @Override
-    public void run() {
-      m_Listening = true;
-      m_Count     = 0;
-      m_Twitter   = TwitterHelper.getTwitterStreamConnection(getOwner());
-
-      while (m_Listening) {
-	try {
-	  if (m_Listening && (m_Stream == null)) {
-	    m_Stream = m_Twitter.getSampleStream();
-	    // connection established successfully
-	    m_TimeToSleep = 0;
-	    while (m_Listening)
-	      m_Stream.next(this);
-	  }
-	}
-	catch (TwitterException te) {
-	  if (m_Listening) {
-	    if (0 == m_TimeToSleep && te.getStatusCode() > 200)
-	      m_TimeToSleep = HTTP_ERROR_INITIAL_WAIT;
-	    else
-	      m_TimeToSleep = TCP_ERROR_INITIAL_WAIT;
-	    // there was a problem establishing the connection, or the connection closed by peer
-	    if (m_Listening) {
-	      try {
-		Thread.sleep(m_TimeToSleep);
-	      }
-	      catch (InterruptedException ignore) {
-	      }
-	      m_TimeToSleep = Math.min(m_TimeToSleep * 2, (te.getStatusCode() > 200) ? HTTP_ERROR_WAIT_CAP : TCP_ERROR_WAIT_CAP);
-	    }
-	    m_Stream = null;
-	    onException(te);
-	  }
-	}
-      }
-
+    public void startExecution() {
       try {
-	if (m_Stream != null)
-	  m_Stream.close();
+	m_Twitter.addListener(this);
+	m_Twitter.sample();
+	m_Listening = true;
       }
-      catch (IOException ignore) {
+      catch (Exception e) {
+	m_Twitter.removeListener(this);
+	getOwner().getLogger().log(Level.SEVERE, "Failed to start listener!", e);
       }
-
-      getOwner().stopListening();
     }
 
     /**
-     * Returns whether the thread is still listening.
+     * Returns whether the listener is active.
      *
-     * @return		true if listening
+     * @return		true if active
      */
     public boolean isListening() {
       return m_Listening;
     }
 
     /**
-     * Stops the listening process.
+     * Pauses the execution (if still listening).
      */
-    public void stopListening() {
-      m_Listening = false;
+    @Override
+    public void pauseExecution() {
+      if (m_Listening)
+	m_Paused = true;
     }
 
     /**
-     * Ignored.
+     * Returns whether the object is currently paused.
      *
-     * @param arg0	ignored
+     * @return		true if object is paused
      */
-    public void onDeletionNotice(StatusDeletionNotice arg0) {
+    @Override
+    public boolean isPaused() {
+      return m_Paused;
     }
 
     /**
-     * Whenever an exception occurs. Merely outputs the exception.
-     *
-     * @param e		the execption
+     * Resumes the execution.
      */
-    public void onException(Exception e) {
-      getOwner().getLogger().log(Level.SEVERE, "Exception occurred", e);
+    @Override
+    public void resumeExecution() {
+      m_Paused = false;
     }
 
     /**
-     * Reacts to new updates.
+     * When receiving a status.
      *
-     * @param status	the new update
+     * @param status	the status
      */
+    @Override
     public void onStatus(Status status) {
-      if ((getOwner().getMaxStatusUpdates() > 0) && (m_Count >= getOwner().getMaxStatusUpdates()))
-	m_Listening = false;
-      else
-	m_Next = status;
-      synchronized(this) {
-	notifyAll();
+      if (m_Listening && !m_Paused) {
+	if ((getOwner().getMaxStatusUpdates() > 0) && (m_Count >= getOwner().getMaxStatusUpdates()))
+	  stopExecution();
+	else
+	  m_Next = status;
       }
     }
 
     /**
      * Ignored.
      *
-     * @param arg0	ignored
+     * @param statusDeletionNotice
      */
-    public void onTrackLimitationNotice(int arg0) {
+    @Override
+    public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
     }
 
     /**
      * Ignored.
      *
-     * @param arg0	ignored
-     * @param arg1	ignored
+     * @param i
      */
-    public void onScrubGeo(int arg0, long arg1) {
+    @Override
+    public void onTrackLimitationNotice(int i) {
     }
 
     /**
      * Ignored.
      *
-     * @param arg0	ignored
-     * @param arg1	ignored
+     * @param l
+     * @param l1
      */
-    public void onScrubGeo(long arg0, long arg1) {
+    @Override
+    public void onScrubGeo(long l, long l1) {
     }
 
     /**
-     * Ignored.
+     * Outputs a stall warning.
      *
-     * @param arg0	ignored
+     * @param stallWarning	the warning
      */
-    public void onStallWarning(StallWarning arg0) {
+    @Override
+    public void onStallWarning(StallWarning stallWarning) {
+      getOwner().getLogger().warning(stallWarning.toString());
     }
 
     /**
-     * Returns the next status update.
+     * Gets called if an exception is encountered.
      *
-     * @return		the update
+     * @param e			the exception
+     */
+    @Override
+    public void onException(Exception e) {
+      // TODO stop listening?
+      getOwner().getLogger().log(Level.SEVERE, "Exception encountered while listening!", e);
+    }
+
+    /**
+     * Stops the execution.
+     */
+    @Override
+    public void stopExecution() {
+      m_Listening = false;
+      m_Paused    = false;
+      m_Twitter.removeListener(this);
+      try {
+	m_Twitter.shutdown();
+      }
+      catch (Exception e) {
+	// ignored
+      }
+      m_Twitter.cleanUp();
+    }
+
+    /**
+     * Returns whether there is another update available.
+     *
+     * @return		true if another update available
+     */
+    public boolean hasNext() {
+      return m_Listening || (m_Next != null);
+    }
+
+    /**
+     * Retrieves the next status update.
+     *
+     * @return		the next status
      */
     public Status next() {
-      Status	result;
+     Status	result;
       int	count;
 
       result = null;
@@ -322,6 +320,7 @@ public class TwitterListener
 	      }
 	    }
 	    catch (Exception e) {
+	      // ignored
 	    }
 	  }
 	  else {
@@ -337,26 +336,13 @@ public class TwitterListener
       // only increment counter when the status update was actually used
       if (result != null) {
 	m_Count++;
-	if (getOwner().isLoggingEnabled() && (m_Count % 50 == 0))
+	if (getOwner().isLoggingEnabled() && (m_Count % 100 == 0))
 	  getOwner().getLogger().info("status updates: " + m_Count);
       }
 
       m_Next = null;
 
-      synchronized(this) {
-	notifyAll();
-      }
-
       return result;
-    }
-
-    /**
-     * Returns whether there is another update available.
-     *
-     * @return		true if another update available
-     */
-    public boolean hasNext() {
-      return m_Listening || (m_Next != null);
     }
   }
 
@@ -384,8 +370,8 @@ public class TwitterListener
     super.defineOptions();
 
     m_OptionManager.add(
-	    "max-updates", "maxStatusUpdates",
-	    100, -1, null);
+            "max-updates", "maxStatusUpdates",
+            100, -1, null);
   }
 
   /**
@@ -449,7 +435,7 @@ public class TwitterListener
 
     if (result == null) {
       if (m_Listener != null)
-	m_Listener.stopListening();
+        m_Listener.stopExecution();
       m_Listener = new Listener(this);
     }
 
@@ -469,7 +455,7 @@ public class TwitterListener
     result = null;
 
     try {
-    m_Listener.start();
+      m_Listener.startExecution();
     }
     catch (IllegalThreadStateException ie) {
       // ignored
@@ -483,17 +469,17 @@ public class TwitterListener
     while (!m_Listener.isListening()) {
       count++;
       try {
-	synchronized(this) {
-	  wait(50);
-	}
+        synchronized(this) {
+          wait(50);
+        }
       }
       catch (Exception e) {
       }
 
       // problem with launching thread?
       if (count == 100) {
-	result = "Thread timed out??";
-	break;
+        result = "Thread timed out??";
+        break;
       }
     }
 
@@ -505,7 +491,7 @@ public class TwitterListener
    */
   protected void stopListening() {
     if (m_Listener != null)
-      m_Listener.stopListening();
+      m_Listener.stopExecution();
   }
 
   /**

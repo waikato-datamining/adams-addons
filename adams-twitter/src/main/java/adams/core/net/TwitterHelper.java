@@ -213,7 +213,7 @@ public class TwitterHelper {
     Hashtable<TwitterField,Object>	result;
     List<String>			list;
 
-    result = new Hashtable<TwitterField,Object>();
+    result = new Hashtable<>();
 
     result.put(TwitterField.ID, status.getId());
     if (status.getUser() != null) {
@@ -258,14 +258,14 @@ public class TwitterHelper {
 	result.put(TwitterField.PLACE, status.getPlace().getName());
     }
     if (status.getURLEntities() != null) {
-      list = new ArrayList<String>();
+      list = new ArrayList<>();
       for (URLEntity url: status.getURLEntities())
 	list.add(url.getExpandedURL());
       if (list.size() > 0)
 	result.put(TwitterField.EXPANDED_URLS, Utils.flatten(list, ","));
     }
     if (status.getSymbolEntities() != null) {
-      list = new ArrayList<String>();
+      list = new ArrayList<>();
       for (SymbolEntity sym: status.getSymbolEntities())
 	list.add(sym.getText());
       if (list.size() > 0)
@@ -276,12 +276,19 @@ public class TwitterHelper {
     if (status.getLang() != null)
       result.put(TwitterField.STATUS_LANG, status.getLang());
     if (status.getScopes() != null) {
-      list = new ArrayList<String>();
+      list = new ArrayList<>();
       for (String id: status.getScopes().getPlaceIds())
 	list.add(id);
       if (list.size() > 0)
 	result.put(TwitterField.SCOPES, Utils.flatten(list, ","));
     }
+    if (status.getWithheldInCountries() != null) {
+      if (status.getWithheldInCountries().length > 0)
+        result.put(TwitterField.WITHHELD_IN_COUNTRIES, Utils.flatten(status.getWithheldInCountries(), ","));
+    }
+    result.put(TwitterField.QUOTED_STATUS_ID, status.getQuotedStatusId());
+    if (status.getQuotedStatus() != null)
+      result.put(TwitterField.QUOTED_STATUS, status.getQuotedStatus().getText());
 
     return result;
   }
@@ -350,7 +357,7 @@ public class TwitterHelper {
     String				current;
     SimulatedHashtagEntity		entity;
     
-    result = new ArrayList<SimulatedHashtagEntity>();
+    result = new ArrayList<>();
     
     current = "";
     offset  = 0;
@@ -396,7 +403,7 @@ public class TwitterHelper {
     String				current;
     SimulatedUserMentionEntity		entity;
 
-    result = new ArrayList<SimulatedUserMentionEntity>();
+    result = new ArrayList<>();
 
     current = "";
     offset  = 0;

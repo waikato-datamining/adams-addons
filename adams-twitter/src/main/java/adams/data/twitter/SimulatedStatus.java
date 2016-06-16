@@ -19,8 +19,7 @@
  */
 package adams.data.twitter;
 
-import java.util.Date;
-
+import twitter4j.ExtendedMediaEntity;
 import twitter4j.GeoLocation;
 import twitter4j.HashtagEntity;
 import twitter4j.MediaEntity;
@@ -31,6 +30,8 @@ import twitter4j.SymbolEntity;
 import twitter4j.URLEntity;
 import twitter4j.User;
 import twitter4j.UserMentionEntity;
+
+import java.util.Date;
 
 /**
  * For simulating tweets without using Twitter.
@@ -122,14 +123,20 @@ public class SimulatedStatus
   /** the favorite count. */
   protected int m_FavoriteCount;
 
-  /** the iso language code. */
-  protected String m_IsoLanguageCode;
-
   /** the language. */
   protected String m_Lang;
 
   /** the scopes. */
   protected Scopes m_Scopes;
+
+  /** the countries in which withheld. */
+  protected String[] m_WithheldInCountries;
+
+  /** the ID of the quoted status. */
+  protected long m_QuotedStatusId;
+
+  /** the quoted status. */
+  protected Status m_QuotedStatus;
 
   /**
    * Initializes the members.
@@ -164,9 +171,11 @@ public class SimulatedStatus
     m_SymbolEntities       = new SymbolEntity[0];
     m_IsRetweeted          = false;
     m_FavoriteCount        = 0;
-    m_IsoLanguageCode      = "";
     m_Lang                 = "";
     m_Scopes               = null;
+    m_WithheldInCountries  = new String[0];
+    m_QuotedStatusId       = -1;
+    m_QuotedStatus         = null;
   }
 
   /**
@@ -264,6 +273,11 @@ public class SimulatedStatus
   @Override
   public MediaEntity[] getMediaEntities() {
     return m_MediaEntity;
+  }
+
+  @Override
+  public ExtendedMediaEntity[] getExtendedMediaEntities() {
+    return new ExtendedMediaEntity[0];
   }
 
   /**
@@ -605,19 +619,19 @@ public class SimulatedStatus
   }
 
   /**
-  * Set true if the status contains a link that is identified as sensitive.
-  *
-  * @param value whether the status contains sensitive links
-  */
+   * Set true if the status contains a link that is identified as sensitive.
+   *
+   * @param value whether the status contains sensitive links
+   */
   public void setPossiblySensitive(boolean value) {
     m_PossiblySensitive = value;
   }
 
   /**
-  * Returns true if the status contains a link that is identified as sensitive.
-  *
-  * @return whether the status contains sensitive links
-  */
+   * Returns true if the status contains a link that is identified as sensitive.
+   *
+   * @return whether the status contains sensitive links
+   */
   @Override
   public boolean isPossiblySensitive() {
     return m_PossiblySensitive;
@@ -631,7 +645,7 @@ public class SimulatedStatus
   public void setSymbolEntities(SymbolEntity[] value) {
     m_SymbolEntities = value;
   }
-  
+
   /**
    * Returns an array of SymbolEntities if medias are available in the tweet. This method will an empty array if no symbols were mentioned.
    *
@@ -644,13 +658,13 @@ public class SimulatedStatus
 
   /**
    * Sets whether the status is retweeted.
-   * 
+   *
    * @param value true if retweeted
    */
   public void setIsRetweeted(boolean value) {
     m_IsRetweeted = value;
   }
-  
+
   /**
    * Test if the status is retweeted
    *
@@ -663,13 +677,13 @@ public class SimulatedStatus
 
   /**
    * Sets how many times this tweet has been "favorited" by twitter users.
-   * 
+   *
    * @param value the count
    */
   public void setFavoriteCount(int value) {
     m_FavoriteCount = value;
   }
-  
+
   /**
    * Indicates approximately how many times this Tweet has been "favorited" by Twitter users.
    *
@@ -681,38 +695,14 @@ public class SimulatedStatus
   }
 
   /**
-   * Sets the iso language code set by the Twitter API (best-effort). This field is available only with the search api.
-   * It is suggested to use {@link #setLang()}
-   * 
-   * @param value the language code
-   */
-  @Deprecated
-  public void setIsoLanguageCode(String value) {
-    m_IsoLanguageCode = value;
-  }
-  
-  /**
-   * Returns the iso language code set by the Twitter API (best-effort). This field is available only with the search api.
-   * It is suggested to use {@link #getLang()}
-   *
-   * @return two-letter iso language code
-   * @deprecated use {@link #getLang()} instead
-   */
-  @Deprecated
-  @Override
-  public String getIsoLanguageCode() {
-    return m_IsoLanguageCode;
-  }
-
-  /**
    * Sets the lang of the status text if available.
-   * 
+   *
    * @param value	the language
    */
   public void setLang(String value) {
     m_Lang = value;
   }
-  
+
   /**
    * Returns the lang of the status text if available.
    *
@@ -725,13 +715,13 @@ public class SimulatedStatus
 
   /**
    * Sets the targeting scopes applied to a status.
-   * 
+   *
    * @param value the scopes
    */
   public void setScopes(Scopes value) {
     m_Scopes = value;
   }
-  
+
   /**
    * Returns the targeting scopes applied to a status.
    *
@@ -740,7 +730,64 @@ public class SimulatedStatus
   @Override
   public Scopes getScopes() {
     return m_Scopes;
-  };
+  }
+
+  /**
+   *  Sets the list of country codes where the tweet is withheld
+   *
+   *  @param value list of country codes where the tweet is withheld - null if not withheld
+   */
+  public void setWithheldInCountries(String[] value) {
+    m_WithheldInCountries = value;
+  }
+
+  /**
+   *  Returns the list of country codes where the tweet is withheld
+   *
+   *  @return list of country codes where the tweet is withheld - null if not withheld
+   */
+  @Override
+  public String[] getWithheldInCountries() {
+    return m_WithheldInCountries;
+  }
+
+  /**
+   * Sets the Tweet ID of the quoted Tweet
+   *
+   * @return the Tweet ID of the quoted Tweet
+   */
+  public void setQuotedStatusId(long value) {
+    m_QuotedStatusId = value;
+  }
+
+  /**
+   * Returns the Tweet ID of the quoted Tweet
+   *
+   * @return the Tweet ID of the quoted Tweet
+   */
+  @Override
+  public long getQuotedStatusId() {
+    return m_QuotedStatusId;
+  }
+
+  /**
+   * Sets the Tweet object of the original Tweet that was quoted.
+   *
+   * @param value the quoted Tweet object
+   */
+  public void setQuotedStatus(Status value) {
+    m_QuotedStatus = value;
+  }
+
+  /**
+   * Returns the Tweet object of the original Tweet that was quoted.
+   *
+   * @return the quoted Tweet object
+   */
+  @Override
+  public Status getQuotedStatus() {
+    return m_QuotedStatus;
+  }
 
   /**
    * Returns a short string describing the tweet (ID + text).
