@@ -126,6 +126,10 @@
           <groupId>jama</groupId>
           <artifactId>jama</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>javassist</groupId>
+          <artifactId>javassist</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
