@@ -20,8 +20,8 @@
 package adams.flow.standalone.rats.input;
 
 import adams.core.AtomicMoveSupporter;
+import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
 import adams.core.base.BaseRegExp;
 import adams.core.io.DirectoryLister;
 import adams.core.io.DirectoryLister.Sorting;
@@ -36,7 +36,9 @@ import java.util.List;
 
 /**
  <!-- globalinfo-start -->
- * Polls files in a directory and forwards them.
+ * Polls files in a directory and forwards them.<br>
+ * It can skip files that are currently flagged as 'in use'.<br>
+ * Moving files to the specified target directory will continue, even if errors are occurred with some files (NB: you may end up with a very large error message if all files from a large list of files are failing).
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -141,7 +143,13 @@ public class FileLister
    */
   @Override
   public String globalInfo() {
-    return "Polls files in a directory and forwards them.";
+    return
+      "Polls files in a directory and forwards them.\n"
+      + "It can skip files that are currently flagged as 'in use'.\n"
+      + "Moving files to the specified target directory will continue, "
+      + "even if errors are occurred with some files (NB: you may end up "
+      + "with a very large error message if all files from a large list of "
+      + "files are failing).";
   }
 
   /**
@@ -590,12 +598,12 @@ public class FileLister
    */
   @Override
   protected String doReceive() {
-    String		result;
+    MessageCollection 	result;
     List<String>	files;
     int			i;
     PlaceholderFile	file;
     
-    result = null;
+    result = new MessageCollection();
     
     files = new ArrayList<>(Arrays.asList(m_Lister.list()));
     doWait(m_WaitList);
@@ -604,10 +612,14 @@ public class FileLister
       i = 0;
       while (i < files.size()) {
 	file = new PlaceholderFile(files.get(i));
-	if (FileUtils.isOpen(file))
+	if (FileUtils.isOpen(file)) {
+	  if (isLoggingEnabled())
+	    getLogger().fine("File in use: " + files.get(i));
 	  files.remove(i);
-	else
+	}
+	else {
 	  i++;
+	}
       }
     }
 
@@ -616,21 +628,19 @@ public class FileLister
 	file = new PlaceholderFile(files.get(i));
 	try {
 	  if (!FileUtils.move(file, m_Target, m_AtomicMove))
-	    result = "Failed to move '" + file + "' to '" + m_Target + "'!";
+	    result.add("Failed to move '" + file + "' to '" + m_Target + "'!");
 	  else
-	    files.set(i, m_Target.getAbsolutePath() + File.separator + file.getName());
+	    m_Files.add(i, m_Target.getAbsolutePath() + File.separator + file.getName());
 	}
 	catch (Exception e) {
-	  result = "Failed to move '" + file + "' to '" + m_Target + "': " + Utils.throwableToString(e);
+	  result.add("Failed to move '" + file + "' to '" + m_Target + "': ", e);
 	}
-	if (result != null)
-	  break;
       }
     }
     
-    if (result == null)
-      m_Files.addAll(files);
-    
-    return result;
+    if (result.isEmpty())
+      return null;
+    else
+      return result.toString();
   }
 }
