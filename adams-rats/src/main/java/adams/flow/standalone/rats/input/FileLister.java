@@ -15,7 +15,7 @@
 
 /**
  * FileLister.java
- * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
@@ -84,6 +84,12 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
+ * <pre>-skip-in-use &lt;boolean&gt; (property: skipInUse)
+ * &nbsp;&nbsp;&nbsp;If enabled, then files are that currently 'in use' get removed from the 
+ * &nbsp;&nbsp;&nbsp;list.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  * <pre>-atomic-move &lt;boolean&gt; (property: atomicMove)
  * &nbsp;&nbsp;&nbsp;If true, then an atomic move operation will be attempted (NB: not supported 
  * &nbsp;&nbsp;&nbsp;by all operating systems).
@@ -118,6 +124,9 @@ public class FileLister
 
   /** whether to move the files before transmitting them. */
   protected boolean m_MoveFiles;
+
+  /** whether to skip 'in-use' files. */
+  protected boolean m_SkipInUse;
 
   /** whether to perform an atomic move. */
   protected boolean m_AtomicMove;
@@ -171,6 +180,10 @@ public class FileLister
       false);
 
     m_OptionManager.add(
+      "skip-in-use", "skipInUse",
+      false);
+
+    m_OptionManager.add(
       "atomic-move", "atomicMove",
       false);
 
@@ -191,7 +204,7 @@ public class FileLister
     m_Lister.setListFiles(true);
     m_Lister.setRecursive(false);
     
-    m_Files = new ArrayList<String>();
+    m_Files = new ArrayList<>();
   }
 
   /**
@@ -407,6 +420,36 @@ public class FileLister
   }
 
   /**
+   * Sets whether to skip files that are currently in use.
+   *
+   * @param value	if true then 'in-use' files are skipped
+   */
+  public void setSkipInUse(boolean value) {
+    m_SkipInUse = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to skip files that are currently in use.
+   *
+   * @return 		true if to skip 'in-use' files
+   */
+  public boolean getSkipInUse() {
+    return m_SkipInUse;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String skipInUseTipText() {
+    return
+        "If enabled, then files are that currently 'in use' get removed from the list.";
+  }
+
+  /**
    * Sets whether to attempt atomic move operation.
    *
    * @param value	if true then attempt atomic move operation
@@ -486,8 +529,8 @@ public class FileLister
   
   /**
    * Hook method for performing checks. Makes sure that directories exist.
-   * 
-   * @throws Exception	if checks fail
+   *
+   * @return		null if successful, otherwise error message
    */
   @Override
   public String check() {
@@ -548,23 +591,34 @@ public class FileLister
   @Override
   protected String doReceive() {
     String		result;
-    String[]		files;
+    List<String>	files;
     int			i;
     PlaceholderFile	file;
     
     result = null;
     
-    files = m_Lister.list();
+    files = new ArrayList<>(Arrays.asList(m_Lister.list()));
     doWait(m_WaitList);
-    
+
+    if (m_SkipInUse) {
+      i = 0;
+      while (i < files.size()) {
+	file = new PlaceholderFile(files.get(i));
+	if (FileUtils.isOpen(file))
+	  files.remove(i);
+	else
+	  i++;
+      }
+    }
+
     if (m_MoveFiles) {
-      for (i = 0; i < files.length; i++) {
-	file = new PlaceholderFile(files[i]);
+      for (i = 0; i < files.size(); i++) {
+	file = new PlaceholderFile(files.get(i));
 	try {
 	  if (!FileUtils.move(file, m_Target, m_AtomicMove))
 	    result = "Failed to move '" + file + "' to '" + m_Target + "'!";
 	  else
-	    files[i] = m_Target.getAbsolutePath() + File.separator + file.getName();
+	    files.set(i, m_Target.getAbsolutePath() + File.separator + file.getName());
 	}
 	catch (Exception e) {
 	  result = "Failed to move '" + file + "' to '" + m_Target + "': " + Utils.throwableToString(e);
@@ -575,7 +629,7 @@ public class FileLister
     }
     
     if (result == null)
-      m_Files.addAll(Arrays.asList(files));
+      m_Files.addAll(files);
     
     return result;
   }
