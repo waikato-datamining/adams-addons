@@ -598,12 +598,10 @@ public class FileLister
    */
   @Override
   protected String doReceive() {
-    MessageCollection 	result;
+    MessageCollection 	errors;
     List<String>	files;
     int			i;
     PlaceholderFile	file;
-    
-    result = new MessageCollection();
     
     files = new ArrayList<>(Arrays.asList(m_Lister.list()));
     doWait(m_WaitList);
@@ -624,23 +622,23 @@ public class FileLister
     }
 
     if (m_MoveFiles) {
+      errors = new MessageCollection();
       for (i = 0; i < files.size(); i++) {
 	file = new PlaceholderFile(files.get(i));
 	try {
 	  if (!FileUtils.move(file, m_Target, m_AtomicMove))
-	    result.add("Failed to move '" + file + "' to '" + m_Target + "'!");
+	    errors.add("Failed to move '" + file + "' to '" + m_Target + "'!");
 	  else
 	    m_Files.add(i, m_Target.getAbsolutePath() + File.separator + file.getName());
 	}
 	catch (Exception e) {
-	  result.add("Failed to move '" + file + "' to '" + m_Target + "': ", e);
+	  errors.add("Failed to move '" + file + "' to '" + m_Target + "': ", e);
 	}
       }
+      if (!errors.isEmpty())
+	getLogger().warning(errors.toString());
     }
-    
-    if (result.isEmpty())
-      return null;
-    else
-      return result.toString();
+
+    return null;
   }
 }
