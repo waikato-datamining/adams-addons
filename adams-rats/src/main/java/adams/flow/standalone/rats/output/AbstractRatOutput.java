@@ -419,7 +419,7 @@ public abstract class AbstractRatOutput
     getOptionManager().setQuiet(true);
     getOptionManager().setVariables(combined);
     getOptionManager().updateVariablesInstance(combined);
-    getOptionManager().updateVariableValues(true);
+    getOptionManager().updateVariableValues(true, isLoggingEnabled() ? getLogger() : null);
     getOptionManager().setQuiet(false);
 
     // re-initialize the actor

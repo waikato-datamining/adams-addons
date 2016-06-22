@@ -25,6 +25,7 @@ import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.Variables;
 import adams.core.base.BaseRegExp;
+import adams.core.logging.LoggingLevel;
 import adams.db.LogEntry;
 import adams.flow.container.ErrorContainer;
 import adams.flow.control.LocalScopeTransformer;
@@ -296,7 +297,18 @@ public class Rat
     m_Actors.setParent(this);
     m_Helper = new CallableActorHelper();
   }
-  
+
+  /**
+   * Sets the logging level.
+   *
+   * @param value 	the level
+   */
+  @Override
+  public synchronized void setLoggingLevel(LoggingLevel value) {
+    super.setLoggingLevel(value);
+    m_Actors.setLoggingLevel(value);
+  }
+
   /**
    * Sets the receiver to use.
    *
