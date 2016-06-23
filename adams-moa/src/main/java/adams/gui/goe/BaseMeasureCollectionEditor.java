@@ -190,7 +190,7 @@ public class BaseMeasureCollectionEditor
     panelAll = new JPanel(new BorderLayout());
     panel    = new JPanel(new FlowLayout(FlowLayout.LEFT));
     panelAll.add(panel, BorderLayout.CENTER);
-    classes = ClassLocator.getSingleton().find(MeasureCollection.class, new String[]{BaseMeasureCollection.DEFAULT_PACKAGE});
+    classes = ClassLocator.getSingleton().findNames(MeasureCollection.class, new String[]{BaseMeasureCollection.DEFAULT_PACKAGE});
     for (i = 0; i < classes.size(); i++)
       classes.set(i, classes.get(i).replaceAll(".*\\.", ""));
     m_ComboBoxValue = new JComboBox<String>(classes.toArray(new String[classes.size()]));
