@@ -39,7 +39,6 @@ import adams.flow.core.CallableActorReference;
 import adams.flow.core.CallableActorUser;
 import adams.flow.core.Compatibility;
 import adams.flow.core.InputConsumer;
-import adams.flow.core.InternalActorHandler;
 import adams.flow.core.MutableActorHandler;
 import adams.flow.core.QueueHelper;
 import adams.flow.core.Token;
@@ -177,8 +176,7 @@ import java.util.HashSet;
  */
 public class Rat
   extends AbstractStandaloneGroupItem<Rats>
-  implements MutableActorHandler, InternalActorHandler, CallableActorUser,
-             Pausable {
+  implements MutableActorHandler, CallableActorUser, Pausable {
 
   /** for serialization. */
   private static final long serialVersionUID = -154461277343021604L;
@@ -919,15 +917,6 @@ public class Rat
   protected void forceVariables(Variables value) {
     super.forceVariables(value);
     m_Actors.setVariables(value);
-  }
-
-  /**
-   * Returns the internal actor.
-   *
-   * @return		the actor, null if not available
-   */
-  public Actor getInternalActor() {
-    return m_Actors;
   }
 
   /**
