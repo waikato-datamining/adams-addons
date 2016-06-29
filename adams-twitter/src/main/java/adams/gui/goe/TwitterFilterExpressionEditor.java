@@ -205,7 +205,7 @@ public class TwitterFilterExpressionEditor
 	HelpDialog dialog = new HelpDialog((Dialog) null);
         dialog.setDefaultCloseOperation(HelpDialog.DISPOSE_ON_CLOSE);
 	dialog.setHelp(new TwitterFilter().getGrammar(), false);
-	dialog.setSize(800, 600);
+	dialog.setSize(GUIHelper.getDefaultDialogDimension());
 	dialog.setLocationRelativeTo(null);
 	dialog.setVisible(true);
       }
