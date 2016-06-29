@@ -396,7 +396,7 @@ public class AnnotatorPanel extends BasePanel
 	    m_ExtractDialog = new ExtractBackgroundDialog(getParentDialog(), Dialog.ModalityType.DOCUMENT_MODAL);
 	  else
 	    m_ExtractDialog = new ExtractBackgroundDialog(getParentFrame(), true);
-	  m_ExtractDialog.setSize(600, 400);
+	  m_ExtractDialog.setSize(GUIHelper.getDefaultSmallDialogDimension());
 	  m_ExtractDialog.setLocationRelativeTo(AnnotatorPanel.this);
 	}
 
