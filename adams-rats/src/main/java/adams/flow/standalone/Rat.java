@@ -905,7 +905,16 @@ public class Rat
   public void removeAll() {
     m_Actors.removeAll();
   }
-  
+
+  /**
+   * Returns the internal local scope transformer.
+   *
+   * @return		the actor, null if not available
+   */
+  public LocalScopeTransformer getLocalScope() {
+    return m_Actors;
+  }
+
   /**
    * Updates the Variables instance in use.
    * <br><br>

@@ -415,7 +415,7 @@ public abstract class AbstractRatOutput
     m_BackupState = backupState();
     // combine variables
     combined = getOptionManager().getVariables().getClone();
-    combined.assign(getOwner().getInternalActor().getVariables());
+    combined.assign(getOwner().getLocalScope().getVariables());
     getOptionManager().setQuiet(true);
     getOptionManager().setVariables(combined);
     getOptionManager().updateVariablesInstance(combined);
