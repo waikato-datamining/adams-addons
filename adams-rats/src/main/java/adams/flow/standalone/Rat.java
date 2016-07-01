@@ -744,7 +744,8 @@ public class Rat
   public void setParent(Actor value) {
     super.setParent(value);
     m_Actors.setParent(null);
-    m_Actors.setParent(this);
+    m_Actors.setParent(value);
+    m_Actors.setName(getName());
   }
   
   /**
