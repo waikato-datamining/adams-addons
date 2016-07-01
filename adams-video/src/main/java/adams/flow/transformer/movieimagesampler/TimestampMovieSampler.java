@@ -247,7 +247,6 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
 	  }
 	};
 	playingCondition.await();
-	System.out.println("\n************************************ " + m_MediaPlayer.getTime() + "\n");
       }
     } catch (Exception e) {
       System.out.println(e.getMessage());
@@ -278,12 +277,10 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
 
       m_CurrentImage.setImage(m_Image);
       long currentTime = directMediaPlayer.getTime();
-      System.out.println("*********************" + m_TargetTime);
       String ts = new BaseTimeMsec(new Date(currentTime)).getValue();
       if (ts.equals(BaseTimeMsec.INF_PAST))
 	ts = BaseTimeMsec.INF_PAST_DATE;
       m_CurrentImage.getReport().setValue(new Field("Timestamp", DataType.STRING), ts);
-      System.out.println("*********************" + m_CurrentImage.getReport().getStringValue("Timestamp"));
       if (currentTime == m_TargetTime)
 	m_Samples.add(m_CurrentImage);
 //      else if (currentTime > m_TargetTime)
