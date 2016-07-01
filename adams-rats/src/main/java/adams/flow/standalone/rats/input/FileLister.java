@@ -28,6 +28,7 @@ import adams.core.io.DirectoryLister.Sorting;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
+import adams.core.logging.LoggingLevel;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -213,6 +214,17 @@ public class FileLister
     m_Lister.setRecursive(false);
     
     m_Files = new ArrayList<>();
+  }
+
+  /**
+   * Sets the logging level.
+   *
+   * @param value 	the level
+   */
+  @Override
+  public synchronized void setLoggingLevel(LoggingLevel value) {
+    super.setLoggingLevel(value);
+    m_Lister.setLoggingLevel(value);
   }
 
   /**
