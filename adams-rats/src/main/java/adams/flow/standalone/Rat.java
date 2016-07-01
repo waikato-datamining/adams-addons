@@ -1122,7 +1122,7 @@ public class Rat
     result = null;
     
     try {
-      // make sure we have all the lates variable values
+      // make sure we have all the latest variable values
       m_Receiver.getOptionManager().updateVariableValues(true);
       m_Transmitter.getOptionManager().updateVariableValues(true);
       // start thread
