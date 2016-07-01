@@ -618,37 +618,39 @@ public class FileLister
     files = new ArrayList<>(Arrays.asList(m_Lister.list()));
     doWait(m_WaitList);
 
-    if (m_SkipInUse) {
-      i = 0;
-      while (i < files.size()) {
-	file = new PlaceholderFile(files.get(i));
-	if (FileUtils.isOpen(file)) {
-	  if (isLoggingEnabled())
-	    getLogger().fine("File in use: " + files.get(i));
-	  files.remove(i);
-	}
-	else {
-	  i++;
+    if (files.size() > 0) {
+      if (m_SkipInUse) {
+	i = 0;
+	while (i < files.size()) {
+	  file = new PlaceholderFile(files.get(i));
+	  if (FileUtils.isOpen(file)) {
+	    if (isLoggingEnabled())
+	      getLogger().fine("File in use: " + files.get(i));
+	    files.remove(i);
+	  }
+	  else {
+	    i++;
+	  }
 	}
       }
-    }
 
-    if (m_MoveFiles) {
-      errors = new MessageCollection();
-      for (i = 0; i < files.size(); i++) {
-	file = new PlaceholderFile(files.get(i));
-	try {
-	  if (!FileUtils.move(file, m_Target, m_AtomicMove))
-	    errors.add("Failed to move '" + file + "' to '" + m_Target + "'!");
-	  else
-	    m_Files.add(i, m_Target.getAbsolutePath() + File.separator + file.getName());
+      if (m_MoveFiles) {
+	errors = new MessageCollection();
+	for (i = 0; i < files.size(); i++) {
+	  file = new PlaceholderFile(files.get(i));
+	  try {
+	    if (!FileUtils.move(file, m_Target, m_AtomicMove))
+	      errors.add("Failed to move '" + file + "' to '" + m_Target + "'!");
+	    else
+	      m_Files.add(i, m_Target.getAbsolutePath() + File.separator + file.getName());
+	  }
+	  catch (Exception e) {
+	    errors.add("Failed to move '" + file + "' to '" + m_Target + "': ", e);
+	  }
 	}
-	catch (Exception e) {
-	  errors.add("Failed to move '" + file + "' to '" + m_Target + "': ", e);
-	}
+	if (!errors.isEmpty())
+	  getLogger().warning(errors.toString());
       }
-      if (!errors.isEmpty())
-	getLogger().warning(errors.toString());
     }
 
     return null;
