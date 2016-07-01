@@ -1122,6 +1122,10 @@ public class Rat
     result = null;
     
     try {
+      // make sure we have all the lates variable values
+      m_Receiver.getOptionManager().updateVariableValues(true);
+      m_Transmitter.getOptionManager().updateVariableValues(true);
+      // start thread
       m_Runnable = new RatRunnable(this);
       m_Runnable.setLoggingLevel(getLoggingLevel());
       new Thread(m_Runnable).start();
