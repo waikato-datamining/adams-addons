@@ -1,0 +1,8 @@
+# Rules for determining what Breakpoint setup to use in what context
+# see ActorSuggestion.props for examples of rules
+
+# The default Breakpoint setup
+Rat-Breakpoint=\
+  IF PARENT IS adams.flow.standalone.Rat \
+  THEN "adams.flow.control.Breakpoint -scope-restriction \\\"adams.flow.execution.debug.SubFlowRestriction -root ${PARENT.FULL}\\\""
+
