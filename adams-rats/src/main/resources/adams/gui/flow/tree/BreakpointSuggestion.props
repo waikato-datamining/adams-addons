@@ -3,6 +3,6 @@
 
 # The default Breakpoint setup
 Rat-Breakpoint=\
-  IF PARENT IS adams.flow.standalone.Rat \
+  IF ANYPARENT LIKE adams.flow.standalone.Rat \
   THEN "adams.flow.control.Breakpoint -scope-restriction \\\"adams.flow.execution.debug.SubFlowRestriction -root ${PARENT.FULL}\\\""
 
