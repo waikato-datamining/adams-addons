@@ -4,5 +4,5 @@
 # The default Breakpoint setup
 Rat-Breakpoint=\
   IF ANYPARENT LIKE adams.flow.standalone.Rat \
-  THEN "adams.flow.control.Breakpoint -scope-restriction \\\"adams.flow.execution.debug.SubFlowRestriction -root ${LASTPARENT.FULL}\\\""
+  THEN "adams.flow.control.Breakpoint -scope-restriction \\\"adams.flow.execution.debug.SubFlowRestriction -root \\\\\"${LASTPARENT.FULL}\\\\\"\\\""
 
