@@ -1088,7 +1088,7 @@ public class Rat
       m_LogActor = findCallableActor();
       if (m_LogActor == null) {
         msg = "Couldn't find callable log actor '" + getLog() + "' - logging disabled!";
-        getLogger().warning(msg);
+        getLogger().info(msg);
       }
       else {
 	comp = new Compatibility();
