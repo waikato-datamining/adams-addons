@@ -154,12 +154,16 @@ import java.util.HashSet;
  * </pre>
  * 
  * <pre>-flow-error-queue &lt;adams.flow.control.StorageName&gt; (property: flowErrorQueue)
- * &nbsp;&nbsp;&nbsp;The name of the (optional) queue in internal storage to feed with flow errors.
+ * &nbsp;&nbsp;&nbsp;The name of the (optional) queue in internal storage to feed with flow errors;
+ * &nbsp;&nbsp;&nbsp; Forwards the original data received as payload in an adams.flow.container.ErrorContainer 
+ * &nbsp;&nbsp;&nbsp;alongside the error message.
  * &nbsp;&nbsp;&nbsp;default: flowerrors
  * </pre>
  * 
  * <pre>-send-error-queue &lt;adams.flow.control.StorageName&gt; (property: sendErrorQueue)
- * &nbsp;&nbsp;&nbsp;The name of the (optional) queue in internal storage to feed with send errors.
+ * &nbsp;&nbsp;&nbsp;The name of the (optional) queue in internal storage to feed with send errors;
+ * &nbsp;&nbsp;&nbsp; Forwards the original data received as payload in an adams.flow.container.ErrorContainer 
+ * &nbsp;&nbsp;&nbsp;alongside the error message.
  * &nbsp;&nbsp;&nbsp;default: senderrors
  * </pre>
  * 
@@ -618,6 +622,8 @@ public class Rat
    * Sets the name for the queue in internal storage to feed with flow errors.
    *
    * @param value	the name
+   * @see		#queueFlowError(Object, String)
+   * @see		ErrorContainer
    */
   public void setFlowErrorQueue(StorageName value) {
     m_FlowErrorQueue = value;
@@ -628,6 +634,8 @@ public class Rat
    * Returns the name for the queue in internal storage to feed with flow errors.
    *
    * @return		the name
+   * @see		#queueFlowError(Object, String)
+   * @see		ErrorContainer
    */
   public StorageName getFlowErrorQueue() {
     return m_FlowErrorQueue;
@@ -640,13 +648,18 @@ public class Rat
    * 			displaying in the GUI or for listing the options.
    */
   public String flowErrorQueueTipText() {
-    return "The name of the (optional) queue in internal storage to feed with flow errors.";
+    return
+      "The name of the (optional) queue in internal storage to feed with flow errors; "
+	+ "Forwards the original data received as payload in an " + ErrorContainer.class.getName()
+	+ " alongside the error message.";
   }
 
   /**
    * Sets the name for the queue in internal storage to feed with send errors.
    *
    * @param value	the name
+   * @see		#queueSendError(Object, String)
+   * @see		ErrorContainer
    */
   public void setSendErrorQueue(StorageName value) {
     m_SendErrorQueue = value;
@@ -657,6 +670,8 @@ public class Rat
    * Returns the name for the queue in internal storage to feed with send errors.
    *
    * @return		the name
+   * @see		#queueSendError(Object, String)
+   * @see		ErrorContainer
    */
   public StorageName getSendErrorQueue() {
     return m_SendErrorQueue;
@@ -669,7 +684,10 @@ public class Rat
    * 			displaying in the GUI or for listing the options.
    */
   public String sendErrorQueueTipText() {
-    return "The name of the (optional) queue in internal storage to feed with send errors.";
+    return
+      "The name of the (optional) queue in internal storage to feed with send errors; "
+	+ "Forwards the original data received as payload in an " + ErrorContainer.class.getName()
+	+ " alongside the error message.";
   }
 
   /**
@@ -1009,6 +1027,7 @@ public class Rat
    * @param payload	the payload to forward
    * @param error	the associated error
    * @return		true if successfully queued
+   * @see		ErrorContainer
    */
   public boolean queueSendError(Object payload, String error) {
     ErrorContainer	cont;
@@ -1027,6 +1046,7 @@ public class Rat
    * @param payload	the payload to forward
    * @param error	the associated error
    * @return		true if successfully queued
+   * @see		ErrorContainer
    */
   public boolean queueFlowError(Object payload, String error) {
     ErrorContainer	cont;
