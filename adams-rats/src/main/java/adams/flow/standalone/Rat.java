@@ -38,6 +38,7 @@ import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.CallableActorUser;
 import adams.flow.core.Compatibility;
+import adams.flow.core.ErrorHandler;
 import adams.flow.core.InputConsumer;
 import adams.flow.core.MutableActorHandler;
 import adams.flow.core.QueueHelper;
@@ -778,6 +779,17 @@ public class Rat
   }
 
   /**
+   * Sets the error handler to use for handling errors in the flow.
+   *
+   * @param value	the error handler
+   */
+  public void setErrorHandler(ErrorHandler value) {
+    super.setErrorHandler(value);
+    if (m_Actors != null)
+      m_Actors.setErrorHandler(value);
+  }
+
+  /**
    * Handles the given error message with the flow that this actor belongs to,
    * if the flow has error logging turned on. Might stop the flow as well.
    *
@@ -1126,6 +1138,7 @@ public class Rat
     if (result == null) {
       // redirect error handling
       ActorUtils.updateErrorHandler(this, this, isLoggingEnabled());
+      m_Actors.setErrorHandler(this);
     }
 
     return result;
