@@ -27,41 +27,41 @@ import adams.flow.standalone.rats.input.PollingRatInput;
 
 /**
  * Runnable class for Rat used in a thread.
- * 
+ *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
 public class RatRunnable
   extends RunnableWithLogging {
-  
+
   /** for serialization. */
   private static final long serialVersionUID = 143445804089303521L;
-  
+
   /** the owning Rat. */
   protected Rat m_Owner;
-  
+
   /** whether we have any actors to apply to the data. */
   protected boolean m_HasActors;
-  
+
   /** whether the execution has been paused. */
   protected boolean m_Paused;
-  
+
   /**
    * Initializes the runnable.
-   * 
+   *
    * @param owner	the owning actor
    */
   public RatRunnable(Rat owner) {
     super();
-    
+
     m_Owner     = owner;
     m_HasActors = (owner.getActorHandler().active() > 0);
     m_Paused    = false;
   }
-  
+
   /**
    * Returns the owning actor.
-   * 
+   *
    * @return		the owner
    */
   public Rat getOwner() {
@@ -70,13 +70,13 @@ public class RatRunnable
 
   /**
    * Transmits the data.
-   * 
+   *
    * @param data 	the data to transmit, ignored if null
    * @return		null if successful, otherwise error message
    */
   protected String transmit(Object data) {
     String	result;
-    
+
     result = null;
 
     if (data != null) {
@@ -87,18 +87,18 @@ public class RatRunnable
 	if (isLoggingEnabled())
 	  getLogger().finer("Inputting to " + m_Owner.getTransmitter().getFullName());
 	m_Owner.getTransmitter().input(data);
-	
+
 	if (isLoggingEnabled())
 	  getLogger().info("Transmitting to " + m_Owner.getTransmitter().getFullName());
 	result = m_Owner.getTransmitter().transmit();
-	
+
 	if (result != null)
 	  getLogger().warning("Failed to transmit to " + m_Owner.getTransmitter().getFullName() + ": " + result);
 	else if (isLoggingEnabled())
 	  getLogger().info("Transmitted to " + m_Owner.getTransmitter().getFullName());
       }
     }
-    
+
     return result;
   }
 
@@ -110,24 +110,24 @@ public class RatRunnable
     String	result;
     Object	data;
     Token	token;
-    
+
     while (!m_Stopped) {
       while (m_Paused && !m_Stopped)
 	Utils.wait(this, this, 100, 100);
-      
+
       data = null;
       if (isLoggingEnabled())
 	getLogger().info("Receiving from " + m_Owner.getReceiver().getFullName());
       if (m_Owner.getReceiver().isStopped())
 	break;
-      
+
       try {
 	result = m_Owner.getReceiver().receive();
       }
       catch (Throwable t) {
 	result = Utils.throwableToString(t);
       }
-      
+
       if (result != null) {
 	getOwner().log("Failed to receive from " + m_Owner.getReceiver().getFullName() + ": " + result, "receive");
       }
@@ -154,7 +154,12 @@ public class RatRunnable
 		if (result == null) {
 		  while (m_Owner.getActorHandler().hasPendingOutput() && !m_Stopped) {
 		    token  = m_Owner.getActorHandler().output();
-		    result = transmit(token.getPayload());
+		    try {
+		      result = transmit(token.getPayload());
+		    }
+		    catch (Throwable t) {
+		      result = Utils.throwableToString(t);
+		    }
 		    if (result != null) {
 		      getOwner().queueSendError(data, result);
 		      break;
@@ -167,7 +172,12 @@ public class RatRunnable
 	      }
 	    }
 	    else {
-	      result = transmit(data);
+	      try {
+		result = transmit(data);
+	      }
+	      catch (Throwable t) {
+		result = Utils.throwableToString(t);
+	      }
 	      if (result != null)
 		getOwner().queueSendError(data, result);
 	    }
@@ -175,7 +185,7 @@ public class RatRunnable
 	}
 	catch (Throwable t) {
 	  result = Utils.throwableToString(t);
-	  getOwner().queueSendError(data, result);
+	  getOwner().queueFlowError(data, result);
 	}
 
 	// log error
@@ -186,7 +196,7 @@ public class RatRunnable
 	    getOwner().log("Failed to transmit data: " + result, "transmit");
 	}
       }
-      
+
       // wait before next poll?
       if (!m_Stopped) {
 	if (m_Owner.getReceiver() instanceof PollingRatInput) {
@@ -195,24 +205,24 @@ public class RatRunnable
       }
     }
   }
-  
+
   /**
    * Pauses the execution.
    */
   public void pauseExecution() {
     m_Paused = true;
   }
-  
+
   /**
    * Resumes the execution.
    */
   public void resumeExecution() {
     m_Paused = false;
   }
-  
+
   /**
    * Returns whether the execution has been suspended.
-   * 
+   *
    * @return		true if paused
    */
   public boolean isPaused() {
