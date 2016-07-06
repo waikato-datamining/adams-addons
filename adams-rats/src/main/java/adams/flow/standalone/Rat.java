@@ -84,8 +84,9 @@ import java.util.HashSet;
  * </pre>
  * 
  * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
- * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this 
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical 
+ * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
@@ -168,6 +169,11 @@ import java.util.HashSet;
  * &nbsp;&nbsp;&nbsp;default: senderrors
  * </pre>
  * 
+ * <pre>-suppress-errors &lt;boolean&gt; (property: suppressErrors)
+ * &nbsp;&nbsp;&nbsp;If enabled, errors are suppressed and only forwarded to the log actor.
+ * &nbsp;&nbsp;&nbsp;default: true
+ * </pre>
+ * 
  * <pre>-show-in-control &lt;boolean&gt; (property: showInControl)
  * &nbsp;&nbsp;&nbsp;If enabled, this Rat will be displayed in the adams.flow.standalone.RatControl 
  * &nbsp;&nbsp;&nbsp;control panel.
@@ -218,6 +224,9 @@ public class Rat
 
   /** whether the rat is currently being stopped. */
   protected boolean m_Stopping;
+
+  /** whether errors a suppressed (only forwarded to log actor). */
+  protected boolean m_SuppressErrors;
 
   /**
    * Returns a string describing the object.
@@ -283,6 +292,10 @@ public class Rat
     m_OptionManager.add(
       "send-error-queue", "sendErrorQueue",
       new StorageName("senderrors"));
+
+    m_OptionManager.add(
+      "suppress-errors", "suppressErrors",
+      true);
 
     m_OptionManager.add(
       "show-in-control", "showInControl",
@@ -692,24 +705,55 @@ public class Rat
   }
 
   /**
-   * Sets whether to show in RatControl.
+   * Sets whether to suppress errors and only forward them to the log actor.
    * 
+   * @param value	true if to suppress errors
+   * @see		#setLog(CallableActorReference)
+   */
+  public void setSuppressErrors(boolean value) {
+    m_SuppressErrors = value;
+    reset();
+  }
+  
+  /**
+   * Returns whether suppress errors and only forward them to the log actor.
+   * 
+   * @return		true if to suppress errors
+   * @see		#setLog(CallableActorReference)
+   */
+  public boolean getSuppressErrors() {
+    return m_SuppressErrors;
+  }
+  
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String suppressErrorsTipText() {
+    return "If enabled, errors are suppressed and only forwarded to the log actor.";
+  }
+
+  /**
+   * Sets whether to show in RatControl.
+   *
    * @param value	true if to show in RatControl
    */
   public void setShowInControl(boolean value) {
     m_ShowInControl = value;
     reset();
   }
-  
+
   /**
    * Returns whether to show in RatControl.
-   * 
+   *
    * @return		true if to show in RatControl
    */
   public boolean getShowInControl() {
     return m_ShowInControl;
   }
-  
+
   /**
    * Returns the tip text for this property.
    *
@@ -820,8 +864,11 @@ public class Rat
 
     if (m_StopFlowOnError)
       stopIfNecessary();
-    
-    return null;
+
+    if (m_SuppressErrors)
+      return null;
+    else
+      return msg;
   }
 
   /**
