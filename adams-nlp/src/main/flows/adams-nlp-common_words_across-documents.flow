@@ -1,0 +1,37 @@
+# Project: adams
+# Date: 2016-07-07 14:57:32
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Extracts the common words from each document and compiles \\nspreadsheet with the common words across the documents." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "iterate files"
+  adams.flow.standalone.SetVariable -name "reset sheets" -var-name sheets -var-value ""
+  adams.flow.standalone.SetVariable -name "reset counter" -var-name count -var-value 0
+  adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/pg12-through_the_looking_glass.txt -file ${EXAMPLE_FLOWS}/data/pg19033-alice_in_wonderland.txt -file ${EXAMPLE_FLOWS}/data/pg29042-a_tangled_tale.txt
+  adams.flow.control.SubProcess -name vars
+   adams.flow.transformer.IncVariable -var-name count
+   adams.flow.transformer.SetVariable -var-name doc
+   adams.flow.control.Tee -name "short filename"
+    adams.flow.transformer.BaseName -remove-extensions true
+    adams.flow.transformer.SetVariable -var-name shortdoc
+   adams.flow.control.ConditionalSubProcess -name "added blank to \"sheets\"" -condition "adams.flow.condition.bool.Expression -expression \"@{count} > 1\""
+    adams.flow.transformer.SetVariable -var-name sheets -var-value " " -update-type APPEND
+   adams.flow.transformer.SetVariable -name "append \"sheets\"" -var-name sheets -var-value @{count} -update-type APPEND
+  adams.flow.control.Trigger -name "count words"
+   adams.flow.standalone.CounterInit -storage-name words
+   adams.flow.source.Variable -var-name doc
+   adams.flow.transformer.TextFileReader -reader adams.data.io.input.SingleStringTextReader
+   adams.flow.transformer.Tokenize -output-array true -tokenizer "adams.flow.transformer.tokenizer.WekaTokenizer -tokenizer \"weka.core.tokenizers.WordTokenizer -delimiters \\\" \\\\r\\\\n\\\\t.,;:\\\\\\\'\\\\\\\"()?!\\\"\""
+   adams.flow.control.ArrayProcess
+    adams.flow.transformer.CounterAdd -storage-name words
+  adams.flow.control.Trigger -name sort/top
+   adams.flow.source.Counter -storage-name words
+   adams.flow.transformer.SpreadSheetSort -no-copy true -sort-column Count -sort-order false
+   adams.flow.transformer.SpreadSheetSubset -annotation "top 20 words" -row 1-20
+   adams.flow.transformer.SpreadSheetSetHeaderCell -name "rename \"Key\" to \"Word\"" -col Key -value Word
+   adams.flow.transformer.SpreadSheetSetHeaderCell -name "rename \"Count\" header to doc name" -no-copy true -col Count -value @{shortdoc} -force-string true
+   adams.flow.transformer.SetStorageValue -storage-name @{count}
+ adams.flow.control.Trigger -name merge
+  adams.flow.source.StorageValuesArray -storage-name @{sheets}
+  adams.flow.transformer.SpreadSheetMerge -remove true -unique-id Word
+  adams.flow.sink.SpreadSheetDisplay -writer adams.data.io.output.NullWriter
