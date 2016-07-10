@@ -162,8 +162,10 @@ public class DistributedEnQueue
     result = super.setUp();
 
     if (result == null) {
-      if (m_StorageNames.length < 1)
-        result = "At least one queue must be defined!";
+      if (!getOptionManager().hasVariableForProperty("storageNames")) {
+        if (m_StorageNames.length < 1)
+          result = "At least one queue must be defined!";
+      }
     }
 
     return result;
@@ -178,18 +180,24 @@ public class DistributedEnQueue
   protected String doTransmit() {
     String		result;
     StorageQueueHandler	queue;
-    
-    result = null;
-    queue  = getQueue(m_StorageNames[m_NextQueue]);
-    if (queue == null)
-      result = "Queue not available: " + m_StorageNames[m_NextQueue];
-    else
-      queue.add(m_Input);
 
-    // move to next queue
-    m_NextQueue++;
-    if (m_NextQueue >= m_StorageNames.length)
-      m_NextQueue = 0;
+    result = null;
+
+    if (m_StorageNames.length < 1)
+      result = "At least one queue must be defined!";
+
+    if (result == null) {
+      queue = getQueue(m_StorageNames[m_NextQueue]);
+      if (queue == null)
+	result = "Queue not available: " + m_StorageNames[m_NextQueue];
+      else
+	queue.add(m_Input);
+
+      // move to next queue
+      m_NextQueue++;
+      if (m_NextQueue >= m_StorageNames.length)
+	m_NextQueue = 0;
+    }
 
     return result;
   }

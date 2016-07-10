@@ -28,6 +28,9 @@ import adams.flow.standalone.rats.input.InputPolling;
 import adams.flow.standalone.rats.output.DummyOutput;
 import adams.flow.standalone.rats.output.EnQueue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  <!-- globalinfo-start -->
  * Replaces itself at runtime with a copy of itself, as many times as there are input queues.
@@ -171,6 +174,9 @@ public class RatPlague
 
   /** the name of the output queue in the internal storage. */
   protected StorageName m_Output;
+
+  /** whether the sub-rats have been set up. */
+  protected boolean m_RatsConfigured;
 
   /**
    * Returns a string describing the object.
@@ -327,14 +333,15 @@ public class RatPlague
   }
 
   /**
-   * Initializes the item for flow execution.
+   * Sets up the rats.
    *
-   * @return		null if everything is fine, otherwise error message
+   * @param execute	whether to execute the actors as well, not just setUp them
+   * @return		null if successfully setup, otherwise error message
    */
-  @Override
-  public String setUp() {
+  protected String setUpRats(boolean execute) {
     String		result;
     Rat			rat;
+    List<Rat> rats;
     int			i;
     int			index;
     int			n;
@@ -343,55 +350,93 @@ public class RatPlague
     DeQueue		dequeue;
     MutableActorHandler parent;
 
+    result = null;
+
+    index  = index();
+    parent = (MutableActorHandler) getParent();
+    rats   = new ArrayList<>();
+    for (i = 0; i < m_Input.length; i++) {
+      rat = new Rat();
+      rat.setName(getName() + "-" + m_Input[i].getValue());
+      dequeue = new DeQueue();
+      dequeue.setStorageName(m_Input[i]);
+      polling = new InputPolling();
+      polling.setWaitPoll(m_WaitPoll);
+      polling.setInput(dequeue);
+      rat.setReceiver(polling);
+      enqueue = new EnQueue();
+      enqueue.setStorageName(m_Output);
+      rat.setTransmitter(enqueue);
+      rat.setLog(getLog());
+      rat.setScopeHandlingVariables(getScopeHandlingVariables());
+      rat.setPropagateVariables(getPropagateVariables());
+      rat.setVariablesRegExp(getVariablesRegExp());
+      rat.setScopeHandlingStorage(getScopeHandlingStorage());
+      rat.setPropagateStorage(getPropagateStorage());
+      rat.setStorageRegExp(getStorageRegExp());
+      rat.setSendErrorQueue(getSendErrorQueue());
+      rat.setShowInControl(getShowInControl());
+
+      rat.removeAll();
+      for (n = 0; n < size(); n++)
+        rat.add(get(n).shallowCopy());
+
+      rat.setVariables(getVariables());
+      if (i == 0)
+        parent.set(index, rat);
+      else
+        parent.add(index + i, rat);
+      rats.add(rat);
+    }
+    result = parent.setUp();
+    setParent(null);
+    cleanUp();
+
+    // execute
+    if ((result == null) && execute) {
+      for (Rat r: rats) {
+	result = r.execute();
+	if (result != null)
+	  break;
+      }
+    }
+
+    m_RatsConfigured = true;
+
+    return result;
+  }
+
+  /**
+   * Initializes the item for flow execution.
+   *
+   * @return		null if everything is fine, otherwise error message
+   */
+  @Override
+  public String setUp() {
+    String		result;
+    boolean		canSetUp;
+
     result = super.setUp();
 
-    if (result == null) {
-      if (m_Input.length == 0)
-	result = "No input queues defined!";
-      else if (!(getParent() instanceof MutableActorHandler))
-	result = "Parent is not a " + MutableActorHandler.class.getName() + "!";
-    }
+    m_RatsConfigured = false;
+    canSetUp         = false;
 
     if (result == null) {
-      index  = index();
-      parent = (MutableActorHandler) getParent();
-      for (i = 0; i < m_Input.length; i++) {
-	rat = new Rat();
-	rat.setName(getName() + "-" + m_Input[i].getValue());
-	dequeue = new DeQueue();
-	dequeue.setStorageName(m_Input[i]);
-	polling = new InputPolling();
-	polling.setWaitPoll(m_WaitPoll);
-	polling.setInput(dequeue);
-	rat.setReceiver(polling);
-	enqueue = new EnQueue();
-	enqueue.setStorageName(m_Output);
-	rat.setTransmitter(enqueue);
-	rat.setLog(getLog());
-	rat.setScopeHandlingVariables(getScopeHandlingVariables());
-	rat.setPropagateVariables(getPropagateVariables());
-	rat.setVariablesRegExp(getVariablesRegExp());
-	rat.setScopeHandlingStorage(getScopeHandlingStorage());
-	rat.setPropagateStorage(getPropagateStorage());
-	rat.setStorageRegExp(getStorageRegExp());
-	rat.setSendErrorQueue(getSendErrorQueue());
-	rat.setShowInControl(getShowInControl());
-
-	rat.removeAll();
-	for (n = 0; n < size(); n++)
-	  rat.add(get(n).shallowCopy());
-
-	rat.setVariables(getVariables());
-	if (i == 0)
-	  parent.set(index, rat);
-	else
-	  parent.add(index + i, rat);
+      if (!getOptionManager().hasVariableForProperty("input")) {
+	canSetUp = true;
+        if (m_Input.length == 0)
+          result = "No input queues defined!";
       }
-      result = parent.setUp();
-      setParent(null);
-      cleanUp();
     }
-    
+
+    if (result == null) {
+      if (!(getParent() instanceof MutableActorHandler))
+        result = "Parent is not a " + MutableActorHandler.class.getName() + "!";
+    }
+
+    if ((result == null) && canSetUp)
+      result = setUpRats(false);
+
     return result;
   }
 
@@ -402,6 +447,13 @@ public class RatPlague
    */
   @Override
   protected String doExecute() {
-    return null;
+    String	result;
+
+    result = null;
+
+    if (!m_RatsConfigured)
+      result = setUpRats(true);
+
+    return result;
   }
 }
