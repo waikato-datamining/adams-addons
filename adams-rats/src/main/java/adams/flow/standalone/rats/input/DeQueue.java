@@ -25,6 +25,9 @@ import adams.flow.control.StorageQueueHandler;
 import adams.flow.control.StorageUpdater;
 import adams.flow.core.Unknown;
 
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+
 /**
  <!-- globalinfo-start -->
  * Polls the specified queue in internal storage for an item, blocks till an item is available.
@@ -59,7 +62,13 @@ public class DeQueue
 
   /** the item obtained from the queue. */
   protected Object m_Output;
-  
+
+  /** the internal timeout interval for polling the queue in msec. */
+  protected int m_PollTimeout;
+
+  /** the current queue. */
+  protected transient StorageQueueHandler m_Queue;
+
   /**
    * Returns a string describing the object.
    *
@@ -80,8 +89,8 @@ public class DeQueue
     super.defineOptions();
 
     m_OptionManager.add(
-	    "storage-name", "storageName",
-	    new StorageName("queue"));
+      "storage-name", "storageName",
+      new StorageName("queue"));
   }
 
   /**
@@ -91,7 +100,8 @@ public class DeQueue
   protected void initialize() {
     super.initialize();
     
-    m_Output = null;
+    m_Output      = null;
+    m_PollTimeout = 100;
   }
 
   /**
@@ -153,6 +163,29 @@ public class DeQueue
   }
 
   /**
+   * Waits for the next data object, polling the queue.
+   *
+   * @return		the data, null if none available (eg when stopped)
+   */
+  protected Object poll(StorageQueueHandler queue) {
+    Object	result;
+
+    result = null;
+
+    while (!m_Stopped && (result == null)) {
+      try {
+	result = queue.poll(m_PollTimeout, TimeUnit.MILLISECONDS);
+      }
+      catch (Exception e) {
+        if (isLoggingEnabled())
+          getLogger().log(Level.INFO, "Exception while polling", e);
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Performs the actual reception of data.
    * 
    * @return		null if successful, otherwise error message
@@ -160,17 +193,15 @@ public class DeQueue
   @Override
   protected String doReceive() {
     String		result;
-    StorageQueueHandler	queue;
 
-    result = null;
-    queue  = getQueue(m_StorageName);
-    if (queue == null)
+    result   = null;
+    m_Output = null;
+    m_Queue  = getQueue(m_StorageName);
+    if (m_Queue == null)
       result = "Queue not available: " + m_StorageName;
 
-    if (result == null) {
-      if (queue.size() > 0)
-	m_Output = queue.remove();
-    }
+    if (result == null)
+      m_Output = poll(m_Queue);
 
     return result;
   }
@@ -198,5 +229,18 @@ public class DeQueue
     m_Output = null;
     
     return result;
+  }
+
+  /**
+   * Stops the execution.
+   */
+  @Override
+  public void stopExecution() {
+    super.stopExecution();
+    if (m_Queue != null) {
+      synchronized (m_Queue) {
+	m_Queue.notifyAll();
+      }
+    }
   }
 }

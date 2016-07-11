@@ -113,7 +113,7 @@ public class RatRunnable
 
     while (!m_Stopped) {
       while (m_Paused && !m_Stopped)
-	Utils.wait(this, this, 100, 100);
+	Utils.wait(this, this, 100, 10);
 
       data = null;
       if (isLoggingEnabled())
@@ -127,6 +127,9 @@ public class RatRunnable
       catch (Throwable t) {
 	result = Utils.throwableToString(t);
       }
+
+      if (m_Stopped)
+	break;
 
       if (result != null) {
 	getOwner().log("Failed to receive from " + m_Owner.getReceiver().getFullName() + ": " + result, "receive");
@@ -200,9 +203,14 @@ public class RatRunnable
       // wait before next poll?
       if (!m_Stopped) {
 	if (m_Owner.getReceiver() instanceof PollingRatInput) {
-	  Utils.wait(this, this, ((PollingRatInput) m_Owner.getReceiver()).getWaitPoll(), 100);
+	  Utils.wait(this, this, ((PollingRatInput) m_Owner.getReceiver()).getWaitPoll(), 10);
 	}
       }
+    }
+
+    if (m_Stopped) {
+      m_Owner.getReceiver().stopExecution();
+      m_Owner.getTransmitter().stopExecution();
     }
   }
 
@@ -227,5 +235,15 @@ public class RatRunnable
    */
   public boolean isPaused() {
     return m_Paused;
+  }
+
+  /**
+   * Stops the execution.
+   */
+  @Override
+  public void stopExecution() {
+    super.stopExecution();
+    m_Owner.getReceiver().stopExecution();
+    m_Owner.getTransmitter().stopExecution();
   }
 }

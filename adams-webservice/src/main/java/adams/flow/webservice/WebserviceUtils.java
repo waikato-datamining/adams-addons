@@ -15,17 +15,19 @@
 
 /**
  * WebserviceUtils.java
- * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.Proxy;
-import java.net.URL;
-
-import javax.xml.ws.BindingProvider;
-
+import adams.core.Utils;
+import adams.core.logging.LoggingLevelHandler;
+import adams.core.net.ProxyHelper;
+import adams.core.option.OptionHandler;
+import adams.core.option.OptionUtils;
+import adams.flow.core.Actor;
+import adams.flow.webservice.interceptor.InterceptorWithActor;
+import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
+import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -37,13 +39,11 @@ import org.apache.cxf.transports.http.configuration.ConnectionType;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.transports.http.configuration.ProxyServerType;
 
-import adams.core.Utils;
-import adams.core.logging.LoggingLevelHandler;
-import adams.core.net.ProxyHelper;
-import adams.flow.core.Actor;
-import adams.flow.webservice.interceptor.InterceptorWithActor;
-import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
-import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
+import javax.xml.ws.BindingProvider;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.Proxy;
+import java.net.URL;
 
 /**
  * Utility class around webservices.
@@ -318,5 +318,19 @@ public class WebserviceUtils {
     }
 
     return result.toString();
+  }
+
+  /**
+   * Creates a copy of the WS implementation, either using a shallow copy
+   * (if implementing {@link OptionHandler}) or {@link Utils#deepCopy(Object)}.
+   *
+   * @param implementation	the webservice implemntation to copy
+   * @return			the copy, null if failed to copy
+   */
+  public static Object copyImplementation(Object implementation) {
+    if (implementation instanceof OptionHandler)
+      return OptionUtils.shallowCopy((OptionHandler) implementation, false);
+    else
+      return Utils.deepCopy(implementation);
   }
 }

@@ -20,18 +20,14 @@
 
 package adams.flow.webservice.blob;
 
-import javax.xml.ws.Endpoint;
-
-import nz.ac.waikato.adams.webservice.rats.blob.RatsBlobService;
-
-import org.apache.cxf.jaxws.EndpointImpl;
-
-import adams.core.Utils;
-import adams.core.option.OptionHandler;
-import adams.core.option.OptionUtils;
 import adams.flow.standalone.rats.input.RatInput;
 import adams.flow.standalone.rats.input.RatInputUser;
 import adams.flow.webservice.AbstractWebServiceProvider;
+import adams.flow.webservice.WebserviceUtils;
+import nz.ac.waikato.adams.webservice.rats.blob.RatsBlobService;
+import org.apache.cxf.jaxws.EndpointImpl;
+
+import javax.xml.ws.Endpoint;
 
 /**
  * Webservice for RATS Blob.
@@ -145,10 +141,7 @@ public class RatsBlobServiceWS
   protected void doStart() throws Exception {
     RatsBlobService implementer;
 
-    if (m_Implementation instanceof OptionHandler)
-      implementer = (RatsBlobService) OptionUtils.shallowCopy((OptionHandler) m_Implementation, false);
-    else
-      implementer = (RatsBlobService) Utils.deepCopy(m_Implementation);
+    implementer = (RatsBlobService) WebserviceUtils.copyImplementation(m_Implementation);
     if (implementer instanceof OwnedByRatsBlobServiceWS)
       ((OwnedByRatsBlobServiceWS) implementer).setOwner(this);
     m_Endpoint  = (EndpointImpl) Endpoint.publish(getURL(), implementer);

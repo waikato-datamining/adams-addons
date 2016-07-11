@@ -15,14 +15,14 @@
 
 /**
  * AbstractMetaRatInput.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
-import java.util.ArrayList;
-
 import adams.core.QuickInfoHelper;
 import adams.flow.standalone.Rat;
+
+import java.util.ArrayList;
 
 /**
  * Ancestor for {@link RatInput} schemes that wrap another {@link RatInput}.
@@ -207,5 +207,14 @@ public abstract class AbstractMetaRatInput
   @Override
   public Object output() {
     return m_Data.remove(0);
+  }
+
+  /**
+   * Stops the execution.
+   */
+  @Override
+  public void stopExecution() {
+    super.stopExecution();
+    m_Input.stopExecution();
   }
 }

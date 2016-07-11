@@ -20,13 +20,10 @@
 
 package adams.flow.webservice;
 
-import javax.xml.ws.Endpoint;
-
 import nz.ac.waikato.adams.webservice.weka.WekaService;
-
 import org.apache.cxf.jaxws.EndpointImpl;
 
-import adams.core.Utils;
+import javax.xml.ws.Endpoint;
 
 /**
  * Webservice for WEKA.
@@ -204,7 +201,7 @@ public class WekaServiceWS
   protected void doStart() throws Exception {
     WekaService implementer;
 
-    implementer = (WekaService) Utils.deepCopy(m_Implementation);
+    implementer = (WekaService) WebserviceUtils.copyImplementation(m_Implementation);
     if (implementer instanceof OwnedByWekaServiceWS)
       ((OwnedByWekaServiceWS) implementer).setOwner(this);
     m_Endpoint  = (EndpointImpl) Endpoint.publish(getURL(), implementer);

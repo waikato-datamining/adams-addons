@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2016-02-15 14:55:41
+# Date: 2016-07-12 11:16:34
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Demonstrates how to distribute data coming in from \\none queue into multiple others. Useful when trying\\nto do simple load-balancing." -flow-execution-listener adams.flow.execution.NullListener
@@ -13,13 +13,14 @@ adams.flow.control.Flow -annotation "Demonstrates how to distribute data coming 
   adams.flow.standalone.QueueInit -name q2 -storage-name q2
   adams.flow.standalone.QueueInit -name q3 -storage-name q3
  adams.flow.standalone.Rats
-  adams.flow.standalone.Rat -name all -receiver "adams.flow.standalone.rats.input.InputPolling -input \"adams.flow.standalone.rats.input.DeQueue -storage-name all\" -wait-poll 50" -transmitter "adams.flow.standalone.rats.output.DistributedEnQueue -storage-name q1 -storage-name q2 -storage-name q3"
-  adams.flow.standalone.Rat -name q1 -receiver "adams.flow.standalone.rats.input.InputPolling -input \"adams.flow.standalone.rats.input.DeQueue -storage-name q1\" -wait-poll 50" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display1"
-  adams.flow.standalone.Rat -name q2 -receiver "adams.flow.standalone.rats.input.InputPolling -input \"adams.flow.standalone.rats.input.DeQueue -storage-name q2\" -wait-poll 50" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display2"
-  adams.flow.standalone.Rat -name q3 -receiver "adams.flow.standalone.rats.input.InputPolling -input \"adams.flow.standalone.rats.input.DeQueue -storage-name q3\" -wait-poll 50" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display3"
+  adams.flow.standalone.Rat -name all -receiver "adams.flow.standalone.rats.input.DeQueue -storage-name all" -transmitter "adams.flow.standalone.rats.output.DistributedEnQueue -storage-name q1 -storage-name q2 -storage-name q3"
+  adams.flow.standalone.Rat -name q1 -receiver "adams.flow.standalone.rats.input.DeQueue -storage-name q1" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display1"
+  adams.flow.standalone.Rat -name q2 -receiver "adams.flow.standalone.rats.input.DeQueue -storage-name q2" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display2"
+  adams.flow.standalone.Rat -name q3 -receiver "adams.flow.standalone.rats.input.DeQueue -storage-name q3" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display3"
  adams.flow.source.Start
  adams.flow.control.Trigger -name "feed in data"
   adams.flow.source.ForLoop -upper 100
+  adams.flow.control.Sleep -interval 50
   adams.flow.sink.EnQueue -storage-name all
  adams.flow.control.WhileLoop -condition adams.flow.condition.bool.True
   adams.flow.source.Start

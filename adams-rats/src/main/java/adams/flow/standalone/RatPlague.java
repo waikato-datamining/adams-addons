@@ -24,7 +24,6 @@ import adams.flow.control.StorageName;
 import adams.flow.core.MutableActorHandler;
 import adams.flow.standalone.rats.input.DeQueue;
 import adams.flow.standalone.rats.input.DummyInput;
-import adams.flow.standalone.rats.input.InputPolling;
 import adams.flow.standalone.rats.output.DummyOutput;
 import adams.flow.standalone.rats.output.EnQueue;
 
@@ -166,9 +165,6 @@ public class RatPlague
   /** for serialization. */
   private static final long serialVersionUID = -154461277343021604L;
 
-  /** the waiting period in msec before polling again. */
-  protected int m_WaitPoll;
-
   /** the names of the input queues in the internal storage. */
   protected StorageName[] m_Input;
 
@@ -199,10 +195,6 @@ public class RatPlague
     m_OptionManager.removeByProperty("transmitter");
 
     m_OptionManager.add(
-	    "wait-poll", "waitPoll",
-	    100, 0, null);
-
-    m_OptionManager.add(
 	    "input", "input",
 	    new StorageName[0]);
 
@@ -222,40 +214,6 @@ public class RatPlague
     // for setUp() method to succeed
     setReceiver(new DummyInput());
     setTransmitter(new DummyOutput());
-  }
-
-  /**
-   * Sets the number of milli-seconds to wait before polling.
-   *
-   * @param value	the number of milli-seconds
-   */
-  public void setWaitPoll(int value) {
-    if (value >= 0) {
-      m_WaitPoll = value;
-      reset();
-    }
-    else {
-      getLogger().warning("Number of milli-seconds to wait must be >=0, provided: " + value);
-    }
-  }
-
-  /**
-   * Returns the number of milli-seconds to wait before polling again.
-   *
-   * @return		the number of milli-seconds
-   */
-  public int getWaitPoll() {
-    return m_WaitPoll;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String waitPollTipText() {
-    return "The number of milli-seconds to wait before polling again.";
   }
 
   /**
@@ -325,8 +283,7 @@ public class RatPlague
   public String getQuickInfo() {
     String	result;
 
-    result  = QuickInfoHelper.toString(this, "waitPoll", m_WaitPoll, "wait poll: ");
-    result += QuickInfoHelper.toString(this, "input", m_Input, ", input: ");
+    result  = QuickInfoHelper.toString(this, "input", m_Input, "input: ");
     result += QuickInfoHelper.toString(this, "output", m_Output, ", output: ");
 
     return result;
@@ -345,7 +302,6 @@ public class RatPlague
     int			i;
     int			index;
     int			n;
-    InputPolling	polling;
     EnQueue		enqueue;
     DeQueue		dequeue;
     MutableActorHandler parent;
@@ -360,10 +316,7 @@ public class RatPlague
       rat.setName(getName() + "-" + m_Input[i].getValue());
       dequeue = new DeQueue();
       dequeue.setStorageName(m_Input[i]);
-      polling = new InputPolling();
-      polling.setWaitPoll(m_WaitPoll);
-      polling.setInput(dequeue);
-      rat.setReceiver(polling);
+      rat.setReceiver(dequeue);
       enqueue = new EnQueue();
       enqueue.setStorageName(m_Output);
       rat.setTransmitter(enqueue);

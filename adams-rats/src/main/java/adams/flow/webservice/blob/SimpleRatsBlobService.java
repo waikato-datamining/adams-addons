@@ -20,14 +20,14 @@
 
 package adams.flow.webservice.blob;
 
-import nz.ac.waikato.adams.webservice.rats.blob.RatsBlobService;
-import nz.ac.waikato.adams.webservice.rats.blob.UploadRequest;
-import nz.ac.waikato.adams.webservice.rats.blob.UploadResponse;
 import adams.core.option.AbstractOptionHandler;
 import adams.data.blob.BlobContainer;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.RatsBlobHelper;
-import adams.flow.standalone.rats.input.WSBlobReception;
+import adams.flow.standalone.rats.input.BufferedRatInput;
+import nz.ac.waikato.adams.webservice.rats.blob.RatsBlobService;
+import nz.ac.waikato.adams.webservice.rats.blob.UploadRequest;
+import nz.ac.waikato.adams.webservice.rats.blob.UploadResponse;
 
 
 /**
@@ -124,8 +124,8 @@ public class SimpleRatsBlobService
     if (isLoggingEnabled())
       getLogger().fine(cont.toString());
 
-    if (getOwner().getRatInput() instanceof WSBlobReception)
-      ((WSBlobReception) getOwner().getRatInput()).setData(cont);
+    if (getOwner().getRatInput() instanceof BufferedRatInput)
+      ((BufferedRatInput) getOwner().getRatInput()).bufferData(cont);
     
     return result;
   }

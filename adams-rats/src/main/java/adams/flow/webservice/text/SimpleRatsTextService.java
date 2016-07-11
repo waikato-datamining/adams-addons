@@ -20,6 +20,7 @@
 
 package adams.flow.webservice.text;
 
+import adams.flow.standalone.rats.input.BufferedRatInput;
 import nz.ac.waikato.adams.webservice.rats.text.RatsTextService;
 import nz.ac.waikato.adams.webservice.rats.text.UploadRequest;
 import nz.ac.waikato.adams.webservice.rats.text.UploadResponse;
@@ -27,7 +28,6 @@ import adams.core.option.AbstractOptionHandler;
 import adams.data.text.TextContainer;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.RatsTextHelper;
-import adams.flow.standalone.rats.input.WSTextReception;
 
 
 /**
@@ -123,8 +123,8 @@ public class SimpleRatsTextService
     if (isLoggingEnabled())
       getLogger().fine(cont.toString());
 
-    if (getOwner().getRatInput() instanceof WSTextReception)
-      ((WSTextReception) getOwner().getRatInput()).setData(cont);
+    if (getOwner().getRatInput() instanceof BufferedRatInput)
+      ((BufferedRatInput) getOwner().getRatInput()).bufferData(cont);
     
     return result;
   }

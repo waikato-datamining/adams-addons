@@ -15,16 +15,16 @@
 
 /**
  * WebserviceInput.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
-import adams.flow.core.Token;
+import adams.event.WebServiceClientProducerResponseDataEvent;
+import adams.event.WebServiceClientProducerResponseDataListener;
 import adams.flow.core.Unknown;
 import adams.flow.webservice.WebServiceClient;
 import adams.flow.webservice.WebServiceClientConsumer;
 import adams.flow.webservice.WebServiceClientProducer;
-
 import com.example.customerservice.flow.CustomersByName;
 
 /**
@@ -50,16 +50,14 @@ import com.example.customerservice.flow.CustomersByName;
  * @version $Revision: 2086 $
  */
 public class WebserviceInput
-extends AbstractRatInput {
+  extends AbstractBufferedRatInput
+  implements WebServiceClientProducerResponseDataListener {
 
   /** for serialization. */
   private static final long serialVersionUID = -3681678330127394451L;
 
   /** the webservice client to use. */
   protected WebServiceClient m_Client;
-
-  /** the spectrum received via webservice. */
-  protected Object m_Data;
 
   /**
    * Returns a string describing the object.
@@ -114,8 +112,10 @@ extends AbstractRatInput {
     
     msg = checkClient(value);
     if (msg == null) {
+      ((WebServiceClientProducer) m_Client).removeResponseDataListener(this);
       m_Client = value;
       m_Client.setOwner(getOwner());
+      ((WebServiceClientProducer) m_Client).addResponseDataListener(this);
       reset();
     }
     else {
@@ -168,6 +168,7 @@ extends AbstractRatInput {
     
     try {
       m_Client.setOwner(getOwner());
+      ((WebServiceClientProducer) m_Client).addResponseDataListener(this);
       m_Client.query();
     }
     catch (Exception e) {
@@ -178,23 +179,22 @@ extends AbstractRatInput {
   }
 
   /**
-   * Checks whether there is pending output to be collected after
-   * executing the flow item.
+   * Gets called whenever data was received from the webservice.
    *
-   * @return		true if there is pending output
+   * @param e		the event
    */
   @Override
-  public boolean hasPendingOutput() {
-    return ((WebServiceClientProducer) m_Client).hasResponseData();
+  public void webServiceReponseDataReceived(WebServiceClientProducerResponseDataEvent e) {
+    m_Buffer.add(e.getProducer().getResponseData());
   }
 
   /**
-   * Returns the generated token.
-   *
-   * @return		the generated token
+   * Cleans up data structures, frees up memory.
    */
   @Override
-  public Token output() {
-    return new Token(((WebServiceClientProducer) m_Client).getResponseData());
+  public void cleanUp() {
+    if (m_Client != null)
+      ((WebServiceClientProducer) m_Client).removeResponseDataListener(this);
+    super.cleanUp();
   }
 }

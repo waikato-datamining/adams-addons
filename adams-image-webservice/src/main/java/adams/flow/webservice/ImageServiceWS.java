@@ -20,14 +20,11 @@
 
 package adams.flow.webservice;
 
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.soap.SOAPBinding;
-
 import nz.ac.waikato.adams.webservice.image.ImageService;
-
 import org.apache.cxf.jaxws.EndpointImpl;
 
-import adams.core.Utils;
+import javax.xml.ws.Endpoint;
+import javax.xml.ws.soap.SOAPBinding;
 
 /**
  * Webservice for Image.
@@ -119,7 +116,7 @@ public class ImageServiceWS
   protected void doStart() throws Exception {
     ImageService implementer;
 
-    implementer = (ImageService) Utils.deepCopy(m_Implementation);
+    implementer = (ImageService) WebserviceUtils.copyImplementation(m_Implementation);
     if (implementer instanceof OwnedByImageServiceWS)
       ((OwnedByImageServiceWS) implementer).setOwner(this);
     m_Endpoint  = (EndpointImpl) Endpoint.publish(getURL(), implementer);

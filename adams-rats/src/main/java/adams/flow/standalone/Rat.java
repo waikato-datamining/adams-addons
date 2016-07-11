@@ -1254,15 +1254,13 @@ public class Rat
       return;
     if (!m_Stopped) {
       m_Stopping = true;
-      m_Receiver.stopExecution();
       m_Actors.stopExecution();
-      m_Transmitter.stopExecution();
       if (m_Runnable != null) {
 	m_Runnable.stopExecution();
 	while (m_Runnable.isRunning()) {
 	  try {
 	    synchronized(this) {
-	      wait(100);
+	      wait(10);
 	    }
 	  }
 	  catch (Exception e) {

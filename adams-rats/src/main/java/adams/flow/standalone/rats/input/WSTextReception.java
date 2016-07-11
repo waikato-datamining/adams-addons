@@ -19,9 +19,6 @@
  */
 package adams.flow.standalone.rats.input;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import adams.data.text.TextContainer;
 import adams.flow.webservice.WebServiceProvider;
 import adams.flow.webservice.text.RatsTextServiceWS;
@@ -56,20 +53,14 @@ import adams.flow.webservice.text.RatsTextServiceWS;
  * @version $Revision: 2083 $
  */
 public class WSTextReception
-  extends AbstractRatInput {
+  extends AbstractBufferedRatInput {
 
   /** for serialization. */
   private static final long serialVersionUID = -3681678330127394451L;
   
   /** the webservice to run. */
   protected WebServiceProvider m_WebService;
-  
-  /** the spectrum received via webservice. */
-  protected List<TextContainer> m_Data;
-  
-  /** the waiting period in msec before polling again. */
-  protected int m_WaitPoll;
-  
+
   /**
    * Returns a string describing the object.
    *
@@ -90,20 +81,6 @@ public class WSTextReception
     m_OptionManager.add(
 	    "web-service", "webService",
 	    getDefaultWebService());
-
-    m_OptionManager.add(
-	    "wait-poll", "waitPoll",
-	    50, 0, null);
-  }
-
-  /**
-   * Initializes the members.
-   */
-  @Override
-  protected void initialize() {
-    super.initialize();
-    
-    m_Data = new ArrayList<TextContainer>();
   }
 
   /**
@@ -148,40 +125,6 @@ public class WSTextReception
   }
 
   /**
-   * Sets the number of milli-seconds to wait before polling whether data has arrived.
-   *
-   * @param value	the number of milli-seconds
-   */
-  public void setWaitPoll(int value) {
-    if (value >= 0) {
-      m_WaitPoll = value;
-      reset();
-    }
-    else {
-      getLogger().warning("Number of milli-seconds to wait must be >=0, provided: " + value);
-    }
-  }
-
-  /**
-   * Returns the number of milli-seconds to wait before polling again whether data has arrived.
-   *
-   * @return		the number of milli-seconds
-   */
-  public int getWaitPoll() {
-    return m_WaitPoll;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String waitPollTipText() {
-    return "The number of milli-seconds to wait before polling again whether data has arrived.";
-  }
-
-  /**
    * Returns the type of data this scheme generates.
    * 
    * @return		the type of data
@@ -189,45 +132,6 @@ public class WSTextReception
   @Override
   public Class generates() {
     return TextContainer.class;
-  }
-
-  /**
-   * For setting the data received from the webservice.
-   * 
-   * @param value	the data received
-   */
-  public void setData(TextContainer value) {
-    synchronized(m_Data) {
-      m_Data.add(value);
-    }
-  }
-  
-  /**
-   * Checks whether any output can be collected.
-   * 
-   * @return		true if output available
-   */
-  @Override
-  public boolean hasPendingOutput() {
-    synchronized(m_Data) {
-      return (m_Data.size() > 0);
-    }
-  }
-
-  /**
-   * Returns the received data.
-   * 
-   * @return		the data
-   */
-  @Override
-  public Object output() {
-    TextContainer	result;
-    
-    synchronized(m_Data) {
-      result = m_Data.remove(0);
-    }
-
-    return result;
   }
 
   /**
@@ -247,12 +151,7 @@ public class WSTextReception
 	((RatInputUser) m_WebService).setRatInput(this);
       result = m_WebService.start();
     }
-    
-    if (result == null) {
-      while ((m_Data.size() == 0) && !m_Stopped)
-	doWait(m_WaitPoll);
-    }
-    
+
     return result;
   }
   
@@ -263,15 +162,5 @@ public class WSTextReception
   public void stopExecution() {
     m_WebService.stop();
     super.stopExecution();
-  }
-  
-  /**
-   * Cleans up data structures, frees up memory.
-   */
-  @Override
-  public void cleanUp() {
-    m_Data.clear();
-    
-    super.cleanUp();
   }
 }

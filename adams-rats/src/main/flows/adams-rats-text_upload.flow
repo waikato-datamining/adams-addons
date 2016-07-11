@@ -1,0 +1,11 @@
+# Project: adams
+# Date: 2016-07-12 11:21:46
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Uploads an image as blob to the BLOB Rats webservice.\\nYou need to start \\\"adams-rats-blob_ws_server.flow\\\" for this to work." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/0_data/boxing.txt -file ${EXAMPLE_FLOWS}/0_data/lazy.txt -file ${EXAMPLE_FLOWS}/0_data/pack.txt
+ adams.flow.transformer.SetVariable -var-name file
+ adams.flow.transformer.TextFileReader -reader adams.data.io.input.SingleStringTextReader
+ adams.flow.transformer.Convert -conversion adams.data.conversion.StringToTextContainer
+ adams.flow.transformer.SetReportValue -field file[S] -value @{file}
+ adams.flow.sink.WSSink -client "adams.flow.webservice.text.Upload -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator"
