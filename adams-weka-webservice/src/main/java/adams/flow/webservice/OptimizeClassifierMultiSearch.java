@@ -15,18 +15,17 @@
 
 /**
  * OptimizeClassifierMultiSearch.java
- * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
-
-import java.net.URL;
-
-import javax.xml.ws.BindingProvider;
 
 import nz.ac.waikato.adams.webservice.weka.OptimizeReturnObject;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
 import weka.classifiers.meta.MultiSearch;
+
+import javax.xml.ws.BindingProvider;
+import java.net.URL;
 
 /**
  * client for using the optimize classifier multi search web service.
@@ -42,12 +41,6 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
 
   /** optimize classifier multi search input object */
   protected nz.ac.waikato.adams.webservice.weka.OptimizeClassifierMultiSearch m_Optimize;
-  
-  /**optimize object returned */
-  protected OptimizeReturnObject m_Returned;
-  
-  /** string containing best setup */
-  protected String m_ReturnedString;
 
   /**
    * Returns a string describing the object.
@@ -90,29 +83,6 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   }
 
   /**
-   * Checks whether there is any response data to be collected.
-   * 
-   * @return		true if data can be collected
-   * @see		#getResponseData()
-   */
-  @Override
-  public boolean hasResponseData() {
-    return m_Returned != null;
-  }
-
-  /**
-   * Returns the response data, if any.
-   * 
-   * @return		the response data
-   */
-  @Override
-  public String getResponseData() {
-    String toReturn = m_ReturnedString;
-    m_Returned = null;
-    return toReturn;
-  }
-
-  /**
    * Returns the WSDL location.
    * 
    * @return		the location
@@ -145,14 +115,13 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
     
-    m_Returned = wekaService.optimizeClassifierMultiSearch(m_Optimize.getClassifier(), m_Optimize.getSearchParameters(), m_Optimize.getDataset(), m_Optimize.getEvaluation());
-    m_ReturnedString = "";
-    if (m_Returned.getErrorMessage() != null)
-      throw new IllegalStateException(m_Returned.getErrorMessage());
-    if (m_Returned.getBestClassifierSetup() != null)
-      m_ReturnedString = m_Returned.getBestClassifierSetup();
-    if (m_Returned.getWarningMessage() != null) 
-      getOwner().getLogger().severe("WARNING: " + m_Returned.getWarningMessage());
+    OptimizeReturnObject returned = wekaService.optimizeClassifierMultiSearch(m_Optimize.getClassifier(), m_Optimize.getSearchParameters(), m_Optimize.getDataset(), m_Optimize.getEvaluation());
+    if (returned.getErrorMessage() != null)
+      throw new IllegalStateException(returned.getErrorMessage());
+    if (returned.getBestClassifierSetup() != null)
+      setResponseData(returned.getBestClassifierSetup());
+    if (returned.getWarningMessage() != null)
+      getOwner().getLogger().severe("WARNING: " + returned.getWarningMessage());
     m_Optimize = null;
   }
 }

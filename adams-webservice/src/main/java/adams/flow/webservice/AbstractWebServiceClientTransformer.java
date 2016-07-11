@@ -22,11 +22,14 @@ package adams.flow.webservice;
 import adams.core.QuickInfoHelper;
 import adams.core.QuickInfoSupporter;
 import adams.core.option.AbstractOptionHandler;
+import adams.event.WebServiceClientProducerResponseDataEvent;
+import adams.event.WebServiceClientProducerResponseDataListener;
 import adams.flow.core.Actor;
 import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
 
 import java.net.URL;
+import java.util.HashSet;
 import java.util.logging.Level;
 
 /**
@@ -66,6 +69,12 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
   /** the interceptor generator for outgoing messages. */
   protected AbstractOutInterceptorGenerator m_OutInterceptor;
 
+  /** the response data. */
+  protected transient O m_ResponseData;
+
+  /** the listeners for reponse data. */
+  protected HashSet<WebServiceClientProducerResponseDataListener> m_ResponseDataListeners;
+
   /**
    * Adds options to the internal list of options.
    */
@@ -96,6 +105,16 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
     m_OptionManager.add(
 	    "in-interceptor", "inInterceptor",
 	    getDefaultInInterceptor());
+  }
+
+  /**
+   * Initializes the members.
+   */
+  @Override
+  protected void initialize() {
+    super.initialize();
+
+    m_ResponseDataListeners = new HashSet<>();
   }
 
   /**
@@ -359,6 +378,70 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
   }
 
   /**
+   * Adds the listener for response data being received.
+   *
+   * @param l		the listener to add
+   */
+  public void addResponseDataListener(WebServiceClientProducerResponseDataListener l) {
+    m_ResponseDataListeners.add(l);
+  }
+
+  /**
+   * Removes the listener for response data being received.
+   *
+   * @param l		the listener to remove
+   */
+  public void removeResponseDataListener(WebServiceClientProducerResponseDataListener l) {
+    m_ResponseDataListeners.remove(l);
+  }
+
+  /**
+   * Notifies all listeners that response data has arrived.
+   */
+  protected synchronized void notifyResponseDataListeners() {
+    WebServiceClientProducerResponseDataEvent e;
+
+    e = new WebServiceClientProducerResponseDataEvent(this);
+    for (WebServiceClientProducerResponseDataListener l: m_ResponseDataListeners)
+      l.webServiceReponseDataReceived(e);
+  }
+
+  /**
+   * Checks whether there is any response data to be collected.
+   *
+   * @return		true if data can be collected
+   * @see		#getResponseData()
+   */
+  public boolean hasResponseData() {
+    return (m_ResponseData != null);
+  }
+
+  /**
+   * Sets the response data.
+   *
+   * @param value	the response data
+   */
+  public void setResponseData(O value) {
+    m_ResponseData = value;
+    if (m_ResponseData != null)
+      notifyResponseDataListeners();
+  }
+
+  /**
+   * Returns the response data, if any.
+   *
+   * @return		the response data
+   */
+  public O getResponseData() {
+    O		result;
+
+    result         = m_ResponseData;
+    m_ResponseData = null;
+
+    return result;
+  }
+
+  /**
    * Returns the WSDL location.
    * 
    * @return		the location
@@ -375,6 +458,7 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
   protected void preQuery() throws Exception {
     if (m_Owner == null)
       throw new IllegalStateException("No owning actor set!");
+    m_ResponseData = null;
   }
   
   /**

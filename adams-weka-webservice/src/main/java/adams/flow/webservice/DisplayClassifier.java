@@ -15,17 +15,16 @@
 
 /**
  * DisplayClassifier.java
- * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
-
-import java.net.URL;
-
-import javax.xml.ws.BindingProvider;
 
 import nz.ac.waikato.adams.webservice.weka.DisplayClassifierResponseObject;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
+
+import javax.xml.ws.BindingProvider;
+import java.net.URL;
 
 /**
  * Displays the string representation of a built classifier model.
@@ -38,15 +37,9 @@ extends AbstractWebServiceClientSource<String>{
 
   /** for serialization*/
   private static final long serialVersionUID = 1297440704076575307L;
-  
-  /**string returned to display */
-  protected String m_ReturnedString;
-  
+
   /** name of model to display */
   protected String m_Classifier;
-  
-  /** response object */
-  protected DisplayClassifierResponseObject m_Returned;
 
   /**
    * Returns a string describing the object.
@@ -108,29 +101,6 @@ extends AbstractWebServiceClientSource<String>{
   }
 
   /**
-   * Checks whether there is any response data to be collected.
-   * 
-   * @return		true if data can be collected
-   * @see		#getResponseData()
-   */
-  @Override
-  public boolean hasResponseData() {
-    return m_ReturnedString != null;
-  }
-
-  /**
-   * Returns the response data, if any.
-   * 
-   * @return		the response data
-   */
-  @Override
-  public String getResponseData() {
-    String toReturn = m_ReturnedString;
-    m_ReturnedString = null;
-    return toReturn;
-  }
-
-  /**
    * Returns the WSDL location.
    * 
    * @return		the location
@@ -161,11 +131,11 @@ extends AbstractWebServiceClientSource<String>{
 	null);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
-    m_Returned = wekaService.displayClassifier(m_Classifier);
+    DisplayClassifierResponseObject returned = wekaService.displayClassifier(m_Classifier);
     // failed to generate data?
-    if (m_Returned.getErrorMessage() != null)
-      throw new IllegalStateException(m_Returned.getErrorMessage());
-    m_ReturnedString = m_Returned.getDisplayString();
+    if (returned.getErrorMessage() != null)
+      throw new IllegalStateException(returned.getErrorMessage());
+    setResponseData(returned.getDisplayString());
 
     m_Classifier = null;
   }

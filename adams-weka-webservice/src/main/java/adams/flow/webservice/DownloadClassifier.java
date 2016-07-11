@@ -15,20 +15,19 @@
 
 /*
  * DownloadClassifier.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.webservice;
 
-import java.net.URL;
-
-import javax.xml.ws.BindingProvider;
-
+import adams.core.SerializationHelper;
 import nz.ac.waikato.adams.webservice.weka.DownloadClassifierResponseObject;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
 import weka.classifiers.Classifier;
-import adams.core.SerializationHelper;
+
+import javax.xml.ws.BindingProvider;
+import java.net.URL;
 
 /**
  * Client for download a classifier model.
@@ -45,9 +44,6 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   /** download input object */
   protected nz.ac.waikato.adams.webservice.weka.DownloadClassifier m_Download;
 
-  /** classifier returned */
-  protected Classifier m_ReturnedClassifier;
-  
   /** response object */
   protected DownloadClassifierResponseObject m_Returned;
 
@@ -93,29 +89,6 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   }
 
   /**
-   * Checks whether there is any response data to be collected.
-   * 
-   * @return		true if data can be collected
-   * @see		#getResponseData()
-   */
-  @Override
-  public boolean hasResponseData() {
-    return m_ReturnedClassifier != null;
-  }
-
-  /**
-   * Returns the response data, if any.
-   * 
-   * @return		the response data
-   */
-  @Override
-  public Classifier getResponseData() {
-    Classifier result = m_ReturnedClassifier;
-    m_ReturnedClassifier = null;
-    return result;
-  }
-
-  /**
    * Returns the WSDL location.
    * 
    * @return		the location
@@ -152,7 +125,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
     // failed to download model?
     if (m_Returned.getErrorMessage() != null)
       throw new IllegalStateException(m_Returned.getErrorMessage());
-    m_ReturnedClassifier = (Classifier) SerializationHelper.read(m_Returned.getModelData().getInputStream());
+    setResponseData((Classifier) SerializationHelper.read(m_Returned.getModelData().getInputStream()));
 
     m_Download = null;
   }

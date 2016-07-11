@@ -19,6 +19,7 @@
  */
 package adams.flow.webservice;
 
+import adams.event.WebServiceClientProducerResponseDataListener;
 import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
 
 /**
@@ -30,7 +31,21 @@ import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator
  */
 public interface WebServiceClientProducer<T> 
   extends WebServiceClient {
-  
+
+  /**
+   * Adds the listener for response data being received.
+   *
+   * @param l		the listener to add
+   */
+  public void addResponseDataListener(WebServiceClientProducerResponseDataListener l);
+
+  /**
+   * Removes the listener for response data being received.
+   *
+   * @param l		the listener to remove
+   */
+  public void removeResponseDataListener(WebServiceClientProducerResponseDataListener l);
+
   /**
    * Returns the classes that this client generates.
    * 
@@ -45,7 +60,14 @@ public interface WebServiceClientProducer<T>
    * @see		#getResponseData()
    */
   public boolean hasResponseData();
-  
+
+  /**
+   * Sets the response data.
+   *
+   * @param value	the response data
+   */
+  public void setResponseData(T value);
+
   /**
    * Returns the response data, if any.
    * 

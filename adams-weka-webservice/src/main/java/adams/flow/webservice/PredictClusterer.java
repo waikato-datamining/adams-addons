@@ -15,18 +15,17 @@
 
 /**
  * PredictClusterer.java
- * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
-
-import java.net.URL;
-
-import javax.xml.ws.BindingProvider;
 
 import nz.ac.waikato.adams.webservice.weka.Dataset;
 import nz.ac.waikato.adams.webservice.weka.PredictClustererResponseObject;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
+
+import javax.xml.ws.BindingProvider;
+import java.net.URL;
 
 /**
  * Predicts the cluster that instances belong to.
@@ -42,12 +41,6 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
 
   /**predict cluster input */
   protected nz.ac.waikato.adams.webservice.weka.PredictClusterer m_Predict;
-  
-  /** dataset returned after predicting */
-  protected Dataset m_ReturnedDataset;
-  
-  /** response object */
-  protected PredictClustererResponseObject m_Returned;
 
   /**
    * Returns a string describing the object.
@@ -77,29 +70,6 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   @Override
   public Class[] generates() {
     return new Class[] {Dataset.class};
-  }
-
-  /**
-   * Checks whether there is any response data to be collected.
-   * 
-   * @return		true if data can be collected
-   * @see		#getResponseData()
-   */
-  @Override
-  public boolean hasResponseData() {
-    return m_ReturnedDataset != null;
-  }
-
-  /**
-   * Returns the response data, if any.
-   * 
-   * @return		the response data
-   */
-  @Override
-  public Dataset getResponseData() {
-    Dataset toReturn = m_ReturnedDataset;
-    m_ReturnedDataset = null;
-    return toReturn;
   }
 
   /**
@@ -143,11 +113,11 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
 	m_OutInterceptor);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
-    m_Returned = wekaService.predictClusterer(m_Predict.getDataset(), m_Predict.getModelName());
+    PredictClustererResponseObject returned = wekaService.predictClusterer(m_Predict.getDataset(), m_Predict.getModelName());
     // failed to generate data?
-    if (m_Returned.getErrorMessage() != null)
-      throw new IllegalStateException(m_Returned.getErrorMessage());
-    m_ReturnedDataset = m_Returned.getReturnDataset();
+    if (returned.getErrorMessage() != null)
+      throw new IllegalStateException(returned.getErrorMessage());
+    setResponseData(returned.getReturnDataset());
 
     m_Predict = null;
   }

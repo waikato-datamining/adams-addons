@@ -14,27 +14,26 @@
  */
 
 /**
- * CustomersByNameGlobalTransformer.java
+ * CustomersByNameCallableTransformer.java
  * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
  */
 package com.example.customerservice.flow;
-
-import java.net.URL;
-import java.util.List;
 
 import adams.core.License;
 import adams.core.Utils;
 import adams.core.annotation.MixedCopyright;
 import adams.flow.webservice.AbstractWebServiceClientTransformerWithCallableTransformer;
 import adams.flow.webservice.WebserviceUtils;
-
 import com.example.customerservice.Customer;
 import com.example.customerservice.CustomerService;
 import com.example.customerservice.CustomerServiceService;
 
+import java.net.URL;
+import java.util.List;
+
 /**
  * Simple client for querying customer names and post-processing the names
- * with a global transformer.
+ * with a callable transformer.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
@@ -45,7 +44,7 @@ import com.example.customerservice.CustomerServiceService;
     note = "Code from 'WSDL first' example",
     url = "http://cxf.apache.org/docs/sample-projects.html"
 )
-public class CustomersByNameGlobalTransformer
+public class CustomersByNameCallableTransformer
   extends AbstractWebServiceClientTransformerWithCallableTransformer<String,String> {
 
   /** for serialization. */
@@ -56,9 +55,6 @@ public class CustomersByNameGlobalTransformer
   
   /** the provided customer name. */
   protected String m_ProvidedCustomerName;
-  
-  /** the list of customers that were obtained from webservice. */
-  protected List<Customer> m_Customers;
 
   /**
    * Returns a string describing the object.
@@ -151,13 +147,13 @@ public class CustomersByNameGlobalTransformer
     CustomerServiceService 	customerServiceService;
     CustomerService 		customerService;
     String			name;
+    String			customer;
     
     if (m_ProvidedCustomerName == null)
       name = m_CustomerName;
     else
       name = m_ProvidedCustomerName;
     
-    m_Customers            = null;
     customerServiceService = new CustomerServiceService(getWsdlLocation());
     customerService        = customerServiceService.getCustomerServicePort();
     WebserviceUtils.configureClient(
@@ -168,7 +164,15 @@ public class CustomersByNameGlobalTransformer
 	(getUseAlternativeURL() ? getAlternativeURL() : null), 
 	m_InInterceptor, 
 	m_OutInterceptor);
-    m_Customers            = customerService.getCustomersByName(name);
+    List<Customer> customers = customerService.getCustomersByName(name);
+    customer = customers.get(0).getCustomerId() + ": " + customers.get(0).getName() + ", " + Utils.flatten(customers.get(0).getAddress(), " ");
+
+    try {
+      setResponseData(applyTransformer(customer));
+    }
+    catch (Exception e) {
+      throw new IllegalStateException("Failed to apply callable transformer", e);
+    }
     m_ProvidedCustomerName = null;
   }
 
@@ -180,37 +184,5 @@ public class CustomersByNameGlobalTransformer
   @Override
   public Class[] generates() {
     return new Class[]{String.class};
-  }
-  
-  /**
-   * Checks whether there is any response data to be collected.
-   * 
-   * @return		true if data can be collected
-   * @see		#getResponseData()
-   */
-  public boolean hasResponseData() {
-    return (m_Customers != null) && (m_Customers.size() > 0);
-  }
-
-  /**
-   * Returns the response data, if any.
-   * 
-   * @return		the response data
-   */
-  @Override
-  public String getResponseData() {
-    String 	result;
-    
-    result = m_Customers.get(0).getCustomerId() + ": " + m_Customers.get(0).getName() + ", " + Utils.flatten(m_Customers.get(0).getAddress(), " ");
-    m_Customers.remove(0);
-    
-    try {
-      result = applyTransformer(result);
-    }
-    catch (Exception e) {
-      throw new IllegalStateException("Failed to apply global transformer", e);
-    }
-    
-    return result;
   }
 }

@@ -20,15 +20,14 @@
 
 package adams.flow.webservice;
 
-import java.net.URL;
-
-import javax.xml.ws.BindingProvider;
-
+import adams.core.SerializationHelper;
 import nz.ac.waikato.adams.webservice.weka.DownloadClustererResponseObject;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
 import weka.clusterers.Clusterer;
-import adams.core.SerializationHelper;
+
+import javax.xml.ws.BindingProvider;
+import java.net.URL;
 
 /**
  * Client for download a cluster model.
@@ -44,12 +43,6 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
 
   /** download input object */
   protected nz.ac.waikato.adams.webservice.weka.DownloadClusterer m_Download;
-
-  /** classifier returned */
-  protected Clusterer m_ReturnedClusterer;
-  
-  /** response object */
-  protected DownloadClustererResponseObject m_Returned;
 
   /**
    * Returns a string describing the object.
@@ -93,29 +86,6 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   }
 
   /**
-   * Checks whether there is any response data to be collected.
-   * 
-   * @return		true if data can be collected
-   * @see		#getResponseData()
-   */
-  @Override
-  public boolean hasResponseData() {
-    return m_ReturnedClusterer != null;
-  }
-
-  /**
-   * Returns the response data, if any.
-   * 
-   * @return		the response data
-   */
-  @Override
-  public Clusterer getResponseData() {
-    Clusterer result = m_ReturnedClusterer;
-    m_ReturnedClusterer = null;
-    return result;
-  }
-
-  /**
    * Returns the WSDL location.
    * 
    * @return		the location
@@ -148,11 +118,11 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
     
-    m_Returned = wekaService.downloadClusterer(m_Download.getModelName()); 
+    DownloadClustererResponseObject returned = wekaService.downloadClusterer(m_Download.getModelName());
     // failed to download model?
-    if (m_Returned.getErrorMessage() != null)
-      throw new IllegalStateException(m_Returned.getErrorMessage());
-    m_ReturnedClusterer = (Clusterer) SerializationHelper.read(m_Returned.getModelData().getInputStream());
+    if (returned.getErrorMessage() != null)
+      throw new IllegalStateException(returned.getErrorMessage());
+    setResponseData((Clusterer) SerializationHelper.read(returned.getModelData().getInputStream()));
 
     m_Download = null;
   }

@@ -15,17 +15,16 @@
 
 /**
  * TrainClusterer.java
- * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
-
-import java.net.URL;
-
-import javax.xml.ws.BindingProvider;
 
 import nz.ac.waikato.adams.webservice.weka.TrainClustererResponseObject;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
+
+import javax.xml.ws.BindingProvider;
+import java.net.URL;
 
 /**
  * Builds a clusterer model.
@@ -41,9 +40,6 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   
   /** train cluster input */
   protected nz.ac.waikato.adams.webservice.weka.TrainClusterer m_Train;
-  
-  /** response object */
-  protected String m_Returned;
 
   /**
    * Returns a string describing the object.
@@ -86,29 +82,6 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   }
 
   /**
-   * Checks whether there is any response data to be collected.
-   * 
-   * @return		true if data can be collected
-   * @see		#getResponseData()
-   */
-  @Override
-  public boolean hasResponseData() {
-    return m_Returned != null;
-  }
-
-  /**
-   * Returns the response data, if any.
-   * 
-   * @return		the response data
-   */
-  @Override
-  public String getResponseData() {
-    String toReturn = m_Returned;
-    m_Returned = null;
-    return toReturn;
-  }
-
-  /**
    * Returns the WSDL location.
    * 
    * @return		the location
@@ -143,7 +116,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
     // failed to generate data?
     if (response.getErrorMessage() != null)
       throw new IllegalStateException(response.getErrorMessage());
-    m_Returned = response.getModel();
+    setResponseData(response.getModel());
 
     m_Train = null;
   }

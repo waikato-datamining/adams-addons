@@ -7,5 +7,5 @@ adams.flow.control.Flow -annotation "Queries the webservice for \\\"CustomersByN
   adams.flow.control.SubProcess
    adams.flow.transformer.Convert -conversion adams.data.conversion.UpperCase
  adams.flow.source.StringConstants -string Smith -string Jones
- adams.flow.transformer.WSTransformer -client "com.example.customerservice.flow.CustomersByNameGlobalTransformer -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator -transformer SubProcess"
+ adams.flow.transformer.WSTransformer -client "com.example.customerservice.flow.CustomersByNameCallableTransformer -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator -transformer SubProcess"
  adams.flow.sink.Display -writer adams.data.io.output.NullWriter

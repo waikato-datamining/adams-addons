@@ -15,17 +15,16 @@
 
 /**
  * ListClassifiers.java
- * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
-import java.net.URL;
-import java.util.ArrayList;
-
-import javax.xml.ws.BindingProvider;
-
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
+
+import javax.xml.ws.BindingProvider;
+import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * Lists all currently available classifier models.
@@ -38,10 +37,6 @@ extends AbstractWebServiceClientSource<ArrayList<String>>{
 
   /** for serialization*/
   private static final long serialVersionUID = 6494416312486305534L;
-
-  /** returned list of classifiers */
-  protected ArrayList<String> m_Returned;
-  
 
   /**
    * Returns a string describing the object.
@@ -61,29 +56,6 @@ extends AbstractWebServiceClientSource<ArrayList<String>>{
   @Override
   public Class[] generates() {
     return new Class[] {ArrayList.class};
-  }
-
-  /**
-   * Checks whether there is any response data to be collected.
-   * 
-   * @return		true if data can be collected
-   * @see		#getResponseData()
-   */
-  @Override
-  public boolean hasResponseData() {
-    return m_Returned != null;
-  }
-
-  /**
-   * Returns the response data, if any.
-   * 
-   * @return		the response data
-   */
-  @Override
-  public ArrayList<String> getResponseData() {
-    ArrayList<String >toReturn = m_Returned;
-    m_Returned = null;
-    return toReturn; 
   }
 
   /**
@@ -118,6 +90,6 @@ extends AbstractWebServiceClientSource<ArrayList<String>>{
 	null);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
-    m_Returned = (ArrayList<String>)wekaService.listClassifiers();
+    setResponseData((ArrayList<String>)wekaService.listClassifiers());
   }
 }

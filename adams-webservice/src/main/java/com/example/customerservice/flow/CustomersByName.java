@@ -19,18 +19,17 @@
  */
 package com.example.customerservice.flow;
 
-import java.net.URL;
-import java.util.List;
-
 import adams.core.License;
 import adams.core.Utils;
 import adams.core.annotation.MixedCopyright;
 import adams.flow.webservice.AbstractWebServiceClientTransformer;
 import adams.flow.webservice.WebserviceUtils;
-
 import com.example.customerservice.Customer;
 import com.example.customerservice.CustomerService;
 import com.example.customerservice.CustomerServiceService;
+
+import java.net.URL;
+import java.util.List;
 
 /**
  * Simple client for querying customer names.
@@ -55,9 +54,6 @@ public class CustomersByName
   
   /** the provided customer name. */
   protected String m_ProvidedCustomerName;
-  
-  /** the list of customers that were obtained from webservice. */
-  protected List<Customer> m_Customers;
 
   /**
    * Returns a string describing the object.
@@ -156,7 +152,6 @@ public class CustomersByName
     else
       name = m_ProvidedCustomerName;
     
-    m_Customers            = null;
     customerServiceService = new CustomerServiceService(getWsdlLocation());
     customerService        = customerServiceService.getCustomerServicePort();
     WebserviceUtils.configureClient(
@@ -167,7 +162,8 @@ public class CustomersByName
 	(getUseAlternativeURL() ? getAlternativeURL() : null), 
 	m_InInterceptor, 
 	m_OutInterceptor);
-    m_Customers            = customerService.getCustomersByName(name);
+    List<Customer> customers = customerService.getCustomersByName(name);
+    setResponseData(customers.get(0).getCustomerId() + ": " + customers.get(0).getName() + ", " + Utils.flatten(customers.get(0).getAddress(), " "));
     m_ProvidedCustomerName = null;
   }
 
@@ -179,30 +175,5 @@ public class CustomersByName
   @Override
   public Class[] generates() {
     return new Class[]{String.class};
-  }
-  
-  /**
-   * Checks whether there is any response data to be collected.
-   * 
-   * @return		true if data can be collected
-   * @see		#getResponseData()
-   */
-  public boolean hasResponseData() {
-    return (m_Customers != null) && (m_Customers.size() > 0);
-  }
-
-  /**
-   * Returns the response data, if any.
-   * 
-   * @return		the response data
-   */
-  @Override
-  public String getResponseData() {
-    String 	result;
-    
-    result = m_Customers.get(0).getCustomerId() + ": " + m_Customers.get(0).getName() + ", " + Utils.flatten(m_Customers.get(0).getAddress(), " ");
-    m_Customers.remove(0);
-    
-    return result;
   }
 }
