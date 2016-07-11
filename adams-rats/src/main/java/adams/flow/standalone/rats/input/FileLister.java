@@ -619,19 +619,17 @@ public class FileLister
     doWait(m_WaitList);
 
     if (files.size() > 0) {
-      if (m_SkipInUse) {
-	i = 0;
-	while (i < files.size()) {
-	  file = new PlaceholderFile(files.get(i));
-	  if (FileUtils.isOpen(file)) {
-	    if (isLoggingEnabled())
-	      getLogger().fine("File in use: " + files.get(i));
-	    files.remove(i);
-	  }
-	  else {
-	    i++;
-	  }
-	}
+      i = 0;
+      while (i < files.size()) {
+        file = new PlaceholderFile(files.get(i));
+        if (m_SkipInUse && FileUtils.isOpen(file)) {
+          if (isLoggingEnabled())
+            getLogger().fine("File in use: " + files.get(i));
+          files.remove(i);
+        }
+        else {
+          i++;
+        }
       }
 
       if (m_MoveFiles) {
@@ -650,6 +648,9 @@ public class FileLister
 	}
 	if (!errors.isEmpty())
 	  getLogger().warning(errors.toString());
+      }
+      else {
+	m_Files.addAll(files);
       }
     }
 
