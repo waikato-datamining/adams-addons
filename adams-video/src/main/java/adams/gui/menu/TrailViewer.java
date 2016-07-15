@@ -15,7 +15,7 @@
 
 /*
  * TrailViewer.java
- * Copyright (C) 2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2016 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -24,6 +24,7 @@ package adams.gui.menu;
 import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractBasicMenuItemDefinition;
 import adams.gui.application.UserMode;
+import adams.gui.core.GUIHelper;
 
 /**
  * For displaying trails.
@@ -67,7 +68,7 @@ public class TrailViewer
    */
   public void launch() {
     adams.gui.visualization.trail.TrailViewerPanel panel = new adams.gui.visualization.trail.TrailViewerPanel();
-    createChildFrame(panel, 1000, 600);
+    createChildFrame(panel, GUIHelper.getDefaultLargeDialogDimension());
   }
 
   /**

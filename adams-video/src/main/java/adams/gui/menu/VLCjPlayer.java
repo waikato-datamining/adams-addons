@@ -15,7 +15,7 @@
 
 /*
  * vlcjplayer.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -24,6 +24,7 @@ package adams.gui.menu;
 import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractBasicMenuItemDefinition;
 import adams.gui.application.UserMode;
+import adams.gui.core.GUIHelper;
 import adams.gui.visualization.video.vlcjplayer.VLCjDirectRenderPanel;
 
 /**
@@ -68,7 +69,7 @@ public class VLCjPlayer
   public void launch() {
     VLCjDirectRenderPanel panel = new VLCjDirectRenderPanel();
     panel.setTitle(getTitle());
-    createChildFrame(panel, 1000, 600);
+    createChildFrame(panel, GUIHelper.getDefaultLargeDialogDimension());
   }
 
   /**

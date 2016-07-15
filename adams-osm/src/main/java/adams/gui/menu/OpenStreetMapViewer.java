@@ -15,7 +15,7 @@
 
 /*
  * OpenStreetMapViewer.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -24,6 +24,7 @@ package adams.gui.menu;
 import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractBasicMenuItemDefinition;
 import adams.gui.application.UserMode;
+import adams.gui.core.GUIHelper;
 import adams.gui.visualization.osm.OpenStreetMapViewerPanel;
 
 /**
@@ -70,7 +71,7 @@ public class OpenStreetMapViewer
   @Override
   public void launch() {
     OpenStreetMapViewerPanel panel = new OpenStreetMapViewerPanel();
-    createChildFrame(panel, 800, 600);
+    createChildFrame(panel, GUIHelper.getDefaultDialogDimension());
   }
 
   /**

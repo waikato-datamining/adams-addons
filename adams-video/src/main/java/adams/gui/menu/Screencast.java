@@ -24,6 +24,7 @@ package adams.gui.menu;
 import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractBasicMenuItemDefinition;
 import adams.gui.application.UserMode;
+import adams.gui.core.GUIHelper;
 import adams.gui.core.MenuBarProvider;
 
 import javax.swing.JMenuBar;
@@ -92,7 +93,7 @@ public class Screencast
    */
   public void launch() {
     ScreencastPanel panel = new ScreencastPanel();
-    createChildFrame(panel, 600, 400);
+    createChildFrame(panel, GUIHelper.getDefaultSmallDialogDimension());
   }
 
   /**

@@ -15,7 +15,7 @@
 
 /*
  * MekaExplorer.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -25,6 +25,7 @@ import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractBasicMenuItemDefinition;
 import adams.gui.application.ChildFrame;
 import adams.gui.application.UserMode;
+import adams.gui.core.GUIHelper;
 
 /**
  * Opens the MEKA Explorer.
@@ -60,7 +61,7 @@ public class MekaExplorer
   @Override
   public void launch() {
     meka.gui.explorer.Explorer explorer = new meka.gui.explorer.Explorer();
-    ChildFrame frame = createChildFrame(explorer, 800, 600);
+    ChildFrame frame = createChildFrame(explorer, GUIHelper.getDefaultDialogDimension());
     frame.setJMenuBar(explorer.getMenuBar());
   }
 

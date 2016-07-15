@@ -15,7 +15,7 @@
 
 /*
  * Annotator.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -24,6 +24,7 @@ package adams.gui.menu;
 import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractBasicMenuItemDefinition;
 import adams.gui.application.UserMode;
+import adams.gui.core.GUIHelper;
 import adams.gui.visualization.annotator.AnnotatorPanel;
 
 /**
@@ -68,7 +69,7 @@ public class Annotator
   public void launch() {
     AnnotatorPanel panel = new AnnotatorPanel();
     panel.setTitle(getTitle());
-    createChildFrame(panel, 1000, 600);
+    createChildFrame(panel, GUIHelper.getDefaultLargeDialogDimension());
   }
 
   /**
