@@ -124,6 +124,10 @@
           <groupId>nz.ac.waikato.cms.weka</groupId>
           <artifactId>weka-dev</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.pentaho.pentaho-commons</groupId>
+          <artifactId>pentaho-package-manager</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
