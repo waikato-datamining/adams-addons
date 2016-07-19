@@ -116,6 +116,18 @@
     </dependency>
 
     <dependency>
+      <groupId>com.github.fracpete</groupId>
+      <artifactId>snowball-stemmers-weka-package</artifactId>
+      <version>1.0.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>nz.ac.waikato.cms.weka</groupId>
+          <artifactId>weka-dev</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
       <groupId>edu.cmu.cs</groupId>
       <artifactId>ark-tweet-nlp</artifactId>
       <version>0.3.2</version>
