@@ -21,6 +21,10 @@ edu.stanford.nlp.trees.TreebankLanguagePack=\
 adams.flow.transformer.splitter.AbstractDocumentToSentences=\
   adams.flow.transformer.splitter
 
+# the stemmer algorithms
+adams.flow.transformer.stemmer.Stemmer=\
+  adams.flow.transformer.stemmer
+
 # for tokenizing strings
 adams.flow.transformer.tokenizer.AbstractTokenizer=\
   adams.flow.transformer.tokenizer

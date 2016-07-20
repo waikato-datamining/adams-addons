@@ -1,0 +1,15 @@
+# Project: adams
+# Date: 2016-07-20 21:17:53
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Demonstrate how to perform word stemming." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
+ adams.flow.source.StringConstants -string "After nine days of plague, Achilles, the leader of the Myrmidon contingent, calls an assembly to solve the plague problem." -string "Under pressure, Agamemnon agrees to return Chryseis to her father, but also decides to take Achilles\\\'s captive, Briseis, as compensation." -string "Angered, Achilles declares that he and his men will no longer fight for Agamemnon, but will go home." -string "Odysseus takes a ship and brings Chryseis to her father, whereupon Apollo ends the plague."
+ adams.flow.control.Tee -name original
+  adams.flow.sink.CallableSink -callable Display
+ adams.flow.transformer.StringSplit -expression " "
+ adams.flow.transformer.Stemmer -stemmer "adams.flow.transformer.stemmer.WekaStemmer -stemmer weka.core.stemmers.IteratedLovinsStemmer"
+ adams.flow.transformer.StringJoin -glue " "
+ adams.flow.transformer.StringInsert -position first -value "--> "
+ adams.flow.sink.CallableSink -callable Display
