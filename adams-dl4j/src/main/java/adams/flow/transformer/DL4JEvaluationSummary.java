@@ -21,7 +21,7 @@
 package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
+import adams.core.Shortening;
 import adams.core.base.BaseText;
 import adams.flow.container.DL4JEvaluationContainer;
 import adams.flow.core.Token;
@@ -152,7 +152,7 @@ public class DL4JEvaluationSummary
     QuickInfoHelper.add(options, QuickInfoHelper.toString(this, "confusionMatrix", m_ConfusionMatrix, "confusion matrix"));
     result = QuickInfoHelper.flatten(options);
     
-    value = QuickInfoHelper.toString(this, "comment", (m_Comment.stringValue().length() > 0 ? Utils.shorten(m_Comment.stringValue(), 20) : null));
+    value = QuickInfoHelper.toString(this, "comment", (m_Comment.stringValue().length() > 0 ? Shortening.shortenEnd(m_Comment.stringValue(), 20) : null));
     if (value != null) {
       if (result.length() > 0)
 	result += ", ";

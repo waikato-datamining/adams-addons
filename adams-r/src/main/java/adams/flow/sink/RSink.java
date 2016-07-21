@@ -20,6 +20,7 @@
 
 package adams.flow.sink;
 
+import adams.core.Shortening;
 import org.rosuda.REngine.Rserve.RConnection;
 
 import adams.core.Placeholders;
@@ -168,7 +169,7 @@ public class RSink
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "script", Utils.shorten((m_Script.stringValue().length() == 0 ? "-none-" : m_Script.stringValue()), 40), "script: ");
+    return QuickInfoHelper.toString(this, "script", Shortening.shortenEnd((m_Script.stringValue().length() == 0 ? "-none-" : m_Script.stringValue()), 40), "script: ");
   }
 
   /**

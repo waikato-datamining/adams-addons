@@ -20,6 +20,7 @@
 
 package adams.flow.source;
 
+import adams.core.Shortening;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.Rserve.RConnection;
 
@@ -256,7 +257,7 @@ public class RSource
   public String getQuickInfo() {
     String 	result;
 
-    result  = QuickInfoHelper.toString(this, "script", Utils.shorten((m_Script.stringValue().length() == 0 ? "-none-" : m_Script.stringValue()), 40), "script: ");
+    result  = QuickInfoHelper.toString(this, "script", Shortening.shortenEnd((m_Script.stringValue().length() == 0 ? "-none-" : m_Script.stringValue()), 40), "script: ");
     result += QuickInfoHelper.toString(this, "returnType", m_returnType, ", return: ");
 
     return result;

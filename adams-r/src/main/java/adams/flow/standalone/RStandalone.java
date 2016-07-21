@@ -20,13 +20,12 @@
 
 package adams.flow.standalone;
 
-import org.rosuda.REngine.Rserve.RConnection;
-
 import adams.core.Placeholders;
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
+import adams.core.Shortening;
 import adams.core.scripting.RScript;
 import adams.flow.core.ActorUtils;
+import org.rosuda.REngine.Rserve.RConnection;
 
 /**
  <!-- globalinfo-start -->
@@ -150,7 +149,7 @@ public class RStandalone
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "script", Utils.shorten((m_Script.stringValue().length() == 0 ? "-none-" : m_Script.stringValue()), 40), "script: ");
+    return QuickInfoHelper.toString(this, "script", Shortening.shortenEnd((m_Script.stringValue().length() == 0 ? "-none-" : m_Script.stringValue()), 40), "script: ");
   }
 
   /**
