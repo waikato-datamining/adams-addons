@@ -21,6 +21,7 @@ package adams.flow.webservice.interceptor.outgoing;
 
 import adams.core.License;
 import adams.core.annotation.MixedCopyright;
+import adams.core.logging.Logger;
 import adams.core.logging.LoggingHelper;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.Fault;
@@ -34,7 +35,6 @@ import org.apache.cxf.phase.Phase;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Default XML Logging interceptor.

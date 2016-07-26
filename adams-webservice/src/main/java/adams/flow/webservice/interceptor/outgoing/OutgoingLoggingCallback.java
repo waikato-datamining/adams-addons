@@ -19,11 +19,11 @@
  */
 package adams.flow.webservice.interceptor.outgoing;
 
-import java.io.OutputStream;
-import java.util.logging.Logger;
-
+import adams.core.logging.Logger;
 import org.apache.cxf.interceptor.LoggingMessage;
 import org.apache.cxf.message.Message;
+
+import java.io.OutputStream;
 
 /**
  * Callback class for outgoing logging.

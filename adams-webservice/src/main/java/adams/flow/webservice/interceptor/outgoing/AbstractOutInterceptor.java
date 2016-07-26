@@ -19,16 +19,15 @@
  */
 package adams.flow.webservice.interceptor.outgoing;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
-
+import adams.core.logging.Logger;
 import adams.core.logging.LoggingHelper;
 import adams.core.logging.LoggingLevel;
 import adams.core.logging.LoggingLevelHandler;
 import adams.core.logging.LoggingSupporter;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+
+import java.util.logging.Level;
 
 /**
  * Interceptor for outgoing messages.

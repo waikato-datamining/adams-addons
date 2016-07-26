@@ -19,10 +19,9 @@
  */
 package adams.flow.webservice.interceptor.incoming;
 
+import adams.core.logging.Logger;
 import adams.core.logging.LoggingHelper;
 import adams.core.logging.LoggingLevel;
-
-import java.util.logging.Logger;
 
 /**
  * Generator for {@link XMLLoggingInInterceptor}.
@@ -65,7 +64,7 @@ public class XMLLoggingGenerator
    */
   @Override
   protected XMLLoggingInInterceptor doGenerate() {
-    Logger 	logger;
+    Logger logger;
 
     logger = LoggingHelper.getLogger(XMLLoggingInInterceptor.class);
     logger.setLevel(getLoggingLevel().getLevel());

@@ -19,10 +19,9 @@
  */
 package adams.flow.webservice.interceptor.outgoing;
 
+import adams.core.logging.Logger;
 import adams.core.logging.LoggingHelper;
 import adams.core.logging.LoggingLevel;
-
-import java.util.logging.Logger;
 
 /**
  * Generator for {@link XMLLoggingOutInterceptor}.

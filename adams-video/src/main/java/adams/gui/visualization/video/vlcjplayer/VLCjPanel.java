@@ -25,6 +25,7 @@ import adams.core.DateFormat;
 import adams.core.DateUtils;
 import adams.core.Properties;
 import adams.core.Utils;
+import adams.core.logging.Logger;
 import adams.core.logging.LoggingHelper;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.chooser.BaseFileChooser;
@@ -62,7 +63,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 /**
  * A basic video player. Allows a user to open, play, and pause video
