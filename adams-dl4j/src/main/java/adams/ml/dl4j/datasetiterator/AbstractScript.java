@@ -22,7 +22,7 @@ package adams.ml.dl4j.datasetiterator;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.AdditionalOptions;
 import adams.flow.core.AdditionalOptionsHandler;
-import org.deeplearning4j.datasets.iterator.DataSetIterator;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 
 /**
  * Ancestor for dataset iterator scripts.

@@ -25,7 +25,7 @@ import adams.core.base.BaseText;
 import adams.core.io.PlaceholderFile;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.scripting.FileBasedScriptingWithOptions;
-import org.deeplearning4j.datasets.iterator.DataSetIterator;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 
 /**
  * Abstract ancestor for dataset iterators that execute external scripts.

@@ -30,12 +30,93 @@ import org.nd4j.linalg.dataset.DataSet;
 
 /**
  <!-- globalinfo-start -->
+ * Uses a serialized model to perform predictions on the data being passed through.<br>
+ * The model can also be obtained from a callable actor, if the model file is pointing to a directory.
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
+ * Input&#47;output:<br>
+ * - accepts:<br>
+ * &nbsp;&nbsp;&nbsp;org.nd4j.linalg.dataset.DataSet<br>
+ * - generates:<br>
+ * &nbsp;&nbsp;&nbsp;adams.flow.container.DL4JPredictionContainer<br>
+ * <br><br>
+ * Container information:<br>
+ * - adams.flow.container.DL4JPredictionContainer: Dataset, Scores
+ * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-name &lt;java.lang.String&gt; (property: name)
+ * &nbsp;&nbsp;&nbsp;The name of the actor.
+ * &nbsp;&nbsp;&nbsp;default: DL4JScoring
+ * </pre>
+ * 
+ * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
+ * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
+ * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
+ * <pre>-skip &lt;boolean&gt; (property: skip)
+ * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
+ * &nbsp;&nbsp;&nbsp;as it is.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this 
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical 
+ * &nbsp;&nbsp;&nbsp;actors.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing 
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-model &lt;adams.core.io.PlaceholderFile&gt; (property: modelFile)
+ * &nbsp;&nbsp;&nbsp;The model file to load (when not pointing to a directory).
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
+ * </pre>
+ * 
+ * <pre>-model-actor &lt;adams.flow.core.CallableActorReference&gt; (property: modelActor)
+ * &nbsp;&nbsp;&nbsp;The callable actor to use for obtaining the model in case serialized model 
+ * &nbsp;&nbsp;&nbsp;file points to a directory (can be a adams.flow.container.DL4JModelContainer 
+ * &nbsp;&nbsp;&nbsp;as well).
+ * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
+ * <pre>-on-the-fly &lt;boolean&gt; (property: onTheFly)
+ * &nbsp;&nbsp;&nbsp;If set to true, the model file is not required to be present at set up time 
+ * &nbsp;&nbsp;&nbsp;(eg if built on the fly), only at execution time.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-use-model-reset-variable &lt;boolean&gt; (property: useModelResetVariable)
+ * &nbsp;&nbsp;&nbsp;If enabled, chnages to the specified variable are monitored in order to 
+ * &nbsp;&nbsp;&nbsp;reset the model, eg when a storage model changed.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-model-reset-variable &lt;adams.core.VariableName&gt; (property: modelResetVariable)
+ * &nbsp;&nbsp;&nbsp;The variable to monitor for changes in order to reset the model, eg when 
+ * &nbsp;&nbsp;&nbsp;a storage model changed.
+ * &nbsp;&nbsp;&nbsp;default: variable
+ * </pre>
+ * 
+ * <pre>-add-regularization-terms &lt;boolean&gt; (property: addRegularizationTerms)
+ * &nbsp;&nbsp;&nbsp;Whether to add regularization terms.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -127,7 +208,7 @@ public class DL4JScoring
   /**
    * Returns the class of objects that it generates.
    *
-   * @return		<!-- flow-generates-start -->adams.flow.container.PredictionContainer.class, weka.core.Instance.class<!-- flow-generates-end -->
+   * @return		<!-- flow-generates-start -->adams.flow.container.DL4JPredictionContainer.class<!-- flow-generates-end -->
    */
   @Override
   public Class[] generates() {

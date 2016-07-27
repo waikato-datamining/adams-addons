@@ -26,7 +26,7 @@ import adams.ml.dl4j.datasetiterator.DataSetIteratorConfigurator;
 import adams.ml.dl4j.datasetiterator.DataSetIteratorWithScriptedConfiguration;
 import adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorConfigurator;
 import adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorWithScriptedConfiguration;
-import org.deeplearning4j.datasets.iterator.DataSetIterator;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.DataSet;
 
 /**

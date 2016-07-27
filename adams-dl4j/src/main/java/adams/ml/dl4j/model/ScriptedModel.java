@@ -290,6 +290,16 @@ public class ScriptedModel
     getModel().setParams(params);
   }
 
+  @Override
+  public void setParamsViewArray(INDArray indArray) {
+    getModel().setParamsViewArray(indArray);
+  }
+
+  @Override
+  public void setBackpropGradientsViewArray(INDArray indArray) {
+    getModel().setBackpropGradientsViewArray(indArray);
+  }
+
   /**
    * Update learningRate using for this model.
    * Use the learningRateScoreBasedDecay to adapt the score

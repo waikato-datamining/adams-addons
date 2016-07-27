@@ -257,7 +257,7 @@ public class DL4JDatasetInfo
 	break;
 
       case LABELS:
-	m_Queue.addAll(data.getLabelNames());
+	m_Queue.addAll(data.getLabelNamesList());
 	break;
 
       default:

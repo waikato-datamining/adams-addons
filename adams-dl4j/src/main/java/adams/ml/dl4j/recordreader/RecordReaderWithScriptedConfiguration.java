@@ -23,6 +23,7 @@ package adams.ml.dl4j.recordreader;
 import adams.core.scripting.AbstractScriptingHandler;
 import adams.core.scripting.Dummy;
 import org.canova.api.conf.Configuration;
+import org.canova.api.records.listener.RecordListener;
 import org.canova.api.records.reader.RecordReader;
 import org.canova.api.split.InputSplit;
 import org.canova.api.writable.Writable;
@@ -313,6 +314,21 @@ public class RecordReaderWithScriptedConfiguration
   @Override
   public Collection<Writable> record(URI uri, DataInputStream dataInputStream) throws IOException {
     return getRecordReader().record(uri, dataInputStream);
+  }
+
+  @Override
+  public Collection<RecordListener> getListeners() {
+    return getRecordReader().getListeners();
+  }
+
+  @Override
+  public void setListeners(RecordListener... recordListeners) {
+    getRecordReader().setListeners(recordListeners);
+  }
+
+  @Override
+  public void setListeners(Collection<RecordListener> collection) {
+    getRecordReader().setListeners(collection);
   }
 
   /** Set the configuration to be used by this object. */

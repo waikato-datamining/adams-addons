@@ -24,7 +24,7 @@ import adams.ml.dl4j.recordreader.ImageRecordReaderConfigurator;
 import adams.ml.dl4j.recordreader.RecordReaderConfigurator;
 import org.canova.api.io.converters.SelfWritableConverter;
 import org.deeplearning4j.datasets.canova.RecordReaderDataSetIterator;
-import org.deeplearning4j.datasets.iterator.DataSetIterator;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 
 /**
  <!-- globalinfo-start -->
