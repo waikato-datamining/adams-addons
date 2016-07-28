@@ -125,7 +125,7 @@
       <artifactId>nd4j-native</artifactId>
       <version>${nd4j.version}</version>
       <scope>package</scope>
-      <classifier>windows-x86_64</classifier>
+      <classifier>windows-x86_64-openblas</classifier>
     </dependency>
 
     <dependency>
