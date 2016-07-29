@@ -1,12 +1,13 @@
 # Project: adams
-# Date: 2016-07-12 11:16:34
+# Date: 2016-07-29 21:30:43
 # User: fracpete
 # Charset: UTF-8
-adams.flow.control.Flow -annotation "Demonstrates how to distribute data coming in from \\none queue into multiple others. Useful when trying\\nto do simple load-balancing." -flow-execution-listener adams.flow.execution.NullListener
+adams.flow.control.Flow -annotation "Demonstrates how to distribute data coming in from \\none queue into multiple others. Useful when trying\\nto do simple load-balancing.\\nThe actors for each of the actors can be copied from\\na callable actor, using a CopyCallableTransformer,\\nin order to avoid duplicating functionality." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
   adams.flow.sink.Display -name Display1 -width 100 -height 100 -writer adams.data.io.output.NullWriter
   adams.flow.sink.Display -name Display2 -width 100 -height 100 -x -2 -writer adams.data.io.output.NullWriter
   adams.flow.sink.Display -name Display3 -width 100 -height 100 -x -3 -writer adams.data.io.output.NullWriter
+  adams.flow.transformer.MathExpression -expression "X / 10"
  adams.flow.standalone.Standalones -name "init queues"
   adams.flow.standalone.QueueInit -name all -storage-name all
   adams.flow.standalone.QueueInit -name q1 -storage-name q1
@@ -15,8 +16,11 @@ adams.flow.control.Flow -annotation "Demonstrates how to distribute data coming 
  adams.flow.standalone.Rats
   adams.flow.standalone.Rat -name all -receiver "adams.flow.standalone.rats.input.DeQueue -storage-name all" -transmitter "adams.flow.standalone.rats.output.DistributedEnQueue -storage-name q1 -storage-name q2 -storage-name q3"
   adams.flow.standalone.Rat -name q1 -receiver "adams.flow.standalone.rats.input.DeQueue -storage-name q1" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display1"
+   adams.flow.transformer.CopyCallableTransformer -callable MathExpression
   adams.flow.standalone.Rat -name q2 -receiver "adams.flow.standalone.rats.input.DeQueue -storage-name q2" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display2"
+   adams.flow.transformer.CopyCallableTransformer -callable MathExpression
   adams.flow.standalone.Rat -name q3 -receiver "adams.flow.standalone.rats.input.DeQueue -storage-name q3" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display3"
+   adams.flow.transformer.CopyCallableTransformer -callable MathExpression
  adams.flow.source.Start
  adams.flow.control.Trigger -name "feed in data"
   adams.flow.source.ForLoop -upper 100
