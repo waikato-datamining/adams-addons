@@ -42,6 +42,7 @@ import adams.flow.core.ErrorHandler;
 import adams.flow.core.InputConsumer;
 import adams.flow.core.MutableActorHandler;
 import adams.flow.core.QueueHelper;
+import adams.flow.core.RatState;
 import adams.flow.core.Token;
 import adams.flow.standalone.rats.RatRunnable;
 import adams.flow.standalone.rats.input.DummyInput;
@@ -180,6 +181,11 @@ import java.util.HashSet;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
+ * <pre>-initial-state &lt;PAUSED|RUNNING&gt; (property: initialState)
+ * &nbsp;&nbsp;&nbsp;The initial state of the Rat actor.
+ * &nbsp;&nbsp;&nbsp;default: RUNNING
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -227,6 +233,9 @@ public class Rat
 
   /** whether errors a suppressed (only forwarded to log actor). */
   protected boolean m_SuppressErrors;
+
+  /** the initial state. */
+  protected RatState m_InitialState;
 
   /**
    * Returns a string describing the object.
@@ -300,6 +309,10 @@ public class Rat
     m_OptionManager.add(
       "show-in-control", "showInControl",
       false);
+
+    m_OptionManager.add(
+      "initial-state", "initialState",
+      RatState.RUNNING);
   }
 
   /**
@@ -765,6 +778,35 @@ public class Rat
   }
 
   /**
+   * Sets the initial state of the Rat actor.
+   *
+   * @param value	the state
+   */
+  public void setInitialState(RatState value) {
+    m_InitialState = value;
+    reset();
+  }
+
+  /**
+   * Returns the initial state of the Rat actor.
+   *
+   * @return		the state
+   */
+  public RatState getInitialState() {
+    return m_InitialState;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String initialStateTipText() {
+    return "The initial state of the Rat actor.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -1209,7 +1251,20 @@ public class Rat
       // start thread
       m_Runnable = new RatRunnable(this);
       m_Runnable.setLoggingLevel(getLoggingLevel());
-      new Thread(m_Runnable).start();
+      switch (m_InitialState) {
+	case RUNNING:
+	  // don't do anything
+	  break;
+	case PAUSED:
+	  if (isLoggingEnabled())
+	    getLogger().info("Starting rat in paused mode");
+	  m_Runnable.pauseExecution();
+	  break;
+	default:
+	  result = "Unhandled initial rat state: " + m_InitialState;
+      }
+      if (result == null)
+	new Thread(m_Runnable).start();
     }
     catch (Exception e) {
       result = handleException("Failed to execute!", e);

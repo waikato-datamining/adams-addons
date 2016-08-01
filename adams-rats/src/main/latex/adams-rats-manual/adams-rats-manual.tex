@@ -46,7 +46,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2014} &
+		\parbox[c][2cm]{2cm}{\copyright 2014-2016} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}}
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -67,6 +67,10 @@ of flows that handle these kind of scenarios, by providing off-the-shelf
 \textit{receivers} and \textit{transmitters}, e.g., for directory polling
 or FTPing files.
 
+In contrast to regular ADAMS flows, the RATS sub-system is event-driven
+and not data-driven. The received data can then be processed by a data-driven
+flow before sending it somewhere else.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
@@ -81,6 +85,12 @@ The following standalone actors are available:
 	the defined input queues, feeding into the same output queue.
 	\item \textit{LabRat} -- the actual Rat setup gets generated at runtime
 	using a generator.
+\end{itemize}
+The following control actors are available:
+\begin{itemize}
+	\item \textit{ChangeRatState} -- changes the state (eg RUNNING, PAUSED)
+	of a \textit{Rat} actor. This allows the startup of Rat actors in a
+	paused state before activating them later on.
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
