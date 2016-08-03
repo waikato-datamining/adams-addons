@@ -21,6 +21,7 @@ package adams.flow.standalone;
 
 import adams.core.QuickInfoHelper;
 import adams.flow.control.StorageName;
+import adams.flow.core.ActorUtils;
 import adams.flow.core.MutableActorHandler;
 import adams.flow.standalone.rats.input.DeQueue;
 import adams.flow.standalone.rats.input.DummyInput;
@@ -62,8 +63,9 @@ import java.util.List;
  * </pre>
  * 
  * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
- * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this 
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical 
+ * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
@@ -74,79 +76,92 @@ import java.util.List;
  * </pre>
  * 
  * <pre>-actor &lt;adams.flow.core.Actor&gt; [-actor ...] (property: actors)
- * &nbsp;&nbsp;&nbsp;The actors for transforming the data obtained by the receiver before sending
+ * &nbsp;&nbsp;&nbsp;The actors for transforming the data obtained by the receiver before sending 
  * &nbsp;&nbsp;&nbsp;it to the transmitter.
- * &nbsp;&nbsp;&nbsp;default:
+ * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
- *
+ * 
  * <pre>-log &lt;adams.flow.core.CallableActorReference&gt; (property: log)
- * &nbsp;&nbsp;&nbsp;The name of the callable log actor to use (logging disabled if actor not
+ * &nbsp;&nbsp;&nbsp;The name of the callable log actor to use (logging disabled if actor not 
  * &nbsp;&nbsp;&nbsp;found).
  * &nbsp;&nbsp;&nbsp;default: unknown
  * </pre>
- *
+ * 
  * <pre>-scope-handling-variables &lt;EMPTY|COPY|SHARE&gt; (property: scopeHandlingVariables)
- * &nbsp;&nbsp;&nbsp;Defines how variables are handled in the local scope; whether to start with
- * &nbsp;&nbsp;&nbsp;empty set, a copy of the outer scope variables or share variables with the
+ * &nbsp;&nbsp;&nbsp;Defines how variables are handled in the local scope; whether to start with 
+ * &nbsp;&nbsp;&nbsp;empty set, a copy of the outer scope variables or share variables with the 
  * &nbsp;&nbsp;&nbsp;outer scope.
  * &nbsp;&nbsp;&nbsp;default: EMPTY
  * </pre>
- *
+ * 
  * <pre>-propagate-variables &lt;boolean&gt; (property: propagateVariables)
- * &nbsp;&nbsp;&nbsp;If enabled, variables that match the specified regular expression get propagated
+ * &nbsp;&nbsp;&nbsp;If enabled, variables that match the specified regular expression get propagated 
  * &nbsp;&nbsp;&nbsp;to the outer scope.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- *
+ * 
  * <pre>-variables-regexp &lt;adams.core.base.BaseRegExp&gt; (property: variablesRegExp)
  * &nbsp;&nbsp;&nbsp;The regular expression that variable names must match in order to get propagated.
  * &nbsp;&nbsp;&nbsp;default: .*
  * </pre>
- *
+ * 
  * <pre>-scope-handling-storage &lt;EMPTY|COPY|SHARE&gt; (property: scopeHandlingStorage)
- * &nbsp;&nbsp;&nbsp;Defines how storage is handled in the local scope; whether to start with
- * &nbsp;&nbsp;&nbsp;empty set, a (deep) copy of the outer scope storage or share the storage
+ * &nbsp;&nbsp;&nbsp;Defines how storage is handled in the local scope; whether to start with 
+ * &nbsp;&nbsp;&nbsp;empty set, a (deep) copy of the outer scope storage or share the storage 
  * &nbsp;&nbsp;&nbsp;with the outer scope.
  * &nbsp;&nbsp;&nbsp;default: EMPTY
  * </pre>
- *
+ * 
  * <pre>-propagate-storage &lt;boolean&gt; (property: propagateStorage)
- * &nbsp;&nbsp;&nbsp;If enabled, storage items which names match the specified regular expression
+ * &nbsp;&nbsp;&nbsp;If enabled, storage items which names match the specified regular expression 
  * &nbsp;&nbsp;&nbsp;get propagated to the outer scope.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- *
+ * 
  * <pre>-storage-regexp &lt;adams.core.base.BaseRegExp&gt; (property: storageRegExp)
- * &nbsp;&nbsp;&nbsp;The regular expression that the names of storage items must match in order
+ * &nbsp;&nbsp;&nbsp;The regular expression that the names of storage items must match in order 
  * &nbsp;&nbsp;&nbsp;to get propagated.
  * &nbsp;&nbsp;&nbsp;default: .*
  * </pre>
- *
+ * 
  * <pre>-flow-error-queue &lt;adams.flow.control.StorageName&gt; (property: flowErrorQueue)
- * &nbsp;&nbsp;&nbsp;The name of the (optional) queue in internal storage to feed with flow errors.
+ * &nbsp;&nbsp;&nbsp;The name of the (optional) queue in internal storage to feed with flow errors;
+ * &nbsp;&nbsp;&nbsp; Forwards the original data received as payload in an adams.flow.container.ErrorContainer 
+ * &nbsp;&nbsp;&nbsp;alongside the error message.
  * &nbsp;&nbsp;&nbsp;default: flowerrors
  * </pre>
- *
+ * 
  * <pre>-send-error-queue &lt;adams.flow.control.StorageName&gt; (property: sendErrorQueue)
- * &nbsp;&nbsp;&nbsp;The name of the (optional) queue in internal storage to feed with send errors.
+ * &nbsp;&nbsp;&nbsp;The name of the (optional) queue in internal storage to feed with send errors;
+ * &nbsp;&nbsp;&nbsp; Forwards the original data received as payload in an adams.flow.container.ErrorContainer 
+ * &nbsp;&nbsp;&nbsp;alongside the error message.
  * &nbsp;&nbsp;&nbsp;default: senderrors
  * </pre>
- *
+ * 
+ * <pre>-suppress-errors &lt;boolean&gt; (property: suppressErrors)
+ * &nbsp;&nbsp;&nbsp;If enabled, errors are suppressed and only forwarded to the log actor.
+ * &nbsp;&nbsp;&nbsp;default: true
+ * </pre>
+ * 
  * <pre>-show-in-control &lt;boolean&gt; (property: showInControl)
- * &nbsp;&nbsp;&nbsp;If enabled, this Rat will be displayed in the adams.flow.standalone.RatControl
+ * &nbsp;&nbsp;&nbsp;If enabled, this Rat will be displayed in the adams.flow.standalone.RatControl 
  * &nbsp;&nbsp;&nbsp;control panel.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- *
- * <pre>-wait-poll &lt;int&gt; (property: waitPoll)
- * &nbsp;&nbsp;&nbsp;The number of milli-seconds to wait before polling again.
- * &nbsp;&nbsp;&nbsp;default: 100
- * &nbsp;&nbsp;&nbsp;minimum: 0
+ * 
+ * <pre>-initial-state &lt;PAUSED|RUNNING&gt; (property: initialState)
+ * &nbsp;&nbsp;&nbsp;The initial state of the Rat actor.
+ * &nbsp;&nbsp;&nbsp;default: RUNNING
  * </pre>
  * 
  * <pre>-input &lt;adams.flow.control.StorageName&gt; [-input ...] (property: input)
  * &nbsp;&nbsp;&nbsp;The names of the input queues in the internal storage.
  * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
+ * <pre>-has-output &lt;boolean&gt; (property: hasOutput)
+ * &nbsp;&nbsp;&nbsp;If enabled, an output queue is configured.
+ * &nbsp;&nbsp;&nbsp;default: true
  * </pre>
  * 
  * <pre>-output &lt;adams.flow.control.StorageName&gt; (property: output)
@@ -167,6 +182,9 @@ public class RatPlague
 
   /** the names of the input queues in the internal storage. */
   protected StorageName[] m_Input;
+
+  /** whether to use an output queue. */
+  protected boolean m_HasOutput;
 
   /** the name of the output queue in the internal storage. */
   protected StorageName m_Output;
@@ -195,12 +213,16 @@ public class RatPlague
     m_OptionManager.removeByProperty("transmitter");
 
     m_OptionManager.add(
-	    "input", "input",
-	    new StorageName[0]);
+      "input", "input",
+      new StorageName[0]);
 
     m_OptionManager.add(
-	    "output", "output",
-	    new StorageName("queue"));
+      "has-output", "hasOutput",
+      true);
+
+    m_OptionManager.add(
+      "output", "output",
+      new StorageName("queue"));
   }
 
   /**
@@ -246,6 +268,35 @@ public class RatPlague
   }
 
   /**
+   * Sets whether an output queue should be used.
+   *
+   * @param value	true if to use output queue
+   */
+  public void setHasOutput(boolean value) {
+    m_HasOutput = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to use an output queue.
+   *
+   * @return		true if to use output queue
+   */
+  public boolean getHasOutput() {
+    return m_HasOutput;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String hasOutputTipText() {
+    return "If enabled, an output queue is configured.";
+  }
+
+  /**
    * Sets the name for the output queues in the internal storage.
    *
    * @param value	the name
@@ -284,7 +335,7 @@ public class RatPlague
     String	result;
 
     result  = QuickInfoHelper.toString(this, "input", m_Input, "input: ");
-    result += QuickInfoHelper.toString(this, "output", m_Output, ", output: ");
+    result += QuickInfoHelper.toString(this, "output", (m_HasOutput ? m_Output : "-none-"), ", output: ");
 
     return result;
   }
@@ -298,7 +349,7 @@ public class RatPlague
   protected String setUpRats(boolean execute) {
     String		result;
     Rat			rat;
-    List<Rat> rats;
+    List<Rat> 		rats;
     int			i;
     int			index;
     int			n;
@@ -317,9 +368,14 @@ public class RatPlague
       dequeue = new DeQueue();
       dequeue.setStorageName(m_Input[i]);
       rat.setReceiver(dequeue);
-      enqueue = new EnQueue();
-      enqueue.setStorageName(m_Output);
-      rat.setTransmitter(enqueue);
+      if (m_HasOutput) {
+	enqueue = new EnQueue();
+	enqueue.setStorageName(m_Output);
+	rat.setTransmitter(enqueue);
+      }
+      else {
+	rat.setTransmitter(new DummyOutput());
+      }
       rat.setLog(getLog());
       rat.setScopeHandlingVariables(getScopeHandlingVariables());
       rat.setPropagateVariables(getPropagateVariables());
@@ -340,8 +396,15 @@ public class RatPlague
       else
         parent.add(index + i, rat);
       rats.add(rat);
+      result = rat.setUp();
+      if (getErrorHandler() != this)
+        ActorUtils.updateErrorHandler(rat, getErrorHandler(), isLoggingEnabled());
+      // make sure we've got the current state of the variables
+      if (result == null)
+        rat.getOptionManager().updateVariableValues(true);
+      else
+        break;
     }
-    result = parent.setUp();
     setParent(null);
     cleanUp();
 
