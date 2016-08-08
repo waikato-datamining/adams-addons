@@ -27,6 +27,7 @@ import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.CallableActorUser;
 import adams.flow.core.InputConsumer;
+import adams.flow.core.OptionalCallableActor;
 import adams.flow.core.Token;
 import adams.flow.core.Unknown;
 
@@ -62,7 +63,7 @@ import java.util.HashSet;
  */
 public class CallableActor
   extends AbstractRatOutput
-  implements CallableActorUser {
+  implements CallableActorUser, OptionalCallableActor {
 
   /** for serialization. */
   private static final long serialVersionUID = 5871927859523743161L;
