@@ -28,6 +28,8 @@ import adams.core.io.DirectoryLister.Sorting;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
+import adams.core.io.fileuse.AbstractFileUseCheck;
+import adams.core.io.fileuse.Default;
 import adams.core.logging.LoggingLevel;
 
 import java.io.File;
@@ -93,6 +95,11 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
+ * <pre>-check &lt;adams.core.io.fileuse.AbstractFileUseCheck&gt; (property: check)
+ * &nbsp;&nbsp;&nbsp;If scheme to use checking the 'in use' state of a file.
+ * &nbsp;&nbsp;&nbsp;default: adams.core.io.fileuse.Default
+ * </pre>
+ * 
  * <pre>-atomic-move &lt;boolean&gt; (property: atomicMove)
  * &nbsp;&nbsp;&nbsp;If true, then an atomic move operation will be attempted (NB: not supported 
  * &nbsp;&nbsp;&nbsp;by all operating systems).
@@ -130,6 +137,9 @@ public class FileLister
 
   /** whether to skip 'in-use' files. */
   protected boolean m_SkipInUse;
+
+  /** the 'in use' check scheme. */
+  protected AbstractFileUseCheck m_Check;
 
   /** whether to perform an atomic move. */
   protected boolean m_AtomicMove;
@@ -191,6 +201,10 @@ public class FileLister
     m_OptionManager.add(
       "skip-in-use", "skipInUse",
       false);
+
+    m_OptionManager.add(
+      "check", "check",
+      new Default());
 
     m_OptionManager.add(
       "atomic-move", "atomicMove",
@@ -470,6 +484,35 @@ public class FileLister
   }
 
   /**
+   * Sets the file 'in use' check scheme.
+   *
+   * @param value	the check scheme
+   */
+  public void setCheck(AbstractFileUseCheck value) {
+    m_Check = value;
+    reset();
+  }
+
+  /**
+   * Returns the file 'in use' check scheme.
+   *
+   * @return 		the check scheme
+   */
+  public AbstractFileUseCheck getCheck() {
+    return m_Check;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String checkTipText() {
+    return "If scheme to use checking the 'in use' state of a file.";
+  }
+
+  /**
    * Sets whether to attempt atomic move operation.
    *
    * @param value	if true then attempt atomic move operation
@@ -622,7 +665,7 @@ public class FileLister
       i = 0;
       while (i < files.size()) {
         file = new PlaceholderFile(files.get(i));
-        if (m_SkipInUse && FileUtils.isOpen(file)) {
+        if (m_SkipInUse && m_Check.isInUse(file)) {
           if (isLoggingEnabled())
             getLogger().fine("File in use: " + files.get(i));
           files.remove(i);
