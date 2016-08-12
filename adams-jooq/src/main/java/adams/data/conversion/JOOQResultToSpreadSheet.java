@@ -24,6 +24,8 @@ import adams.data.spreadsheet.DataRow;
 import adams.data.spreadsheet.DataRowTypeHandler;
 import adams.data.spreadsheet.DenseDataRow;
 import adams.data.spreadsheet.SpreadSheet;
+import adams.data.spreadsheet.sql.AbstractTypeMapper;
+import adams.data.spreadsheet.sql.DefaultTypeMapper;
 import adams.data.spreadsheet.sql.Reader;
 import org.jooq.Result;
 
@@ -63,6 +65,9 @@ public class JOOQResultToSpreadSheet
   /** for serialization. */
   private static final long serialVersionUID = -1978448247862661404L;
 
+  /** the type mapper to use. */
+  protected AbstractTypeMapper m_TypeMapper;
+
   /** the data row type to use. */
   protected DataRow m_DataRowType;
 
@@ -87,6 +92,10 @@ public class JOOQResultToSpreadSheet
     super.defineOptions();
 
     m_OptionManager.add(
+      "type-mapper", "typeMapper",
+      new DefaultTypeMapper());
+
+    m_OptionManager.add(
       "data-row-type", "dataRowType",
       new DenseDataRow());
   }
@@ -99,6 +108,35 @@ public class JOOQResultToSpreadSheet
   @Override
   public String getQuickInfo() {
     return QuickInfoHelper.toString(this, "dataRowType", m_DataRowType, "row type: ");
+  }
+
+  /**
+   * Sets the type mapper to use.
+   *
+   * @param value	the mapper
+   */
+  public void setTypeMapper(AbstractTypeMapper value) {
+    m_TypeMapper = value;
+    reset();
+  }
+
+  /**
+   * Returns the type mapper in use.
+   *
+   * @return		the mapper
+   */
+  public AbstractTypeMapper  getTypeMapper() {
+    return m_TypeMapper;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String typeMapperTipText() {
+    return "The type mapper to use for mapping spreadsheet and SQL types.";
   }
 
   /**
@@ -164,7 +202,7 @@ public class JOOQResultToSpreadSheet
     
     jooq     = (Result) m_Input;
     rs       = jooq.intoResultSet();
-    m_Reader = new Reader(m_DataRowType.getClass());
+    m_Reader = new Reader(m_TypeMapper, m_DataRowType.getClass());
     result   = m_Reader.read(rs);
     m_Reader = null;
     
