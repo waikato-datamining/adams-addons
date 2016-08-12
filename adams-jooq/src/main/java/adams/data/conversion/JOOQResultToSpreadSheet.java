@@ -24,7 +24,7 @@ import adams.data.spreadsheet.DataRow;
 import adams.data.spreadsheet.DataRowTypeHandler;
 import adams.data.spreadsheet.DenseDataRow;
 import adams.data.spreadsheet.SpreadSheet;
-import adams.data.spreadsheet.SqlUtils.Reader;
+import adams.data.spreadsheet.sql.Reader;
 import org.jooq.Result;
 
 import java.sql.ResultSet;
