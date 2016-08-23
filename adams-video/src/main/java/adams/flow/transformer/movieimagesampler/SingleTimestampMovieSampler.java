@@ -14,7 +14,7 @@
  */
 
 /**
- * TimestampMovieSampler.java
+ * SingleTimestampMovieSampler.java
  * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
  */
 
@@ -38,25 +38,26 @@ import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
- * Takes a list of timestamps in BaseTimeMSec format and returns an array containing the frames closest
- * to those timestamps
+ * TODO: what class does.
  *
- * @author steven
+ * @author sjb90
  * @version $Revision$
  */
-public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSampler {
+public class SingleTimestampMovieSampler extends AbstractBufferedImageMovieImageSampler {
 
   /**
    * List of time stamps to sample
    */
-  protected long[] m_TimeStampsLong;
+  protected long m_TimeStampLong;
 
   /** the timestamps to grab. */
-  protected BaseTimeMsec[] m_Timestamps;
+  protected BaseTimeMsec m_Timestamp;
 
   /**
    * headless media player
@@ -87,19 +88,21 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
 
   protected long m_TimeOffset;
 
+  protected File m_File;
+
   @Override
   protected void reset() {
     super.reset();
 
-    m_TimeStampsLong = null;
+    m_TimeStampLong = -1;
   }
 
   /**
    * Sets the timestamps to sample
-   * @param timeStamps
+   * @param timeStamp
    */
-  public void setTimeStamps(BaseTimeMsec[] timeStamps) {
-    m_Timestamps = timeStamps;
+  public void setTimeStamp(BaseTimeMsec timeStamp) {
+    m_Timestamp = timeStamp;
     reset();
   }
 
@@ -108,38 +111,35 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
    *
    * @return		the timestamps
    */
-  public BaseTimeMsec[] getTimeStamps() {
-    return m_Timestamps;
+  public BaseTimeMsec getTimeStamp() {
+    return m_Timestamp;
   }
 
-  public void setTimeStampsAsLong(long[] timeStamps) {
-    m_TimeStampsLong = timeStamps;
+  public void setTimeStampAsLong(long timeStamps) {
+    m_TimeStampLong = timeStamps;
   }
 
-  public long[] getTimeStampsAsLong() {
-    if (m_TimeStampsLong == null) {
+  public long getTimeStampAsLong() {
       m_TimeOffset = new BaseTimeMsec(BaseTimeMsec.INF_PAST_DATE).dateValue().getTime();
       Calendar calendar = Calendar.getInstance();
-      long hours = 0;
-      long minutes = 0;
-      long seconds = 0;
-      long mseconds = 0;
-      m_TimeStampsLong = new long[m_Timestamps.length];
-      for (int i = 0; i < m_Timestamps.length; i++) {
-	calendar.setTime(m_Timestamps[i].dateValue());
+      long hours;
+      long minutes;
+      long seconds;
+      long mseconds;
+
+	calendar.setTime(m_Timestamp.dateValue());
 	hours = calendar.get(Calendar.HOUR_OF_DAY);
 	minutes = calendar.get(Calendar.MINUTE);
 	seconds = calendar.get(Calendar.SECOND);
 	mseconds = calendar.get(Calendar.MILLISECOND);
 
 	//Convert everything to miliseconds and add it to the long array
-	m_TimeStampsLong[i] += hours * 3600000;
-	m_TimeStampsLong[i] += minutes * 60000;
-	m_TimeStampsLong[i] += seconds * 1000;
-	m_TimeStampsLong[i] += mseconds;
-      }
-    }
-    return m_TimeStampsLong;
+	m_TimeStampLong += hours * 3600000;
+	m_TimeStampLong += minutes * 60000;
+	m_TimeStampLong += seconds * 1000;
+	m_TimeStampLong += mseconds;
+
+    return m_TimeStampLong;
   }
 
   /**
@@ -148,8 +148,8 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
    * @return tip text for this property suitable for
    * displaying in the GUI or for listing the options.
    */
-  public String timeStampsTipText() {
-    return "The timestamps to capture images at.";
+  public String timeStampTipText() {
+    return "The timestamp to capture the image at.";
   }
 
   /**
@@ -170,7 +170,7 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
     super.defineOptions();
 
     m_OptionManager.add(
-      "timestamp", "timeStamps",
+      "timestamp", "timeStamp",
       new BaseTimeMsec[0]);
   }
 
@@ -194,14 +194,19 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
    */
   @Override
   protected BufferedImageContainer[] doSample(File file) {
-    long[] timestamps = getTimeStampsAsLong();
-    m_VideoDimension = VideoUtilities.getVideoDimensions(file.getAbsolutePath());
-    m_Image = new BufferedImage((int) m_VideoDimension.getWidth(), (int) m_VideoDimension.getHeight(),
-      BufferedImage.TYPE_INT_RGB);
-    m_Factory = new MediaPlayerFactory();
-    BufferFormatCallback bufferFormatCallback = (i, i1) -> new RV32BufferFormat((int) m_VideoDimension.getWidth(),
-      (int) m_VideoDimension.getHeight());
-    m_MediaPlayer = m_Factory.newDirectMediaPlayer(bufferFormatCallback, new SnapshotRenderCallback());
+    long timestamp = getTimeStampAsLong();
+    boolean first = false;
+    if(m_File == null) {
+      m_File = file;
+      m_VideoDimension = VideoUtilities.getVideoDimensions(file.getAbsolutePath());
+      m_Image = new BufferedImage((int) m_VideoDimension.getWidth(), (int) m_VideoDimension.getHeight(),
+        BufferedImage.TYPE_INT_RGB);
+      m_Factory = new MediaPlayerFactory();
+      BufferFormatCallback bufferFormatCallback = (i, i1) -> new RV32BufferFormat((int) m_VideoDimension.getWidth(),
+        (int) m_VideoDimension.getHeight());
+      m_MediaPlayer = m_Factory.newDirectMediaPlayer(bufferFormatCallback, new SnapshotRenderCallback());
+      first = true;
+    }
     m_Samples = new ArrayList<>();
 
     // Uses the vlcj conditions to make sure the steps happen in sequence. the onBefore method ensures that
@@ -210,16 +215,18 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
       Condition<?> playingCondition = new PlayingCondition(m_MediaPlayer) {
 	@Override
 	protected boolean onBefore() {
-	  return m_MediaPlayer.startMedia(file.getAbsolutePath());
+          if(!m_MediaPlayer.isPlayable())
+	    return m_MediaPlayer.startMedia(file.getAbsolutePath());
+          m_MediaPlayer.play();
+          return true;
 	}
       };
 
       playingCondition.await();
-      for (int i = 0; i < timestamps.length; i++) {
-        System.out.println("Ding " + timestamps[i]);
-	m_TargetTime = timestamps[i];
+	System.out.println("Ding " + timestamp);
+	m_TargetTime = timestamp;
 	if (m_TargetTime > m_MediaPlayer.getLength())
-	  break;
+	  return null;
 	Condition<?> timeReachedCondition = new TimeReachedCondition(m_MediaPlayer, m_TargetTime) {
 	  @Override
 	  protected boolean onBefore() {
@@ -240,24 +247,27 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
 	pausedCondition.await();
 
 
-	playingCondition = new PlayingCondition(m_MediaPlayer) {
-	  @Override
-	  protected boolean onBefore() {
-	    m_MediaPlayer.play();
-	    return true;
-	  }
-	};
-	playingCondition.await();
-      }
+//	playingCondition = new PlayingCondition(m_MediaPlayer) {
+//	  @Override
+//	  protected boolean onBefore() {
+//	    m_MediaPlayer.play();
+//	    return true;
+//	  }
+//	};
+//	playingCondition.await();
     } catch (Exception e) {
       System.out.println(e.getMessage());
     }
 
+    return m_Samples.toArray(new BufferedImageContainer[m_Samples.size()]);
+  }
+
+  public void cleanUp() {
     // make sure to clean up the media player and factory
     m_MediaPlayer.release();
     m_Factory.release();
-    return m_Samples.toArray(new BufferedImageContainer[m_Samples.size()]);
   }
+
 
   /**
    * Internal RenderCallback class. Needed for the direct render media player
@@ -282,8 +292,12 @@ public class TimestampMovieSampler extends AbstractBufferedImageMovieImageSample
       if (ts.equals(BaseTimeMsec.INF_PAST))
 	ts = BaseTimeMsec.INF_PAST_DATE;
       m_CurrentImage.getReport().setValue(new Field("Timestamp", DataType.STRING), ts);
-      if (currentTime == m_TargetTime)
-	m_Samples.add(m_CurrentImage);
+      if (currentTime == m_TargetTime) {
+        m_Samples.add(m_CurrentImage);
+        System.out.println("CurrentTime: " + currentTime + " Target Time: " + m_TargetTime);
+      }
+      else
+        System.out.println("CurrentTime: " + currentTime + " Target Time: " + m_TargetTime);
 //      else if (currentTime > m_TargetTime)
 //	m_Samples.add(m_PreviousImage);
 //      m_PreviousImage = m_CurrentImage;
