@@ -366,6 +366,8 @@ public class TwitterHelper {
       text    = text.substring(pos + 1, text.length());
       for (i = 0; i < text.length(); i++) {
 	chr = text.charAt(i);
+        if (Character.isLetterOrDigit(chr))
+          current += chr;
 	if (!Character.isLetterOrDigit(chr) || (i == text.length() - 1)) {
 	  if (!current.isEmpty()) {
 	    entity = new SimulatedHashtagEntity();
@@ -378,9 +380,6 @@ public class TwitterHelper {
 	  text    = text.substring(i + 1, text.length());
 	  current = "";
 	  break;
-	}
-	else {
-	  current += chr;
 	}
       }
     }
