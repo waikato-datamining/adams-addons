@@ -257,7 +257,7 @@ public class FileLister
    * @return		the incoming directory.
    */
   public PlaceholderDirectory getSource() {
-    return m_Lister.getWatchDir();
+    return new PlaceholderDirectory(m_Lister.getWatchDir());
   }
 
   /**
