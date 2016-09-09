@@ -23,8 +23,8 @@ import adams.core.AtomicMoveSupporter;
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.core.base.BaseRegExp;
-import adams.core.io.DirectoryLister;
-import adams.core.io.DirectoryLister.Sorting;
+import adams.core.io.lister.LocalDirectoryLister;
+import adams.core.io.lister.Sorting;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
@@ -124,7 +124,7 @@ public class FileLister
   private static final long serialVersionUID = 4089376907540465883L;
 
   /** the lister for listing the files. */
-  protected DirectoryLister m_Lister;
+  protected LocalDirectoryLister m_Lister;
   
   /** the located files. */
   protected List<String> m_Files;
@@ -222,7 +222,7 @@ public class FileLister
   protected void initialize() {
     super.initialize();
     
-    m_Lister = new DirectoryLister();
+    m_Lister = new LocalDirectoryLister();
     m_Lister.setListDirs(false);
     m_Lister.setListFiles(true);
     m_Lister.setRecursive(false);
