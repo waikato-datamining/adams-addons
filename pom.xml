@@ -33,9 +33,6 @@
   </properties>
 
   <modules>
-    <!-- all modules -->
-    <module>adams-addons-all</module>
-    <!-- individual modules -->
     <module>adams-dl4j</module>
     <module>adams-gnuplot</module>
     <module>adams-heatmap</module>
