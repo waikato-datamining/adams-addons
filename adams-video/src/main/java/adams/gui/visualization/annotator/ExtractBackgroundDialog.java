@@ -27,9 +27,11 @@ import adams.data.image.multiimageoperation.Median;
 import adams.flow.transformer.movieimagesampler.AbstractBufferedImageMovieImageSampler;
 import adams.flow.transformer.movieimagesampler.AbstractMovieImageSampler;
 import adams.flow.transformer.movieimagesampler.FixedIntervalBufferedImageSampler;
+import adams.gui.core.MouseUtils;
 import adams.gui.core.ParameterPanel;
 import adams.gui.dialog.ApprovalDialog;
 import adams.gui.goe.GenericObjectEditorPanel;
+import adams.gui.tools.SpreadSheetViewerPanel;
 import adams.gui.visualization.image.ImagePanel;
 
 import javax.swing.*;
@@ -224,7 +226,7 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
     worker = new SwingWorker() {
       @Override
       protected Object doInBackground() throws Exception {
-	setCursor(new Cursor(Cursor.WAIT_CURSOR));
+	MouseUtils.setWaitCursor(ExtractBackgroundDialog.this);
 	BufferedImageContainer[] imageContainers = m_ImageSampler.sample(m_CurrentFile);
 	BufferedImageContainer bufferedImageContainer = m_ImageOperation.process(imageContainers)[0];
 	m_Background = bufferedImageContainer.getImage();
@@ -236,7 +238,7 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
       @Override
       protected void done() {
 	super.done();
-	setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        MouseUtils.setDefaultCursor(ExtractBackgroundDialog.this);
 	updateButtons();
       }
     };
