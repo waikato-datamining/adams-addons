@@ -247,7 +247,7 @@ public class FileLister
    * @param value	the incoming directory
    */
   public void setSource(PlaceholderDirectory value) {
-    m_Lister.setWatchDir(value);
+    m_Lister.setWatchDir(value.getAbsolutePath());
     reset();
   }
 
