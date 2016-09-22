@@ -135,7 +135,7 @@ public class MaxQueueSize
   protected String doEnqueue(StorageQueueHandler handler, Object input) {
     String	result;
 
-    if (m_Limit < 1) {
+    if ((m_Limit < 1) || (handler.size() < m_Limit)) {
       handler.add(input);
       return null;
     }
