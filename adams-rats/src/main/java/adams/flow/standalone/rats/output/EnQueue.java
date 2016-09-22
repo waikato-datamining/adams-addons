@@ -15,7 +15,7 @@
 
 /**
  * EnQueue.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
 
@@ -24,6 +24,8 @@ import adams.flow.control.StorageName;
 import adams.flow.control.StorageQueueHandler;
 import adams.flow.control.StorageUpdater;
 import adams.flow.core.Unknown;
+import adams.flow.standalone.rats.output.enqueue.AbstractEnqueueGuard;
+import adams.flow.standalone.rats.output.enqueue.PassThrough;
 
 /**
  <!-- globalinfo-start -->
@@ -42,6 +44,11 @@ import adams.flow.core.Unknown;
  * &nbsp;&nbsp;&nbsp;default: queue
  * </pre>
  * 
+ * <pre>-guard &lt;adams.flow.standalone.rats.output.enqueue.AbstractEnqueueGuard&gt; (property: guard)
+ * &nbsp;&nbsp;&nbsp;The guard for enqueuing the data.
+ * &nbsp;&nbsp;&nbsp;default: adams.flow.standalone.rats.output.enqueue.PassThrough
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -56,6 +63,9 @@ public class EnQueue
   
   /** the name of the queue in the internal storage. */
   protected StorageName m_StorageName;
+
+  /** the guard for enqueuing the data. */
+  protected AbstractEnqueueGuard m_Guard;
 
   /**
    * Returns a string describing the object.
@@ -75,8 +85,12 @@ public class EnQueue
     super.defineOptions();
 
     m_OptionManager.add(
-	    "storage-name", "storageName",
-	    new StorageName("queue"));
+      "storage-name", "storageName",
+      new StorageName("queue"));
+
+    m_OptionManager.add(
+      "guard", "guard",
+      new PassThrough());
   }
 
   /**
@@ -106,6 +120,35 @@ public class EnQueue
    */
   public String storageNameTipText() {
     return "The name of the queue in the internal storage.";
+  }
+
+  /**
+   * Sets the guard for enqueuing the data.
+   *
+   * @param value	the guard
+   */
+  public void setGuard(AbstractEnqueueGuard value) {
+    m_Guard = value;
+    reset();
+  }
+
+  /**
+   * Returns the guard for enqueuing the data.
+   *
+   * @return		the guard
+   */
+  public AbstractEnqueueGuard getGuard() {
+    return m_Guard;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String guardTipText() {
+    return "The guard for enqueuing the data.";
   }
 
   /**
@@ -152,8 +195,17 @@ public class EnQueue
     if (queue == null)
       result = "Queue not available: " + m_StorageName;
     else
-      queue.add(m_Input);
-    
+      m_Guard.enqueue(queue, m_Input);
+
     return result;
+  }
+
+  /**
+   * Stops the execution.
+   */
+  @Override
+  public void stopExecution() {
+    m_Guard.stopExecution();
+    super.stopExecution();
   }
 }

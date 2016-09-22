@@ -15,6 +15,10 @@ adams.flow.standalone.rats.input.RatInput=\
 adams.flow.standalone.rats.output.RatOutput=\
   adams.flow.standalone.rats.output
 
+# the guards for enqueuing data
+adams.flow.standalone.rats.output.enqueue.AbstractEnqueueGuard=\
+  adams.flow.standalone.rats.output.enqueue
+
 # rat generators
 adams.flow.standalone.rats.generator.AbstractRatGenerator=\
   adams.flow.standalone.rats.generator
