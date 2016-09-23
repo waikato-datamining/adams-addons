@@ -15,22 +15,23 @@
 
 /**
  * TwitterSetupPanel.java
- * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.application;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import adams.core.Constants;
+import adams.core.Properties;
+import adams.core.io.FileUtils;
+import adams.core.net.TwitterHelper;
+import adams.env.Environment;
+import adams.env.TwitterDefinition;
+import adams.gui.core.ParameterPanel;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-
-import adams.core.Constants;
-import adams.core.Properties;
-import adams.core.net.TwitterHelper;
-import adams.gui.core.ParameterPanel;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
 
 /**
  * Panel for configuring the system-wide twitter settings.
@@ -88,13 +89,11 @@ public class TwitterSetupPanel
 
     m_CheckBoxShowConsumerSecret = new JCheckBox();
     m_CheckBoxShowConsumerSecret.setSelected(false);
-    m_CheckBoxShowConsumerSecret.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-	if (m_CheckBoxShowConsumerSecret.isSelected())
-	  m_TextConsumerSecret.setEchoChar((char) 0);
-	else
-	  m_TextConsumerSecret.setEchoChar(Constants.PASSWORD_CHAR);
-      }
+    m_CheckBoxShowConsumerSecret.addActionListener((ActionEvent e) -> {
+      if (m_CheckBoxShowConsumerSecret.isSelected())
+        m_TextConsumerSecret.setEchoChar((char) 0);
+      else
+        m_TextConsumerSecret.setEchoChar(Constants.PASSWORD_CHAR);
     });
     m_PanelParameters.addParameter("Show consumer secret", m_CheckBoxShowConsumerSecret);
 
@@ -109,13 +108,11 @@ public class TwitterSetupPanel
 
     m_CheckBoxShowAccessTokenSecret = new JCheckBox();
     m_CheckBoxShowAccessTokenSecret.setSelected(false);
-    m_CheckBoxShowAccessTokenSecret.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-	if (m_CheckBoxShowAccessTokenSecret.isSelected())
-	  m_TextAccessTokenSecret.setEchoChar((char) 0);
-	else
-	  m_TextAccessTokenSecret.setEchoChar(Constants.PASSWORD_CHAR);
-      }
+    m_CheckBoxShowAccessTokenSecret.addActionListener((ActionEvent e) -> {
+      if (m_CheckBoxShowAccessTokenSecret.isSelected())
+        m_TextAccessTokenSecret.setEchoChar((char) 0);
+      else
+        m_TextAccessTokenSecret.setEchoChar(Constants.PASSWORD_CHAR);
     });
     m_PanelParameters.addParameter("Show access token secret", m_CheckBoxShowAccessTokenSecret);
   }
@@ -172,5 +169,34 @@ public class TwitterSetupPanel
       return null;
     else
       return "Failed to save twitter setup to " + TwitterHelper.FILENAME + "!";
+  }
+
+  /**
+   * Returns whether the panel supports resetting the options.
+   *
+   * @return		true if supported
+   */
+  public boolean canReset() {
+    String	props;
+
+    props = Environment.getInstance().getCustomPropertiesFilename(TwitterDefinition.KEY);
+    return (props != null) && FileUtils.fileExists(props);
+  }
+
+  /**
+   * Resets the settings to their default.
+   *
+   * @return		null if successfully reset, otherwise error message
+   */
+  public String reset() {
+    String	props;
+
+    props = Environment.getInstance().getCustomPropertiesFilename(TwitterDefinition.KEY);
+    if ((props != null) && FileUtils.fileExists(props)) {
+      if (!FileUtils.delete(props))
+	return "Failed to remove custom Twitter properties: " + props;
+    }
+
+    return null;
   }
 }
