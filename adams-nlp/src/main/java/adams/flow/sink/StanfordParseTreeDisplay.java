@@ -15,13 +15,9 @@
 
 /**
  * StanfordParseTreeDisplay.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.sink;
-
-import java.awt.BorderLayout;
-
-import javax.swing.JComponent;
 
 import adams.core.QuickInfoHelper;
 import adams.flow.core.Token;
@@ -30,6 +26,9 @@ import adams.gui.core.BaseScrollPane;
 import adams.gui.core.ExtensionFileFilter;
 import adams.gui.visualization.nlp.StanfordTree;
 import edu.stanford.nlp.trees.Tree;
+
+import javax.swing.JComponent;
+import java.awt.BorderLayout;
 
 /**
  <!-- globalinfo-start -->
@@ -254,6 +253,15 @@ public class StanfordParseTreeDisplay
     result.add(new BaseScrollPane((JComponent) m_Tree), BorderLayout.CENTER);
     
     return result;
+  }
+
+  /**
+   * Returns the text for the menu item.
+   *
+   * @return		the menu item text, null for default
+   */
+  public String getCustomSupplyTextMenuItemCaption() {
+    return null;
   }
 
   /**
