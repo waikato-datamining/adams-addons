@@ -132,6 +132,22 @@
     </dependency>
 
     <dependency>
+      <groupId>com.github.fracpete</groupId>
+      <artifactId>ptstemmer-weka-package</artifactId>
+      <version>2.0.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>nz.ac.waikato.cms.weka</groupId>
+          <artifactId>weka-dev</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.pentaho.pentaho-commons</groupId>
+          <artifactId>pentaho-package-manager</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
       <groupId>edu.cmu.cs</groupId>
       <artifactId>ark-tweet-nlp</artifactId>
       <version>0.3.2</version>
