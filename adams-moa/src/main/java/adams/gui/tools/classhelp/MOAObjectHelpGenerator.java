@@ -82,7 +82,7 @@ public class MOAObjectHelpGenerator
 
     // description
     result.append("DESCRIPTION\n\n");
-    obj.getDescription(result, 0);
+    result.append(obj.getClass().getName());
     result.append("\n\n");
 
     // options
@@ -90,7 +90,8 @@ public class MOAObjectHelpGenerator
       result.append("OPTIONS\n\n");
       handler = (moa.options.OptionHandler) obj;
       for (moa.options.Option opt: handler.getOptions().getOptionArray()) {
-	opt.getDescription(result, 0);
+	result.append(opt.getName() + "/-" + opt.getCLIChar() + "\n");
+        result.append(opt.getPurpose() + "\n");
 	result.append("\n");
       }
     }
