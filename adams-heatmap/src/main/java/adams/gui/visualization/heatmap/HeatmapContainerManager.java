@@ -69,4 +69,19 @@ public class HeatmapContainerManager
   public HeatmapContainer newContainer(Comparable o) {
     return new HeatmapContainer(this, (Heatmap) o);
   }
+
+  /**
+   * Returns whether the container matches the current search.
+   *
+   * @param cont	the container to check
+   * @param search	the search string
+   * @param regExp	whether to perform regular expression matching
+   */
+  @Override
+  protected boolean isMatch(HeatmapContainer cont, String search, boolean regExp) {
+    if (regExp)
+      return cont.getID().matches(search);
+    else
+      return cont.getID().toLowerCase().contains(search);
+  }
 }
