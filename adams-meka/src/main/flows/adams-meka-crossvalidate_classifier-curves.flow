@@ -11,7 +11,7 @@ adams.flow.control.Flow -annotation "Evaluates a MEKA classifier on a train/test
   adams.flow.sink.MekaGraphVisualizer -name Graphs -short-title true -writer adams.gui.print.NullWriter
  adams.flow.standalone.CallableActors
   adams.flow.source.MekaClassifierSetup -classifier "meka.classifiers.multilabel.BR -W weka.classifiers.trees.J48 -- -C 0.25 -M 2"
- adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/Music.arff
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/Music.arff
  adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
  adams.flow.transformer.MekaPrepareData
  adams.flow.transformer.WekaRandomSplit

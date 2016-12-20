@@ -5,7 +5,7 @@
 adams.flow.control.Flow -annotation "Outputs information about the selected movie." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
   adams.flow.sink.Display -writer adams.data.io.output.NullWriter
- adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select movie" -initial-dir ${EXAMPLE_FLOWS}/data -extension mp4 -extension mkv -extension avi
+ adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select movie" -initial-dir ${FLOWS}/data -extension mp4 -extension mkv -extension avi
  adams.flow.transformer.SetVariable -var-name movie
  adams.flow.control.Tee -name duration
   adams.flow.transformer.MovieInfo

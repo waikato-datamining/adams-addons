@@ -7,9 +7,9 @@ adams.flow.control.Flow -annotation "Simple demonstration that shows how to move
   adams.flow.transformer.PassThrough -name nothing1
   adams.flow.transformer.PassThrough -name nothing2
  adams.flow.standalone.Rats
-  adams.flow.standalone.Rat -logging-level FINER -name "incoming -> processing" -receiver "adams.flow.standalone.rats.input.InputPolling -input \"adams.flow.standalone.rats.input.InputWithCallableTransformer -input \\\"adams.flow.standalone.rats.input.FileLister -source ${EXAMPLE_FLOWS}/1_incoming\\\" -callable nothing1\" -wait-poll 2000" -transmitter "adams.flow.standalone.rats.output.FileMover -wait-move 500 -target ${EXAMPLE_FLOWS}/2_processing"
+  adams.flow.standalone.Rat -logging-level FINER -name "incoming -> processing" -receiver "adams.flow.standalone.rats.input.InputPolling -input \"adams.flow.standalone.rats.input.InputWithCallableTransformer -input \\\"adams.flow.standalone.rats.input.FileLister -source ${FLOWS}/1_incoming\\\" -callable nothing1\" -wait-poll 2000" -transmitter "adams.flow.standalone.rats.output.FileMover -wait-move 500 -target ${FLOWS}/2_processing"
    adams.flow.transformer.PassThrough
-  adams.flow.standalone.Rat -logging-level FINER -name "processing -> outgoing" -receiver "adams.flow.standalone.rats.input.InputPolling -input \"adams.flow.standalone.rats.input.FileLister -source ${EXAMPLE_FLOWS}/2_processing\" -wait-poll 2000" -transmitter "adams.flow.standalone.rats.output.OutputWithCallableTransformer -output \"adams.flow.standalone.rats.output.FileMover -wait-move 500 -target ${EXAMPLE_FLOWS}/3_outgoing\" -callable nothing2"
+  adams.flow.standalone.Rat -logging-level FINER -name "processing -> outgoing" -receiver "adams.flow.standalone.rats.input.InputPolling -input \"adams.flow.standalone.rats.input.FileLister -source ${FLOWS}/2_processing\" -wait-poll 2000" -transmitter "adams.flow.standalone.rats.output.OutputWithCallableTransformer -output \"adams.flow.standalone.rats.output.FileMover -wait-move 500 -target ${FLOWS}/3_outgoing\" -callable nothing2"
    adams.flow.transformer.PassThrough -skip true
  adams.flow.source.Start
  adams.flow.control.WhileLoop -name "keep going" -condition adams.flow.condition.bool.True

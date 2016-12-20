@@ -8,14 +8,14 @@ adams.flow.control.Flow -annotation "Trains a MEKA classifier and then uses the 
   adams.flow.source.StorageValue -name model -storage-name model
  adams.flow.source.Start
  adams.flow.control.Trigger -name "train classifier"
-  adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/Music.arff
+  adams.flow.source.FileSupplier -file ${FLOWS}/data/Music.arff
   adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
   adams.flow.transformer.MekaPrepareData
   adams.flow.transformer.MekaTrainClassifier -classifier setup
   adams.flow.control.ContainerValuePicker -value Model -switch-outputs true
   adams.flow.transformer.SetStorageValue -storage-name model
  adams.flow.control.Trigger -name "perform classification"
-  adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/Music.arff
+  adams.flow.source.FileSupplier -file ${FLOWS}/data/Music.arff
   adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
   adams.flow.transformer.MekaPrepareData
   adams.flow.transformer.WekaInstanceBuffer -operation INSTANCES_TO_INSTANCE

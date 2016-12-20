@@ -7,4 +7,4 @@ adams.flow.control.Flow -annotation "Example flow for querying and filtering Twi
  adams.flow.source.TwitterQuery -query work -max-tweets 1000
  adams.flow.transformer.TwitterFilter -expression "text:\":)\" or text:\":(\""
  adams.flow.transformer.TwitterConverter -converter "adams.data.twitter.SpreadSheetConverter -field ID -field CREATED -field USER_NAME -field TEXT -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.SpreadSheet"
- adams.flow.sink.SpreadSheetFileWriter -output ${EXAMPLE_FLOWS}/output/tweets_filtered.csv -writer "adams.data.io.output.CsvSpreadSheetWriter -appending true -always-quote-text true"
+ adams.flow.sink.SpreadSheetFileWriter -output ${FLOWS}/output/tweets_filtered.csv -writer "adams.data.io.output.CsvSpreadSheetWriter -appending true -always-quote-text true"

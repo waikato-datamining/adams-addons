@@ -6,7 +6,7 @@ adams.flow.control.Flow -annotation "Samples a number of images from a movie, co
  adams.flow.standalone.GridView -width 1200 -num-cols 2 -writer adams.gui.print.NullWriter
   adams.flow.sink.ImageViewer -name Background -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay adams.gui.visualization.image.NullOverlay
   adams.flow.sink.ImageViewer -name "First frame" -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay adams.gui.visualization.image.NullOverlay
- adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select movie file" -initial-dir ${EXAMPLE_FLOWS}/data -extension mp4 -extension mkv -extension avi -initial-file ${EXAMPLE_FLOWS}/data/mouse.mp4
+ adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select movie file" -initial-dir ${FLOWS}/data -extension mp4 -extension mkv -extension avi -initial-file ${FLOWS}/data/mouse.mp4
  adams.flow.control.Tee -name "extract background"
   adams.flow.transformer.MovieImageSampler -output-array true -sampler "adams.flow.transformer.movieimagesampler.FixedIntervalBufferedImageSampler -interval 20000"
   adams.flow.transformer.BufferedImageMultiImageOperation -operation adams.data.image.multiimageoperation.Median

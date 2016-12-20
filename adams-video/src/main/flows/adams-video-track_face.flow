@@ -7,7 +7,7 @@ adams.flow.control.Flow -annotation "Uses the OpenIMAJ HaarCascade face detector
   adams.flow.sink.ImageViewer -name Frame -short-title true -writer adams.gui.print.NullWriter -zoom -1.0 -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay "adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport -regexp Tracker\\\\.Current"
   adams.flow.sink.ImageViewer -name Object -short-title true -y -3 -writer adams.gui.print.NullWriter -zoom -1.0 -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay "adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport -regexp Tracker\\\\.Current"
   adams.flow.sink.Display -name Locations -x -3 -writer adams.data.io.output.NullWriter
- adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/track_peter.mjpeg
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/track_peter.mjpeg
  adams.flow.transformer.MjpegImageSequence -output-type FRAME
  adams.flow.transformer.BufferedImageTransformer -transformer "adams.data.jai.transformer.Brightness -factor 1.5"
  adams.flow.transformer.Convert -conversion adams.data.conversion.BufferedImageToBoofCV

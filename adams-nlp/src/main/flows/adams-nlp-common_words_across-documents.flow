@@ -7,7 +7,7 @@ adams.flow.control.Flow -annotation "Extracts the common words from each documen
  adams.flow.control.Trigger -name "iterate files"
   adams.flow.standalone.SetVariable -name "reset sheets" -var-name sheets -var-value ""
   adams.flow.standalone.SetVariable -name "reset counter" -var-name count -var-value 0
-  adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/pg12-through_the_looking_glass.txt -file ${EXAMPLE_FLOWS}/data/pg19033-alice_in_wonderland.txt -file ${EXAMPLE_FLOWS}/data/pg29042-a_tangled_tale.txt
+  adams.flow.source.FileSupplier -file ${FLOWS}/data/pg12-through_the_looking_glass.txt -file ${FLOWS}/data/pg19033-alice_in_wonderland.txt -file ${FLOWS}/data/pg29042-a_tangled_tale.txt
   adams.flow.control.SubProcess -name vars
    adams.flow.transformer.IncVariable -var-name count
    adams.flow.transformer.SetVariable -var-name doc

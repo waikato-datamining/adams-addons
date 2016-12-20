@@ -3,7 +3,7 @@
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Extracts a random subset of rows from a text file." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/numbers.txt
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/numbers.txt
  adams.flow.transformer.TextFileReader -reader adams.data.io.input.LineArrayTextReader
  adams.flow.control.Branch
   adams.flow.control.Sequence -name normal

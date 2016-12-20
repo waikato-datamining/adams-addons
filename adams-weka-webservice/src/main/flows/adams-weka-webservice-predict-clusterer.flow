@@ -3,7 +3,7 @@
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Uses a previously trained clusterer model (\\\'simplekmeans\\\') provided by the webservice\\nto generate predictions (cluster and cluster memberships) for the incoming dataset.\\nAlso removes the class attribute from the dataset.\\nSee \\\"adams-weka-webservice-train-clusterer.flow\\\" flow for training (and storing) the clusterer model on the server-side." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.source.SelectFile -stop-if-canceled true -custom-stop-message "User canceled dataset selection!" -file-chooser-title "Select dataset to cross-validate" -initial-dir ${EXAMPLE_FLOWS}/data -extension ARFF -extension CSV -initial-file ${EXAMPLE_FLOWS}/data/anneal_test.arff
+ adams.flow.source.SelectFile -stop-if-canceled true -custom-stop-message "User canceled dataset selection!" -file-chooser-title "Select dataset to cross-validate" -initial-dir ${FLOWS}/data -extension ARFF -extension CSV -initial-file ${FLOWS}/data/anneal_test.arff
  adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
  adams.flow.transformer.WekaFilter -name "remove class attribute" -filter "weka.filters.unsupervised.attribute.Remove -R last"
  adams.flow.transformer.WekaWSPredictClusterer -model-name simplekmeans

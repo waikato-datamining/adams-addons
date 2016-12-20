@@ -7,4 +7,4 @@ adams.flow.control.Flow -annotation "This flow trains a FIMTDD regressor on a ra
   adams.flow.source.MOARegressorSetup
  adams.flow.source.MOAStream -stream moa.streams.generators.RandomTreeGenerator -chunk-size 1000
  adams.flow.transformer.MOATrainRegressor -name MOARegressor -output-interval 10000
- adams.flow.sink.MOAModelWriter -output ${EXAMPLE_FLOWS}/output/fimtdd.model
+ adams.flow.sink.MOAModelWriter -output ${FLOWS}/output/fimtdd.model

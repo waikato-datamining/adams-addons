@@ -3,9 +3,9 @@
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Reads in a document, splits it into sentences and performs lexical analysis on each sentence." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/adams_andy-cattle_brands.txt
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/adams_andy-cattle_brands.txt
  adams.flow.transformer.TextFileReader -reader adams.data.io.input.SingleStringTextReader
  adams.flow.transformer.DocumentToSentences -splitter adams.flow.transformer.splitter.StanfordPTBTokenizer
  adams.flow.transformer.SetVariable -var-name sentence
- adams.flow.transformer.StanfordLexicalizedParser -model ${EXAMPLE_FLOWS}/data/englishPCFG.ser.gz
+ adams.flow.transformer.StanfordLexicalizedParser -model ${FLOWS}/data/englishPCFG.ser.gz
  adams.flow.sink.DisplayPanelManager -provider "adams.flow.sink.StanfordParseTreeDisplay -writer adams.gui.print.NullWriter -expand true" -entry-name-variable sentence

@@ -8,12 +8,12 @@ adams.flow.control.Flow -annotation "Tracks an object throughout a movie using a
   adams.flow.sink.Display -name Locations -x -3 -writer adams.data.io.output.NullWriter
  adams.flow.source.Start
  adams.flow.control.Trigger -name "load initial position"
-  adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/track_book_rect.txt
+  adams.flow.source.FileSupplier -file ${FLOWS}/data/track_book_rect.txt
   adams.flow.transformer.TextFileReader -reader adams.data.io.input.SingleStringTextReader
   adams.flow.transformer.StringTrim
   adams.flow.transformer.SetVariable -var-name pos
  adams.flow.control.Trigger -name track
-  adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/track_book.mjpeg
+  adams.flow.source.FileSupplier -file ${FLOWS}/data/track_book.mjpeg
   adams.flow.transformer.MjpegImageSequence -output-type BOTH
   adams.flow.control.Sleep -interval 10
   adams.flow.control.Tee -name "gui image" -annotation "rather than the displaying the frame, we want to display the nice GUI image"

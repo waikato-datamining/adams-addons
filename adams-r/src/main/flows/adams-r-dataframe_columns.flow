@@ -4,7 +4,7 @@
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "This flow demonstrates how to build a linear model\\nfrom a spreadsheet. The spreadsheet gets automatically\\nconverted into an R dataframe before passing it into R.\\nThe residuals of the linear model are plotted." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.Rserve
- adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/bolts.csv
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/bolts.csv
  adams.flow.transformer.SpreadSheetFileReader -reader "adams.data.io.input.CsvSpreadSheetReader -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.SpreadSheet"
  adams.flow.transformer.RTransformer -script "res = lm(X$T20BOLT ~ X$SPEED1)" -return-type DataFrame -data-frame-columns residuals
  adams.flow.transformer.SpreadSheetPlotGenerator -generator "adams.flow.transformer.plotgenerator.SimplePlotGenerator -default-cell-value 0.0 -columns 1"

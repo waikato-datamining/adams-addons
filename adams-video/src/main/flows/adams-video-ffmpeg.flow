@@ -3,8 +3,8 @@
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.standalone.SetVariable -name "images pattern" -annotation "Defines where what images to use for the movie.\\n\\\"day%03d.png\\\" matches file names that have 3 digits in their name, with leading zeroes.\\nFor instance: day001.png, day002.png." -var-name images -var-value ${EXAMPLE_FLOWS}/data/day%03d.png
- adams.flow.standalone.SetVariable -name "movie file" -annotation "Defines where the movie is generated." -var-name movie -var-value ${EXAMPLE_FLOWS}/output/days.mp4
+ adams.flow.standalone.SetVariable -name "images pattern" -annotation "Defines where what images to use for the movie.\\n\\\"day%03d.png\\\" matches file names that have 3 digits in their name, with leading zeroes.\\nFor instance: day001.png, day002.png." -var-name images -var-value ${FLOWS}/data/day%03d.png
+ adams.flow.standalone.SetVariable -name "movie file" -annotation "Defines where the movie is generated." -var-name movie -var-value ${FLOWS}/output/days.mp4
  adams.flow.source.Start
  adams.flow.control.Trigger -name "create movie"
   adams.flow.source.Variable -var-name images

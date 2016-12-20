@@ -6,7 +6,7 @@ adams.flow.control.Flow -annotation "Counts the words in \\\"Alice in Wonderland
  adams.flow.standalone.CounterInit -storage-name words
  adams.flow.source.Start
  adams.flow.control.Trigger -name count
-  adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select text file" -initial-dir ${EXAMPLE_FLOWS}/data -extension txt -initial-file ${EXAMPLE_FLOWS}/data/pg19033-alice_in_wonderland.txt
+  adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select text file" -initial-dir ${FLOWS}/data -extension txt -initial-file ${FLOWS}/data/pg19033-alice_in_wonderland.txt
   adams.flow.transformer.TextFileReader -reader adams.data.io.input.SingleStringTextReader
   adams.flow.transformer.Convert -conversion adams.data.conversion.LowerCase
   adams.flow.transformer.Tokenize -output-array true -tokenizer "adams.flow.transformer.tokenizer.WekaTokenizer -tokenizer \"weka.core.tokenizers.WordTokenizer -delimiters \\\" \\\\r\\\\n\\\\t.,;:\\\\\\\'\\\\\\\"()?!\\\"\""

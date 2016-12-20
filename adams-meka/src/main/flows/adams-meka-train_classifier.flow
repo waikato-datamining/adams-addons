@@ -5,8 +5,8 @@
 adams.flow.control.Flow -annotation "Shows how to train a MEKA classifier and store the model." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
   adams.flow.source.MekaClassifierSetup -classifier "meka.classifiers.multilabel.BR -W weka.classifiers.trees.J48 -- -C 0.25 -M 2"
- adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/Music.arff
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/Music.arff
  adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
  adams.flow.transformer.MekaPrepareData
  adams.flow.transformer.MekaTrainClassifier
- adams.flow.sink.WekaModelWriter -output ${EXAMPLE_FLOWS}/output/meka.model
+ adams.flow.sink.WekaModelWriter -output ${FLOWS}/output/meka.model

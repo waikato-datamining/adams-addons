@@ -2,10 +2,10 @@
 # Date: 2016-07-12 11:22:12
 # User: fracpete
 # Charset: UTF-8
-adams.flow.control.Flow -annotation "Places uploaded files in ${EXAMPLE_FLOWS}/output" -flow-execution-listener adams.flow.execution.NullListener
+adams.flow.control.Flow -annotation "Places uploaded files in ${FLOWS}/output" -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
   adams.flow.sink.Display -writer adams.data.io.output.NullWriter
- adams.flow.standalone.SetVariable -var-name output_dir -var-value ${EXAMPLE_FLOWS}/output
+ adams.flow.standalone.SetVariable -var-name output_dir -var-value ${FLOWS}/output
  adams.flow.standalone.Rats
   adams.flow.standalone.Rat -receiver "adams.flow.standalone.rats.input.WSTextReception -web-service \"adams.flow.webservice.text.RatsTextServiceWS -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -implementation adams.flow.webservice.text.SimpleRatsTextService\"" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display" -scope-handling-variables SHARE
  adams.flow.source.Start

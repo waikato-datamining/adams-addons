@@ -3,7 +3,7 @@
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Displays the images obtained from a MJPEG movie file." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select MJPEG file" -initial-dir ${EXAMPLE_FLOWS}/data -extension mjpeg
+ adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select MJPEG file" -initial-dir ${FLOWS}/data -extension mjpeg
  adams.flow.transformer.MjpegImageSequence -output-type BOTH
  adams.flow.control.Sleep -interval 20
  adams.flow.control.Branch

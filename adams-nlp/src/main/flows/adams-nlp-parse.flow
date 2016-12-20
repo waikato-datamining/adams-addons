@@ -6,7 +6,7 @@ adams.flow.control.Flow -annotation "Shows how to apply a Stanford LexicalizedPa
  adams.flow.standalone.CallableActors
   adams.flow.sink.HistoryDisplay -entry-name-variable name
  adams.flow.source.StringConstants -string "The quick brown fox jumps over the lazy dog"
- adams.flow.transformer.StanfordLexicalizedParser -model ${EXAMPLE_FLOWS}/data/englishPCFG.ser.gz
+ adams.flow.transformer.StanfordLexicalizedParser -model ${FLOWS}/data/englishPCFG.ser.gz
  adams.flow.control.Tee -name "output tree"
   adams.flow.transformer.Convert -conversion adams.data.conversion.AnyToString
   adams.flow.transformer.SetVariable -var-name name -var-value tree

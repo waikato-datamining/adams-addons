@@ -11,12 +11,12 @@ adams.flow.control.Flow -annotation "Tracks an object throughout a movie using a
   adams.flow.source.StorageValue -name background -storage-name image
  adams.flow.source.Start
  adams.flow.control.Trigger -name "load initial position"
-  adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/track_peter_rect.txt
+  adams.flow.source.FileSupplier -file ${FLOWS}/data/track_peter_rect.txt
   adams.flow.transformer.TextFileReader -reader adams.data.io.input.SingleStringTextReader
   adams.flow.transformer.StringTrim
   adams.flow.transformer.SetVariable -var-name pos
  adams.flow.control.Trigger -name track
-  adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/track_peter.mjpeg
+  adams.flow.source.FileSupplier -file ${FLOWS}/data/track_peter.mjpeg
   adams.flow.control.Tee -name id
    adams.flow.transformer.BaseName -remove-extensions true
    adams.flow.transformer.SetVariable -var-name id
@@ -65,4 +65,4 @@ adams.flow.control.Flow -annotation "Tracks an object throughout a movie using a
     adams.flow.transformer.Convert -conversion adams.data.conversion.TrailToSpreadSheet
     adams.flow.sink.CallableSink -callable Data
    adams.flow.sink.CallableSink -callable Trail
-   adams.flow.transformer.TrailFileWriter -writer adams.data.io.output.SimpleTrailWriter -dir ${EXAMPLE_FLOWS}/output -file-name-generation ID
+   adams.flow.transformer.TrailFileWriter -writer adams.data.io.output.SimpleTrailWriter -dir ${FLOWS}/output -file-name-generation ID

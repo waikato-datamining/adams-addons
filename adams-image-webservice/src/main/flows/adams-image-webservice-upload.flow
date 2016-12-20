@@ -3,7 +3,7 @@
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Uploads user-selected image files using the image webservice." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.source.SelectFile -stop-if-canceled true -custom-stop-message "User canceled selection of image!" -file-chooser-title "Select image file" -initial-dir ${EXAMPLE_FLOWS}/data -extension jpg -extension bmp -extension png
+ adams.flow.source.SelectFile -stop-if-canceled true -custom-stop-message "User canceled selection of image!" -file-chooser-title "Select image file" -initial-dir ${FLOWS}/data -extension jpg -extension bmp -extension png
  adams.flow.control.Tee -name ID
   adams.flow.transformer.BaseName -remove-extensions true
   adams.flow.transformer.SetVariable -var-name id

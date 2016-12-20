@@ -2,8 +2,8 @@
 # Date: 2016-02-15 14:55:09
 # User: fracpete
 # Charset: UTF-8
-adams.flow.control.Flow -annotation "Places uploaded files in ${EXAMPLE_FLOWS}/output" -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.standalone.SetVariable -var-name output_dir -var-value ${EXAMPLE_FLOWS}/output
+adams.flow.control.Flow -annotation "Places uploaded files in ${FLOWS}/output" -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.SetVariable -var-name output_dir -var-value ${FLOWS}/output
  adams.flow.standalone.Rats
   adams.flow.standalone.Rat -receiver "adams.flow.standalone.rats.input.WSBlobReception -web-service \"adams.flow.webservice.blob.RatsBlobServiceWS -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -implementation adams.flow.webservice.blob.SimpleRatsBlobService\"" -transmitter "adams.flow.standalone.rats.output.BinaryFileWriter -output @{file}" -scope-handling-variables SHARE
    adams.flow.control.Tee -name "create output filename"

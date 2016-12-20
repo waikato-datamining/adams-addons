@@ -6,7 +6,7 @@ adams.flow.control.Flow -annotation "Flow to demonstrate how to display polygons
  adams.flow.standalone.CallableActors
   adams.flow.sink.DisplayPanelManager -name Locations -width 740 -x -3 -provider "adams.flow.sink.SpreadSheetDisplay -name Locations -short-title true -x -3 -writer adams.data.io.output.NullWriter" -entry-name-variable name
   adams.flow.sink.OpenStreetMapViewer -name Map -short-title true -writer adams.gui.print.NullWriter -tile-source adams.flow.sink.openstreetmapviewer.OpenStreetMapSource -tile-loader adams.flow.sink.openstreetmapviewer.OpenStreetMapCachedLoader -hit-listener adams.flow.sink.openstreetmapviewer.SimpleMapObjectHitListener -click-listener adams.flow.sink.openstreetmapviewer.NullMapClickListener -mapobject-pruner adams.flow.sink.openstreetmapviewer.NullPruner -map-overlay adams.flow.sink.openstreetmapviewer.NullMapOverlay -initial-zoom 1 -layer-tree true -layer Location
- adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/polygons.csv
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/polygons.csv
  adams.flow.transformer.SpreadSheetFileReader -reader "adams.data.io.input.CsvSpreadSheetReader -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.SpreadSheet -missing \"\""
  adams.flow.control.Tee -name "display original spreadsheet"
   adams.flow.transformer.SetVariable -var-name name -var-value original

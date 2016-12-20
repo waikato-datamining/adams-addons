@@ -47,7 +47,7 @@ adams.flow.control.Flow
 	-actor
 		adams.flow.source.FileSupplier
 			-file
-			${EXAMPLE_FLOWS}/data/pro_occ2.arff
+			${FLOWS}/data/pro_occ2.arff
 	-actor
 		adams.flow.transformer.WekaFileReader
 			-loader

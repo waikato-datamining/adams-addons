@@ -3,7 +3,7 @@
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Displays the images obtained from a movie file." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select MP4 file" -initial-dir ${EXAMPLE_FLOWS}/data -extension mp4
+ adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select MP4 file" -initial-dir ${FLOWS}/data -extension mp4
  adams.flow.transformer.MovieImageSequence -interval 100
  adams.flow.control.Sleep -interval 100
  adams.flow.sink.ImageViewer -short-title true -writer adams.gui.print.NullWriter -zoom -1.0 -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay adams.gui.visualization.image.NullOverlay

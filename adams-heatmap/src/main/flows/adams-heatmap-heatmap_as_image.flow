@@ -9,7 +9,7 @@ adams.flow.control.Flow
 	-actor
 		adams.flow.source.FileSupplier
 			-file
-			${EXAMPLE_FLOWS}/data/sample.csv
+			${FLOWS}/data/sample.csv
 	-actor
 		adams.flow.transformer.SpreadSheetFileReader
 			-reader

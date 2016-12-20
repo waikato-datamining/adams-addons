@@ -5,7 +5,7 @@
 adams.flow.control.Flow -annotation "Trains a SimpleKMeans clusterer on a dataset that the user chooses through the referenced \\nwebservice and stores the model there as well. Removes the class attribute from the data.\\nSee flow defined in \\\"adams-weka-webservice-weka-webservice.flow\\\" for running the webservice." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
   adams.flow.source.WekaClustererSetup -clusterer "weka.clusterers.SimpleKMeans -init 0 -max-candidates 100 -periodic-pruning 10000 -min-density 2.0 -t1 -1.25 -t2 -1.0 -N 2 -A \"weka.core.EuclideanDistance -R first-last\" -I 500 -num-slots 1 -S 10"
- adams.flow.source.SelectFile -stop-if-canceled true -custom-stop-message "User canceled dataset selection!" -file-chooser-title "Select dataset to cross-validate" -initial-dir ${EXAMPLE_FLOWS}/data -extension ARFF -extension CSV -initial-file ${EXAMPLE_FLOWS}/data/anneal_train.arff
+ adams.flow.source.SelectFile -stop-if-canceled true -custom-stop-message "User canceled dataset selection!" -file-chooser-title "Select dataset to cross-validate" -initial-dir ${FLOWS}/data -extension ARFF -extension CSV -initial-file ${FLOWS}/data/anneal_train.arff
  adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
  adams.flow.transformer.WekaFilter -name "Remove class attribute" -filter "weka.filters.unsupervised.attribute.Remove -R last"
  adams.flow.transformer.WekaWSTrainClusterer -model-name simplekmeans

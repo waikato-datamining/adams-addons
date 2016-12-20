@@ -3,7 +3,7 @@
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Replays a tweet archive and tokenizes the tweet text using TweetNLP\\\'s Twokenize." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.source.TweetReplay -replay "adams.data.io.input.SpreadSheetConverterArchive -archive ${EXAMPLE_FLOWS}/data/tweet-archive.csv"
+ adams.flow.source.TweetReplay -replay "adams.data.io.input.SpreadSheetConverterArchive -archive ${FLOWS}/data/tweet-archive.csv"
  adams.flow.transformer.TwitterConverter -converter "adams.data.twitter.TextConverter -separator \\t"
  adams.flow.transformer.Tokenize -output-array true -tokenizer adams.flow.transformer.tokenizer.Twokenize
  adams.flow.transformer.StringJoin -glue \n

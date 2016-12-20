@@ -6,7 +6,7 @@ adams.flow.control.Flow -annotation "Generates a histogram from the image loaded
  adams.flow.standalone.GridView -height 800 -num-rows 2 -writer adams.gui.print.NullWriter
   adams.flow.sink.HeatmapDisplay -name Heatmap -short-title true -writer adams.gui.print.NullWriter -color-generator adams.gui.visualization.core.BiColorGenerator -zoom -1.0
   adams.flow.sink.HeatmapHistogram -name Histogram -short-title true -writer adams.gui.print.NullWriter -array-histogram adams.data.statistics.ArrayHistogram
- adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/3666455665_18795f0741_small.jpg
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/3666455665_18795f0741_small.jpg
  adams.flow.transformer.HeatmapFileReader -reader "adams.data.io.input.SimpleImageHeatmapReader -reader adams.data.io.input.JAIImageReader"
  adams.flow.control.Branch
   adams.flow.sink.CallableSink -name heatmap -callable Heatmap

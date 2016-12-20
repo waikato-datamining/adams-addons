@@ -11,4 +11,4 @@ adams.flow.control.Flow -annotation "Example flow for listening to the sample st
    adams.flow.sink.Display -writer adams.data.io.output.NullWriter
   adams.flow.control.Sequence -name file
    adams.flow.transformer.TwitterConverter -converter "adams.data.twitter.SpreadSheetConverter -field ID -field CREATED -field USER_NAME -field TEXT -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.SpreadSheet"
-   adams.flow.sink.SpreadSheetFileWriter -output ${EXAMPLE_FLOWS}/output/twitter_updates.csv -writer "adams.data.io.output.CsvSpreadSheetWriter -appending true -always-quote-text true"
+   adams.flow.sink.SpreadSheetFileWriter -output ${FLOWS}/output/twitter_updates.csv -writer "adams.data.io.output.CsvSpreadSheetWriter -appending true -always-quote-text true"
