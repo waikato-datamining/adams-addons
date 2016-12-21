@@ -1,11 +1,11 @@
 # Project: adams
-# Date: 2016-02-15 14:23:38
+# Date: 2016-12-21 13:20:39
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Loads a JPG image, converts it into a heatmap,\\nstandardizes it and then exports it to a CSV file" -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.source.FileSupplier -file ${FLOWS}/data/3666455665_18795f0741.jpg
  adams.flow.transformer.ImageReader -reader adams.data.io.input.JAIImageReader
- adams.flow.transformer.Convert -skip true -conversion adams.data.conversion.BufferedImageToHeatmap
+ adams.flow.transformer.Convert -conversion adams.data.conversion.BufferedImageToHeatmap
  adams.flow.transformer.HeatmapFilter -filter adams.data.filter.HeatmapStandardize
  adams.flow.transformer.Convert -name Convert-1 -conversion adams.data.conversion.HeatmapToSpreadSheet
  adams.flow.control.Tee
