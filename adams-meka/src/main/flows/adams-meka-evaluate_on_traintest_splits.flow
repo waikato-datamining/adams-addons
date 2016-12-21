@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2016-02-15 14:36:30
+# Date: 2016-12-21 13:37:12
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Shows how to output the result for each \\ncross-validation fold of a Meka classifier." -flow-execution-listener adams.flow.execution.NullListener
@@ -13,4 +13,4 @@ adams.flow.control.Flow -annotation "Shows how to output the result for each \\n
   adams.flow.transformer.SetVariable -var-name fold
  adams.flow.transformer.MekaTrainTestSetEvaluator
  adams.flow.transformer.MekaResultSummary
- adams.flow.sink.HistoryDisplay -entry-name-variable fold
+ adams.flow.sink.HistoryDisplay -width 800 -entry-name-variable fold
