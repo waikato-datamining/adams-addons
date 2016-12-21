@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2016-02-15 14:51:33
+# Date: 2016-12-21 13:48:58
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Flow to demonstrate how to display based on data from a spreadsheet.\\nThis flow draws circles relative in their size to the population of a state,\\ncentered around the capital of that country." -flow-execution-listener adams.flow.execution.NullListener
@@ -9,7 +9,7 @@ adams.flow.control.Flow -annotation "Flow to demonstrate how to display based on
   adams.flow.transformer.MathExpression -name "scale population" -expression "X / @{max} * @{radius}"
  adams.flow.standalone.SetVariable -var-name radius -var-value 25
  adams.flow.source.FileSupplier -file ${FLOWS}/data/cow.csv
- adams.flow.transformer.SpreadSheetFileReader -reader "adams.data.io.input.CsvSpreadSheetReader -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.SpreadSheet -missing \"\" -separator ;"
+ adams.flow.transformer.SpreadSheetFileReader -reader "adams.data.io.input.CsvSpreadSheetReader -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.DefaultSpreadSheet -missing \"\" -separator ;"
  adams.flow.control.Tee -name "display original spreadsheet"
   adams.flow.transformer.SetVariable -var-name name -var-value original
   adams.flow.sink.CallableSink -callable "City locations"
@@ -20,7 +20,7 @@ adams.flow.control.Flow -annotation "Flow to demonstrate how to display based on
   adams.flow.transformer.SpreadSheetGetCell
   adams.flow.transformer.SetVariable -var-name max
  adams.flow.transformer.SpreadSheetTransformCells -finder "adams.data.spreadsheet.cellfinder.CellRange -columns population" -transformer "scale population"
- adams.flow.transformer.Convert -name "join LAT and LON" -conversion "adams.data.conversion.SpreadSheetJoinColumns -columns \"UNc_latitude\",\"UNc_longitude\" -glue \" \" -column-name LOCATION"
+ adams.flow.transformer.Convert -name "join LAT and LON" -conversion "adams.data.conversion.SpreadSheetJoinColumns -columns UNc_latitude,UNc_longitude -glue \" \" -column-name LOCATION"
  adams.flow.transformer.Convert -name "create GPS object column" -conversion "adams.data.conversion.SpreadSheetStringColumnToObject -column LOCATION -keep-failed true -handler adams.data.spreadsheet.GPSDecimalDegrees"
  adams.flow.control.Branch
   adams.flow.control.Sequence -name map
