@@ -15,13 +15,10 @@
 
 /*
  * AbstractFFmpegPlugin.java
- * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink.ffmpeg;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
@@ -31,6 +28,9 @@ import adams.core.management.ProcessUtils.ProcessResult;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.OptionUtils;
 import adams.flow.sink.FFmpeg;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Ancestor for {@link FFmpeg} plugins.
@@ -71,7 +71,7 @@ public abstract class AbstractFFmpegPlugin
 
     m_OptionManager.add(
 	    "bit-rate", "bitRate",
-	    getDefaultBitRate(), 1, null);
+	    getDefaultBitRate(), 0, null);
 
     m_OptionManager.add(
 	    "fps", "framesPerSecond",
@@ -180,7 +180,7 @@ public abstract class AbstractFFmpegPlugin
   /**
    * Sets the bit rate in kbits to use.
    *
-   * @param value	the bit rate
+   * @param value	the bit rate, 0 to ignore parameter
    */
   public void setBitRate(int value) {
     m_BitRate = value;
@@ -203,7 +203,7 @@ public abstract class AbstractFFmpegPlugin
    * 			displaying in the GUI or for listing the options.
    */
   public String bitRateTipText() {
-    return "The bit rate (in kbits) to use.";
+    return "The bit rate (in kbits) to use; if <1 then bitrate gets ignored.";
   }
 
   /**
@@ -299,7 +299,7 @@ public abstract class AbstractFFmpegPlugin
       result = "No input file set!";
     
     if (result == null) {
-      options = new ArrayList<String>();
+      options = new ArrayList<>();
       try {
 	// executable
 	options.add(getExecutable().getAbsolutePath());
@@ -307,8 +307,10 @@ public abstract class AbstractFFmpegPlugin
 	options.add("-r");
 	options.add("" + m_FramesPerSecond);
 	// bitrate
-	options.add("-b");
-	options.add("" + m_BitRate);
+        if (m_BitRate > 0) {
+          options.add("-b");
+          options.add("" + m_BitRate);
+        }
 	// always overwrite output files
 	options.add("-y");
 	// input options
