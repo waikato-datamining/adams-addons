@@ -1,11 +1,11 @@
 # Project: adams
-# Date: 2016-02-15 15:09:02
+# Date: 2016-12-21 14:16:45
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Uses the OpenIMAJ HaarCascade face detector to \\ndetect the initial location of the face for the tracker." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.standalone.CallableActors
-  adams.flow.sink.ImageViewer -name Frame -short-title true -writer adams.gui.print.NullWriter -zoom -1.0 -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay "adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport -regexp Tracker\\\\.Current"
-  adams.flow.sink.ImageViewer -name Object -short-title true -y -3 -writer adams.gui.print.NullWriter -zoom -1.0 -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay "adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport -regexp Tracker\\\\.Current"
+ adams.flow.standalone.GridView -width 1200 -num-cols 3 -add-headers true -writer adams.gui.print.NullWriter
+  adams.flow.sink.ImageViewer -name Frame -short-title true -writer adams.gui.print.NullWriter -zoom -1.0 -selection-processor adams.gui.visualization.image.selection.NullProcessor -left-click-processor adams.gui.visualization.image.leftclick.NullProcessor -image-overlay "adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport -regexp Tracker\\\\.Current"
+  adams.flow.sink.ImageViewer -name Object -short-title true -y -3 -writer adams.gui.print.NullWriter -zoom -1.0 -selection-processor adams.gui.visualization.image.selection.NullProcessor -left-click-processor adams.gui.visualization.image.leftclick.NullProcessor -image-overlay "adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport -regexp Tracker\\\\.Current"
   adams.flow.sink.Display -name Locations -x -3 -writer adams.data.io.output.NullWriter
  adams.flow.source.FileSupplier -file ${FLOWS}/data/track_peter.mjpeg
  adams.flow.transformer.MjpegImageSequence -output-type FRAME
