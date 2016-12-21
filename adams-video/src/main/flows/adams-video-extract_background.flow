@@ -1,11 +1,11 @@
 # Project: adams
-# Date: 2016-02-15 15:07:01
+# Date: 2016-12-21 14:07:06
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Samples a number of images from a movie, computes the\\nmedian from it and displays the result.\\nExtracting the background only works, if the camera\\nis stationery and objects are moving through it." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.standalone.GridView -width 1200 -num-cols 2 -writer adams.gui.print.NullWriter
-  adams.flow.sink.ImageViewer -name Background -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay adams.gui.visualization.image.NullOverlay
-  adams.flow.sink.ImageViewer -name "First frame" -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay adams.gui.visualization.image.NullOverlay
+ adams.flow.standalone.GridView -width 1200 -num-cols 2 -add-headers true -writer adams.gui.print.NullWriter
+  adams.flow.sink.ImageViewer -name Background -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.NullProcessor -left-click-processor adams.gui.visualization.image.leftclick.NullProcessor -image-overlay adams.gui.visualization.image.NullOverlay
+  adams.flow.sink.ImageViewer -name "First frame" -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.NullProcessor -left-click-processor adams.gui.visualization.image.leftclick.NullProcessor -image-overlay adams.gui.visualization.image.NullOverlay
  adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select movie file" -initial-dir ${FLOWS}/data -extension mp4 -extension mkv -extension avi -initial-file ${FLOWS}/data/mouse.mp4
  adams.flow.control.Tee -name "extract background"
   adams.flow.transformer.MovieImageSampler -output-array true -sampler "adams.flow.transformer.movieimagesampler.FixedIntervalBufferedImageSampler -interval 20000"
