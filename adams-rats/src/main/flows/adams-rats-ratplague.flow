@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2016-07-12 11:15:11
+# Date: 2016-12-21 13:54:15
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Shows how to use the \\\"RatPlague\\\" for parallel computing." -flow-execution-listener adams.flow.execution.NullListener
@@ -7,7 +7,7 @@ adams.flow.control.Flow -annotation "Shows how to use the \\\"RatPlague\\\" for 
   adams.flow.sink.Display -name output -short-title true -writer adams.data.io.output.NullWriter
  adams.flow.standalone.QueueInit -storage-name queue1 -storage-name queue2 -storage-name queue3 -storage-name queue4 -storage-name queue5 -storage-name queue6 -storage-name queue7 -storage-name queue8 -storage-name queue9 -storage-name queue10 -storage-name in -storage-name out
  adams.flow.standalone.Rats
-  adams.flow.standalone.Rat -name in -receiver "adams.flow.standalone.rats.input.InputPolling -input \"adams.flow.standalone.rats.input.DeQueue -storage-name in\" -wait-poll 10" -transmitter "adams.flow.standalone.rats.output.DistributedEnQueue -storage-name queue1 -storage-name queue2 -storage-name queue3 -storage-name queue4 -storage-name queue5 -storage-name queue6 -storage-name queue7 -storage-name queue8 -storage-name queue9 -storage-name queue10"
+  adams.flow.standalone.Rat -name in -receiver "adams.flow.standalone.rats.input.DeQueue -storage-name in" -transmitter "adams.flow.standalone.rats.output.DistributedEnQueue -storage-name queue1 -storage-name queue2 -storage-name queue3 -storage-name queue4 -storage-name queue5 -storage-name queue6 -storage-name queue7 -storage-name queue8 -storage-name queue9 -storage-name queue10"
   adams.flow.standalone.RatPlague -name plague -input queue1 -input queue2 -input queue3 -input queue4 -input queue5 -input queue6 -input queue7 -input queue8 -input queue9 -input queue10 -output out
    adams.flow.transformer.MathExpression -expression "ifelse(X % 3 = 0, sqrt(X), ifelse(X % 7 = 0, X^2, X*2))"
   adams.flow.standalone.Rat -name out -receiver "adams.flow.standalone.rats.input.DeQueue -storage-name out" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable output"
