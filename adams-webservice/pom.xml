@@ -214,12 +214,9 @@
                   <bindingFiles>
                     <bindingFile>src/main/resources/wsdl/customerservice/CustomerService-binding.xml</bindingFile>
                   </bindingFiles>
+                  <frontEnd>jaxws21</frontEnd>
                 </wsdlOption>
               </wsdlOptions>
-              <extraargs>
-                <extraarg>-frontend</extraarg>
-                <extraarg>jaxws21</extraarg>
-              </extraargs>
             </configuration>
             <goals>
               <goal>wsdl2java</goal>
