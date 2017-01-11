@@ -15,14 +15,14 @@
 
 /*
  * InputSplitWithScriptedConfiguration.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.ml.dl4j.inputsplit;
 
 import adams.core.scripting.AbstractScriptingHandler;
 import adams.core.scripting.Dummy;
-import org.canova.api.split.InputSplit;
+import org.datavec.api.split.InputSplit;
 
 import java.io.DataInput;
 import java.io.DataOutput;

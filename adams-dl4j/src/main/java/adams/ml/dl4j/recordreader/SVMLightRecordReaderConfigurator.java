@@ -15,13 +15,13 @@
 
 /**
  * SVMLightRecordReaderConfigurator.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.ml.dl4j.recordreader;
 
-import org.canova.api.records.reader.RecordReader;
-import org.canova.api.records.reader.impl.SVMLightRecordReader;
+import org.datavec.api.records.reader.RecordReader;
+import org.datavec.api.records.reader.impl.misc.SVMLightRecordReader;
 
 /**
  <!-- globalinfo-start -->

@@ -15,14 +15,14 @@
 
 /**
  * FileSplitConfigurator.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.ml.dl4j.inputsplit;
 
 import adams.core.io.PlaceholderFile;
-import org.canova.api.split.FileSplit;
-import org.canova.api.split.InputSplit;
+import org.datavec.api.split.FileSplit;
+import org.datavec.api.split.InputSplit;
 
 /**
  <!-- globalinfo-start -->

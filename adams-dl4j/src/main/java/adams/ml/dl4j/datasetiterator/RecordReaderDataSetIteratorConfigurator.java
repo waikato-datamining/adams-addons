@@ -15,15 +15,15 @@
 
 /**
  * RecordReaderDataSetIterator.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.ml.dl4j.datasetiterator;
 
 import adams.ml.dl4j.recordreader.ImageRecordReaderConfigurator;
 import adams.ml.dl4j.recordreader.RecordReaderConfigurator;
-import org.canova.api.io.converters.SelfWritableConverter;
-import org.deeplearning4j.datasets.canova.RecordReaderDataSetIterator;
+import org.datavec.api.io.converters.SelfWritableConverter;
+import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 
 /**

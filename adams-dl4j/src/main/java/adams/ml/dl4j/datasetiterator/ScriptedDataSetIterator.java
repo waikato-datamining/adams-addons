@@ -15,7 +15,7 @@
 
 /*
  * ScriptedInputSplit.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.ml.dl4j.datasetiterator;
@@ -27,6 +27,7 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  <!-- globalinfo-start -->
@@ -39,24 +40,24 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- * 
+ *
  * <pre>-script &lt;adams.core.io.PlaceholderFile&gt; (property: scriptFile)
  * &nbsp;&nbsp;&nbsp;The script file to load and execute.
  * &nbsp;&nbsp;&nbsp;default: ${CWD}
  * </pre>
- * 
+ *
  * <pre>-options &lt;adams.core.base.BaseText&gt; (property: scriptOptions)
  * &nbsp;&nbsp;&nbsp;The options for the script; must consist of 'key=value' pairs separated 
  * &nbsp;&nbsp;&nbsp;by blanks; the value of 'key' can be accessed via the 'getAdditionalOptions
  * &nbsp;&nbsp;&nbsp;().getXYZ("key")' method in the script actor.
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
- * 
+ *
  * <pre>-handler &lt;adams.core.scripting.AbstractScriptingHandler&gt; (property: handler)
  * &nbsp;&nbsp;&nbsp;The handler to use for scripting.
  * &nbsp;&nbsp;&nbsp;default: adams.core.scripting.Dummy
  * </pre>
- * 
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -254,6 +255,35 @@ public class ScriptedDataSetIterator
   }
 
   /**
+   * Is resetting supported by this DataSetIterator? Many DataSetIterators do support resetting,
+   * but some don't
+   *
+   * @return true if reset method is supported; false otherwise
+   */
+  @Override
+  public boolean resetSupported() {
+    return getDataSetIterator().resetSupported();
+  }
+
+  /**
+   * Does this DataSetIterator support asynchronous prefetching of multiple DataSet objects?
+   * Most DataSetIterators do, but in some cases it may not make sense to wrap this iterator in an
+   * iterator that does asynchronous prefetching. For example, it would not make sense to use asynchronous
+   * prefetching for the following types of iterators:
+   * (a) Iterators that store their full contents in memory already
+   * (b) Iterators that re-use features/labels arrays (as future next() calls will overwrite past contents)
+   * (c) Iterators that already implement some level of asynchronous prefetching
+   * (d) Iterators that may return different data depending on when the next() method is called
+   *
+   * @return true if asynchronous prefetching from this iterator is OK; false if asynchronous prefetching should not
+   * be used with this iterator
+   */
+  @Override
+  public boolean asyncSupported() {
+    return getDataSetIterator().asyncSupported();
+  }
+
+  /**
    * Batch size
    *
    * @return
@@ -273,6 +303,11 @@ public class ScriptedDataSetIterator
     return getDataSetIterator().cursor();
   }
 
+  /**
+   * Total number of examples in the dataset
+   *
+   * @return
+   */
   @Override
   public int numExamples() {
     return getDataSetIterator().numExamples();
@@ -288,6 +323,11 @@ public class ScriptedDataSetIterator
     getDataSetIterator().setPreProcessor(preProcessor);
   }
 
+  /**
+   * Returns preprocessors, if defined
+   *
+   * @return
+   */
   @Override
   public DataSetPreProcessor getPreProcessor() {
     return getDataSetIterator().getPreProcessor();
@@ -302,11 +342,24 @@ public class ScriptedDataSetIterator
     return getDataSetIterator().getLabels();
   }
 
+  /**
+   * Returns {@code true} if the iteration has more elements.
+   * (In other words, returns {@code true} if {@link #next} would
+   * return an element rather than throwing an exception.)
+   *
+   * @return {@code true} if the iteration has more elements
+   */
   @Override
   public boolean hasNext() {
     return getDataSetIterator().hasNext();
   }
 
+  /**
+   * Returns the next element in the iteration.
+   *
+   * @return the next element in the iteration
+   * @throws NoSuchElementException if the iteration has no more elements
+   */
   @Override
   public DataSet next() {
     return getDataSetIterator().next();

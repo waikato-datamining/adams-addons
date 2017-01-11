@@ -15,14 +15,14 @@
 
 /**
  * AbstractScript.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.ml.dl4j.recordreader;
 
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.AdditionalOptions;
 import adams.flow.core.AdditionalOptionsHandler;
-import org.canova.api.records.reader.RecordReader;
+import org.datavec.api.records.reader.RecordReader;
 
 /**
  * Ancestor for record reader scripts.

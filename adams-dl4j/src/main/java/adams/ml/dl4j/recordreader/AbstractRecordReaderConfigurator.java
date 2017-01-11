@@ -15,7 +15,7 @@
 
 /**
  * AbstractRecordReaderConfigurator.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.ml.dl4j.recordreader;
@@ -24,7 +24,7 @@ import adams.core.option.AbstractOptionHandler;
 import adams.core.option.OptionUtils;
 import adams.ml.dl4j.inputsplit.FileSplitConfigurator;
 import adams.ml.dl4j.inputsplit.InputSplitConfigurator;
-import org.canova.api.records.reader.RecordReader;
+import org.datavec.api.records.reader.RecordReader;
 
 /**
  * Ancestor for record reader configurators.

@@ -15,7 +15,7 @@
 
 /*
  * ModelWithScriptedConfiguration.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.ml.dl4j.model;
@@ -42,24 +42,24 @@ import java.util.Map;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- * 
+ *
  * <pre>-script &lt;adams.core.io.PlaceholderFile&gt; (property: scriptFile)
  * &nbsp;&nbsp;&nbsp;The script file to load and execute.
  * &nbsp;&nbsp;&nbsp;default: ${CWD}
  * </pre>
- * 
+ *
  * <pre>-options &lt;adams.core.base.BaseText&gt; (property: scriptOptions)
  * &nbsp;&nbsp;&nbsp;The options for the script; must consist of 'key=value' pairs separated 
  * &nbsp;&nbsp;&nbsp;by blanks; the value of 'key' can be accessed via the 'getAdditionalOptions
  * &nbsp;&nbsp;&nbsp;().getXYZ("key")' method in the script actor.
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
- * 
+ *
  * <pre>-handler &lt;adams.core.scripting.AbstractScriptingHandler&gt; (property: handler)
  * &nbsp;&nbsp;&nbsp;The handler to use for scripting.
  * &nbsp;&nbsp;&nbsp;default: adams.core.scripting.Dummy
  * </pre>
- * 
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -90,7 +90,7 @@ public class ModelWithScriptedConfiguration
   public String globalInfo() {
     return
       "A meta-model that uses any scripting handler for generating the "
-	+ "model in the specified script file.";
+        + "model in the specified script file.";
   }
 
   /**
@@ -115,8 +115,8 @@ public class ModelWithScriptedConfiguration
   public String scriptOptionsTipText() {
     return
       "The options for the script; must consist of 'key=value' pairs "
-	+ "separated by blanks; the value of 'key' can be accessed via the "
-	+ "'getAdditionalOptions().getXYZ(\"key\")' method in the script actor.";
+        + "separated by blanks; the value of 'key' can be accessed via the "
+        + "'getAdditionalOptions().getXYZ(\"key\")' method in the script actor.";
   }
 
   /**
@@ -220,7 +220,7 @@ public class ModelWithScriptedConfiguration
     if (m_ModelConfiguratorObject == null) {
       msg = check();
       if (msg != null)
-	throw new IllegalStateException(msg);
+        throw new IllegalStateException(msg);
     }
     if (m_ModelConfiguratorObject != null)
       m_Model = m_ModelConfiguratorObject.configureModel(numInput, numOutput);
@@ -316,11 +316,21 @@ public class ModelWithScriptedConfiguration
     getModel().setParams(params);
   }
 
+  /**
+   * Set the initial parameters array as a view of the full (backprop) network parameters
+   * NOTE: this is intended to be used internally in MultiLayerNetwork and ComputationGraph, not by users.
+   * @param indArray a 1 x nParams row vector that is a view of the larger (MLN/CG) parameters array
+   */
   @Override
   public void setParamsViewArray(INDArray indArray) {
     getModel().setParamsViewArray(indArray);
   }
 
+  /**
+   * Set the gradients array as a view of the full (backprop) network parameters
+   * NOTE: this is intended to be used internally in MultiLayerNetwork and ComputationGraph, not by users.
+   * @param indArray a 1 x nParams row vector that is a view of the larger (MLN/CG) gradients array
+   */
   @Override
   public void setBackpropGradientsViewArray(INDArray indArray) {
     getModel().setBackpropGradientsViewArray(indArray);
@@ -342,6 +352,14 @@ public class ModelWithScriptedConfiguration
   @Override
   public void fit() {
     getModel().fit();
+  }
+
+  /**
+   * Update layer weights and biases with gradient change
+   */
+  @Override
+  public void update(Gradient gradient) {
+    getModel().update(gradient);
   }
 
   /**
@@ -458,6 +476,17 @@ public class ModelWithScriptedConfiguration
   @Override
   public Map<String, INDArray> paramTable() {
     return getModel().paramTable();
+  }
+
+  /**
+   * Table of parameters by key, for backprop
+   * For many models (dense layers, etc) - all parameters are backprop parameters
+   * @param b If true, return backprop params only. If false: return all params (equivalent to
+   *                           paramsTable())
+   */
+  @Override
+  public Map<String, INDArray> paramTable(boolean b) {
+    return getModel().paramTable(b);
   }
 
   /**

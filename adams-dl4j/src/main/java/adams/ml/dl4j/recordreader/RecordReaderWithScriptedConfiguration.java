@@ -15,18 +15,20 @@
 
 /*
  * RecordReaderWithScriptedConfiguration.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.ml.dl4j.recordreader;
 
 import adams.core.scripting.AbstractScriptingHandler;
 import adams.core.scripting.Dummy;
-import org.canova.api.conf.Configuration;
-import org.canova.api.records.listener.RecordListener;
-import org.canova.api.records.reader.RecordReader;
-import org.canova.api.split.InputSplit;
-import org.canova.api.writable.Writable;
+import org.datavec.api.conf.Configuration;
+import org.datavec.api.records.Record;
+import org.datavec.api.records.listener.RecordListener;
+import org.datavec.api.records.metadata.RecordMetaData;
+import org.datavec.api.records.reader.RecordReader;
+import org.datavec.api.split.InputSplit;
+import org.datavec.api.writable.Writable;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -45,24 +47,24 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- * 
+ *
  * <pre>-script &lt;adams.core.io.PlaceholderFile&gt; (property: scriptFile)
  * &nbsp;&nbsp;&nbsp;The script file to load and execute.
  * &nbsp;&nbsp;&nbsp;default: ${CWD}
  * </pre>
- * 
+ *
  * <pre>-options &lt;adams.core.base.BaseText&gt; (property: scriptOptions)
  * &nbsp;&nbsp;&nbsp;The options for the script; must consist of 'key=value' pairs separated 
  * &nbsp;&nbsp;&nbsp;by blanks; the value of 'key' can be accessed via the 'getAdditionalOptions
  * &nbsp;&nbsp;&nbsp;().getXYZ("key")' method in the script actor.
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
- * 
+ *
  * <pre>-handler &lt;adams.core.scripting.AbstractScriptingHandler&gt; (property: handler)
  * &nbsp;&nbsp;&nbsp;The handler to use for scripting.
  * &nbsp;&nbsp;&nbsp;default: adams.core.scripting.Dummy
  * </pre>
- * 
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -286,10 +288,15 @@ public class RecordReaderWithScriptedConfiguration
    * @return
    */
   @Override
-  public Collection<Writable> next() {
+  public List<Writable> next() {
     return getRecordReader().next();
   }
 
+  /**
+   * Whether there are anymore records
+   *
+   * @return
+   */
   @Override
   public boolean hasNext() {
     return getRecordReader().hasNext();
@@ -312,20 +319,66 @@ public class RecordReaderWithScriptedConfiguration
    * @throws IOException if error occurs during reading from the input stream
    */
   @Override
-  public Collection<Writable> record(URI uri, DataInputStream dataInputStream) throws IOException {
-    return getRecordReader().record(uri, dataInputStream);
+  public List<Writable> record(URI uri, DataInputStream dataInputStream) throws IOException {
+    return null;
   }
 
+  /**
+   * Similar to {@link #next()}, but returns a {@link Record} object, that may include metadata such as the source
+   * of the data
+   *
+   * @return next record
+   */
   @Override
-  public Collection<RecordListener> getListeners() {
-    return getRecordReader().getListeners();
+  public Record nextRecord() {
+    return getRecordReader().nextRecord();
   }
 
+  /**
+   * Load a single record from the given {@link RecordMetaData} instance<br>
+   * Note: that for data that isn't splittable (i.e., text data that needs to be scanned/split), it is more efficient to
+   * load multiple records at once using {@link #loadFromMetaData(List)}
+   *
+   * @param recordMetaData Metadata for the record that we want to load from
+   * @return Single record for the given RecordMetaData instance
+   * @throws IOException If I/O error occurs during loading
+   */
+  @Override
+  public Record loadFromMetaData(RecordMetaData recordMetaData) throws IOException {
+    return null;
+  }
+
+  /**
+   * Load multiple records from the given a list of {@link RecordMetaData} instances<br>
+   *
+   * @param recordMetaDatas Metadata for the records that we want to load from
+   * @return Multiple records for the given RecordMetaData instances
+   * @throws IOException If I/O error occurs during loading
+   */
+  @Override
+  public List<Record> loadFromMetaData(List<RecordMetaData> list) throws IOException {
+    return null;
+  }
+
+  /**
+   * Get the record listeners for this record reader.
+   */
+  @Override
+  public List<RecordListener> getListeners() {
+    return null;
+  }
+
+  /**
+   * Set the record listeners for this record reader.
+   */
   @Override
   public void setListeners(RecordListener... recordListeners) {
     getRecordReader().setListeners(recordListeners);
   }
 
+  /**
+   * Set the record listeners for this record reader.
+   */
   @Override
   public void setListeners(Collection<RecordListener> collection) {
     getRecordReader().setListeners(collection);

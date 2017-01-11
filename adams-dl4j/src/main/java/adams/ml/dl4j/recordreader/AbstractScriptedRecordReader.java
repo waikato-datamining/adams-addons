@@ -15,7 +15,7 @@
 
 /*
  * AbstractScriptedRecordReader.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -25,7 +25,7 @@ import adams.core.base.BaseText;
 import adams.core.io.PlaceholderFile;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.scripting.FileBasedScriptingWithOptions;
-import org.canova.api.records.reader.RecordReader;
+import org.datavec.api.records.reader.RecordReader;
 
 /**
  * Abstract ancestor for input splits that execute external scripts.

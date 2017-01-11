@@ -15,17 +15,14 @@
 
 /**
  * ImageRecordReaderConfigurator.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.ml.dl4j.recordreader;
 
-import adams.core.base.BaseObject;
-import adams.core.base.BaseString;
-import org.canova.api.records.reader.RecordReader;
-import org.canova.image.recordreader.ImageRecordReader;
-
-import java.util.Arrays;
+import org.datavec.api.io.labels.ParentPathLabelGenerator;
+import org.datavec.api.records.reader.RecordReader;
+import org.datavec.image.recordreader.ImageRecordReader;
 
 /**
  <!-- globalinfo-start -->
@@ -86,12 +83,6 @@ public class ImageRecordReaderConfigurator
   /** the number of channels. */
   protected int m_Channels;
 
-  /** whether to append the label. */
-  protected boolean m_AppendLabel;
-
-  /** the labels. */
-  protected BaseString[] m_Labels;
-
   /**
    * Returns a string describing the object.
    *
@@ -120,14 +111,6 @@ public class ImageRecordReaderConfigurator
     m_OptionManager.add(
       "channels", "channels",
       3, 1, null);
-
-    m_OptionManager.add(
-      "append-label", "appendLabel",
-      false);
-
-    m_OptionManager.add(
-      "label", "labels",
-      new BaseString[0]);
   }
 
   /**
@@ -224,70 +207,12 @@ public class ImageRecordReaderConfigurator
   }
 
   /**
-   * Sets whether to append the label.
-   *
-   * @param value	true if to append the label
-   */
-  public void setAppendLabel(boolean value) {
-    m_AppendLabel = value;
-    reset();
-  }
-
-  /**
-   * Returns whether to append the label.
-   *
-   * @return 		true if to append the label
-   */
-  public boolean getAppendLabel() {
-    return m_AppendLabel;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return		tip text for this property suitable for
-   *             	displaying in the GUI or for listing the options.
-   */
-  public String appendLabelTipText() {
-    return "Whether to append the label.";
-  }
-
-  /**
-   * Sets the labels to use.
-   *
-   * @param value	the labels
-   */
-  public void setLabels(BaseString[] value) {
-    m_Labels = value;
-    reset();
-  }
-
-  /**
-   * Returns the labels to use.
-   *
-   * @return 		the labels
-   */
-  public BaseString[] getLabels() {
-    return m_Labels;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return		tip text for this property suitable for
-   *             	displaying in the GUI or for listing the options.
-   */
-  public String labelsTipText() {
-    return "The labels to use.";
-  }
-
-  /**
    * Configures the actual {@link RecordReader} and returns it.
    *
    * @return		the reader
    */
   @Override
   protected RecordReader doConfigureRecordReader() {
-    return new ImageRecordReader(m_Width, m_Height, m_Channels, m_AppendLabel, Arrays.asList(BaseObject.toStringArray(m_Labels)));
+    return new ImageRecordReader(m_Height, m_Width, m_Channels, new ParentPathLabelGenerator());
   }
 }

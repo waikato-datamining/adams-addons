@@ -8,12 +8,12 @@
 # Version: $Revision$
 
 # record readers
-org.canova.api.records.reader.RecordReader=\
+org.datavec.api.records.reader.RecordReader=\
   adams.ml.dl4j.recordreader,\
-  org.canova.api.records.reader,\
-  org.canova.api.records.reader.impl,\
-  org.canova.codec.reader,\
-  org.canova.image.recordreader
+  org.datavec.api.records.reader,\
+  org.datavec.api.records.reader.impl,\
+  org.datavec.codec.reader,\
+  org.datavec.image.recordreader
 
 # record reader configurators
 adams.ml.dl4j.recordreader.RecordReaderConfigurator=\
@@ -63,9 +63,9 @@ adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorConfigurator=\
   adams.ml.dl4j.datasetpreprocessor
 
 # the input splitters
-org.canova.api.split.InputSplit=\
+org.datavec.api.split.InputSplit=\
   adams.ml.dl4j.inputsplit,\
-  org.canova.api.split
+  org.datavec.api.split
 
 # the input splitter configurators
 adams.ml.dl4j.inputsplit.InputSplitConfigurator=\
