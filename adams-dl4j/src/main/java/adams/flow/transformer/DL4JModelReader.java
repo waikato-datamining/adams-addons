@@ -15,7 +15,7 @@
 
 /*
  * DL4JModelReader.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -95,6 +95,6 @@ public class DL4JModelReader
    * @return 			a description suitable for displaying in the gui
    */
   public String globalInfo() {
-    return "Actor for loading a model.";
+    return "Actor for loading a model (from ZIP file).";
   }
 }

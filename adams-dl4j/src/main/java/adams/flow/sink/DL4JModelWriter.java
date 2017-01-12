@@ -15,7 +15,7 @@
 
 /*
  * DL4JModelWriter.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
@@ -96,7 +96,7 @@ public class DL4JModelWriter
    * @return 			a description suitable for displaying in the gui
    */
   public String globalInfo() {
-    return "Actor for saving a model.";
+    return "Actor for saving a model as ZIP file.";
   }
 
   /**

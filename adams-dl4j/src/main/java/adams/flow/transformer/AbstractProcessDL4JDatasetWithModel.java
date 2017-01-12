@@ -30,7 +30,7 @@ import adams.flow.container.DL4JModelContainer;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.Token;
-import adams.ml.dl4j.ModelSerialization;
+import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.dataset.DataSet;
 
 import java.util.Hashtable;
@@ -421,7 +421,7 @@ public abstract class AbstractProcessDL4JDatasetWithModel<T>
     else {
       // load model
       try {
-        m_Model = (T) ModelSerialization.read(m_ModelFile);
+        m_Model = (T) ModelSerializer.restoreMultiLayerNetwork(m_ModelFile.getAbsoluteFile());
       }
       catch (Exception e) {
         m_Model = null;

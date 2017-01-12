@@ -22,8 +22,8 @@ package adams.flow.sink;
 
 import adams.core.SerializationHelper;
 import adams.flow.container.DL4JModelContainer;
-import adams.ml.dl4j.ModelSerialization;
 import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.util.ModelSerializer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -107,7 +107,7 @@ public abstract class AbstractDL4JModelWriter
 	  obj = m_InputToken.getPayload();
       }
       if (model != null) {
-	ModelSerialization.write(m_OutputFile, model);
+	ModelSerializer.writeModel(model, m_OutputFile.getAbsoluteFile(), true);
       }
       else if (obj != null) {
 	SerializationHelper.write(

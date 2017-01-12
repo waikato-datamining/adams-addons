@@ -24,8 +24,8 @@ import adams.core.QuickInfoHelper;
 import adams.core.io.PlaceholderFile;
 import adams.flow.container.DL4JModelContainer;
 import adams.flow.core.Token;
-import adams.ml.dl4j.ModelSerialization;
 import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.util.ModelSerializer;
 
 import java.io.File;
 
@@ -136,7 +136,7 @@ public abstract class AbstractDL4JModelReader
       file = new PlaceholderFile((String) m_InputToken.getPayload());
 
     try {
-      model = ModelSerialization.read(file);
+      model = ModelSerializer.restoreMultiLayerNetwork(file.getAbsoluteFile());
       if (m_OutputOnlyModel) {
 	m_OutputToken = new Token(model);
       }
