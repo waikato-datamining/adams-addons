@@ -10,10 +10,15 @@
 # record readers
 org.datavec.api.records.reader.RecordReader=\
   adams.ml.dl4j.recordreader,\
+  org.datavec.codec.reader,\
+  org.datavec.image.recordreader,\
   org.datavec.api.records.reader,\
   org.datavec.api.records.reader.impl,\
-  org.datavec.codec.reader,\
-  org.datavec.image.recordreader
+  org.datavec.api.records.reader.impl.csv,\
+  org.datavec.api.records.reader.impl.misc,\
+  org.datavec.api.records.reader.impl.regex,\
+  org.datavec.api.records.reader.impl.collection
+
 
 # record reader configurators
 adams.ml.dl4j.recordreader.RecordReaderConfigurator=\
