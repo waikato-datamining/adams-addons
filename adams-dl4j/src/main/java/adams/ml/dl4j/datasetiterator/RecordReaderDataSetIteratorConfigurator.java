@@ -51,8 +51,8 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
  * 
  * <pre>-label-index &lt;int&gt; (property: labelIndex)
  * &nbsp;&nbsp;&nbsp;The index of the attribute with the labels (0-based).
- * &nbsp;&nbsp;&nbsp;default: 1
- * &nbsp;&nbsp;&nbsp;minimum: 1
+ * &nbsp;&nbsp;&nbsp;default: 0
+ * &nbsp;&nbsp;&nbsp;minimum: 0
  * </pre>
  * 
  * <pre>-num-possible-labels &lt;int&gt; (property: numPossibleLabels)
@@ -118,7 +118,7 @@ public class RecordReaderDataSetIteratorConfigurator
 
     m_OptionManager.add(
       "label-index", "labelIndex",
-      1, 1, null);
+      0, 0, null);
 
     m_OptionManager.add(
       "num-possible-labels", "numPossibleLabels",
