@@ -15,7 +15,7 @@
 
 /**
  * AbstractDataSetPreProcessorConfigurator.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.ml.dl4j.datasetpreprocessor;
@@ -58,7 +58,7 @@ public abstract class AbstractDataSetPreProcessorConfigurator
    *
    * @return		the preprocessor
    */
-  public DataSetPreProcessor configurePreProcessor() {
+  public DataSetPreProcessor configureDataSetPreProcessor() {
     check();
     return doConfigurePreProcessor();
   }
