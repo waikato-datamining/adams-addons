@@ -1,17 +1,30 @@
 # Project: adams
-# Date: 2017-01-13 16:49:41
+# Date: 2017-01-16 09:20:40
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Uses a random split to train a model and then\\nevaluate it on the animals image dataset." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
   adams.flow.source.DL4JModelConfigurator -model-configurator adams.ml.dl4j.model.AnimalsLeNet
- adams.flow.source.DL4JDatasetIterator -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.ImageRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.FileSplitConfigurator -root-dir ${FLOWS}/data/animals -allow-format jpg -recursive true\\\" -width 100 -height 100\" -batch-size 1000 -num-possible-labels 4" -use-preprocessor true -preprocessor adams.ml.dl4j.datasetpreprocessor.ImageScaler
- adams.flow.transformer.DL4JRandomSplit
- adams.flow.transformer.DL4JTrainTestSetEvaluator -always-use-container true
- adams.flow.control.Branch
-  adams.flow.control.Sequence -name summary
-   adams.flow.transformer.DL4JEvaluationSummary -confusion-matrix true
-   adams.flow.sink.Display -name Summary -short-title true -writer adams.data.io.output.NullWriter
-  adams.flow.control.Sequence -name stats
-   adams.flow.transformer.DL4JEvaluationValues -statistic ACCURACY -statistic CLASS_COUNT -statistic F1 -statistic F1_CLASS -statistic FALSE_ALARM_RATE -statistic FALSE_NEGATIVE_RATE -statistic FALSE_NEGATIVE_RATE_CLASS -statistic FALSE_POSITIVE_RATE -statistic FALSE_POSITIVE_RATE_CLASS -statistic PRECISION -statistic PRECISION_CLASS -statistic RECALL -statistic RECALL_CLASS -statistic ROW_COUNT
-   adams.flow.sink.SpreadSheetDisplay -name Statistics -short-title true -x -3 -writer adams.data.io.output.NullWriter
+  adams.flow.source.SequenceSource -name Test
+   adams.flow.source.DL4JDatasetIterator -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.ImageRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.FileSplitConfigurator -root-dir ${FLOWS}/data/animals -allow-format jpg -recursive true\\\" -width 100 -height 100\" -batch-size 1000 -num-possible-labels 4" -use-preprocessor true -preprocessor adams.ml.dl4j.datasetpreprocessor.ImageScaler
+   adams.flow.transformer.DL4JRandomSplit
+   adams.flow.control.ContainerValuePicker -value Test -switch-outputs true
+ adams.flow.standalone.SetVariable -var-name batchcount -var-value 0
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name train
+  adams.flow.source.DL4JDatasetIterator -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.ImageRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.FileSplitConfigurator -root-dir ${FLOWS}/data/animals -allow-format jpg -recursive true\\\" -width 100 -height 100\" -batch-size 20 -num-possible-labels 4" -use-preprocessor true -preprocessor adams.ml.dl4j.datasetpreprocessor.ImageScaler
+  adams.flow.transformer.DL4JRandomSplit
+  adams.flow.control.ContainerValuePicker -value Train -switch-outputs true
+  adams.flow.transformer.IncVariable -var-name batchcount
+  adams.flow.transformer.DL4JTrainModel
+  adams.flow.transformer.SetStorageValue -storage-name model
+ adams.flow.control.Trigger -name evaluate
+  adams.flow.source.StorageValue -storage-name model
+  adams.flow.transformer.DL4JTestSetEvaluator -always-use-container true -testset Test
+  adams.flow.control.Branch
+   adams.flow.control.Sequence -name summary
+    adams.flow.transformer.DL4JEvaluationSummary -confusion-matrix true
+    adams.flow.sink.Display -name Summary -short-title true -writer adams.data.io.output.NullWriter
+   adams.flow.control.Sequence -name stats
+    adams.flow.transformer.DL4JEvaluationValues -statistic ACCURACY -statistic CLASS_COUNT -statistic F1 -statistic F1_CLASS -statistic FALSE_ALARM_RATE -statistic FALSE_NEGATIVE_RATE -statistic FALSE_NEGATIVE_RATE_CLASS -statistic FALSE_POSITIVE_RATE -statistic FALSE_POSITIVE_RATE_CLASS -statistic PRECISION -statistic PRECISION_CLASS -statistic RECALL -statistic RECALL_CLASS -statistic ROW_COUNT
+    adams.flow.sink.SpreadSheetDisplay -name Statistics -short-title true -x -3 -writer adams.data.io.output.NullWriter
