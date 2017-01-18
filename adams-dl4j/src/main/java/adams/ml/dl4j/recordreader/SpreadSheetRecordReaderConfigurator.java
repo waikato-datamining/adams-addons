@@ -20,6 +20,7 @@
 
 package adams.ml.dl4j.recordreader;
 
+import adams.data.conversion.SpreadSheetToNumeric;
 import adams.data.io.input.CsvSpreadSheetReader;
 import adams.data.io.input.SpreadSheetReader;
 import org.datavec.api.records.reader.RecordReader;
@@ -46,6 +47,12 @@ import org.datavec.api.records.reader.RecordReader;
  * &nbsp;&nbsp;&nbsp;default: adams.data.io.input.CsvSpreadSheetReader -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.DefaultSpreadSheet
  * </pre>
  * 
+ * <pre>-conversion &lt;adams.data.conversion.SpreadSheetToNumeric&gt; (property: conversion)
+ * &nbsp;&nbsp;&nbsp;The conversion setup to use for converting non-numeric cells into numeric 
+ * &nbsp;&nbsp;&nbsp;ones.
+ * &nbsp;&nbsp;&nbsp;default: adams.data.conversion.SpreadSheetToNumeric -missing-value NaN -unhandled NaN
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -58,6 +65,9 @@ public class SpreadSheetRecordReaderConfigurator
 
   /** the reader to use. */
   protected SpreadSheetReader m_Reader;
+
+  /** the conversion for turning non-numeric cells into numeric ones. */
+  protected SpreadSheetToNumeric m_Conversion;
 
   /**
    * Returns a string describing the object.
@@ -79,6 +89,10 @@ public class SpreadSheetRecordReaderConfigurator
     m_OptionManager.add(
       "reader", "reader",
       new CsvSpreadSheetReader());
+
+    m_OptionManager.add(
+      "conversion", "conversion",
+      new SpreadSheetToNumeric());
   }
 
   /**
@@ -111,12 +125,41 @@ public class SpreadSheetRecordReaderConfigurator
   }
 
   /**
+   * Sets the conversion setup for turning non-numeric cells into numeric ones.
+   *
+   * @param value	the conversion
+   */
+  public void setConversion(SpreadSheetToNumeric value) {
+    m_Conversion = value;
+    reset();
+  }
+
+  /**
+   * Returns the conversion setup for turning non-numeric cells into numeric ones.
+   *
+   * @return 		the conversion
+   */
+  public SpreadSheetToNumeric getConversion() {
+    return m_Conversion;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String conversionTipText() {
+    return "The conversion setup to use for converting non-numeric cells into numeric ones.";
+  }
+
+  /**
    * Configures the actual {@link RecordReader} and returns it.
    *
    * @return		the reader
    */
   @Override
   protected RecordReader doConfigureRecordReader() {
-    return new SpreadSheetRecordReader(m_Reader);
+    return new SpreadSheetRecordReader(m_Reader, m_Conversion);
   }
 }

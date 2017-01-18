@@ -23,6 +23,7 @@ package adams.ml.dl4j.recordreader;
 import adams.core.io.FileUtils;
 import adams.core.option.OptionUtils;
 import adams.data.SharedStringsTable;
+import adams.data.conversion.SpreadSheetToNumeric;
 import adams.data.io.input.CsvSpreadSheetReader;
 import adams.data.io.input.SpreadSheetReader;
 import adams.data.spreadsheet.Cell;
@@ -62,11 +63,17 @@ public class SpreadSheetRecordReader
   /** the key for the reader commandline. */
   public final static String READER_CMDLINE = "ReaderCmdLine";
 
+  /** the key for the conversion commandline. */
+  public final static String CONVERSION_CMDLINE = "ConversionCmdLine";
+
   /** the configuration. */
   protected Configuration m_Configuration;
 
   /** the spreadsheet reader to use. */
   protected SpreadSheetReader m_Reader;
+
+  /** the conversion for turning non-numeric cells into numeric ones. */
+  protected SpreadSheetToNumeric m_Conversion;
 
   /** the locations to read. */
   protected URI[] m_Locations;
@@ -88,10 +95,11 @@ public class SpreadSheetRecordReader
    *
    * @param reader	the reader to use
    */
-  public SpreadSheetRecordReader(SpreadSheetReader reader) {
+  public SpreadSheetRecordReader(SpreadSheetReader reader, SpreadSheetToNumeric conversion) {
     super();
 
     m_Reader     = reader;
+    m_Conversion = conversion;
     m_SplitIndex = 0;
     m_Row        = 0;
   }
@@ -125,8 +133,9 @@ public class SpreadSheetRecordReader
    * @throws IOException	if failed to read
    */
   protected SpreadSheet getSheet(int index) throws IOException {
-    SpreadSheet result;
+    SpreadSheet 	result;
     InputStream 	stream;
+    String		msg;
 
     result = null;
 
@@ -151,6 +160,20 @@ public class SpreadSheetRecordReader
       }
     }
 
+    // ensure we only have numeric cells
+    if (result != null) {
+      m_Conversion.setInput(result);
+      msg = m_Conversion.convert();
+      if (msg != null) {
+	result = null;
+	System.err.println("Failed to convert spreadsheet to numeric:\n" + msg);
+      }
+      else {
+	result = (SpreadSheet) m_Conversion.getOutput();
+      }
+      m_Conversion.cleanUp();
+    }
+
     return result;
   }
 
@@ -169,6 +192,13 @@ public class SpreadSheetRecordReader
     }
     catch (Exception e) {
       m_Reader = new CsvSpreadSheetReader();
+    }
+
+    try {
+      m_Conversion = (SpreadSheetToNumeric) OptionUtils.forCommandLine(SpreadSheetToNumeric.class, conf.get(CONVERSION_CMDLINE, new SpreadSheetToNumeric().toCommandLine()));
+    }
+    catch (Exception e) {
+      m_Conversion = new SpreadSheetToNumeric();
     }
   }
 
