@@ -22,6 +22,7 @@ package adams.ml.dl4j.recordreader;
 
 import adams.core.io.FileUtils;
 import adams.core.option.OptionUtils;
+import adams.data.SharedStringsTable;
 import adams.data.io.input.CsvSpreadSheetReader;
 import adams.data.io.input.SpreadSheetReader;
 import adams.data.spreadsheet.Cell;
@@ -47,6 +48,8 @@ import java.util.List;
 
 /**
  * Record reader that wraps around an ADAMS {@link SpreadSheetReader}.
+ * For strings, uses the index from the shared strings table.
+ * For missing values and non-supported cell types, NaN is used.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
@@ -174,6 +177,7 @@ public class SpreadSheetRecordReader
     Row			row;
     int			i;
     Cell 		cell;
+    SharedStringsTable	table;
 
     cells = null;
 
@@ -195,6 +199,7 @@ public class SpreadSheetRecordReader
     }
 
     if (m_Sheet != null) {
+      table = m_Sheet.getSharedStringsTable();
       cells = new ArrayList<>();
       row   = m_Sheet.getRow(m_Row);
       for (i = 0; i < m_Sheet.getColumnCount(); i++) {
@@ -224,7 +229,7 @@ public class SpreadSheetRecordReader
 	      cells.add(new LongWritable(cell.toAnyDateType().getTime()));
 	      break;
 	    case STRING:
-	      cells.add(new DoubleWritable(Double.NaN));  // TODO internal format?
+	      cells.add(new IntWritable(table.getIndex(cell.getContent())));
 	      break;
 	    default:
 	      cells.add(new DoubleWritable(Double.NaN));
