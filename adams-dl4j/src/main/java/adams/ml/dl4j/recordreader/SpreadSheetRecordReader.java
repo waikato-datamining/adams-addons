@@ -20,6 +20,7 @@
 
 package adams.ml.dl4j.recordreader;
 
+import adams.core.io.FileUtils;
 import adams.core.option.OptionUtils;
 import adams.data.io.input.CsvSpreadSheetReader;
 import adams.data.io.input.SpreadSheetReader;
@@ -35,7 +36,6 @@ import org.datavec.api.split.InputSplit;
 import org.datavec.api.writable.DoubleWritable;
 import org.datavec.api.writable.IntWritable;
 import org.datavec.api.writable.LongWritable;
-import org.datavec.api.writable.NullWritable;
 import org.datavec.api.writable.Writable;
 
 import java.io.DataInputStream;
@@ -127,10 +127,19 @@ public class SpreadSheetRecordReader
 
     result = null;
 
-    if (m_Locations.length > 0) {
-      stream  = m_Locations[index].toURL().openStream();
-      result = m_Reader.read(stream);
-      stream.close();
+    if (m_Locations.length > index) {
+      stream = null;
+      try {
+	stream = m_Locations[index].toURL().openStream();
+	result = m_Reader.read(stream);
+      }
+      finally {
+	FileUtils.closeQuietly(stream);
+      }
+      // failed to read from stream? try as file
+      if (result == null) {
+	result = m_Reader.read(m_Locations[index].toURL().getFile());
+      }
     }
 
     return result;
@@ -190,13 +199,13 @@ public class SpreadSheetRecordReader
       row   = m_Sheet.getRow(m_Row);
       for (i = 0; i < m_Sheet.getColumnCount(); i++) {
 	if (!row.hasCell(i)) {
-	  cells.add(new NullWritable());
+	  cells.add(new DoubleWritable(Double.NaN));
 	}
 	else {
 	  cell = row.getCell(i);
 	  switch (cell.getContentType()) {
 	    case MISSING:
-	      cells.add(new NullWritable());
+	      cells.add(new DoubleWritable(Double.NaN));
 	      break;
 	    case LONG:
 	      cells.add(new LongWritable(cell.toLong()));
@@ -215,10 +224,10 @@ public class SpreadSheetRecordReader
 	      cells.add(new LongWritable(cell.toAnyDateType().getTime()));
 	      break;
 	    case STRING:
-	      cells.add(new NullWritable());  // TODO internal format?
+	      cells.add(new DoubleWritable(Double.NaN));  // TODO internal format?
 	      break;
 	    default:
-	      cells.add(new NullWritable());
+	      cells.add(new DoubleWritable(Double.NaN));
 	  }
 	}
       }
@@ -265,6 +274,13 @@ public class SpreadSheetRecordReader
     }
   }
 
+  /**
+   * Load the record from the given DataInputStream
+   * Unlike {@link #next()} the internal state of the RecordReader is not modified
+   * Implementations of this method should not close the DataInputStream
+   *
+   * @throws IOException if error occurs during reading from the input stream
+   */
   @Override
   public List<Writable> record(URI uri, DataInputStream dataInputStream) throws IOException {
     // TODO
@@ -285,12 +301,28 @@ public class SpreadSheetRecordReader
     return new org.datavec.api.records.impl.Record(next, meta);
   }
 
+  /**
+   * Load a single record from the given {@link RecordMetaData} instance<br>
+   * Note: that for data that isn't splittable (i.e., text data that needs to be scanned/split), it is more efficient to
+   * load multiple records at once using {@link #loadFromMetaData(List)}
+   *
+   * @param recordMetaData Metadata for the record that we want to load from
+   * @return Single record for the given RecordMetaData instance
+   * @throws IOException If I/O error occurs during loading
+   */
   @Override
   public Record loadFromMetaData(RecordMetaData recordMetaData) throws IOException {
     // TODO
     return null;
   }
 
+  /**
+   * Load multiple records from the given a list of {@link RecordMetaData} instances<br>
+   *
+   * @param recordMetaDatas Metadata for the records that we want to load from
+   * @return Multiple records for the given RecordMetaData instances
+   * @throws IOException If I/O error occurs during loading
+   */
   @Override
   public List<Record> loadFromMetaData(List<RecordMetaData> recordMetaDatas) throws IOException {
     // TODO
