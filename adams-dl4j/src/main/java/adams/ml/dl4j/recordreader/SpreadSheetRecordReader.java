@@ -131,17 +131,23 @@ public class SpreadSheetRecordReader
     result = null;
 
     if (m_Locations.length > index) {
-      stream = null;
+      // try reading from file
       try {
-	stream = m_Locations[index].toURL().openStream();
-	result = m_Reader.read(stream);
-      }
-      finally {
-	FileUtils.closeQuietly(stream);
-      }
-      // failed to read from stream? try as file
-      if (result == null) {
 	result = m_Reader.read(m_Locations[index].toURL().getFile());
+      }
+      catch (Exception e) {
+	// ignored
+      }
+      // try reading from stream
+      if (result == null) {
+	stream = null;
+	try {
+	  stream = m_Locations[index].toURL().openStream();
+	  result = m_Reader.read(stream);
+	}
+	finally {
+	  FileUtils.closeQuietly(stream);
+	}
       }
     }
 
