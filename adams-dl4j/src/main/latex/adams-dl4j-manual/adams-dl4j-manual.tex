@@ -89,13 +89,15 @@ The following sources are available:
 
 The following transformers are available:
 \begin{tight_itemize}
-  \item \textit{DL4JRandomSplit} -- generates a random split on the incoming dataset.
+  \item \textit{DL4JCrossValidationSplit} -- generates sequence of train/test
+  splits from the incoming dataset.
   \item \textit{DL4JDatasetInfo} -- outputs information about a dataset.
   \item \textit{DL4JEvaluationSummary} -- generates a summary from an Evaluation
   object/container.
   \item \textit{DL4JEvaluationValues} -- retrieves statistics from an Evaluation
   object/container and places them in a spreadsheet.
   \item \textit{DL4JModelReader} -- reads a serialized model from disk.
+  \item \textit{DL4JRandomSplit} -- generates a random split on the incoming dataset.
   \item \textit{DL4JScoring} -- generates scores (= predictions) for a dataset
   using a built model.
   \item \textit{DL4JTestSetEvaluator} -- evaluates an incoming built model on a
