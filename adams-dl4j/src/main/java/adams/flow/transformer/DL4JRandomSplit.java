@@ -15,7 +15,7 @@
 
 /*
  * DL4JRandomSplit.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -297,7 +297,8 @@ public class DL4JRandomSplit
     data = (DataSet) m_InputToken.getPayload();
     if (!m_PreserveOrder) {
       Nd4j.shuffle(data.getFeatureMatrix(), new Random(m_Seed), 1);
-      Nd4j.shuffle(data.getLabels(), new Random(m_Seed), 1);
+      if (data.getLabels() != null)
+        Nd4j.shuffle(data.getLabels(), new Random(m_Seed), 1);
     }
 
     split         = data.splitTestAndTrain(m_Percentage);
