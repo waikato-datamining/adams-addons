@@ -291,13 +291,15 @@ public class DL4JCrossValidationEvaluator
       if (result == null) {
 	eval = new Evaluation(data.numOutcomes());
 	iter = new KFoldIterator(m_Folds, data);
-	while (iter.hasNext()) {
+	while (iter.hasNext() && !m_Stopped) {
 	  train = iter.next();
 	  test  = iter.testFold();
 	  model = conf.configureModel(data.numInputs(), data.numOutcomes());
 	  ((MultiLayerNetwork) model).fit(train);
 	  eval.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
 	}
+	if (m_Stopped)
+	  eval = null;
       }
 
       // broadcast result
