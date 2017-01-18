@@ -15,7 +15,7 @@
 
 /**
  * DL4JDatasetIterator.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.source;
@@ -26,8 +26,11 @@ import adams.ml.dl4j.datasetiterator.DataSetIteratorConfigurator;
 import adams.ml.dl4j.datasetiterator.DataSetIteratorWithScriptedConfiguration;
 import adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorConfigurator;
 import adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorWithScriptedConfiguration;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -65,8 +68,9 @@ import org.nd4j.linalg.dataset.DataSet;
  * </pre>
  * 
  * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
- * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this 
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical 
+ * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
@@ -94,8 +98,9 @@ import org.nd4j.linalg.dataset.DataSet;
  * &nbsp;&nbsp;&nbsp;default: adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorWithScriptedConfiguration -handler adams.core.scripting.Dummy
  * </pre>
  * 
- * <pre>-normalize-zero-mean-zero-unit-variance &lt;boolean&gt; (property: normalizeZeroMeanZeroUnitVariance)
- * &nbsp;&nbsp;&nbsp;If enabled, subtract by the column means and divide by the standard deviation.
+ * <pre>-full-dataset &lt;boolean&gt; (property: fullDataset)
+ * &nbsp;&nbsp;&nbsp;If enabled, the dataset is returned in full rather than in batches (eg for 
+ * &nbsp;&nbsp;&nbsp;cross-validation).
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
@@ -118,11 +123,11 @@ public class DL4JDatasetIterator
   /** the preprocessor. */
   protected DataSetPreProcessorConfigurator m_PreProcessor;
 
-  /** Subtract by the column means and divide by the standard deviation. */
-  protected boolean m_NormalizeZeroMeanZeroUnitVariance;
-
   /** the dataset iterator in use. */
   protected transient DataSetIterator m_ActualIterator;
+
+  /** whether to return the full dataset instead of batches. */
+  protected boolean m_FullDataset;
 
   /**
    * Returns a string describing the object.
@@ -156,7 +161,7 @@ public class DL4JDatasetIterator
       new DataSetPreProcessorWithScriptedConfiguration());
 
     m_OptionManager.add(
-      "normalize-zero-mean-zero-unit-variance", "normalizeZeroMeanZeroUnitVariance",
+      "full-dataset", "fullDataset",
       false);
   }
 
@@ -248,22 +253,22 @@ public class DL4JDatasetIterator
   }
 
   /**
-   * Sets whether to subtract by the column means and divide by the standard deviation.
+   * Sets whether to return full dataset or batches.
    *
-   * @param value	true if to do
+   * @param value	true if to return dataset
    */
-  public void setNormalizeZeroMeanZeroUnitVariance(boolean value) {
-    m_NormalizeZeroMeanZeroUnitVariance = value;
+  public void setFullDataset(boolean value) {
+    m_FullDataset = value;
     reset();
   }
 
   /**
-   * Returns whether to subtract by the column means and divide by the standard deviation.
+   * Returns whether to return full dataset or batches.
    *
-   * @return 		true if to do
+   * @return 		true if to return full dataset
    */
-  public boolean getNormalizeZeroMeanZeroUnitVariance() {
-    return m_NormalizeZeroMeanZeroUnitVariance;
+  public boolean getFullDataset() {
+    return m_FullDataset;
   }
 
   /**
@@ -272,8 +277,8 @@ public class DL4JDatasetIterator
    * @return		tip text for this property suitable for
    *             	displaying in the GUI or for listing the options.
    */
-  public String normalizeZeroMeanZeroUnitVarianceTipText() {
-    return "If enabled, subtract by the column means and divide by the standard deviation.";
+  public String fullDatasetTipText() {
+    return "If enabled, the dataset is returned in full rather than in batches (eg for cross-validation).";
   }
 
   /**
@@ -329,13 +334,22 @@ public class DL4JDatasetIterator
    */
   @Override
   public Token output() {
-    Token	result;
-    DataSet	data;
+    Token		result;
+    DataSet		data;
+    List<DataSet> 	list;
 
-    data = m_ActualIterator.next();
-    if (m_NormalizeZeroMeanZeroUnitVariance)
-      data.normalizeZeroMeanZeroUnitVariance();
+    if (m_FullDataset) {
+      list = new ArrayList<>();
+      while (m_ActualIterator.hasNext())
+	list.add(m_ActualIterator.next());
+      data = DataSet.merge(list);
+    }
+    else {
+      data = m_ActualIterator.next();
+    }
+
     result = new Token(data);
+
     if (!m_ActualIterator.hasNext())
       m_ActualIterator = null;
 
