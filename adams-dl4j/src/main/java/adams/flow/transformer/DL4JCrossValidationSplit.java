@@ -165,7 +165,7 @@ public class DL4JCrossValidationSplit
     String	result;
 
     result = QuickInfoHelper.toString(this, "seed", m_Seed, "seed: ");
-    result += QuickInfoHelper.toString(this, "folds", m_Folds, "folds: ");
+    result += QuickInfoHelper.toString(this, "folds", m_Folds, ", folds: ");
 
     return result;
   }
