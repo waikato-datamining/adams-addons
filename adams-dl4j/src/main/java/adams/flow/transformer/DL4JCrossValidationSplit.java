@@ -14,13 +14,14 @@
  */
 
 /*
- * WekaCrossValidationSplit.java
- * Copyright (C) 2010-2016 University of Waikato, Hamilton, New Zealand
+ * DL4JCrossValidationSplit.java
+ * Copyright (C) 2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
+import adams.core.Randomizable;
 import adams.flow.container.DL4JTrainTestSetContainer;
 import adams.flow.core.Token;
 import adams.flow.provenance.ActorType;
@@ -30,17 +31,76 @@ import adams.flow.provenance.ProvenanceInformation;
 import adams.flow.provenance.ProvenanceSupporter;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.KFoldIterator;
+import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.Hashtable;
+import java.util.Random;
 
 /**
  <!-- globalinfo-start -->
+ * Generates train&#47;test pairs like during a cross-validation run.<br>
+ * It is essential that a class attribute is set. The training set can be accessed in the container with 'Train' and the test set with 'Test'.
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
+ * Input&#47;output:<br>
+ * - accepts:<br>
+ * &nbsp;&nbsp;&nbsp;org.nd4j.linalg.dataset.DataSet<br>
+ * - generates:<br>
+ * &nbsp;&nbsp;&nbsp;adams.flow.container.DL4JTrainTestSetContainer<br>
+ * <br><br>
+ * Container information:<br>
+ * - adams.flow.container.DL4JTrainTestSetContainer: Train, Test, Seed
+ * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-name &lt;java.lang.String&gt; (property: name)
+ * &nbsp;&nbsp;&nbsp;The name of the actor.
+ * &nbsp;&nbsp;&nbsp;default: DL4JCrossValidationSplit
+ * </pre>
+ * 
+ * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
+ * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
+ * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
+ * <pre>-skip &lt;boolean&gt; (property: skip)
+ * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
+ * &nbsp;&nbsp;&nbsp;as it is.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this 
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical 
+ * &nbsp;&nbsp;&nbsp;actors.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing 
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-seed &lt;long&gt; (property: seed)
+ * &nbsp;&nbsp;&nbsp;The seed value for the randomization.
+ * &nbsp;&nbsp;&nbsp;default: 1
+ * </pre>
+ * 
+ * <pre>-folds &lt;int&gt; (property: folds)
+ * &nbsp;&nbsp;&nbsp;The folds to use.
+ * &nbsp;&nbsp;&nbsp;default: 10
+ * &nbsp;&nbsp;&nbsp;minimum: 2
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -48,13 +108,16 @@ import java.util.Hashtable;
  */
 public class DL4JCrossValidationSplit
   extends AbstractTransformer
-  implements ProvenanceSupporter {
+  implements Randomizable, ProvenanceSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = 4026105903223741240L;
 
-  /** the key for the generator. */
-  public final static String BACKUP_GENERATOR = "Generator";
+  /** the key for the iterator. */
+  public final static String BACKUP_ITERATOR = "Iterator";
+
+  /** the seed value. */
+  protected long m_Seed;
 
   /** the number of folds to generate. */
   protected int m_Folds;
@@ -84,8 +147,12 @@ public class DL4JCrossValidationSplit
     super.defineOptions();
 
     m_OptionManager.add(
+      "seed", "seed",
+      1L);
+
+    m_OptionManager.add(
       "folds", "folds",
-      10);
+      10, 2, null);
   }
 
   /**
@@ -95,13 +162,18 @@ public class DL4JCrossValidationSplit
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "folds", m_Folds, "folds: ");
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "seed", m_Seed, "seed: ");
+    result += QuickInfoHelper.toString(this, "folds", m_Folds, "folds: ");
+
+    return result;
   }
 
   /**
    * Returns the class that the consumer accepts.
    *
-   * @return		<!-- flow-accepts-start -->weka.core.Instances.class<!-- flow-accepts-end -->
+   * @return		<!-- flow-accepts-start -->org.nd4j.linalg.dataset.DataSet.class<!-- flow-accepts-end -->
    */
   public Class[] accepts() {
     return new Class[]{DataSet.class};
@@ -110,10 +182,39 @@ public class DL4JCrossValidationSplit
   /**
    * Returns the class of objects that it generates.
    *
-   * @return		<!-- flow-generates-start -->adams.flow.container.WekaTrainTestSetContainer.class<!-- flow-generates-end -->
+   * @return		<!-- flow-generates-start -->adams.flow.container.DL4JTrainTestSetContainer.class<!-- flow-generates-end -->
    */
   public Class[] generates() {
     return new Class[]{DL4JTrainTestSetContainer.class};
+  }
+
+  /**
+   * Sets the seed value.
+   *
+   * @param value	the seed
+   */
+  public void setSeed(long value) {
+    m_Seed = value;
+    reset();
+  }
+
+  /**
+   * Returns the seed value.
+   *
+   * @return  		the seed
+   */
+  public long getSeed() {
+    return m_Seed;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String seedTipText() {
+    return "The seed value for the randomization.";
   }
 
   /**
@@ -154,7 +255,7 @@ public class DL4JCrossValidationSplit
   protected void pruneBackup() {
     super.pruneBackup();
 
-    pruneBackup(BACKUP_GENERATOR);
+    pruneBackup(BACKUP_ITERATOR);
   }
 
   /**
@@ -169,7 +270,7 @@ public class DL4JCrossValidationSplit
     result = super.backupState();
 
     if (m_Generator != null)
-      result.put(BACKUP_GENERATOR, m_Generator);
+      result.put(BACKUP_ITERATOR, m_Generator);
 
     return result;
   }
@@ -181,9 +282,9 @@ public class DL4JCrossValidationSplit
    */
   @Override
   protected void restoreState(Hashtable<String,Object> state) {
-    if (state.containsKey(BACKUP_GENERATOR)) {
-      m_Generator = (KFoldIterator) state.get(BACKUP_GENERATOR);
-      state.remove(BACKUP_GENERATOR);
+    if (state.containsKey(BACKUP_ITERATOR)) {
+      m_Generator = (KFoldIterator) state.get(BACKUP_ITERATOR);
+      state.remove(BACKUP_ITERATOR);
     }
 
     super.restoreState(state);
@@ -207,13 +308,21 @@ public class DL4JCrossValidationSplit
   @Override
   protected String doExecute() {
     String	result;
+    DataSet	data;
 
     result = null;
+
+    data = (DataSet) m_InputToken.getPayload();
+
+    Nd4j.shuffle(data.getFeatureMatrix(), new Random(m_Seed), 1);
+    if (data.getLabels() != null)
+      Nd4j.shuffle(data.getLabels(), new Random(m_Seed), 1);
+
     try {
-      m_Generator = new KFoldIterator(m_Folds, (DataSet) m_InputToken.getPayload());
+      m_Generator = new KFoldIterator(m_Folds, data);
     }
     catch (Exception e) {
-      result = handleException("Failed to initialize fold generator!", e);
+      result = handleException("Failed to initialize fold iterator!", e);
     }
 
     return result;
