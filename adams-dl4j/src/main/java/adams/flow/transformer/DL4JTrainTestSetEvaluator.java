@@ -15,7 +15,7 @@
 
 /*
  * DL4JTrainTestSetEvaluator.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -165,7 +165,7 @@ public class DL4JTrainTestSetEvaluator
     try {
       conf = getModelConfiguratorInstance();
       if (conf == null)
-	throw new IllegalStateException("Classifier '" + getModel() + "' not found!");
+	throw new IllegalStateException("Model configurator '" + getModel() + "' not found!");
 
       cont  = (DL4JTrainTestSetContainer) m_InputToken.getPayload();
       train = (DataSet) cont.getValue(DL4JTrainTestSetContainer.VALUE_TRAIN);
