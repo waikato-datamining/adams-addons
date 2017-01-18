@@ -28,7 +28,7 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 
 /**
  <!-- globalinfo-start -->
- * Configures a org.deeplearning4j.datasets.canova.RecordReaderDataSetIterator instance, using the specified base record reader configurator.
+ * Configures a org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator instance, using the specified base record reader configurator.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -40,25 +40,26 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
  * 
  * <pre>-record-reader &lt;adams.ml.dl4j.recordreader.RecordReaderConfigurator&gt; (property: recordReader)
  * &nbsp;&nbsp;&nbsp;The record reader configurator to use.
- * &nbsp;&nbsp;&nbsp;default: adams.ml.dl4j.recordreader.ImageRecordReaderConfigurator
+ * &nbsp;&nbsp;&nbsp;default: adams.ml.dl4j.recordreader.ImageRecordReaderConfigurator -input-split adams.ml.dl4j.inputsplit.FileSplitConfigurator
  * </pre>
  * 
  * <pre>-batch-size &lt;int&gt; (property: batchSize)
  * &nbsp;&nbsp;&nbsp;The batch size to use.
- * &nbsp;&nbsp;&nbsp;default: 1
+ * &nbsp;&nbsp;&nbsp;default: 10
  * &nbsp;&nbsp;&nbsp;minimum: 1
  * </pre>
  * 
  * <pre>-label-index &lt;int&gt; (property: labelIndex)
- * &nbsp;&nbsp;&nbsp;The index of the attribute with the labels (0-based).
- * &nbsp;&nbsp;&nbsp;default: 0
- * &nbsp;&nbsp;&nbsp;minimum: 0
+ * &nbsp;&nbsp;&nbsp;The index of the attribute with the labels (0-based); use -1 for none (numPossibleLabels 
+ * &nbsp;&nbsp;&nbsp;must be -1 then as well!).
+ * &nbsp;&nbsp;&nbsp;default: -1
+ * &nbsp;&nbsp;&nbsp;minimum: -1
  * </pre>
  * 
  * <pre>-num-possible-labels &lt;int&gt; (property: numPossibleLabels)
- * &nbsp;&nbsp;&nbsp;The number of possible labels.
- * &nbsp;&nbsp;&nbsp;default: 1
- * &nbsp;&nbsp;&nbsp;minimum: 1
+ * &nbsp;&nbsp;&nbsp;The number of possible labels; use -1 for none.
+ * &nbsp;&nbsp;&nbsp;default: -1
+ * &nbsp;&nbsp;&nbsp;minimum: -1
  * </pre>
  * 
  * <pre>-regression &lt;boolean&gt; (property: regression)
@@ -114,15 +115,15 @@ public class RecordReaderDataSetIteratorConfigurator
 
     m_OptionManager.add(
       "batch-size", "batchSize",
-      1, 1, null);
+      10, 1, null);
 
     m_OptionManager.add(
       "label-index", "labelIndex",
-      0, 0, null);
+      -1, -1, null);
 
     m_OptionManager.add(
       "num-possible-labels", "numPossibleLabels",
-      1, 1, null);
+      -1, -1, null);
 
     m_OptionManager.add(
       "regression", "regression",
@@ -217,7 +218,7 @@ public class RecordReaderDataSetIteratorConfigurator
    *             	displaying in the GUI or for listing the options.
    */
   public String labelIndexTipText() {
-    return "The index of the attribute with the labels (0-based).";
+    return "The index of the attribute with the labels (0-based); use -1 for none (numPossibleLabels must be -1 then as well!).";
   }
 
   /**
@@ -248,7 +249,7 @@ public class RecordReaderDataSetIteratorConfigurator
    *             	displaying in the GUI or for listing the options.
    */
   public String numPossibleLabelsTipText() {
-    return "The number of possible labels.";
+    return "The number of possible labels; use -1 for none.";
   }
 
   /**
