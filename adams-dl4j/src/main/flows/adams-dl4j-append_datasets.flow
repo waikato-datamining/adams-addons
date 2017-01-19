@@ -1,0 +1,23 @@
+# Project: adams
+# Date: 2017-01-19 13:32:30
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Combines two datasets into a single one (one after the other)." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.HistoryDisplay -entry-name-variable entry
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "1st dataset"
+  adams.flow.source.DL4JDatasetIterator -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.CSVRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.SingleFileSplitConfigurator -source ${FLOWS}/data/iris_numeric-train.csv\\\" -skip-num-lines 1\" -label-index 4 -num-possible-labels 3" -preprocessor "adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorWithScriptedConfiguration -handler adams.core.scripting.Dummy" -full-dataset true
+  adams.flow.transformer.SetVariable -var-name entry -var-value 1st
+  adams.flow.transformer.SetStorageValue -storage-name train
+  adams.flow.sink.CallableSink -callable HistoryDisplay
+ adams.flow.control.Trigger -name "2nd dataset"
+  adams.flow.source.DL4JDatasetIterator -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.CSVRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.SingleFileSplitConfigurator -source ${FLOWS}/data/iris_numeric-test.csv\\\" -skip-num-lines 1\" -label-index 4 -num-possible-labels 3" -preprocessor "adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorWithScriptedConfiguration -handler adams.core.scripting.Dummy" -full-dataset true
+  adams.flow.transformer.SetVariable -var-name entry -var-value 2nd
+  adams.flow.transformer.SetStorageValue -storage-name test
+  adams.flow.sink.CallableSink -callable HistoryDisplay
+ adams.flow.control.Trigger -name "append datasets"
+  adams.flow.source.StorageValuesArray -storage-name train -storage-name test
+  adams.flow.transformer.DL4JDatasetAppend
+  adams.flow.transformer.SetVariable -var-name entry -var-value combined
+  adams.flow.sink.CallableSink -callable HistoryDisplay
