@@ -98,12 +98,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.boofcv</groupId>
-      <artifactId>xuggler</artifactId>
-      <version>${boofcv.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>nz.ac.waikato.cms.adams</groupId>
       <artifactId>adams-imaging-openimaj</artifactId>
       <version>${adams.version}</version>
