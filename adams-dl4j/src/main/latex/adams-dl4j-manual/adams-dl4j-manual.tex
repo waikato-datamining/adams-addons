@@ -133,18 +133,41 @@ By default, dl4j (actually nd4j\cite{nd4j}) uses the CPU for linear algebra.
 However, if you have CUDA installed, you can switch to GPU computation by
 adding another dependency in your \textit{pom.xml} file.
 
-The current version of JCuda\cite{jcuda} supports the CUDA\cite{cuda} versions
-5.5, 6.0, 6.5 and 7, and requires you to specify which one you have. For example,
-if you have CUDA v6.0 installed, then you need to define the \textit{artifactId}
-like this:
+The current version of nd4j supports CUDA\cite{cuda} versions
+7.5 and 8.0 at the time of writing\footnote{Check Maven Central for updated
+artifacts using \url{http://search.maven.org/#search%7Cga%7C1%7Cnd4j-cuda}{}},
+and requires you to specify which one you have.
+For example, if you have CUDA v7.5 installed, then you need to define the
+\textit{artifactId} like this:
 
 \begin{verbatim}
     <dependency>
-     <groupId>org.nd4j</groupId>
-     <artifactId>nd4j-cuda-6.0</artifactId>
-     <version>${nd4j.version}</version>
+      <groupId>org.nd4j</groupId>
+      <artifactId>nd4j-cuda-7.5</artifactId>
+      <version>${nd4j.version}</version>
     </dependency>
 \end{verbatim}
+
+If you do not compile your own project, but simply use ADAMS releases/snapshots,
+then you can simply download the appropriate version of the CUDA libraries. E.g.,
+for CUDA 7.5, this is \textit{adams-dl4j-cuda-7.5-libs}. Just add all the
+files in the \textit{lib} directory of this archive to the one of your ADAMS
+installation to enable CUDA support. But be aware that ADAMS will only work
+if you have CUDA support on the machine that you are running it on (a
+design drawback of deeplearning4j, unfortunately).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{OpenBLAS}
+By default, OpenBLAS determines automatically how many threads to use for
+speeding up the computing. However, you can use the following environment
+variable to manually set the number of
+threads\footnote{\url{https://deeplearning4j.org/native}{}}:
+\begin{verbatim}
+OMP_NUM_THREADS
+\end{verbatim}
+\textbf{NB:} This should be the number of \textit{actual} cpus/cores.
+Systems with hyper-threading support will report multiples of this number.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
