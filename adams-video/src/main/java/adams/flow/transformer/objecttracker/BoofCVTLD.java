@@ -26,14 +26,14 @@ import adams.core.TechnicalInformation.Type;
 import adams.core.TechnicalInformationHandler;
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayF64;
-import boofcv.struct.image.GrayS16;
-import boofcv.struct.image.GrayS32;
-import boofcv.struct.image.GrayS64;
-import boofcv.struct.image.GrayS8;
-import boofcv.struct.image.GrayU16;
-import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSInt64;
+import boofcv.struct.image.ImageSInt8;
+import boofcv.struct.image.ImageUInt16;
+import boofcv.struct.image.ImageUInt8;
 
 /**
  <!-- globalinfo-start -->
@@ -122,21 +122,21 @@ public class BoofCVTLD
 
     switch (m_ImageType) {
       case FLOAT_32:
-        return FactoryTrackerObjectQuad.tld(null, GrayF32.class);
+        return FactoryTrackerObjectQuad.tld(null, ImageFloat32.class);
       case FLOAT_64:
-        return FactoryTrackerObjectQuad.tld(null, GrayF64.class);
+        return FactoryTrackerObjectQuad.tld(null, ImageFloat64.class);
       case SIGNED_INT_16:
-        return FactoryTrackerObjectQuad.tld(null, GrayS16.class);
+        return FactoryTrackerObjectQuad.tld(null, ImageSInt16.class);
       case SIGNED_INT_32:
-        return FactoryTrackerObjectQuad.tld(null, GrayS32.class);
+        return FactoryTrackerObjectQuad.tld(null, ImageSInt32.class);
       case SIGNED_INT_64:
-        return FactoryTrackerObjectQuad.tld(null, GrayS64.class);
+        return FactoryTrackerObjectQuad.tld(null, ImageSInt64.class);
       case SIGNED_INT_8:
-        return FactoryTrackerObjectQuad.tld(null, GrayS8.class);
+        return FactoryTrackerObjectQuad.tld(null, ImageSInt8.class);
       case UNSIGNED_INT_16:
-        return FactoryTrackerObjectQuad.tld(null, GrayU16.class);
+        return FactoryTrackerObjectQuad.tld(null, ImageUInt16.class);
       case UNSIGNED_INT_8:
-        return FactoryTrackerObjectQuad.tld(null, GrayU8.class);
+        return FactoryTrackerObjectQuad.tld(null, ImageUInt8.class);
       default:
         throw new IllegalStateException("Unhandled image type: " + m_ImageType);
     }

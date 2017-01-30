@@ -23,14 +23,14 @@ package adams.flow.transformer.objecttracker;
 import boofcv.abst.tracker.ConfigCirculantTracker;
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayF64;
-import boofcv.struct.image.GrayS16;
-import boofcv.struct.image.GrayS32;
-import boofcv.struct.image.GrayS64;
-import boofcv.struct.image.GrayS8;
-import boofcv.struct.image.GrayU16;
-import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSInt64;
+import boofcv.struct.image.ImageSInt8;
+import boofcv.struct.image.ImageUInt16;
+import boofcv.struct.image.ImageUInt8;
 
 /**
  <!-- globalinfo-start -->
@@ -427,21 +427,21 @@ public class BoofCVCirculant
 
     switch (m_ImageType) {
       case FLOAT_32:
-        return FactoryTrackerObjectQuad.circulant(config, GrayF32.class);
+        return FactoryTrackerObjectQuad.circulant(config, ImageFloat32.class);
       case FLOAT_64:
-        return FactoryTrackerObjectQuad.circulant(config, GrayF64.class);
+        return FactoryTrackerObjectQuad.circulant(config, ImageFloat64.class);
       case SIGNED_INT_16:
-        return FactoryTrackerObjectQuad.circulant(config, GrayS16.class);
+        return FactoryTrackerObjectQuad.circulant(config, ImageSInt16.class);
       case SIGNED_INT_32:
-        return FactoryTrackerObjectQuad.circulant(config, GrayS32.class);
+        return FactoryTrackerObjectQuad.circulant(config, ImageSInt32.class);
       case SIGNED_INT_64:
-        return FactoryTrackerObjectQuad.circulant(config, GrayS64.class);
+        return FactoryTrackerObjectQuad.circulant(config, ImageSInt64.class);
       case SIGNED_INT_8:
-        return FactoryTrackerObjectQuad.circulant(config, GrayS8.class);
+        return FactoryTrackerObjectQuad.circulant(config, ImageSInt8.class);
       case UNSIGNED_INT_16:
-        return FactoryTrackerObjectQuad.circulant(config, GrayU16.class);
+        return FactoryTrackerObjectQuad.circulant(config, ImageUInt16.class);
       case UNSIGNED_INT_8:
-        return FactoryTrackerObjectQuad.circulant(config, GrayU8.class);
+        return FactoryTrackerObjectQuad.circulant(config, ImageUInt8.class);
       default:
         throw new IllegalStateException("Unhandled image type: " + m_ImageType);
     }
