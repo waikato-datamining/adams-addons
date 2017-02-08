@@ -21,12 +21,12 @@
 
 package adams.gui.goe;
 
-import adams.core.ClassLocator;
 import adams.core.Utils;
 import adams.core.base.BaseMeasureCollection;
 import adams.core.option.AbstractOption;
 import adams.gui.dialog.ApprovalDialog;
 import moa.evaluation.MeasureCollection;
+import nz.ac.waikato.cms.locator.ClassLocator;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;

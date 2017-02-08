@@ -20,9 +20,9 @@
 
 package adams.gui.visualization.debug.objectrenderer;
 
-import adams.core.ClassLocator;
 import adams.data.heatmap.Heatmap;
 import adams.gui.visualization.heatmap.HeatmapPanel;
+import nz.ac.waikato.cms.locator.ClassLocator;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;

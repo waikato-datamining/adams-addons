@@ -20,9 +20,9 @@
 
 package adams.gui.visualization.debug.objectrenderer;
 
-import adams.core.ClassLocator;
 import adams.data.trail.Trail;
 import adams.gui.visualization.trail.TrailPanel;
+import nz.ac.waikato.cms.locator.ClassLocator;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;

@@ -20,10 +20,10 @@
 
 package adams.gui.visualization.debug.objectexport;
 
-import adams.core.ClassLocator;
 import adams.core.io.PlaceholderFile;
 import adams.data.io.output.SimpleTrailWriter;
 import adams.data.trail.Trail;
+import nz.ac.waikato.cms.locator.ClassLocator;
 
 import java.io.File;
 

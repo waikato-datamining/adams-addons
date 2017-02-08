@@ -19,10 +19,10 @@
  */
 package adams.flow.core;
 
+import adams.core.option.MOACommandLineHandler;
 import adams.core.option.OptionUtils;
 import moa.AbstractMOAObject;
-import adams.core.ClassLocator;
-import adams.core.option.MOACommandLineHandler;
+import nz.ac.waikato.cms.locator.ClassLocator;
 
 import java.lang.reflect.Array;
 

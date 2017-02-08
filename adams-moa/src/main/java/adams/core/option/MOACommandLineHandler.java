@@ -20,8 +20,8 @@
 package adams.core.option;
 
 import moa.MOAObject;
+import nz.ac.waikato.cms.locator.ClassLocator;
 import weka.core.MOAUtils;
-import adams.core.ClassLocator;
 
 import java.util.logging.Level;
 

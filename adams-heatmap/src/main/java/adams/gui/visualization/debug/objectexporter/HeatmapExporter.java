@@ -20,11 +20,11 @@
 
 package adams.gui.visualization.debug.objectexporter;
 
-import adams.core.ClassLocator;
 import adams.core.io.PlaceholderFile;
 import adams.data.heatmap.Heatmap;
 import adams.data.io.output.SimpleHeatmapWriter;
 import adams.gui.visualization.debug.objectexport.AbstractObjectExporter;
+import nz.ac.waikato.cms.locator.ClassLocator;
 
 import java.io.File;
 

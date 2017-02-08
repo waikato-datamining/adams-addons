@@ -20,9 +20,9 @@
 
 package adams.gui.tools.classhelp;
 
-import adams.core.ClassLocator;
 import adams.gui.core.ConsolePanel;
 import moa.MOAObject;
+import nz.ac.waikato.cms.locator.ClassLocator;
 
 import java.util.logging.Level;
 
