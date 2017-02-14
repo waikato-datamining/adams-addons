@@ -15,7 +15,7 @@
 
 /**
  * AbstractWebServiceClientSink.java
- * Copyright (C) 2012-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
@@ -191,13 +191,15 @@ public abstract class AbstractWebServiceClientSink<I>
    * @param value	the URL to use
    */
   public void setAlternativeURL(String value) {
-    try {
-      new URL(value);
-      m_AlternativeURL = value;
-      reset();
-    }
-    catch (Exception e) {
-      getLogger().log(Level.SEVERE, "Invalid URL: " + value, e);
+    if ((value != null) && !value.isEmpty()) {
+      try {
+        new URL(value);
+        m_AlternativeURL = value;
+        reset();
+      }
+      catch (Exception e) {
+        getLogger().log(Level.SEVERE, "Invalid URL: " + value, e);
+      }
     }
   }
   
