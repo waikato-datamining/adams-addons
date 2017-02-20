@@ -15,7 +15,7 @@
 
 /**
  * DeQueue.java
- * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
@@ -172,7 +172,7 @@ public class DeQueue
 
     result = null;
 
-    while (!m_Stopped && (result == null)) {
+    while (canReceive() && (result == null)) {
       try {
 	result = queue.poll(m_PollTimeout, TimeUnit.MILLISECONDS);
       }

@@ -15,7 +15,7 @@
 
 /**
  * AbstractBufferedRatInput.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone.rats.input;
@@ -141,7 +141,7 @@ public abstract class AbstractBufferedRatInput
 
     result = null;
 
-    while (!m_Stopped && (result == null)) {
+    while (canReceive() && (result == null)) {
       try {
 	result = m_Buffer.poll(m_PollTimeout, TimeUnit.MILLISECONDS);
       }

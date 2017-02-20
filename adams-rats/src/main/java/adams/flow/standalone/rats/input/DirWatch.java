@@ -15,7 +15,7 @@
 
 /**
  * DirWatch.java
- * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
@@ -488,7 +488,7 @@ public class DirWatch
     result = null;
     
     dir   = m_Source.toPath();
-    files = new ArrayList<String>();
+    files = new ArrayList<>();
     
     // init watch service
     if (m_Watch == null) {
@@ -505,7 +505,7 @@ public class DirWatch
     }
 
     if (result == null) {
-      while ((files.size() == 0) && !m_Stopped) {
+      while ((files.size() == 0) && canReceive()) {
 	// wait for key to be signalled
 	try {
 	  key = m_Watch.poll(m_WaitPoll, TimeUnit.MILLISECONDS);

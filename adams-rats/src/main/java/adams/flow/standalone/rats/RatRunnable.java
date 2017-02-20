@@ -112,8 +112,10 @@ public class RatRunnable
     Token	token;
 
     while (!m_Stopped) {
-      while (m_Paused && !m_Stopped)
+      if (m_Paused && !m_Stopped) {
 	Utils.wait(this, this, 100, 10);
+	continue;
+      }
 
       data = null;
       if (isLoggingEnabled())
@@ -127,6 +129,9 @@ public class RatRunnable
       catch (Throwable t) {
 	result = Utils.throwableToString(t);
       }
+
+      if (getOwner().getReceiver().getReceptionInterrupted())
+	getLogger().warning("Reception interrupted: " + m_Owner.getReceiver().getFullName());
 
       if (m_Stopped)
 	break;

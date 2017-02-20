@@ -92,7 +92,7 @@ public class Cron
       owner = (Cron) context.getJobDetail().getJobDataMap().get(KEY_OWNER);
       
       // skip if paused
-      if (owner.getOwner().isPaused())
+      if (owner.getOwner().isPaused() || !owner.canReceive())
 	return;
       
       result = owner.receiveData();

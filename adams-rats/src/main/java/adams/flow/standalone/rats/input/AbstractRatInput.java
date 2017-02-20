@@ -15,7 +15,7 @@
 
 /**
  * AbstractRatInput.java
- * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
@@ -54,6 +54,9 @@ public abstract class AbstractRatInput
 
   /** the logging prefix. */
   protected String m_LoggingPrefix;
+
+  /** whether reception was interrupted. */
+  protected boolean m_ReceptionInterruped;
 
   /**
    * Initializes the members.
@@ -205,7 +208,7 @@ public abstract class AbstractRatInput
       getLogger().fine("doWait: " + msec);
     
     count = 0;
-    while ((count < msec) && !m_Stopped) {
+    while ((count < msec) && canReceive()) {
       try {
 	current = msec - 100;
 	if (current <= 0)
@@ -240,7 +243,34 @@ public abstract class AbstractRatInput
    * @return		null if successful, otherwise error message
    */
   protected abstract String doReceive();
-  
+
+  /**
+   * Interrupts the reception (eg when pausing).
+   */
+  public void interruptReception() {
+    m_ReceptionInterruped = true;
+  }
+
+  /**
+   * Returns whether the reception was interrupted.
+   *
+   * @return		true if interrupted
+   */
+  public boolean getReceptionInterrupted() {
+    return m_ReceptionInterruped;
+  }
+
+  /**
+   * Whether reception is possible.
+   *
+   * @return		true if possible
+   * @see		#m_Stopped
+   * @see		#m_ReceptionInterruped
+   */
+  protected boolean canReceive() {
+    return !m_Stopped && !m_ReceptionInterruped;
+  }
+
   /**
    * Initiates the reception of data.
    * 
@@ -249,11 +279,13 @@ public abstract class AbstractRatInput
   public String receive() {
     String	result;
     
-    m_Stopped = false;
+    m_Stopped             = false;
+    m_ReceptionInterruped = false;
+
     result = check();
     if (result == null)
       result = doReceive();
-    
+
     return result;
   }
   

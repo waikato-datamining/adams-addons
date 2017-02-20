@@ -89,6 +89,18 @@ public interface RatInput
   public String receive();
 
   /**
+   * Interrupts the reception (eg when pausing).
+   */
+  public void interruptReception();
+
+  /**
+   * Returns whether the reception was interrupted.
+   *
+   * @return		true if interrupted
+   */
+  public boolean getReceptionInterrupted();
+
+  /**
    * Stops the execution.
    */
   public void stopExecution();
