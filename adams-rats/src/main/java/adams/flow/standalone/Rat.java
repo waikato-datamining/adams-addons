@@ -15,7 +15,7 @@
 
 /**
  * Rat.java
- * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
@@ -27,6 +27,8 @@ import adams.core.Variables;
 import adams.core.base.BaseRegExp;
 import adams.core.logging.LoggingLevel;
 import adams.db.LogEntry;
+import adams.event.FlowPauseStateEvent;
+import adams.event.FlowPauseStateListener;
 import adams.flow.container.ErrorContainer;
 import adams.flow.control.LocalScopeTransformer;
 import adams.flow.control.ScopeHandler.ScopeHandling;
@@ -41,6 +43,8 @@ import adams.flow.core.Compatibility;
 import adams.flow.core.ErrorHandler;
 import adams.flow.core.InputConsumer;
 import adams.flow.core.MutableActorHandler;
+import adams.flow.core.PauseStateHandler;
+import adams.flow.core.PauseStateManager;
 import adams.flow.core.QueueHelper;
 import adams.flow.core.RatState;
 import adams.flow.core.Token;
@@ -193,7 +197,7 @@ import java.util.HashSet;
  */
 public class Rat
   extends AbstractStandaloneGroupItem<Rats>
-  implements MutableActorHandler, CallableActorUser, Pausable {
+  implements MutableActorHandler, CallableActorUser, Pausable, FlowPauseStateListener {
 
   /** for serialization. */
   private static final long serialVersionUID = -154461277343021604L;
@@ -1170,6 +1174,7 @@ public class Rat
     Compatibility	comp;
     String		msg;
     HashSet<String>	variables;
+    PauseStateManager 	manager;
 
     result = super.setUp();
 
@@ -1228,6 +1233,14 @@ public class Rat
       // redirect error handling
       ActorUtils.updateErrorHandler(this, this, isLoggingEnabled());
       m_Actors.setErrorHandler(this);
+    }
+
+    if (result == null) {
+      if (getRoot() instanceof PauseStateHandler) {
+	manager = ((PauseStateHandler) getRoot()).getPauseStateManager();
+	if (manager != null)
+	  manager.addListener(this);
+      }
     }
 
     return result;
@@ -1364,20 +1377,47 @@ public class Rat
     
     super.wrapUp();
   }
-  
+
+  /**
+   * Gets called when the pause state of the flow changes.
+   *
+   * @param e		the event
+   */
+  @Override
+  public void flowPauseStateChanged(FlowPauseStateEvent e) {
+    switch (e.getType()) {
+      case PAUSED:
+	pauseExecution();
+	break;
+      case RESUMED:
+	resumeExecution();
+	break;
+      default:
+	throw new IllegalStateException("Unhandled pause state: " + e.getType());
+    }
+  }
+
   /**
    * Cleans up after the execution has finished. Also removes graphical
    * components.
    */
   @Override
   public void cleanUp() {
+    PauseStateManager	manager;
+
     m_Actors.cleanUp();
 
     if (m_LogActor != null) {
       m_LogActor.cleanUp();
       m_LogActor = null;
     }
-    
+
+    if (getRoot() instanceof PauseStateHandler) {
+      manager = ((PauseStateHandler) getRoot()).getPauseStateManager();
+      if (manager != null)
+	manager.removeListener(this);
+    }
+
     super.cleanUp();
   }
 }

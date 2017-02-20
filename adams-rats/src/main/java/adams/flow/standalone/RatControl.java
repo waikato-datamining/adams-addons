@@ -20,9 +20,13 @@
 package adams.flow.standalone;
 
 import adams.core.Pausable;
+import adams.event.FlowPauseStateEvent;
+import adams.event.FlowPauseStateListener;
 import adams.flow.core.AbstractDisplay;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
+import adams.flow.core.PauseStateHandler;
+import adams.flow.core.PauseStateManager;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.GUIHelper;
@@ -30,10 +34,10 @@ import adams.gui.core.ParameterPanel;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,7 +122,8 @@ import java.util.List;
  * @version $Revision$
  */
 public class RatControl
-  extends AbstractDisplay {
+  extends AbstractDisplay
+  implements FlowPauseStateListener {
 
   /** for serialization. */
   private static final long serialVersionUID = 2777897240842864503L;
@@ -151,11 +156,7 @@ public class RatControl
       setLayout(new FlowLayout(FlowLayout.LEFT));
       
       m_ButtonPause = new JButton(GUIHelper.getIcon("pause.gif"));
-      m_ButtonPause.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          pauseOrResume();
-        }
-      });
+      m_ButtonPause.addActionListener((ActionEvent e) -> pauseOrResume());
       add(m_ButtonPause);
       
       updateButtons();
@@ -270,7 +271,7 @@ public class RatControl
   protected void initialize() {
     super.initialize();
     
-    m_ControlPanels = new ArrayList<AbstractControlPanel>();
+    m_ControlPanels = new ArrayList<>();
   }
   
   /**
@@ -347,12 +348,7 @@ public class RatControl
     // general buttons
     panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     buttonStop = new JButton("Stop");
-    buttonStop.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-	getRoot().stopExecution();
-      }
-    });
+    buttonStop.addActionListener((ActionEvent e) -> getRoot().stopExecution());
     panel.add(buttonStop);
     
     result = new BasePanel(new BorderLayout());
@@ -388,14 +384,59 @@ public class RatControl
 
     return result;
   }
-  
+
+  /**
+   * Initializes the item for flow execution.
+   *
+   * @return		null if everything is fine, otherwise error message
+   */
+  @Override
+  public String setUp() {
+    String		result;
+    PauseStateManager 	manager;
+
+    result = super.setUp();
+
+    if (result == null) {
+      if (getRoot() instanceof PauseStateHandler) {
+	manager = ((PauseStateHandler) getRoot()).getPauseStateManager();
+	if (manager != null)
+	  manager.addListener(this);
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Gets called when the pause state of the flow changes.
+   *
+   * @param e		the event
+   */
+  @Override
+  public void flowPauseStateChanged(FlowPauseStateEvent e) {
+    SwingUtilities.invokeLater(() -> {
+      for (AbstractControlPanel panel: m_ControlPanels)
+	panel.updateButtons();
+    });
+  }
+
   /**
    * Cleans up after the execution has finished. Also removes graphical
    * components.
    */
   @Override
   public void cleanUp() {
+    PauseStateManager	manager;
+
     m_ControlPanels.clear();
+
+    if (getRoot() instanceof PauseStateHandler) {
+      manager = ((PauseStateHandler) getRoot()).getPauseStateManager();
+      if (manager != null)
+	manager.removeListener(this);
+    }
+
     super.cleanUp();
   }
 }
