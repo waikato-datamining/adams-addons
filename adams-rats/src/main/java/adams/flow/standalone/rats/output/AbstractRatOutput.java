@@ -15,7 +15,7 @@
 
 /**
  * AbstractRatOutput.java
- * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
 
@@ -438,6 +438,14 @@ public abstract class AbstractRatOutput
     m_VariablesUpdated.clear();
 
     return result;
+  }
+
+  /**
+   * Initializes the transmission.
+   */
+  public void initTransmission() {
+    m_Stopped = false;
+    getOptionManager().updateVariableValues(true);
   }
 
   /**

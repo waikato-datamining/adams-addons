@@ -80,7 +80,12 @@ public interface RatInput
    * @return		the data
    */
   public Object output();
-  
+
+  /**
+   * Initializes the reception.
+   */
+  public void initReception();
+
   /**
    * Initiates the reception of data.
    * 

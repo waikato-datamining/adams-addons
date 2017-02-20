@@ -238,6 +238,15 @@ public abstract class AbstractRatInput
   }
 
   /**
+   * Initializes the reception.
+   */
+  public void initReception() {
+    m_Stopped             = false;
+    m_ReceptionInterruped = false;
+    getOptionManager().updateVariableValues(true);
+  }
+
+  /**
    * Performs the actual reception of data.
    * 
    * @return		null if successful, otherwise error message

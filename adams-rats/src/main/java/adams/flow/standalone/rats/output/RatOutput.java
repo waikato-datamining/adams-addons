@@ -15,7 +15,7 @@
 
 /**
  * RatOutput.java
- * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
 
@@ -68,7 +68,12 @@ public interface RatOutput
    * @return		the type of data
    */
   public Class[] accepts();
-  
+
+  /**
+   * Initializes the transmission.
+   */
+  public void initTransmission();
+
   /**
    * Whether input can be supplied at the moment.
    * 

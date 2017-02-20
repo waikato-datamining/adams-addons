@@ -22,6 +22,8 @@ package adams.flow.standalone;
 import adams.core.Pausable;
 import adams.event.FlowPauseStateEvent;
 import adams.event.FlowPauseStateListener;
+import adams.event.RatStateEvent;
+import adams.event.RatStateListener;
 import adams.flow.core.AbstractDisplay;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
@@ -123,7 +125,7 @@ import java.util.List;
  */
 public class RatControl
   extends AbstractDisplay
-  implements FlowPauseStateListener {
+  implements FlowPauseStateListener, RatStateListener {
 
   /** for serialization. */
   private static final long serialVersionUID = 2777897240842864503L;
@@ -143,8 +145,8 @@ public class RatControl
     /** the actor to manage. */
     protected T m_Actor;
     
-    /** the button for pausing. */
-    protected JButton m_ButtonPause;
+    /** the button for pausing/resuming. */
+    protected JButton m_ButtonPauseResume;
     
     /**
      * Initializes the widgets.
@@ -155,13 +157,20 @@ public class RatControl
       
       setLayout(new FlowLayout(FlowLayout.LEFT));
       
-      m_ButtonPause = new JButton(GUIHelper.getIcon("pause.gif"));
-      m_ButtonPause.addActionListener((ActionEvent e) -> pauseOrResume());
-      add(m_ButtonPause);
-      
+      m_ButtonPauseResume = new JButton(GUIHelper.getIcon("pause.gif"));
+      m_ButtonPauseResume.addActionListener((ActionEvent e) -> pauseOrResume());
+      add(m_ButtonPauseResume);
+    }
+
+    /**
+     * Finishes the initialization.
+     */
+    @Override
+    protected void finishInit() {
+      super.finishInit();
       updateButtons();
     }
-    
+
     /**
      * Sets the actor to manage.
      * 
@@ -201,9 +210,9 @@ public class RatControl
       if (m_Actor == null)
 	return;
       if (m_Actor.isPaused())
-	m_ButtonPause.setIcon(GUIHelper.getIcon("resume.gif"));
+	m_ButtonPauseResume.setIcon(GUIHelper.getIcon("resume.gif"));
       else
-	m_ButtonPause.setIcon(GUIHelper.getIcon("pause.gif"));
+	m_ButtonPauseResume.setIcon(GUIHelper.getIcon("pause.gif"));
     }
     
     /**
@@ -212,7 +221,7 @@ public class RatControl
      * @param value	true if to enable
      */
     public void setPausable(boolean value) {
-      m_ButtonPause.setVisible(value);
+      m_ButtonPauseResume.setVisible(value);
     }
     
     /**
@@ -221,7 +230,7 @@ public class RatControl
      * @return		true if enabled
      */
     public boolean isPausable() {
-      return m_ButtonPause.isVisible();
+      return m_ButtonPauseResume.isVisible();
     }
   }
   
@@ -249,6 +258,80 @@ public class RatControl
     
     /** for serialization. */
     private static final long serialVersionUID = 4516229240505598425L;
+
+    /** the button for stopping/starting. */
+    protected JButton m_ButtonStopStart;
+
+    /**
+     * Initializes the widgets.
+     */
+    @Override
+    protected void initGUI() {
+      super.initGUI();
+
+      m_ButtonStopStart = new JButton(GUIHelper.getIcon("run.gif"));
+      m_ButtonStopStart.addActionListener((ActionEvent e) -> stopOrStart());
+      add(m_ButtonStopStart);
+    }
+    
+    /**
+     * Stops/starts the rat.
+     *
+     * @return		null if successful, otherwise error message
+     */
+    public String stopOrStart() {
+      String	result;
+
+      if (m_Actor == null)
+	return null;
+
+      result = null;
+      if (m_Actor.isRunnableActive())
+	m_Actor.stopRunnable();
+      else
+	result = m_Actor.startRunnable();
+
+      updateButtons();
+
+      return result;
+    }
+    
+    /**
+     * Updates the state of the buttons.
+     */
+    public void updateButtons() {
+      if (m_Actor == null)
+	return;
+
+      m_ButtonPauseResume.setEnabled(m_Actor.isRunnableActive());
+      if (m_Actor.isRunnableActive() && m_Actor.isPaused())
+	m_ButtonPauseResume.setIcon(GUIHelper.getIcon("resume.gif"));
+      else
+	m_ButtonPauseResume.setIcon(GUIHelper.getIcon("pause.gif"));
+
+      if (m_Actor.isRunnableActive())
+	m_ButtonStopStart.setIcon(GUIHelper.getIcon("stop_blue.gif"));
+      else
+	m_ButtonStopStart.setIcon(GUIHelper.getIcon("run.gif"));
+    }
+    
+    /**
+     * Sets the "stoppable" state of the control panel.
+     * 
+     * @param value	true if to enable
+     */
+    public void setStoppable(boolean value) {
+      m_ButtonStopStart.setVisible(value);
+    }
+    
+    /**
+     * Returns whether the "stoppable" state of the control panel is enabled.
+     * 
+     * @return		true if enabled
+     */
+    public boolean isStoppable() {
+      return m_ButtonStopStart.isVisible();
+    }
   }
   
   /** the control panels. */
@@ -339,6 +422,7 @@ public class RatControl
 	inControl = true;
 	subcpanel = new RatControlPanel();
 	subcpanel.setActor(rat);
+	rat.addRatStateListener(this);
 	param.addParameter(" - " + rat.getName(), subcpanel);
 	m_ControlPanels.add(subcpanel);
       }
@@ -418,6 +502,25 @@ public class RatControl
     SwingUtilities.invokeLater(() -> {
       for (AbstractControlPanel panel: m_ControlPanels)
 	panel.updateButtons();
+    });
+  }
+
+  /**
+   * Gets called in case the state of a Rat actor changes.
+   *
+   * @param e		the event
+   */
+  public void ratStateChanged(RatStateEvent e) {
+    SwingUtilities.invokeLater(() -> {
+      for (AbstractControlPanel panel: m_ControlPanels) {
+	if (panel instanceof RatControlPanel) {
+	  RatControlPanel rpanel = (RatControlPanel) panel;
+	  if (rpanel.getActor() == e.getRat()) {
+	    panel.updateButtons();
+	    break;
+	  }
+	}
+      }
     });
   }
 

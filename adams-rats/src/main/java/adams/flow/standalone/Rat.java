@@ -29,6 +29,8 @@ import adams.core.logging.LoggingLevel;
 import adams.db.LogEntry;
 import adams.event.FlowPauseStateEvent;
 import adams.event.FlowPauseStateListener;
+import adams.event.RatStateEvent;
+import adams.event.RatStateListener;
 import adams.flow.container.ErrorContainer;
 import adams.flow.control.LocalScopeTransformer;
 import adams.flow.control.ScopeHandler.ScopeHandling;
@@ -56,6 +58,7 @@ import adams.flow.standalone.rats.output.RatOutput;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  <!-- globalinfo-start -->
@@ -241,6 +244,9 @@ public class Rat
   /** the initial state. */
   protected RatState m_InitialState;
 
+  /** the state listeners. */
+  protected Set<RatStateListener> m_StateListeners;
+
   /**
    * Returns a string describing the object.
    *
@@ -328,7 +334,8 @@ public class Rat
     
     m_Actors = new LocalScopeTransformer();
     m_Actors.setParent(this);
-    m_Helper = new CallableActorHelper();
+    m_Helper         = new CallableActorHelper();
+    m_StateListeners = new HashSet<>();
   }
 
   /**
@@ -1247,21 +1254,21 @@ public class Rat
   }
 
   /**
-   * Executes the flow item.
+   * Starts the runnable.
    *
-   * @return		null if everything is fine, otherwise error message
+   * @return		null if successful, otherwise error message
    */
-  @Override
-  protected String doExecute() {
-    String	result;
-    
+  public String startRunnable() {
+    String		result;
+
     result = null;
-    
+
     try {
       // make sure we have all the latest variable values
-      m_Receiver.getOptionManager().updateVariableValues(true);
-      m_Transmitter.getOptionManager().updateVariableValues(true);
-      // start thread
+      m_Receiver.initReception();
+      m_Transmitter.initTransmission();
+
+      // start runnable
       m_Runnable = new RatRunnable(this);
       m_Runnable.setLoggingLevel(getLoggingLevel());
       switch (m_InitialState) {
@@ -1280,10 +1287,23 @@ public class Rat
 	new Thread(m_Runnable).start();
     }
     catch (Exception e) {
-      result = handleException("Failed to execute!", e);
+      result = handleException("Failed to start!", e);
     }
-    
+
+    if (result == null)
+      notifyRatStateListeners();
+
     return result;
+  }
+
+  /**
+   * Executes the flow item.
+   *
+   * @return		null if everything is fine, otherwise error message
+   */
+  @Override
+  protected String doExecute() {
+    return startRunnable();
   }
 
   /**
@@ -1293,6 +1313,7 @@ public class Rat
   public void pauseExecution() {
     if (m_Runnable != null)
       m_Runnable.pauseExecution();
+    notifyRatStateListeners();
   }
 
   /**
@@ -1312,6 +1333,37 @@ public class Rat
   public void resumeExecution() {
     if (m_Runnable != null)
       m_Runnable.resumeExecution();
+    notifyRatStateListeners();
+  }
+
+  /**
+   * Returns whwether the runnable is currently active.
+   *
+   * @return		true if active
+   */
+  public boolean isRunnableActive() {
+    return (m_Runnable != null);
+  }
+
+  /**
+   * Stops the runnable.
+   */
+  public void stopRunnable() {
+    if (m_Runnable != null) {
+      m_Runnable.stopExecution();
+      while (m_Runnable.isRunning()) {
+	try {
+	  synchronized(this) {
+	    wait(10);
+	  }
+	}
+	catch (Exception e) {
+	  // ignored
+	}
+      }
+      m_Runnable = null;
+      notifyRatStateListeners();
+    }
   }
 
   /**
@@ -1323,20 +1375,7 @@ public class Rat
     if (!m_Stopped) {
       m_Stopping = true;
       m_Actors.stopExecution();
-      if (m_Runnable != null) {
-	m_Runnable.stopExecution();
-	while (m_Runnable.isRunning()) {
-	  try {
-	    synchronized(this) {
-	      wait(10);
-	    }
-	  }
-	  catch (Exception e) {
-	    // ignored
-	  }
-	}
-	m_Runnable = null;
-      }
+      stopRunnable();
       m_Stopping = false;
     }
   }
@@ -1398,6 +1437,35 @@ public class Rat
   }
 
   /**
+   * Adds the state listener.
+   *
+   * @param l		the listener
+   */
+  public void addRatStateListener(RatStateListener l) {
+    m_StateListeners.add(l);
+  }
+
+  /**
+   * Removes the state listener.
+   *
+   * @param l		the listener
+   */
+  public void removeRatStateListener(RatStateListener l) {
+    m_StateListeners.remove(l);
+  }
+
+  /**
+   * Notifies all the listeners.
+   */
+  protected void notifyRatStateListeners() {
+    RatStateEvent	e;
+
+    e = new RatStateEvent(this, this);
+    for (RatStateListener l: m_StateListeners)
+      l.ratStateChanged(e);
+  }
+
+  /**
    * Cleans up after the execution has finished. Also removes graphical
    * components.
    */
@@ -1406,6 +1474,7 @@ public class Rat
     PauseStateManager	manager;
 
     m_Actors.cleanUp();
+    m_StateListeners.clear();
 
     if (m_LogActor != null) {
       m_LogActor.cleanUp();
