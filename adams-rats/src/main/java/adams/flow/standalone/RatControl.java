@@ -201,7 +201,7 @@ public class RatControl
       if (m_Actor == null)
 	return;
       if (m_Actor.isPaused())
-	m_ButtonPause.setIcon(GUIHelper.getIcon("run.gif"));
+	m_ButtonPause.setIcon(GUIHelper.getIcon("resume.gif"));
       else
 	m_ButtonPause.setIcon(GUIHelper.getIcon("pause.gif"));
     }
