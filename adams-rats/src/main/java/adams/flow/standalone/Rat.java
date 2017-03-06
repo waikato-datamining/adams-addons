@@ -48,6 +48,7 @@ import adams.flow.core.MutableActorHandler;
 import adams.flow.core.PauseStateHandler;
 import adams.flow.core.PauseStateManager;
 import adams.flow.core.QueueHelper;
+import adams.flow.core.RatMode;
 import adams.flow.core.RatState;
 import adams.flow.core.Token;
 import adams.flow.standalone.rats.RatRunnable;
@@ -244,6 +245,9 @@ public class Rat
   /** the initial state. */
   protected RatState m_InitialState;
 
+  /** the mode. */
+  protected RatMode m_Mode;
+
   /** the state listeners. */
   protected Set<RatStateListener> m_StateListeners;
 
@@ -323,6 +327,10 @@ public class Rat
     m_OptionManager.add(
       "initial-state", "initialState",
       RatState.RUNNING);
+
+    m_OptionManager.add(
+      "mode", "mode",
+      RatMode.CONTINUOUS);
   }
 
   /**
@@ -815,6 +823,35 @@ public class Rat
    */
   public String initialStateTipText() {
     return "The initial state of the Rat actor.";
+  }
+
+  /**
+   * Sets the mode the Rat is run in.
+   *
+   * @param value	the mode
+   */
+  public void setMode(RatMode value) {
+    m_Mode = value;
+    reset();
+  }
+
+  /**
+   * Returns the mode the Rat is run in.
+   *
+   * @return		the mode
+   */
+  public RatMode getMode() {
+    return m_Mode;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String modeTipText() {
+    return "The mode the Rat actor is run in.";
   }
 
   /**
@@ -1361,9 +1398,16 @@ public class Rat
 	  // ignored
 	}
       }
-      m_Runnable = null;
-      notifyRatStateListeners();
+      wrapUpRunnable();
     }
+  }
+
+  /**
+   * Nulls the runnable and notifies listeners.
+   */
+  public void wrapUpRunnable() {
+    m_Runnable = null;
+    notifyRatStateListeners();
   }
 
   /**
@@ -1457,7 +1501,7 @@ public class Rat
   /**
    * Notifies all the listeners.
    */
-  protected void notifyRatStateListeners() {
+  public void notifyRatStateListeners() {
     RatStateEvent	e;
 
     e = new RatStateEvent(this, this);

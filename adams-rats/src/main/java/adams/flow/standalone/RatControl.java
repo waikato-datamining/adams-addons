@@ -15,7 +15,7 @@
 
 /**
  * RatControl.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
@@ -29,6 +29,7 @@ import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.PauseStateHandler;
 import adams.flow.core.PauseStateManager;
+import adams.flow.core.RatMode;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.GUIHelper;
@@ -421,6 +422,7 @@ public class RatControl
 	  continue;
 	inControl = true;
 	subcpanel = new RatControlPanel();
+        subcpanel.setPausable(rat.getMode() == RatMode.CONTINUOUS);
 	subcpanel.setActor(rat);
 	rat.addRatStateListener(this);
 	param.addParameter(" - " + rat.getName(), subcpanel);

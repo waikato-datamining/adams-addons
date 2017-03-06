@@ -15,11 +15,12 @@
 
 /**
  * RatRunnable.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats;
 
 import adams.core.Utils;
+import adams.flow.core.RatMode;
 import adams.flow.core.RunnableWithLogging;
 import adams.flow.core.Token;
 import adams.flow.standalone.Rat;
@@ -205,6 +206,10 @@ public class RatRunnable
 	}
       }
 
+      // manual mode?
+      if (m_Owner.getMode() == RatMode.MANUAL)
+	break;
+
       // wait before next poll?
       if (!m_Stopped) {
 	if (m_Owner.getReceiver() instanceof PollingRatInput) {
@@ -217,6 +222,18 @@ public class RatRunnable
       m_Owner.getReceiver().stopExecution();
       m_Owner.getTransmitter().stopExecution();
     }
+    else if (m_Owner.getMode() == RatMode.MANUAL) {
+      m_Owner.getReceiver().stopExecution();
+      m_Owner.wrapUpRunnable();
+    }
+  }
+
+  /**
+   * Hook method after the run finished.
+   */
+  protected void postRun() {
+    super.postRun();
+    m_Owner.notifyRatStateListeners();
   }
 
   /**
