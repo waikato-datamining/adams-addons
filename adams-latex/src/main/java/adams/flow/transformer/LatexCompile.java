@@ -95,6 +95,27 @@ public class LatexCompile
 
   private static final long serialVersionUID = -2873331108505370869L;
 
+  /** outlines need a rerun. */
+  public final static String RERUN_OUTLINES = "Rerun to get outlines right";
+
+  /** cross-references need a rerun. */
+  public final static String RERUN_CROSSREF = "Rerun to get cross-references right";
+
+  /** citations need a rerun. */
+  public final static String RERUN_CITATIONS = "Rerun to get citations correct";
+
+  /** emergency stop text in log. */
+  public static final String EMERGENCY_STOP = "Emergency stop";
+
+  /** extensions of temp files to delete before compilation (incl dot). */
+  public final static String[] TMP_EXT = new String[]{
+    ".aux",
+    ".lof",
+    ".out",
+    ".toc",
+    ".bbl",
+  };
+
   /** the latex setup. */
   protected LatexSetup m_LatexSetup;
 
@@ -154,6 +175,7 @@ public class LatexCompile
     String			result;
     String			exec;
     String			latex;
+    String			tmp;
     String			log;
     String			bibtex;
     PlaceholderDirectory	cwd;
@@ -180,6 +202,13 @@ public class LatexCompile
     else {
       exec   = m_LatexSetup.executablePath();
       bibtex = m_LatexSetup.bibtexPath();
+    }
+
+    // delete tmp files
+    for (String ext: TMP_EXT) {
+      tmp = FileUtils.replaceExtension(latex, ext);
+      if (FileUtils.fileExists(tmp))
+	FileUtils.delete(tmp);
     }
 
     // do we have a bibtex file?
@@ -212,10 +241,10 @@ public class LatexCompile
 	    if (FileUtils.fileExists(log)) {
 	      list = FileUtils.loadFromFile(new PlaceholderFile(log));
 	      for (String line : list) {
-		if (line.contains("Rerun to get citations correct") || line.contains("Rerun to get cross-references right")) {
+		if (line.contains(RERUN_CITATIONS) || line.contains(RERUN_CROSSREF) || line.contains(RERUN_OUTLINES)) {
 		  compiling = true;
 		}
-		else if (line.contains("Emergency stop")) {
+		else if (line.contains(EMERGENCY_STOP)) {
 		  compiling = false;
 		  result = proc.toErrorOutput();
 		}
