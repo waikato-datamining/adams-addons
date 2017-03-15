@@ -32,6 +32,8 @@ import adams.flow.source.filesystemsearch.LocalFileSearch;
 import adams.flow.standalone.LatexSetup;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -174,6 +176,8 @@ public class LatexCompile
   protected String doExecute() {
     String			result;
     String			exec;
+    String			options;
+    List<String>		cmdline;
     String			latex;
     String			tmp;
     String			log;
@@ -196,12 +200,14 @@ public class LatexCompile
 
     // executables
     if (m_LatexSetup == null) {
-      exec   = LatexHelper.getBinariesDir() + File.separator + LatexHelper.getExecutable();
-      bibtex = LatexHelper.getBinariesDir() + File.separator + LatexHelper.getBibtex();
+      exec    = LatexHelper.getBinariesDir() + File.separator + LatexHelper.getExecutable();
+      bibtex  = LatexHelper.getBinariesDir() + File.separator + LatexHelper.getBibtex();
+      options = LatexHelper.getExecutableOptions();
     }
     else {
-      exec   = m_LatexSetup.executablePath();
-      bibtex = m_LatexSetup.bibtexPath();
+      exec    = m_LatexSetup.executablePath();
+      bibtex  = m_LatexSetup.bibtexPath();
+      options = m_LatexSetup.getExecutableOptions();
     }
 
     // delete tmp files
@@ -232,10 +238,17 @@ public class LatexCompile
 
     // compile latex document
     if (result == null) {
+      // assemble commandline
+      cmdline = new ArrayList<>();
+      cmdline.add(exec);
+      if (!options.isEmpty())
+	cmdline.addAll(Arrays.asList(options.split(" ")));
+      cmdline.add(latex);
+
       compiling = true;
       while (compiling) {
 	try {
-	  proc = ProcessUtils.execute(new String[]{exec, latex}, cwd);
+	  proc = ProcessUtils.execute(cmdline.toArray(new String[cmdline.size()]), cwd);
 	  compiling = false;
 	  if (proc.hasSucceeded()) {
 	    if (FileUtils.fileExists(log)) {

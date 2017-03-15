@@ -43,6 +43,9 @@ public class LatexHelper {
   /** the executable. */
   public final static String EXECUTABLE = "Executable";
 
+  /** the executable options. */
+  public final static String EXECUTABLE_OPTIONS = "ExecutableOptions";
+
   /** the bibtex executable. */
   public final static String BIBTEX = "Bibtex";
 
@@ -122,6 +125,15 @@ public class LatexHelper {
       defExec = "pdflatex";
 
     return getProperties().getProperty(EXECUTABLE, defExec);
+  }
+
+  /**
+   * Returns the executable options, eg "-halt-on-error".
+   *
+   * @return		the executable options
+   */
+  public static String getExecutableOptions() {
+    return getProperties().getProperty(EXECUTABLE_OPTIONS, "");
   }
 
   /**

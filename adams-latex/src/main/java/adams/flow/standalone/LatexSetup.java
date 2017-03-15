@@ -71,7 +71,7 @@ import java.io.File;
  * 
  * <pre>-binaries-dir &lt;adams.core.io.PlaceholderDirectory&gt; (property: binariesDir)
  * &nbsp;&nbsp;&nbsp;The directory containing the LaTeX binaries.
- * &nbsp;&nbsp;&nbsp;default: &#47;usr&#47;bin
+ * &nbsp;&nbsp;&nbsp;default: &#47;usr&#47;local&#47;texlive&#47;2016&#47;bin&#47;x86_64-linux
  * </pre>
  * 
  * <pre>-executable &lt;java.lang.String&gt; (property: executable)
@@ -79,9 +79,14 @@ import java.io.File;
  * &nbsp;&nbsp;&nbsp;default: pdflatex
  * </pre>
  * 
+ * <pre>-executable-options &lt;java.lang.String&gt; (property: executableOptions)
+ * &nbsp;&nbsp;&nbsp;The options for the executable to use.
+ * &nbsp;&nbsp;&nbsp;default: -halt-on-error
+ * </pre>
+ * 
  * <pre>-bibtex &lt;java.lang.String&gt; (property: bibtex)
  * &nbsp;&nbsp;&nbsp;The bibtex executable to use (no path).
- * &nbsp;&nbsp;&nbsp;default: bibtex
+ * &nbsp;&nbsp;&nbsp;default: pdflatex
  * </pre>
  * 
  <!-- options-end -->
@@ -100,6 +105,9 @@ public class LatexSetup
 
   /** the executable. */
   protected String m_Executable;
+
+  /** the executable options. */
+  protected String m_ExecutableOptions;
 
   /** the bibtex executable. */
   protected String m_Bibtex;
@@ -128,6 +136,10 @@ public class LatexSetup
     m_OptionManager.add(
       "executable", "executable",
       LatexHelper.getExecutable());
+
+    m_OptionManager.add(
+      "executable-options", "executableOptions",
+      LatexHelper.getExecutableOptions());
 
     m_OptionManager.add(
       "bibtex", "bibtex",
@@ -190,6 +202,35 @@ public class LatexSetup
    */
   public String executableTipText() {
     return "The executable to use (no path).";
+  }
+
+  /**
+   * Sets the options for the executable to use.
+   *
+   * @param value	the options
+   */
+  public void setExecutableOptions(String value) {
+    m_ExecutableOptions = value;
+    reset();
+  }
+
+  /**
+   * Returns the options for the executable to use.
+   *
+   * @return		the options
+   */
+  public String getExecutableOptions() {
+    return m_ExecutableOptions;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String executableOptionsTipText() {
+    return "The options for the executable to use.";
   }
 
   /**

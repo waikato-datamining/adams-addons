@@ -51,6 +51,9 @@ public class LatexSetupPanel
   /** the executable. */
   protected JTextField m_TextExecutable;
 
+  /** the executable options. */
+  protected JTextField m_TextExecutableOptions;
+
   /** the bibtex executable. */
   protected JTextField m_TextBibtex;
 
@@ -74,6 +77,10 @@ public class LatexSetupPanel
     m_TextExecutable.setText(LatexHelper.getExecutable());
     m_PanelParameters.addParameter("_Executable", m_TextExecutable);
 
+    m_TextExecutableOptions = new JTextField(10);
+    m_TextExecutableOptions.setText(LatexHelper.getExecutableOptions());
+    m_PanelParameters.addParameter("Executable _options", m_TextExecutableOptions);
+
     m_TextBibtex = new JTextField(10);
     m_TextBibtex.setText(LatexHelper.getBibtex());
     m_PanelParameters.addParameter("B_ibtex", m_TextBibtex);
@@ -91,6 +98,7 @@ public class LatexSetupPanel
 
     result.setProperty(LatexHelper.BINARIES_DIR, m_ChooserLatexBinaries.getCurrent().getAbsolutePath());
     result.setProperty(LatexHelper.EXECUTABLE, m_TextExecutable.getText());
+    result.setProperty(LatexHelper.EXECUTABLE_OPTIONS, m_TextExecutableOptions.getText());
     result.setProperty(LatexHelper.BIBTEX, m_TextBibtex.getText());
 
     return result;

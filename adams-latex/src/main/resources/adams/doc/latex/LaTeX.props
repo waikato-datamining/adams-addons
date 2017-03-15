@@ -1,0 +1,23 @@
+# Configuration file for LaTeX.
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision: 15672 $
+
+# Binaries directory
+# eg Linux:
+# BinariesDir=/usr/bin
+
+# Executable
+# eg Linux:
+# Executable=pdflatex
+# eg Windows
+# Executable=pdflatex.exe
+
+# Options for the executable
+ExecutableOptions=-halt-on-error
+
+# Bibtex executable
+# eg Linux:
+# Bibtex=bibtex
+# eg Windows
+# Bibtex=bibtex.exe
