@@ -263,7 +263,7 @@ public class NewSection
 
     result  = QuickInfoHelper.toString(this, "pageAction", m_PageAction, "page: ");
     result += QuickInfoHelper.toString(this, "type", m_Type, ", type: ");
-    result += QuickInfoHelper.toString(this, "title", m_Title, ", title: ");
+    result += QuickInfoHelper.toString(this, "title", (m_Title.isEmpty() ? "-no title-" : m_Title), ", title: ");
 
     return result;
   }
