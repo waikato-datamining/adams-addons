@@ -11,10 +11,18 @@
 # Author: FracPete (fracpete at waikato dot ac dot nz)
 # Version: $Revision$
 
-adams-latex.LatexAppendDocument=\
+adams-latex.LatexAppendDocument1=\
   IF AFTER adams.flow.source.NewLatexDocument \
   THEN adams.flow.transformer.LatexAppendDocument
 
+adams-latex.LatexAppendDocument2=\
+  IF AFTER adams.flow.transformer.LatexAppendDocument \
+  THEN adams.flow.transformer.LatexAppendDocument
+
 adams-latex.LatexCloseDocument=\
-  IF AFTER adams.flow.source.NewLatexDocument \
+  IF AFTER adams.flow.transformer.LatexAppendDocument \
   THEN adams.flow.transformer.LatexCloseDocument
+
+adams-latex.DumpFile=\
+  IF AFTER adams.flow.transformer.LatexCloseDocument \
+  THEN adams.flow.transformer.DumpFile
