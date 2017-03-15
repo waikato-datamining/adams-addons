@@ -265,7 +265,7 @@ public class Figure
     String	result;
 
     result  = super.getQuickInfo();
-    result += QuickInfoHelper.toString(this, "caption", m_Caption, ", caption: ");
+    result += QuickInfoHelper.toString(this, "caption", (m_Caption.isEmpty() ? "-no caption-" : m_Caption), ", caption: ");
 
     return result;
   }
