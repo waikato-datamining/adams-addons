@@ -20,6 +20,8 @@
 
 package adams.doc.latex.generator;
 
+import adams.core.QuickInfoHelper;
+
 /**
  <!-- globalinfo-start -->
  * Adds a new section to the document with an optional label for cross-referencing.
@@ -249,6 +251,21 @@ public class NewSection
    */
   public String labelTipText() {
     return "The optional label of the section (for cross-referencing).";
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  public String getQuickInfo() {
+    String	result;
+
+    result  = QuickInfoHelper.toString(this, "pageAction", m_PageAction, "page: ");
+    result += QuickInfoHelper.toString(this, "type", m_Type, ", type: ");
+    result += QuickInfoHelper.toString(this, "title", m_Title, ", title: ");
+
+    return result;
   }
 
   /**

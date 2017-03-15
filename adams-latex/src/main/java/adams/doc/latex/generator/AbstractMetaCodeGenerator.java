@@ -20,6 +20,8 @@
 
 package adams.doc.latex.generator;
 
+import adams.core.QuickInfoHelper;
+
 /**
  * Ancestor for generators that enhance another base generator.
  *
@@ -79,4 +81,13 @@ public abstract class AbstractMetaCodeGenerator
    * 			displaying in the GUI or for listing the options.
    */
   public abstract String generatorTipText();
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  public String getQuickInfo() {
+    return QuickInfoHelper.toString(this, "generator", m_Generator, "generator: ");
+  }
 }

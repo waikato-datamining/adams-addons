@@ -20,6 +20,7 @@
 
 package adams.doc.latex.generator;
 
+import adams.core.QuickInfoSupporter;
 import adams.core.option.AbstractOptionHandler;
 import adams.data.conversion.EscapeLatexCharacters;
 import adams.data.conversion.EscapeLatexCharacters.Characters;
@@ -34,7 +35,7 @@ import adams.flow.core.FlowContextHandler;
  */
 public abstract class AbstractCodeGenerator
   extends AbstractOptionHandler
-  implements FlowContextHandler {
+  implements FlowContextHandler, QuickInfoSupporter {
 
   private static final long serialVersionUID = -590133419718559795L;
 
@@ -137,6 +138,17 @@ public abstract class AbstractCodeGenerator
    */
   public Actor getFlowContext() {
     return m_FlowContext;
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   * <br>
+   * Default implementation returns null.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  public String getQuickInfo() {
+    return null;
   }
 
   /**

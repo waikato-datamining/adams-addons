@@ -20,6 +20,8 @@
 
 package adams.doc.latex.generator;
 
+import adams.core.QuickInfoHelper;
+
 /**
  <!-- globalinfo-start -->
  * Inserts the code from the base generator inside a block with the specified font size.
@@ -145,6 +147,15 @@ public class BlockSize
    */
   public String fontSizeTipText() {
     return "The font size to use for the encapsulated block.";
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  public String getQuickInfo() {
+    return QuickInfoHelper.toString(this, "fontSize", m_FontSize, "size: ");
   }
 
   /**

@@ -20,6 +20,7 @@
 
 package adams.doc.latex.generator;
 
+import adams.core.QuickInfoHelper;
 import adams.core.management.LocaleHelper;
 import adams.data.io.output.LatexSpreadSheetWriter;
 import adams.data.spreadsheet.SpreadSheet;
@@ -261,6 +262,15 @@ public class Table
    */
   public String numberFormatTipText() {
     return "The format for the numbers (see java.text.DecimalFormat), use empty string for default 'double' output.";
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  public String getQuickInfo() {
+    return QuickInfoHelper.toString(this, "storageName", m_StorageName, "storage: ");
   }
 
   /**

@@ -20,6 +20,7 @@
 
 package adams.doc.latex.generator;
 
+import adams.core.QuickInfoHelper;
 import adams.core.io.PlaceholderFile;
 
 /**
@@ -147,6 +148,15 @@ public class Image
    */
   public String optionsTipText() {
     return "The options (if any) for the image.";
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  public String getQuickInfo() {
+    return QuickInfoHelper.toString(this, "image", m_Image, "image: ");
   }
 
   /**
