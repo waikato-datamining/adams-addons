@@ -21,6 +21,7 @@
 package adams.doc.latex.generator;
 
 import adams.core.QuickInfoHelper;
+import adams.flow.core.Actor;
 
 /**
  * Ancestor for generators that enhance another base generator.
@@ -62,6 +63,7 @@ public abstract class AbstractMetaCodeGenerator
    */
   public void setGenerator(AbstractCodeGenerator value) {
     m_Generator = value;
+    m_Generator.setFlowContext(getFlowContext());
     reset();
   }
 
@@ -72,6 +74,17 @@ public abstract class AbstractMetaCodeGenerator
    */
   public AbstractCodeGenerator getGenerator() {
     return m_Generator;
+  }
+
+  /**
+   * Sets the flow context.
+   *
+   * @param value	the actor
+   */
+  @Override
+  public void setFlowContext(Actor value) {
+    super.setFlowContext(value);
+    m_Generator.setFlowContext(value);
   }
 
   /**
