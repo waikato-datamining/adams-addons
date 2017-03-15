@@ -33,7 +33,7 @@ import adams.flow.core.Token;
  <!-- flow-summary-start -->
  * Input&#47;output:<br>
  * - generates:<br>
- * &nbsp;&nbsp;&nbsp;java.lang.String<br>
+ * &nbsp;&nbsp;&nbsp;java.lang.StringBuilder<br>
  * <br><br>
  <!-- flow-summary-end -->
  *
@@ -45,7 +45,7 @@ import adams.flow.core.Token;
  * 
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
- * &nbsp;&nbsp;&nbsp;default: LatexNewDocument
+ * &nbsp;&nbsp;&nbsp;default: NewLatexDocument
  * </pre>
  * 
  * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
@@ -281,7 +281,7 @@ public class NewLatexDocument
    */
   @Override
   public Class[] generates() {
-    return new Class[]{String.class};
+    return new Class[]{StringBuilder.class};
   }
 
   /**
@@ -328,7 +328,7 @@ public class NewLatexDocument
     doc.append("\\begin{document}\n");
     doc.append("\n");
 
-    m_OutputToken = new Token(doc.toString());
+    m_OutputToken = new Token(doc);
 
     return null;
   }

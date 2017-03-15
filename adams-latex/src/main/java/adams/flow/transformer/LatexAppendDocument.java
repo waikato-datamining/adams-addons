@@ -35,8 +35,9 @@ import adams.flow.core.Token;
  * Input&#47;output:<br>
  * - accepts:<br>
  * &nbsp;&nbsp;&nbsp;java.lang.String<br>
+ * &nbsp;&nbsp;&nbsp;java.lang.StringBuilder<br>
  * - generates:<br>
- * &nbsp;&nbsp;&nbsp;java.lang.String<br>
+ * &nbsp;&nbsp;&nbsp;java.lang.StringBuilder<br>
  * <br><br>
  <!-- flow-summary-end -->
  *
@@ -161,7 +162,7 @@ public class LatexAppendDocument
    */
   @Override
   public Class[] accepts() {
-    return new Class[]{String.class};
+    return new Class[]{String.class, StringBuilder.class};
   }
 
   /**
@@ -171,7 +172,7 @@ public class LatexAppendDocument
    */
   @Override
   public Class[] generates() {
-    return new Class[]{String.class};
+    return new Class[]{StringBuilder.class};
   }
 
   /**
@@ -186,10 +187,13 @@ public class LatexAppendDocument
 
     result = null;
     try {
-      doc = new StringBuilder((String) m_InputToken.getPayload());
+      if (m_InputToken.getPayload() instanceof StringBuilder)
+	doc = (StringBuilder) m_InputToken.getPayload();
+      else
+	doc = new StringBuilder((String) m_InputToken.getPayload());
       m_Generator.setFlowContext(this);
       doc.append(m_Generator.generate());
-      m_OutputToken = new Token(doc.toString());
+      m_OutputToken = new Token(doc);
     }
     catch (Exception e) {
       result = handleException("Failed to append document!", e);
