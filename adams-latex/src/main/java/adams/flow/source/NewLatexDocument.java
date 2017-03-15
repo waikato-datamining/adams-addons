@@ -20,6 +20,7 @@
 
 package adams.flow.source;
 
+import adams.core.QuickInfoHelper;
 import adams.core.base.BaseText;
 import adams.flow.core.Token;
 
@@ -261,6 +262,16 @@ public class NewLatexDocument
    */
   public String additionalStatementsTipText() {
     return "The additional statements (eg include or usepackage) to insert.";
+  }
+
+  /**
+   * Returns a quick info about the actor, which will be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    return QuickInfoHelper.toString(this, "documentClass", m_DocumentClass, "class: ");
   }
 
   /**
