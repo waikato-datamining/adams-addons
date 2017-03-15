@@ -43,6 +43,9 @@ public class LatexHelper {
   /** the executable. */
   public final static String EXECUTABLE = "Executable";
 
+  /** the bibtex executable. */
+  public final static String BIBTEX = "Bibtex";
+
   /** the properties. */
   protected static Properties m_Properties;
 
@@ -106,9 +109,9 @@ public class LatexHelper {
   }
 
   /**
-   * Returns the binaries dir.
+   * Returns the executable, eg pdflatex.
    *
-   * @return		the binaries dir
+   * @return		the executable (no path)
    */
   public static String getExecutable() {
     String 	defExec;
@@ -117,6 +120,22 @@ public class LatexHelper {
       defExec = "pdflatex.exe";
     else
       defExec = "pdflatex";
+
+    return getProperties().getProperty(EXECUTABLE, defExec);
+  }
+
+  /**
+   * Returns the bibtex executable.
+   *
+   * @return		the bibtex executable (no path)
+   */
+  public static String getBibtex() {
+    String 	defExec;
+
+    if (OS.isWindows())
+      defExec = "bibtex.exe";
+    else
+      defExec = "bibtex";
 
     return getProperties().getProperty(EXECUTABLE, defExec);
   }

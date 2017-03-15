@@ -79,6 +79,11 @@ import java.io.File;
  * &nbsp;&nbsp;&nbsp;default: pdflatex
  * </pre>
  * 
+ * <pre>-bibtex &lt;java.lang.String&gt; (property: bibtex)
+ * &nbsp;&nbsp;&nbsp;The bibtex executable to use (no path).
+ * &nbsp;&nbsp;&nbsp;default: bibtex
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -95,6 +100,9 @@ public class LatexSetup
 
   /** the executable. */
   protected String m_Executable;
+
+  /** the bibtex executable. */
+  protected String m_Bibtex;
 
   /**
    * Returns a string describing the object.
@@ -120,6 +128,10 @@ public class LatexSetup
     m_OptionManager.add(
       "executable", "executable",
       LatexHelper.getExecutable());
+
+    m_OptionManager.add(
+      "bibtex", "bibtex",
+      LatexHelper.getBibtex());
   }
 
   /**
@@ -181,6 +193,35 @@ public class LatexSetup
   }
 
   /**
+   * Sets the bibtex executable to use (no path).
+   *
+   * @param value	the executable
+   */
+  public void setBibtex(String value) {
+    m_Bibtex = value;
+    reset();
+  }
+
+  /**
+   * Returns the bibtex executable to use (no path).
+   *
+   * @return		the executable
+   */
+  public String getBibtex() {
+    return m_Bibtex;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String bibtexTipText() {
+    return "The bibtex executable to use (no path).";
+  }
+
+  /**
    * Returns the full path of the executable.
    *
    * @param exec	the executable (no path)
@@ -197,6 +238,15 @@ public class LatexSetup
    */
   public String executablePath() {
     return executablePath(getExecutable());
+  }
+
+  /**
+   * Returns the full path of the bibtex executable.
+   *
+   * @return		the full path
+   */
+  public String bibtexPath() {
+    return executablePath(getBibtex());
   }
 
   /**
