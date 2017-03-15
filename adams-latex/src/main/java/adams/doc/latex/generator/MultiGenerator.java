@@ -120,6 +120,7 @@ public class MultiGenerator
     for (i = 0; i < m_Generators.length; i++) {
       m_Generators[i].setFlowContext(m_FlowContext);
       result.append(m_Generators[i].generate());
+      ensureTrailingNewLine(result);
     }
 
     return result.toString();
