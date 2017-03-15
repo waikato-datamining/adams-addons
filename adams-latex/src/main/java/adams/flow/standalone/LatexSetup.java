@@ -74,6 +74,11 @@ import java.io.File;
  * &nbsp;&nbsp;&nbsp;default: &#47;usr&#47;bin
  * </pre>
  * 
+ * <pre>-executable &lt;java.lang.String&gt; (property: executable)
+ * &nbsp;&nbsp;&nbsp;The executable to use (no path).
+ * &nbsp;&nbsp;&nbsp;default: pdflatex
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -87,6 +92,9 @@ public class LatexSetup
 
   /** the path to the binaries. */
   protected PlaceholderDirectory m_BinariesDir;
+
+  /** the executable. */
+  protected String m_Executable;
 
   /**
    * Returns a string describing the object.
@@ -106,8 +114,12 @@ public class LatexSetup
     super.defineOptions();
 
     m_OptionManager.add(
-	    "binaries-dir", "binariesDir",
-	    LatexHelper.getBinariesDir());
+      "binaries-dir", "binariesDir",
+      LatexHelper.getBinariesDir());
+
+    m_OptionManager.add(
+      "executable", "executable",
+      LatexHelper.getExecutable());
   }
 
   /**
@@ -140,13 +152,51 @@ public class LatexSetup
   }
 
   /**
-   * Prepends the binaries path to the executable.
+   * Sets the executable to use (no path).
+   *
+   * @param value	the executable
+   */
+  public void setExecutable(String value) {
+    m_Executable = value;
+    reset();
+  }
+
+  /**
+   * Returns the executable to use (no path).
+   *
+   * @return		the executable
+   */
+  public String getExecutable() {
+    return m_Executable;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String executableTipText() {
+    return "The executable to use (no path).";
+  }
+
+  /**
+   * Returns the full path of the executable.
    *
    * @param exec	the executable (no path)
    * @return		the full path
    */
-  public String getExecutable(String exec) {
+  public String executablePath(String exec) {
     return m_BinariesDir.getAbsolutePath() + File.separator + exec;
+  }
+
+  /**
+   * Returns the full path of the executable.
+   *
+   * @return		the full path
+   */
+  public String executablePath() {
+    return executablePath(getExecutable());
   }
 
   /**
@@ -156,6 +206,9 @@ public class LatexSetup
    */
   @Override
   protected String doExecute() {
+    if (!getBinariesDir().exists())
+      return "LaTeX directory for binaries does not exist: " + m_BinariesDir;
+
     return null;
   }
 }

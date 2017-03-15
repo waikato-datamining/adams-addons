@@ -40,6 +40,9 @@ public class LatexHelper {
   /** the binaries dir. */
   public final static String BINARIES_DIR = "BinariesDir";
 
+  /** the executable. */
+  public final static String EXECUTABLE = "Executable";
+
   /** the properties. */
   protected static Properties m_Properties;
 
@@ -102,4 +105,19 @@ public class LatexHelper {
     return new PlaceholderDirectory(getProperties().getPath(BINARIES_DIR, defPath));
   }
 
+  /**
+   * Returns the binaries dir.
+   *
+   * @return		the binaries dir
+   */
+  public static String getExecutable() {
+    String 	defExec;
+
+    if (OS.isWindows())
+      defExec = "pdflatex.exe";
+    else
+      defExec = "pdflatex";
+
+    return getProperties().getProperty(EXECUTABLE, defExec);
+  }
 }

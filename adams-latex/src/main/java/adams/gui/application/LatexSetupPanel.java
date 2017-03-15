@@ -27,6 +27,7 @@ import adams.env.LatexDefinition;
 import adams.gui.chooser.DirectoryChooserPanel;
 import adams.gui.core.ParameterPanel;
 
+import javax.swing.JTextField;
 import java.awt.BorderLayout;
 
 /**
@@ -44,8 +45,11 @@ public class LatexSetupPanel
   /** the parameters. */
   protected ParameterPanel m_PanelParameters;
 
-  /** the consumer key. */
+  /** the directory with the binaries. */
   protected DirectoryChooserPanel m_ChooserLatexBinaries;
+
+  /** the directory with the binaries. */
+  protected JTextField m_TextExecutable;
 
   /**
    * Initializes the members.
@@ -62,6 +66,10 @@ public class LatexSetupPanel
     m_ChooserLatexBinaries = new DirectoryChooserPanel();
     m_ChooserLatexBinaries.setCurrent(LatexHelper.getBinariesDir());
     m_PanelParameters.addParameter("_Binaries dir", m_ChooserLatexBinaries);
+
+    m_TextExecutable = new JTextField(10);
+    m_TextExecutable.setText(LatexHelper.getExecutable());
+    m_PanelParameters.addParameter("_Executable", m_TextExecutable);
   }
 
   /**
@@ -75,6 +83,7 @@ public class LatexSetupPanel
     result = new Properties();
 
     result.setProperty(LatexHelper.BINARIES_DIR, m_ChooserLatexBinaries.getCurrent().getAbsolutePath());
+    result.setProperty(LatexHelper.EXECUTABLE, m_TextExecutable.getText());
 
     return result;
   }
