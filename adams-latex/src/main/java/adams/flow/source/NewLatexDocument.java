@@ -14,7 +14,7 @@
  */
 
 /**
- * LatexNewDocument.java
+ * NewLatexDocument.java
  * Copyright (C) 2017 University of Waikato, Hamilton, NZ
  */
 
@@ -96,7 +96,7 @@ import adams.flow.core.Token;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class LatexNewDocument
+public class NewLatexDocument
   extends AbstractSimpleSource {
 
   private static final long serialVersionUID = 1277901907777271692L;
