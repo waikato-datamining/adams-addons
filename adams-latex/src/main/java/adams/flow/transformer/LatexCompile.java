@@ -151,15 +151,16 @@ public class LatexCompile
    */
   @Override
   protected String doExecute() {
-    String		result;
-    String		exec;
-    String		latex;
-    String		log;
-    String		bibtex;
-    LocalFileSearch	search;
-    List<String> 	list;
-    ProcessResult 	proc;
-    boolean		compiling;
+    String			result;
+    String			exec;
+    String			latex;
+    String			log;
+    String			bibtex;
+    PlaceholderDirectory	cwd;
+    LocalFileSearch		search;
+    List<String> 		list;
+    ProcessResult 		proc;
+    boolean			compiling;
 
     result = null;
 
@@ -168,6 +169,7 @@ public class LatexCompile
       latex = ((File) m_InputToken.getPayload()).getAbsolutePath();
     else
       latex = new PlaceholderFile((String) m_InputToken.getPayload()).getAbsolutePath();
+    cwd = new PlaceholderDirectory(new PlaceholderFile(latex).getParentFile());
     log = FileUtils.replaceExtension(latex, ".log");
 
     // executables
@@ -188,7 +190,7 @@ public class LatexCompile
     try {
       list = search.search();
       for (String file: list) {
-	proc = ProcessUtils.execute(new String[]{bibtex, file});
+	proc = ProcessUtils.execute(new String[]{bibtex, file}, cwd);
 	if (!proc.hasSucceeded()) {
 	  result = proc.toErrorOutput();
 	  break;
@@ -204,17 +206,19 @@ public class LatexCompile
       compiling = true;
       while (compiling) {
 	try {
-	  proc      = ProcessUtils.execute(new String[]{exec, latex});
+	  proc = ProcessUtils.execute(new String[]{exec, latex}, cwd);
 	  compiling = false;
 	  if (proc.hasSucceeded()) {
-	    list = FileUtils.loadFromFile(new PlaceholderFile(log));
-	    for (String line: list) {
-	      if (line.contains("Rerun to get citations correct") || line.contains("Rerun to get cross-references right")) {
-		compiling = true;
-	      }
-	      else if (line.contains("Emergency stop")) {
-		compiling = false;
-		result    = proc.toErrorOutput();
+	    if (FileUtils.fileExists(log)) {
+	      list = FileUtils.loadFromFile(new PlaceholderFile(log));
+	      for (String line : list) {
+		if (line.contains("Rerun to get citations correct") || line.contains("Rerun to get cross-references right")) {
+		  compiling = true;
+		}
+		else if (line.contains("Emergency stop")) {
+		  compiling = false;
+		  result = proc.toErrorOutput();
+		}
 	      }
 	    }
 	  }
