@@ -20,6 +20,7 @@
 
 package adams.flow.transformer;
 
+import adams.core.QuickInfoHelper;
 import adams.doc.latex.generator.AbstractCodeGenerator;
 import adams.doc.latex.generator.CustomStatements;
 import adams.flow.core.Token;
@@ -141,6 +142,16 @@ public class LatexAppendDocument
    */
   public String generatorTipText() {
     return "The code generator to use for appending the document.";
+  }
+
+  /**
+   * Returns a quick info about the actor, which will be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    return QuickInfoHelper.toString(this, "generator", m_Generator, "generator: ");
   }
 
   /**
