@@ -15,17 +15,16 @@
 
 /*
  * ArraySubSample.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
+import adams.core.QuickInfoHelper;
+import adams.flow.core.Token;
 import gnu.trove.list.array.TIntArrayList;
 
 import java.lang.reflect.Array;
-
-import adams.core.QuickInfoHelper;
-import adams.flow.core.Token;
 
 /**
  <!-- globalinfo-start -->
@@ -114,7 +113,8 @@ public class ArraySubSample
   @Override
   public String globalInfo() {
     return
-        "Generates a subset of the array, using a random sub-sample.";
+        "Generates a subset of the array, using a random sub-sample.\n"
+          + "Use '1.1' if you only want to have an array of length one.";
   }
 
   /**
