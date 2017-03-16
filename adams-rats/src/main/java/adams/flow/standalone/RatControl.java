@@ -379,7 +379,16 @@ public class RatControl
   protected boolean deregisterInWrapUp() {
     return true;
   }
-  
+
+  /**
+   * Returns the current control panels.
+   *
+   * @return		the panels
+   */
+  public List<AbstractControlPanel> getControlPanels() {
+    return m_ControlPanels;
+  }
+
   /**
    * Does nothing.
    */
