@@ -53,7 +53,7 @@ public class GetRatControlStatus
   /** the ID of the flow to retrieve. */
   protected Integer m_ID;
 
-  /** the flow. */
+  /** the status. */
   protected SpreadSheet m_Status;
 
   /**
