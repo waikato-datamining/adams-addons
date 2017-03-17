@@ -20,15 +20,17 @@
 
 package adams.flow.sink;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 import adams.core.base.BaseText;
 import adams.core.option.AbstractArgumentOption;
+import adams.data.conversion.NumberToDouble;
 import adams.env.Environment;
 import adams.flow.AbstractRFlowTest;
 import adams.flow.control.Flow;
 import adams.flow.core.Actor;
+import adams.flow.transformer.Convert;
 import adams.test.TmpFile;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * Test for RSink actor.
@@ -106,7 +108,7 @@ public class RSinkTest
 
     try {
       argOption = (AbstractArgumentOption) flow.getOptionManager().findByProperty("actors");
-      adams.flow.core.Actor[] abstractactor1 = new adams.flow.core.Actor[5];
+      adams.flow.core.Actor[] abstractactor1 = new adams.flow.core.Actor[6];
 
       // Flow.Rserve
       adams.flow.standalone.Rserve rserve2 = new adams.flow.standalone.Rserve();
@@ -136,19 +138,23 @@ public class RSinkTest
 
       abstractactor1[2] = randomnumbergenerator7;
 
+      Convert conv = new Convert();
+      conv.setConversion(new NumberToDouble());
+      abstractactor1[3] = conv;
+
       // Flow.SequenceToArray
       adams.flow.transformer.SequenceToArray sequencetoarray10 = new adams.flow.transformer.SequenceToArray();
       argOption = (AbstractArgumentOption) sequencetoarray10.getOptionManager().findByProperty("arrayLength");
       argOption.setVariable("@{num}");
 
-      abstractactor1[3] = sequencetoarray10;
+      abstractactor1[4] = sequencetoarray10;
 
       // Flow.RSink
       adams.flow.sink.RSink rsink11 = new adams.flow.sink.RSink();
       argOption = (AbstractArgumentOption) rsink11.getOptionManager().findByProperty("script");
       rsink11.setScript((adams.core.scripting.RScript) argOption.valueOf("\nwrite.table(X, file=\"/tmp/dumpfile.txt\")\n"));
 
-      abstractactor1[4] = rsink11;
+      abstractactor1[5] = rsink11;
       flow.setActors(abstractactor1);
 
       argOption = (AbstractArgumentOption) flow.getOptionManager().findByProperty("flowExecutionListener");
