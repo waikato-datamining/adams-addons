@@ -29,6 +29,7 @@ import adams.flow.standalone.RatControl;
 import adams.flow.standalone.RatControl.AbstractControlPanel;
 import adams.flow.standalone.RatControl.RatControlPanel;
 import adams.scripting.command.AbstractCommandWithResponse;
+import adams.scripting.command.RemoteCommandOnFlow;
 
 /**
  * Sends a control command for a Rat to a remote flow.
@@ -37,7 +38,8 @@ import adams.scripting.command.AbstractCommandWithResponse;
  * @version $Revision$
  */
 public class SendRatControlCommand
-  extends AbstractCommandWithResponse {
+  extends AbstractCommandWithResponse
+  implements RemoteCommandOnFlow {
 
   private static final long serialVersionUID = -3350680106789169314L;
 

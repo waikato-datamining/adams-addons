@@ -34,6 +34,7 @@ import adams.flow.standalone.RatControl;
 import adams.flow.standalone.RatControl.AbstractControlPanel;
 import adams.flow.standalone.RatControl.RatControlPanel;
 import adams.scripting.command.AbstractCommandWithResponse;
+import adams.scripting.command.RemoteCommandOnFlow;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -46,7 +47,8 @@ import java.io.StringWriter;
  * @version $Revision$
  */
 public class GetRatControlStatus
-  extends AbstractCommandWithResponse {
+  extends AbstractCommandWithResponse
+  implements RemoteCommandOnFlow {
 
   private static final long serialVersionUID = -3350680106789169314L;
 
