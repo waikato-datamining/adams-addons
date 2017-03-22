@@ -36,6 +36,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -104,7 +105,7 @@ public class RatsTab
 	cmdStatus = (GetRatControlStatus) cmd;
 	if (cmdStatus.getResponsePayloadObjects().length > 0) {
 	  status = (SpreadSheet) cmdStatus.getResponsePayloadObjects()[0];
-	  m_Tab.updateRats(status);
+	  SwingUtilities.invokeLater(() -> m_Tab.updateRats(status));
 	}
       }
     }
@@ -388,12 +389,12 @@ public class RatsTab
       row = status.getRow(i);
       panel = new RatStatusPanel(
 	this,
-	row.getCell(0).toLong().intValue(),  // flow ID
-	row.getCell(1).toString(), // rat name
-	row.getCell(2).toBoolean(), // pausable
-	row.getCell(3).toBoolean(), // paused
-	row.getCell(4).toBoolean(), // stoppable
-	row.getCell(5).toBoolean() // stopped
+	row.getCell(GetRatControlStatus.COL_ID).toLong().intValue(),
+	row.getCell(GetRatControlStatus.COL_RAT).toString(),
+	row.getCell(GetRatControlStatus.COL_PAUSABLE).toBoolean(),
+	row.getCell(GetRatControlStatus.COL_PAUSED).toBoolean(),
+	row.getCell(GetRatControlStatus.COL_STOPPABLE).toBoolean(),
+	row.getCell(GetRatControlStatus.COL_STOPPED).toBoolean()
       );
       m_PanelRats.add(panel);
       panels.add(panel);

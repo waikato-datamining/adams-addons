@@ -49,6 +49,24 @@ public class GetRatControlStatus
 
   private static final long serialVersionUID = -3350680106789169314L;
 
+  /** the column of the flow ID. */
+  public final static int COL_ID = 0;
+
+  /** the column of the Rat name. */
+  public final static int COL_RAT = 1;
+
+  /** the column of the pausable flag. */
+  public final static int COL_PAUSABLE = 2;
+
+  /** the column of the paused flag. */
+  public final static int COL_PAUSED = 3;
+
+  /** the column of the stoppable flag. */
+  public final static int COL_STOPPABLE = 4;
+
+  /** the column of the stopped flag. */
+  public final static int COL_STOPPED = 5;
+
   /** the status. */
   protected SpreadSheet m_Status;
 
@@ -181,28 +199,28 @@ public class GetRatControlStatus
     if (flow != null) {
       sheet = new DefaultSpreadSheet();
       row   = sheet.getHeaderRow();
-      row.addCell("flowid").setContent("flowid");
-      row.addCell("rat").setContent("rat");
-      row.addCell("pausable").setContent("pausable");
-      row.addCell("ispaused").setContent("ispaused");
-      row.addCell("stoppable").setContent("stoppable");
-      row.addCell("isstopped").setContent("isstopped");
+      row.addCell("" + COL_ID).setContent("flowid");
+      row.addCell("" + COL_RAT).setContent("rat");
+      row.addCell("" + COL_PAUSABLE).setContent("pausable");
+      row.addCell("" + COL_PAUSED).setContent("ispaused");
+      row.addCell("" + COL_STOPPABLE).setContent("stoppable");
+      row.addCell("" + COL_STOPPED).setContent("isstopped");
       for (Actor a : ActorUtils.enumerate(flow, new Class[]{RatControl.class})) {
 	rc = (RatControl) a;
 	for (AbstractControlPanel panel: rc.getControlPanels()) {
 	  actor = panel.getActor();
 	  row = sheet.addRow();
-	  row.addCell("flowid").setContent(m_ID);
-	  row.addCell("rat").setContent(panel.getActor().getFullName());
-	  row.addCell("pausable").setContent(panel.isPausable());
-	  row.addCell("ispaused").setContent(((Pausable) actor).isPaused());
+	  row.addCell(COL_ID).setContent(m_ID);
+	  row.addCell(COL_RAT).setContent(panel.getActor().getFullName());
+	  row.addCell(COL_PAUSABLE).setContent(panel.isPausable());
+	  row.addCell(COL_PAUSED).setContent(((Pausable) actor).isPaused());
 	  if ((panel instanceof RatControlPanel)) {
-	    row.addCell("stoppable").setContent(((RatControlPanel) panel).isStoppable());
-	    row.addCell("isstopped").setContent(!((Rat) actor).isRunnableActive());
+	    row.addCell(COL_STOPPABLE).setContent(((RatControlPanel) panel).isStoppable());
+	    row.addCell(COL_STOPPED).setContent(!((Rat) actor).isRunnableActive());
 	  }
 	  else {
-	    row.addCell("stoppable").setContent(false);
-	    row.addCell("isstopped").setContent(false);
+	    row.addCell(COL_STOPPABLE).setContent(false);
+	    row.addCell(COL_STOPPED).setContent(false);
 	  }
 	}
       }
