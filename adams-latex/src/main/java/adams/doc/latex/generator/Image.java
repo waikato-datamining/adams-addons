@@ -35,8 +35,28 @@ import adams.core.io.PlaceholderFile;
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
  * 
+ * <pre>-skip &lt;boolean&gt; (property: skip)
+ * &nbsp;&nbsp;&nbsp;If enabled, the code generation gets skipped.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  * <pre>-no-var-expansion &lt;boolean&gt; (property: noVariableExpansion)
  * &nbsp;&nbsp;&nbsp;If enabled, variable expansion gets skipped.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-path-type &lt;ABSOLUTE|BASENAME|SUPPLIED_DIR&gt; (property: pathType)
+ * &nbsp;&nbsp;&nbsp;Determines how to process the file name.
+ * &nbsp;&nbsp;&nbsp;default: ABSOLUTE
+ * </pre>
+ * 
+ * <pre>-supplied-dir &lt;java.lang.String&gt; (property: suppliedDir)
+ * &nbsp;&nbsp;&nbsp;The directory name to use instead.
+ * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
+ * <pre>-remove-extension &lt;boolean&gt; (property: removeExtension)
+ * &nbsp;&nbsp;&nbsp;If enabled, removes the extension from the filename.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
@@ -47,16 +67,16 @@ import adams.core.io.PlaceholderFile;
  * 
  * <pre>-options &lt;java.lang.String&gt; (property: options)
  * &nbsp;&nbsp;&nbsp;The options (if any) for the image.
- * &nbsp;&nbsp;&nbsp;default:
+ * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
- *
+ * 
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
 public class Image
-  extends AbstractCodeGenerator {
+  extends AbstractFileReferencingCodeGenerator {
 
   private static final long serialVersionUID = 101642148012049382L;
 
@@ -172,7 +192,7 @@ public class Image
     result.append("\\includegraphics");
     if (!m_Options.isEmpty())
       result.append("[").append(m_Options).append("]");
-    result.append("{").append(m_Image.getAbsolutePath()).append("}\n");
+    result.append("{").append(processFile(m_Image)).append("}\n");
 
     return result.toString();
   }

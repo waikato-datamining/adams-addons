@@ -21,7 +21,6 @@
 package adams.doc.latex.generator;
 
 import adams.core.QuickInfoHelper;
-import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 
 /**
@@ -46,8 +45,23 @@ import adams.core.io.PlaceholderFile;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
+ * <pre>-path-type &lt;ABSOLUTE|BASENAME|SUPPLIED_DIR&gt; (property: pathType)
+ * &nbsp;&nbsp;&nbsp;Determines how to process the file name.
+ * &nbsp;&nbsp;&nbsp;default: ABSOLUTE
+ * </pre>
+ * 
+ * <pre>-supplied-dir &lt;java.lang.String&gt; (property: suppliedDir)
+ * &nbsp;&nbsp;&nbsp;The directory name to use instead.
+ * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
+ * <pre>-remove-extension &lt;boolean&gt; (property: removeExtension)
+ * &nbsp;&nbsp;&nbsp;If enabled, removes the extension from the filename.
+ * &nbsp;&nbsp;&nbsp;default: true
+ * </pre>
+ * 
  * <pre>-include &lt;adams.core.io.PlaceholderFile&gt; (property: include)
- * &nbsp;&nbsp;&nbsp;The file to include.
+ * &nbsp;&nbsp;&nbsp;The LaTeX file to include.
  * &nbsp;&nbsp;&nbsp;default: ${CWD}
  * </pre>
  * 
@@ -57,7 +71,7 @@ import adams.core.io.PlaceholderFile;
  * @version $Revision$
  */
 public class Include
-  extends AbstractCodeGenerator {
+  extends AbstractFileReferencingCodeGenerator {
 
   private static final long serialVersionUID = 101642148012049382L;
 
@@ -84,6 +98,15 @@ public class Include
     m_OptionManager.add(
       "include", "include",
       new PlaceholderFile());
+  }
+
+  /**
+   * Returns the default for removing the extension.
+   *
+   * @return		the default
+   */
+  protected boolean getDefaultRemoveExtension() {
+    return true;
   }
 
   /**
@@ -135,7 +158,7 @@ public class Include
 
     result = new StringBuilder();
     result.append("\\include{");
-    result.append(FileUtils.replaceExtension(m_Include.getAbsolutePath(), ""));
+    result.append(processFile(m_Include));
     result.append("}\n");
 
     return result.toString();
