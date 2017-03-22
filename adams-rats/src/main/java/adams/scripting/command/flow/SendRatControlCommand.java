@@ -21,15 +21,13 @@
 package adams.scripting.command.flow;
 
 import adams.core.Pausable;
-import adams.flow.control.RunningFlowsRegistry;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
 import adams.flow.standalone.Rat;
 import adams.flow.standalone.RatControl;
 import adams.flow.standalone.RatControl.AbstractControlPanel;
 import adams.flow.standalone.RatControl.RatControlPanel;
-import adams.scripting.command.AbstractCommandWithResponse;
-import adams.scripting.command.RemoteCommandOnFlow;
+import adams.scripting.command.AbstractRemoteCommandOnFlowWithResponse;
 
 /**
  * Sends a control command for a Rat to a remote flow.
@@ -38,8 +36,7 @@ import adams.scripting.command.RemoteCommandOnFlow;
  * @version $Revision$
  */
 public class SendRatControlCommand
-  extends AbstractCommandWithResponse
-  implements RemoteCommandOnFlow {
+  extends AbstractRemoteCommandOnFlowWithResponse {
 
   private static final long serialVersionUID = -3350680106789169314L;
 
@@ -71,9 +68,6 @@ public class SendRatControlCommand
   /** response: already stopped. */
   public final static String RESPONSE_ALREADY_STOPPED = "Already stopped";
 
-  /** the ID of the flow to retrieve. */
-  protected Integer m_ID;
-
   /** the rat name. */
   protected String m_Rat;
 
@@ -101,10 +95,6 @@ public class SendRatControlCommand
     super.defineOptions();
 
     m_OptionManager.add(
-      "id", "ID",
-      1, -1, null);
-
-    m_OptionManager.add(
       "rat", "rat",
       "");
 
@@ -124,32 +114,13 @@ public class SendRatControlCommand
   }
 
   /**
-   * Sets the ID of the flow to get.
-   *
-   * @param value	the ID, -1 if to retrieve the only one
-   */
-  public void setID(int value) {
-    m_ID = value;
-    reset();
-  }
-
-  /**
-   * Returns the ID of the flow to get.
-   *
-   * @return		the ID, -1 if to retrieve the only one
-   */
-  public int getID() {
-    return m_ID;
-  }
-
-  /**
    * Returns the tip text for this property.
    *
    * @return 		tip text for this property suitable for
    * 			displaying in the gui
    */
   public String IDTipText() {
-    return "The ID of the flow to get; -1 if to retrieve the only one.";
+    return "The ID of the flow to oeprate on; -1 if to use the only one.";
   }
 
   /**
@@ -278,14 +249,7 @@ public class SendRatControlCommand
 
     super.prepareResponsePayload();
 
-    flow = null;
-    if (m_ID == -1) {
-      if (RunningFlowsRegistry.getSingleton().size() == 1)
-        flow = RunningFlowsRegistry.getSingleton().flows()[0];
-    }
-    else {
-      flow = RunningFlowsRegistry.getSingleton().getFlow(m_ID);
-    }
+    flow = retrieveFlow(false);
 
     // get RatControl actors
     m_Response = RESPONSE_NOT_FOUND;

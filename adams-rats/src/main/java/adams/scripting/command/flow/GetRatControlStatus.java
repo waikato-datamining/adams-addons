@@ -26,15 +26,13 @@ import adams.data.io.output.CsvSpreadSheetWriter;
 import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
-import adams.flow.control.RunningFlowsRegistry;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
 import adams.flow.standalone.Rat;
 import adams.flow.standalone.RatControl;
 import adams.flow.standalone.RatControl.AbstractControlPanel;
 import adams.flow.standalone.RatControl.RatControlPanel;
-import adams.scripting.command.AbstractCommandWithResponse;
-import adams.scripting.command.RemoteCommandOnFlow;
+import adams.scripting.command.AbstractRemoteCommandOnFlowWithResponse;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -47,13 +45,9 @@ import java.io.StringWriter;
  * @version $Revision$
  */
 public class GetRatControlStatus
-  extends AbstractCommandWithResponse
-  implements RemoteCommandOnFlow {
+  extends AbstractRemoteCommandOnFlowWithResponse {
 
   private static final long serialVersionUID = -3350680106789169314L;
-
-  /** the ID of the flow to retrieve. */
-  protected Integer m_ID;
 
   /** the status. */
   protected SpreadSheet m_Status;
@@ -78,18 +72,6 @@ public class GetRatControlStatus
   }
 
   /**
-   * Adds options to the internal list of options.
-   */
-  @Override
-  public void defineOptions() {
-    super.defineOptions();
-
-    m_OptionManager.add(
-      "id", "ID",
-      1, -1, null);
-  }
-
-  /**
    * Initializes the members.
    */
   @Override
@@ -100,32 +82,13 @@ public class GetRatControlStatus
   }
 
   /**
-   * Sets the ID of the flow to get.
-   *
-   * @param value	the ID, -1 if to retrieve the only one
-   */
-  public void setID(int value) {
-    m_ID = value;
-    reset();
-  }
-
-  /**
-   * Returns the ID of the flow to get.
-   *
-   * @return		the ID, -1 if to retrieve the only one
-   */
-  public int getID() {
-    return m_ID;
-  }
-
-  /**
    * Returns the tip text for this property.
    *
    * @return 		tip text for this property suitable for
    * 			displaying in the gui
    */
   public String IDTipText() {
-    return "The ID of the flow to get; -1 if to retrieve the only one.";
+    return "The ID of the flow to query; -1 if to use the only one.";
   }
 
   /**
@@ -212,14 +175,7 @@ public class GetRatControlStatus
 
     super.prepareResponsePayload();
 
-    flow = null;
-    if (m_ID == -1) {
-      if (RunningFlowsRegistry.getSingleton().size() == 1)
-        flow = RunningFlowsRegistry.getSingleton().flows()[0];
-    }
-    else {
-      flow = RunningFlowsRegistry.getSingleton().getFlow(m_ID);
-    }
+    flow = retrieveFlow(false);
 
     // get RatControl actors
     if (flow != null) {
