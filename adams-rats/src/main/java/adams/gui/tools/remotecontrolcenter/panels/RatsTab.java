@@ -30,12 +30,12 @@ import adams.scripting.command.flow.ListFlows;
 import adams.scripting.command.flow.SendRatControlCommand;
 import adams.scripting.command.flow.SendRatControlCommand.Command;
 import adams.scripting.responsehandler.AbstractResponseHandler;
+import com.googlecode.jfilechooserbookmarks.gui.BaseScrollPane;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.event.ListSelectionEvent;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -277,12 +277,13 @@ public class RatsTab
   protected void initGUI() {
     JPanel	panelAll;
     JPanel 	panelRefresh;
+    JPanel	panel;
     JLabel	label;
 
     super.initGUI();
 
     panelAll = new JPanel(new BorderLayout());
-    add(panelAll, BorderLayout.SOUTH);
+    m_SplitPane.setBottomComponent(panelAll);
 
     panelRefresh = new JPanel(new FlowLayout(FlowLayout.LEFT));
     panelAll.add(panelRefresh, BorderLayout.NORTH);
@@ -295,7 +296,9 @@ public class RatsTab
     panelRefresh.add(m_ButtonRefreshRats);
 
     m_PanelRats = new JPanel(new BorderLayout());
-    panelAll.add(m_PanelRats, BorderLayout.CENTER);
+    panel = new JPanel(new BorderLayout());
+    panel.add(m_PanelRats, BorderLayout.NORTH);
+    panelAll.add(new BaseScrollPane(panel), BorderLayout.CENTER);
   }
 
   /**
@@ -328,13 +331,10 @@ public class RatsTab
   }
 
   /**
-   * Gets called when the selection in the flow table changes.
-   *
-   * @param e		the mouse event
+   * Updates the state of the buttons.
    */
-  @Override
-  public void valueChanged(ListSelectionEvent e) {
-    super.valueChanged(e);
+  protected void updateButtons() {
+    super.updateButtons();
     m_ButtonRefreshRats.setEnabled(m_TableFlows.getSelectedRowCount() == 1);
   }
 
