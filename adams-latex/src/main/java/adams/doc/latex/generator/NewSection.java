@@ -283,7 +283,7 @@ public class NewSection
       result.append("\\").append(m_PageAction.toString().toLowerCase()).append("\n");
 
     result.append("\\").append(m_Type.toString().toLowerCase()).append("{");
-    result.append(expand(m_Title));
+    result.append(expandEscape(m_Title));
     result.append("}\n");
     if (!m_Label.isEmpty())
       result.append("\\label{").append(expand(m_Label)).append("}\n");
