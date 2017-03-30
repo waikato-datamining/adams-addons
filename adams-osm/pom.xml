@@ -48,18 +48,6 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-    
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>${postgresql.version}</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.postgis</groupId>
-      <artifactId>postgis-jdbc</artifactId>
-      <version>${postgis.version}</version>
-    </dependency>
 
     <dependency>
       <groupId>nz.ac.waikato.cms.adams</groupId>
