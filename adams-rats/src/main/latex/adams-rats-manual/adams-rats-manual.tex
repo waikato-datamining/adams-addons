@@ -93,6 +93,23 @@ The following control actors are available:
 	paused state before activating them later on.
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%
+% Remote commands %
+%%%%%%%%%%%%%%%%%%%
+
+\section{Remote commands}
+The Rats module has some additional remote commands that allow the control of
+individual \textit{Rat} actors, as long as they have been flagged to show up in a
+\textit{RatControl} actor and such an actor is also present in the flow.
+
+Available commands:
+\begin{tight_itemize}
+  \item \textit{flow.GetRatControlStatus} -- returns the status
+  (stoppable/isstopped/pausable/ispaused) for all the registered Rat actors
+  \item \textit{flow.SendRatControlCommand} -- sends the specified control command
+  to a specific Rat actor (pause/resume/stop/start)
+\end{tight_itemize}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
 
