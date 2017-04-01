@@ -19,10 +19,14 @@
  */
 package adams.flow.webservice.interceptor.outgoing;
 
+import adams.core.DateFormat;
+import adams.core.DateUtils;
 import adams.core.License;
 import adams.core.annotation.MixedCopyright;
+import adams.core.io.FileUtils;
 import adams.core.logging.Logger;
 import adams.core.logging.LoggingHelper;
+import adams.data.conversion.PrettyPrintXML;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
@@ -32,7 +36,9 @@ import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
+import java.io.File;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -57,14 +63,55 @@ public class XMLLoggingOutInterceptor
 
   protected Logger logger = null;
 
+  /** whether to use pretty printing. */
+  protected boolean prettyPrint;
+
+  /** the file to output the XML messages to - disabled if null. */
+  protected File outputFile;
+
+  /** the conversion for pretty printing the XML. */
+  protected PrettyPrintXML convert;
+
+  /** for outputting timestamps in the output file. */
+  protected transient DateFormat formatter;
+
   public XMLLoggingOutInterceptor() {
-    this(LoggingHelper.getLogger(XMLLoggingOutInterceptor.class));
+    this(LoggingHelper.getLogger(XMLLoggingOutInterceptor.class), false, null);
   }
 
-  public XMLLoggingOutInterceptor(Logger logger) {
+  public XMLLoggingOutInterceptor(Logger logger, boolean prettyPrint, File outputFile) {
     super(Phase.PRE_STREAM);
     addBefore(StaxOutInterceptor.class.getName());
     this.logger = logger;
+    this.prettyPrint = prettyPrint;
+    this.outputFile = outputFile;
+  }
+
+  /**
+   * Pretty prints the buffer, if enabled.
+   *
+   * @param buffer	the buffer to turn into "pretty" XML
+   * @return		the (potentially) new buffer
+   */
+  protected StringBuilder prettyPrint(StringBuilder buffer) {
+    StringBuilder	result;
+    String		msg;
+
+    if (prettyPrint) {
+      if (convert == null)
+        convert = new PrettyPrintXML();
+      convert.setInput(buffer.toString());
+      msg = convert.convert();
+      if (msg == null)
+        result = new StringBuilder((String) convert.getOutput());
+      else
+        result = buffer;
+    }
+    else {
+      result = buffer;
+    }
+
+    return result;
   }
 
   public void handleMessage(Message message) throws Fault {
@@ -119,17 +166,25 @@ public class XMLLoggingOutInterceptor
     public void onClose(CachedOutputStream cos) {
       int length = buffer.length();
       try {
-	cos.writeCacheTo(buffer);
+        cos.writeCacheTo(buffer);
       }
       catch (Exception ex) {
-	// ignore
+        // ignore
       }
 
       // decode chars from bytes
       char[] chars = new char[buffer.length() - length];
       buffer.getChars(length, buffer.length(), chars, 0);
+      buffer = prettyPrint(buffer);
 
       logger.log(Level.INFO, buffer.toString());
+
+      if (outputFile != null) {
+        if (formatter == null)
+          formatter = DateUtils.getTimestampFormatterMsecs();
+	FileUtils.writeToFile(outputFile.getAbsolutePath(), "\n--- " + formatter.format(new Date()) + " ---\n", true);
+        FileUtils.writeToFile(outputFile.getAbsolutePath(), buffer, true);
+      }
     }
   }
 
@@ -146,8 +201,8 @@ public class XMLLoggingOutInterceptor
 
     if (headers != null) {
       for (Header header:headers) {
-	if (header.getName().getLocalPart().equalsIgnoreCase(name))
-	  return header.getObject().toString();
+        if (header.getName().getLocalPart().equalsIgnoreCase(name))
+          return header.getObject().toString();
       }
     }
     return null;

@@ -19,10 +19,14 @@
  */
 package adams.flow.webservice.interceptor.incoming;
 
+import adams.core.DateFormat;
+import adams.core.DateUtils;
 import adams.core.License;
 import adams.core.annotation.MixedCopyright;
+import adams.core.io.FileUtils;
 import adams.core.logging.Logger;
 import adams.core.logging.LoggingHelper;
+import adams.data.conversion.PrettyPrintXML;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -31,8 +35,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -57,13 +63,54 @@ public class XMLLoggingInInterceptor
 
   protected Logger logger;
 
+  /** whether to use pretty printing. */
+  protected boolean prettyPrint;
+
+  /** the file to output the XML messages to - disabled if null. */
+  protected File outputFile;
+
+  /** the conversion for pretty printing the XML. */
+  protected PrettyPrintXML convert;
+
+  /** for outputting timestamps in the output file. */
+  protected transient DateFormat formatter;
+
   public XMLLoggingInInterceptor() {
-    this(LoggingHelper.getLogger(XMLLoggingInInterceptor.class));
+    this(LoggingHelper.getLogger(XMLLoggingInInterceptor.class), false, null);
   }
 
-  public XMLLoggingInInterceptor(Logger logger) {
+  public XMLLoggingInInterceptor(Logger logger, boolean prettyPrint, File outputFile) {
     super(Phase.RECEIVE);
     this.logger = logger;
+    this.prettyPrint = prettyPrint;
+    this.outputFile = outputFile;
+  }
+
+  /**
+   * Pretty prints the buffer, if enabled.
+   *
+   * @param buffer	the buffer to turn into "pretty" XML
+   * @return		the (potentially) new buffer
+   */
+  protected StringBuilder prettyPrint(StringBuilder buffer) {
+    StringBuilder	result;
+    String		msg;
+
+    if (prettyPrint) {
+      if (convert == null)
+	convert = new PrettyPrintXML();
+      convert.setInput(buffer.toString());
+      msg = convert.convert();
+      if (msg == null)
+	result = new StringBuilder((String) convert.getOutput());
+      else
+	result = buffer;
+    }
+    else {
+      result = buffer;
+    }
+
+    return result;
   }
 
   public void handleMessage(Message message) throws Fault {
@@ -103,8 +150,15 @@ public class XMLLoggingInInterceptor
     char[] chars = new char[buffer.length()];
     buffer.getChars(0, chars.length, chars, 0);
 
+    buffer = prettyPrint(buffer);
     logProperties(buffer, message);
     logger.log(Level.INFO, buffer.toString());
+    if (outputFile != null) {
+      if (formatter == null)
+	formatter = DateUtils.getTimestampFormatterMsecs();
+      FileUtils.writeToFile(outputFile.getAbsolutePath(), "\n--- " + formatter.format(new Date()) + " ---\n", true);
+      FileUtils.writeToFile(outputFile.getAbsolutePath(), buffer, true);
+    }
   }
 
 

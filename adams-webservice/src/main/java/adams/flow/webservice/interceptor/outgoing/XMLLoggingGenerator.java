@@ -15,10 +15,13 @@
 
 /**
  * XMLLoggingGenerator.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice.interceptor.outgoing;
 
+import adams.core.io.FileWriter;
+import adams.core.io.PlaceholderFile;
+import adams.core.io.PrettyPrintingSupporter;
 import adams.core.logging.Logger;
 import adams.core.logging.LoggingHelper;
 import adams.core.logging.LoggingLevel;
@@ -30,10 +33,17 @@ import adams.core.logging.LoggingLevel;
  * @version $Revision$
  */
 public class XMLLoggingGenerator
-  extends AbstractOutInterceptorGenerator<XMLLoggingOutInterceptor> {
+  extends AbstractOutInterceptorGenerator<XMLLoggingOutInterceptor>
+  implements PrettyPrintingSupporter, FileWriter {
 
   /** for serialization. */
   private static final long serialVersionUID = -8109018608359183466L;
+
+  /** whether to use pretty-printing. */
+  protected boolean m_PrettyPrinting;
+
+  /** the optional output file to write the XML messages to. */
+  protected PlaceholderFile m_OutputFile;
 
   /**
    * Returns a string describing the object.
@@ -48,6 +58,22 @@ public class XMLLoggingGenerator
   }
 
   /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "pretty-printing", "prettyPrinting",
+      false);
+
+    m_OptionManager.add(
+      "output-file", "outputFile",
+      new PlaceholderFile());
+  }
+
+  /**
    * Returns the default logging level to use.
    *
    * @return		the logging level
@@ -55,6 +81,64 @@ public class XMLLoggingGenerator
   @Override
   protected LoggingLevel getDefaultLoggingLevel() {
     return LoggingLevel.INFO;
+  }
+
+  /**
+   * Sets whether to use pretty-printing or not.
+   *
+   * @param value	true if to use pretty-printing
+   */
+  public void setPrettyPrinting(boolean value) {
+    m_PrettyPrinting = value;
+    reset();
+  }
+
+  /**
+   * Returns whether pretty-printing is used or not.
+   *
+   * @return		true if to use pretty-printing
+   */
+  public boolean getPrettyPrinting() {
+    return m_PrettyPrinting;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String prettyPrintingTipText() {
+    return "If enabled, XML is output is 'pretty printed' format, i.e., nicely nested.";
+  }
+
+  /**
+   * Sets the output file in use. Ignored if pointing to a directory.
+   *
+   * @param value	the output file
+   */
+  public void setOutputFile(PlaceholderFile value) {
+    m_OutputFile = value;
+    reset();
+  }
+
+  /**
+   * Returns the output file in use. Ignored if pointing to a directory.
+   *
+   * @return		the output file
+   */
+  public PlaceholderFile getOutputFile() {
+    return m_OutputFile;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String outputFileTipText() {
+    return "Optional file to store the XML messages in; ignored if pointing to a directory.";
   }
 
   /**
@@ -69,6 +153,6 @@ public class XMLLoggingGenerator
     logger = LoggingHelper.getLogger(XMLLoggingOutInterceptor.class);
     logger.setLevel(getLoggingLevel().getLevel());
 
-    return new XMLLoggingOutInterceptor(logger);
+    return new XMLLoggingOutInterceptor(logger, m_PrettyPrinting, m_OutputFile.isDirectory() ? null : m_OutputFile);
   }
 }
