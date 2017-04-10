@@ -339,7 +339,15 @@ public class CustomersByName extends AbstractWebServiceClientTransformer<String,
     m_Customers = null;
     CustomerServiceService customerServiceService = new CustomerServiceService(getWsdlLocation());
     CustomerService customerService = customerServiceService.getCustomerServicePort();
-    WebserviceUtils.configureClient(customerService, m_ConnectionTimeout, m_ReceiveTimeout);
+    WebserviceUtils.configureClient(
+	m_Owner,
+	customerService,
+	m_ConnectionTimeout,
+	m_ReceiveTimeout,
+	(getUseAlternativeURL() ? getAlternativeURL() : null),
+	m_InInterceptor,
+	m_OutInterceptor);
+    WebserviceUtils.enableSchemaValidation(((BindingProvider) customerService));
     m_Customers = customerService.getCustomersByName(m_ProvidedCustomerName);
     m_ProvidedCustomerName = null;
   }
@@ -409,6 +417,66 @@ The following sinks are available:
 \begin{tight_itemize}
 	\item \textit{WSSink} -- simply sends data to a web-service\footnote{adams-webservice-client\_as\_sink.flow}.
 \end{tight_itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Messages}
+The following sections explain how SOAP messages can be intercepted (in- and
+outgoing ones) and also replayed. This is especially useful when debugging
+webservices.
+
+\section{Interception}
+Webservice clients and servers can take advantage of the same interceptors.
+
+\noindent The following generators for \textit{incoming} interceptors are available:
+\begin{tight_itemize}
+  \item \textit{BaseLoggingGenerator} -- simply outputs the message using the
+  ADAMS logging framework.
+  \item \textit{EnqueueGenerator} -- forwards the messages to the specified
+  queue for further processing.
+  \item \textit{LogFileGenerator} -- appends the messages to the specified log file.
+  \item \textit{NullGenerator} -- does nothing (default).
+  \item \textit{XMLLoggingGenerator} -- outputs the message as XML, either via
+  logging or to a file.
+\end{tight_itemize}
+
+\noindent The following generators for \textit{outgoing} interceptors are available:
+\begin{tight_itemize}
+  \item \textit{BaseLoggingGenerator} -- simply outputs the message using the
+  ADAMS logging framework.
+  \item \textit{EnqueueGenerator} -- forwards the messages to the specified
+  queue for further processing.
+  \item \textit{LogFileGenerator} -- appends the messages to the specified log file.
+  \item \textit{NullGenerator} -- does nothing (default).
+  \item \textit{XMLLoggingGenerator} -- outputs the message as XML, either via
+  logging or to a file.
+\end{tight_itemize}
+
+
+\section{Simulation}
+Messages collected using one of the \textit{XMLLoggingGenerator} instances or
+hand-coded ones can be replayed again rather easily. This is great for
+debugging the handling of requests, without relying on an actual sender
+transmitting the requests.
+
+For sending, you can use one of the following approaches:
+\begin{tight_itemize}
+  \item \textit{SoapUI}\cite{soapui} -- an application for testing SOAP and REST
+  \item Workflow using the \textit{HttpRequest} transformer\footnote{adams-webservice-simulate.flow}
+\end{tight_itemize}
+
+\noindent For the second approach to work, not only the URL of the webservices
+has to be supplied, but also additional HTTP headers (the payload itself is the
+content of the XML file). The following headers should be included:
+\begin{tight_itemize}
+  \item \texttt{Content-Type=text/xml}
+  \item \texttt{Content-Length=length}
+  \item \texttt{SOAPAction=XYZ}
+\end{tight_itemize}
+The \textit{SOAPAction} header is specific to the webservice. Some webservices
+might not require it at all and therefore can be left empty. This action is
+output in the default logging information in the console, just search for the
+\textit{SOAPAction:} text in the output.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}

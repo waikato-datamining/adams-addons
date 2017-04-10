@@ -1,0 +1,18 @@
+# Project: adams
+# Date: 2017-04-10 15:47:40
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Shows how to simulate a SOAP request by loading an existing XML \\ndocument and sending it via a HTTP POST request (with custom headers)." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.GridView -width 1200 -num-cols 2 -add-headers true -writer adams.gui.print.NullWriter
+  adams.flow.sink.Display -name outgoing -short-title true -writer adams.data.io.output.NullWriter
+  adams.flow.sink.Display -name response -short-title true -x -3 -writer adams.data.io.output.NullWriter -line-wrap true -wrap-style-word true
+ adams.flow.source.SelectFile -stop-if-canceled true -initial-dir ${HOME}/temp/cropwatch -initial-file ${FLOWS}/data/customer_query.xml
+ adams.flow.transformer.TextFileReader -reader adams.data.io.input.SingleStringTextReader
+ adams.flow.control.Tee -name display
+  adams.flow.sink.CallableSink -callable outgoing
+ adams.flow.transformer.HttpRequest -url http://localhost:9090/CustomerServicePort -header Content-Type=text/xml -header Content-Length=length -header SOAPAction=
+ adams.flow.control.ContainerValuePicker -name "status code" -value "Status code"
+  adams.flow.sink.CallableSink -callable response
+ adams.flow.control.ContainerValuePicker -name body -value Body
+  adams.flow.transformer.Convert -conversion adams.data.conversion.PrettyPrintXML
+  adams.flow.sink.CallableSink -callable response
