@@ -15,7 +15,7 @@
 
 /**
  * CustomersByName.java
- * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2017 University of Waikato, Hamilton, New Zealand
  */
 package com.example.customerservice.flow;
 
@@ -28,6 +28,7 @@ import com.example.customerservice.Customer;
 import com.example.customerservice.CustomerService;
 import com.example.customerservice.CustomerServiceService;
 
+import javax.xml.ws.BindingProvider;
 import java.net.URL;
 import java.util.List;
 
@@ -162,6 +163,7 @@ public class CustomersByName
 	(getUseAlternativeURL() ? getAlternativeURL() : null), 
 	m_InInterceptor, 
 	m_OutInterceptor);
+    WebserviceUtils.enableSchemaValidation(((BindingProvider) customerService));
     List<Customer> customers = customerService.getCustomersByName(name);
     setResponseData(customers.get(0).getCustomerId() + ": " + customers.get(0).getName() + ", " + Utils.flatten(customers.get(0).getAddress(), " "));
     m_ProvidedCustomerName = null;

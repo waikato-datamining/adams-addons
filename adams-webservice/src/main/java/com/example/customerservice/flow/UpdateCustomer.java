@@ -15,20 +15,20 @@
 
 /**
  * UpdateCustomer.java
- * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2017 University of Waikato, Hamilton, New Zealand
  */
 package com.example.customerservice.flow;
-
-import java.net.URL;
 
 import adams.core.License;
 import adams.core.annotation.MixedCopyright;
 import adams.flow.webservice.AbstractWebServiceClientSink;
 import adams.flow.webservice.WebserviceUtils;
-
 import com.example.customerservice.Customer;
 import com.example.customerservice.CustomerService;
 import com.example.customerservice.CustomerServiceService;
+
+import javax.xml.ws.BindingProvider;
+import java.net.URL;
 
 /**
  * Simple client for querying customer names.
@@ -164,6 +164,7 @@ public class UpdateCustomer
 	(getUseAlternativeURL() ? getAlternativeURL() : null),
 	null,
 	m_OutInterceptor);
+    WebserviceUtils.enableSchemaValidation(((BindingProvider) customerService));
     customerService.updateCustomer(customer);
     m_ProvidedCustomerName = null;
   }
