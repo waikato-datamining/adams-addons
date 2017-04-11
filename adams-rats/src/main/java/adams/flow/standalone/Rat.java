@@ -37,6 +37,7 @@ import adams.flow.control.ScopeHandler.ScopeHandling;
 import adams.flow.control.StorageName;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorHandlerInfo;
+import adams.flow.core.ActorPath;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
@@ -51,6 +52,9 @@ import adams.flow.core.QueueHelper;
 import adams.flow.core.RatMode;
 import adams.flow.core.RatState;
 import adams.flow.core.Token;
+import adams.flow.execution.debug.AbstractScopeRestriction;
+import adams.flow.execution.debug.DebugScopeRestrictionHandler;
+import adams.flow.execution.debug.SubFlowRestriction;
 import adams.flow.standalone.rats.RatRunnable;
 import adams.flow.standalone.rats.input.DummyInput;
 import adams.flow.standalone.rats.input.RatInput;
@@ -201,7 +205,8 @@ import java.util.Set;
  */
 public class Rat
   extends AbstractStandaloneGroupItem<Rats>
-  implements MutableActorHandler, CallableActorUser, Pausable, FlowPauseStateListener {
+  implements MutableActorHandler, CallableActorUser, Pausable,
+             FlowPauseStateListener, DebugScopeRestrictionHandler {
 
   /** for serialization. */
   private static final long serialVersionUID = -154461277343021604L;
@@ -1507,6 +1512,20 @@ public class Rat
     e = new RatStateEvent(this, this);
     for (RatStateListener l: m_StateListeners)
       l.ratStateChanged(e);
+  }
+
+  /**
+   * Returns the scope restriction in place.
+   *
+   * @return		the scope restriction
+   */
+  public AbstractScopeRestriction getDebugScopeRestriction() {
+    SubFlowRestriction  result;
+
+    result = new SubFlowRestriction();
+    result.setRoot(new ActorPath(getFullName()));
+
+    return result;
   }
 
   /**
