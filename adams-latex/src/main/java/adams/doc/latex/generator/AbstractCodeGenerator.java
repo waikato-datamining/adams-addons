@@ -20,6 +20,7 @@
 
 package adams.doc.latex.generator;
 
+import adams.core.AdditionalInformationHandler;
 import adams.core.QuickInfoSupporter;
 import adams.core.option.AbstractOptionHandler;
 import adams.data.conversion.EscapeLatexCharacters;
@@ -35,7 +36,7 @@ import adams.flow.core.FlowContextHandler;
  */
 public abstract class AbstractCodeGenerator
   extends AbstractOptionHandler
-  implements FlowContextHandler, QuickInfoSupporter {
+  implements FlowContextHandler, QuickInfoSupporter, AdditionalInformationHandler {
 
   private static final long serialVersionUID = -590133419718559795L;
 
@@ -149,6 +150,34 @@ public abstract class AbstractCodeGenerator
    */
   public String getQuickInfo() {
     return null;
+  }
+
+  /**
+   * Returns the list of required LaTeX packages for this code generator.
+   *
+   * @return		the packages
+   */
+  public abstract String[] getRequiredPackages();
+
+  /**
+   * Returns the additional information.
+   *
+   * @return		the additional information, null or 0-length string for no information
+   */
+  public String getAdditionalInformation() {
+    StringBuilder	result;
+    String[]		packages;
+
+    packages = getRequiredPackages();
+    if (packages.length == 0)
+      return null;
+
+    result = new StringBuilder();
+    result.append("Required package(s):\n");
+    for (String pkg: packages)
+      result.append("\\usepackage{" + pkg + "}\n");
+
+    return result.toString();
   }
 
   /**

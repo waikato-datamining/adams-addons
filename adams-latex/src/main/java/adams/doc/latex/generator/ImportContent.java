@@ -160,6 +160,15 @@ public class ImportContent
   }
 
   /**
+   * Returns the list of required LaTeX packages for this code generator.
+   *
+   * @return		the packages
+   */
+  public String[] getRequiredPackages() {
+    return new String[0];
+  }
+
+  /**
    * Returns a quick info about the object, which can be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string

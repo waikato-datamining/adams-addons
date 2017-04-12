@@ -63,6 +63,15 @@ public class ListOfFigures
   }
 
   /**
+   * Returns the list of required LaTeX packages for this code generator.
+   *
+   * @return		the packages
+   */
+  public String[] getRequiredPackages() {
+    return new String[0];
+  }
+
+  /**
    * Generates the actual code.
    *
    * @return		the generated code
