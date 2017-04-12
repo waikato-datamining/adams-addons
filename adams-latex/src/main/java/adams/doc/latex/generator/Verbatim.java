@@ -33,24 +33,34 @@ import adams.core.base.BaseText;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- *
+ * 
+ * <pre>-skip &lt;boolean&gt; (property: skip)
+ * &nbsp;&nbsp;&nbsp;If enabled, the code generation gets skipped.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  * <pre>-no-var-expansion &lt;boolean&gt; (property: noVariableExpansion)
  * &nbsp;&nbsp;&nbsp;If enabled, variable expansion gets skipped.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- *
+ * 
+ * <pre>-suppress-trailing-space &lt;boolean&gt; (property: suppressTrailingSpace)
+ * &nbsp;&nbsp;&nbsp;If enabled, adds a '%' to suppress the trailing space.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  * <pre>-statements &lt;adams.core.base.BaseText&gt; (property: statements)
  * &nbsp;&nbsp;&nbsp;The statements to insert as verbatim block.
- * &nbsp;&nbsp;&nbsp;default:
+ * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
- *
+ * 
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
 public class Verbatim
-  extends AbstractCodeGenerator {
+  extends AbstractEnvironmentWithNoTrailingSpace {
 
   private static final long serialVersionUID = 7225514457280622837L;
 
@@ -130,7 +140,10 @@ public class Verbatim
     result.append("\\begin{verbatim}\n");
     result.append(expand(m_Statements.getValue()));
     ensureTrailingNewLine(result);
-    result.append("\\end{verbatim}\n");
+    result.append("\\end{verbatim}");
+    if (m_SuppressTrailingSpace)
+      result.append("%");
+    result.append("\n");
 
     return result.toString();
   }
