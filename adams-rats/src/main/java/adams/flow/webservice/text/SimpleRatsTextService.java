@@ -15,19 +15,19 @@
 
 /*
  * SimpleRatsTextService.java
- * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.webservice.text;
 
-import adams.flow.standalone.rats.input.BufferedRatInput;
-import nz.ac.waikato.adams.webservice.rats.text.RatsTextService;
-import nz.ac.waikato.adams.webservice.rats.text.UploadRequest;
-import nz.ac.waikato.adams.webservice.rats.text.UploadResponse;
 import adams.core.option.AbstractOptionHandler;
 import adams.data.text.TextContainer;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.RatsTextHelper;
+import adams.flow.standalone.rats.input.BufferedRatInput;
+import nz.ac.waikato.adams.webservice.rats.text.RatsTextService;
+import nz.ac.waikato.adams.webservice.rats.text.UploadRequest;
+import nz.ac.waikato.adams.webservice.rats.text.UploadResponse;
 
 
 /**
@@ -78,7 +78,7 @@ public class SimpleRatsTextService
   protected adams.db.AbstractDatabaseConnection getDatabaseConnection() {
     return ActorUtils.getDatabaseConnection(
 	  m_Owner.getOwner(),
-	  adams.flow.standalone.DatabaseConnection.class,
+	  adams.flow.standalone.DatabaseConnectionProvider.class,
 	  adams.db.DatabaseConnection.getSingleton());
   }
 

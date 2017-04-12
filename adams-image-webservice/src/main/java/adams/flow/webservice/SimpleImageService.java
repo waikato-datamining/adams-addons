@@ -15,7 +15,7 @@
 
 /*
  * SimpleImageService.java
- * Copyright (C) 2014-2015 Image BV, Wageningen, NL
+ * Copyright (C) 2014-2017 Image BV, Wageningen, NL
  */
 
 package adams.flow.webservice;
@@ -127,7 +127,7 @@ public class SimpleImageService
   protected adams.db.AbstractDatabaseConnection getDatabaseConnection() {
     return ActorUtils.getDatabaseConnection(
 	  m_Owner.getOwner(),
-	  adams.flow.standalone.DatabaseConnection.class,
+	  adams.flow.standalone.DatabaseConnectionProvider.class,
 	  adams.db.DatabaseConnection.getSingleton());
   }
 
