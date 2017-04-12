@@ -39,7 +39,7 @@ import adams.core.QuickInfoHelper;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
- * <pre>-generator &lt;adams.doc.latex.generator.AbstractCodeGenerator&gt; (property: generator)
+ * <pre>-generator &lt;adams.doc.latex.generator.CodeGenerator&gt; (property: generator)
  * &nbsp;&nbsp;&nbsp;Generates the code for the figure.
  * &nbsp;&nbsp;&nbsp;default: adams.doc.latex.generator.Image
  * </pre>
@@ -125,7 +125,7 @@ public class Figure
    *
    * @return		the default
    */
-  protected AbstractCodeGenerator getDefaultGenerator() {
+  protected CodeGenerator getDefaultGenerator() {
     return new Image();
   }
 

@@ -35,7 +35,7 @@ public abstract class AbstractMetaCodeGenerator
   private static final long serialVersionUID = 8498377917687585899L;
   
   /** the base generator to use. */
-  protected AbstractCodeGenerator m_Generator;
+  protected CodeGenerator m_Generator;
 
   /**
    * Adds options to the internal list of options.
@@ -54,14 +54,14 @@ public abstract class AbstractMetaCodeGenerator
    *
    * @return		the default
    */
-  protected abstract AbstractCodeGenerator getDefaultGenerator();
+  protected abstract CodeGenerator getDefaultGenerator();
 
   /**
    * Sets the base generator to use.
    *
    * @param value	the generator
    */
-  public void setGenerator(AbstractCodeGenerator value) {
+  public void setGenerator(CodeGenerator value) {
     m_Generator = value;
     m_Generator.setFlowContext(getFlowContext());
     reset();
@@ -72,7 +72,7 @@ public abstract class AbstractMetaCodeGenerator
    *
    * @return		the generator
    */
-  public AbstractCodeGenerator getGenerator() {
+  public CodeGenerator getGenerator() {
     return m_Generator;
   }
 

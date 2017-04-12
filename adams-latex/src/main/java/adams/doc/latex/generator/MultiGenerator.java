@@ -37,7 +37,7 @@ package adams.doc.latex.generator;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
- * <pre>-generator &lt;adams.doc.latex.generator.AbstractCodeGenerator&gt; [-generator ...] (property: generators)
+ * <pre>-generator &lt;adams.doc.latex.generator.CodeGenerator&gt; [-generator ...] (property: generators)
  * &nbsp;&nbsp;&nbsp;The generators to use for appending the document.
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
@@ -53,7 +53,7 @@ public class MultiGenerator
   private static final long serialVersionUID = 7225514457280622837L;
 
   /** the generators to use. */
-  protected AbstractCodeGenerator[] m_Generators;
+  protected CodeGenerator[] m_Generators;
 
   /**
    * Returns a string describing the object.
@@ -74,7 +74,7 @@ public class MultiGenerator
 
     m_OptionManager.add(
       "generator", "generators",
-      new AbstractCodeGenerator[0]);
+      new CodeGenerator[0]);
   }
 
   /**
@@ -82,7 +82,7 @@ public class MultiGenerator
    *
    * @param value	the generators
    */
-  public void setGenerators(AbstractCodeGenerator[] value) {
+  public void setGenerators(CodeGenerator[] value) {
     m_Generators = value;
     reset();
   }
@@ -92,7 +92,7 @@ public class MultiGenerator
    *
    * @return		the generators
    */
-  public AbstractCodeGenerator[] getGenerators() {
+  public CodeGenerator[] getGenerators() {
     return m_Generators;
   }
 

@@ -21,7 +21,7 @@
 package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
-import adams.doc.latex.generator.AbstractCodeGenerator;
+import adams.doc.latex.generator.CodeGenerator;
 import adams.doc.latex.generator.CustomStatements;
 import adams.flow.core.Token;
 
@@ -92,7 +92,7 @@ public class LatexAppendDocument
   private static final long serialVersionUID = 8176319006728477554L;
 
   /** the code generator to use. */
-  protected AbstractCodeGenerator m_Generator;
+  protected CodeGenerator m_Generator;
 
   /**
    * Returns a string describing the object.
@@ -121,7 +121,7 @@ public class LatexAppendDocument
    *
    * @param value	the generator
    */
-  public void setGenerator(AbstractCodeGenerator value) {
+  public void setGenerator(CodeGenerator value) {
     m_Generator = value;
     reset();
   }
@@ -131,7 +131,7 @@ public class LatexAppendDocument
    *
    * @return		the generator
    */
-  public AbstractCodeGenerator getGenerator() {
+  public CodeGenerator getGenerator() {
     return m_Generator;
   }
 

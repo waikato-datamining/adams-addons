@@ -20,13 +20,10 @@
 
 package adams.doc.latex.generator;
 
-import adams.core.AdditionalInformationHandler;
-import adams.core.QuickInfoSupporter;
 import adams.core.option.AbstractOptionHandler;
 import adams.data.conversion.EscapeLatexCharacters;
 import adams.data.conversion.EscapeLatexCharacters.Characters;
 import adams.flow.core.Actor;
-import adams.flow.core.FlowContextHandler;
 
 /**
  * Ancestor for LaTeX code generators.
@@ -36,7 +33,7 @@ import adams.flow.core.FlowContextHandler;
  */
 public abstract class AbstractCodeGenerator
   extends AbstractOptionHandler
-  implements FlowContextHandler, QuickInfoSupporter, AdditionalInformationHandler {
+  implements CodeGenerator {
 
   private static final long serialVersionUID = -590133419718559795L;
 

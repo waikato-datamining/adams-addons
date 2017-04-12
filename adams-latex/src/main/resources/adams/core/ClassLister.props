@@ -8,5 +8,5 @@
 # Version: $Revision$
 
 # code generators
-adams.doc.latex.generator.AbstractCodeGenerator=\
+adams.doc.latex.generator.CodeGenerator=\
   adams.doc.latex.generator
