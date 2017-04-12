@@ -1,13 +1,13 @@
 # Project: adams
-# Date: 2016-02-15 14:53:57
+# Date: 2017-04-13 11:10:50
 # User: fracpete
 # Charset: UTF-8
-adams.flow.control.Flow -annotation "Demonstrates how to use Rserve in parallel by making some nice spirals." -flow-execution-listener "adams.flow.execution.ExecutionLog -log-file ${HOME}/temp/r.log"
+adams.flow.control.Flow -annotation "Demonstrates how to use Rserve in parallel by making some nice spirals."
  adams.flow.standalone.SetVariable -name radius -var-name radius -var-value 50
  adams.flow.standalone.SetVariable -name max -var-name max -var-value 2000
  adams.flow.standalone.SetVariable -name loops -var-name loops -var-value 6
  adams.flow.standalone.CallableActors
-  adams.flow.sink.SequencePlotter -width 900 -height 800 -writer adams.gui.print.NullWriter -comparison X_AND_Y -paintlet adams.gui.visualization.sequence.DotPaintlet -overlay-paintlet adams.gui.visualization.sequence.CirclePaintlet -marker-paintlet adams.flow.sink.sequenceplotter.NoMarkers -error-paintlet adams.flow.sink.sequenceplotter.NoErrorPaintlet -mouse-click-action adams.flow.sink.sequenceplotter.NullClickAction -color-provider adams.gui.visualization.core.DefaultColorProvider -overlay-color-provider adams.gui.visualization.core.DefaultColorProvider -title "R Demo" -axis-x "adams.gui.visualization.core.AxisPanelOptions -label x -tick-generator adams.gui.visualization.core.axis.FancyTickGenerator -nth-value 1 -width 40 -custom-format 0" -axis-y "adams.gui.visualization.core.AxisPanelOptions -label y -tick-generator adams.gui.visualization.core.axis.FancyTickGenerator -nth-value 1 -width 40 -custom-format 0" -plot-updater "adams.flow.sink.sequenceplotter.SimplePlotUpdater -update-interval 100" -post-processor adams.flow.sink.sequenceplotter.PassThrough
+  adams.flow.sink.SequencePlotter -width 900 -height 800 -writer adams.gui.print.NullWriter -comparison X_AND_Y -paintlet "adams.gui.visualization.sequence.DotPaintlet -meta-data-color adams.gui.visualization.sequence.metadatacolor.Dummy" -overlay-paintlet "adams.gui.visualization.sequence.CirclePaintlet -meta-data-color adams.gui.visualization.sequence.metadatacolor.Dummy" -marker-paintlet adams.flow.sink.sequenceplotter.NoMarkers -error-paintlet adams.flow.sink.sequenceplotter.NoErrorPaintlet -mouse-click-action adams.flow.sink.sequenceplotter.NullClickAction -color-provider adams.gui.visualization.core.DefaultColorProvider -overlay-color-provider adams.gui.visualization.core.DefaultColorProvider -title "R Demo" -axis-x "adams.gui.visualization.core.AxisPanelOptions -label x -tick-generator adams.gui.visualization.core.axis.FancyTickGenerator -nth-value 1 -width 40 -custom-format 0" -axis-y "adams.gui.visualization.core.AxisPanelOptions -label y -tick-generator adams.gui.visualization.core.axis.FancyTickGenerator -nth-value 1 -width 40 -custom-format 0" -plot-updater "adams.flow.sink.sequenceplotter.SimplePlotUpdater -update-interval 100" -post-processor adams.flow.sink.sequenceplotter.PassThrough
  adams.flow.source.Start
  adams.flow.control.Branch
   adams.flow.control.Trigger -name "1st spiral"
