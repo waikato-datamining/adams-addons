@@ -24,7 +24,7 @@ ZeroOne loss                   0.975
 Harmonic score                 0.356
 One error                      0.607
 Rank loss                      0.452
-Avg precision                  0.524
+Avg precision                  0.534
 Log Loss (lim. L)              0.613
 Log Loss (lim. D)              0.613
 F1 (micro averaged)            0.328
