@@ -246,7 +246,7 @@ public class RatsTab
       cmd.setID(m_ID);
       cmd.setCommand(m_Paused ? Command.RESUME : Command.PAUSE);
       cmd.setRat(m_Name);
-      m_Owner.sendCommand(cmd, null);
+      m_Owner.sendCommandWithReponse(cmd);
       m_Owner.refreshRats();
     }
 
@@ -260,7 +260,7 @@ public class RatsTab
       cmd.setID(m_ID);
       cmd.setCommand(m_Stopped ? Command.START : Command.STOP);
       cmd.setRat(m_Name);
-      m_Owner.sendCommand(cmd, null);
+      m_Owner.sendCommandWithReponse(cmd);
       m_Owner.refreshRats();
     }
   }
@@ -352,7 +352,7 @@ public class RatsTab
 
     cmd = new GetRatControlStatus();
     cmd.setID(ids[0]);
-    sendCommand(cmd, new RatStatusResponseHandler(this));
+    sendCommandWithReponse(cmd, new RatStatusResponseHandler(this));
   }
 
   /**
