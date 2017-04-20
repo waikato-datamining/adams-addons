@@ -177,13 +177,14 @@ public class XMLLoggingOutInterceptor
       buffer.getChars(length, buffer.length(), chars, 0);
       buffer = prettyPrint(buffer);
 
-      logger.log(Level.INFO, buffer.toString());
-
       if (outputFile != null) {
         if (formatter == null)
           formatter = DateUtils.getTimestampFormatterMsecs();
 	FileUtils.writeToFile(outputFile.getAbsolutePath(), "\n--- " + formatter.format(new Date()) + " ---\n", true);
         FileUtils.writeToFile(outputFile.getAbsolutePath(), buffer, true);
+      }
+      else {
+        logger.log(Level.INFO, buffer.toString());
       }
     }
   }

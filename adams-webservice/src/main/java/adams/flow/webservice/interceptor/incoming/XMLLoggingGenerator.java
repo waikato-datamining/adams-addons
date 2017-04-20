@@ -54,7 +54,7 @@ public class XMLLoggingGenerator
   public String globalInfo() {
     return 
 	"Generates a " + XMLLoggingInInterceptor.class.getName() + " instance.\n"
-	+ "Logs the messages using its logger instance in XML.\n";
+	+ "Logs the messages using its logger instance in XML or to a file, if supplied.";
   }
 
   /**
@@ -138,7 +138,7 @@ public class XMLLoggingGenerator
    * 			displaying in the GUI or for listing the options.
    */
   public String outputFileTipText() {
-    return "Optional file to store the XML messages in; ignored if pointing to a directory.";
+    return "Optional file to store the XML messages in; ignored if pointing to a directory, otherwise turns off logging in console.";
   }
 
   /**
