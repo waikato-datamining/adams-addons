@@ -15,19 +15,19 @@
 
 /**
  * NullGenerator.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice.interceptor.incoming;
 
 
 /**
- * Generator for {@link Null}.
+ * Does not generate an interceptor.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
 public class NullGenerator
-  extends AbstractInInterceptorGenerator<Null> {
+  extends AbstractInInterceptorGenerator<AbstractInInterceptor> {
 
   /** for serialization. */
   private static final long serialVersionUID = -8109018608359183466L;
@@ -39,16 +39,16 @@ public class NullGenerator
    */
   @Override
   public String globalInfo() {
-    return "Generates a " + Null.class.getName() + " instance.";
+    return "Does not generate an interceptor.";
   }
 
   /**
    * Generates the actual interceptor for incoming messages.
    * 
-   * @return		the interceptor
+   * @return		always null
    */
   @Override
-  protected Null doGenerate() {
-    return new Null();
+  protected AbstractInInterceptor doGenerate() {
+    return null;
   }
 }

@@ -15,7 +15,7 @@
 
 /**
  * AbstractInInterceptorGenerator.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice.interceptor.incoming;
 
@@ -35,9 +35,53 @@ public abstract class AbstractInInterceptorGenerator<T extends AbstractInInterce
   /** for serialization. */
   private static final long serialVersionUID = -8741445331354712393L;
 
+  /** whether the generator is enabled. */
+  protected boolean m_Enabled;
+
   /** the last interceptor generated. */
   protected transient T m_LastInterceptor;
-  
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "enabled", "enabled",
+      true);
+  }
+
+  /**
+   * Sets whether the generator is enabled, ie instantiating the interceptor.
+   *
+   * @param value	true if enabled
+   */
+  public void setEnabled(boolean value) {
+    m_Enabled = value;
+    reset();
+  }
+
+  /**
+   * Returns whether the generator is enabled, ie instantiating the interceptor.
+   *
+   * @return		true if enabled
+   */
+  public boolean getEnabled() {
+    return m_Enabled;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String enabledTipText() {
+    return "Interceptor gets only instantiated if the generator is enabled.";
+  }
+
   /**
    * Hook method for checks, throws an exception if check fails.
    * <br><br>
@@ -60,7 +104,10 @@ public abstract class AbstractInInterceptorGenerator<T extends AbstractInInterce
    */
   public T generate() {
     T	result;
-    
+
+    if (!m_Enabled)
+      return null;
+
     m_LastInterceptor = null;
     check();
     result = doGenerate();

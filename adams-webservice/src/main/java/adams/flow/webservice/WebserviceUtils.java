@@ -15,7 +15,7 @@
 
 /**
  * WebserviceUtils.java
- * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
@@ -157,17 +157,17 @@ public class WebserviceUtils {
     
     // interceptors?
     in = null;
-    if ((inInterceptor != null) && !(inInterceptor instanceof adams.flow.webservice.interceptor.incoming.NullGenerator))
+    if (inInterceptor != null)
       in = inInterceptor.generate();
-    if (in instanceof InterceptorWithActor)
+    if ((in != null) && (in instanceof InterceptorWithActor))
       ((InterceptorWithActor) in).setActor(owner);
     if (in != null)
       client.getInInterceptors().add(in);
 
     out = null;
-    if ((outInterceptor != null) && !(outInterceptor instanceof adams.flow.webservice.interceptor.outgoing.NullGenerator))
+    if (outInterceptor != null)
       out = outInterceptor.generate();
-    if (out instanceof InterceptorWithActor)
+    if ((out != null) && (out instanceof InterceptorWithActor))
       ((InterceptorWithActor) out).setActor(owner);
     if (out != null)
       client.getOutInterceptors().add(out);
@@ -190,22 +190,22 @@ public class WebserviceUtils {
     
     // logging
     if (owner.isLoggingEnabled()) {
-      if (in instanceof LoggingLevelHandler)
+      if ((in != null) && (in instanceof LoggingLevelHandler))
 	((LoggingLevelHandler) in).setLoggingLevel(owner.getLoggingLevel());
-      if (out instanceof LoggingLevelHandler)
+      if ((out != null) && (out instanceof LoggingLevelHandler))
 	((LoggingLevelHandler) out).setLoggingLevel(owner.getLoggingLevel());
     }
     
     // actor aware?
-    if (in instanceof InterceptorWithActor)
+    if ((in != null) && (in instanceof InterceptorWithActor))
       ((InterceptorWithActor) in).setActor(owner);
-    if (out instanceof InterceptorWithActor)
+    if ((out != null) && (out instanceof InterceptorWithActor))
       ((InterceptorWithActor) out).setActor(owner);
       
     // add interceptors
-    if (!(in instanceof adams.flow.webservice.interceptor.incoming.Null))
+    if (in != null)
       endpoint.getServer().getEndpoint().getInInterceptors().add(in);
-    if (!(out instanceof adams.flow.webservice.interceptor.outgoing.Null))
+    if (out != null)
       endpoint.getServer().getEndpoint().getOutInterceptors().add(out);
   }
   
