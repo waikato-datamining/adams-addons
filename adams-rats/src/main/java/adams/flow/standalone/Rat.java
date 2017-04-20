@@ -60,6 +60,7 @@ import adams.flow.standalone.rats.input.DummyInput;
 import adams.flow.standalone.rats.input.RatInput;
 import adams.flow.standalone.rats.output.DummyOutput;
 import adams.flow.standalone.rats.output.RatOutput;
+import adams.gui.flow.tree.Node;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -1524,6 +1525,21 @@ public class Rat
 
     result = new SubFlowRestriction();
     result.setRoot(new ActorPath(getFullName()));
+
+    return result;
+  }
+
+  /**
+   * Returns the scope restriction in place.
+   *
+   * @param context	the actor's node
+   * @return		the scope restriction
+   */
+  public AbstractScopeRestriction getDebugScopeRestriction(Node context) {
+    SubFlowRestriction  result;
+
+    result = new SubFlowRestriction();
+    result.setRoot(new ActorPath(context.getFullName()));
 
     return result;
   }
