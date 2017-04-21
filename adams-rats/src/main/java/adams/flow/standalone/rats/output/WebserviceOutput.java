@@ -15,19 +15,22 @@
 
 /**
  * WebserviceOutput.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
 
 import adams.flow.core.Unknown;
+import adams.flow.standalone.rats.output.webservice.AbstractWebserviceResponseDataPostProcessor;
+import adams.flow.standalone.rats.output.webservice.NullPostProcessor;
 import adams.flow.webservice.WebServiceClient;
 import adams.flow.webservice.WebServiceClientConsumer;
-
+import adams.flow.webservice.WebServiceClientProducer;
 import com.example.customerservice.flow.UpdateCustomer;
 
 /**
  <!-- globalinfo-start -->
- * Allows to send data to webservices using the supplied client.
+ * Allows to send data to webservices using the supplied client.<br>
+ * If the webservice client implements adams.flow.webservice.WebServiceClientProducer then the supplied post-processor can be used to inspect the response from the webservice, e.g., for inspecting any error messages.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -39,7 +42,13 @@ import com.example.customerservice.flow.UpdateCustomer;
  * 
  * <pre>-client &lt;adams.flow.webservice.WebServiceClient&gt; (property: client)
  * &nbsp;&nbsp;&nbsp;The webservice client to use.
- * &nbsp;&nbsp;&nbsp;default: com.example.customerservice.flow.UpdateCustomer
+ * &nbsp;&nbsp;&nbsp;default: com.example.customerservice.flow.UpdateCustomer -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator
+ * </pre>
+ * 
+ * <pre>-response-post-processor &lt;adams.flow.standalone.rats.output.webservice.AbstractWebserviceResponseDataPostProcessor&gt; (property: responsePostProcessor)
+ * &nbsp;&nbsp;&nbsp;The post-processor to use for the webservice response (if the client implements 
+ * &nbsp;&nbsp;&nbsp;adams.flow.webservice.WebServiceClientProducer).
+ * &nbsp;&nbsp;&nbsp;default: adams.flow.standalone.rats.output.webservice.NullPostProcessor
  * </pre>
  * 
  <!-- options-end -->
@@ -49,12 +58,15 @@ import com.example.customerservice.flow.UpdateCustomer;
  */
 public class WebserviceOutput
   extends AbstractRatOutput {
-  
+
   /** for serialization. */
   private static final long serialVersionUID = -3752727785209685369L;
-  
+
   /** the webservice client to use. */
   protected WebServiceClient m_Client;
+
+  /** the post-processor for the response (if applicable). */
+  protected AbstractWebserviceResponseDataPostProcessor m_ResponsePostProcessor;
 
   /**
    * Returns a string describing the object.
@@ -63,7 +75,11 @@ public class WebserviceOutput
    */
   @Override
   public String globalInfo() {
-    return "Allows to send data to webservices using the supplied client.";
+    return
+      "Allows to send data to webservices using the supplied client.\n"
+	+ "If the webservice client implements " + WebServiceClientProducer.class.getName() + " "
+	+ "then the supplied post-processor can be used to inspect the response "
+	+ "from the webservice, e.g., for inspecting any error messages.";
   }
 
   /**
@@ -74,22 +90,26 @@ public class WebserviceOutput
     super.defineOptions();
 
     m_OptionManager.add(
-	    "client", "client",
-	    getDefaultClient());
+      "client", "client",
+      getDefaultClient());
+
+    m_OptionManager.add(
+      "response-post-processor", "responsePostProcessor",
+      new NullPostProcessor());
   }
-  
+
   /**
    * Returns the default client to use.
-   * 
+   *
    * @return		the client
    */
   protected WebServiceClient getDefaultClient() {
     return new UpdateCustomer();
   }
-  
+
   /**
    * Checks the client.
-   * 
+   *
    * @param value	the client to check
    * @return		null if accepted, otherwise error message
    */
@@ -98,15 +118,15 @@ public class WebserviceOutput
       return "Does not implement " + WebServiceClientConsumer.class.getName() + "!";
     return null;
   }
-  
+
   /**
    * Sets the webservice client to use.
-   * 
+   *
    * @param value	the webservice client to use
    */
   public void setClient(WebServiceClient value) {
     String	msg;
-    
+
     msg = checkClient(value);
     if (msg == null) {
       m_Client = value;
@@ -117,10 +137,10 @@ public class WebserviceOutput
       getLogger().severe("Failed to set client: " + msg);
     }
   }
-  
+
   /**
    * Returns the webservice client in use.
-   * 
+   *
    * @return		the webservice client in use
    */
   public WebServiceClient getClient() {
@@ -138,8 +158,39 @@ public class WebserviceOutput
   }
 
   /**
+   * Sets the post-processor for the webservice response, if the client
+   * implements {@link WebServiceClientProducer}.
+   *
+   * @param value	the post-processor
+   */
+  public void setResponsePostProcessor(AbstractWebserviceResponseDataPostProcessor value) {
+    m_ResponsePostProcessor = value;
+    reset();
+  }
+
+  /**
+   * Returns the post-processor for the webservice response, if the client
+   * implements {@link WebServiceClientProducer}.
+   *
+   * @return		the post-processor
+   */
+  public AbstractWebserviceResponseDataPostProcessor getResponsePostProcessor() {
+    return m_ResponsePostProcessor;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String responsePostProcessorTipText() {
+    return "The post-processor to use for the webservice response (if the client implements " + WebServiceClientProducer.class.getName() + ").";
+  }
+
+  /**
    * Returns the type of data that gets accepted.
-   * 
+   *
    * @return		the type of data
    */
   @Override
@@ -152,15 +203,16 @@ public class WebserviceOutput
 
   /**
    * Performs the actual transmission.
-   * 
+   *
    * @return		null if successful, otherwise error message
    */
   @Override
   protected String doTransmit() {
     String	result;
-    
+    Object	response;
+
     result = null;
-    
+
     try {
       m_Client.setOwner(getOwner());
       ((WebServiceClientConsumer) m_Client).setRequestData(m_Input);
@@ -169,7 +221,20 @@ public class WebserviceOutput
     catch (Exception e) {
       result = handleException("Failed to send data to webservice!", e);
     }
-    
+
+    if (result == null) {
+      if (m_Client instanceof WebServiceClientProducer) {
+	try {
+	  response = ((WebServiceClientProducer) m_Client).getResponseData();
+	  m_ResponsePostProcessor.setFlowContext(getOwner());
+	  m_ResponsePostProcessor.postProcess(response);
+	}
+	catch (Exception e) {
+	  result = handleException("Failed to post-process response data from webservice!", e);
+	}
+      }
+    }
+
     return result;
   }
 }

@@ -19,6 +19,10 @@ adams.flow.standalone.rats.output.RatOutput=\
 adams.flow.standalone.rats.output.enqueue.AbstractEnqueueGuard=\
   adams.flow.standalone.rats.output.enqueue
 
+# the webservice response post-processors
+adams.flow.standalone.rats.output.webservice.AbstractWebserviceResponseDataPostProcessor=\
+  adams.flow.standalone.rats.output.webservice
+
 # rat generators
 adams.flow.standalone.rats.generator.AbstractRatGenerator=\
   adams.flow.standalone.rats.generator
