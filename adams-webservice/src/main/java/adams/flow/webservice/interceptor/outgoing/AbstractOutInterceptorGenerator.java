@@ -111,7 +111,8 @@ public abstract class AbstractOutInterceptorGenerator<T extends AbstractOutInter
     m_LastInterceptor = null;
     check();
     result = doGenerate();
-    result.setLoggingLevel(getLoggingLevel());
+    if (result != null)
+      result.setLoggingLevel(getLoggingLevel());
     m_LastInterceptor = result;
 
     return result;
