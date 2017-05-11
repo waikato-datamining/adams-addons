@@ -31,6 +31,7 @@ import adams.flow.provenance.ProvenanceInformation;
 import adams.flow.provenance.ProvenanceSupporter;
 import adams.ml.dl4j.model.ModelConfigurator;
 import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.eval.RegressionEvaluation;
 import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
@@ -113,6 +114,11 @@ import java.util.Random;
  * &nbsp;&nbsp;&nbsp;minimum: 2
  * </pre>
  * 
+ * <pre>-type &lt;CLASSIFICATION|REGRESSION&gt; (property: type)
+ * &nbsp;&nbsp;&nbsp;The type of evaluation to perform.
+ * &nbsp;&nbsp;&nbsp;default: CLASSIFICATION
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -130,6 +136,9 @@ public class DL4JCrossValidationEvaluator
 
   /** the number of folds to generate. */
   protected int m_Folds;
+
+  /** the evaluation type. */
+  protected DL4JEvaluationType m_Type;
 
   /**
    * Returns a string describing the object.
@@ -158,6 +167,10 @@ public class DL4JCrossValidationEvaluator
     m_OptionManager.add(
       "folds", "folds",
       10, 2, null);
+
+    m_OptionManager.add(
+      "type", "type",
+      DL4JEvaluationType.CLASSIFICATION);
   }
 
   /**
@@ -172,6 +185,7 @@ public class DL4JCrossValidationEvaluator
     result = super.getQuickInfo();
     result += QuickInfoHelper.toString(this, "seed", m_Seed, ", seed: ");
     result += QuickInfoHelper.toString(this, "folds", m_Folds, ", folds: ");
+    result += QuickInfoHelper.toString(this, "type", m_Type, ", type: ");
 
     return result;
   }
@@ -248,6 +262,35 @@ public class DL4JCrossValidationEvaluator
   }
 
   /**
+   * Sets the type of evaluation to perform.
+   *
+   * @param value	the type
+   */
+  public void setType(DL4JEvaluationType value) {
+    m_Type = value;
+    reset();
+  }
+
+  /**
+   * Returns the type of evaluation to perform.
+   *
+   * @return  		the type
+   */
+  public DL4JEvaluationType getType() {
+    return m_Type;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String typeTipText() {
+    return "The type of evaluation to perform.";
+  }
+
+  /**
    * Returns the class that the consumer accepts.
    *
    * @return		<!-- flow-accepts-start -->org.nd4j.linalg.dataset.DataSet.class<!-- flow-accepts-end -->
@@ -269,7 +312,8 @@ public class DL4JCrossValidationEvaluator
     DataSet 			test;
     ModelConfigurator 		conf;
     Model			model;
-    Evaluation 			eval;
+    Evaluation 			evalCls;
+    RegressionEvaluation	evalReg;
     KFoldIterator		iter;
 
     result = null;
@@ -287,27 +331,55 @@ public class DL4JCrossValidationEvaluator
       if (!(conf.configureModel(data.numInputs(), data.numOutcomes()) instanceof MultiLayerNetwork))
         result = "Can only evaluate " + MultiLayerNetwork.class.getName() + "!";
 
-      eval = null;
+      evalCls = null;
+      evalReg = null;
       if (result == null) {
-	eval = new Evaluation(data.numOutcomes());
-	iter = new KFoldIterator(m_Folds, data);
-	while (iter.hasNext() && !m_Stopped) {
-	  train = iter.next();
-	  test  = iter.testFold();
-	  model = conf.configureModel(data.numInputs(), data.numOutcomes());
-	  ((MultiLayerNetwork) model).fit(train);
-	  eval.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
+	switch (m_Type) {
+	  case CLASSIFICATION:
+	    evalCls = new Evaluation(data.numOutcomes());
+	    iter = new KFoldIterator(m_Folds, data);
+	    while (iter.hasNext() && !m_Stopped) {
+	      train = iter.next();
+	      test  = iter.testFold();
+	      model = conf.configureModel(data.numInputs(), data.numOutcomes());
+	      ((MultiLayerNetwork) model).fit(train);
+	      evalCls.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
+	    }
+	    break;
+
+	  case REGRESSION:
+	    evalReg = new RegressionEvaluation(data.numOutcomes());
+	    iter = new KFoldIterator(m_Folds, data);
+	    while (iter.hasNext() && !m_Stopped) {
+	      train = iter.next();
+	      test  = iter.testFold();
+	      model = conf.configureModel(data.numInputs(), data.numOutcomes());
+	      ((MultiLayerNetwork) model).fit(train);
+	      evalReg.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
+	    }
+	    break;
+
+	  default:
+	    throw new IllegalStateException("Unhandled evaluation type: " + m_Type);
 	}
-	if (m_Stopped)
-	  eval = null;
+	if (m_Stopped) {
+	  evalCls = null;
+	  evalReg = null;
+	}
       }
 
       // broadcast result
-      if (eval != null) {
+      if (evalCls != null) {
 	if (m_AlwaysUseContainer)
-	  m_OutputToken = new Token(new DL4JEvaluationContainer(eval, conf));
+	  m_OutputToken = new Token(new DL4JEvaluationContainer(evalCls, conf));
 	else
-	  m_OutputToken = new Token(eval.stats());
+	  m_OutputToken = new Token(evalCls.stats());
+      }
+      else if (evalReg != null) {
+	if (m_AlwaysUseContainer)
+	  m_OutputToken = new Token(new DL4JEvaluationContainer(evalReg, conf));
+	else
+	  m_OutputToken = new Token(evalReg.stats());
       }
     }
     catch (Exception e) {

@@ -1,1 +1,1 @@
-DL4JModelConfigurator, seed: 1, folds: 10
+DL4JModelConfigurator, seed: 1, folds: 10, type: CLASSIFICATION

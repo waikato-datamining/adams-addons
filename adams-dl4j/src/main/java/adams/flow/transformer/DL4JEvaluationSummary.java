@@ -14,8 +14,8 @@
  */
 
 /*
- * WekaEvaluationSummary.java
- * Copyright (C) 2009-2013 University of Waikato, Hamilton, New Zealand
+ * DL4JEvaluationSummary.java
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -26,6 +26,7 @@ import adams.core.base.BaseText;
 import adams.flow.container.DL4JEvaluationContainer;
 import adams.flow.core.Token;
 import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.eval.RegressionEvaluation;
 
 import java.util.ArrayList;
 
@@ -71,8 +72,9 @@ import java.util.ArrayList;
  * </pre>
  * 
  * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
- * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this 
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical 
+ * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
@@ -245,18 +247,29 @@ public class DL4JEvaluationSummary
    */
   @Override
   protected String doExecute() {
-    String		result;
-    Evaluation		eval;
-    StringBuilder	buffer;
-    boolean		prolog;
-    String[]		comment;
+    String			result;
+    Object			evalObj;
+    Evaluation 			evalCls;
+    RegressionEvaluation	evalReg;
+    StringBuilder		buffer;
+    boolean			prolog;
+    String[]			comment;
 
     result = null;
 
-    if (m_InputToken.getPayload() instanceof DL4JEvaluationContainer)
-      eval = (Evaluation) ((DL4JEvaluationContainer) m_InputToken.getPayload()).getValue(DL4JEvaluationContainer.VALUE_EVALUATION);
-    else
-      eval = (Evaluation) m_InputToken.getPayload();
+    evalCls = null;
+    evalReg = null;
+    if (m_InputToken.getPayload() instanceof DL4JEvaluationContainer) {
+      evalObj = ((DL4JEvaluationContainer) m_InputToken.getPayload()).getValue(DL4JEvaluationContainer.VALUE_EVALUATION);
+    }
+    else {
+      evalObj = m_InputToken.getPayload();
+    }
+    if (evalObj instanceof Evaluation)
+      evalCls = (Evaluation) evalObj;
+    else if (evalObj instanceof RegressionEvaluation)
+      evalReg = (RegressionEvaluation) evalObj;
+
     buffer = new StringBuilder();
     prolog = false;
 
@@ -279,15 +292,20 @@ public class DL4JEvaluationSummary
       buffer.append("\n");
 
     // summary
-    buffer.append(eval.stats());
+    if (evalCls != null)
+      buffer.append(evalCls.stats());
+    else if (evalReg != null)
+      buffer.append(evalReg.stats());
 
     // confusion matrix
-    if (m_ConfusionMatrix) {
-      try {
-	buffer.append("\n\n" + eval.confusionToString());
-      }
-      catch (Exception e) {
-	result = handleException("Failed to generate confusion matrix: ", e);
+    if (evalCls != null) {
+      if (m_ConfusionMatrix) {
+	try {
+	  buffer.append("\n\n" + evalCls.confusionToString());
+	}
+	catch (Exception e) {
+	  result = handleException("Failed to generate confusion matrix: ", e);
+	}
       }
     }
 

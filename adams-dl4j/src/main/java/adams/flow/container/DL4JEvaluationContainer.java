@@ -15,12 +15,13 @@
 
 /*
  * DL4JEvaluationContainer.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.container;
 
 import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.eval.RegressionEvaluation;
 import org.deeplearning4j.nn.api.Model;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class DL4JEvaluationContainer
    * Only used for generating help information.
    */
   public DL4JEvaluationContainer() {
-    this(null);
+    this((Evaluation) null);
   }
 
   /**
@@ -77,12 +78,34 @@ public class DL4JEvaluationContainer
   }
 
   /**
+   * Initializes the container with no model.
+   *
+   * @param eval	the evaluation to use
+   */
+  public DL4JEvaluationContainer(RegressionEvaluation eval) {
+    this(eval, null);
+  }
+
+  /**
+   * Initializes the container with evaluation and model.
+   *
+   * @param eval	the evaluation to use
+   * @param model	the model to use
+   */
+  public DL4JEvaluationContainer(RegressionEvaluation eval, Object model) {
+    super();
+
+    store(VALUE_EVALUATION, eval);
+    store(VALUE_MODEL,      model);
+  }
+
+  /**
    * Initializes the help strings.
    */
   protected void initHelp() {
     super.initHelp();
 
-    addHelp(VALUE_EVALUATION, "evaluation object " + Evaluation.class.getName());
+    addHelp(VALUE_EVALUATION, "evaluation object " + Evaluation.class.getName() + " or " + RegressionEvaluation.class.getName());
     addHelp(VALUE_MODEL, "model object; " + Model.class.getName());
   }
 

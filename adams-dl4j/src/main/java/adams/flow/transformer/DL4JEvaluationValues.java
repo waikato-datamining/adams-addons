@@ -30,6 +30,7 @@ import adams.flow.core.Token;
 import adams.ml.dl4j.EvaluationHelper;
 import adams.ml.dl4j.EvaluationStatistic;
 import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.eval.RegressionEvaluation;
 
 /**
  <!-- globalinfo-start -->
@@ -112,6 +113,9 @@ public class DL4JEvaluationValues
   /** the range of the class labels. */
   protected Range m_ClassIndex;
 
+  /** the regression columns to get statistics for. */
+  protected Range m_RegressionColumns;
+
   /**
    * Returns a string describing the object.
    *
@@ -139,6 +143,10 @@ public class DL4JEvaluationValues
     m_OptionManager.add(
       "index", "classIndex",
       new Range(Range.FIRST));
+
+    m_OptionManager.add(
+      "regression-columns", "regressionColumns",
+      new Range(Range.LAST));
   }
 
   /**
@@ -200,6 +208,35 @@ public class DL4JEvaluationValues
   }
 
   /**
+   * Sets the range of columns to get regression statistics for.
+   *
+   * @param value	the column indices
+   */
+  public void setRegressionColumns(Range value) {
+    m_RegressionColumns = value;
+    reset();
+  }
+
+  /**
+   * Returns the range of columns to get regression statistics for.
+   *
+   * @return		the column indices
+   */
+  public Range getRegressionColumns() {
+    return m_RegressionColumns;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String regressionColumnsTipText() {
+    return "The range of columns to get regression statistics for.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -208,7 +245,8 @@ public class DL4JEvaluationValues
   public String getQuickInfo() {
     String	result;
 
-    result  = QuickInfoHelper.toString(this, "classIndex", m_ClassIndex, "Labels: ");
+    result  = QuickInfoHelper.toString(this, "classIndex", m_ClassIndex, "class labels: ");
+    result += QuickInfoHelper.toString(this, "regressionColumns", m_RegressionColumns, ", reg cols: ");
     result += QuickInfoHelper.toString(this, "statisticValues", m_StatisticValues.length + " value" + (m_StatisticValues.length != 1 ? "s" : ""), ", ");
     
     return result;
@@ -259,62 +297,132 @@ public class DL4JEvaluationValues
   }
 
   /**
+   * Adds the specified statistic to the spreadsheet.
+   *
+   * @param eval	the {@link Evaluation} object to get the statist from
+   * @param sheet	the sheet to add the data to
+   * @param statistic	the statistic to add
+   * @param column	the class index to use (for class-specific stats)
+   * @param useCol	whether to use the index in the "Statistic" column
+   * @return		null if successfully added, otherwise error message
+   */
+  protected String addStatistic(RegressionEvaluation eval, SpreadSheet sheet, EvaluationStatistic statistic, int column, boolean useCol) {
+    String	result;
+    Row		row;
+    double	value;
+    String	name;
+
+    result = null;
+
+    try {
+      value = EvaluationHelper.getValue(eval, statistic, column);
+      row   = sheet.addRow("" + sheet.getRowCount());
+      name  = statistic.toDisplay();
+      if (useCol)
+	name += " (col #" + (column +1) + ")";
+      row.addCell(0).setContent(name);
+      row.addCell(1).setContent(Double.toString(value));
+    }
+    catch (Exception e) {
+      result = handleException("Error retrieving value for '" + statistic + "':\n", e);
+    }
+
+    return result;
+  }
+
+  /**
    * Executes the flow item.
    *
    * @return		null if everything is fine, otherwise error message
    */
   @Override
   protected String doExecute() {
-    String		result;
-    Evaluation		eval;
-    SpreadSheet		sheet;
-    int[]		indices;
-    String		msg;
+    String			result;
+    Object			evalObj;
+    Evaluation 			evalCls;
+    RegressionEvaluation	evalReg;
+    SpreadSheet			sheet;
+    int[]			indices;
+    String			msg;
 
     result = null;
 
     // fill spreadsheet
+    evalCls = null;
+    evalReg = null;
     if (m_InputToken.getPayload() instanceof DL4JEvaluationContainer)
-      eval = (Evaluation) ((DL4JEvaluationContainer) m_InputToken.getPayload()).getValue(DL4JEvaluationContainer.VALUE_EVALUATION);
+      evalObj = ((DL4JEvaluationContainer) m_InputToken.getPayload()).getValue(DL4JEvaluationContainer.VALUE_EVALUATION);
     else
-      eval = (Evaluation) m_InputToken.getPayload();
-    m_ClassIndex.setMax(eval.falseNegatives().size());  // TODO better way of retrieving numClasses???
-    indices = m_ClassIndex.getIntIndices();
+      evalObj = m_InputToken.getPayload();
+    if (evalObj instanceof Evaluation)
+      evalCls = (Evaluation) evalObj;
+    else if (evalObj instanceof RegressionEvaluation)
+      evalReg = (RegressionEvaluation) evalObj;
+
     sheet = new DefaultSpreadSheet();
     sheet.getHeaderRow().addCell("0").setContent("Statistic");
     sheet.getHeaderRow().addCell("1").setContent("Value");
-    if (indices.length == 1) {
-      for (EvaluationStatistic statistic: m_StatisticValues) {
-	msg = addStatistic(eval, sheet, statistic, indices[0], true);
-	if (msg != null) {
-	  if (result == null)
-	    result = "";
-	  else
-	    result += "\n";
-	  result += msg;
+
+    if (evalCls != null) {
+      m_ClassIndex.setMax(evalCls.falseNegatives().size());  // TODO better way of retrieving numClasses???
+      indices = m_ClassIndex.getIntIndices();
+      if (indices.length == 1) {
+	for (EvaluationStatistic statistic: m_StatisticValues) {
+	  if (!statistic.isClassification())
+	    continue;
+	  msg = addStatistic(evalCls, sheet, statistic, indices[0], true);
+	  if (msg != null) {
+	    if (result == null)
+	      result = "";
+	    else
+	      result += "\n";
+	    result += msg;
+	  }
+	}
+      }
+      else if (indices.length > 1) {
+	// not class-specific stats
+	for (EvaluationStatistic statistic: m_StatisticValues) {
+	  if (!statistic.isClassification())
+	    continue;
+	  if (statistic.isPerClass())
+	    continue;
+	  msg = addStatistic(evalCls, sheet, statistic, 0, false);  // class index is irrelevant
+	  if (msg != null) {
+	    if (result == null)
+	      result = "";
+	    else
+	      result += "\n";
+	    result += msg;
+	  }
+	}
+	// class-specific stats
+	for (int index: indices) {
+	  for (EvaluationStatistic statistic: m_StatisticValues) {
+	    if (!statistic.isClassification())
+	      continue;
+	    if (!statistic.isPerClass())
+	      continue;
+	    msg = addStatistic(evalCls, sheet, statistic, index, true);
+	    if (msg != null) {
+	      if (result == null)
+		result = "";
+	      else
+		result += "\n";
+	      result += msg;
+	    }
+	  }
 	}
       }
     }
-    else if (indices.length > 1) {
-      // not class-specific stats
-      for (EvaluationStatistic statistic: m_StatisticValues) {
-	if (statistic.isPerClass())
+    else if (evalReg != null) {
+      m_RegressionColumns.setMax(evalReg.numColumns());
+      indices = m_RegressionColumns.getIntIndices();
+      for (EvaluationStatistic statistic : m_StatisticValues) {
+	if (!statistic.isRegression())
 	  continue;
-	msg = addStatistic(eval, sheet, statistic, 0, false);  // class index is irrelevant
-	if (msg != null) {
-	  if (result == null)
-	    result = "";
-	  else
-	    result += "\n";
-	  result += msg;
-	}
-      }
-      // class-specific stats
-      for (int index: indices) {
-	for (EvaluationStatistic statistic: m_StatisticValues) {
-	  if (!statistic.isPerClass())
-	    continue;
-	  msg = addStatistic(eval, sheet, statistic, index, true);
+	for (int index: indices) {
+	  msg = addStatistic(evalReg, sheet, statistic, index, true);
 	  if (msg != null) {
 	    if (result == null)
 	      result = "";

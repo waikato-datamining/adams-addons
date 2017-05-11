@@ -20,6 +20,7 @@
 package adams.ml.dl4j;
 
 import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.eval.RegressionEvaluation;
 
 /**
  * A helper class for Evaluation related things.
@@ -69,7 +70,39 @@ public class EvaluationHelper {
       case ROW_COUNT:
 	return eval.getNumRowCounter();
       default:
-        throw new IllegalArgumentException("Unhandled statistic field: " + statistic);
+        if (statistic.isRegression() && !statistic.isClassification())
+          throw new IllegalArgumentException("Regression statistic cannot be used on classification evaluation: " + statistic);
+        else
+          throw new IllegalArgumentException("Unhandled statistic field: " + statistic);
+    }
+  }
+
+  /**
+   * Returns a statistical value from the evaluation object.
+   *
+   * @param eval	the evaluation object to get the value from
+   * @param statistic	the type of value to return
+   * @param column	the column
+   * @return		the determined value
+   * @throws Exception	if evaluation fails
+   */
+  public static double getValue(RegressionEvaluation eval, EvaluationStatistic statistic, int column) throws Exception {
+    switch (statistic) {
+      case CORRELATION_R_SQUARED:
+        return eval.correlationR2(column);
+      case MEAN_ABSOLUTE_ERROR:
+        return eval.meanAbsoluteError(column);
+      case MEAN_SQUARED_ERROR:
+        return eval.meanSquaredError(column);
+      case RELATIVE_SQUARED_ERROR:
+        return eval.relativeSquaredError(column);
+      case ROOT_MEAN_SQUARED_ERROR:
+        return eval.rootMeanSquaredError(column);
+      default:
+        if (!statistic.isRegression() && statistic.isClassification())
+          throw new IllegalArgumentException("Classification statistic cannot be used on regression evaluation: " + statistic);
+        else
+          throw new IllegalArgumentException("Unhandled statistic field: " + statistic);
     }
   }
 }

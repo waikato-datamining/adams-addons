@@ -15,7 +15,7 @@
 
 /*
  * DL4JTestSetEvaluator.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -32,6 +32,7 @@ import adams.flow.provenance.ProvenanceInformation;
 import adams.flow.provenance.ProvenanceSupporter;
 import adams.flow.source.CallableSource;
 import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.eval.RegressionEvaluation;
 import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
@@ -79,8 +80,9 @@ import org.nd4j.linalg.dataset.DataSet;
  * </pre>
  * 
  * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
- * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this 
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical 
+ * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
@@ -100,6 +102,11 @@ import org.nd4j.linalg.dataset.DataSet;
  * &nbsp;&nbsp;&nbsp;default: Testset
  * </pre>
  * 
+ * <pre>-type &lt;CLASSIFICATION|REGRESSION&gt; (property: type)
+ * &nbsp;&nbsp;&nbsp;The type of evaluation to perform.
+ * &nbsp;&nbsp;&nbsp;default: CLASSIFICATION
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -114,6 +121,9 @@ public class DL4JTestSetEvaluator
 
   /** the name of the callable trainset provider. */
   protected CallableActorReference m_Testset;
+
+  /** the evaluation type. */
+  protected DL4JEvaluationType m_Type;
 
   /**
    * Returns a string describing the object.
@@ -137,6 +147,10 @@ public class DL4JTestSetEvaluator
     m_OptionManager.add(
       "testset", "testset",
       new CallableActorReference("Testset"));
+
+    m_OptionManager.add(
+      "type", "type",
+      DL4JEvaluationType.CLASSIFICATION);
   }
 
   /**
@@ -146,7 +160,12 @@ public class DL4JTestSetEvaluator
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "testset", m_Testset);
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "testset", m_Testset, "test: ");
+    result += QuickInfoHelper.toString(this, "type", m_Type, ", type: ");
+
+    return result;
   }
 
   /**
@@ -179,6 +198,35 @@ public class DL4JTestSetEvaluator
   }
 
   /**
+   * Sets the type of evaluation to perform.
+   *
+   * @param value	the type
+   */
+  public void setType(DL4JEvaluationType value) {
+    m_Type = value;
+    reset();
+  }
+
+  /**
+   * Returns the type of evaluation to perform.
+   *
+   * @return  		the type
+   */
+  public DL4JEvaluationType getType() {
+    return m_Type;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String typeTipText() {
+    return "The type of evaluation to perform.";
+  }
+
+  /**
    * Returns the class that the consumer accepts.
    *
    * @return		<!-- flow-accepts-start -->org.deeplearning4j.nn.api.Model.class, adams.flow.container.DL4JModelContainer.class<!-- flow-accepts-end -->
@@ -196,7 +244,8 @@ public class DL4JTestSetEvaluator
   protected String doExecute() {
     String			result;
     DataSet 			test;
-    Evaluation 			eval;
+    Evaluation 			evalCls;
+    RegressionEvaluation 	evalReg;
     Model 			model;
     CallableSource		gs;
     Token			output;
@@ -224,21 +273,40 @@ public class DL4JTestSetEvaluator
 	  model = (Model) m_InputToken.getPayload();
 	else
 	  model = (Model) ((DL4JModelContainer) m_InputToken.getPayload()).getValue(DL4JModelContainer.VALUE_MODEL);
-	eval = null;
+	evalCls = null;
+	evalReg = null;
 	if (model instanceof MultiLayerNetwork) {
-	  eval = new Evaluation(test.numOutcomes());
-	  eval.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
+	  switch (m_Type) {
+	    case CLASSIFICATION:
+	      evalCls = new Evaluation(test.numOutcomes());
+	      evalCls.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
+	      break;
+
+	    case REGRESSION:
+	      evalReg = new RegressionEvaluation(test.numOutcomes());
+	      evalReg.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
+	      break;
+
+	    default:
+	      throw new IllegalStateException("Unhandled evaluation type: " + m_Type);
+	  }
 	}
 	else {
 	  result = "Can only evaluate " + MultiLayerNetwork.class.getName() + "!";
 	}
 
 	// broadcast result
-	if (eval != null) {
+	if (evalCls != null) {
 	  if (m_AlwaysUseContainer)
-	    m_OutputToken = new Token(new DL4JEvaluationContainer(eval, model));
+	    m_OutputToken = new Token(new DL4JEvaluationContainer(evalCls, model));
 	  else
-	    m_OutputToken = new Token(eval.stats());
+	    m_OutputToken = new Token(evalCls.stats());
+	}
+	else if (evalReg != null) {
+	  if (m_AlwaysUseContainer)
+	    m_OutputToken = new Token(new DL4JEvaluationContainer(evalReg, model));
+	  else
+	    m_OutputToken = new Token(evalReg.stats());
 	}
       }
     }

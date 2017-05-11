@@ -15,7 +15,7 @@
 
 /**
  * EvaluationStatistic.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.ml.dl4j;
 
@@ -23,7 +23,7 @@ import adams.core.EnumWithCustomDisplay;
 import adams.core.option.AbstractOption;
 
 /**
- * The enumeration for the comparison field.
+ * The enumeration for the comparison field (classification and regression).
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
@@ -31,22 +31,26 @@ import adams.core.option.AbstractOption;
 public enum EvaluationStatistic
   implements EnumWithCustomDisplay<EvaluationStatistic> {
 
-  ACCURACY("Accuracy", false),
-  CLASS_COUNT("Class count", true),
-  F1("F1", false),
-  F1_CLASS("F1", true),
-  FALSE_ALARM_RATE("False alarm rate", false),
-  FALSE_NEGATIVE_RATE("False negative rate", false),
-  FALSE_NEGATIVE_RATE_CLASS("False negative rate", true),
-  FALSE_POSITIVE_RATE("False positive rate", false),
-  FALSE_POSITIVE_RATE_CLASS("False positive rate", true),
-  PRECISION("Precision", false),
-  PRECISION_CLASS("Precision", true),
-  RECALL("Recall", false),
-  RECALL_CLASS("Recall", true),
-  ROW_COUNT("Row count", false);
+  ACCURACY("Accuracy", false, true),
+  CLASS_COUNT("Class count", true, true),
+  F1("F1", false, true),
+  F1_CLASS("F1", true, true),
+  FALSE_ALARM_RATE("False alarm rate", false, true),
+  FALSE_NEGATIVE_RATE("False negative rate", false, true),
+  FALSE_NEGATIVE_RATE_CLASS("False negative rate", true, true),
+  FALSE_POSITIVE_RATE("False positive rate", false, true),
+  FALSE_POSITIVE_RATE_CLASS("False positive rate", true, true),
+  PRECISION("Precision", false, true),
+  PRECISION_CLASS("Precision", true, true),
+  RECALL("Recall", false, true),
+  RECALL_CLASS("Recall", true, true),
+  ROW_COUNT("Row count", false, true),
+  CORRELATION_R_SQUARED("Correlation R^2", false, false),
+  MEAN_ABSOLUTE_ERROR("Mean absolute error", false, false),
+  MEAN_SQUARED_ERROR("Mean squared error", false, false),
+  RELATIVE_SQUARED_ERROR("Relative squared error", false, false),
+  ROOT_MEAN_SQUARED_ERROR("Root mean squared error", false, false);
 
-  
   /** the display value. */
   private String m_Display;
 
@@ -56,14 +60,8 @@ public enum EvaluationStatistic
   /** whether the statistic is per class. */
   private boolean m_PerClass;
 
-  /**
-   * Initializes the element. Sets {@link #m_PerClass} to false
-   *
-   * @param display	the display value
-   */
-  private EvaluationStatistic(String display) {
-    this(display, false);
-  }
+  /** classification (true), regression (false), both (null). */
+  private Boolean m_Type;
 
   /**
    * Initializes the element.
@@ -71,10 +69,11 @@ public enum EvaluationStatistic
    * @param display	the display value
    * @param perClass	whether this element is per class
    */
-  private EvaluationStatistic(String display, boolean perClass) {
+  private EvaluationStatistic(String display, boolean perClass, Boolean type) {
     m_Display     = display + (perClass ? " (class)" : "");
     m_Raw         = super.toString();
     m_PerClass    = perClass;
+    m_Type        = type;
   }
   
   /**
@@ -84,6 +83,24 @@ public enum EvaluationStatistic
    */
   public boolean isPerClass() {
     return m_PerClass;
+  }
+
+  /**
+   * Returns whether this statistic is applicable for classification.
+   *
+   * @return		true if for classification
+   */
+  public boolean isClassification() {
+    return (m_Type == null) || m_Type;
+  }
+
+  /**
+   * Returns whether this statistic is applicable for regression.
+   *
+   * @return		true if for regression
+   */
+  public boolean isRegression() {
+    return (m_Type == null) || !m_Type;
   }
 
   /**
