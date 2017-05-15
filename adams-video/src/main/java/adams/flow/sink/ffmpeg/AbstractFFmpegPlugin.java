@@ -24,10 +24,10 @@ import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.io.PlaceholderFile;
 import adams.core.management.ProcessUtils;
-import adams.core.management.ProcessUtils.ProcessResult;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.OptionUtils;
 import adams.flow.sink.FFmpeg;
+import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -291,7 +291,7 @@ public abstract class AbstractFFmpegPlugin
     String		result;
     ArrayList<String>	options;
     String		cmd;
-    ProcessResult	proc;
+    CollectingProcessOutput proc;
     
     result = null;
     
@@ -329,7 +329,7 @@ public abstract class AbstractFFmpegPlugin
 	  getLogger().info("Command-line: " + Utils.flatten(options, " "));
 	proc = ProcessUtils.execute(options.toArray(new String[options.size()]));
 	if (!proc.hasSucceeded())
-	  result = proc.toErrorOutput();
+	  result = ProcessUtils.toErrorOutput(proc);
       }
       catch (Exception e) {
 	result = handleException("Failed to execute commandline:\n" + Utils.flatten(options, "\n"), e);

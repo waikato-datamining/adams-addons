@@ -15,7 +15,7 @@
 
 /**
  * TweeboParser.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.transformer;
@@ -27,8 +27,8 @@ import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
 import adams.core.io.TempUtils;
 import adams.core.management.ProcessUtils;
-import adams.core.management.ProcessUtils.ProcessResult;
 import adams.data.spreadsheet.SpreadSheet;
+import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
 
 import java.io.File;
 import java.util.Arrays;
@@ -230,7 +230,7 @@ public class TweeboParser
     File		tmpFile;
     File		inFile;
     List<String>	lines;
-    ProcessResult 	procresult;
+    CollectingProcessOutput procresult;
 
     m_Queue.clear();
 

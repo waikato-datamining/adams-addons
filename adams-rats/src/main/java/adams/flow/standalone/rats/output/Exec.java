@@ -23,9 +23,9 @@ package adams.flow.standalone.rats.output;
 import adams.core.Placeholders;
 import adams.core.QuickInfoHelper;
 import adams.core.management.ProcessUtils;
-import adams.core.management.ProcessUtils.ProcessResult;
 import adams.core.option.OptionUtils;
 import adams.flow.core.Unknown;
+import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
 
 /**
  <!-- globalinfo-start -->
@@ -230,7 +230,7 @@ public class Exec
   protected String doTransmit() {
     String		result;
     String		cmd;
-    ProcessResult proc;
+    CollectingProcessOutput proc;
 
     result = null;
 
@@ -243,7 +243,7 @@ public class Exec
     try {
       proc = ProcessUtils.execute(OptionUtils.splitOptions(cmd));
       if (!proc.hasSucceeded())
-	result = proc.toErrorOutput();
+	result = ProcessUtils.toErrorOutput(proc);
     }
     catch (Exception e) {
       result = handleException("Failed to execute command: " + cmd, e);

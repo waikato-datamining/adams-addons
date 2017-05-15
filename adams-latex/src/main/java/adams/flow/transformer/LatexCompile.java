@@ -25,11 +25,11 @@ import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
 import adams.core.management.ProcessUtils;
-import adams.core.management.ProcessUtils.ProcessResult;
 import adams.doc.latex.LatexHelper;
 import adams.flow.core.ActorUtils;
 import adams.flow.source.filesystemsearch.LocalFileSearch;
 import adams.flow.standalone.LatexSetup;
+import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -185,7 +185,7 @@ public class LatexCompile
     PlaceholderDirectory	cwd;
     LocalFileSearch		search;
     List<String> 		list;
-    ProcessResult 		proc;
+    CollectingProcessOutput 	proc;
     boolean			compiling;
 
     result = null;
@@ -227,7 +227,7 @@ public class LatexCompile
       for (String file: list) {
 	proc = ProcessUtils.execute(new String[]{bibtex, file}, cwd);
 	if (!proc.hasSucceeded()) {
-	  result = proc.toErrorOutput();
+	  result = ProcessUtils.toErrorOutput(proc);
 	  break;
 	}
       }
@@ -259,7 +259,7 @@ public class LatexCompile
 		}
 		else if (line.contains(EMERGENCY_STOP)) {
 		  compiling = false;
-		  result = proc.toErrorOutput();
+		  result = ProcessUtils.toErrorOutput(proc);
 		}
 	      }
 	    }

@@ -15,7 +15,7 @@
 
 /*
  * Gnuplot.java
- * Copyright (C) 2012-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.standalone;
@@ -23,7 +23,7 @@ package adams.flow.standalone;
 import adams.core.QuickInfoHelper;
 import adams.core.io.PlaceholderFile;
 import adams.core.management.ProcessUtils;
-import adams.core.management.ProcessUtils.ProcessResult;
+import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
 
 /**
  <!-- globalinfo-start -->
@@ -202,7 +202,7 @@ public class Gnuplot
   protected String doExecute() {
     String		result;
     String[]		cmd;
-    ProcessResult	proc;
+    CollectingProcessOutput proc;
 
     result = null;
 
@@ -222,7 +222,7 @@ public class Gnuplot
     try {
       proc = ProcessUtils.execute(cmd);
       if (!proc.hasSucceeded())
-	result = proc.toErrorOutput();
+	result = ProcessUtils.toErrorOutput(proc);
       else
 	getLogger().severe(proc.getStdErr());
     }
