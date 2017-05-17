@@ -1,1 +1,1 @@
-type: CLASSIFICATION
+type: CLASSIFICATION, minibatch: -1

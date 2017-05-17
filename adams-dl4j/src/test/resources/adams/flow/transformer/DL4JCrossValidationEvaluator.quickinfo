@@ -1,1 +1,1 @@
-DL4JModelConfigurator, seed: 1, folds: 10, type: CLASSIFICATION
+DL4JModelConfigurator, seed: 1, folds: 10, type: CLASSIFICATION, minibatch: -1

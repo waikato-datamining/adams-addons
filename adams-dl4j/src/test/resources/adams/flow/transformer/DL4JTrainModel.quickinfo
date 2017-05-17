@@ -1,1 +1,1 @@
-DL4JModelConfigurator
+model: DL4JModelConfigurator, minibatch: -1
