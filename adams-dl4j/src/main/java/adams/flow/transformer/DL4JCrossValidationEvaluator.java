@@ -29,6 +29,7 @@ import adams.flow.provenance.Provenance;
 import adams.flow.provenance.ProvenanceContainer;
 import adams.flow.provenance.ProvenanceInformation;
 import adams.flow.provenance.ProvenanceSupporter;
+import adams.ml.dl4j.datasetiterator.ShufflingDataSetIterator;
 import adams.ml.dl4j.model.ModelConfigurator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.eval.RegressionEvaluation;
@@ -114,6 +115,12 @@ import java.util.Random;
  * &nbsp;&nbsp;&nbsp;minimum: 2
  * </pre>
  * 
+ * <pre>-mini-batch-size &lt;int&gt; (property: miniBatchSize)
+ * &nbsp;&nbsp;&nbsp;The mini-batch size to use; -1 to turn off.
+ * &nbsp;&nbsp;&nbsp;default: -1
+ * &nbsp;&nbsp;&nbsp;minimum: -1
+ * </pre>
+ * 
  * <pre>-type &lt;CLASSIFICATION|REGRESSION&gt; (property: type)
  * &nbsp;&nbsp;&nbsp;The type of evaluation to perform.
  * &nbsp;&nbsp;&nbsp;default: CLASSIFICATION
@@ -136,6 +143,9 @@ public class DL4JCrossValidationEvaluator
 
   /** the number of folds to generate. */
   protected int m_Folds;
+
+  /** the minibatch size. */
+  protected int m_MiniBatchSize;
 
   /** the evaluation type. */
   protected DL4JEvaluationType m_Type;
@@ -169,6 +179,10 @@ public class DL4JCrossValidationEvaluator
       10, 2, null);
 
     m_OptionManager.add(
+      "mini-batch-size", "miniBatchSize",
+      -1, -1, null);
+
+    m_OptionManager.add(
       "type", "type",
       DL4JEvaluationType.CLASSIFICATION);
   }
@@ -186,6 +200,7 @@ public class DL4JCrossValidationEvaluator
     result += QuickInfoHelper.toString(this, "seed", m_Seed, ", seed: ");
     result += QuickInfoHelper.toString(this, "folds", m_Folds, ", folds: ");
     result += QuickInfoHelper.toString(this, "type", m_Type, ", type: ");
+    result += QuickInfoHelper.toString(this, "miniBatchSize", m_MiniBatchSize, ", minibatch: ");
 
     return result;
   }
@@ -262,6 +277,35 @@ public class DL4JCrossValidationEvaluator
   }
 
   /**
+   * Sets the minibatch size to use.
+   *
+   * @param value	the size (-1 to turn off)
+   */
+  public void setMiniBatchSize(int value) {
+    m_MiniBatchSize = value;
+    reset();
+  }
+
+  /**
+   * Returns the type of evaluation to perform.
+   *
+   * @return  		the type
+   */
+  public int getMiniBatchSize() {
+    return m_MiniBatchSize;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String miniBatchSizeTipText() {
+    return "The mini-batch size to use; -1 to turn off.";
+  }
+
+  /**
    * Sets the type of evaluation to perform.
    *
    * @param value	the type
@@ -315,6 +359,7 @@ public class DL4JCrossValidationEvaluator
     Evaluation 			evalCls;
     RegressionEvaluation	evalReg;
     KFoldIterator		iter;
+    ShufflingDataSetIterator 	shuffle;
 
     result = null;
 
@@ -342,7 +387,14 @@ public class DL4JCrossValidationEvaluator
 	      train = iter.next();
 	      test  = iter.testFold();
 	      model = conf.configureModel(data.numInputs(), data.numOutcomes());
-	      ((MultiLayerNetwork) model).fit(train);
+	      if (m_MiniBatchSize < 1) {
+		((MultiLayerNetwork) model).fit(train);
+	      }
+	      else {
+		shuffle = new ShufflingDataSetIterator(train, m_MiniBatchSize, (int) m_Seed);
+		while (shuffle.hasNext())
+		  ((MultiLayerNetwork) model).fit(shuffle.next());
+	      }
 	      evalCls.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
 	    }
 	    break;
@@ -354,7 +406,14 @@ public class DL4JCrossValidationEvaluator
 	      train = iter.next();
 	      test  = iter.testFold();
 	      model = conf.configureModel(data.numInputs(), data.numOutcomes());
-	      ((MultiLayerNetwork) model).fit(train);
+	      if (m_MiniBatchSize < 1) {
+		((MultiLayerNetwork) model).fit(train);
+	      }
+	      else {
+		shuffle = new ShufflingDataSetIterator(train, m_MiniBatchSize, (int) m_Seed);
+		while (shuffle.hasNext())
+		  ((MultiLayerNetwork) model).fit(shuffle.next());
+	      }
 	      evalReg.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
 	    }
 	    break;

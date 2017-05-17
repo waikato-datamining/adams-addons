@@ -21,6 +21,7 @@
 package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
+import adams.core.Randomizable;
 import adams.flow.container.DL4JEvaluationContainer;
 import adams.flow.container.DL4JTrainTestSetContainer;
 import adams.flow.core.Token;
@@ -29,6 +30,7 @@ import adams.flow.provenance.Provenance;
 import adams.flow.provenance.ProvenanceContainer;
 import adams.flow.provenance.ProvenanceInformation;
 import adams.flow.provenance.ProvenanceSupporter;
+import adams.ml.dl4j.datasetiterator.ShufflingDataSetIterator;
 import adams.ml.dl4j.model.ModelConfigurator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.eval.RegressionEvaluation;
@@ -102,6 +104,17 @@ import org.nd4j.linalg.dataset.DataSet;
  * &nbsp;&nbsp;&nbsp;default: DL4JModelConfigurator
  * </pre>
  * 
+ * <pre>-mini-batch-size &lt;int&gt; (property: miniBatchSize)
+ * &nbsp;&nbsp;&nbsp;The mini-batch size to use; -1 to turn off.
+ * &nbsp;&nbsp;&nbsp;default: -1
+ * &nbsp;&nbsp;&nbsp;minimum: -1
+ * </pre>
+ * 
+ * <pre>-seed &lt;long&gt; (property: seed)
+ * &nbsp;&nbsp;&nbsp;The seed value to use for randomization.
+ * &nbsp;&nbsp;&nbsp;default: 1
+ * </pre>
+ * 
  * <pre>-type &lt;CLASSIFICATION|REGRESSION&gt; (property: type)
  * &nbsp;&nbsp;&nbsp;The type of evaluation to perform.
  * &nbsp;&nbsp;&nbsp;default: CLASSIFICATION
@@ -114,10 +127,16 @@ import org.nd4j.linalg.dataset.DataSet;
  */
 public class DL4JTrainTestSetEvaluator
   extends AbstractCallableDL4JModelEvaluator
-  implements ProvenanceSupporter {
+  implements ProvenanceSupporter, Randomizable {
 
   /** for serialization. */
   private static final long serialVersionUID = -1092101024095887007L;
+
+  /** the minibatch size. */
+  protected int m_MiniBatchSize;
+
+  /** the seed value. */
+  protected long m_Seed;
 
   /** the evaluation type. */
   protected DL4JEvaluationType m_Type;
@@ -144,6 +163,14 @@ public class DL4JTrainTestSetEvaluator
     super.defineOptions();
 
     m_OptionManager.add(
+      "mini-batch-size", "miniBatchSize",
+      -1, -1, null);
+
+    m_OptionManager.add(
+      "seed", "seed",
+      1L);
+
+    m_OptionManager.add(
       "type", "type",
       DL4JEvaluationType.CLASSIFICATION);
   }
@@ -157,6 +184,64 @@ public class DL4JTrainTestSetEvaluator
   @Override
   public String modelTipText() {
     return "The callable model configurator actor to obtain the model from to train and evaluate on the test data.";
+  }
+
+  /**
+   * Sets the minibatch size to use.
+   *
+   * @param value	the size (-1 to turn off)
+   */
+  public void setMiniBatchSize(int value) {
+    m_MiniBatchSize = value;
+    reset();
+  }
+
+  /**
+   * Returns the type of evaluation to perform.
+   *
+   * @return  		the type
+   */
+  public int getMiniBatchSize() {
+    return m_MiniBatchSize;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String miniBatchSizeTipText() {
+    return "The mini-batch size to use; -1 to turn off.";
+  }
+
+  /**
+   * Sets the seed value.
+   *
+   * @param value	the seed
+   */
+  public void setSeed(long value) {
+    m_Seed = value;
+    reset();
+  }
+
+  /**
+   * Returns the seed value.
+   *
+   * @return  		the seed
+   */
+  public long getSeed() {
+    return m_Seed;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String seedTipText() {
+    return "The seed value to use for randomization.";
   }
 
   /**
@@ -195,7 +280,12 @@ public class DL4JTrainTestSetEvaluator
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "type", m_Type, "type: ");
+    String	result;
+
+    result  = QuickInfoHelper.toString(this, "type", m_Type, "type: ");
+    result += QuickInfoHelper.toString(this, "miniBatchSize", m_MiniBatchSize, ", minibatch: ");
+
+    return result;
   }
 
   /**
@@ -222,6 +312,7 @@ public class DL4JTrainTestSetEvaluator
     Evaluation 			evalCls;
     RegressionEvaluation 	evalReg;
     DL4JTrainTestSetContainer	cont;
+    ShufflingDataSetIterator	iter;
 
     result = null;
 
@@ -236,10 +327,19 @@ public class DL4JTrainTestSetEvaluator
       model = conf.configureModel(train.numInputs(), train.numOutcomes());
       evalCls = null;
       evalReg = null;
-      if (model instanceof MultiLayerNetwork)
-	((MultiLayerNetwork) model).fit(train);
-      else
-        result = "Can only evaluate " + MultiLayerNetwork.class.getName() + "!";
+      if (model instanceof MultiLayerNetwork) {
+	if (m_MiniBatchSize < 1) {
+	  ((MultiLayerNetwork) model).fit(train);
+	}
+	else {
+	  iter = new ShufflingDataSetIterator(train, m_MiniBatchSize, (int) m_Seed);
+	  while (iter.hasNext())
+	    ((MultiLayerNetwork) model).fit(iter.next());
+	}
+      }
+      else {
+	result = "Can only evaluate " + MultiLayerNetwork.class.getName() + "!";
+      }
       if (result == null) {
 	switch (m_Type) {
 	  case CLASSIFICATION:
