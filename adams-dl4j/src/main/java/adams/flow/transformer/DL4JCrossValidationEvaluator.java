@@ -428,15 +428,16 @@ public class DL4JCrossValidationEvaluator
       }
 
       // broadcast result
+      model = conf.configureModel(data.numInputs(), data.numOutcomes());
       if (evalCls != null) {
 	if (m_AlwaysUseContainer)
-	  m_OutputToken = new Token(new DL4JEvaluationContainer(evalCls, conf));
+	  m_OutputToken = new Token(new DL4JEvaluationContainer(evalCls, model));
 	else
 	  m_OutputToken = new Token(evalCls.stats());
       }
       else if (evalReg != null) {
 	if (m_AlwaysUseContainer)
-	  m_OutputToken = new Token(new DL4JEvaluationContainer(evalReg, conf));
+	  m_OutputToken = new Token(new DL4JEvaluationContainer(evalReg, model));
 	else
 	  m_OutputToken = new Token(evalReg.stats());
       }
