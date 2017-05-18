@@ -19,6 +19,7 @@
  */
 package adams.flow.standalone.rats.output;
 
+import adams.core.AdditionalInformationHandler;
 import adams.core.StoppableWithFeedback;
 import adams.core.option.OptionHandler;
 import adams.event.VariableChangeEvent;
@@ -32,7 +33,7 @@ import adams.flow.standalone.Rat;
  * @version $Revision$
  */
 public interface RatOutput
-  extends StoppableWithFeedback, VariableChangeListener, OptionHandler {
+  extends StoppableWithFeedback, VariableChangeListener, OptionHandler, AdditionalInformationHandler {
 
   /**
    * Returns the full name of the receiver.

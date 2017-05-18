@@ -153,6 +153,15 @@ public abstract class AbstractRatOutput
   }
 
   /**
+   * Returns the additional information.
+   *
+   * @return		the additional information, null or 0-length string for no information
+   */
+  public String getAdditionalInformation() {
+    return "Transmitter accepts: " + Utils.classesToString(accepts());
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    * <br><br>
    * Default implementation returns null.

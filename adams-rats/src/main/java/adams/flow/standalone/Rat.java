@@ -861,6 +861,24 @@ public class Rat
   }
 
   /**
+   * Returns the additional information.
+   *
+   * @return		the additional information
+   */
+  @Override
+  public String getAdditionalInformation() {
+    String	result;
+
+    result = super.getAdditionalInformation();
+
+    result += "\n\nRat input/output:\n";
+    result += "-receiver generates: " + Utils.classToString(getReceiver().generates()) + "\n";
+    result += "-transmitter accepts: " + Utils.classesToString(getTransmitter().accepts()) + "\n";
+
+    return result;
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
