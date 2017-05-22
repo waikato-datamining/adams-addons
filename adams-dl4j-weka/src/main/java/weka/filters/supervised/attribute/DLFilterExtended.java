@@ -39,6 +39,7 @@ public class DLFilterExtended extends SimpleBatchFilter implements SupervisedFil
   protected static String SEED="seed";
   protected static String PRE_TRAINED="pre-trained";
   protected static String MODEL_FILE="model-file";
+  protected static String LOG_FILE="log-file";
   protected static String EPOCHS="epochs";
 
 
@@ -48,11 +49,8 @@ public class DLFilterExtended extends SimpleBatchFilter implements SupervisedFil
   protected int m_epochs=500;
   protected int m_seed=1;
   protected PlaceholderFile m_modelFile=new PlaceholderFile();
+  protected PlaceholderFile m_logFile=new PlaceholderFile();
   protected boolean m_preTrained=true;
-
-  /** The dataset iterator to use. */
-  protected AbstractDataSetIterator m_iterator =  new DefaultInstancesIterator();
-
 
   /**
    * Load model from serialised file.
@@ -65,7 +63,7 @@ public class DLFilterExtended extends SimpleBatchFilter implements SupervisedFil
         FileInputStream inputFileStream = new FileInputStream(getModelFile());
         ObjectInputStream objectInputStream = new ObjectInputStream(inputFileStream);
         m_model = (Dl4jMlpClassifierExtended) objectInputStream.readObject();
-        m_model.setLogFile(new File("c:/tmp/logfile")); //TODO
+        m_model.setLogFile(new File(getLogFile().getAbsoluteFile().toString()));
         objectInputStream.close();
         inputFileStream.close();
         m_model_loaded = true;
@@ -125,6 +123,9 @@ public class DLFilterExtended extends SimpleBatchFilter implements SupervisedFil
   public PlaceholderFile getModelFile(){
     return(m_modelFile);
   }
+  public PlaceholderFile getLogFile(){
+    return(m_logFile);
+  }
   public int getEpochs() {return(m_epochs);};
 
   // sets
@@ -137,10 +138,14 @@ public class DLFilterExtended extends SimpleBatchFilter implements SupervisedFil
   public void setModelFile(PlaceholderFile mf){
     m_modelFile=mf;
   }
+  public void setLogFile(PlaceholderFile mf){
+    m_logFile=mf;
+  }
   public void setEpochs(int e){m_epochs=e;};
 
   //TipTexxt
   public String modelFileTipText() {return "Model file to load";}
+  public String logFileTipText() {return "Log file for Weka Classifier";}
   public String seedTipText() {
     return "Seed";
   }
@@ -161,9 +166,12 @@ public class DLFilterExtended extends SimpleBatchFilter implements SupervisedFil
 
     result = new Vector();
 
+    WekaOptionUtils.addOption(result, logFileTipText(), "" + getLogFile(), LOG_FILE);
     WekaOptionUtils.addOption(result, modelFileTipText(), "" + getModelFile(), MODEL_FILE);
     WekaOptionUtils.addOption(result, preTrainedTipText(), ""+getPreTrained(), PRE_TRAINED);
     WekaOptionUtils.addOption(result, seedTipText(), ""+getSeed(), SEED);
+    WekaOptionUtils.addOption(result, epochsTipText(), ""+getEpochs(), EPOCHS);
+
 
     // Serialised trained model - file
     // use pre-trained - boolean
@@ -186,8 +194,10 @@ public class DLFilterExtended extends SimpleBatchFilter implements SupervisedFil
 
     List<String> result = new ArrayList<>();
     WekaOptionUtils.add(result, SEED, getSeed());
+    WekaOptionUtils.add(result, EPOCHS, getEpochs());
     WekaOptionUtils.add(result, PRE_TRAINED, getPreTrained());
     WekaOptionUtils.add(result, MODEL_FILE, getModelFile());
+    WekaOptionUtils.add(result, LOG_FILE, getLogFile());
     WekaOptionUtils.add(result, super.getOptions());
     return WekaOptionUtils.toArray(result);
   }
@@ -242,7 +252,9 @@ public class DLFilterExtended extends SimpleBatchFilter implements SupervisedFil
   @Override
   public void setOptions(String[] options) throws Exception {
     setSeed((int) WekaOptionUtils.parse(options, SEED, 1));
+    setEpochs((int) WekaOptionUtils.parse(options, EPOCHS, 500));
     setModelFile(new PlaceholderFile(WekaOptionUtils.parse(options, MODEL_FILE, new PlaceholderFile())));
+    setLogFile(new PlaceholderFile(WekaOptionUtils.parse(options, LOG_FILE, new PlaceholderFile())));
     setPreTrained(Utils.getFlag(PRE_TRAINED,options));
     super.setOptions(options);
   }
@@ -302,13 +314,6 @@ public class DLFilterExtended extends SimpleBatchFilter implements SupervisedFil
     return result;
   }
 
-  @OptionMetadata(description = "The dataset iterator to use",
-    displayName = "dataset iterator", commandLineParamName = "iterator",
-    commandLineParamSynopsis = "-iterator <string>", displayOrder = 6)
-
-  public AbstractDataSetIterator getDataSetIterator() {
-    return m_iterator;
-  }
   /**
    * Processes the given data (may change the provided dataset) and returns the
    * modified version. This method is called in batchFinished().
@@ -335,10 +340,6 @@ public class DLFilterExtended extends SimpleBatchFilter implements SupervisedFil
     }
 
 
-    //Iterator<DataSet> it=getDataSetIterator().getIterator(instances, getSeed(), 1);
-    //while(it.hasNext()){
-
-//    }
     // restore original class values
     Instances header=getOutputFormat();
     result = new Instances(header, 0);
