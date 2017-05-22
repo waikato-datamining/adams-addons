@@ -1,1 +1,1 @@
-receiver: DummyInput, transmitter: DummyOutput, log: unknown, flow errors: flowerrors, send errors: senderrors, variables [scope: EMPTY, no propagation, regexp: .*], storage [scope: EMPTY, no propagation, regexp: .*]
+in: DummyInput, variables [scope: EMPTY], storage [scope: EMPTY]

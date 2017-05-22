@@ -212,6 +212,15 @@ public class Rat
   /** for serialization. */
   private static final long serialVersionUID = -154461277343021604L;
 
+  /** the default log queue name. */
+  public final static String DEFAULT_LOG = "unknown";
+
+  /** the default flow errors queue name. */
+  public final static String DEFAULT_FLOWERRORS = "flowerrors";
+
+  /** the default send errors queue name. */
+  public final static String DEFAULT_SENDERRORS = "senderrors";
+
   /** the receiver to use. */
   protected RatInput m_Receiver;
   
@@ -288,7 +297,7 @@ public class Rat
 
     m_OptionManager.add(
       "log", "log",
-      new CallableActorReference("unknown"));
+      new CallableActorReference(DEFAULT_LOG));
 
     m_OptionManager.add(
       "scope-handling-variables", "scopeHandlingVariables",
@@ -316,11 +325,11 @@ public class Rat
 
     m_OptionManager.add(
       "flow-error-queue", "flowErrorQueue",
-      new StorageName("flowerrors"));
+      new StorageName(DEFAULT_FLOWERRORS));
 
     m_OptionManager.add(
       "send-error-queue", "sendErrorQueue",
-      new StorageName("senderrors"));
+      new StorageName(DEFAULT_SENDERRORS));
 
     m_OptionManager.add(
       "suppress-errors", "suppressErrors",
@@ -886,27 +895,30 @@ public class Rat
   @Override
   public String getQuickInfo() {
     String	result;
-    String	value;
-    
-    result  = QuickInfoHelper.toString(this, "receiver", m_Receiver, "receiver: ");
-    result += QuickInfoHelper.toString(this, "transmitter", m_Transmitter, ", transmitter: ");
-    result += QuickInfoHelper.toString(this, "log", m_Log, ", log: ");
-    result += QuickInfoHelper.toString(this, "flowErrorQueue", m_FlowErrorQueue, ", flow errors: ");
-    result += QuickInfoHelper.toString(this, "sendErrorQueue", m_SendErrorQueue, ", send errors: ");
-    value   = QuickInfoHelper.toString(this, "showInControl", m_ShowInControl, "control", ", ");
-    if (value != null)
-      result += value;
-    
+
+    result  = QuickInfoHelper.toString(this, "receiver", m_Receiver, "in: ");
+    if (!(m_Transmitter instanceof DummyOutput))
+      result += QuickInfoHelper.toString(this, "transmitter", m_Transmitter, ", out: ");
+    if (!m_Log.getValue().equals(DEFAULT_LOG))
+      result += QuickInfoHelper.toString(this, "log", m_Log, ", log: ");
+    if (!m_FlowErrorQueue.getValue().equals(DEFAULT_FLOWERRORS))
+      result += QuickInfoHelper.toString(this, "flowErrorQueue", m_FlowErrorQueue, ", flow errors: ");
+    if (!m_SendErrorQueue.getValue().equals(DEFAULT_SENDERRORS))
+      result += QuickInfoHelper.toString(this, "sendErrorQueue", m_SendErrorQueue, ", send errors: ");
+    result += QuickInfoHelper.toString(this, "showInControl", m_ShowInControl, "control", ", ");
+
     result += ", variables [";
     result += QuickInfoHelper.toString(this, "scopeHandlingVariables", getScopeHandlingVariables(), "scope: ");
-    result += QuickInfoHelper.toString(this, "propagateVariables", (getPropagateVariables() ? "propagate" : "no propagation"), ", ");
-    result += QuickInfoHelper.toString(this, "variablesRegExp", getVariablesRegExp(), ", regexp: ");
+    result += QuickInfoHelper.toString(this, "propagateVariables", getPropagateVariables(), "propagate", ", ");
+    if (getPropagateVariables())
+      result += QuickInfoHelper.toString(this, "variablesRegExp", getVariablesRegExp(), ", regexp: ");
     result += "]";
     
     result += ", storage [";
     result += QuickInfoHelper.toString(this, "scopeHandlingStorage", getScopeHandlingStorage(), "scope: ");
-    result += QuickInfoHelper.toString(this, "propagateStorage", (getPropagateStorage() ? "propagate" : "no propagation"), ", ");
-    result += QuickInfoHelper.toString(this, "storageRegExp", getStorageRegExp(), ", regexp: ");
+    result += QuickInfoHelper.toString(this, "propagateStorage", getPropagateStorage(), "propagate", ", ");
+    if (getPropagateStorage())
+      result += QuickInfoHelper.toString(this, "storageRegExp", getStorageRegExp(), ", regexp: ");
     result += "]";
 
     return result;
