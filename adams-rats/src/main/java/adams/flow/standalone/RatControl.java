@@ -20,6 +20,7 @@
 package adams.flow.standalone;
 
 import adams.core.Pausable;
+import adams.core.logging.LoggingObject;
 import adams.event.FlowPauseStateEvent;
 import adams.event.FlowPauseStateListener;
 import adams.event.RatStateEvent;
@@ -334,9 +335,156 @@ public class RatControl
       return m_ButtonStopStart.isVisible();
     }
   }
-  
+
+  /**
+   * Ancestor for control states.
+   *
+   * @author  fracpete (fracpete at waikato dot ac dot nz)
+   * @version $Revision: 107 $
+   */
+  public static abstract class AbstractControlState<T extends Actor & Pausable>
+    extends LoggingObject {
+
+    /** for serialization. */
+    private static final long serialVersionUID = -5965060223206287867L;
+
+    /** the actor to manage. */
+    protected T m_Actor;
+
+    /** the button for pausing/resuming. */
+    protected boolean m_PauseResume;
+
+    /**
+     * Sets the actor to manage.
+     *
+     * @param value	the actor
+     */
+    public void setActor(T value) {
+      m_Actor = value;
+    }
+
+    /**
+     * Returns the actor in use.
+     *
+     * @return		the actor
+     */
+    public T getActor() {
+      return m_Actor;
+    }
+
+    /**
+     * Pauses/resumes the processor applier.
+     */
+    public void pauseOrResume() {
+      if (m_Actor == null)
+	return;
+      if (m_Actor.isPaused())
+	m_Actor.resumeExecution();
+      else
+	m_Actor.pauseExecution();
+    }
+
+    /**
+     * Sets the "pauseable" state of the control panel.
+     *
+     * @param value	true if to enable
+     */
+    public void setPausable(boolean value) {
+      m_PauseResume = value;
+    }
+
+    /**
+     * Returns whether the control panel is enabled.
+     *
+     * @return		true if enabled
+     */
+    public boolean isPausable() {
+      return m_PauseResume;
+    }
+  }
+
+  /**
+   * Control state for {@link Rats} actor.
+   *
+   * @author  fracpete (fracpete at waikato dot ac dot nz)
+   * @version $Revision: 107 $
+   */
+  public static class RatsControlState
+    extends AbstractControlState<Rats> {
+
+    /** for serialization. */
+    private static final long serialVersionUID = 4516229240505598425L;
+  }
+
+  /**
+   * Control state for {@link Rat} actor.
+   *
+   * @author  fracpete (fracpete at waikato dot ac dot nz)
+   * @version $Revision: 107 $
+   */
+  public static class RatControlState
+    extends AbstractControlState<Rat> {
+
+    /** for serialization. */
+    private static final long serialVersionUID = 4516229240505598425L;
+
+    /** the button for stopping/starting. */
+    protected boolean m_StopStart;
+
+    /**
+     * Stops/starts the rat.
+     *
+     * @return		null if successful, otherwise error message
+     */
+    public String stopOrStart() {
+      String	result;
+
+      if (m_Actor == null)
+	return null;
+
+      result = null;
+      if (m_Actor.isRunnableActive())
+	m_Actor.stopRunnable();
+      else
+	result = m_Actor.startRunnable();
+
+      return result;
+    }
+
+    /**
+     * Updates the state of the buttons.
+     */
+    public void updateButtons() {
+      if (m_Actor == null)
+	return;
+
+      m_PauseResume = m_Actor.isRunnableActive();
+    }
+
+    /**
+     * Sets the "stoppable" state of the control staet.
+     *
+     * @param value	true if to enable
+     */
+    public void setStoppable(boolean value) {
+      m_StopStart = value;
+    }
+
+    /**
+     * Returns whether the "stoppable" state of the control state is enabled.
+     *
+     * @return		true if enabled
+     */
+    public boolean isStoppable() {
+      return m_StopStart;
+    }
+  }
+
   /** the control panels. */
   protected List<AbstractControlPanel> m_ControlPanels;
+
+  /** the control states. */
+  protected List<AbstractControlState> m_ControlStates;
 
   /**
    * Returns a string describing the object.
@@ -356,6 +504,7 @@ public class RatControl
     super.initialize();
     
     m_ControlPanels = new ArrayList<>();
+    m_ControlStates = new ArrayList<>();
   }
   
   /**
@@ -390,6 +539,15 @@ public class RatControl
   }
 
   /**
+   * Returns the current control states.
+   *
+   * @return		the states
+   */
+  public List<AbstractControlState> getControlStates() {
+    return m_ControlStates;
+  }
+
+  /**
    * Does nothing.
    */
   @Override
@@ -400,6 +558,7 @@ public class RatControl
    * Creates the panel to display in the dialog.
    *
    * @return		the panel
+   * @see		#m_ControlPanels
    */
   @Override
   protected BasePanel newPanel() {
@@ -429,11 +588,11 @@ public class RatControl
 	rat = (Rat) rats.get(i);
 	if (!rat.getShowInControl())
 	  continue;
+	rat.addRatStateListener(this);
 	inControl = true;
-	subcpanel = new RatControlPanel();
+        subcpanel = new RatControlPanel();
         subcpanel.setPausable(rat.getMode() == RatMode.CONTINUOUS);
 	subcpanel.setActor(rat);
-	rat.addRatStateListener(this);
 	param.addParameter(" - " + rat.getName(), subcpanel);
 	m_ControlPanels.add(subcpanel);
       }
@@ -450,7 +609,46 @@ public class RatControl
     result.add(new BaseScrollPane(param), BorderLayout.CENTER);
     result.add(panel, BorderLayout.SOUTH);
 
+    setUpControlStates();
+
     return result;
+  }
+
+  /**
+   * Configures the control states.
+   *
+   * @see		#m_ControlStates
+   */
+  protected void setUpControlStates() {
+    List<Actor> 		list;
+    Rats			rats;
+    Rat				rat;
+    AbstractControlState	cstate;
+    AbstractControlState	subcstate;
+    int				i;
+    boolean			inControl;
+
+    list  = ActorUtils.findClosestTypes(this, Rats.class, true);
+    for (Actor item: list) {
+      rats = (Rats) item;
+      cstate = new RatsControlState();
+      cstate.setActor(rats);
+      m_ControlStates.add(cstate);
+      // the individual Rat actors
+      inControl = false;
+      for (i = 0; i < rats.size(); i++) {
+	rat = (Rat) rats.get(i);
+	if (!rat.getShowInControl())
+	  continue;
+	rat.addRatStateListener(this);
+	inControl = true;
+        subcstate = new RatControlState();
+        subcstate.setPausable(rat.getMode() == RatMode.CONTINUOUS);
+	subcstate.setActor(rat);
+	m_ControlStates.add(subcstate);
+      }
+      cstate.setPausable(!inControl);
+    }
   }
 
   /**
@@ -504,6 +702,22 @@ public class RatControl
   }
 
   /**
+   * Executes the flow item.
+   *
+   * @return		null if everything is fine, otherwise error message
+   */
+  @Override
+  protected String doExecute() {
+    if (!isHeadless()) {
+      return super.doExecute();
+    }
+    else {
+      setUpControlStates();
+      return null;
+    }
+  }
+
+  /**
    * Gets called when the pause state of the flow changes.
    *
    * @param e		the event
@@ -511,7 +725,7 @@ public class RatControl
   @Override
   public void flowPauseStateChanged(FlowPauseStateEvent e) {
     SwingUtilities.invokeLater(() -> {
-      for (AbstractControlPanel panel: m_ControlPanels)
+      for (AbstractControlPanel panel : m_ControlPanels)
 	panel.updateButtons();
     });
   }
@@ -544,6 +758,7 @@ public class RatControl
     PauseStateManager	manager;
 
     m_ControlPanels.clear();
+    m_ControlStates.clear();
 
     if (getRoot() instanceof PauseStateHandler) {
       manager = ((PauseStateHandler) getRoot()).getPauseStateManager();

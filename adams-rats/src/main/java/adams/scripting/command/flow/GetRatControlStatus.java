@@ -30,8 +30,8 @@ import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
 import adams.flow.standalone.Rat;
 import adams.flow.standalone.RatControl;
-import adams.flow.standalone.RatControl.AbstractControlPanel;
-import adams.flow.standalone.RatControl.RatControlPanel;
+import adams.flow.standalone.RatControl.AbstractControlState;
+import adams.flow.standalone.RatControl.RatControlState;
 import adams.scripting.command.AbstractRemoteCommandOnFlowWithResponse;
 
 import java.io.StringReader;
@@ -207,15 +207,15 @@ public class GetRatControlStatus
       row.addCell("" + COL_STOPPED).setContent("isstopped");
       for (Actor a : ActorUtils.enumerate(flow, new Class[]{RatControl.class})) {
 	rc = (RatControl) a;
-	for (AbstractControlPanel panel: rc.getControlPanels()) {
-	  actor = panel.getActor();
+	for (AbstractControlState state: rc.getControlStates()) {
+	  actor = state.getActor();
 	  row = sheet.addRow();
 	  row.addCell(COL_ID).setContent(m_ID);
-	  row.addCell(COL_RAT).setContent(panel.getActor().getFullName());
-	  row.addCell(COL_PAUSABLE).setContent(panel.isPausable());
+	  row.addCell(COL_RAT).setContent(state.getActor().getFullName());
+	  row.addCell(COL_PAUSABLE).setContent(state.isPausable());
 	  row.addCell(COL_PAUSED).setContent(((Pausable) actor).isPaused());
-	  if ((panel instanceof RatControlPanel)) {
-	    row.addCell(COL_STOPPABLE).setContent(((RatControlPanel) panel).isStoppable());
+	  if ((state instanceof RatControlState)) {
+	    row.addCell(COL_STOPPABLE).setContent(((RatControlState) state).isStoppable());
 	    row.addCell(COL_STOPPED).setContent(!((Rat) actor).isRunnableActive());
 	  }
 	  else {
