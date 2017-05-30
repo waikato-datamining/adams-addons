@@ -27,12 +27,7 @@ import adams.core.logging.Logger;
 import adams.core.net.TwitterHelper;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.source.TwitterListener;
-import twitter4j.StallWarning;
 import twitter4j.Status;
-import twitter4j.StatusDeletionNotice;
-import twitter4j.StatusListener;
-
-import java.util.logging.Level;
 
 /**
  * Ancestor for twitter stream listeners.
@@ -42,7 +37,7 @@ import java.util.logging.Level;
  */
 public abstract class AbstractListener
   extends AbstractOptionHandler
-  implements Pausable, Stoppable, StatusListener, QuickInfoSupporter {
+  implements Pausable, Stoppable, QuickInfoSupporter {
 
   private static final long serialVersionUID = 5406360301457780558L;
 
@@ -164,68 +159,9 @@ public abstract class AbstractListener
   }
 
   /**
-   * When receiving a status.
-   *
-   * @param status	the status
+   * Removes the listener.
    */
-  @Override
-  public void onStatus(Status status) {
-    if (m_Listening && !m_Paused) {
-      if ((getOwner().getMaxStatusUpdates() > 0) && (m_Count >= getOwner().getMaxStatusUpdates()))
-	stopExecution();
-      else
-	m_Next = status;
-    }
-  }
-
-  /**
-   * Ignored.
-   *
-   * @param statusDeletionNotice
-   */
-  @Override
-  public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
-  }
-
-  /**
-   * Ignored.
-   *
-   * @param i
-   */
-  @Override
-  public void onTrackLimitationNotice(int i) {
-  }
-
-  /**
-   * Ignored.
-   *
-   * @param l
-   * @param l1
-   */
-  @Override
-  public void onScrubGeo(long l, long l1) {
-  }
-
-  /**
-   * Outputs a stall warning.
-   *
-   * @param stallWarning	the warning
-   */
-  @Override
-  public void onStallWarning(StallWarning stallWarning) {
-    getLogger().warning(stallWarning.toString());
-  }
-
-  /**
-   * Gets called if an exception is encountered.
-   *
-   * @param e			the exception
-   */
-  @Override
-  public void onException(Exception e) {
-    // TODO stop listening?
-    getLogger().log(Level.SEVERE, "Exception encountered while listening!", e);
-  }
+  protected abstract void removeListener();
 
   /**
    * Stops the execution.
@@ -234,7 +170,7 @@ public abstract class AbstractListener
   public void stopExecution() {
     m_Listening = false;
     m_Paused    = false;
-    m_Twitter.removeListener(this);
+    removeListener();
     try {
       m_Twitter.shutdown();
     }

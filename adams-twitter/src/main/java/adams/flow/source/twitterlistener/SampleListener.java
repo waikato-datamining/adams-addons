@@ -20,6 +20,11 @@
 
 package adams.flow.source.twitterlistener;
 
+import twitter4j.StallWarning;
+import twitter4j.Status;
+import twitter4j.StatusDeletionNotice;
+import twitter4j.StatusListener;
+
 import java.util.logging.Level;
 
 /**
@@ -29,7 +34,8 @@ import java.util.logging.Level;
  * @version $Revision: 13567 $
  */
 public class SampleListener
-  extends AbstractListener {
+  extends AbstractListener
+  implements StatusListener {
 
   private static final long serialVersionUID = 5406360301457780558L;
 
@@ -56,5 +62,77 @@ public class SampleListener
       m_Twitter.removeListener(this);
       getLogger().log(Level.SEVERE, "Failed to start listener!", e);
     }
+  }
+
+  /**
+   * Removes the listener.
+   */
+  @Override
+  protected void removeListener() {
+    m_Twitter.removeListener(this);
+  }
+
+  /**
+   * When receiving a status.
+   *
+   * @param status	the status
+   */
+  @Override
+  public void onStatus(Status status) {
+    if (m_Listening && !m_Paused) {
+      if ((getOwner().getMaxStatusUpdates() > 0) && (m_Count >= getOwner().getMaxStatusUpdates()))
+	stopExecution();
+      else
+	m_Next = status;
+    }
+  }
+
+  /**
+   * Ignored.
+   *
+   * @param statusDeletionNotice
+   */
+  @Override
+  public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
+  }
+
+  /**
+   * Ignored.
+   *
+   * @param i
+   */
+  @Override
+  public void onTrackLimitationNotice(int i) {
+  }
+
+  /**
+   * Ignored.
+   *
+   * @param l
+   * @param l1
+   */
+  @Override
+  public void onScrubGeo(long l, long l1) {
+  }
+
+  /**
+   * Outputs a stall warning.
+   *
+   * @param stallWarning	the warning
+   */
+  @Override
+  public void onStallWarning(StallWarning stallWarning) {
+    getLogger().warning(stallWarning.toString());
+  }
+
+  /**
+   * Gets called if an exception is encountered.
+   *
+   * @param e			the exception
+   */
+  @Override
+  public void onException(Exception e) {
+    // TODO stop listening?
+    getLogger().log(Level.SEVERE, "Exception encountered while listening!", e);
   }
 }
