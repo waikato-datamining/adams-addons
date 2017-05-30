@@ -54,7 +54,7 @@ public class SampleListener
     }
     catch (Exception e) {
       m_Twitter.removeListener(this);
-      getOwner().getLogger().log(Level.SEVERE, "Failed to start listener!", e);
+      getLogger().log(Level.SEVERE, "Failed to start listener!", e);
     }
   }
 }
