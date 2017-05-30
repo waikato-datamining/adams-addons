@@ -20,13 +20,13 @@
 
 package adams.parser;
 
-import java.io.ByteArrayInputStream;
-import java.util.HashMap;
-
-import java_cup.runtime.DefaultSymbolFactory;
-import java_cup.runtime.SymbolFactory;
 import adams.parser.twitterfilter.Parser;
 import adams.parser.twitterfilter.Scanner;
+import java_cup.runtime.DefaultSymbolFactory;
+import java_cup.runtime.SymbolFactory;
+
+import java.io.ByteArrayInputStream;
+import java.util.HashMap;
 
 /**
  <!-- globalinfo-start -->
@@ -62,6 +62,7 @@ import adams.parser.twitterfilter.Scanner;
  *               | source &lt;match&gt; pattern<br>
  *               | text &lt;match&gt; pattern<br>
  *               | user &lt;match&gt; pattern<br>
+ *               | screenname &lt;match&gt; pattern<br>
  *               | hashtag &lt;match&gt; pattern<br>
  *               | usermention &lt;match&gt; pattern<br>
  *               | statuslang &lt;match&gt; pattern<br>
@@ -177,6 +178,7 @@ public class TwitterFilter
       + "              | source <match> pattern\n"
       + "              | text <match> pattern\n"
       + "              | user <match> pattern\n"
+      + "              | screenname <match> pattern\n"
       + "              | hashtag <match> pattern\n"
       + "              | usermention <match> pattern\n"
       + "              | statuslang <match> pattern\n"

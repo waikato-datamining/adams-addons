@@ -307,7 +307,7 @@ parser code {:
 
 terminal COMMA, LPAREN, RPAREN;
 terminal SUBSTRING_MATCH, EXACT_MATCH, REGEXP_MATCH;
-terminal LANGUAGE_CODE, COUNTRY, COUNTRY_CODE, PLACE, SOURCE, TEXT, USER, LONGITUDE, LATITUDE, HASHTAG, USERMENTION, STATUSLANG, RETWEET, ISRETWEETED, FAVCOUNT;
+terminal LANGUAGE_CODE, COUNTRY, COUNTRY_CODE, PLACE, SOURCE, TEXT, USER, SCREENNAME, LONGITUDE, LATITUDE, HASHTAG, USERMENTION, STATUSLANG, RETWEET, ISRETWEETED, FAVCOUNT;
 terminal IFELSE, HAS;
 terminal NOT, AND, OR, XOR, LT, LE, NOT_EQ, GT, GE;
 terminal Boolean BOOLEAN;
@@ -323,7 +323,7 @@ non terminal TwitterField parameter;
 precedence left AND, OR, XOR, LT, LE, EXACT_MATCH, NOT_EQ, GT, GE;
 precedence left NOT;
 precedence left LPAREN, RPAREN;
-precedence left LANGUAGE_CODE, COUNTRY, COUNTRY_CODE, PLACE, SOURCE, TEXT, USER, LONGITUDE, LATITUDE, HASHTAG, USERMENTION, STATUSLANG, RETWEET, ISRETWEETED, FAVCOUNT;
+precedence left LANGUAGE_CODE, COUNTRY, COUNTRY_CODE, PLACE, SOURCE, TEXT, USER, SCREENNAME, LONGITUDE, LATITUDE, HASHTAG, USERMENTION, STATUSLANG, RETWEET, ISRETWEETED, FAVCOUNT;
 
 expr_list ::= expr_list expr_part | expr_part;
 expr_part ::= expr:e {: parser.setResult(e); :} ;
@@ -400,6 +400,13 @@ boolexpr ::=    BOOLEAN:b
               | USER REGEXP_MATCH STRING:s
                 {: RESULT = parser.get(TwitterField.USER_NAME).matches(s); :}
 
+              | SCREENNAME SUBSTRING_MATCH STRING:s
+                {: RESULT = (parser.get(TwitterField.USER_SCREENNAME).indexOf(s) > -1); :}
+              | SCREENNAME EXACT_MATCH STRING:s
+                {: RESULT = parser.get(TwitterField.USER_SCREENNAME).equals(s); :}
+              | SCREENNAME REGEXP_MATCH STRING:s
+                {: RESULT = parser.get(TwitterField.USER_SCREENNAME).matches(s); :}
+
               | HASHTAG SUBSTRING_MATCH STRING:s
                 {: RESULT = (parser.isSubstringMatch(s, (String[]) parser.get(TwitterHelper.SYMBOL_HASHTAGS))); :}
               | HASHTAG EXACT_MATCH STRING:s
@@ -470,6 +477,8 @@ parameter ::=   LANGUAGE_CODE
                 {: RESULT = TwitterField.SOURCE; :}
               | USER
                 {: RESULT = TwitterField.USER_NAME; :}
+              | SCREENNAME
+                {: RESULT = TwitterField.USER_SCREENNAME; :}
               | LATITUDE
                 {: RESULT = TwitterField.GEO_LATITUDE; :}
               | LONGITUDE

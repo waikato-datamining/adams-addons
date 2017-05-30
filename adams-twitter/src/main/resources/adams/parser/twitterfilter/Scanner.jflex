@@ -57,59 +57,60 @@ import java.io.*;
 
 %%
 <YYINITIAL> {
-	// matching
-	":" { return sf.newSymbol("substring match", sym.SUBSTRING_MATCH); }
-	"=" { return sf.newSymbol("exact match", sym.EXACT_MATCH); }
-	"~" { return sf.newSymbol("regexp match", sym.REGEXP_MATCH); }
+    // matching
+    ":" { return sf.newSymbol("substring match", sym.SUBSTRING_MATCH); }
+    "=" { return sf.newSymbol("exact match", sym.EXACT_MATCH); }
+    "~" { return sf.newSymbol("regexp match", sym.REGEXP_MATCH); }
 
-	// strings
+    // strings
     \"  { string.setLength(0); yybegin(STRING); }
 
-	// boolean stuff
-	"not" { return sf.newSymbol("not", sym.NOT); }
-	"and" { return sf.newSymbol("and", sym.AND); }
-	"or"  { return sf.newSymbol("or", sym.OR); }
-	"xor" { return sf.newSymbol("xor", sym.XOR); }
+    // boolean stuff
+    "not" { return sf.newSymbol("not", sym.NOT); }
+    "and" { return sf.newSymbol("and", sym.AND); }
+    "or"  { return sf.newSymbol("or", sym.OR); }
+    "xor" { return sf.newSymbol("xor", sym.XOR); }
     "<"   { return sf.newSymbol("less than", sym.LT); }
     "<="  { return sf.newSymbol("less or equal than", sym.LE); }
     ">"   { return sf.newSymbol("greater than", sym.GT); }
     ">="  { return sf.newSymbol("greater or equal than", sym.GE); }
     "<>"  { return sf.newSymbol("not equal", sym.NOT_EQ); }
 
-	// predicates
-	"langcode"    { return sf.newSymbol("language code", sym.LANGUAGE_CODE); }
-	"country"     { return sf.newSymbol("country", sym.COUNTRY); }
-	"countrycode" { return sf.newSymbol("country code", sym.COUNTRY_CODE); }
-	"place"       { return sf.newSymbol("place", sym.PLACE); }
-	"text"        { return sf.newSymbol("text", sym.TEXT); }
-	"source"      { return sf.newSymbol("source", sym.SOURCE); }
-	"user"        { return sf.newSymbol("user", sym.USER); }
-	"lat"         { return sf.newSymbol("latitude", sym.LATITUDE); }
-	"latitude"    { return sf.newSymbol("latitude", sym.LATITUDE); }
-	"long"        { return sf.newSymbol("longitude", sym.LONGITUDE); }
-	"longitude"   { return sf.newSymbol("longitude", sym.LONGITUDE); }
-	"hashtag"     { return sf.newSymbol("hashtag", sym.HASHTAG); }
-	"usermention" { return sf.newSymbol("usermention", sym.USERMENTION); }
-	"statuslang"  { return sf.newSymbol("usermention", sym.STATUSLANG); }
-	"retweet"     { return sf.newSymbol("usermention", sym.RETWEET); }
-	"isretweeted" { return sf.newSymbol("usermention", sym.ISRETWEETED); }
-	"favcount"    { return sf.newSymbol("usermention", sym.FAVCOUNT); }
+    // predicates
+    "langcode"    { return sf.newSymbol("language code", sym.LANGUAGE_CODE); }
+    "country"     { return sf.newSymbol("country", sym.COUNTRY); }
+    "countrycode" { return sf.newSymbol("country code", sym.COUNTRY_CODE); }
+    "place"       { return sf.newSymbol("place", sym.PLACE); }
+    "text"        { return sf.newSymbol("text", sym.TEXT); }
+    "source"      { return sf.newSymbol("source", sym.SOURCE); }
+    "user"        { return sf.newSymbol("user", sym.USER); }
+    "screenname"  { return sf.newSymbol("user", sym.SCREENNAME); }
+    "lat"         { return sf.newSymbol("latitude", sym.LATITUDE); }
+    "latitude"    { return sf.newSymbol("latitude", sym.LATITUDE); }
+    "long"        { return sf.newSymbol("longitude", sym.LONGITUDE); }
+    "longitude"   { return sf.newSymbol("longitude", sym.LONGITUDE); }
+    "hashtag"     { return sf.newSymbol("hashtag", sym.HASHTAG); }
+    "usermention" { return sf.newSymbol("usermention", sym.USERMENTION); }
+    "statuslang"  { return sf.newSymbol("usermention", sym.STATUSLANG); }
+    "retweet"     { return sf.newSymbol("usermention", sym.RETWEET); }
+    "isretweeted" { return sf.newSymbol("usermention", sym.ISRETWEETED); }
+    "favcount"    { return sf.newSymbol("usermention", sym.FAVCOUNT); }
 
-	// functions
-	"if"     { return sf.newSymbol("ifelse", sym.IFELSE); }
-	"ifelse" { return sf.newSymbol("ifelse", sym.IFELSE); }
-	"has"    { return sf.newSymbol("has", sym.HAS); }
+    // functions
+    "if"     { return sf.newSymbol("ifelse", sym.IFELSE); }
+    "ifelse" { return sf.newSymbol("ifelse", sym.IFELSE); }
+    "has"    { return sf.newSymbol("has", sym.HAS); }
 
     // numbers
     [0-9]*\.?[0-9]+(E(-)?[1-9][0-9]*)? { return sf.newSymbol("Number", sym.NUMBER, new Double(yytext())); }
 
-	// whitespaces
-	[ \r\n\t\f] { /* ignore white space. */ }
+    // whitespaces
+    [ \r\n\t\f] { /* ignore white space. */ }
 
-	// various
-	"," { return sf.newSymbol("Comma", sym.COMMA); }
-	"(" { return sf.newSymbol("Left Bracket", sym.LPAREN); }
-	")" { return sf.newSymbol("Right Bracket", sym.RPAREN); }
+    // various
+    "," { return sf.newSymbol("Comma", sym.COMMA); }
+    "(" { return sf.newSymbol("Left Bracket", sym.LPAREN); }
+    ")" { return sf.newSymbol("Right Bracket", sym.RPAREN); }
 }
 
 <STRING> {

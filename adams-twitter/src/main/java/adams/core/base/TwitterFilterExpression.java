@@ -20,12 +20,12 @@
 
 package adams.core.base;
 
-import java.util.HashMap;
-
 import adams.core.net.TwitterHelper;
 import adams.data.twitter.TwitterField;
 import adams.parser.GrammarSupplier;
 import adams.parser.TwitterFilter;
+
+import java.util.HashMap;
 
 /**
  * Wrapper for a twitter filter expression.
@@ -87,6 +87,7 @@ public class TwitterFilterExpression
       symbols.put(TwitterField.SOURCE, "source");
       symbols.put(TwitterField.TEXT, "a tweet");
       symbols.put(TwitterField.USER_NAME, "user name");
+      symbols.put(TwitterField.USER_SCREENNAME, "screen name");
       symbols.put(TwitterField.PLACE, "place");
       symbols.put(TwitterHelper.SYMBOL_HASHTAGS, new String[0]);
       symbols.put(TwitterHelper.SYMBOL_USERMENTIONS, new String[0]);

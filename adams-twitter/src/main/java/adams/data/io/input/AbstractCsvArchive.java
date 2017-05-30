@@ -15,7 +15,7 @@
 
 /**
  * AbstractCsvArchive.java
- * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.input;
 
@@ -259,6 +259,9 @@ public abstract class AbstractCsvArchive
 	    break;
 	  case USER_NAME:
 	    ((SimulatedUser) result.getUser()).setName(cell.getContent());
+	    break;
+	  case USER_SCREENNAME:
+	    ((SimulatedUser) result.getUser()).setScreenName(cell.getContent());
 	    break;
 	  case SOURCE:
 	    result.setSource(cell.getContent());

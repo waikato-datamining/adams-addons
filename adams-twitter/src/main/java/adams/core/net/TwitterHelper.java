@@ -15,7 +15,7 @@
 
 /*
  * Twitter.java
- * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.core.net;
@@ -220,6 +220,8 @@ public class TwitterHelper {
       result.put(TwitterField.USER_ID, status.getUser().getId());
       if (status.getUser().getName() != null)
 	result.put(TwitterField.USER_NAME, status.getUser().getName());
+      if (status.getUser().getScreenName() != null)
+        result.put(TwitterField.USER_SCREENNAME, status.getUser().getScreenName());
     }
     result.put(TwitterField.SOURCE, status.getSource());
     result.put(TwitterField.TEXT, status.getText());

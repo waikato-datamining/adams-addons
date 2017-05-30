@@ -15,7 +15,7 @@
 
 /**
  * TwitterField.java
- * Copyright (C) 2010-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.twitter;
 
@@ -32,6 +32,8 @@ public enum TwitterField {
   USER_ID,
   /** the user name. */
   USER_NAME,
+  /** the screen name. */
+  USER_SCREENNAME,
   /** the source. */
   SOURCE,
   /** the text of the tweet. */

@@ -20,14 +20,14 @@
 
 package adams.flow.transformer;
 
-import java.util.HashMap;
-
-import twitter4j.Status;
 import adams.core.QuickInfoHelper;
 import adams.core.base.TwitterFilterExpression;
 import adams.core.net.TwitterHelper;
 import adams.flow.core.Token;
 import adams.parser.GrammarSupplier;
+import twitter4j.Status;
+
+import java.util.HashMap;
 
 /**
  <!-- globalinfo-start -->
@@ -63,6 +63,7 @@ import adams.parser.GrammarSupplier;
  *               | source &lt;match&gt; pattern<br>
  *               | text &lt;match&gt; pattern<br>
  *               | user &lt;match&gt; pattern<br>
+ *               | screenname &lt;match&gt; pattern<br>
  *               | hashtag &lt;match&gt; pattern<br>
  *               | usermention &lt;match&gt; pattern<br>
  *               | statuslang &lt;match&gt; pattern<br>
