@@ -80,7 +80,7 @@ public class SampleListener
   @Override
   public void onStatus(Status status) {
     if (m_Listening && !m_Paused) {
-      if ((getOwner().getMaxStatusUpdates() > 0) && (m_Count >= getOwner().getMaxStatusUpdates()))
+      if ((getMaxStatusUpdates() > 0) && (m_Count >= getMaxStatusUpdates()))
 	stopExecution();
       else
 	m_Next = status;

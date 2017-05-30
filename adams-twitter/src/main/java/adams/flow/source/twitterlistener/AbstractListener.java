@@ -21,12 +21,14 @@
 package adams.flow.source.twitterlistener;
 
 import adams.core.Pausable;
+import adams.core.QuickInfoHelper;
 import adams.core.QuickInfoSupporter;
 import adams.core.Stoppable;
 import adams.core.logging.Logger;
 import adams.core.net.TwitterHelper;
 import adams.core.option.AbstractOptionHandler;
-import adams.flow.source.TwitterListener;
+import adams.flow.core.Actor;
+import adams.flow.core.FlowContextHandler;
 import twitter4j.Status;
 
 /**
@@ -37,12 +39,15 @@ import twitter4j.Status;
  */
 public abstract class AbstractListener
   extends AbstractOptionHandler
-  implements Pausable, Stoppable, QuickInfoSupporter {
+  implements Pausable, Stoppable, QuickInfoSupporter, FlowContextHandler {
 
   private static final long serialVersionUID = 5406360301457780558L;
 
+  /** the maximum number of status updates to output. */
+  protected int m_MaxStatusUpdates;
+
   /** the owner. */
-  protected TwitterListener m_Owner;
+  protected Actor m_FlowContext;
 
   /** for accessing the twitter streaming API. */
   protected transient twitter4j.TwitterStream m_Twitter;
@@ -60,14 +65,66 @@ public abstract class AbstractListener
   protected boolean m_Listening;
 
   /**
-   * Initializes the listener.
+   * Initializes the members.
    */
-  public AbstractListener() {
-    super();
+  @Override
+  protected void initialize() {
+    super.initialize();
 
-    m_Owner   = null;
-    m_Count   = 0;
-    m_Twitter = null;
+    m_FlowContext = null;
+    m_Count       = 0;
+    m_Twitter     = null;
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+            "max-updates", "maxStatusUpdates",
+            100, -1, null);
+  }
+
+  /**
+   * Sets the maximum number of status updates to output.
+   *
+   * @param value	the maximum number
+   */
+  public void setMaxStatusUpdates(int value) {
+    m_MaxStatusUpdates = value;
+    reset();
+  }
+
+  /**
+   * Returns the maximum number of status updates to output.
+   *
+   * @return		the maximum number
+   */
+  public int getMaxStatusUpdates() {
+    return m_MaxStatusUpdates;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String maxStatusUpdatesTipText() {
+    return "The maximum number of status updates to output; use <=0 for unlimited.";
+  }
+
+  /**
+   * Returns a quick info about the actor, which will be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    return QuickInfoHelper.toString(this, "maxStatusUpdates", ((m_MaxStatusUpdates <= 0) ? "unlimited " : "" + m_MaxStatusUpdates) + " status updates");
   }
 
   /**
@@ -77,44 +134,33 @@ public abstract class AbstractListener
    */
   @Override
   public synchronized Logger getLogger() {
-    if (m_Owner != null)
-      return m_Owner.getLogger();
+    if (m_FlowContext != null)
+      return m_FlowContext.getLogger();
     else
       return super.getLogger();
   }
 
   /**
-   * Sets the owner.
+   * Sets the flow context.
    *
-   * @param value	the owning actor
+   * @param value	the flow context
    */
-  public void setOwner(TwitterListener value) {
+  public void setFlowContext(Actor value) {
     if (value == null)
-      throw new IllegalArgumentException("Owner cannot be null!");
+      throw new IllegalArgumentException("Flow context cannot be null!");
 
-    m_Owner   = value;
-    m_Count   = 0;
-    m_Twitter = TwitterHelper.getTwitterStreamConnection(getOwner());
+    m_FlowContext = value;
+    m_Count       = 0;
+    m_Twitter     = TwitterHelper.getTwitterStreamConnection(getFlowContext());
   }
 
   /**
-   * Returns the owner.
+   * Returns the flow context.
    *
-   * @return		the owner
+   * @return		the flow context
    */
-  public TwitterListener getOwner() {
-    return m_Owner;
-  }
-
-  /**
-   * Returns a quick info about the object, which can be displayed in the GUI.
-   * <br>
-   * Default implementation returns null.
-   *
-   * @return		null if no info available, otherwise short string
-   */
-  public String getQuickInfo() {
-    return null;
+  public Actor getFlowContext() {
+    return m_FlowContext;
   }
 
   /**
@@ -229,7 +275,7 @@ public abstract class AbstractListener
     // only increment counter when the status update was actually used
     if (result != null) {
       m_Count++;
-      if (getOwner().isLoggingEnabled() && (m_Count % 100 == 0))
+      if (getFlowContext().isLoggingEnabled() && (m_Count % 100 == 0))
 	getLogger().info("status updates: " + m_Count);
     }
 

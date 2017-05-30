@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2017-05-30 23:15:27
+# Date: 2017-05-31 10:54:22
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Example flow for listening to a user tweet stream.\\nRequires actual twitter user credentials to work." -flow-execution-listener adams.flow.execution.NullListener
@@ -7,7 +7,7 @@ adams.flow.control.Flow -annotation "Example flow for listening to a user tweet 
   adams.flow.sink.Display -name Full -writer adams.data.io.output.NullWriter
   adams.flow.sink.Display -name "Only Reuters" -writer adams.data.io.output.NullWriter
  adams.flow.standalone.TwitterConnection
- adams.flow.source.TwitterListener -max-updates 1000 -listener "adams.flow.source.twitterlistener.UserListener -user Reuters"
+ adams.flow.source.TwitterListener -listener "adams.flow.source.twitterlistener.UserListener -max-updates 1000 -user Reuters"
  adams.flow.control.Tee -name "only tweets from @Reuters"
   adams.flow.transformer.TwitterFilter -annotation "we only want tweets originating from @Reuters, not retweets" -expression "screenname = \"reuters\""
   adams.flow.transformer.TwitterConverter -converter "adams.data.twitter.TextConverter -field CREATED -field USER_SCREENNAME -field USER_NAME -field TEXT -separator \\t"

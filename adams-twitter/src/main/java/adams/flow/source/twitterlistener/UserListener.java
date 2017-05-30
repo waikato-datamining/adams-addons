@@ -77,7 +77,12 @@ public class UserListener
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "user", (m_User.isEmpty() ? "not set" : m_User));
+    String	result;
+
+    result  = super.getQuickInfo();
+    result += QuickInfoHelper.toString(this, "user", (m_User.isEmpty() ? "not set" : m_User), ", user: ");
+
+    return result;
   }
 
   /**
@@ -123,7 +128,7 @@ public class UserListener
 	name = name.substring(1);
       if (name.isEmpty())
 	throw new IllegalStateException("No screen name provided!");
-      user = TwitterHelper.getTwitterConnection(getOwner()).users().showUser(name);
+      user = TwitterHelper.getTwitterConnection(getFlowContext()).users().showUser(name);
       if (user == null)
 	throw new IllegalStateException("Failed to retrieve user data for name: " + name);
       getLogger().info("Following tweets from user: " + name + "/" + user.getId());
@@ -262,7 +267,7 @@ public class UserListener
   @Override
   public void onStatus(Status status) {
     if (m_Listening && !m_Paused) {
-      if ((getOwner().getMaxStatusUpdates() > 0) && (m_Count >= getOwner().getMaxStatusUpdates()))
+      if ((getMaxStatusUpdates() > 0) && (m_Count >= getMaxStatusUpdates()))
 	stopExecution();
       else
 	m_Next = status;

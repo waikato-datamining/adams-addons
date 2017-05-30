@@ -97,9 +97,6 @@ public class TwitterListener
   /** for serialization. */
   private static final long serialVersionUID = -7777610085728160967L;
 
-  /** the maximum number of status updates to output. */
-  protected int m_MaxStatusUpdates;
-
   /** the listener for retrieving the status updates. */
   protected AbstractListener m_Listener;
 
@@ -124,10 +121,6 @@ public class TwitterListener
     super.defineOptions();
 
     m_OptionManager.add(
-            "max-updates", "maxStatusUpdates",
-            100, -1, null);
-
-    m_OptionManager.add(
             "listener", "listener",
             new SampleListener());
   }
@@ -139,12 +132,7 @@ public class TwitterListener
    */
   @Override
   public String getQuickInfo() {
-    String	result;
-
-    result = QuickInfoHelper.toString(this, "maxStatusUpdates", ((m_MaxStatusUpdates <= 0) ? "unlimited " : "" + m_MaxStatusUpdates) + " status updates");
-    result += QuickInfoHelper.toString(this, "listener", m_Listener, ", listener: ");
-
-    return result;
+    return QuickInfoHelper.toString(this, "listener", m_Listener, "listener: ");
   }
 
   /**
@@ -154,35 +142,6 @@ public class TwitterListener
    */
   public Class[] generates() {
     return new Class[]{Status.class};
-  }
-
-  /**
-   * Sets the maximum number of status updates to output.
-   *
-   * @param value	the maximum number
-   */
-  public void setMaxStatusUpdates(int value) {
-    m_MaxStatusUpdates = value;
-    reset();
-  }
-
-  /**
-   * Returns the maximum number of status updates to output.
-   *
-   * @return		the maximum number
-   */
-  public int getMaxStatusUpdates() {
-    return m_MaxStatusUpdates;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String maxStatusUpdatesTipText() {
-    return "The maximum number of status updates to output; use <=0 for unlimited.";
   }
 
   /**
@@ -229,7 +188,7 @@ public class TwitterListener
       if (m_ActualListener != null)
         m_ActualListener.stopExecution();
       m_ActualListener = (AbstractListener) OptionUtils.shallowCopy(m_Listener);
-      m_ActualListener.setOwner(this);
+      m_ActualListener.setFlowContext(this);
     }
 
     return result;
