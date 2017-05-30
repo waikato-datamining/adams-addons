@@ -21,6 +21,7 @@
 package adams.flow.source.twitterlistener;
 
 import adams.core.Pausable;
+import adams.core.QuickInfoSupporter;
 import adams.core.Stoppable;
 import adams.core.logging.Logger;
 import adams.core.net.TwitterHelper;
@@ -41,7 +42,7 @@ import java.util.logging.Level;
  */
 public abstract class AbstractListener
   extends AbstractOptionHandler
-  implements Pausable, Stoppable, StatusListener {
+  implements Pausable, Stoppable, StatusListener, QuickInfoSupporter {
 
   private static final long serialVersionUID = 5406360301457780558L;
 
@@ -108,6 +109,17 @@ public abstract class AbstractListener
    */
   public TwitterListener getOwner() {
     return m_Owner;
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   * <br>
+   * Default implementation returns null.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  public String getQuickInfo() {
+    return null;
   }
 
   /**
