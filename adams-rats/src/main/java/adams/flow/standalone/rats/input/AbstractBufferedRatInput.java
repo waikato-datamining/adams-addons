@@ -197,6 +197,9 @@ public abstract class AbstractBufferedRatInput
     }
   }
 
+  /**
+   * Cleans up data structures, frees up memory.
+   */
   @Override
   public void cleanUp() {
     m_Buffer.clear();
