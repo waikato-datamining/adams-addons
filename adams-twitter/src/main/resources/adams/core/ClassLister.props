@@ -14,3 +14,7 @@ adams.data.twitter.AbstractTwitterStatusConverter=\
 # the tweet replayers
 adams.data.io.input.AbstractTweetReplay=\
   adams.data.io.input
+
+# the stream listeners
+adams.flow.source.twitterlistener.AbstractListener=\
+  adams.flow.source.twitterlistener
