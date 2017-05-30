@@ -15,7 +15,7 @@
 
 /*
  * SimulatedUser.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.twitter;
@@ -192,6 +192,9 @@ public class SimulatedUser
   /** whether it is the default profile. */
   protected boolean m_DefaultProfile;
 
+  /** the email. */
+  protected String m_Email;
+
   /**
    * Initializes the members.
    */
@@ -249,6 +252,7 @@ public class SimulatedUser
     m_Verified                       = false;
     m_DefaultProfileImage            = false;
     m_DefaultProfile                 = false;
+    m_Email                          = null;
   }
 
   /**
@@ -553,6 +557,25 @@ public class SimulatedUser
    */
   public void setName(String value) {
     m_Name = value;
+  }
+
+  /**
+   * Returns the email of the user.
+   *
+   * @return		the email
+   */
+  @Override
+  public String getEmail() {
+    return m_Email;
+  }
+
+  /**
+   * Sets the email.
+   *
+   * @param value	the email
+   */
+  public void setEmail(String value) {
+    m_Email = value;
   }
 
   /**

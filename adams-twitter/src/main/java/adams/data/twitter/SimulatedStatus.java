@@ -15,11 +15,10 @@
 
 /**
  * SimulatedStatus.java
- * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.twitter;
 
-import twitter4j.ExtendedMediaEntity;
 import twitter4j.GeoLocation;
 import twitter4j.HashtagEntity;
 import twitter4j.MediaEntity;
@@ -275,11 +274,6 @@ public class SimulatedStatus
     return m_MediaEntity;
   }
 
-  @Override
-  public ExtendedMediaEntity[] getExtendedMediaEntities() {
-    return new ExtendedMediaEntity[0];
-  }
-
   /**
    * Sets the created_at
    *
@@ -335,6 +329,16 @@ public class SimulatedStatus
   @Override
   public String getText() {
     return m_Text;
+  }
+
+  @Override
+  public int getDisplayTextRangeStart() {
+    return 0;
+  }
+
+  @Override
+  public int getDisplayTextRangeEnd() {
+    return 0;
   }
 
   /**
