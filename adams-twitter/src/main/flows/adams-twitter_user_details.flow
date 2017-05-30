@@ -1,0 +1,11 @@
+# Project: adams
+# Date: 2017-05-30 13:38:29
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Outputs information abou the ADAMS twitter account.\\nRequires actual twitter user credentials to work." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.TwitterConnection
+ adams.flow.source.StringConstants -string TheAdamsFlow -conversion adams.data.conversion.StringToString
+ adams.flow.transformer.TwitterUser
+ adams.flow.transformer.Convert -conversion adams.data.conversion.MapToSpreadSheet
+ adams.flow.transformer.SpreadSheetSort -no-copy true
+ adams.flow.sink.SpreadSheetDisplay -writer adams.data.io.output.NullWriter
