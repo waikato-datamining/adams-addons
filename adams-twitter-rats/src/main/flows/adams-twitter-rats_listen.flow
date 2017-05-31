@@ -1,0 +1,15 @@
+# Project: adams
+# Date: 2017-05-31 11:47:52
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Uses a Rat actor to listen for tweets from @Reuters and displays them." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.TwitterConnection
+ adams.flow.standalone.Rats
+  adams.flow.standalone.Rat -receiver "adams.flow.standalone.rats.input.TwitterListener -listener \"adams.flow.source.twitterlistener.UserListener -max-updates -1 -user Reuters\"" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display"
+   adams.flow.transformer.TwitterConverter -converter "adams.data.twitter.TextConverter -field CREATED -field USER_NAME -field TEXT -separator \\t"
+ adams.flow.source.Start
+ adams.flow.control.WhileLoop -condition adams.flow.condition.bool.True
+  adams.flow.source.Start
+  adams.flow.control.Sleep
