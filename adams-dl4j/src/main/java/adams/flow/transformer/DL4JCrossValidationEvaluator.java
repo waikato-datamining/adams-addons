@@ -30,16 +30,20 @@ import adams.flow.provenance.ProvenanceContainer;
 import adams.flow.provenance.ProvenanceInformation;
 import adams.flow.provenance.ProvenanceSupporter;
 import adams.ml.dl4j.datasetiterator.ShufflingDataSetIterator;
+import adams.ml.dl4j.iterationlistener.IterationListenerConfigurator;
+import adams.ml.dl4j.iterationlistener.NullListener;
 import adams.ml.dl4j.model.ModelConfigurator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.eval.RegressionEvaluation;
 import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.optimize.api.IterationListener;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.KFoldIterator;
 import org.nd4j.linalg.factory.Nd4j;
 
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -150,6 +154,9 @@ public class DL4JCrossValidationEvaluator
   /** the evaluation type. */
   protected DL4JEvaluationType m_Type;
 
+  /** the iteration listener to use. */
+  protected IterationListenerConfigurator m_IterationListener;
+
   /**
    * Returns a string describing the object.
    *
@@ -185,6 +192,10 @@ public class DL4JCrossValidationEvaluator
     m_OptionManager.add(
       "type", "type",
       DL4JEvaluationType.CLASSIFICATION);
+
+    m_OptionManager.add(
+      "iteration-listener", "iterationListener",
+      new NullListener());
   }
 
   /**
@@ -335,6 +346,35 @@ public class DL4JCrossValidationEvaluator
   }
 
   /**
+   * Sets the iteration listener to use.
+   *
+   * @param value	the configurator
+   */
+  public void setIterationListener(IterationListenerConfigurator value) {
+    m_IterationListener = value;
+    reset();
+  }
+
+  /**
+   * Returns the iteration listener to use.
+   *
+   * @return		the configurator
+   */
+  public IterationListenerConfigurator getIterationListener() {
+    return m_IterationListener;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String iterationListenerTipText() {
+    return "The iteration listener to use (configurator).";
+  }
+
+  /**
    * Returns the class that the consumer accepts.
    *
    * @return		<!-- flow-accepts-start -->org.nd4j.linalg.dataset.DataSet.class<!-- flow-accepts-end -->
@@ -360,6 +400,7 @@ public class DL4JCrossValidationEvaluator
     RegressionEvaluation	evalReg;
     KFoldIterator		iter;
     ShufflingDataSetIterator 	shuffle;
+    List<IterationListener> 	listeners;
 
     result = null;
 
@@ -387,6 +428,8 @@ public class DL4JCrossValidationEvaluator
 	      train = iter.next();
 	      test  = iter.testFold();
 	      model = conf.configureModel(data.numInputs(), data.numOutcomes());
+	      listeners = m_IterationListener.configureIterationListeners();
+	      ((MultiLayerNetwork) model).setListeners(listeners);
 	      if (m_MiniBatchSize < 1) {
 		((MultiLayerNetwork) model).fit(train);
 	      }

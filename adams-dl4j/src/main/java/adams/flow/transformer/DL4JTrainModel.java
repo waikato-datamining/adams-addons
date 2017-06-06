@@ -34,13 +34,17 @@ import adams.flow.provenance.ProvenanceInformation;
 import adams.flow.provenance.ProvenanceSupporter;
 import adams.flow.source.DL4JModelConfigurator;
 import adams.ml.dl4j.datasetiterator.ShufflingDataSetIterator;
+import adams.ml.dl4j.iterationlistener.IterationListenerConfigurator;
+import adams.ml.dl4j.iterationlistener.NullListener;
 import adams.ml.dl4j.model.ModelConfigurator;
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.optimize.api.IterationListener;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.nd4j.linalg.dataset.DataSet;
 
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -138,6 +142,9 @@ public class DL4JTrainModel
   /** the seed value. */
   protected long m_Seed;
 
+  /** the iteration listener to use. */
+  protected IterationListenerConfigurator m_IterationListener;
+
   /**
    * Returns a string describing the object.
    *
@@ -168,6 +175,10 @@ public class DL4JTrainModel
     m_OptionManager.add(
       "seed", "seed",
       1L);
+
+    m_OptionManager.add(
+      "iteration-listener", "iterationListener",
+      new NullListener());
   }
 
   /**
@@ -255,6 +266,35 @@ public class DL4JTrainModel
    */
   public String seedTipText() {
     return "The seed value to use for randomization.";
+  }
+
+  /**
+   * Sets the iteration listener to use.
+   *
+   * @param value	the configurator
+   */
+  public void setIterationListener(IterationListenerConfigurator value) {
+    m_IterationListener = value;
+    reset();
+  }
+
+  /**
+   * Returns the iteration listener to use.
+   *
+   * @return		the configurator
+   */
+  public IterationListenerConfigurator getIterationListener() {
+    return m_IterationListener;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String iterationListenerTipText() {
+    return "The iteration listener to use (configurator).";
   }
 
   /**
@@ -373,6 +413,7 @@ public class DL4JTrainModel
     DataSet			data;
     ModelConfigurator		conf;
     ShufflingDataSetIterator 	iter;
+    List<IterationListener> 	listeners;
 
     result = null;
 
@@ -386,6 +427,8 @@ public class DL4JTrainModel
       }
       if (result == null) {
 	if (m_ActualModel instanceof MultiLayerNetwork) {
+	  listeners = m_IterationListener.configureIterationListeners();
+	  ((MultiLayerNetwork) m_ActualModel).setListeners(listeners);
 	  ((MultiLayerNetwork) m_ActualModel).init();
 	  if (isLoggingEnabled()) {
 	    ((MultiLayerNetwork) m_ActualModel).setListeners(new ScoreIterationListener() {

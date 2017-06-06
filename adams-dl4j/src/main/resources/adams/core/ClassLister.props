@@ -75,3 +75,7 @@ org.datavec.api.split.InputSplit=\
 # the input splitter configurators
 adams.ml.dl4j.inputsplit.InputSplitConfigurator=\
   adams.ml.dl4j.inputsplit
+
+# the input iterationlistener configurators
+adams.ml.dl4j.iterationlistener.IterationListenerConfigurator=\
+  adams.ml.dl4j.iterationlistener
