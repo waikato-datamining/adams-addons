@@ -109,6 +109,12 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: DL4JModelConfigurator
  * </pre>
  * 
+ * <pre>-num-epochs &lt;int&gt; (property: numEpochs)
+ * &nbsp;&nbsp;&nbsp;The number of epochs to perform.
+ * &nbsp;&nbsp;&nbsp;default: 1000
+ * &nbsp;&nbsp;&nbsp;minimum: 1
+ * </pre>
+ * 
  * <pre>-mini-batch-size &lt;int&gt; (property: miniBatchSize)
  * &nbsp;&nbsp;&nbsp;The mini-batch size to use; -1 to turn off.
  * &nbsp;&nbsp;&nbsp;default: -1
@@ -125,6 +131,11 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: CLASSIFICATION
  * </pre>
  * 
+ * <pre>-iteration-listener &lt;adams.ml.dl4j.iterationlistener.IterationListenerConfigurator&gt; (property: iterationListener)
+ * &nbsp;&nbsp;&nbsp;The iteration listener to use (configurator).
+ * &nbsp;&nbsp;&nbsp;default: adams.ml.dl4j.iterationlistener.NullListener
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -136,6 +147,9 @@ public class DL4JTrainTestSetEvaluator
 
   /** for serialization. */
   private static final long serialVersionUID = -1092101024095887007L;
+
+  /** the number of epochs. */
+  protected int m_NumEpochs;
 
   /** the minibatch size. */
   protected int m_MiniBatchSize;
@@ -158,9 +172,9 @@ public class DL4JTrainTestSetEvaluator
   public String globalInfo() {
     return
       "Trains a model on an incoming training dataset (from a container) "
-        + "and then evaluates it on the test set (also from a container).\n"
-        + "The model setup being used in the evaluation is obtained from the "
-        + "callable actor returning a model configurator.";
+	+ "and then evaluates it on the test set (also from a container).\n"
+	+ "The model setup being used in the evaluation is obtained from the "
+	+ "callable actor returning a model configurator.";
   }
 
   /**
@@ -169,6 +183,10 @@ public class DL4JTrainTestSetEvaluator
   @Override
   public void defineOptions() {
     super.defineOptions();
+
+    m_OptionManager.add(
+      "num-epochs", "numEpochs",
+      1000, 1, null);
 
     m_OptionManager.add(
       "mini-batch-size", "miniBatchSize",
@@ -196,6 +214,35 @@ public class DL4JTrainTestSetEvaluator
   @Override
   public String modelTipText() {
     return "The callable model configurator actor to obtain the model from to train and evaluate on the test data.";
+  }
+
+  /**
+   * Sets the number of epochs.
+   *
+   * @param value	the epochs
+   */
+  public void setNumEpochs(int value) {
+    m_NumEpochs = value;
+    reset();
+  }
+
+  /**
+   * Returns the number of epochs.
+   *
+   * @return  		the epochs
+   */
+  public int getNumEpochs() {
+    return m_NumEpochs;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String numEpochsTipText() {
+    return "The number of epochs to perform.";
   }
 
   /**
@@ -355,6 +402,7 @@ public class DL4JTrainTestSetEvaluator
     DL4JTrainTestSetContainer	cont;
     ShufflingDataSetIterator	iter;
     List<IterationListener> 	listeners;
+    int				i;
 
     result = null;
 
@@ -372,13 +420,17 @@ public class DL4JTrainTestSetEvaluator
       if (model instanceof MultiLayerNetwork) {
 	listeners = m_IterationListener.configureIterationListeners();
 	((MultiLayerNetwork) model).setListeners(listeners);
-	if (m_MiniBatchSize < 1) {
-	  ((MultiLayerNetwork) model).fit(train);
-	}
-	else {
-	  iter = new ShufflingDataSetIterator(train, m_MiniBatchSize, (int) m_Seed);
-	  while (iter.hasNext() && !isStopped())
-	    ((MultiLayerNetwork) model).fit(iter.next());
+	for (i = 0; i < m_NumEpochs; i++) {
+	  if (m_MiniBatchSize < 1) {
+	    ((MultiLayerNetwork) model).fit(train);
+	  }
+	  else {
+	    iter = new ShufflingDataSetIterator(train, m_MiniBatchSize, (int) m_Seed);
+	    while (iter.hasNext() && !isStopped())
+	      ((MultiLayerNetwork) model).fit(iter.next());
+	  }
+	  if (isStopped())
+	    break;
 	}
       }
       else {

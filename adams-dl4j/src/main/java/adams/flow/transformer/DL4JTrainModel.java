@@ -104,6 +104,12 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: DL4JModelConfigurator
  * </pre>
  * 
+ * <pre>-num-epochs &lt;int&gt; (property: numEpochs)
+ * &nbsp;&nbsp;&nbsp;The number of epochs to perform.
+ * &nbsp;&nbsp;&nbsp;default: 1000
+ * &nbsp;&nbsp;&nbsp;minimum: 1
+ * </pre>
+ * 
  * <pre>-mini-batch-size &lt;int&gt; (property: miniBatchSize)
  * &nbsp;&nbsp;&nbsp;The mini-batch size to use; -1 to turn off.
  * &nbsp;&nbsp;&nbsp;default: -1
@@ -113,6 +119,11 @@ import java.util.List;
  * <pre>-seed &lt;long&gt; (property: seed)
  * &nbsp;&nbsp;&nbsp;The seed value to use for randomization.
  * &nbsp;&nbsp;&nbsp;default: 1
+ * </pre>
+ * 
+ * <pre>-iteration-listener &lt;adams.ml.dl4j.iterationlistener.IterationListenerConfigurator&gt; (property: iterationListener)
+ * &nbsp;&nbsp;&nbsp;The iteration listener to use (configurator).
+ * &nbsp;&nbsp;&nbsp;default: adams.ml.dl4j.iterationlistener.NullListener
  * </pre>
  * 
  <!-- options-end -->
@@ -135,6 +146,9 @@ public class DL4JTrainModel
 
   /** the actual model. */
   protected Model m_ActualModel;
+
+  /** the number of epochs. */
+  protected int m_NumEpochs;
 
   /** the minibatch size. */
   protected int m_MiniBatchSize;
@@ -167,6 +181,10 @@ public class DL4JTrainModel
     m_OptionManager.add(
       "model", "model",
       new CallableActorReference(DL4JModelConfigurator.class.getSimpleName()));
+
+    m_OptionManager.add(
+      "num-epochs", "numEpochs",
+      1000, 1, null);
 
     m_OptionManager.add(
       "mini-batch-size", "miniBatchSize",
@@ -208,6 +226,35 @@ public class DL4JTrainModel
    */
   public String modelTipText() {
     return "The model to train on the input data.";
+  }
+
+  /**
+   * Sets the number of epochs.
+   *
+   * @param value	the epochs
+   */
+  public void setNumEpochs(int value) {
+    m_NumEpochs = value;
+    reset();
+  }
+
+  /**
+   * Returns the number of epochs.
+   *
+   * @return  		the epochs
+   */
+  public int getNumEpochs() {
+    return m_NumEpochs;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String numEpochsTipText() {
+    return "The number of epochs to perform.";
   }
 
   /**
@@ -414,6 +461,7 @@ public class DL4JTrainModel
     ModelConfigurator		conf;
     ShufflingDataSetIterator 	iter;
     List<IterationListener> 	listeners;
+    int				i;
 
     result = null;
 
@@ -442,13 +490,17 @@ public class DL4JTrainModel
 	      }
 	    });
 	  }
-	  if (m_MiniBatchSize < 1) {
-	    ((MultiLayerNetwork) m_ActualModel).fit(data);
-	  }
-	  else {
-	    iter = new ShufflingDataSetIterator(data, m_MiniBatchSize, (int) m_Seed);
-	    while (iter.hasNext())
-	      ((MultiLayerNetwork) m_ActualModel).fit(iter.next());
+	  for (i = 0; i < m_NumEpochs; i++) {
+	    if (m_MiniBatchSize < 1) {
+	      ((MultiLayerNetwork) m_ActualModel).fit(data);
+	    }
+	    else {
+	      iter = new ShufflingDataSetIterator(data, m_MiniBatchSize, (int) m_Seed);
+	      while (iter.hasNext())
+		((MultiLayerNetwork) m_ActualModel).fit(iter.next());
+	    }
+	    if (isStopped())
+	      break;
 	  }
 	}
 	else {

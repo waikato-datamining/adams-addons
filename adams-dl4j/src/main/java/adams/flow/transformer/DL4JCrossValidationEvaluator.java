@@ -119,6 +119,12 @@ import java.util.Random;
  * &nbsp;&nbsp;&nbsp;minimum: 2
  * </pre>
  * 
+ * <pre>-num-epochs &lt;int&gt; (property: numEpochs)
+ * &nbsp;&nbsp;&nbsp;The number of epochs to perform.
+ * &nbsp;&nbsp;&nbsp;default: 1000
+ * &nbsp;&nbsp;&nbsp;minimum: 1
+ * </pre>
+ * 
  * <pre>-mini-batch-size &lt;int&gt; (property: miniBatchSize)
  * &nbsp;&nbsp;&nbsp;The mini-batch size to use; -1 to turn off.
  * &nbsp;&nbsp;&nbsp;default: -1
@@ -128,6 +134,11 @@ import java.util.Random;
  * <pre>-type &lt;CLASSIFICATION|REGRESSION&gt; (property: type)
  * &nbsp;&nbsp;&nbsp;The type of evaluation to perform.
  * &nbsp;&nbsp;&nbsp;default: CLASSIFICATION
+ * </pre>
+ * 
+ * <pre>-iteration-listener &lt;adams.ml.dl4j.iterationlistener.IterationListenerConfigurator&gt; (property: iterationListener)
+ * &nbsp;&nbsp;&nbsp;The iteration listener to use (configurator).
+ * &nbsp;&nbsp;&nbsp;default: adams.ml.dl4j.iterationlistener.NullListener
  * </pre>
  * 
  <!-- options-end -->
@@ -148,6 +159,9 @@ public class DL4JCrossValidationEvaluator
   /** the number of folds to generate. */
   protected int m_Folds;
 
+  /** the number of epochs. */
+  protected int m_NumEpochs;
+
   /** the minibatch size. */
   protected int m_MiniBatchSize;
 
@@ -166,8 +180,8 @@ public class DL4JCrossValidationEvaluator
   public String globalInfo() {
     return
       "Cross-validates a model on the incoming dataset.\n"
-        + "The model setup being used in the evaluation is obtained from the "
-        + "callable actor returning a model configurator.";
+	+ "The model setup being used in the evaluation is obtained from the "
+	+ "callable actor returning a model configurator.";
   }
 
   /**
@@ -184,6 +198,10 @@ public class DL4JCrossValidationEvaluator
     m_OptionManager.add(
       "folds", "folds",
       10, 2, null);
+
+    m_OptionManager.add(
+      "num-epochs", "numEpochs",
+      1000, 1, null);
 
     m_OptionManager.add(
       "mini-batch-size", "miniBatchSize",
@@ -285,6 +303,35 @@ public class DL4JCrossValidationEvaluator
    */
   public String foldsTipText() {
     return "The folds to use.";
+  }
+
+  /**
+   * Sets the number of epochs.
+   *
+   * @param value	the epochs
+   */
+  public void setNumEpochs(int value) {
+    m_NumEpochs = value;
+    reset();
+  }
+
+  /**
+   * Returns the number of epochs.
+   *
+   * @return  		the epochs
+   */
+  public int getNumEpochs() {
+    return m_NumEpochs;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String numEpochsTipText() {
+    return "The number of epochs to perform.";
   }
 
   /**
@@ -401,6 +448,7 @@ public class DL4JCrossValidationEvaluator
     KFoldIterator		iter;
     ShufflingDataSetIterator 	shuffle;
     List<IterationListener> 	listeners;
+    int				i;
 
     result = null;
 
@@ -415,7 +463,7 @@ public class DL4JCrossValidationEvaluator
 	Nd4j.shuffle(data.getLabels(), new Random(m_Seed), 1);
 
       if (!(conf.configureModel(data.numInputs(), data.numOutcomes()) instanceof MultiLayerNetwork))
-        result = "Can only evaluate " + MultiLayerNetwork.class.getName() + "!";
+	result = "Can only evaluate " + MultiLayerNetwork.class.getName() + "!";
 
       evalCls = null;
       evalReg = null;
@@ -430,13 +478,17 @@ public class DL4JCrossValidationEvaluator
 	      model = conf.configureModel(data.numInputs(), data.numOutcomes());
 	      listeners = m_IterationListener.configureIterationListeners();
 	      ((MultiLayerNetwork) model).setListeners(listeners);
-	      if (m_MiniBatchSize < 1) {
-		((MultiLayerNetwork) model).fit(train);
-	      }
-	      else {
-		shuffle = new ShufflingDataSetIterator(train, m_MiniBatchSize, (int) m_Seed);
-		while (shuffle.hasNext() && !isStopped())
-		  ((MultiLayerNetwork) model).fit(shuffle.next());
+	      for (i = 0; i < m_NumEpochs; i++) {
+		if (m_MiniBatchSize < 1) {
+		  ((MultiLayerNetwork) model).fit(train);
+		}
+		else {
+		  shuffle = new ShufflingDataSetIterator(train, m_MiniBatchSize, (int) m_Seed);
+		  while (shuffle.hasNext() && !isStopped())
+		    ((MultiLayerNetwork) model).fit(shuffle.next());
+		}
+		if (isStopped())
+		  break;
 	      }
 	      evalCls.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
 	    }
@@ -449,13 +501,17 @@ public class DL4JCrossValidationEvaluator
 	      train = iter.next();
 	      test  = iter.testFold();
 	      model = conf.configureModel(data.numInputs(), data.numOutcomes());
-	      if (m_MiniBatchSize < 1) {
-		((MultiLayerNetwork) model).fit(train);
-	      }
-	      else {
-		shuffle = new ShufflingDataSetIterator(train, m_MiniBatchSize, (int) m_Seed);
-		while (shuffle.hasNext() && !isStopped())
-		  ((MultiLayerNetwork) model).fit(shuffle.next());
+	      for (i = 0; i < m_NumEpochs; i++) {
+		if (m_MiniBatchSize < 1) {
+		  ((MultiLayerNetwork) model).fit(train);
+		}
+		else {
+		  shuffle = new ShufflingDataSetIterator(train, m_MiniBatchSize, (int) m_Seed);
+		  while (shuffle.hasNext() && !isStopped())
+		    ((MultiLayerNetwork) model).fit(shuffle.next());
+		}
+		if (isStopped())
+		  break;
 	      }
 	      evalReg.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
 	    }
