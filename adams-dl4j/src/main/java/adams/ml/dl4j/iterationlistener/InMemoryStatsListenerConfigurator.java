@@ -31,9 +31,23 @@ import java.util.List;
 
 /**
  <!-- globalinfo-start -->
+ * Configures a statistics listener (using in-memory storage), which allows you to monitor the progress at:<br>
+ * http:&#47;&#47;localhost:9000&#47;train
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-frequency &lt;int&gt; (property: frequency)
+ * &nbsp;&nbsp;&nbsp;The update frequency.
+ * &nbsp;&nbsp;&nbsp;default: 1
+ * &nbsp;&nbsp;&nbsp;minimum: 1
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)

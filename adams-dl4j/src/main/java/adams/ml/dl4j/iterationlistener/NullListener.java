@@ -26,7 +26,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO: What class does.
+ <!-- globalinfo-start -->
+ * Doesn't return a iteration listener.
+ * <br><br>
+ <!-- globalinfo-end -->
+ *
+ <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
