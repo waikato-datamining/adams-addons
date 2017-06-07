@@ -424,7 +424,7 @@ public class DL4JCrossValidationEvaluator
 	  case CLASSIFICATION:
 	    evalCls = new Evaluation(data.numOutcomes());
 	    iter = new KFoldIterator(m_Folds, data);
-	    while (iter.hasNext() && !m_Stopped) {
+	    while (iter.hasNext() && !isStopped()) {
 	      train = iter.next();
 	      test  = iter.testFold();
 	      model = conf.configureModel(data.numInputs(), data.numOutcomes());
@@ -435,7 +435,7 @@ public class DL4JCrossValidationEvaluator
 	      }
 	      else {
 		shuffle = new ShufflingDataSetIterator(train, m_MiniBatchSize, (int) m_Seed);
-		while (shuffle.hasNext())
+		while (shuffle.hasNext() && !isStopped())
 		  ((MultiLayerNetwork) model).fit(shuffle.next());
 	      }
 	      evalCls.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
@@ -445,7 +445,7 @@ public class DL4JCrossValidationEvaluator
 	  case REGRESSION:
 	    evalReg = new RegressionEvaluation(data.numOutcomes());
 	    iter = new KFoldIterator(m_Folds, data);
-	    while (iter.hasNext() && !m_Stopped) {
+	    while (iter.hasNext() && !isStopped()) {
 	      train = iter.next();
 	      test  = iter.testFold();
 	      model = conf.configureModel(data.numInputs(), data.numOutcomes());
@@ -454,7 +454,7 @@ public class DL4JCrossValidationEvaluator
 	      }
 	      else {
 		shuffle = new ShufflingDataSetIterator(train, m_MiniBatchSize, (int) m_Seed);
-		while (shuffle.hasNext())
+		while (shuffle.hasNext() && !isStopped())
 		  ((MultiLayerNetwork) model).fit(shuffle.next());
 	      }
 	      evalReg.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
@@ -464,7 +464,7 @@ public class DL4JCrossValidationEvaluator
 	  default:
 	    throw new IllegalStateException("Unhandled evaluation type: " + m_Type);
 	}
-	if (m_Stopped) {
+	if (isStopped()) {
 	  evalCls = null;
 	  evalReg = null;
 	}

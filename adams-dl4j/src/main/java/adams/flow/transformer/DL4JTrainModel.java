@@ -457,11 +457,12 @@ public class DL4JTrainModel
 	  }
 	  else {
 	    iter = new ShufflingDataSetIterator(data, m_MiniBatchSize, (int) m_Seed);
-	    while (iter.hasNext())
+	    while (iter.hasNext() && !isStopped())
 	      m_ActualModel.fit(iter.next().getFeatureMatrix());
 	  }
 	}
-	m_OutputToken = new Token(new DL4JModelContainer(m_ActualModel, data));
+	if (!isStopped())
+	  m_OutputToken = new Token(new DL4JModelContainer(m_ActualModel, data));
       }
     }
     catch (Exception e) {

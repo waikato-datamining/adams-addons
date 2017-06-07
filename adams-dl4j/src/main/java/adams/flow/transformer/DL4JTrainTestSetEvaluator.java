@@ -377,14 +377,14 @@ public class DL4JTrainTestSetEvaluator
 	}
 	else {
 	  iter = new ShufflingDataSetIterator(train, m_MiniBatchSize, (int) m_Seed);
-	  while (iter.hasNext())
+	  while (iter.hasNext() && !isStopped())
 	    ((MultiLayerNetwork) model).fit(iter.next());
 	}
       }
       else {
 	result = "Can only evaluate " + MultiLayerNetwork.class.getName() + "!";
       }
-      if (result == null) {
+      if ((result == null) && !isStopped()) {
 	switch (m_Type) {
 	  case CLASSIFICATION:
 	    evalCls = new Evaluation(train.numOutcomes());

@@ -1452,7 +1452,7 @@ public class Rat
   protected synchronized void stopIfNecessary() {
     if (m_Stopping)
       return;
-    if (!m_Stopped) {
+    if (!isStopped()) {
       m_Stopping = true;
       m_Actors.stopExecution();
       stopRunnable();
