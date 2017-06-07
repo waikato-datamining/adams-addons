@@ -45,66 +45,66 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- * 
+ *
  * <pre>-num-iterations &lt;int&gt; (property: numIterations)
  * &nbsp;&nbsp;&nbsp;The number of iterations to perform.
  * &nbsp;&nbsp;&nbsp;default: 1
  * &nbsp;&nbsp;&nbsp;minimum: 1
  * </pre>
- * 
+ *
  * <pre>-learning-rate &lt;double&gt; (property: learningRate)
  * &nbsp;&nbsp;&nbsp;The learning rate to use.
  * &nbsp;&nbsp;&nbsp;default: 0.0015
  * &nbsp;&nbsp;&nbsp;minimum: 0.0
  * </pre>
- * 
+ *
  * <pre>-momentum &lt;double&gt; (property: momentum)
  * &nbsp;&nbsp;&nbsp;The momentum to use.
  * &nbsp;&nbsp;&nbsp;default: 0.9
  * &nbsp;&nbsp;&nbsp;minimum: 0.0
  * </pre>
- * 
+ *
  * <pre>-seed &lt;long&gt; (property: seed)
  * &nbsp;&nbsp;&nbsp;The seed value for the weight initialization.
  * &nbsp;&nbsp;&nbsp;default: 140
  * </pre>
- * 
+ *
  * <pre>-hidden-nodes &lt;int&gt; (property: hiddenNodes)
  * &nbsp;&nbsp;&nbsp;The number of hidden nodes.
  * &nbsp;&nbsp;&nbsp;default: 10
  * &nbsp;&nbsp;&nbsp;minimum: 1
  * </pre>
- * 
+ *
  * <pre>-activation &lt;CUBE|ELU|HARDSIGMOID|HARDTANH|IDENTITY|LEAKYRELU|RELU|RRELU|SIGMOID|SOFTMAX|SOFTPLUS|SOFTSIGN|TANH&gt; (property: activation)
  * &nbsp;&nbsp;&nbsp;The activation to use.
  * &nbsp;&nbsp;&nbsp;default: TANH
  * </pre>
- * 
+ *
  * <pre>-output-activation &lt;CUBE|ELU|HARDSIGMOID|HARDTANH|IDENTITY|LEAKYRELU|RELU|RRELU|SIGMOID|SOFTMAX|SOFTPLUS|SOFTSIGN|TANH&gt; (property: outputActivation)
  * &nbsp;&nbsp;&nbsp;The activation to use for the output layer.
  * &nbsp;&nbsp;&nbsp;default: IDENTITY
  * </pre>
- * 
+ *
  * <pre>-weight-init &lt;DISTRIBUTION|ZERO|SIGMOID_UNIFORM|UNIFORM|XAVIER|XAVIER_UNIFORM|XAVIER_FAN_IN|XAVIER_LEGACY|RELU|RELU_UNIFORM|VI|SIZE|NORMALIZED&gt; (property: weightInit)
  * &nbsp;&nbsp;&nbsp;The weight init to use.
  * &nbsp;&nbsp;&nbsp;default: XAVIER
  * </pre>
- * 
+ *
  * <pre>-optimization-algorithm &lt;LINE_GRADIENT_DESCENT|CONJUGATE_GRADIENT|HESSIAN_FREE|LBFGS|STOCHASTIC_GRADIENT_DESCENT&gt; (property: optimizationAlgorithm)
  * &nbsp;&nbsp;&nbsp;The optimization algorithm to use.
  * &nbsp;&nbsp;&nbsp;default: STOCHASTIC_GRADIENT_DESCENT
  * </pre>
- * 
+ *
  * <pre>-updater &lt;SGD|ADAM|ADADELTA|NESTEROVS|ADAGRAD|RMSPROP|NONE|CUSTOM&gt; (property: updater)
  * &nbsp;&nbsp;&nbsp;The updater to use.
  * &nbsp;&nbsp;&nbsp;default: NESTEROVS
  * </pre>
- * 
+ *
  * <pre>-loss-function &lt;MSE|L1|EXPLL|XENT|MCXENT|RMSE_XENT|SQUARED_LOSS|RECONSTRUCTION_CROSSENTROPY|NEGATIVELOGLIKELIHOOD|CUSTOM|COSINE_PROXIMITY|HINGE|SQUARED_HINGE|KL_DIVERGENCE|MEAN_ABSOLUTE_ERROR|L2|MEAN_ABSOLUTE_PERCENTAGE_ERROR|MEAN_SQUARED_LOGARITHMIC_ERROR|POISSON&gt; (property: lossFunction)
  * &nbsp;&nbsp;&nbsp;The loss function to use.
  * &nbsp;&nbsp;&nbsp;default: MSE
  * </pre>
- * 
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -552,13 +552,33 @@ public class SimpleRegressionMultiLayerNetwork
       .seed(m_Seed)
       .optimizationAlgo(m_OptimizationAlgorithm)
       .iterations(m_NumIterations)
-      .weightInit(m_WeightInit)
-      .updater(m_Updater)
-      .momentum(m_Momentum)
-      .learningRate(m_LearningRate)
       .list()
-      .layer(0, new DenseLayer.Builder().activation(m_Activation).nIn(numInput).nOut(m_HiddenNodes).build())
-      .layer(1, new OutputLayer.Builder(m_LossFunction).activation(m_OutputActivation).nIn(m_HiddenNodes).nOut(1).build())
+      .layer(
+	0,
+	new DenseLayer.Builder()
+	  .nIn(numInput)
+	  .nOut(m_HiddenNodes)
+	  .biasLearningRate(0.01)
+	  .epsilon(0.000001)
+	  .activation(m_Activation)
+	  .momentum(m_Momentum)
+	  .learningRate(m_LearningRate)
+	  .weightInit(m_WeightInit)
+	  .updater(m_Updater)
+	  .build())
+      .layer(
+	1,
+	new OutputLayer.Builder(m_LossFunction)
+	  .nIn(m_HiddenNodes)
+	  .nOut(1)
+	  .biasLearningRate(0.01)
+	  .epsilon(0.000001)
+	  .activation(m_OutputActivation)
+	  .momentum(m_Momentum)
+	  .learningRate(m_LearningRate)
+	  .weightInit(m_WeightInit)
+	  .updater(m_Updater)
+	  .build())
       .build();
 
     return new MultiLayerNetwork(conf);
