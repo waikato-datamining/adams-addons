@@ -27,7 +27,9 @@ import adams.ml.dl4j.datasetiterator.DataSetIteratorWithScriptedConfiguration;
 import adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorConfigurator;
 import adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorWithScriptedConfiguration;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -304,15 +306,23 @@ public class DL4JDatasetIterator
    */
   @Override
   protected String doExecute() {
-    String	result;
+    String		result;
+    DataSetPreProcessor	preprocessor;
 
     result = null;
 
     m_ActualIterator = m_Iterator.configureDataSetIterator();
-    if (m_UsePreProcessor)
-      m_ActualIterator.setPreProcessor(m_PreProcessor.configureDataSetPreProcessor());
-    if (m_ActualIterator == null)
+    if (m_ActualIterator == null) {
       result = "Failed to configure dataset iterator!";
+    }
+    else {
+      if (m_UsePreProcessor) {
+	preprocessor = m_PreProcessor.configureDataSetPreProcessor();
+	if (preprocessor instanceof DataNormalization)
+	  ((DataNormalization) preprocessor).fit(m_ActualIterator);
+	m_ActualIterator.setPreProcessor(preprocessor);
+      }
+    }
 
     return result;
   }
