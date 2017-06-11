@@ -1,1 +1,1 @@
-type: CLASSIFICATION, minibatch: -1
+type: CLASSIFICATION, epochs: 1000, minibatch: -1

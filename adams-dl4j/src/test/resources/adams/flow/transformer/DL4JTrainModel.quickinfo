@@ -1,1 +1,1 @@
-model: DL4JModelConfigurator, minibatch: -1
+model: DL4JModelConfigurator, epochs: 1000, minibatch: -1
