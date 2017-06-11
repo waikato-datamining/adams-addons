@@ -156,7 +156,7 @@ public class AnimalsLeNet
 
     m_OptionManager.add(
       "num-iterations", "numIterations",
-      1000, 1, null);
+      1, 1, null);
 
     m_OptionManager.add(
       "learning-rate", "learningRate",
