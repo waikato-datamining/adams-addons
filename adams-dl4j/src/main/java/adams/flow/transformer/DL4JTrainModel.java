@@ -126,7 +126,7 @@ import java.util.List;
  * </pre>
  * 
  * <pre>-output-interval &lt;int&gt; (property: outputInterval)
- * &nbsp;&nbsp;&nbsp;The interval (of epochs) to output the model (usee &lt;1 to turn off).
+ * &nbsp;&nbsp;&nbsp;The interval (of epochs) to output the model (use &lt;1 to turn off).
  * &nbsp;&nbsp;&nbsp;default: -1
  * &nbsp;&nbsp;&nbsp;minimum: -1
  * </pre>
@@ -394,7 +394,7 @@ public class DL4JTrainModel
    * 			displaying in the GUI or for listing the options.
    */
   public String outputIntervalTipText() {
-    return "The interval (of epochs) to output the model (usee <1 to turn off).";
+    return "The interval (of epochs) to output the model (use <1 to turn off).";
   }
 
   /**
