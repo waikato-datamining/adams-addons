@@ -371,6 +371,7 @@ public class DL4JTrainTestSetEvaluator
     String	result;
 
     result  = QuickInfoHelper.toString(this, "type", m_Type, "type: ");
+    result += QuickInfoHelper.toString(this, "numEpochs", m_NumEpochs, ", epochs: ");
     result += QuickInfoHelper.toString(this, "miniBatchSize", m_MiniBatchSize, ", minibatch: ");
 
     return result;

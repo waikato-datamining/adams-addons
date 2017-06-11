@@ -354,6 +354,7 @@ public class DL4JTrainModel
     String	result;
 
     result  = QuickInfoHelper.toString(this, "model", m_Model, "model: ");
+    result += QuickInfoHelper.toString(this, "numEpochs", m_NumEpochs, ", epochs: ");
     result += QuickInfoHelper.toString(this, "miniBatchSize", m_MiniBatchSize, ", minibatch: ");
 
     return result;
