@@ -39,7 +39,6 @@ import adams.ml.dl4j.model.ModelConfigurator;
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.optimize.api.IterationListener;
-import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.nd4j.linalg.dataset.DataSet;
 
 import java.util.ArrayList;
@@ -126,6 +125,12 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
  * 
+ * <pre>-output-interval &lt;int&gt; (property: outputInterval)
+ * &nbsp;&nbsp;&nbsp;The interval (of epochs) to output the model (usee &lt;1 to turn off).
+ * &nbsp;&nbsp;&nbsp;default: -1
+ * &nbsp;&nbsp;&nbsp;minimum: -1
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -140,6 +145,12 @@ public class DL4JTrainModel
 
   /** the key for storing the current model in the backup. */
   public final static String BACKUP_MODEL = "model";
+
+  /** the key for storing the current epoch in the backup. */
+  public final static String BACKUP_EPOCH = "epoch";
+
+  /** the key for storing the current training data in the backup. */
+  public final static String BACKUP_TRAINDATA = "traindata";
 
   /** the name of the callable model. */
   protected CallableActorReference m_Model;
@@ -158,6 +169,15 @@ public class DL4JTrainModel
 
   /** the iteration listeners to use. */
   protected IterationListenerConfigurator[] m_IterationListeners;
+
+  /** output the model every number of epochs. */
+  protected int m_OutputInterval;
+
+  /** the current epoch. */
+  protected int m_Epoch;
+
+  /** the training data. */
+  protected DataSet m_TrainData;
 
   /**
    * Returns a string describing the object.
@@ -197,6 +217,10 @@ public class DL4JTrainModel
     m_OptionManager.add(
       "iteration-listener", "iterationListeners",
       new IterationListenerConfigurator[0]);
+
+    m_OptionManager.add(
+      "output-interval", "outputInterval",
+      -1, -1, null);
   }
 
   /**
@@ -345,6 +369,35 @@ public class DL4JTrainModel
   }
 
   /**
+   * Sets the epoch interval to output the model.
+   *
+   * @param value	the number of epochs (-1 to turn off)
+   */
+  public void setOutputInterval(int value) {
+    m_OutputInterval = value;
+    reset();
+  }
+
+  /**
+   * Returns the epoch interval to output the model.
+   *
+   * @return  		the number of epochs (-1 to turn off)
+   */
+  public int getOutputInterval() {
+    return m_OutputInterval;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String outputIntervalTipText() {
+    return "The interval (of epochs) to output the model (usee <1 to turn off).";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -368,6 +421,8 @@ public class DL4JTrainModel
     super.pruneBackup();
 
     pruneBackup(BACKUP_MODEL);
+    pruneBackup(BACKUP_EPOCH);
+    pruneBackup(BACKUP_TRAINDATA);
   }
 
   /**
@@ -380,7 +435,11 @@ public class DL4JTrainModel
     Hashtable<String,Object>	result;
 
     result = super.backupState();
-    result.put(BACKUP_MODEL, m_ActualModel);
+    if (m_ActualModel != null)
+      result.put(BACKUP_MODEL, m_ActualModel);
+    result.put(BACKUP_EPOCH, m_Epoch);
+    if (m_TrainData != null)
+      result.put(BACKUP_TRAINDATA, m_TrainData);
 
     return result;
   }
@@ -396,6 +455,14 @@ public class DL4JTrainModel
       m_ActualModel = (Model) state.get(BACKUP_MODEL);
       state.remove(BACKUP_MODEL);
     }
+    if (state.containsKey(BACKUP_EPOCH)) {
+      m_Epoch = (Integer) state.get(BACKUP_EPOCH);
+      state.remove(BACKUP_EPOCH);
+    }
+    if (state.containsKey(BACKUP_TRAINDATA)) {
+      m_TrainData = (DataSet) state.get(BACKUP_TRAINDATA);
+      state.remove(BACKUP_TRAINDATA);
+    }
 
     super.restoreState(state);
   }
@@ -408,6 +475,8 @@ public class DL4JTrainModel
     super.reset();
 
     m_ActualModel = null;
+    m_Epoch       = 0;
+    m_TrainData   = null;
   }
 
   /**
@@ -451,6 +520,62 @@ public class DL4JTrainModel
   }
 
   /**
+   * Iterates through the epochs.
+   *
+   * @return		null if successful, otherwise error message
+   */
+  protected String iterate() {
+    String			result;
+    ShufflingDataSetIterator 	iter;
+
+    result = null;
+
+    try {
+      while (m_Epoch < m_NumEpochs) {
+	m_Epoch++;
+	if (isLoggingEnabled() && (m_Epoch % 100 == 0))
+	  getLogger().info("#epoch: " + m_Epoch);
+	if (m_ActualModel instanceof MultiLayerNetwork) {
+	  if (m_MiniBatchSize < 1) {
+	    ((MultiLayerNetwork) m_ActualModel).fit(m_TrainData);
+	  }
+	  else {
+	    iter = new ShufflingDataSetIterator(m_TrainData, m_MiniBatchSize, (int) m_Seed);
+	    while (iter.hasNext())
+	      ((MultiLayerNetwork) m_ActualModel).fit(iter.next());
+	  }
+	}
+	else {
+	  if (m_MiniBatchSize < 1) {
+	    m_ActualModel.fit(m_TrainData.getFeatureMatrix());
+	  }
+	  else {
+	    iter = new ShufflingDataSetIterator(m_TrainData, m_MiniBatchSize, (int) m_Seed);
+	    while (iter.hasNext() && !isStopped())
+	      m_ActualModel.fit(iter.next().getFeatureMatrix());
+	  }
+	}
+	if ((m_OutputInterval > 0) && (m_Epoch % m_OutputInterval == 0))
+	  break;
+	if (isStopped())
+	  break;
+      }
+
+      if (!isStopped())
+	m_OutputToken = new Token(new DL4JModelContainer(m_ActualModel, m_TrainData, m_Epoch));
+    }
+    catch (Exception e) {
+      m_OutputToken = null;
+      result        = handleException("Failed to process data (epoch: " + m_Epoch + "):", e);
+    }
+
+    if (m_OutputToken != null)
+      updateProvenance(m_OutputToken);
+
+    return result;
+  }
+
+  /**
    * Executes the flow item.
    *
    * @return		null if everything is fine, otherwise error message
@@ -458,19 +583,16 @@ public class DL4JTrainModel
   @Override
   protected String doExecute() {
     String			result;
-    DataSet			data;
     ModelConfigurator		conf;
-    ShufflingDataSetIterator 	iter;
     List<IterationListener> 	listeners;
-    int				i;
 
     result = null;
 
     try {
-      data = (DataSet) m_InputToken.getPayload();
+      m_TrainData = (DataSet) m_InputToken.getPayload();
       if (m_ActualModel == null) {
 	conf          = getModelConfiguratorInstance();
-	m_ActualModel = conf.configureModel(data.numInputs(), data.numOutcomes());
+	m_ActualModel = conf.configureModel(m_TrainData.numInputs(), m_TrainData.numOutcomes());
 	if (m_ActualModel == null)
 	  result = "Failed to obtain model?";
       }
@@ -482,50 +604,7 @@ public class DL4JTrainModel
 	    listeners.addAll(l.configureIterationListeners());
 	  ((MultiLayerNetwork) m_ActualModel).setListeners(listeners);
 	  ((MultiLayerNetwork) m_ActualModel).init();
-	  if (isLoggingEnabled()) {
-	    ((MultiLayerNetwork) m_ActualModel).setListeners(new ScoreIterationListener() {
-	      private static final long serialVersionUID = -5322197573419602284L;
-
-	      @Override
-	      public void iterationDone(Model model, int iteration) {
-		if (iteration % 100 == 0) {
-		  invoke();
-		  getLogger().info("Score at iteration " + iteration + " is " + model.score());
-		}
-	      }
-	    });
-	  }
 	}
-      }
-
-      if (result == null) {
-	for (i = 0; i < m_NumEpochs; i++) {
-	  if (m_ActualModel instanceof MultiLayerNetwork) {
-	    if (m_MiniBatchSize < 1) {
-	      ((MultiLayerNetwork) m_ActualModel).fit(data);
-	    }
-	    else {
-	      iter = new ShufflingDataSetIterator(data, m_MiniBatchSize, (int) m_Seed);
-	      while (iter.hasNext())
-		((MultiLayerNetwork) m_ActualModel).fit(iter.next());
-	    }
-	  }
-	  else {
-	    if (m_MiniBatchSize < 1) {
-	      m_ActualModel.fit(data.getFeatureMatrix());
-	    }
-	    else {
-	      iter = new ShufflingDataSetIterator(data, m_MiniBatchSize, (int) m_Seed);
-	      while (iter.hasNext() && !isStopped())
-		m_ActualModel.fit(iter.next().getFeatureMatrix());
-	    }
-	  }
-	  if (isStopped())
-	    break;
-	}
-
-	if (!isStopped())
-	  m_OutputToken = new Token(new DL4JModelContainer(m_ActualModel, data));
       }
     }
     catch (Exception e) {
@@ -533,20 +612,10 @@ public class DL4JTrainModel
       result        = handleException("Failed to process data:", e);
     }
 
-    if (m_OutputToken != null)
-      updateProvenance(m_OutputToken);
+    if (result == null)
+      result = iterate();
 
     return result;
-  }
-
-  /**
-   * Cleans up after the execution has finished.
-   */
-  @Override
-  public void wrapUp() {
-    super.wrapUp();
-
-    m_ActualModel = null;
   }
 
   /**
@@ -560,5 +629,46 @@ public class DL4JTrainModel
 	cont.setProvenance(m_InputToken.getProvenance().getClone());
       cont.addProvenance(new ProvenanceInformation(ActorType.MODEL_GENERATOR, m_InputToken.getPayload().getClass(), this, m_OutputToken.getPayload().getClass()));
     }
+  }
+
+  /**
+   * Checks whether there is pending output to be collected after
+   * executing the flow item.
+   *
+   * @return		true if there is pending output
+   */
+  @Override
+  public boolean hasPendingOutput() {
+    return super.hasPendingOutput() || ((m_Epoch > 0) && (m_Epoch < m_NumEpochs));
+  }
+
+  /**
+   * Returns the generated token.
+   *
+   * @return		the generated token
+   */
+  @Override
+  public Token output() {
+    Token	result;
+
+    if (m_OutputToken == null)
+      iterate();
+
+    result        = m_OutputToken;
+    m_OutputToken = null;
+
+    return result;
+  }
+
+  /**
+   * Cleans up after the execution has finished.
+   */
+  @Override
+  public void wrapUp() {
+    super.wrapUp();
+
+    m_ActualModel = null;
+    m_TrainData   = null;
+    m_Epoch       = 0;
   }
 }

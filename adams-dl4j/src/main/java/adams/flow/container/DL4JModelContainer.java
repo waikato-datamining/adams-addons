@@ -15,7 +15,7 @@
 
 /*
  * DL4JModelContainer.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.container;
@@ -44,6 +44,9 @@ public class DL4JModelContainer
   /** the identifier for the full dataset. */
   public final static String VALUE_DATASET = "Dataset";
 
+  /** the identifier for the epoch. */
+  public final static String VALUE_EPOCH = "Epoch";
+
   /**
    * Initializes the container.
    * <br><br>
@@ -69,10 +72,22 @@ public class DL4JModelContainer
    * @param data	the data to use
    */
   public DL4JModelContainer(Object model, DataSet data) {
+    this(model, data, null);
+  }
+
+  /**
+   * Initializes the container with the full dataset.
+   *
+   * @param model	the model to use
+   * @param data	the data to use
+   * @param epoch 	the epoch this model stems from
+   */
+  public DL4JModelContainer(Object model, DataSet data, Integer epoch) {
     super();
 
-    store(VALUE_MODEL, model);
+    store(VALUE_MODEL,   model);
     store(VALUE_DATASET, data);
+    store(VALUE_EPOCH,   epoch);
   }
 
   /**
@@ -83,6 +98,7 @@ public class DL4JModelContainer
 
     addHelp(VALUE_MODEL, "model object; " + Object.class.getName());
     addHelp(VALUE_DATASET, "full dataset; " + DataSet.class.getName());
+    addHelp(VALUE_EPOCH, "epoch; " + Integer.class.getName());
   }
 
   /**
@@ -98,6 +114,7 @@ public class DL4JModelContainer
 
     result.add(VALUE_MODEL);
     result.add(VALUE_DATASET);
+    result.add(VALUE_EPOCH);
 
     return result.iterator();
   }

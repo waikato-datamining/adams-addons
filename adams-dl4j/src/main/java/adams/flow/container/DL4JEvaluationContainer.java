@@ -46,6 +46,9 @@ public class DL4JEvaluationContainer
   /** the identifier for the Model. */
   public final static String VALUE_MODEL = "Model";
 
+  /** the identifier for the epoch. */
+  public final static String VALUE_EPOCH = "Epoch";
+
   /**
    * Initializes the container.
    * <br><br>
@@ -71,10 +74,22 @@ public class DL4JEvaluationContainer
    * @param model	the model to use
    */
   public DL4JEvaluationContainer(Evaluation eval, Object model) {
+    this(eval, model, null);
+  }
+
+  /**
+   * Initializes the container with evaluation and model.
+   *
+   * @param eval	the evaluation to use
+   * @param model	the model to use
+   * @param epoch 	the epoch this model stems from
+   */
+  public DL4JEvaluationContainer(Evaluation eval, Object model, Integer epoch) {
     super();
 
     store(VALUE_EVALUATION, eval);
     store(VALUE_MODEL,      model);
+    store(VALUE_EPOCH,      epoch);
   }
 
   /**
@@ -93,10 +108,22 @@ public class DL4JEvaluationContainer
    * @param model	the model to use
    */
   public DL4JEvaluationContainer(RegressionEvaluation eval, Object model) {
+    this(eval, model, null);
+  }
+
+  /**
+   * Initializes the container with evaluation and model.
+   *
+   * @param eval	the evaluation to use
+   * @param model	the model to use
+   * @param epoch 	the epoch this model stems from
+   */
+  public DL4JEvaluationContainer(RegressionEvaluation eval, Object model, Integer epoch) {
     super();
 
     store(VALUE_EVALUATION, eval);
     store(VALUE_MODEL,      model);
+    store(VALUE_EPOCH,      epoch);
   }
 
   /**
@@ -107,6 +134,7 @@ public class DL4JEvaluationContainer
 
     addHelp(VALUE_EVALUATION, "evaluation object " + Evaluation.class.getName() + " or " + RegressionEvaluation.class.getName());
     addHelp(VALUE_MODEL, "model object; " + Model.class.getName());
+    addHelp(VALUE_EPOCH, "epoch; " + Integer.class.getName());
   }
 
   /**
@@ -122,6 +150,7 @@ public class DL4JEvaluationContainer
 
     result.add(VALUE_EVALUATION);
     result.add(VALUE_MODEL);
+    result.add(VALUE_EPOCH);
 
     return result.iterator();
   }

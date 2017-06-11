@@ -424,6 +424,8 @@ public class DL4JTrainTestSetEvaluator
 	  listeners.addAll(l.configureIterationListeners());
 	((MultiLayerNetwork) model).setListeners(listeners);
 	for (i = 0; i < m_NumEpochs; i++) {
+	  if (isLoggingEnabled() && ((i+1) % 100 == 0))
+	    getLogger().info("#epoch: " + i);
 	  if (m_MiniBatchSize < 1) {
 	    ((MultiLayerNetwork) model).fit(train);
 	  }
@@ -459,13 +461,13 @@ public class DL4JTrainTestSetEvaluator
       // broadcast result
       if (evalCls != null) {
 	if (m_AlwaysUseContainer)
-	  m_OutputToken = new Token(new DL4JEvaluationContainer(evalCls, model));
+	  m_OutputToken = new Token(new DL4JEvaluationContainer(evalCls, model, m_NumEpochs));
 	else
 	  m_OutputToken = new Token(evalCls.stats());
       }
       else if (evalReg != null) {
 	if (m_AlwaysUseContainer)
-	  m_OutputToken = new Token(new DL4JEvaluationContainer(evalReg, model));
+	  m_OutputToken = new Token(new DL4JEvaluationContainer(evalReg, model, m_NumEpochs));
 	else
 	  m_OutputToken = new Token(evalReg.stats());
       }

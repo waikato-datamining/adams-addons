@@ -1,0 +1,15 @@
+# Project: adams
+# Date: 2017-06-12 10:55:58
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Builds a simple model on the iris UCI dataset, \\noutputting statistics every 100 epochs.\\n" -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.source.DL4JModelConfigurator -model-configurator adams.ml.dl4j.model.SimpleMultiLayerNetwork
+  adams.flow.sink.HistoryDisplay -name Statistics -entry-name-variable epoch
+  adams.flow.source.DL4JDatasetIterator -name data -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.CSVRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.SingleFileSplitConfigurator -source ${FLOWS}/data/iris_numeric.csv\\\" -skip-num-lines 1\" -batch-size 150 -label-index 4 -num-possible-labels 3" -preprocessor "adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorWithScriptedConfiguration -handler adams.core.scripting.Dummy" -full-dataset true
+ adams.flow.source.CallableSource -callable data
+ adams.flow.transformer.DL4JTrainModel -mini-batch-size 10 -iteration-listener adams.ml.dl4j.iterationlistener.ScoreIterationListenerConfigurator -output-interval 100
+ adams.flow.control.ContainerValuePicker -value Epoch
+  adams.flow.transformer.SetVariable -var-name epoch
+ adams.flow.transformer.DL4JTestSetEvaluator -testset data
+ adams.flow.sink.CallableSink -callable Statistics
