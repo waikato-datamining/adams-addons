@@ -69,63 +69,63 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- * 
+ *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
  * &nbsp;&nbsp;&nbsp;default: DL4JTrainModel
  * </pre>
- * 
+ *
  * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
  * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
- * 
+ *
  * <pre>-skip &lt;boolean&gt; (property: skip)
  * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
  * &nbsp;&nbsp;&nbsp;as it is.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
  * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this 
  * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical 
  * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-silent &lt;boolean&gt; (property: silent)
  * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing 
  * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-model &lt;adams.flow.core.CallableActorReference&gt; (property: model)
  * &nbsp;&nbsp;&nbsp;The model to train on the input data.
  * &nbsp;&nbsp;&nbsp;default: DL4JModelConfigurator
  * </pre>
- * 
+ *
  * <pre>-num-epochs &lt;int&gt; (property: numEpochs)
  * &nbsp;&nbsp;&nbsp;The number of epochs to perform.
  * &nbsp;&nbsp;&nbsp;default: 1000
  * &nbsp;&nbsp;&nbsp;minimum: 1
  * </pre>
- * 
+ *
  * <pre>-mini-batch-size &lt;int&gt; (property: miniBatchSize)
  * &nbsp;&nbsp;&nbsp;The mini-batch size to use; -1 to turn off.
  * &nbsp;&nbsp;&nbsp;default: -1
  * &nbsp;&nbsp;&nbsp;minimum: -1
  * </pre>
- * 
+ *
  * <pre>-seed &lt;long&gt; (property: seed)
  * &nbsp;&nbsp;&nbsp;The seed value to use for randomization.
  * &nbsp;&nbsp;&nbsp;default: 1
  * </pre>
- * 
+ *
  * <pre>-iteration-listener &lt;adams.ml.dl4j.iterationlistener.IterationListenerConfigurator&gt; (property: iterationListener)
  * &nbsp;&nbsp;&nbsp;The iteration listener to use (configurator).
  * &nbsp;&nbsp;&nbsp;default: adams.ml.dl4j.iterationlistener.NullListener
  * </pre>
- * 
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -468,11 +468,12 @@ public class DL4JTrainModel
     try {
       data = (DataSet) m_InputToken.getPayload();
       if (m_ActualModel == null) {
-	conf = getModelConfiguratorInstance();
+	conf          = getModelConfiguratorInstance();
 	m_ActualModel = conf.configureModel(data.numInputs(), data.numOutcomes());
 	if (m_ActualModel == null)
 	  result = "Failed to obtain model?";
       }
+
       if (result == null) {
 	if (m_ActualModel instanceof MultiLayerNetwork) {
 	  listeners = m_IterationListener.configureIterationListeners();
@@ -481,6 +482,7 @@ public class DL4JTrainModel
 	  if (isLoggingEnabled()) {
 	    ((MultiLayerNetwork) m_ActualModel).setListeners(new ScoreIterationListener() {
 	      private static final long serialVersionUID = -5322197573419602284L;
+
 	      @Override
 	      public void iterationDone(Model model, int iteration) {
 		if (iteration % 100 == 0) {
@@ -490,7 +492,12 @@ public class DL4JTrainModel
 	      }
 	    });
 	  }
-	  for (i = 0; i < m_NumEpochs; i++) {
+	}
+      }
+
+      if (result == null) {
+	for (i = 0; i < m_NumEpochs; i++) {
+	  if (m_ActualModel instanceof MultiLayerNetwork) {
 	    if (m_MiniBatchSize < 1) {
 	      ((MultiLayerNetwork) m_ActualModel).fit(data);
 	    }
@@ -499,20 +506,21 @@ public class DL4JTrainModel
 	      while (iter.hasNext())
 		((MultiLayerNetwork) m_ActualModel).fit(iter.next());
 	    }
-	    if (isStopped())
-	      break;
-	  }
-	}
-	else {
-	  if (m_MiniBatchSize < 1) {
-	    m_ActualModel.fit(data.getFeatureMatrix());
 	  }
 	  else {
-	    iter = new ShufflingDataSetIterator(data, m_MiniBatchSize, (int) m_Seed);
-	    while (iter.hasNext() && !isStopped())
-	      m_ActualModel.fit(iter.next().getFeatureMatrix());
+	    if (m_MiniBatchSize < 1) {
+	      m_ActualModel.fit(data.getFeatureMatrix());
+	    }
+	    else {
+	      iter = new ShufflingDataSetIterator(data, m_MiniBatchSize, (int) m_Seed);
+	      while (iter.hasNext() && !isStopped())
+		m_ActualModel.fit(iter.next().getFeatureMatrix());
+	    }
 	  }
+	  if (isStopped())
+	    break;
 	}
+
 	if (!isStopped())
 	  m_OutputToken = new Token(new DL4JModelContainer(m_ActualModel, data));
       }
