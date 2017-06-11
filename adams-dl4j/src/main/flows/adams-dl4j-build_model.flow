@@ -1,12 +1,12 @@
 # Project: adams
-# Date: 2017-06-12 09:38:16
+# Date: 2017-06-12 10:02:20
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Builds a simple model on the iris UCI dataset.\\nThe training process monitors the statistics and you \\ncan monitor the progress at the following URL:\\n  http://localhost:9000/train" -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
-  adams.flow.source.DL4JModelConfigurator -model-configurator "adams.ml.dl4j.model.SimpleMultiLayerNetwork -num-iterations 1"
+  adams.flow.source.DL4JModelConfigurator -model-configurator adams.ml.dl4j.model.SimpleMultiLayerNetwork
  adams.flow.source.DL4JDatasetIterator -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.CSVRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.SingleFileSplitConfigurator -source ${FLOWS}/data/iris_numeric.csv\\\" -skip-num-lines 1\" -batch-size 150 -label-index 4 -num-possible-labels 3" -preprocessor "adams.ml.dl4j.datasetpreprocessor.DataSetPreProcessorWithScriptedConfiguration -handler adams.core.scripting.Dummy" -full-dataset true
- adams.flow.transformer.DL4JTrainModel -mini-batch-size 50 -iteration-listener adams.ml.dl4j.iterationlistener.InMemoryStatsListenerConfigurator
+ adams.flow.transformer.DL4JTrainModel -mini-batch-size 50 -iteration-listener adams.ml.dl4j.iterationlistener.InMemoryStatsListenerConfigurator -iteration-listener adams.ml.dl4j.iterationlistener.ScoreIterationListenerConfigurator
  adams.flow.control.ContainerValuePicker -value Model -switch-outputs true
  adams.flow.transformer.Convert -conversion adams.data.conversion.DL4JModelToYaml
  adams.flow.sink.Display -writer adams.data.io.output.NullWriter

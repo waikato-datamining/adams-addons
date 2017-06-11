@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2017-01-16 09:20:40
+# Date: 2017-06-12 10:01:43
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Uses a random split to train a model and then\\nevaluate it on the animals image dataset." -flow-execution-listener adams.flow.execution.NullListener
@@ -16,10 +16,10 @@ adams.flow.control.Flow -annotation "Uses a random split to train a model and th
   adams.flow.transformer.DL4JRandomSplit
   adams.flow.control.ContainerValuePicker -value Train -switch-outputs true
   adams.flow.transformer.IncVariable -var-name batchcount
-  adams.flow.transformer.DL4JTrainModel
+  adams.flow.transformer.DL4JTrainModel -mini-batch-size 10 -iteration-listener adams.ml.dl4j.iterationlistener.ScoreIterationListenerConfigurator
   adams.flow.transformer.SetStorageValue -storage-name model
  adams.flow.control.Trigger -name evaluate
-  adams.flow.source.StorageValue -storage-name model
+  adams.flow.source.StorageValue -storage-name model -conversion adams.data.conversion.UnknownToUnknown
   adams.flow.transformer.DL4JTestSetEvaluator -always-use-container true -testset Test
   adams.flow.control.Branch
    adams.flow.control.Sequence -name summary

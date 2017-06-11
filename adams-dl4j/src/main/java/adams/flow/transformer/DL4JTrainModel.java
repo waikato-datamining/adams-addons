@@ -35,7 +35,6 @@ import adams.flow.provenance.ProvenanceSupporter;
 import adams.flow.source.DL4JModelConfigurator;
 import adams.ml.dl4j.datasetiterator.ShufflingDataSetIterator;
 import adams.ml.dl4j.iterationlistener.IterationListenerConfigurator;
-import adams.ml.dl4j.iterationlistener.NullListener;
 import adams.ml.dl4j.model.ModelConfigurator;
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
@@ -43,6 +42,7 @@ import org.deeplearning4j.optimize.api.IterationListener;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.nd4j.linalg.dataset.DataSet;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -69,63 +69,63 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- *
+ * 
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
  * &nbsp;&nbsp;&nbsp;default: DL4JTrainModel
  * </pre>
- *
+ * 
  * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
  * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
- *
+ * 
  * <pre>-skip &lt;boolean&gt; (property: skip)
  * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
  * &nbsp;&nbsp;&nbsp;as it is.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- *
+ * 
  * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
  * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this 
  * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical 
  * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- *
+ * 
  * <pre>-silent &lt;boolean&gt; (property: silent)
  * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing 
  * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- *
+ * 
  * <pre>-model &lt;adams.flow.core.CallableActorReference&gt; (property: model)
  * &nbsp;&nbsp;&nbsp;The model to train on the input data.
  * &nbsp;&nbsp;&nbsp;default: DL4JModelConfigurator
  * </pre>
- *
+ * 
  * <pre>-num-epochs &lt;int&gt; (property: numEpochs)
  * &nbsp;&nbsp;&nbsp;The number of epochs to perform.
  * &nbsp;&nbsp;&nbsp;default: 1000
  * &nbsp;&nbsp;&nbsp;minimum: 1
  * </pre>
- *
+ * 
  * <pre>-mini-batch-size &lt;int&gt; (property: miniBatchSize)
  * &nbsp;&nbsp;&nbsp;The mini-batch size to use; -1 to turn off.
  * &nbsp;&nbsp;&nbsp;default: -1
  * &nbsp;&nbsp;&nbsp;minimum: -1
  * </pre>
- *
+ * 
  * <pre>-seed &lt;long&gt; (property: seed)
  * &nbsp;&nbsp;&nbsp;The seed value to use for randomization.
  * &nbsp;&nbsp;&nbsp;default: 1
  * </pre>
- *
- * <pre>-iteration-listener &lt;adams.ml.dl4j.iterationlistener.IterationListenerConfigurator&gt; (property: iterationListener)
- * &nbsp;&nbsp;&nbsp;The iteration listener to use (configurator).
- * &nbsp;&nbsp;&nbsp;default: adams.ml.dl4j.iterationlistener.NullListener
+ * 
+ * <pre>-iteration-listener &lt;adams.ml.dl4j.iterationlistener.IterationListenerConfigurator&gt; [-iteration-listener ...] (property: iterationListeners)
+ * &nbsp;&nbsp;&nbsp;The iteration listeners to use (configurators).
+ * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
- *
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -156,8 +156,8 @@ public class DL4JTrainModel
   /** the seed value. */
   protected long m_Seed;
 
-  /** the iteration listener to use. */
-  protected IterationListenerConfigurator m_IterationListener;
+  /** the iteration listeners to use. */
+  protected IterationListenerConfigurator[] m_IterationListeners;
 
   /**
    * Returns a string describing the object.
@@ -195,8 +195,8 @@ public class DL4JTrainModel
       1L);
 
     m_OptionManager.add(
-      "iteration-listener", "iterationListener",
-      new NullListener());
+      "iteration-listener", "iterationListeners",
+      new IterationListenerConfigurator[0]);
   }
 
   /**
@@ -316,22 +316,22 @@ public class DL4JTrainModel
   }
 
   /**
-   * Sets the iteration listener to use.
+   * Sets the iteration listeners to use.
    *
-   * @param value	the configurator
+   * @param value	the configurators
    */
-  public void setIterationListener(IterationListenerConfigurator value) {
-    m_IterationListener = value;
+  public void setIterationListeners(IterationListenerConfigurator[] value) {
+    m_IterationListeners = value;
     reset();
   }
 
   /**
-   * Returns the iteration listener to use.
+   * Returns the iteration listeners to use.
    *
-   * @return		the configurator
+   * @return		the configurators
    */
-  public IterationListenerConfigurator getIterationListener() {
-    return m_IterationListener;
+  public IterationListenerConfigurator[] getIterationListeners() {
+    return m_IterationListeners;
   }
 
   /**
@@ -340,8 +340,8 @@ public class DL4JTrainModel
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String iterationListenerTipText() {
-    return "The iteration listener to use (configurator).";
+  public String iterationListenersTipText() {
+    return "The iteration listeners to use (configurators).";
   }
 
   /**
@@ -477,7 +477,9 @@ public class DL4JTrainModel
 
       if (result == null) {
 	if (m_ActualModel instanceof MultiLayerNetwork) {
-	  listeners = m_IterationListener.configureIterationListeners();
+	  listeners = new ArrayList<>();
+	  for (IterationListenerConfigurator l: m_IterationListeners)
+	    listeners.addAll(l.configureIterationListeners());
 	  ((MultiLayerNetwork) m_ActualModel).setListeners(listeners);
 	  ((MultiLayerNetwork) m_ActualModel).init();
 	  if (isLoggingEnabled()) {

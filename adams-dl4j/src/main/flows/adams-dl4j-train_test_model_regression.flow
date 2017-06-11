@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2017-06-07 16:29:09
+# Date: 2017-06-12 10:03:53
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Uses a random split to train a model and then\\nevaluate it on the bolts UCI regression dataset.\\nCheck out the statistics over time at the following URL:\\nhttp://localhost:9000/train/overview" -flow-execution-listener adams.flow.execution.NullListener
@@ -7,7 +7,7 @@ adams.flow.control.Flow -annotation "Uses a random split to train a model and th
   adams.flow.source.DL4JModelConfigurator -model-configurator "adams.ml.dl4j.model.SimpleRegressionMultiLayerNetwork -num-iterations 10 -learning-rate 1.5E-4"
  adams.flow.source.DL4JDatasetIterator -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.CSVRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.SingleFileSplitConfigurator -source ${FLOWS}/data/bolts.csv\\\" -skip-num-lines 1\" -batch-size 150 -label-index 7 -regression true" -preprocessor adams.ml.dl4j.datasetpreprocessor.NormalizerMinMaxScaler
  adams.flow.transformer.DL4JRandomSplit
- adams.flow.transformer.DL4JTrainTestSetEvaluator -always-use-container true -mini-batch-size 20 -type REGRESSION -iteration-listener adams.ml.dl4j.iterationlistener.InMemoryStatsListenerConfigurator
+ adams.flow.transformer.DL4JTrainTestSetEvaluator -always-use-container true -mini-batch-size 20 -type REGRESSION -iteration-listener adams.ml.dl4j.iterationlistener.InMemoryStatsListenerConfigurator -iteration-listener adams.ml.dl4j.iterationlistener.ScoreIterationListenerConfigurator
  adams.flow.control.Branch
   adams.flow.control.Sequence
    adams.flow.transformer.DL4JEvaluationSummary

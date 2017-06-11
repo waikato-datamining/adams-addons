@@ -32,7 +32,6 @@ import adams.flow.provenance.ProvenanceInformation;
 import adams.flow.provenance.ProvenanceSupporter;
 import adams.ml.dl4j.datasetiterator.ShufflingDataSetIterator;
 import adams.ml.dl4j.iterationlistener.IterationListenerConfigurator;
-import adams.ml.dl4j.iterationlistener.NullListener;
 import adams.ml.dl4j.model.ModelConfigurator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.eval.RegressionEvaluation;
@@ -42,6 +41,7 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.optimize.api.IterationListener;
 import org.nd4j.linalg.dataset.DataSet;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -131,9 +131,9 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: CLASSIFICATION
  * </pre>
  * 
- * <pre>-iteration-listener &lt;adams.ml.dl4j.iterationlistener.IterationListenerConfigurator&gt; (property: iterationListener)
- * &nbsp;&nbsp;&nbsp;The iteration listener to use (configurator).
- * &nbsp;&nbsp;&nbsp;default: adams.ml.dl4j.iterationlistener.NullListener
+ * <pre>-iteration-listener &lt;adams.ml.dl4j.iterationlistener.IterationListenerConfigurator&gt; [-iteration-listener ...] (property: iterationListeners)
+ * &nbsp;&nbsp;&nbsp;The iteration listeners to use (configurators).
+ * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
  * 
  <!-- options-end -->
@@ -160,8 +160,8 @@ public class DL4JTrainTestSetEvaluator
   /** the evaluation type. */
   protected DL4JEvaluationType m_Type;
 
-  /** the iteration listener to use. */
-  protected IterationListenerConfigurator m_IterationListener;
+  /** the iteration listeners to use. */
+  protected IterationListenerConfigurator[] m_IterationListeners;
 
   /**
    * Returns a string describing the object.
@@ -201,8 +201,8 @@ public class DL4JTrainTestSetEvaluator
       DL4JEvaluationType.CLASSIFICATION);
 
     m_OptionManager.add(
-      "iteration-listener", "iterationListener",
-      new NullListener());
+      "iteration-listener", "iterationListeners",
+      new IterationListenerConfigurator[0]);
   }
 
   /**
@@ -333,22 +333,22 @@ public class DL4JTrainTestSetEvaluator
   }
 
   /**
-   * Sets the iteration listener to use.
+   * Sets the iteration listeners to use.
    *
-   * @param value	the configurator
+   * @param value	the configurators
    */
-  public void setIterationListener(IterationListenerConfigurator value) {
-    m_IterationListener = value;
+  public void setIterationListeners(IterationListenerConfigurator[] value) {
+    m_IterationListeners = value;
     reset();
   }
 
   /**
-   * Returns the iteration listener to use.
+   * Returns the iteration listeners to use.
    *
-   * @return		the configurator
+   * @return		the configurators
    */
-  public IterationListenerConfigurator getIterationListener() {
-    return m_IterationListener;
+  public IterationListenerConfigurator[] getIterationListeners() {
+    return m_IterationListeners;
   }
 
   /**
@@ -357,8 +357,8 @@ public class DL4JTrainTestSetEvaluator
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String iterationListenerTipText() {
-    return "The iteration listener to use (configurator).";
+  public String iterationListenersTipText() {
+    return "The iteration listeners to use (configurators).";
   }
 
   /**
@@ -419,7 +419,9 @@ public class DL4JTrainTestSetEvaluator
       evalCls = null;
       evalReg = null;
       if (model instanceof MultiLayerNetwork) {
-	listeners = m_IterationListener.configureIterationListeners();
+	listeners = new ArrayList<>();
+	for (IterationListenerConfigurator l: m_IterationListeners)
+	  listeners.addAll(l.configureIterationListeners());
 	((MultiLayerNetwork) model).setListeners(listeners);
 	for (i = 0; i < m_NumEpochs; i++) {
 	  if (m_MiniBatchSize < 1) {
