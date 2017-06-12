@@ -79,3 +79,15 @@ adams.ml.dl4j.inputsplit.InputSplitConfigurator=\
 # the input iterationlistener configurators
 adams.ml.dl4j.iterationlistener.IterationListenerConfigurator=\
   adams.ml.dl4j.iterationlistener
+
+# distributions
+org.deeplearning4j.nn.conf.distribution.Distribution=\
+  org.deeplearning4j.nn.conf.distribution
+
+# loss functions
+org.nd4j.linalg.lossfunctions.ILossFunction=\
+  org.nd4j.linalg.lossfunctions
+
+# activations
+org.nd4j.linalg.activations.IActivation=\
+  org.nd4j.linalg.activations
