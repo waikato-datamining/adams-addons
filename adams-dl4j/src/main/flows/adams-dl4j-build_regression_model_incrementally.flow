@@ -1,0 +1,19 @@
+# Project: adams
+# Date: 2017-06-13 15:58:00
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Builds a simple model on the bolts UCI dataset, \\noutputting statistics every 100 epochs and \\nplots the score every 50 iterations.\\n" -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.source.DL4JModelConfigurator -model-configurator "adams.ml.dl4j.model.SimpleRegressionMultiLayerNetwork -num-iterations 10 -learning-rate 1.5E-4"
+  adams.flow.source.DL4JDatasetIterator -name data -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.CSVRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.SingleFileSplitConfigurator -source ${FLOWS}/data/bolts.csv\\\" -skip-num-lines 1\" -batch-size 150 -label-index 7 -regression true" -preprocessor adams.ml.dl4j.datasetpreprocessor.NormalizerMinMaxScaler
+  adams.flow.sink.HistoryDisplay -name Statistics -entry-name-variable epoch
+  adams.flow.sink.SequencePlotter -x -3 -writer adams.gui.print.NullWriter -paintlet "adams.gui.visualization.sequence.LinePaintlet -markers-disabled true -paint-all true" -overlay-paintlet adams.gui.visualization.sequence.NullPaintlet -marker-paintlet adams.flow.sink.sequenceplotter.NoMarkers -error-paintlet adams.flow.sink.sequenceplotter.NoErrorPaintlet -mouse-click-action adams.flow.sink.sequenceplotter.NullClickAction -color-provider adams.gui.visualization.core.DefaultColorProvider -overlay-color-provider adams.gui.visualization.core.DefaultColorProvider -title Score -axis-x "adams.gui.visualization.core.AxisPanelOptions -label iteration -tick-generator \"adams.gui.visualization.core.axis.FancyTickGenerator -num-ticks 20\" -nth-value 2 -width 40 -custom-format 0" -axis-y "adams.gui.visualization.core.AxisPanelOptions -label score -tick-generator adams.gui.visualization.core.axis.FancyTickGenerator -nth-value 2 -width 60 -custom-format 0.0" -plot-updater adams.flow.sink.sequenceplotter.SimplePlotUpdater -post-processor adams.flow.sink.sequenceplotter.PassThrough
+  adams.flow.control.Sequence -name plot
+   adams.flow.transformer.MakePlotContainer -plot-name Score
+   adams.flow.sink.CallableSink -callable SequencePlotter
+ adams.flow.source.CallableSource -callable data
+ adams.flow.transformer.DL4JTrainModel -mini-batch-size 10 -iteration-listener adams.ml.dl4j.iterationlistener.ScoreIterationListenerConfigurator -iteration-listener "adams.ml.dl4j.iterationlistener.CallableActorScoreListenerConfigurator -callable plot -frequency 50" -output-interval 100
+ adams.flow.control.ContainerValuePicker -value Epoch
+  adams.flow.transformer.SetVariable -var-name epoch
+ adams.flow.transformer.DL4JTestSetEvaluator -testset data -type REGRESSION
+ adams.flow.sink.CallableSink -callable Statistics
