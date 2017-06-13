@@ -20,6 +20,7 @@
 
 package adams.ml.dl4j.iterationlistener;
 
+import adams.flow.core.FlowContextHandler;
 import org.deeplearning4j.optimize.api.IterationListener;
 
 import java.io.Serializable;
@@ -32,7 +33,7 @@ import java.util.List;
  * @version $Revision$
  */
 public interface IterationListenerConfigurator
-  extends Serializable {
+  extends Serializable, FlowContextHandler {
 
   /**
    * Configures the listeners and returns it.

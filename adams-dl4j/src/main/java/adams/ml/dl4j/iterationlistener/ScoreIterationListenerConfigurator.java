@@ -20,6 +20,7 @@
 
 package adams.ml.dl4j.iterationlistener;
 
+import adams.core.QuickInfoHelper;
 import org.deeplearning4j.optimize.api.IterationListener;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 
@@ -108,6 +109,16 @@ public class ScoreIterationListenerConfigurator
    */
   public String frequencyTipText() {
     return "The update frequency.";
+  }
+
+  /**
+   * Returns a quick info about the actor, which will be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    return QuickInfoHelper.toString(this, "frequency", m_Frequency, "frequency: ");
   }
 
   /**

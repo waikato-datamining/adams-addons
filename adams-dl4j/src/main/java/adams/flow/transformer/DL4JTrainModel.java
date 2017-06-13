@@ -600,8 +600,10 @@ public class DL4JTrainModel
       if (result == null) {
 	if (m_ActualModel instanceof MultiLayerNetwork) {
 	  listeners = new ArrayList<>();
-	  for (IterationListenerConfigurator l: m_IterationListeners)
+	  for (IterationListenerConfigurator l: m_IterationListeners) {
+	    l.setFlowContext(this);
 	    listeners.addAll(l.configureIterationListeners());
+	  }
 	  ((MultiLayerNetwork) m_ActualModel).setListeners(listeners);
 	  ((MultiLayerNetwork) m_ActualModel).init();
 	}

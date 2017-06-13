@@ -420,8 +420,10 @@ public class DL4JTrainTestSetEvaluator
       evalReg = null;
       if (model instanceof MultiLayerNetwork) {
 	listeners = new ArrayList<>();
-	for (IterationListenerConfigurator l: m_IterationListeners)
+	for (IterationListenerConfigurator l: m_IterationListeners) {
+	  l.setFlowContext(this);
 	  listeners.addAll(l.configureIterationListeners());
+	}
 	((MultiLayerNetwork) model).setListeners(listeners);
 	for (i = 0; i < m_NumEpochs; i++) {
 	  if (isLoggingEnabled() && ((i+1) % 100 == 0))

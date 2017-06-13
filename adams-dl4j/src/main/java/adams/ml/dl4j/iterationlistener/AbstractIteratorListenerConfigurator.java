@@ -20,7 +20,9 @@
 
 package adams.ml.dl4j.iterationlistener;
 
+import adams.core.QuickInfoSupporter;
 import adams.core.option.AbstractOptionHandler;
+import adams.flow.core.Actor;
 import org.deeplearning4j.optimize.api.IterationListener;
 
 import java.util.List;
@@ -33,18 +35,52 @@ import java.util.List;
  */
 public abstract class AbstractIteratorListenerConfigurator
   extends AbstractOptionHandler
-  implements IterationListenerConfigurator {
+  implements IterationListenerConfigurator, QuickInfoSupporter {
 
   private static final long serialVersionUID = -5049221729823530346L;
+
+  /** the flow context. */
+  protected Actor m_FlowContext;
+
+  /**
+   * Sets the flow context.
+   *
+   * @param value	the actor
+   */
+  public void setFlowContext(Actor value) {
+    m_FlowContext = value;
+  }
+
+  /**
+   * Returns the flow context, if any.
+   *
+   * @return		the actor, null if none available
+   */
+  public Actor getFlowContext() {
+    return m_FlowContext;
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   * <br>
+   * The default implementation returns null.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  public String getQuickInfo() {
+    return null;
+  }
 
   /**
    * Hook method before configuring the listener.
    * <br>
-   * Default implementation does nothing.
+   * Default implementation only ensures that flow context is set.
    *
    * @return		null if successful, otherwise error message
    */
   protected String check() {
+    if (m_FlowContext == null)
+      return "No flow context set!";
     return null;
   }
 
@@ -62,8 +98,12 @@ public abstract class AbstractIteratorListenerConfigurator
    */
   public List<IterationListener> configureIterationListeners() {
     List<IterationListener>	result;
+    String			msg;
 
-    check();
+    msg = check();
+    if (msg != null)
+      throw new IllegalStateException(msg);
+
     result = doConfigureIterationListeners();
 
     return result;

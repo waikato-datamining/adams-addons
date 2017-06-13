@@ -478,8 +478,10 @@ public class DL4JCrossValidationEvaluator
 	      test  = iter.testFold();
 	      model = conf.configureModel(data.numInputs(), data.numOutcomes());
 	      listeners = new ArrayList<>();
-	      for (IterationListenerConfigurator l: m_IterationListeners)
+	      for (IterationListenerConfigurator l: m_IterationListeners) {
+		l.setFlowContext(this);
 		listeners.addAll(l.configureIterationListeners());
+	      }
 	      ((MultiLayerNetwork) model).setListeners(listeners);
 	      for (i = 0; i < m_NumEpochs; i++) {
 		if (m_MiniBatchSize < 1) {
