@@ -52,6 +52,34 @@ import weka.dl4j.layers.OutputLayer;
  * &nbsp;&nbsp;&nbsp;default: STOCHASTIC_GRADIENT_DESCENT
  * </pre>
  * 
+ * <pre>-use-regularization &lt;boolean&gt; (property: useRegularization)
+ * &nbsp;&nbsp;&nbsp;If enabled, regularization is used.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-l1 &lt;double&gt; (property: l1)
+ * &nbsp;&nbsp;&nbsp;The L1 value.
+ * &nbsp;&nbsp;&nbsp;default: 0.0
+ * &nbsp;&nbsp;&nbsp;minimum: 0.0
+ * </pre>
+ * 
+ * <pre>-l2 &lt;double&gt; (property: l2)
+ * &nbsp;&nbsp;&nbsp;The L2 value.
+ * &nbsp;&nbsp;&nbsp;default: 0.0
+ * &nbsp;&nbsp;&nbsp;minimum: 0.0
+ * </pre>
+ * 
+ * <pre>-drop-out &lt;double&gt; (property: dropOut)
+ * &nbsp;&nbsp;&nbsp;The drop-out value.
+ * &nbsp;&nbsp;&nbsp;default: 0.0
+ * &nbsp;&nbsp;&nbsp;minimum: 0.0
+ * </pre>
+ * 
+ * <pre>-use-drop-connect &lt;boolean&gt; (property: useDropConnect)
+ * &nbsp;&nbsp;&nbsp;If enabled, drop connect is used.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  * <pre>-layer &lt;org.deeplearning4j.nn.conf.layers.Layer&gt; [-layer ...] (property: layers)
  * &nbsp;&nbsp;&nbsp;The layers specification.
  * &nbsp;&nbsp;&nbsp;default: weka.dl4j.layers.OutputLayer -activation identity -adamMeanDecay 0.9 -adamVarDecay 0.999 -biasInit 1.0 -biasL1 0.0 -biasL2 0.0 -blr 0.01 -dist \"weka.dl4j.distribution.NormalDistribution -mean 0.001 -std 1.0\" -dropout 0.0 -epsilon 1.0E-6 -gradientNormalization None -gradNormThreshold 1.0 -L1 0.0 -L2 0.0 -name \"Output layer\" -lr 0.01 -lossFn LossMSE() -momentum 0.9 -rho 0.0 -rmsDecay 0.95 -updater NESTEROVS -weightInit XAVIER
@@ -73,6 +101,21 @@ public class Dl4jMlpClassifier
 
   /** the optimization algorithm. */
   protected OptimizationAlgorithm m_OptimizationAlgorithm;
+
+  /** whether to use regularization. */
+  protected boolean m_UseRegularization;
+
+  /** the L1. */
+  protected double m_L1;
+
+  /** the L2. */
+  protected double m_L2;
+
+  /** the drop out value. */
+  protected double m_DropOut;
+
+  /** whether to use drop-connect. */
+  protected boolean m_UseDropConnect;
 
   /** The layers of the network. */
   protected Layer[] m_Layers;
@@ -101,6 +144,26 @@ public class Dl4jMlpClassifier
     m_OptionManager.add(
       "optimization-algorithm", "optimizationAlgorithm",
       OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+
+    m_OptionManager.add(
+      "use-regularization", "useRegularization",
+      false);
+
+    m_OptionManager.add(
+      "l1", "l1",
+      0.0, 0.0, null);
+
+    m_OptionManager.add(
+      "l2", "l2",
+      0.0, 0.0, null);
+
+    m_OptionManager.add(
+      "drop-out", "dropOut",
+      0.0, 0.0, null);
+
+    m_OptionManager.add(
+      "use-drop-connect", "useDropConnect",
+      false);
 
     m_OptionManager.add(
       "layer", "layers",
@@ -166,6 +229,157 @@ public class Dl4jMlpClassifier
    */
   public String optimizationAlgorithmTipText() {
     return "The optimization algorithm.";
+  }
+
+  /**
+   * Sets whether to use regularization.
+   *
+   * @param value	true if to use regularization
+   */
+  public void setUseRegularization(boolean value) {
+    m_UseRegularization = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to use regularization.
+   *
+   * @return  		true if to use regularization
+   */
+  public boolean getUseRegularization() {
+    return m_UseRegularization;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String useRegularizationTipText() {
+    return "If enabled, regularization is used.";
+  }
+
+  /**
+   * Sets L1.
+   *
+   * @param value	L1
+   */
+  public void setL1(double value) {
+    if (getOptionManager().isValid("l1", value)) {
+      m_L1 = value;
+      reset();
+    }
+  }
+
+  /**
+   * Returns L1.
+   *
+   * @return  		L1
+   */
+  public double getL1() {
+    return m_L1;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String l1TipText() {
+    return "The L1 value.";
+  }
+
+  /**
+   * Sets L2.
+   *
+   * @param value	L2
+   */
+  public void setL2(double value) {
+    if (getOptionManager().isValid("l2", value)) {
+      m_L2 = value;
+      reset();
+    }
+  }
+
+  /**
+   * Returns L2.
+   *
+   * @return  		L2
+   */
+  public double getL2() {
+    return m_L2;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String l2TipText() {
+    return "The L2 value.";
+  }
+
+  /**
+   * Sets the drop-out value.
+   *
+   * @param value	the drop-out
+   */
+  public void setDropOut(double value) {
+    if (getOptionManager().isValid("dropOut", value)) {
+      m_DropOut = value;
+      reset();
+    }
+  }
+
+  /**
+   * Returns the drop-out value.
+   *
+   * @return  		the drop-out
+   */
+  public double getDropOut() {
+    return m_DropOut;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String dropOutTipText() {
+    return "The drop-out value.";
+  }
+
+  /**
+   * Sets whether to use drop-connect.
+   *
+   * @param value	true if to use drop-connect
+   */
+  public void setUseDropConnect(boolean value) {
+    m_UseDropConnect = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to use drop-connect.
+   *
+   * @return  		true if to use drop-connect
+   */
+  public boolean getUseDropConnect() {
+    return m_UseDropConnect;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String useDropConnectTipText() {
+    return "If enabled, drop connect is used.";
   }
 
   /**
@@ -241,6 +455,11 @@ public class Dl4jMlpClassifier
     builder = new NeuralNetConfiguration.Builder();
     builder.setOptimizationAlgo(getOptimizationAlgorithm());
     builder.setSeed(m_Seed);
+    builder.setUseRegularization(m_UseRegularization);
+    builder.setL1(m_L1);
+    builder.setL2(m_L2);
+    builder.setDropOut(m_DropOut);
+    builder.setUseDropConnect(m_UseDropConnect);
 
     listbuilder = builder.list(getLayers());
     for (i = 0; i < m_Layers.length; i++) {
