@@ -119,6 +119,7 @@ The following sinks are available:
 
 The following conversions are available:
 \begin{tight_itemize}
+  \item \textit{DL4JDataSetToSpreadSheet} -- turns a DataSet into a SpreadSheet.
   \item \textit{DL4JModelToJson} -- turns a model into its JSON\cite{json} representation.
   \item \textit{DL4JModelToSpreadSheet} -- turns the parameters of a model into a spreadsheet.
   \item \textit{DL4JModelToString} -- turns the parameters of a model into a simple string representation.
@@ -143,6 +144,8 @@ These listeners can be attached to the following actors:
 The following schemes for configuring iteration listeners are available:
 \begin{tight_itemize}
   \item \textit{NullListener} -- does nothing
+  \item \textit{CallableActorScoreListenerConfigurator} -- forwards double array
+  of iteration/score to the specified callable actor (e.g., for plotting)
   \item \textit{InMemoryStatsListenerConfigurator} -- stores statistics in memory
   and allows accessing them via a web interface on \url{http://localhost:9000/train}{}
   \item \textit{ScoreIterationListenerConfigurator} -- simple logging of
