@@ -69,15 +69,15 @@ import weka.dl4j.layers.OutputLayer;
  * &nbsp;&nbsp;&nbsp;minimum: 0.0
  * </pre>
  * 
+ * <pre>-drop-type &lt;NONE|DROP_CONNECT|DROP_OUT&gt; (property: dropType)
+ * &nbsp;&nbsp;&nbsp;The type of drop to use.
+ * &nbsp;&nbsp;&nbsp;default: NONE
+ * </pre>
+ * 
  * <pre>-drop-out &lt;double&gt; (property: dropOut)
  * &nbsp;&nbsp;&nbsp;The drop-out value.
  * &nbsp;&nbsp;&nbsp;default: 0.0
  * &nbsp;&nbsp;&nbsp;minimum: 0.0
- * </pre>
- * 
- * <pre>-use-drop-connect &lt;boolean&gt; (property: useDropConnect)
- * &nbsp;&nbsp;&nbsp;If enabled, drop connect is used.
- * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
  * <pre>-layer &lt;org.deeplearning4j.nn.conf.layers.Layer&gt; [-layer ...] (property: layers)
@@ -96,6 +96,15 @@ public class Dl4jMlpClassifier
 
   private static final long serialVersionUID = -1020010172973169754L;
 
+  /**
+   * How drop outs are handled.
+   */
+  public enum DropType {
+    NONE,
+    DROP_CONNECT,
+    DROP_OUT,
+  }
+
   /** the seed. */
   protected long m_Seed;
 
@@ -111,11 +120,11 @@ public class Dl4jMlpClassifier
   /** the L2. */
   protected double m_L2;
 
+  /** the drop type. */
+  protected DropType m_DropType;
+
   /** the drop out value. */
   protected double m_DropOut;
-
-  /** whether to use drop-connect. */
-  protected boolean m_UseDropConnect;
 
   /** The layers of the network. */
   protected Layer[] m_Layers;
@@ -158,12 +167,12 @@ public class Dl4jMlpClassifier
       0.0, 0.0, null);
 
     m_OptionManager.add(
-      "drop-out", "dropOut",
-      0.0, 0.0, null);
+      "drop-type", "dropType",
+      DropType.NONE);
 
     m_OptionManager.add(
-      "use-drop-connect", "useDropConnect",
-      false);
+      "drop-out", "dropOut",
+      0.0, 0.0, null);
 
     m_OptionManager.add(
       "layer", "layers",
@@ -323,6 +332,35 @@ public class Dl4jMlpClassifier
   }
 
   /**
+   * Sets the drop type
+   *
+   * @param value	the type
+   */
+  public void setDropType(DropType value) {
+    m_DropType = value;
+    reset();
+  }
+
+  /**
+   * Returns the drop type.
+   *
+   * @return  		the type
+   */
+  public DropType getDropType() {
+    return m_DropType;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String dropTypeTipText() {
+    return "The type of drop to use.";
+  }
+
+  /**
    * Sets the drop-out value.
    *
    * @param value	the drop-out
@@ -351,35 +389,6 @@ public class Dl4jMlpClassifier
    */
   public String dropOutTipText() {
     return "The drop-out value.";
-  }
-
-  /**
-   * Sets whether to use drop-connect.
-   *
-   * @param value	true if to use drop-connect
-   */
-  public void setUseDropConnect(boolean value) {
-    m_UseDropConnect = value;
-    reset();
-  }
-
-  /**
-   * Returns whether to use drop-connect.
-   *
-   * @return  		true if to use drop-connect
-   */
-  public boolean getUseDropConnect() {
-    return m_UseDropConnect;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String useDropConnectTipText() {
-    return "If enabled, drop connect is used.";
   }
 
   /**
@@ -455,11 +464,27 @@ public class Dl4jMlpClassifier
     builder = new NeuralNetConfiguration.Builder();
     builder.setOptimizationAlgo(getOptimizationAlgorithm());
     builder.setSeed(m_Seed);
-    builder.setUseRegularization(m_UseRegularization);
-    builder.setL1(m_L1);
-    builder.setL2(m_L2);
-    builder.setDropOut(m_DropOut);
-    builder.setUseDropConnect(m_UseDropConnect);
+
+    if (m_UseRegularization) {
+      builder.setUseRegularization(true);
+      builder.setL1(m_L1);
+      builder.setL2(m_L2);
+    }
+
+    switch (m_DropType) {
+      case NONE:
+	// nothing to do
+	break;
+      case DROP_OUT:
+	builder.setDropOut(m_DropOut);
+	break;
+      case DROP_CONNECT:
+	builder.setUseDropConnect(true);
+	builder.setDropOut(m_DropOut);
+	break;
+      default:
+	throw new IllegalStateException("Unhandled drop type: " + m_DropType);
+    }
 
     listbuilder = builder.list(getLayers());
     for (i = 0; i < m_Layers.length; i++) {
