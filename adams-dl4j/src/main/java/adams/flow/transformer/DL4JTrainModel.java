@@ -23,10 +23,14 @@ package adams.flow.transformer;
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.core.Randomizable;
+import adams.core.VariableName;
+import adams.event.VariableChangeEvent;
+import adams.event.VariableChangeEvent.Type;
 import adams.flow.container.DL4JModelContainer;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.Token;
+import adams.flow.core.VariableMonitor;
 import adams.flow.provenance.ActorType;
 import adams.flow.provenance.Provenance;
 import adams.flow.provenance.ProvenanceContainer;
@@ -47,7 +51,8 @@ import java.util.List;
 
 /**
  <!-- globalinfo-start -->
- * Trains a model based on the incoming dataset and outputs the built model alongside the dataset (in a model container).
+ * Trains a model based on the incoming dataset and outputs the built model alongside the dataset (in a model container).<br>
+ * The model can be reset using the monitor variable option, i.e, whenever this variable changes value, the model gets reset. Useful when training sequentually on multiple datasets (using the file name as monitor variable).
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -59,7 +64,7 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;adams.flow.container.DL4JModelContainer<br>
  * <br><br>
  * Container information:<br>
- * - adams.flow.container.DL4JModelContainer: Model, Dataset
+ * - adams.flow.container.DL4JModelContainer: Model, Dataset, Epoch
  * <br><br>
  <!-- flow-summary-end -->
  *
@@ -131,6 +136,11 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;minimum: -1
  * </pre>
  * 
+ * <pre>-var-name &lt;adams.core.VariableName&gt; (property: variableName)
+ * &nbsp;&nbsp;&nbsp;The variable to monitor.
+ * &nbsp;&nbsp;&nbsp;default: variable
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -138,7 +148,7 @@ import java.util.List;
  */
 public class DL4JTrainModel
   extends AbstractTransformer
-  implements ProvenanceSupporter, Randomizable {
+  implements ProvenanceSupporter, Randomizable, VariableMonitor {
 
   /** for serialization. */
   private static final long serialVersionUID = -3019442578354930841L;
@@ -173,6 +183,9 @@ public class DL4JTrainModel
   /** output the model every number of epochs. */
   protected int m_OutputInterval;
 
+  /** the variable to listen to. */
+  protected VariableName m_VariableName;
+
   /** the current epoch. */
   protected int m_Epoch;
 
@@ -188,7 +201,11 @@ public class DL4JTrainModel
   public String globalInfo() {
     return
       "Trains a model based on the incoming dataset and outputs the "
-	+ "built model alongside the dataset (in a model container).";
+	+ "built model alongside the dataset (in a model container).\n"
+        + "The model can be reset using the monitor variable option, i.e, "
+	+ "whenever this variable changes value, the model gets reset. "
+	+ "Useful when training sequentually on multiple datasets (using the "
+	+ "file name as monitor variable).";
   }
 
   /**
@@ -221,6 +238,10 @@ public class DL4JTrainModel
     m_OptionManager.add(
       "output-interval", "outputInterval",
       -1, -1, null);
+
+    m_OptionManager.add(
+      "var-name", "variableName",
+      new VariableName());
   }
 
   /**
@@ -398,6 +419,35 @@ public class DL4JTrainModel
   }
 
   /**
+   * Sets the name of the variable to monitor.
+   *
+   * @param value	the name
+   */
+  public void setVariableName(VariableName value) {
+    m_VariableName = value;
+    reset();
+  }
+
+  /**
+   * Returns the name of the variable to monitor.
+   *
+   * @return		the name
+   */
+  public VariableName getVariableName() {
+    return m_VariableName;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String variableNameTipText() {
+    return "The variable to monitor.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -409,6 +459,7 @@ public class DL4JTrainModel
     result  = QuickInfoHelper.toString(this, "model", m_Model, "model: ");
     result += QuickInfoHelper.toString(this, "numEpochs", m_NumEpochs, ", epochs: ");
     result += QuickInfoHelper.toString(this, "miniBatchSize", m_MiniBatchSize, ", minibatch: ");
+    result += QuickInfoHelper.toString(this, "variableName", m_VariableName.paddedValue(), ", monitor: ");
 
     return result;
   }
@@ -468,12 +519,35 @@ public class DL4JTrainModel
   }
 
   /**
+   * Gets triggered when a variable changed (added, modified, removed).
+   *
+   * @param e		the event
+   */
+  @Override
+  public void variableChanged(VariableChangeEvent e) {
+    super.variableChanged(e);
+    if ((e.getType() == Type.MODIFIED) || (e.getType() == Type.ADDED)) {
+      if (e.getName().equals(m_VariableName.getValue())) {
+	resetModel();
+        if (isLoggingEnabled())
+          getLogger().info("Reset model");
+      }
+    }
+  }
+
+  /**
    * Resets the scheme.
    */
   @Override
   protected void reset() {
     super.reset();
+    resetModel();
+  }
 
+  /**
+   * Resets the model.
+   */
+  protected void resetModel() {
     m_ActualModel = null;
     m_Epoch       = 0;
     m_TrainData   = null;
@@ -668,9 +742,6 @@ public class DL4JTrainModel
   @Override
   public void wrapUp() {
     super.wrapUp();
-
-    m_ActualModel = null;
-    m_TrainData   = null;
-    m_Epoch       = 0;
+    resetModel();
   }
 }
