@@ -27,8 +27,10 @@ import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.gradient.Gradient;
 import org.deeplearning4j.optimize.api.ConvexOptimizer;
+import org.deeplearning4j.optimize.api.IterationListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -308,6 +310,22 @@ public class ScriptedModel
   @Override
   public void applyLearningRateScoreDecay() {
     getModel().applyLearningRateScoreDecay();
+  }
+
+  /**
+   * Set the IterationListeners for the ComputationGraph (and all layers in the network)
+   */
+  @Override
+  public void setListeners(Collection<IterationListener> listeners) {
+    getModel().setListeners(listeners);
+  }
+
+  /**
+   * Set the IterationListeners for the ComputationGraph (and all layers in the network)
+   */
+  @Override
+  public void setListeners(IterationListener... listeners) {
+    getModel().setListeners(listeners);
   }
 
   /**

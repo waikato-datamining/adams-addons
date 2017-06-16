@@ -23,17 +23,26 @@ package weka.dl4j.layers;
 import org.deeplearning4j.nn.conf.GradientNormalization;
 import org.deeplearning4j.nn.conf.Updater;
 import org.deeplearning4j.nn.conf.distribution.Distribution;
-import org.nd4j.linalg.activations.impl.*;
-import org.nd4j.linalg.lossfunctions.impl.LossMSE;
-import weka.dl4j.distribution.NormalDistribution;
 import org.deeplearning4j.nn.weights.WeightInit;
-
+import org.nd4j.linalg.activations.impl.ActivationCube;
+import org.nd4j.linalg.activations.impl.ActivationELU;
+import org.nd4j.linalg.activations.impl.ActivationHardSigmoid;
+import org.nd4j.linalg.activations.impl.ActivationHardTanH;
+import org.nd4j.linalg.activations.impl.ActivationIdentity;
+import org.nd4j.linalg.activations.impl.ActivationLReLU;
+import org.nd4j.linalg.activations.impl.ActivationRReLU;
+import org.nd4j.linalg.activations.impl.ActivationReLU;
+import org.nd4j.linalg.activations.impl.ActivationSigmoid;
+import org.nd4j.linalg.activations.impl.ActivationSoftPlus;
+import org.nd4j.linalg.activations.impl.ActivationSoftSign;
+import org.nd4j.linalg.activations.impl.ActivationSoftmax;
+import org.nd4j.linalg.activations.impl.ActivationTanH;
 import org.nd4j.linalg.lossfunctions.ILossFunction;
-import org.nd4j.linalg.lossfunctions.impl.LossMCXENT;
-
+import org.nd4j.linalg.lossfunctions.impl.LossMSE;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
+import weka.dl4j.distribution.NormalDistribution;
 import weka.gui.ProgrammaticProperty;
 
 import java.io.Serializable;
@@ -327,10 +336,10 @@ public class OutputLayer extends org.deeplearning4j.nn.conf.layers.OutputLayer i
     commandLineParamName = "biasL1", commandLineParamSynopsis = "-biasL1 <double>",
     displayOrder = 13)
   public double getBiasL1() {
-    return this.biasL1;
+    return this.l1Bias;
   }
   public void setBiasL1(double biasL1) {
-    this.biasL1 = biasL1;
+    this.l1Bias = biasL1;
   }
 
   @OptionMetadata(
@@ -339,10 +348,10 @@ public class OutputLayer extends org.deeplearning4j.nn.conf.layers.OutputLayer i
     commandLineParamName = "biasL2", commandLineParamSynopsis = "-biasL2 <double>",
     displayOrder = 14)
   public double getBiasL2() {
-    return this.biasL2;
+    return this.l2Bias;
   }
   public void setBiasL2(double biasL2) {
-    this.biasL2 = biasL2;
+    this.l2Bias = biasL2;
   }
 
   @OptionMetadata(

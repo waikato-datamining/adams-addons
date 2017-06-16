@@ -70,4 +70,14 @@ public abstract class AbstractScript
   public AdditionalOptions getAdditionalOptions() {
     return m_AdditionalOptions;
   }
+
+  /**
+   * Resets the scheme.
+   * Derived classes must call this method in set-methods of parameters to
+   * assure the invalidation of previously generated data.
+   */
+  @Override
+  public void reset() {
+    super.reset();
+  }
 }

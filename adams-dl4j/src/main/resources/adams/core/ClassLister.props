@@ -45,8 +45,10 @@ adams.ml.dl4j.model.ModelConfigurator=\
   adams.ml.dl4j.model
 
 # dataset iterators
-org.deeplearning4j.datasets.iterator.DataSetIterator=\
+org.nd4j.linalg.dataset.api.iterator.DataSetIterator=\
   adams.ml.dl4j.datasetiterator,\
+  org.nd4j.linalg.dataset.api.iterator,\
+  org.deeplearning4j.iterator,\
   org.deeplearning4j.datasets.iterator,\
   org.deeplearning4j.datasets.iterator.impl,\
   org.deeplearning4j.datasets.canova,\

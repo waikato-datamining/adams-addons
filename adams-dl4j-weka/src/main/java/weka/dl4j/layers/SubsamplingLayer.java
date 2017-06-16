@@ -20,21 +20,32 @@
  */
 package weka.dl4j.layers;
 
-import java.io.Serializable;
-import java.util.Enumeration;
-import java.util.Map;
-
 import org.deeplearning4j.nn.conf.GradientNormalization;
 import org.deeplearning4j.nn.conf.Updater;
 import org.deeplearning4j.nn.conf.distribution.Distribution;
 import org.deeplearning4j.nn.weights.WeightInit;
-import org.nd4j.linalg.activations.impl.*;
-import weka.dl4j.distribution.NormalDistribution;
-
+import org.nd4j.linalg.activations.impl.ActivationCube;
+import org.nd4j.linalg.activations.impl.ActivationELU;
+import org.nd4j.linalg.activations.impl.ActivationHardSigmoid;
+import org.nd4j.linalg.activations.impl.ActivationHardTanH;
+import org.nd4j.linalg.activations.impl.ActivationIdentity;
+import org.nd4j.linalg.activations.impl.ActivationLReLU;
+import org.nd4j.linalg.activations.impl.ActivationRReLU;
+import org.nd4j.linalg.activations.impl.ActivationReLU;
+import org.nd4j.linalg.activations.impl.ActivationSigmoid;
+import org.nd4j.linalg.activations.impl.ActivationSoftPlus;
+import org.nd4j.linalg.activations.impl.ActivationSoftSign;
+import org.nd4j.linalg.activations.impl.ActivationSoftmax;
+import org.nd4j.linalg.activations.impl.ActivationTanH;
 import weka.core.Option;
-import weka.core.OptionMetadata;
 import weka.core.OptionHandler;
+import weka.core.OptionMetadata;
+import weka.dl4j.distribution.NormalDistribution;
 import weka.gui.ProgrammaticProperty;
+
+import java.io.Serializable;
+import java.util.Enumeration;
+import java.util.Map;
 
 /**
  * A version of DeepLearning4j's SubsamplingLayer that implements WEKA option handling.
@@ -78,7 +89,7 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
     setKernelSize(new int[] {1, 1});
     setStride(new int[] {2, 2});
     setPadding(new int[] {0, 0});
-    setPoolingType(PoolingType.MAX);
+    setPoolingType(org.deeplearning4j.nn.conf.layers.PoolingType.MAX);
   }
 
   @OptionMetadata(
@@ -326,10 +337,10 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
     commandLineParamName = "biasL1", commandLineParamSynopsis = "-biasL1 <double>",
     displayOrder = 13)
   public double getBiasL1() {
-    return this.biasL1;
+    return this.l1Bias;
   }
   public void setBiasL1(double biasL1) {
-    this.biasL1 = biasL1;
+    this.l1Bias = biasL1;
   }
 
   @OptionMetadata(
@@ -338,10 +349,10 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
     commandLineParamName = "biasL2", commandLineParamSynopsis = "-biasL2 <double>",
     displayOrder = 14)
   public double getBiasL2() {
-    return this.biasL2;
+    return this.l2Bias;
   }
   public void setBiasL2(double biasL2) {
-    this.biasL2 = biasL2;
+    this.l2Bias = biasL2;
   }
 
   @OptionMetadata(
@@ -553,10 +564,10 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
     description = "The type of pooling to use (default = MAX; options: MAX, AVG, SUM, NONE).",
     commandLineParamName = "poolingType", commandLineParamSynopsis = "-poolingType <string>",
     displayOrder = 30)
-  public PoolingType getPoolingType() {
+  public org.deeplearning4j.nn.conf.layers.PoolingType getPoolingType() {
     return this.poolingType;
   }
-  public void setPoolingType(PoolingType poolingType) {
+  public void setPoolingType(org.deeplearning4j.nn.conf.layers.PoolingType poolingType) {
     this.poolingType = poolingType;
   }
 

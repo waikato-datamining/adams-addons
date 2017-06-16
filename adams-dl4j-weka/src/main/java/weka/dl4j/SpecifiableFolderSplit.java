@@ -20,9 +20,9 @@
  */
 package weka.dl4j;
 
-import java.net.URI;
-
 import org.datavec.api.split.FileSplit;
+
+import java.net.URI;
 
 /**
  * A hacky override of FileSplit that lets you specify the files directly.
@@ -51,7 +51,9 @@ public class SpecifiableFolderSplit extends FileSplit {
    * @param uris the list of files
    */
   public void setFiles(URI[] uris) {
-    locations = uris;
+    uriStrings.clear();
+    for (URI uri: uris)
+      uriStrings.add(uri.toString());
   }
 
   /**
