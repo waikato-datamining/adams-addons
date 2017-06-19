@@ -44,6 +44,10 @@ org.deeplearning4j.nn.api.Model=\
 adams.ml.dl4j.model.ModelConfigurator=\
   adams.ml.dl4j.model
 
+# model generators
+adams.ml.dl4j.modelgenerator.ModelGenerator=\
+  adams.ml.dl4j.modelgenerator
+
 # dataset iterators
 org.nd4j.linalg.dataset.api.iterator.DataSetIterator=\
   adams.ml.dl4j.datasetiterator,\

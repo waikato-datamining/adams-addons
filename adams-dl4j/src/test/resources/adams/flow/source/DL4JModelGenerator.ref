@@ -1,0 +1,50 @@
+--> dumpfile.txt
+---
+iterationCount: 0
+l1ByParam: {}
+l2ByParam: {}
+layer: !<dense>
+  activationFn: !<TanH> {}
+  adamMeanDecay: NaN
+  adamVarDecay: NaN
+  biasInit: 0.0
+  biasLearningRate: 0.1
+  dist: null
+  dropOut: 0.0
+  epsilon: NaN
+  gradientNormalization: "None"
+  gradientNormalizationThreshold: 1.0
+  l1: 0.0
+  l1Bias: 0.0
+  l2: 1.0E-4
+  l2Bias: 0.0
+  layerName: "layer0"
+  learningRate: 0.1
+  learningRateSchedule: null
+  momentum: NaN
+  momentumSchedule: null
+  nin: 1
+  nout: 3
+  rho: NaN
+  rmsDecay: NaN
+  updater: "SGD"
+  weightInit: "XAVIER"
+leakyreluAlpha: 0.0
+learningRateByParam: {}
+learningRatePolicy: "None"
+lrPolicyDecayRate: NaN
+lrPolicyPower: NaN
+lrPolicySteps: NaN
+maxNumLineSearchIterations: 5
+miniBatch: true
+minimize: true
+numIterations: 1
+optimizationAlgo: "STOCHASTIC_GRADIENT_DESCENT"
+pretrain: false
+seed: 6
+stepFunction: null
+useDropConnect: false
+useRegularization: true
+variables: []
+
+
