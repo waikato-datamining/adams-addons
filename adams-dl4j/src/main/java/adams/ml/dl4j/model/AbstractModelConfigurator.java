@@ -60,11 +60,13 @@ public abstract class AbstractModelConfigurator
   /**
    * Hook method before configuring the model.
    * <br>
-   * Default implementation does nothing.
+   * Default implementation only ensures that flow context is set.
    *
    * @return		null if successful, otherwise error message
    */
   protected String check() {
+    if (m_FlowContext == null)
+      return "No flow context set!";
     return null;
   }
 
