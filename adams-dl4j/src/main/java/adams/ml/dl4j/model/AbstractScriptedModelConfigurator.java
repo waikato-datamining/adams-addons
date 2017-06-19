@@ -25,6 +25,8 @@ import adams.core.base.BaseText;
 import adams.core.io.PlaceholderFile;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.scripting.FileBasedScriptingWithOptions;
+import adams.flow.core.Actor;
+import adams.flow.core.FlowContextHandler;
 
 /**
  * Abstract ancestor for model generators that execute external scripts.
@@ -47,6 +49,9 @@ public abstract class AbstractScriptedModelConfigurator
 
   /** the loaded script object. */
   protected transient Object m_ScriptObject;
+
+  /** the flow context. */
+  protected Actor m_FlowContext;
 
   /**
    * Adds options to the internal list of options.
@@ -72,6 +77,24 @@ public abstract class AbstractScriptedModelConfigurator
     super.reset();
     
     m_ScriptObject = null;
+  }
+
+  /**
+   * Sets the flow context.
+   *
+   * @param value	the actor
+   */
+  public void setFlowContext(Actor value) {
+    m_FlowContext = value;
+  }
+
+  /**
+   * Returns the flow context, if any.
+   *
+   * @return		the actor, null if none available
+   */
+  public Actor getFlowContext() {
+    return m_FlowContext;
   }
 
   /**
@@ -156,8 +179,12 @@ public abstract class AbstractScriptedModelConfigurator
     String	result;
 
     result = loadScriptObject();
-    if (result == null)
+
+    if (result == null) {
+      if (m_ScriptObject instanceof FlowContextHandler)
+        ((FlowContextHandler) m_ScriptObject).setFlowContext(m_FlowContext);
       result = checkScriptObject();
+    }
 
     return result;
   }

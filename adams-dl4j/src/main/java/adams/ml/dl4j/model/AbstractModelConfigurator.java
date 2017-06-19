@@ -21,6 +21,7 @@
 package adams.ml.dl4j.model;
 
 import adams.core.option.AbstractOptionHandler;
+import adams.flow.core.Actor;
 import org.deeplearning4j.nn.api.Model;
 
 /**
@@ -34,6 +35,27 @@ public abstract class AbstractModelConfigurator
   implements ModelConfigurator {
 
   private static final long serialVersionUID = -5049221729823530346L;
+
+  /** the flow context. */
+  protected Actor m_FlowContext;
+
+  /**
+   * Sets the flow context.
+   *
+   * @param value	the actor
+   */
+  public void setFlowContext(Actor value) {
+    m_FlowContext = value;
+  }
+
+  /**
+   * Returns the flow context, if any.
+   *
+   * @return		the actor, null if none available
+   */
+  public Actor getFlowContext() {
+    return m_FlowContext;
+  }
 
   /**
    * Hook method before configuring the model.

@@ -20,6 +20,7 @@
 
 package adams.ml.dl4j.model;
 
+import adams.flow.core.FlowContextHandler;
 import org.deeplearning4j.nn.api.Model;
 
 import java.io.Serializable;
@@ -31,7 +32,7 @@ import java.io.Serializable;
  * @version $Revision$
  */
 public interface ModelConfigurator
-  extends Serializable {
+  extends Serializable, FlowContextHandler {
 
   /**
    * Configures a model and returns it.

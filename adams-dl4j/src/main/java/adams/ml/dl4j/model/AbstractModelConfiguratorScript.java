@@ -20,6 +20,7 @@
 package adams.ml.dl4j.model;
 
 import adams.core.option.AbstractOptionHandler;
+import adams.flow.core.Actor;
 import adams.flow.core.AdditionalOptions;
 import adams.flow.core.AdditionalOptionsHandler;
 
@@ -41,6 +42,9 @@ public abstract class AbstractModelConfiguratorScript
   
   /** for storing the additional options. */
   protected AdditionalOptions m_AdditionalOptions;
+
+  /** the flow context. */
+  protected Actor m_FlowContext;
 
   /**
    * Initializes the members.
@@ -68,5 +72,23 @@ public abstract class AbstractModelConfiguratorScript
    */
   public AdditionalOptions getAdditionalOptions() {
     return m_AdditionalOptions;
+  }
+
+  /**
+   * Sets the flow context.
+   *
+   * @param value	the actor
+   */
+  public void setFlowContext(Actor value) {
+    m_FlowContext = value;
+  }
+
+  /**
+   * Returns the flow context, if any.
+   *
+   * @return		the actor, null if none available
+   */
+  public Actor getFlowContext() {
+    return m_FlowContext;
   }
 }
