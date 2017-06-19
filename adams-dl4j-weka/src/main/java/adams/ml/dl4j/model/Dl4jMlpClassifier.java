@@ -473,7 +473,7 @@ public class Dl4jMlpClassifier
 
     switch (m_DropType) {
       case NONE:
-	// nothing to do
+	builder.setDropOut(0.0);
 	break;
       case DROP_OUT:
 	builder.setDropOut(m_DropOut);
