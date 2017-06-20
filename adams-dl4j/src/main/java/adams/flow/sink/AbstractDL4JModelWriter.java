@@ -15,7 +15,7 @@
 
 /*
  * AbstractDL4JModelWriter.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
@@ -23,6 +23,7 @@ package adams.flow.sink;
 import adams.core.SerializationHelper;
 import adams.flow.container.DL4JModelContainer;
 import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.util.ModelSerializer;
 
 import java.util.ArrayList;
@@ -107,6 +108,10 @@ public abstract class AbstractDL4JModelWriter
 	  obj = m_InputToken.getPayload();
       }
       if (model != null) {
+        if (model instanceof MultiLayerNetwork) {
+          if (!((MultiLayerNetwork) model).isInitCalled())
+            ((MultiLayerNetwork) model).init();
+        }
 	ModelSerializer.writeModel(model, m_OutputFile.getAbsoluteFile(), true);
       }
       else if (obj != null) {
