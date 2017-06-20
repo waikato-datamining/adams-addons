@@ -101,7 +101,7 @@ public class RandomDl4jMlpClassifierNetworks
   public String globalInfo() {
     return
       "Generates random " + Dl4jMlpClassifier.class.getName() + " networks.\n"
-      + "Randomly selects items from the supplied parameter lists if more than item supplied.";
+	+ "Randomly selects items from the supplied parameter lists if more than item supplied.";
   }
 
   /**
@@ -559,16 +559,6 @@ public class RandomDl4jMlpClassifierNetworks
 	result = "List of layers is empty!";
       else if (m_NumNodes.length == 0)
 	result = "List of nodes is empty!";
-      else if (m_UseRegularization.length == 0)
-	result = "List of regularization flags is empty!";
-      else if (m_L1.length == 0)
-	result = "List of L1 values is empty!";
-      else if (m_L2.length == 0)
-	result = "List of L2 values is empty!";
-      else if (m_DropType.length == 0)
-	result = "List of drop types is empty!";
-      else if (m_DropOut.length == 0)
-	result = "List of drop out values is empty!";
     }
 
     return result;
@@ -611,11 +601,16 @@ public class RandomDl4jMlpClassifierNetworks
 
     while (result.size() < m_NumNetworks) {
       conf = (Dl4jMlpClassifier) OptionUtils.shallowCopy(m_DefaultNetwork);
-      conf.setUseRegularization(((BaseBoolean) pick(rand, m_UseRegularization)).booleanValue());
-      conf.setL1(((BaseDouble) pick(rand, m_L1)).doubleValue());
-      conf.setL2(((BaseDouble) pick(rand, m_L2)).doubleValue());
-      conf.setDropType((DropType) pick(rand, m_DropType));
-      conf.setDropOut(((BaseDouble) pick(rand, m_DropOut)).doubleValue());
+      if (m_UseRegularization.length > 0)
+	conf.setUseRegularization(((BaseBoolean) pick(rand, m_UseRegularization)).booleanValue());
+      if (m_L1.length > 0)
+	conf.setL1(((BaseDouble) pick(rand, m_L1)).doubleValue());
+      if (m_L2.length > 0)
+	conf.setL2(((BaseDouble) pick(rand, m_L2)).doubleValue());
+      if (m_DropType.length > 0)
+	conf.setDropType((DropType) pick(rand, m_DropType));
+      if (m_DropOut.length > 0)
+	conf.setDropOut(((BaseDouble) pick(rand, m_DropOut)).doubleValue());
 
       layers = new Layer[((BaseInteger) pick(rand, m_NumLayers)).intValue()];
       if (isLoggingEnabled())
@@ -630,10 +625,13 @@ public class RandomDl4jMlpClassifierNetworks
 	  layers[i].setLayerName("dense-" + i);
 	  ((DenseLayer) layers[i]).setNOut(((BaseInteger) pick(rand, m_NumNodes)).intValue());
 	}
-	layers[i].setLearningRate(((BaseDouble) pick(rand, m_LearningRate)).doubleValue());
+	if (m_LearningRate.length > 0)
+	  layers[i].setLearningRate(((BaseDouble) pick(rand, m_LearningRate)).doubleValue());
 	if (conf.getUseRegularization()) {
-	  layers[i].setL1(((BaseDouble) pick(rand, m_L1)).doubleValue());
-	  layers[i].setL2(((BaseDouble) pick(rand, m_L2)).doubleValue());
+	  if (m_L1.length > 0)
+	    layers[i].setL1(((BaseDouble) pick(rand, m_L1)).doubleValue());
+	  if (m_L2.length > 0)
+	    layers[i].setL2(((BaseDouble) pick(rand, m_L2)).doubleValue());
 	}
       }
       conf.setLayers(layers);
