@@ -24,6 +24,7 @@ import adams.core.Randomizable;
 import adams.core.base.BaseBoolean;
 import adams.core.base.BaseDouble;
 import adams.core.base.BaseInteger;
+import adams.core.option.OptionUtils;
 import adams.ml.dl4j.model.Dl4jMlpClassifier;
 import adams.ml.dl4j.model.Dl4jMlpClassifier.DropType;
 import org.deeplearning4j.nn.api.Model;
@@ -51,6 +52,15 @@ public class RandomDl4jMlpClassifierNetworks
   implements Randomizable {
 
   private static final long serialVersionUID = -3934375675313822523L;
+
+  /** the default network. */
+  protected Dl4jMlpClassifier m_DefaultNetwork;
+
+  /** the default dense layer. */
+  protected DenseLayer m_DefaultDenseLayer;
+
+  /** the default output layer. */
+  protected OutputLayer m_DefaultOutputLayer;
 
   /** the seed value. */
   protected long m_Seed;
@@ -99,6 +109,18 @@ public class RandomDl4jMlpClassifierNetworks
     super.defineOptions();
 
     m_OptionManager.add(
+      "default-network", "defaultNetwork",
+      new Dl4jMlpClassifier());
+
+    m_OptionManager.add(
+      "default-dense-layer", "defaultDenseLayer",
+      new DenseLayer());
+
+    m_OptionManager.add(
+      "default-output-layer", "defaultOutputLayer",
+      new OutputLayer());
+
+    m_OptionManager.add(
       "seed", "seed",
       1L);
 
@@ -133,6 +155,93 @@ public class RandomDl4jMlpClassifierNetworks
     m_OptionManager.add(
       "drop-out", "dropOut",
       new BaseDouble[0]);
+  }
+
+  /**
+   * Sets the default network.
+   *
+   * @param value	the network
+   */
+  public void setDefaultNetwork(Dl4jMlpClassifier value) {
+    m_DefaultNetwork = value;
+    reset();
+  }
+
+  /**
+   * Returns the default network.
+   *
+   * @return  		the network
+   */
+  public Dl4jMlpClassifier getDefaultNetwork() {
+    return m_DefaultNetwork;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String defaultNetworkTipText() {
+    return "The default network setup to use (minus layers).";
+  }
+
+  /**
+   * Sets the default dense layer.
+   *
+   * @param value	the dense layer
+   */
+  public void setDefaultDenseLayer(DenseLayer value) {
+    m_DefaultDenseLayer = value;
+    reset();
+  }
+
+  /**
+   * Returns the default dense layer.
+   *
+   * @return  		the dense layer
+   */
+  public DenseLayer getDefaultDenseLayer() {
+    return m_DefaultDenseLayer;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String defaultDenseLayerTipText() {
+    return "The default dense layer setup to use (minus layers).";
+  }
+
+  /**
+   * Sets the default output layer.
+   *
+   * @param value	the output layer
+   */
+  public void setDefaultOutputLayer(OutputLayer value) {
+    m_DefaultOutputLayer = value;
+    reset();
+  }
+
+  /**
+   * Returns the default output layer.
+   *
+   * @return  		the output layer
+   */
+  public OutputLayer getDefaultOutputLayer() {
+    return m_DefaultOutputLayer;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String defaultOutputLayerTipText() {
+    return "The default output layer setup to use.";
   }
 
   /**
@@ -465,7 +574,7 @@ public class RandomDl4jMlpClassifierNetworks
     rand      = new Random(m_Seed);
 
     while (result.size() < m_NumNetworks) {
-      conf = new Dl4jMlpClassifier();
+      conf = (Dl4jMlpClassifier) OptionUtils.shallowCopy(m_DefaultNetwork);
       conf.setUseRegularization(((BaseBoolean) pick(rand, m_UseRegularization)).booleanValue());
       conf.setL1(((BaseDouble) pick(rand, m_L1)).doubleValue());
       conf.setL2(((BaseDouble) pick(rand, m_L2)).doubleValue());
@@ -477,11 +586,11 @@ public class RandomDl4jMlpClassifierNetworks
 	getLogger().info("# layers: " + layers.length);
       for (i = 0; i < layers.length; i++) {
 	if (i == layers.length - 1) {
-	  layers[i] = new OutputLayer();
+	  layers[i] = (OutputLayer) OptionUtils.shallowCopy(m_DefaultOutputLayer);
 	  layers[i].setLayerName("output-" + i);
 	}
 	else {
-	  layers[i] = new DenseLayer();
+	  layers[i] = (DenseLayer) OptionUtils.shallowCopy(m_DefaultDenseLayer);
 	  layers[i].setLayerName("dense-" + i);
 	  ((DenseLayer) layers[i]).setNOut(((BaseInteger) pick(rand, m_NumNodes)).intValue());
 	}
