@@ -28,6 +28,7 @@ import adams.ml.dl4j.model.Dl4jMlpClassifier;
 import adams.ml.dl4j.model.Dl4jMlpClassifier.DropType;
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.conf.layers.Layer;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.layers.OutputLayer;
 
@@ -472,13 +473,21 @@ public class RandomDl4jMlpClassifierNetworks
       conf.setDropOut(((BaseDouble) pick(rand, m_DropOut)).doubleValue());
 
       layers = new Layer[((BaseInteger) pick(rand, m_NumLayers)).intValue()];
+      if (isLoggingEnabled())
+	getLogger().info("# layers: " + layers.length);
       for (i = 0; i < layers.length; i++) {
 	if (i == layers.length - 1) {
 	  layers[i] = new OutputLayer();
+	  layers[i].setLayerName("output-" + i);
 	}
 	else {
 	  layers[i] = new DenseLayer();
+	  layers[i].setLayerName("dense-" + i);
 	  ((DenseLayer) layers[i]).setNOut(((BaseInteger) pick(rand, m_NumNodes)).intValue());
+	}
+	if (conf.getUseRegularization()) {
+	  layers[i].setL1(((BaseDouble) pick(rand, m_L1)).doubleValue());
+	  layers[i].setL2(((BaseDouble) pick(rand, m_L2)).doubleValue());
 	}
       }
       conf.setLayers(layers);
@@ -490,7 +499,7 @@ public class RandomDl4jMlpClassifierNetworks
     generated = new HashSet<>();
     i         = 0;
     while (i < result.size()) {
-      yaml = result.get(i).conf().toYaml();
+      yaml = ((MultiLayerNetwork) result.get(i)).getLayerWiseConfigurations().toYaml();
       if (generated.contains(yaml)) {
 	result.remove(i);
       }
