@@ -15,7 +15,7 @@
 
 /*
  * AbstractDL4JModelReader.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -24,7 +24,10 @@ import adams.core.QuickInfoHelper;
 import adams.core.io.PlaceholderFile;
 import adams.flow.container.DL4JModelContainer;
 import adams.flow.core.Token;
+import adams.ml.dl4j.model.ModelType;
 import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.util.ModelSerializer;
 
 import java.io.File;
@@ -41,6 +44,9 @@ public abstract class AbstractDL4JModelReader
   /** for serialization. */
   private static final long serialVersionUID = -2949611378612429555L;
 
+  /** the model type. */
+  protected ModelType m_Type;
+
   /** whether to only output the model. */
   protected boolean m_OutputOnlyModel;
 
@@ -52,8 +58,41 @@ public abstract class AbstractDL4JModelReader
     super.defineOptions();
 
     m_OptionManager.add(
-	    "output-only-model", "outputOnlyModel",
-	    false);
+      "type", "type",
+      ModelType.MULTI_LAYER_NETWORK);
+
+    m_OptionManager.add(
+      "output-only-model", "outputOnlyModel",
+      false);
+  }
+
+  /**
+   * Sets the model type to instantiate.
+   *
+   * @param value	the type
+   */
+  public void setType(ModelType value) {
+    m_Type = value;
+    reset();
+  }
+
+  /**
+   * Returns the model type to instantiate.
+   *
+   * @return 		the type
+   */
+  public ModelType getType() {
+    return m_Type;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String typeTipText() {
+    return "The type of model to instantiate.";
   }
 
   /**
@@ -107,13 +146,22 @@ public abstract class AbstractDL4JModelReader
   /**
    * Returns the class that the producer generates.
    *
-   * @return		adams.flow.container.WekaModelContainer.class or Object
+   * @return		the classes it generates
    */
   public Class[] generates() {
-    if (m_OutputOnlyModel)
-      return new Class[]{Object.class};
-    else
+    if (m_OutputOnlyModel) {
+      switch (m_Type) {
+        case MULTI_LAYER_NETWORK:
+          return new Class[]{MultiLayerConfiguration.class};
+        case COMPUTATION_GRAPH:
+          return new Class[]{ComputationGraph.class};
+        default:
+          throw new IllegalStateException("Unhanded model type: " + m_Type);
+      }
+    }
+    else {
       return new Class[]{DL4JModelContainer.class};
+    }
   }
 
   /**
@@ -136,7 +184,16 @@ public abstract class AbstractDL4JModelReader
       file = new PlaceholderFile((String) m_InputToken.getPayload());
 
     try {
-      model = ModelSerializer.restoreMultiLayerNetwork(file.getAbsoluteFile());
+      switch (m_Type) {
+        case MULTI_LAYER_NETWORK:
+          model = ModelSerializer.restoreMultiLayerNetwork(file.getAbsoluteFile());
+          break;
+        case COMPUTATION_GRAPH:
+          model = ModelSerializer.restoreComputationGraph(file.getAbsoluteFile());
+          break;
+        default:
+          throw new IllegalStateException("Unhanded model type: " + m_Type);
+      }
       if (m_OutputOnlyModel) {
 	m_OutputToken = new Token(model);
       }
