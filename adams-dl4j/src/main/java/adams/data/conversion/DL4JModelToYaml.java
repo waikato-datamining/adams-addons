@@ -21,6 +21,7 @@
 package adams.data.conversion;
 
 import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 
 /**
@@ -75,6 +76,8 @@ public class DL4JModelToYaml
   protected Object doConvert() throws Exception {
     if (m_Input instanceof MultiLayerNetwork)
       return ((MultiLayerNetwork) m_Input).getLayerWiseConfigurations().toYaml();
+    else if (m_Input instanceof ComputationGraph)
+      return ((ComputationGraph) m_Input).getConfiguration().toYaml();
     else
       return ((Model) m_Input).conf().toYaml();
   }

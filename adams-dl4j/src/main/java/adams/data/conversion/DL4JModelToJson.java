@@ -22,6 +22,7 @@ package adams.data.conversion;
 
 import net.minidev.json.JSONAware;
 import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 
 /**
@@ -91,6 +92,8 @@ public class DL4JModelToJson
 
     if (m_Input instanceof MultiLayerNetwork)
       jsonStr = ((MultiLayerNetwork) m_Input).getLayerWiseConfigurations().toJson();
+    else if (m_Input instanceof ComputationGraph)
+      jsonStr = ((ComputationGraph) m_Input).getConfiguration().toJson();
     else
       jsonStr = ((Model) m_Input).conf().toJson();
     conv = new StringToJson();
