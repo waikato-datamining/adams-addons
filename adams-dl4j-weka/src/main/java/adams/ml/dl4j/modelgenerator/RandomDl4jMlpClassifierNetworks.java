@@ -74,6 +74,9 @@ public class RandomDl4jMlpClassifierNetworks
   /** the list of possible nodes (per layer). */
   protected BaseInteger[] m_NumNodes;
 
+  /** learning rate values (per layer). */
+  protected BaseDouble[] m_LearningRate;
+
   /** using regularization (per layer). */
   protected BaseBoolean[] m_UseRegularization;
 
@@ -135,6 +138,10 @@ public class RandomDl4jMlpClassifierNetworks
     m_OptionManager.add(
       "num-nodes", "numNodes",
       new BaseInteger[0]);
+
+    m_OptionManager.add(
+      "learning-rate", "learningRate",
+      new BaseDouble[0]);
 
     m_OptionManager.add(
       "use-regularization", "useRegularization",
@@ -360,6 +367,35 @@ public class RandomDl4jMlpClassifierNetworks
    */
   public String numNodesTipText() {
     return "The list of node counts to choose from.";
+  }
+
+  /**
+   * Sets the list of learning rate values to choose from.
+   *
+   * @param value	the list
+   */
+  public void setLearningRate(BaseDouble[] value) {
+    m_LearningRate = value;
+    reset();
+  }
+
+  /**
+   * Returns the list of learning rate values to choose from.
+   *
+   * @return  		the list
+   */
+  public BaseDouble[] getLearningRate() {
+    return m_LearningRate;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String learningRateTipText() {
+    return "The list of learning rate values to choose from.";
   }
 
   /**
@@ -594,6 +630,7 @@ public class RandomDl4jMlpClassifierNetworks
 	  layers[i].setLayerName("dense-" + i);
 	  ((DenseLayer) layers[i]).setNOut(((BaseInteger) pick(rand, m_NumNodes)).intValue());
 	}
+	layers[i].setLearningRate(((BaseDouble) pick(rand, m_LearningRate)).doubleValue());
 	if (conf.getUseRegularization()) {
 	  layers[i].setL1(((BaseDouble) pick(rand, m_L1)).doubleValue());
 	  layers[i].setL2(((BaseDouble) pick(rand, m_L2)).doubleValue());
