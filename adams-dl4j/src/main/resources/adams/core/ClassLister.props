@@ -92,8 +92,10 @@ org.deeplearning4j.nn.conf.distribution.Distribution=\
 
 # loss functions
 org.nd4j.linalg.lossfunctions.ILossFunction=\
-  org.nd4j.linalg.lossfunctions
+  org.nd4j.linalg.lossfunctions,\
+  org.nd4j.linalg.lossfunctions.impl
 
 # activations
 org.nd4j.linalg.activations.IActivation=\
-  org.nd4j.linalg.activations
+  org.nd4j.linalg.activations,\
+  org.nd4j.linalg.activations.impl
