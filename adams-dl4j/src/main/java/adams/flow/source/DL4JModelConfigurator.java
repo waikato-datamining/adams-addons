@@ -159,6 +159,7 @@ public class DL4JModelConfigurator
    */
   @Override
   protected String doExecute() {
+    m_ModelConfigurator.setFlowContext(this);
     m_OutputToken = new Token(m_ModelConfigurator);
     return null;
   }
