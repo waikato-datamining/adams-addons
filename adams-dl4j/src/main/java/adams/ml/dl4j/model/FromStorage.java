@@ -163,6 +163,9 @@ public class FromStorage
    */
   @Override
   protected Model doConfigureModel(int numInput, int numOutput) {
-    return (Model) m_FlowContext.getStorageHandler().getStorage().get(m_StorageName);
+    if (m_Cache.length() == 0)
+      return (Model) m_FlowContext.getStorageHandler().getStorage().get(m_StorageName);
+    else
+      return (Model) m_FlowContext.getStorageHandler().getStorage().get(m_Cache, m_StorageName);
   }
 }
