@@ -26,8 +26,8 @@ import adams.flow.container.DL4JModelContainer;
 import adams.flow.core.Token;
 import adams.ml.dl4j.model.ModelType;
 import org.deeplearning4j.nn.api.Model;
-import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.util.ModelSerializer;
 
 import java.io.File;
@@ -131,7 +131,12 @@ public abstract class AbstractDL4JModelReader
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "outputOnlyModel", m_OutputOnlyModel, "only model");
+    String	result;
+
+    result  = QuickInfoHelper.toString(this, "type", m_Type, "type: ");
+    result += QuickInfoHelper.toString(this, "outputOnlyModel", m_OutputOnlyModel, "only model", ", ");
+
+    return result;
   }
 
   /**
@@ -152,7 +157,7 @@ public abstract class AbstractDL4JModelReader
     if (m_OutputOnlyModel) {
       switch (m_Type) {
         case MULTI_LAYER_NETWORK:
-          return new Class[]{MultiLayerConfiguration.class};
+          return new Class[]{MultiLayerNetwork.class};
         case COMPUTATION_GRAPH:
           return new Class[]{ComputationGraph.class};
         default:
