@@ -15,12 +15,13 @@
 
 /**
  * DL4JModelToYaml.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.conversion;
 
 import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 
 /**
  <!-- globalinfo-start -->
@@ -72,6 +73,9 @@ public class DL4JModelToYaml
    */
   @Override
   protected Object doConvert() throws Exception {
-    return ((Model) m_Input).conf().toYaml();
+    if (m_Input instanceof MultiLayerNetwork)
+      return ((MultiLayerNetwork) m_Input).getLayerWiseConfigurations().toYaml();
+    else
+      return ((Model) m_Input).conf().toYaml();
   }
 }

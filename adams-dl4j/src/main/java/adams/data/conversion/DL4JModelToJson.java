@@ -15,13 +15,14 @@
 
 /**
  * DL4JModelToJson.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.conversion;
 
 import net.minidev.json.JSONAware;
 import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 
 /**
  <!-- globalinfo-start -->
@@ -84,13 +85,14 @@ public class DL4JModelToJson
   @Override
   protected Object doConvert() throws Exception {
     Object		result;
-    Model		model;
     String		jsonStr;
     StringToJson	conv;
     String		msg;
 
-    model   = (Model) m_Input;
-    jsonStr = model.conf().toJson();
+    if (m_Input instanceof MultiLayerNetwork)
+      jsonStr = ((MultiLayerNetwork) m_Input).getLayerWiseConfigurations().toJson();
+    else
+      jsonStr = ((Model) m_Input).conf().toJson();
     conv = new StringToJson();
     conv.setInput(jsonStr);
     msg = conv.convert();
