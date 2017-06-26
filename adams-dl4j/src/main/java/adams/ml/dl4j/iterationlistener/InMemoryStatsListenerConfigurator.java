@@ -118,6 +118,15 @@ public class InMemoryStatsListenerConfigurator
   }
 
   /**
+   * Returns whether a flow context is required or optional.
+   *
+   * @return		true if required
+   */
+  public boolean requiresFlowContext() {
+    return false;
+  }
+
+  /**
    * Configures the actual {@link IterationListener} and returns it.
    *
    * @return		the listeners

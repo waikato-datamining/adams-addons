@@ -36,6 +36,13 @@ public interface IterationListenerConfigurator
   extends Serializable, FlowContextHandler {
 
   /**
+   * Returns whether a flow context is required or optional.
+   *
+   * @return		true if required
+   */
+  public boolean requiresFlowContext();
+
+  /**
    * Configures the listeners and returns it.
    *
    * @return		the listeners

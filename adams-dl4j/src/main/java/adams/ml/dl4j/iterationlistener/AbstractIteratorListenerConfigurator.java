@@ -79,8 +79,10 @@ public abstract class AbstractIteratorListenerConfigurator
    * @return		null if successful, otherwise error message
    */
   protected String check() {
-    if (m_FlowContext == null)
-      return "No flow context set!";
+    if (requiresFlowContext()) {
+      if (m_FlowContext == null)
+        return "No flow context set!";
+    }
     return null;
   }
 

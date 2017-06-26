@@ -247,6 +247,15 @@ public class CallableActorScoreListenerConfigurator
   }
 
   /**
+   * Returns whether a flow context is required or optional.
+   *
+   * @return		true if required
+   */
+  public boolean requiresFlowContext() {
+    return !m_Optional;
+  }
+
+  /**
    * Tries to find the callable actor referenced by its callable name.
    *
    * @return		the callable actor or null if not found
