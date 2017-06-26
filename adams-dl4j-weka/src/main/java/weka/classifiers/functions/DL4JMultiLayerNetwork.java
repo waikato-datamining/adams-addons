@@ -38,7 +38,6 @@ import weka.classifiers.rules.ZeroR;
 import weka.core.Capabilities;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.OptionHandler;
 import weka.core.Utils;
 import weka.core.WekaOptionUtils;
 import weka.dl4j.iterators.DefaultInstancesIterator;
@@ -159,13 +158,13 @@ public class DL4JMultiLayerNetwork
    * @throws Exception 	if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
-    setLayers((Layer[]) WekaOptionUtils.parse(options, LAYER, (OptionHandler[]) getDefaultLayers(), Layer.class));
+    setLayers((Layer[]) WekaOptionUtils.parse(options, LAYER, getDefaultLayers(), Layer.class));
     setOptimizationAlgorithm((OptimizationAlgorithm) WekaOptionUtils.parse(options, OPTIMIZATION_ALGORITHM, getDefaultOptimizationAlgorithm()));
     setNumEpochs(WekaOptionUtils.parse(options, NUM_EPOCHS, getDefaultNumEpochs()));
     setMiniBatchSize(WekaOptionUtils.parse(options, MINI_BATCH_SIZE, getDefaultMiniBatchSize()));
     setDropType((DropType) WekaOptionUtils.parse(options, DROP_TYPE, getDefaultDropType()));
     setDropOut(WekaOptionUtils.parse(options, DROP_OUT, getDefaultDropOut()));
-    setIterationListeners((IterationListenerConfigurator[]) WekaOptionUtils.parse(options, ITERATION_LISTENER, (adams.core.option.OptionHandler[]) getDefaultIterationListeners(), IterationListenerConfigurator.class));
+    setIterationListeners((IterationListenerConfigurator[]) WekaOptionUtils.parse(options, ITERATION_LISTENER, getDefaultIterationListeners(), IterationListenerConfigurator.class));
     super.setOptions(options);
   }
 
@@ -657,8 +656,11 @@ public class DL4JMultiLayerNetwork
     m_Model.setListeners(listeners);
 
     // build
-    iter = m_Iterator.getIterator(data, getSeed());
     for (i = 0; i < getNumEpochs(); i++) {
+      if (m_MiniBatchSize < 1)
+	iter = m_Iterator.getIterator(data, getSeed());
+      else
+	iter = m_Iterator.getIterator(data, getSeed(), m_MiniBatchSize);
       m_Model.fit(iter);
       if (getDebug() && (i % 100 == 0))
 	System.out.println("Epoch #" + (i+1) + " finished");
