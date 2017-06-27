@@ -20,9 +20,16 @@
 
 package adams.ml.dl4j.model;
 
+import adams.data.InPlaceProcessing;
 import adams.flow.control.StorageName;
 import adams.flow.control.StorageUser;
 import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.util.ModelSerializer;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 /**
  * Retrieves existing model simply from storage.
@@ -32,7 +39,7 @@ import org.deeplearning4j.nn.api.Model;
  */
 public class FromStorage
   extends AbstractModelConfigurator
-  implements StorageUser {
+  implements StorageUser, InPlaceProcessing {
 
   private static final long serialVersionUID = -5856765502127602083L;
 
@@ -41,6 +48,9 @@ public class FromStorage
 
   /** the name of the stored value. */
   protected StorageName m_StorageName;
+
+  /** whether to skip creating a copy of the model. */
+  protected boolean m_NoCopy;
 
   /**
    * Returns a string describing the object.
@@ -66,6 +76,10 @@ public class FromStorage
     m_OptionManager.add(
 	    "storage-name", "storageName",
 	    new StorageName());
+
+    m_OptionManager.add(
+	    "no-copy", "noCopy",
+	    false);
   }
 
   /**
@@ -127,6 +141,35 @@ public class FromStorage
   }
 
   /**
+   * Sets whether to skip creating a copy of the spreadsheet before setting value.
+   *
+   * @param value	true if to skip creating copy
+   */
+  public void setNoCopy(boolean value) {
+    m_NoCopy = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to skip creating a copy of the spreadsheet before setting value.
+   *
+   * @return		true if copying is skipped
+   */
+  public boolean getNoCopy() {
+    return m_NoCopy;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String noCopyTipText() {
+    return "If enabled, no copy of the model is created before returning it.";
+  }
+
+  /**
    * Returns whether storage items are being used.
    *
    * @return		true if storage items are used
@@ -163,9 +206,36 @@ public class FromStorage
    */
   @Override
   protected Model doConfigureModel(int numInput, int numOutput) {
+    Model			result;
+    ByteArrayOutputStream	bos;
+    ByteArrayInputStream	bis;
+
     if (m_Cache.length() == 0)
-      return (Model) m_FlowContext.getStorageHandler().getStorage().get(m_StorageName);
+      result = (Model) m_FlowContext.getStorageHandler().getStorage().get(m_StorageName);
     else
-      return (Model) m_FlowContext.getStorageHandler().getStorage().get(m_Cache, m_StorageName);
+      result = (Model) m_FlowContext.getStorageHandler().getStorage().get(m_Cache, m_StorageName);
+
+    if (!m_NoCopy) {
+      bos = new ByteArrayOutputStream();
+      try {
+        if (result instanceof MultiLayerNetwork) {
+          if (!((MultiLayerNetwork) result).isInitCalled())
+            ((MultiLayerNetwork) result).init();
+        }
+	ModelSerializer.writeModel(result, bos, true);
+	bis = new ByteArrayInputStream(bos.toByteArray());
+	if (result instanceof MultiLayerNetwork)
+          result = ModelSerializer.restoreMultiLayerNetwork(bis);
+	else if (result instanceof ComputationGraph)
+          result = ModelSerializer.restoreComputationGraph(bis);
+	else
+	  throw new IllegalStateException("Unhandled model type: " + result.getClass().getName());
+      }
+      catch (Exception e) {
+	throw new IllegalStateException("Failed to create copy of model!", e);
+      }
+    }
+
+    return result;
   }
 }
