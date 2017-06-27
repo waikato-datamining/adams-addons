@@ -264,7 +264,13 @@ public class DL4JModelGenerator
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "model", m_ModelGenerator, "model: ");
+    String	result;
+
+    result  = QuickInfoHelper.toString(this, "model", m_ModelGenerator, "generator: ");
+    result += QuickInfoHelper.toString(this, "numInput", m_NumInput, ", input: ");
+    result += QuickInfoHelper.toString(this, "numOutput", m_NumOutput, ", output: ");
+
+    return result;
   }
 
   /**
