@@ -59,7 +59,29 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
-TODO
+\section{Iteration listeners}
+By default, building models does not provide any insight into how the building
+is going. However, DL4J offers iteration listeners that can shed some light
+on the build process.
+
+These listeners can be attached to the following actors:
+\begin{tight_itemize}
+  \item DL4JCrossValidationEvaluator
+  \item DL4JTrainModel
+  \item DL4JTrainTestSetEvaluator
+\end{tight_itemize}
+
+The following schemes for configuring iteration listeners are available:
+\begin{tight_itemize}
+  \item \textit{InMemoryStatsListenerConfigurator} -- stores statistics in memory
+  and allows accessing them via a web interface on \url{http://localhost:9000/train}{}
+\end{tight_itemize}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=12.0cm]{images/stats_iteration_listener.png}
+  \label{stats_iteration_listener}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}

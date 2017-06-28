@@ -152,17 +152,9 @@ The following schemes for configuring iteration listeners are available:
   \item \textit{NullListener} -- does nothing
   \item \textit{CallableActorScoreListenerConfigurator} -- forwards double array
   of iteration/score to the specified callable actor (e.g., for plotting)
-  \item \textit{InMemoryStatsListenerConfigurator} -- stores statistics in memory
-  and allows accessing them via a web interface on \url{http://localhost:9000/train}{}
   \item \textit{ScoreIterationListenerConfigurator} -- simple logging of
   statistics in console
 \end{tight_itemize}
-
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=12.0cm]{images/stats_iteration_listener.png}
-  \label{stats_iteration_listener}
-\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
