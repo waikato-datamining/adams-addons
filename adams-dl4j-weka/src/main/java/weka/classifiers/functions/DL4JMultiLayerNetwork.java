@@ -20,8 +20,14 @@
  */
 package weka.classifiers.functions;
 
+import adams.core.SerializationHelper;
+import adams.core.io.FileUtils;
+import adams.core.io.PlaceholderFile;
+import adams.data.conversion.DL4JJsonToModel;
+import adams.data.conversion.DL4JYamlToModel;
 import adams.ml.dl4j.iterationlistener.IterationListenerConfigurator;
 import adams.ml.dl4j.model.Dl4jMlpClassifier.DropType;
+import adams.ml.dl4j.model.ModelType;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -33,6 +39,7 @@ import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import weka.classifiers.DL4JMultiLayerNetworkProvider;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.rules.ZeroR;
 import weka.core.Capabilities;
@@ -63,7 +70,8 @@ import java.util.Vector;
  * @version $Revision: 11711 $
  */
 public class DL4JMultiLayerNetwork
-  extends RandomizableClassifier {
+  extends RandomizableClassifier
+  implements DL4JMultiLayerNetworkProvider {
 
   /** The ID used for serializing this class. */
   protected static final long serialVersionUID = -6363254116597574265L;
@@ -81,6 +89,17 @@ public class DL4JMultiLayerNetwork
   public final static String DROP_OUT = "drop-out";
 
   public final static String ITERATION_LISTENER = "iteration-listener";
+
+  public final static String MODEL_FILE = "model-file";
+
+  public final static String MODEL_FILE_TYPE = "model-file-type";
+
+  public enum ModelFileType {
+    YAML,
+    JSON,
+    DL4J_SERIALIZED_MODEL,
+    WEKA_SERIALIZED_MODEL,
+  }
 
   /**
    * ZeroR classifier, just in case we don't actually have any data to train a
@@ -118,6 +137,12 @@ public class DL4JMultiLayerNetwork
   /** the iteration listeners to use. */
   protected IterationListenerConfigurator[] m_IterationListeners = getDefaultIterationListeners();
 
+  /** the file to load the model from. */
+  protected PlaceholderFile m_ModelFile = getDefaultModelFile();
+
+  /** the type of the model file. */
+  protected ModelFileType m_ModelFileType = getDefaultModelFileType();
+
   /** the iterator. */
   protected DefaultInstancesIterator m_Iterator = null;
 
@@ -147,6 +172,8 @@ public class DL4JMultiLayerNetwork
     WekaOptionUtils.addOption(result, dropTypeTipText(), "" + getDefaultDropType(), DROP_TYPE);
     WekaOptionUtils.addOption(result, dropOutTipText(), "" + getDefaultDropOut(), DROP_OUT);
     WekaOptionUtils.addOption(result, iterationListenersTipText(), Utils.arrayToString(getDefaultIterationListeners()), ITERATION_LISTENER);
+    WekaOptionUtils.addOption(result, modelFileTipText(), "" + getDefaultModelFile(), MODEL_FILE);
+    WekaOptionUtils.addOption(result, modelFileTypeTipText(), "" + getDefaultModelFileType(), MODEL_FILE_TYPE);
     WekaOptionUtils.add(result, super.listOptions());
     return WekaOptionUtils.toEnumeration(result);
   }
@@ -165,6 +192,8 @@ public class DL4JMultiLayerNetwork
     setDropType((DropType) WekaOptionUtils.parse(options, DROP_TYPE, getDefaultDropType()));
     setDropOut(WekaOptionUtils.parse(options, DROP_OUT, getDefaultDropOut()));
     setIterationListeners((IterationListenerConfigurator[]) WekaOptionUtils.parse(options, ITERATION_LISTENER, getDefaultIterationListeners(), IterationListenerConfigurator.class));
+    setModelFile(new PlaceholderFile(WekaOptionUtils.parse(options, MODEL_FILE, getDefaultModelFile())));
+    setModelFileType((ModelFileType) WekaOptionUtils.parse(options, MODEL_FILE_TYPE, getDefaultModelFileType()));
     super.setOptions(options);
   }
 
@@ -182,6 +211,8 @@ public class DL4JMultiLayerNetwork
     WekaOptionUtils.add(result, DROP_TYPE, getDropType());
     WekaOptionUtils.add(result, DROP_OUT, getDropOut());
     WekaOptionUtils.add(result, ITERATION_LISTENER, getIterationListeners());
+    WekaOptionUtils.add(result, MODEL_FILE, getModelFile());
+    WekaOptionUtils.add(result, MODEL_FILE_TYPE, getModelFileType());
     WekaOptionUtils.add(result, super.getOptions());
     return WekaOptionUtils.toArray(result);
   }
@@ -531,6 +562,82 @@ public class DL4JMultiLayerNetwork
   }
 
   /**
+   * Returns the default model file.
+   *
+   * @return		the default
+   */
+  protected PlaceholderFile getDefaultModelFile() {
+    return new PlaceholderFile();
+  }
+
+  /**
+   * Sets the model file to load; ignored if directory.
+   *
+   * @param value	the file
+   */
+  public void setModelFile(PlaceholderFile value) {
+    m_ModelFile = value;
+  }
+
+  /**
+   * Returns the model file to load; ignored if directory.
+   *
+   * @return		the file
+   */
+  public PlaceholderFile getModelFile() {
+    return m_ModelFile;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String modelFileTipText() {
+    return "The (optional) file to load a model from (trained or just structure); ignored if pointing to a directory.";
+  }
+
+  /**
+   * Returns the default model file type.
+   *
+   * @return		the default
+   */
+  protected ModelFileType getDefaultModelFileType() {
+    return ModelFileType.YAML;
+  }
+
+  /**
+   * Sets the type of the model file.
+   *
+   * @param value	the type
+   */
+  public void setModelFileType(ModelFileType value) {
+    m_ModelFileType = value;
+  }
+
+  /**
+   * Returns the type of the model file.
+   *
+   * @return		the type
+   */
+  public ModelFileType getModelFileType() {
+    return m_ModelFileType;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String modelFileTypeTipText() {
+    return
+      "The type of the model file; in case of '" + ModelFileType.WEKA_SERIALIZED_MODEL + "', "
+	+ "the object must implement '" + DL4JMultiLayerNetworkProvider.class.getName() + "'.";
+  }
+
+  /**
    * Get the current number of units for a particular layer. Returns -1 for
    * anything that is not a DenseLayer or an OutputLayer.
    *
@@ -559,23 +666,73 @@ public class DL4JMultiLayerNetwork
   }
 
   /**
-   * The method used to train the classifier.
+   * Loads the model from disk, if possible.
    *
-   * @param data set of instances serving as training data
-   * @throws Exception if something goes wrong in the training process
+   * @return		the model
+   * @throws Exception	if failed to load
    */
-  @Override
-  public void buildClassifier(Instances data) throws Exception {
+  protected MultiLayerNetwork loadModel() throws Exception {
+    MultiLayerNetwork			result;
+    DL4JYamlToModel			yaml;
+    DL4JJsonToModel 			json;
+    String				str;
+    String				msg;
+    DL4JMultiLayerNetworkProvider	provider;
+
+    result = null;
+
+    switch (m_ModelFileType) {
+      case YAML:
+	str  = adams.core.Utils.flatten(FileUtils.loadFromFile(m_ModelFile), "\n");
+	yaml = new DL4JYamlToModel();
+	yaml.setType(ModelType.MULTI_LAYER_NETWORK);
+	yaml.setInput(str);
+	msg = yaml.convert();
+	if (msg != null)
+	  throw new Exception("Failed to convert YAML model loaded from '" + m_ModelFile + "': " + msg);
+	result = (MultiLayerNetwork) yaml.getOutput();
+	break;
+
+      case JSON:
+	str  = adams.core.Utils.flatten(FileUtils.loadFromFile(m_ModelFile), "\n");
+	json = new DL4JJsonToModel();
+	json.setType(ModelType.MULTI_LAYER_NETWORK);
+	json.setInput(str);
+	msg = json.convert();
+	if (msg != null)
+	  throw new Exception("Failed to convert JSON model loaded from '" + m_ModelFile + "': " + msg);
+	result = (MultiLayerNetwork) json.getOutput();
+	break;
+
+      case WEKA_SERIALIZED_MODEL:
+	provider = (DL4JMultiLayerNetworkProvider) SerializationHelper.read(m_ModelFile.getAbsolutePath());
+	result   = provider.getMultiLayerNetwork();
+	break;
+
+      case DL4J_SERIALIZED_MODEL:
+	result = ModelSerializer.restoreMultiLayerNetwork(m_ModelFile.getAbsoluteFile());
+	break;
+
+      default:
+	throw new IllegalStateException("Unhandled model file type: " + m_ModelFileType);
+    }
+
+    return result;
+  }
+
+  /**
+   * Builds the model using the layers and parameters specified.
+   *
+   * @return		the model
+   * @throws Exception	if failed to build or incorrect parameters
+   */
+  protected MultiLayerNetwork buildModel(Instances data) throws Exception {
+    MultiLayerNetwork result;
     NeuralNetConfiguration.Builder 	builder;
     ListBuilder 			listbuilder;
-    int numInputAtts;
+    int 				numInputAtts;
     MultiLayerConfiguration 		conf;
-    ArrayList<IterationListener> 	listeners;
-    DataSetIterator 			iter;
     int					i;
-
-    // Can classifier handle the data?
-    getCapabilities().testWithFail(data);
 
     // Check basic network structure
     if (m_Layers.length == 0)
@@ -583,21 +740,6 @@ public class DL4JMultiLayerNetwork
     if (!(m_Layers[m_Layers.length - 1] instanceof OutputLayer))
       throw new Exception("Last layer in network must be an output layer!");
 
-    // Remove instances with missing class and check that instances and
-    // predictor attributes remain.
-    data = new Instances(data);
-    data.deleteWithMissingClass();
-    m_ZeroR = null;
-    if ((data.numInstances() == 0) || (data.numAttributes() < 2)) {
-      System.err.println("Not enough data, using ZeroR model!");
-      m_ZeroR = new ZeroR();
-      m_ZeroR.buildClassifier(data);
-      return;
-    }
-
-    m_Iterator = new DefaultInstancesIterator();
-
-    // Initialize random number generator for construction of network
     builder = new NeuralNetConfiguration.Builder();
     builder.setOptimizationAlgo(getOptimizationAlgorithm());
     builder.setSeed(getSeed());
@@ -643,11 +785,53 @@ public class DL4JMultiLayerNetwork
     conf = listbuilder.build();
 
     // initialize
-    m_Model = new MultiLayerNetwork(conf);
-    m_Model.init();
+    result = new MultiLayerNetwork(conf);
+    result.init();
+
+    return result;
+  }
+
+  /**
+   * The method used to train the classifier.
+   *
+   * @param data set of instances serving as training data
+   * @throws Exception if something goes wrong in the training process
+   */
+  @Override
+  public void buildClassifier(Instances data) throws Exception {
+    ArrayList<IterationListener> 	listeners;
+    DataSetIterator 			iter;
+    int					i;
+
+    // Can classifier handle the data?
+    getCapabilities().testWithFail(data);
+
+    m_Iterator = new DefaultInstancesIterator();
+
+    // Remove instances with missing class and check that instances and
+    // predictor attributes remain.
+    data = new Instances(data);
+    data.deleteWithMissingClass();
+    m_ZeroR = null;
+    if ((data.numInstances() == 0) || (data.numAttributes() < 2)) {
+      System.err.println("Not enough data, using ZeroR model!");
+      m_ZeroR = new ZeroR();
+      m_ZeroR.buildClassifier(data);
+      return;
+    }
+
+    // load model from file?
+    if (m_ModelFile.exists() && !m_ModelFile.isDirectory())
+      m_Model = loadModel();
+    else
+      m_Model = buildModel(data);
+
+    // initialized?
+    if (!m_Model.isInitCalled())
+      m_Model.init();
 
     if (getDebug())
-      System.out.println("Network:\n" + conf.toYaml());
+      System.out.println("Network:\n" + m_Model.getLayerWiseConfigurations().toYaml());
 
     // listeners
     listeners = new ArrayList<>();
@@ -662,7 +846,7 @@ public class DL4JMultiLayerNetwork
       else
 	iter = m_Iterator.getIterator(data, getSeed(), m_MiniBatchSize);
       m_Model.fit(iter);
-      if (getDebug() && (i % 100 == 0))
+      if (getDebug() && ((i+1) % 100 == 0))
 	System.out.println("Epoch #" + (i+1) + " finished");
     }
 
@@ -703,6 +887,16 @@ public class DL4JMultiLayerNetwork
       Utils.normalize(preds);
 
     return preds;
+  }
+
+  /**
+   * Returns the network.
+   *
+   * @return		the network, null if none available
+   */
+  @Override
+  public MultiLayerNetwork getMultiLayerNetwork() {
+    return m_Model;
   }
 
   /**
