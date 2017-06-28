@@ -35,6 +35,7 @@
 
   <modules>
     <module>adams-dl4j</module>
+    <module>adams-dl4j-insight</module>
     <module>adams-dl4j-weka</module>
     <module>adams-gnuplot</module>
     <module>adams-heatmap</module>
