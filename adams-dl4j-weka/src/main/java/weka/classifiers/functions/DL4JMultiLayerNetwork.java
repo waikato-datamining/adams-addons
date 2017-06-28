@@ -192,7 +192,7 @@ public class DL4JMultiLayerNetwork
     setDropType((DropType) WekaOptionUtils.parse(options, DROP_TYPE, getDefaultDropType()));
     setDropOut(WekaOptionUtils.parse(options, DROP_OUT, getDefaultDropOut()));
     setIterationListeners((IterationListenerConfigurator[]) WekaOptionUtils.parse(options, ITERATION_LISTENER, getDefaultIterationListeners(), IterationListenerConfigurator.class));
-    setModelFile(new PlaceholderFile(WekaOptionUtils.parse(options, MODEL_FILE, getDefaultModelFile())));
+    setModelFile(WekaOptionUtils.parse(options, MODEL_FILE, getDefaultModelFile()));
     setModelFileType((ModelFileType) WekaOptionUtils.parse(options, MODEL_FILE_TYPE, getDefaultModelFileType()));
     super.setOptions(options);
   }
@@ -204,15 +204,19 @@ public class DL4JMultiLayerNetwork
    */
   public String [] getOptions() {
     List<String> result = new ArrayList<>();
-    WekaOptionUtils.add(result, LAYER, getLayers());
-    WekaOptionUtils.add(result, OPTIMIZATION_ALGORITHM, getOptimizationAlgorithm());
+    if (getModelFile().isDirectory()) {
+      WekaOptionUtils.add(result, LAYER, getLayers());
+      WekaOptionUtils.add(result, OPTIMIZATION_ALGORITHM, getOptimizationAlgorithm());
+      WekaOptionUtils.add(result, DROP_TYPE, getDropType());
+      WekaOptionUtils.add(result, DROP_OUT, getDropOut());
+    }
+    else {
+      WekaOptionUtils.add(result, MODEL_FILE, getModelFile());
+      WekaOptionUtils.add(result, MODEL_FILE_TYPE, getModelFileType());
+    }
     WekaOptionUtils.add(result, NUM_EPOCHS, getNumEpochs());
     WekaOptionUtils.add(result, MINI_BATCH_SIZE, getMiniBatchSize());
-    WekaOptionUtils.add(result, DROP_TYPE, getDropType());
-    WekaOptionUtils.add(result, DROP_OUT, getDropOut());
     WekaOptionUtils.add(result, ITERATION_LISTENER, getIterationListeners());
-    WekaOptionUtils.add(result, MODEL_FILE, getModelFile());
-    WekaOptionUtils.add(result, MODEL_FILE_TYPE, getModelFileType());
     WekaOptionUtils.add(result, super.getOptions());
     return WekaOptionUtils.toArray(result);
   }
@@ -681,6 +685,9 @@ public class DL4JMultiLayerNetwork
 
     result = null;
 
+    if (getDebug())
+      System.out.println("Loading model (" + m_ModelFileType + "): " + m_ModelFile);
+
     switch (m_ModelFileType) {
       case YAML:
 	str  = adams.core.Utils.flatten(FileUtils.loadFromFile(m_ModelFile), "\n");
@@ -721,18 +728,21 @@ public class DL4JMultiLayerNetwork
   }
 
   /**
-   * Builds the model using the layers and parameters specified.
+   * Generates the model using the layers and parameters specified.
    *
    * @return		the model
    * @throws Exception	if failed to build or incorrect parameters
    */
-  protected MultiLayerNetwork buildModel(Instances data) throws Exception {
+  protected MultiLayerNetwork generateModel(Instances data) throws Exception {
     MultiLayerNetwork result;
     NeuralNetConfiguration.Builder 	builder;
     ListBuilder 			listbuilder;
     int 				numInputAtts;
     MultiLayerConfiguration 		conf;
     int					i;
+
+    if (getDebug())
+      System.out.println("Generating model...");
 
     // Check basic network structure
     if (m_Layers.length == 0)
@@ -824,7 +834,7 @@ public class DL4JMultiLayerNetwork
     if (m_ModelFile.exists() && !m_ModelFile.isDirectory())
       m_Model = loadModel();
     else
-      m_Model = buildModel(data);
+      m_Model = generateModel(data);
 
     // initialized?
     if (!m_Model.isInitCalled())
