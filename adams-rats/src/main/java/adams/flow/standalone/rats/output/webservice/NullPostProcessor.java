@@ -47,6 +47,6 @@ public class NullPostProcessor
    * @param response	the data to post-process
    */
   @Override
-  public void postProcess(Object response) {
+  protected void doPostProcess(Object response) {
   }
 }

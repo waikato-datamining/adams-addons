@@ -88,7 +88,7 @@ public abstract class AbstractWebserviceResponseDataPostProcessor<T>
    *
    * @param response	the data to post-process
    */
-  public abstract void doPostProcess(T response);
+  protected abstract void doPostProcess(T response);
 
   /**
    * For post-processing the response data.
