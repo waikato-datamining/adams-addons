@@ -15,10 +15,11 @@
 
 /**
  * AbstractScriptlet.java
- * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.core.gnuplot;
 
+import adams.core.ErrorProvider;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.Actor;
 
@@ -29,7 +30,8 @@ import adams.flow.core.Actor;
  * @version $Revision$
  */
 public abstract class AbstractScriptlet
-  extends AbstractOptionHandler {
+  extends AbstractOptionHandler
+  implements ErrorProvider {
 
   /** for serialization. */
   private static final long serialVersionUID = 8269710957096517396L;
