@@ -75,6 +75,9 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
   /** the listeners for reponse data. */
   protected HashSet<WebServiceClientProducerResponseDataListener> m_ResponseDataListeners;
 
+  /** the last error that was generated. */
+  protected String m_LastError;
+
   /**
    * Adds options to the internal list of options.
    */
@@ -380,6 +383,25 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
   }
 
   /**
+   * Checks whether there was an error with the last call.
+   *
+   * @return		true if there was an error
+   * @see		#getLastError()
+   */
+  public boolean hasLastError() {
+    return (m_LastError != null);
+  }
+
+  /**
+   * Returns the last error that occurred.
+   *
+   * @return		the last error, null if none occurred
+   */
+  public String getLastError() {
+    return m_LastError;
+  }
+
+  /**
    * Adds the listener for response data being received.
    *
    * @param l		the listener to add
@@ -461,6 +483,7 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
     if (m_Owner == null)
       throw new IllegalStateException("No owning actor set!");
     m_ResponseData = null;
+    m_LastError    = null;
   }
   
   /**

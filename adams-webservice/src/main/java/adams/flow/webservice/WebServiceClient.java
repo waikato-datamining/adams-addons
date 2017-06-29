@@ -20,6 +20,7 @@
 package adams.flow.webservice;
 
 import adams.core.CleanUpHandler;
+import adams.core.ErrorProvider;
 import adams.core.option.OptionHandler;
 import adams.flow.core.Actor;
 
@@ -30,7 +31,7 @@ import adams.flow.core.Actor;
  * @version $Revision$
  */
 public interface WebServiceClient
-  extends OptionHandler, CleanUpHandler {
+  extends OptionHandler, CleanUpHandler, ErrorProvider {
   
   /**
    * Sets the actor that executes this webservice.

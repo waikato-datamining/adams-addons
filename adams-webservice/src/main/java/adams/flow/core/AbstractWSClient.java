@@ -217,6 +217,11 @@ public abstract class AbstractWSClient
 	getLogger().info("postQuery: " + result);
     }
 
+    if (result == null) {
+      if (m_Client.hasLastError())
+        result = m_Client.getLastError();
+    }
+
     return result;
   }
   

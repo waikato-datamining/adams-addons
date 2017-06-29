@@ -61,6 +61,9 @@ public abstract class AbstractWebServiceClientSink<I>
   /** the interceptor generator for outgoing messages. */
   protected AbstractOutInterceptorGenerator m_OutInterceptor;
 
+  /** the last error that was generated. */
+  protected String m_LastError;
+
   /**
    * Adds options to the internal list of options.
    */
@@ -312,7 +315,26 @@ public abstract class AbstractWebServiceClientSink<I>
   public Actor getOwner() {
     return m_Owner;
   }
-  
+
+  /**
+   * Checks whether there was an error with the last call.
+   *
+   * @return		true if there was an error
+   * @see		#getLastError()
+   */
+  public boolean hasLastError() {
+    return (m_LastError != null);
+  }
+
+  /**
+   * Returns the last error that occurred.
+   *
+   * @return		the last error, null if none occurred
+   */
+  public String getLastError() {
+    return m_LastError;
+  }
+
   /**
    * Returns the WSDL location.
    * 
@@ -330,6 +352,7 @@ public abstract class AbstractWebServiceClientSink<I>
   protected void preQuery() throws Exception {
     if (m_Owner == null)
       throw new IllegalStateException("No owning actor set!");
+    m_LastError = null;
   }
   
   /**
