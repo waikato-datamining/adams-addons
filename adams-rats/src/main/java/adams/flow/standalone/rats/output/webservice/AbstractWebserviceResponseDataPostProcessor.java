@@ -20,6 +20,7 @@
 
 package adams.flow.standalone.rats.output.webservice;
 
+import adams.core.ErrorProvider;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.Actor;
 import adams.flow.core.FlowContextHandler;
@@ -35,12 +36,15 @@ import adams.flow.core.FlowContextHandler;
  */
 public abstract class AbstractWebserviceResponseDataPostProcessor<T>
   extends AbstractOptionHandler
-  implements FlowContextHandler {
+  implements FlowContextHandler, ErrorProvider {
 
   private static final long serialVersionUID = -6157013941356537849L;
 
   /** the flow context. */
   protected Actor m_FlowContext;
+
+  /** the last error that was generated. */
+  protected String m_LastError;
 
   /**
    * Sets the flow context.
@@ -61,9 +65,38 @@ public abstract class AbstractWebserviceResponseDataPostProcessor<T>
   }
 
   /**
+   * Checks whether there was an error with the last call.
+   *
+   * @return		true if there was an error
+   * @see		#getLastError()
+   */
+  public boolean hasLastError() {
+    return (m_LastError != null);
+  }
+
+  /**
+   * Returns the last error that occurred.
+   *
+   * @return		the last error, null if none occurred
+   */
+  public String getLastError() {
+    return m_LastError;
+  }
+
+  /**
    * For post-processing the response data.
    *
    * @param response	the data to post-process
    */
-  public abstract void postProcess(T response);
+  public abstract void doPostProcess(T response);
+
+  /**
+   * For post-processing the response data.
+   *
+   * @param response	the data to post-process
+   */
+  public void postProcess(T response) {
+    m_LastError = null;
+    doPostProcess(response);
+  }
 }

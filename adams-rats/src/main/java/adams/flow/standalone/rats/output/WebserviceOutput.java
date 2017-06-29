@@ -231,6 +231,8 @@ public class WebserviceOutput
 	  response = ((WebServiceClientProducer) m_Client).getResponseData();
 	  m_ResponsePostProcessor.setFlowContext(getOwner());
 	  m_ResponsePostProcessor.postProcess(response);
+	  if (m_ResponsePostProcessor.hasLastError())
+	    result = m_ResponsePostProcessor.getLastError();
 	}
 	catch (Exception e) {
 	  result = handleException("Failed to post-process response data from webservice!", e);
