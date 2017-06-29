@@ -221,6 +221,9 @@ public class WebserviceOutput
     catch (Exception e) {
       result = handleException("Failed to send data to webservice!", e);
     }
+    // soft error?
+    if (m_Client.hasLastError())
+      result = m_Client.getLastError();
 
     if (result == null) {
       if (m_Client instanceof WebServiceClientProducer) {
