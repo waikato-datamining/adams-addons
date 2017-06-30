@@ -99,3 +99,7 @@ org.nd4j.linalg.lossfunctions.ILossFunction=\
 org.nd4j.linalg.activations.IActivation=\
   org.nd4j.linalg.activations,\
   org.nd4j.linalg.activations.impl
+
+# train stop criteria
+adams.ml.dl4j.trainstopcriterion.AbstractTrainStopCriterion=\
+  adams.ml.dl4j.trainstopcriterion
