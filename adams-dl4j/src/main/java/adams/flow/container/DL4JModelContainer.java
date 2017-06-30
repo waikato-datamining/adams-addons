@@ -20,6 +20,8 @@
 
 package adams.flow.container;
 
+import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.eval.RegressionEvaluation;
 import org.nd4j.linalg.dataset.DataSet;
 
 import java.util.ArrayList;
@@ -46,6 +48,9 @@ public class DL4JModelContainer
 
   /** the identifier for the epoch. */
   public final static String VALUE_EPOCH = "Epoch";
+
+  /** the identifier for the evaluation. */
+  public final static String VALUE_EVALUATION = "Evaluation";
 
   /**
    * Initializes the container.
@@ -83,11 +88,24 @@ public class DL4JModelContainer
    * @param epoch 	the epoch this model stems from
    */
   public DL4JModelContainer(Object model, DataSet data, Integer epoch) {
+    this(model, data, epoch, null);
+  }
+
+  /**
+   * Initializes the container with the full dataset.
+   *
+   * @param model	the model to use
+   * @param data	the data to use
+   * @param epoch 	the epoch this model stems from
+   * @param evaluation  the evaluation object
+   */
+  public DL4JModelContainer(Object model, DataSet data, Integer epoch, Object evaluation) {
     super();
 
-    store(VALUE_MODEL,   model);
-    store(VALUE_DATASET, data);
-    store(VALUE_EPOCH,   epoch);
+    store(VALUE_MODEL,      model);
+    store(VALUE_DATASET,    data);
+    store(VALUE_EPOCH,      epoch);
+    store(VALUE_EVALUATION, evaluation);
   }
 
   /**
@@ -99,6 +117,7 @@ public class DL4JModelContainer
     addHelp(VALUE_MODEL, "model object; " + Object.class.getName());
     addHelp(VALUE_DATASET, "full dataset; " + DataSet.class.getName());
     addHelp(VALUE_EPOCH, "epoch; " + Integer.class.getName());
+    addHelp(VALUE_EVALUATION, "evaluation; " + Evaluation.class.getName() + " or " + RegressionEvaluation.class.getName());
   }
 
   /**
@@ -115,6 +134,7 @@ public class DL4JModelContainer
     result.add(VALUE_MODEL);
     result.add(VALUE_DATASET);
     result.add(VALUE_EPOCH);
+    result.add(VALUE_EVALUATION);
 
     return result.iterator();
   }
