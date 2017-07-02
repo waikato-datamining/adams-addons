@@ -43,6 +43,9 @@ public class DL4JModelContainer
   /** the identifier for the Model. */
   public final static String VALUE_MODEL = "Model";
 
+  /** the identifier for the Best Model. */
+  public final static String VALUE_BEST_MODEL = "Best Model";
+
   /** the identifier for the full dataset. */
   public final static String VALUE_DATASET = "Dataset";
 
@@ -100,9 +103,23 @@ public class DL4JModelContainer
    * @param evaluation  the evaluation object
    */
   public DL4JModelContainer(Object model, DataSet data, Integer epoch, Object evaluation) {
+    this(model, data, epoch, evaluation, null);
+  }
+
+  /**
+   * Initializes the container with the full dataset.
+   *
+   * @param model	the model to use
+   * @param data	the data to use
+   * @param epoch 	the epoch this model stems from
+   * @param evaluation  the evaluation object
+   * @param bestModel	the best model
+   */
+  public DL4JModelContainer(Object model, DataSet data, Integer epoch, Object evaluation, Object bestModel) {
     super();
 
     store(VALUE_MODEL,      model);
+    store(VALUE_BEST_MODEL, bestModel);
     store(VALUE_DATASET,    data);
     store(VALUE_EPOCH,      epoch);
     store(VALUE_EVALUATION, evaluation);
@@ -115,6 +132,7 @@ public class DL4JModelContainer
     super.initHelp();
 
     addHelp(VALUE_MODEL, "model object; " + Object.class.getName());
+    addHelp(VALUE_BEST_MODEL, "best model object; " + Object.class.getName());
     addHelp(VALUE_DATASET, "full dataset; " + DataSet.class.getName());
     addHelp(VALUE_EPOCH, "epoch; " + Integer.class.getName());
     addHelp(VALUE_EVALUATION, "evaluation; " + Evaluation.class.getName() + " or " + RegressionEvaluation.class.getName());
@@ -132,6 +150,7 @@ public class DL4JModelContainer
     result = new ArrayList<>();
 
     result.add(VALUE_MODEL);
+    result.add(VALUE_BEST_MODEL);
     result.add(VALUE_DATASET);
     result.add(VALUE_EPOCH);
     result.add(VALUE_EVALUATION);
