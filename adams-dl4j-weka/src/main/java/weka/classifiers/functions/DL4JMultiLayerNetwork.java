@@ -51,6 +51,8 @@ import weka.dl4j.iterators.DefaultInstancesIterator;
 import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.layers.OutputLayer;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -109,6 +111,9 @@ public class DL4JMultiLayerNetwork
 
   /** The actual neural network model. **/
   protected transient MultiLayerNetwork m_Model;
+
+  /** the model data. */
+  protected byte[] m_ModelData = null;
 
   /** whether the model was trained. */
   protected boolean m_Trained = false;
@@ -245,14 +250,27 @@ public class DL4JMultiLayerNetwork
 
   /**
    * Custom serialization method.
+   * <br>
+   * Simply serializing into the stream doesn't work, as models cannot be
+   * deserialized anymore if the classifier is inside a FilteredClassifier.
    *
    * @param oos the object output stream
    * @throws IOException
+   * @see #m_ModelData
    */
   private void writeObject(ObjectOutputStream oos) throws IOException {
+    ByteArrayOutputStream 	bos;
+
+    if (m_Trained) {
+      bos = new ByteArrayOutputStream();
+      ModelSerializer.writeModel(m_Model, bos, false);
+      m_ModelData = bos.toByteArray();
+    }
+
     oos.defaultWriteObject();
-    if (m_Trained)
-      ModelSerializer.writeModel(m_Model, oos, false);
+
+    // free up memory
+    m_ModelData = null;
   }
 
   /**
@@ -261,11 +279,19 @@ public class DL4JMultiLayerNetwork
    * @param ois the object input stream
    * @throws ClassNotFoundException
    * @throws IOException
+   * @see #m_ModelData
    */
   private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+    ByteArrayInputStream 	bis;
+
     ois.defaultReadObject();
-    if (m_Trained)
-      m_Model = ModelSerializer.restoreMultiLayerNetwork(ois, false);
+
+    if (m_ModelData != null) {
+      bis         = new ByteArrayInputStream(m_ModelData);
+      m_Model     = ModelSerializer.restoreMultiLayerNetwork(bis, false);
+      // free up memory
+      m_ModelData = null;
+    }
   }
 
   /**
