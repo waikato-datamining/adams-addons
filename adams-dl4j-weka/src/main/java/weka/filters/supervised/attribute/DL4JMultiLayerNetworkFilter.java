@@ -10,6 +10,7 @@ import weka.classifiers.functions.DL4JMultiLayerNetwork;
 import weka.classifiers.functions.Dl4jMlpClassifierExtended;
 import weka.core.*;
 import weka.dl4j.iterators.DefaultInstancesIterator;
+import weka.filters.Filter;
 import weka.filters.SimpleBatchFilter;
 import weka.filters.SupervisedFilter;
 
@@ -34,7 +35,7 @@ public class DL4JMultiLayerNetworkFilter extends SimpleBatchFilter implements Su
   protected static String MODEL_FILE="model-file";
   protected static String LOG_FILE="log-file";
   protected static String EPOCHS="epochs";
-
+  protected Filter m_Filter=null;
 
   protected DL4JMultiLayerNetwork m_model;
   protected boolean m_model_loaded =false;
@@ -55,6 +56,7 @@ public class DL4JMultiLayerNetworkFilter extends SimpleBatchFilter implements Su
     if (!m_model_loaded) {
       try {
         m_model = (DL4JMultiLayerNetwork)adams.core.SerializationHelper.read(getModelFile().getAbsolutePath());
+        m_Filter= m_model.getPreFilter();
         //m_model.setLogFile(new File(getLogFile().getAbsolutePath()));
         m_model_loaded = true;
       } catch (Exception e) {
@@ -262,11 +264,15 @@ public class DL4JMultiLayerNetworkFilter extends SimpleBatchFilter implements Su
     //double[] values=new double[header.numAttributes()];
     Instance tf;
     MultiLayerNetwork mln=m_model.getMultiLayerNetwork();
+
     //synchronized (this) {
 
     //}
     Instances t_insts = new Instances(i.dataset(), 0);
     t_insts.add(i);
+    if (m_Filter != null) {
+      t_insts = Filter.useFilter(t_insts, m_Filter);
+    }
     DataSet ds = m_Iterator.getIterator(t_insts, getSeed(), 1).next();
 
     List<INDArray> list_of_vals = mln.feedForward(ds.getFeatureMatrix());
