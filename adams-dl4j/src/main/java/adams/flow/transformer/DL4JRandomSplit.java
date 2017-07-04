@@ -29,11 +29,8 @@ import adams.flow.provenance.Provenance;
 import adams.flow.provenance.ProvenanceContainer;
 import adams.flow.provenance.ProvenanceInformation;
 import adams.flow.provenance.ProvenanceSupporter;
+import adams.ml.dl4j.DataSetHelper;
 import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.dataset.SplitTestAndTrain;
-import org.nd4j.linalg.factory.Nd4j;
-
-import java.util.Random;
 
 /**
  <!-- globalinfo-start -->
@@ -291,18 +288,12 @@ public class DL4JRandomSplit
   @Override
   protected String doExecute() {
     DataSet 			data;
-    SplitTestAndTrain 		split;
+    DataSet[]			split;
     DL4JTrainTestSetContainer	cont;
 
-    data = (DataSet) m_InputToken.getPayload();
-    if (!m_PreserveOrder) {
-      Nd4j.shuffle(data.getFeatureMatrix(), new Random(m_Seed), 1);
-      if (data.getLabels() != null)
-        Nd4j.shuffle(data.getLabels(), new Random(m_Seed), 1);
-    }
-
-    split         = data.splitTestAndTrain(m_Percentage);
-    cont          = new DL4JTrainTestSetContainer(split.getTrain(), split.getTest(), m_Seed);
+    data          = (DataSet) m_InputToken.getPayload();
+    split         = DataSetHelper.split(data, m_Percentage, (m_PreserveOrder ? null : m_Seed));
+    cont          = new DL4JTrainTestSetContainer(split[0], split[1], m_Seed);
     m_OutputToken = new Token(cont);
 
     updateProvenance(m_OutputToken);
