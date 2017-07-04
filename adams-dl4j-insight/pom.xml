@@ -79,6 +79,20 @@
       <groupId>org.deeplearning4j</groupId>
       <artifactId>deeplearning4j-ui_2.10</artifactId>
       <version>${dl4j.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.fusesource.leveldbjni</groupId>
+          <artifactId>leveldbjni-all</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.fusesource.leveldbjni</groupId>
+          <artifactId>leveldbjni-win32</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.fusesource.leveldbjni</groupId>
+          <artifactId>leveldbjni-linux32</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
