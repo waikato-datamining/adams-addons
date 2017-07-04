@@ -39,6 +39,7 @@ import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import weka.classifiers.DL4JFilteredMultiLayerNetworkProvider;
 import weka.classifiers.DL4JMultiLayerNetworkProvider;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.rules.ZeroR;
@@ -75,7 +76,7 @@ import java.util.Vector;
  */
 public class DL4JMultiLayerNetwork
   extends RandomizableClassifier
-  implements DL4JMultiLayerNetworkProvider {
+  implements DL4JFilteredMultiLayerNetworkProvider {
 
   /** The ID used for serializing this class. */
   protected static final long serialVersionUID = -6363254116597574265L;
@@ -1057,6 +1058,16 @@ public class DL4JMultiLayerNetwork
   @Override
   public MultiLayerNetwork getMultiLayerNetwork() {
     return m_Model;
+  }
+
+  /**
+   * Returns the filter that is used to filter the data before presenting it
+   * to the network.
+   *
+   * @return		the filter in use
+   */
+  public Filter getPreFilter() {
+    return m_ActualFilter;
   }
 
   /**
