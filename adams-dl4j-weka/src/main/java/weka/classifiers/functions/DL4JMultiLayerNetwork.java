@@ -14,8 +14,8 @@
  */
 
 /*
- *    Dl4jMlpClassifier.java
- *    Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ *    DL4JMultiLayerNetwork.java
+ *    Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  *
  */
 package weka.classifiers.functions;
@@ -50,6 +50,8 @@ import weka.core.WekaOptionUtils;
 import weka.dl4j.iterators.DefaultInstancesIterator;
 import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.layers.OutputLayer;
+import weka.filters.AllFilter;
+import weka.filters.Filter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -68,7 +70,6 @@ import java.util.Vector;
  * @author Christopher Beckham
  * @author Eibe Frank
  * @author FracPete (fracpete at waikato dot ac dot nz)
- *
  * @version $Revision: 11711 $
  */
 public class DL4JMultiLayerNetwork
@@ -95,6 +96,8 @@ public class DL4JMultiLayerNetwork
   public final static String MODEL_FILE = "model-file";
 
   public final static String MODEL_FILE_TYPE = "model-file-type";
+
+  public final static String FILTER = "filter";
 
   public enum ModelFileType {
     YAML,
@@ -148,6 +151,12 @@ public class DL4JMultiLayerNetwork
   /** the type of the model file. */
   protected ModelFileType m_ModelFileType = getDefaultModelFileType();
 
+  /** the filter to use. */
+  protected Filter m_Filter = getDefaultFilter();
+
+  /** the actual filter in use. */
+  protected Filter m_ActualFilter;
+
   /** the iterator. */
   protected DefaultInstancesIterator m_Iterator = null;
 
@@ -179,6 +188,7 @@ public class DL4JMultiLayerNetwork
     WekaOptionUtils.addOption(result, iterationListenersTipText(), Utils.arrayToString(getDefaultIterationListeners()), ITERATION_LISTENER);
     WekaOptionUtils.addOption(result, modelFileTipText(), "" + getDefaultModelFile(), MODEL_FILE);
     WekaOptionUtils.addOption(result, modelFileTypeTipText(), "" + getDefaultModelFileType(), MODEL_FILE_TYPE);
+    WekaOptionUtils.addOption(result, filterTipText(), getDefaultFilter(), FILTER);
     WekaOptionUtils.add(result, super.listOptions());
     return WekaOptionUtils.toEnumeration(result);
   }
@@ -199,6 +209,7 @@ public class DL4JMultiLayerNetwork
     setIterationListeners((IterationListenerConfigurator[]) WekaOptionUtils.parse(options, ITERATION_LISTENER, getDefaultIterationListeners(), IterationListenerConfigurator.class));
     setModelFile(WekaOptionUtils.parse(options, MODEL_FILE, getDefaultModelFile()));
     setModelFileType((ModelFileType) WekaOptionUtils.parse(options, MODEL_FILE_TYPE, getDefaultModelFileType()));
+    setFilter((Filter) WekaOptionUtils.parse(options, FILTER, getDefaultFilter()));
     super.setOptions(options);
   }
 
@@ -222,6 +233,7 @@ public class DL4JMultiLayerNetwork
     WekaOptionUtils.add(result, NUM_EPOCHS, getNumEpochs());
     WekaOptionUtils.add(result, MINI_BATCH_SIZE, getMiniBatchSize());
     WekaOptionUtils.add(result, ITERATION_LISTENER, getIterationListeners());
+    WekaOptionUtils.add(result, FILTER, getFilter());
     WekaOptionUtils.add(result, super.getOptions());
     return WekaOptionUtils.toArray(result);
   }
@@ -232,18 +244,26 @@ public class DL4JMultiLayerNetwork
    * @return the capabilities of this classifier
    */
   public Capabilities getCapabilities() {
-    Capabilities result = super.getCapabilities();
-    result.disableAll();
+    Capabilities 	result;
 
-    // attributes
-    result.enable(Capabilities.Capability.NUMERIC_ATTRIBUTES);
-    result.enable(Capabilities.Capability.DATE_ATTRIBUTES);
+    if (m_Filter instanceof AllFilter) {
+      result = super.getCapabilities();
+      result.disableAll();
 
-    // class
-    result.enable(Capabilities.Capability.NOMINAL_CLASS);
-    result.enable(Capabilities.Capability.NUMERIC_CLASS);
-    result.enable(Capabilities.Capability.DATE_CLASS);
-    result.enable(Capabilities.Capability.MISSING_CLASS_VALUES);
+      // attributes
+      result.enable(Capabilities.Capability.NUMERIC_ATTRIBUTES);
+      result.enable(Capabilities.Capability.DATE_ATTRIBUTES);
+
+      // class
+      result.enable(Capabilities.Capability.NOMINAL_CLASS);
+      result.enable(Capabilities.Capability.NUMERIC_CLASS);
+      result.enable(Capabilities.Capability.DATE_CLASS);
+      result.enable(Capabilities.Capability.MISSING_CLASS_VALUES);
+    }
+    else {
+      result = m_Filter.getCapabilities();
+      result.setOwner(this);
+    }
 
     return result;
   }
@@ -592,6 +612,43 @@ public class DL4JMultiLayerNetwork
   }
 
   /**
+   * Returns the default filter.
+   *
+   * @return		the default
+   */
+  protected Filter getDefaultFilter() {
+    return new AllFilter();
+  }
+
+  /**
+   * Sets the filter to apply to the data.
+   *
+   * @param value	the filter
+   */
+  public void setFilter(Filter value) {
+    m_Filter = value;
+  }
+
+  /**
+   * Returns the filter to apply to the data.
+   *
+   * @return		the filter
+   */
+  public Filter getFilter() {
+    return m_Filter;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String filterTipText() {
+    return "The filter to apply to the data, ignored if " + AllFilter.class.getName() + ".";
+  }
+
+  /**
    * Returns the default model file.
    *
    * @return		the default
@@ -856,6 +913,14 @@ public class DL4JMultiLayerNetwork
       return;
     }
 
+    // filter data
+    m_ActualFilter = null;
+    if (!(m_Filter instanceof AllFilter)) {
+      m_ActualFilter = Filter.makeCopy(m_Filter);
+      m_ActualFilter.setInputFormat(data);
+      data = Filter.useFilter(data, m_ActualFilter);
+    }
+
     // load model from file?
     if (m_ModelFile.exists() && !m_ModelFile.isDirectory())
       m_Model = loadModel();
@@ -908,6 +973,13 @@ public class DL4JMultiLayerNetwork
     // Do we only have a ZeroR model?
     if (m_ZeroR != null)
       return m_ZeroR.distributionForInstance(inst);
+
+    // filter instance
+    if (m_ActualFilter != null) {
+      m_ActualFilter.input(inst);
+      m_ActualFilter.batchFinished();
+      inst = m_ActualFilter.output();
+    }
 
     insts = new Instances(inst.dataset(), 0);
     insts.add(inst);
