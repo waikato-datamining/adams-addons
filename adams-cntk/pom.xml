@@ -9,10 +9,10 @@
     <version>17.7.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>adams-dl4j-cntk</artifactId>
+  <artifactId>adams-cntk</artifactId>
   <packaging>jar</packaging>
 
-  <name>adams-dl4j-cntk</name>
+  <name>adams-cntk</name>
   <description>Module for Microsoft CNTK bindings for prediction time.</description>
   <url>https://adams.cms.waikato.ac.nz/</url>
   <organization>
