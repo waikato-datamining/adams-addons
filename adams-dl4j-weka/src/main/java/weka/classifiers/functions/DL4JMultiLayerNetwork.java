@@ -61,6 +61,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Random;
 import java.util.Vector;
 
 /**
@@ -86,6 +87,8 @@ public class DL4JMultiLayerNetwork
   public final static String NUM_EPOCHS = "num-epochs";
 
   public final static String MINI_BATCH_SIZE = "mini-batch-size";
+
+  public final static String RANDOMIZE_BETWEEN_EPOCHS = "randomize-between-epochs";
 
   public final static String DROP_TYPE = "drop-type";
 
@@ -132,6 +135,9 @@ public class DL4JMultiLayerNetwork
 
   /** the minibatch size. */
   protected int m_MiniBatchSize = getDefaultMiniBatchSize();
+
+  /** whether to randomize the data between epochs. */
+  protected boolean m_RandomizeBetweenEpochs = getDefaultRandomizeBetweenEpochs();
 
   /** whether to use regularization. */
   protected boolean m_UseRegularization = getDefaultUseRegularization();
@@ -183,6 +189,7 @@ public class DL4JMultiLayerNetwork
     WekaOptionUtils.addOption(result, optimizationAlgorithmTipText(), "" + getDefaultOptimizationAlgorithm(), OPTIMIZATION_ALGORITHM);
     WekaOptionUtils.addOption(result, numEpochsTipText(), "" + getDefaultNumEpochs(), NUM_EPOCHS);
     WekaOptionUtils.addOption(result, miniBatchSizeTipText(), "" + getDefaultMiniBatchSize(), MINI_BATCH_SIZE);
+    WekaOptionUtils.addOption(result, randomizeBetweenEpochsTipText(), "" + getDefaultRandomizeBetweenEpochs(), RANDOMIZE_BETWEEN_EPOCHS);
     WekaOptionUtils.addOption(result, dropTypeTipText(), "" + getDefaultDropType(), DROP_TYPE);
     WekaOptionUtils.addOption(result, dropOutTipText(), "" + getDefaultDropOut(), DROP_OUT);
     WekaOptionUtils.addOption(result, iterationListenersTipText(), Utils.arrayToString(getDefaultIterationListeners()), ITERATION_LISTENER);
@@ -204,6 +211,7 @@ public class DL4JMultiLayerNetwork
     setOptimizationAlgorithm((OptimizationAlgorithm) WekaOptionUtils.parse(options, OPTIMIZATION_ALGORITHM, getDefaultOptimizationAlgorithm()));
     setNumEpochs(WekaOptionUtils.parse(options, NUM_EPOCHS, getDefaultNumEpochs()));
     setMiniBatchSize(WekaOptionUtils.parse(options, MINI_BATCH_SIZE, getDefaultMiniBatchSize()));
+    setRandomizeBetweenEpochs(Utils.getFlag(RANDOMIZE_BETWEEN_EPOCHS, options));
     setDropType((DropType) WekaOptionUtils.parse(options, DROP_TYPE, getDefaultDropType()));
     setDropOut(WekaOptionUtils.parse(options, DROP_OUT, getDefaultDropOut()));
     setIterationListeners((IterationListenerConfigurator[]) WekaOptionUtils.parse(options, ITERATION_LISTENER, getDefaultIterationListeners(), IterationListenerConfigurator.class));
@@ -232,6 +240,7 @@ public class DL4JMultiLayerNetwork
     }
     WekaOptionUtils.add(result, NUM_EPOCHS, getNumEpochs());
     WekaOptionUtils.add(result, MINI_BATCH_SIZE, getMiniBatchSize());
+    WekaOptionUtils.add(result, RANDOMIZE_BETWEEN_EPOCHS, getRandomizeBetweenEpochs());
     WekaOptionUtils.add(result, ITERATION_LISTENER, getIterationListeners());
     WekaOptionUtils.add(result, FILTER, getFilter());
     WekaOptionUtils.add(result, super.getOptions());
@@ -423,6 +432,43 @@ public class DL4JMultiLayerNetwork
    */
   public String miniBatchSizeTipText() {
     return "The size to use for mini-batches.";
+  }
+
+  /**
+   * Returns whether to randomize mini-batches between epochs.
+   *
+   * @return		the default
+   */
+  protected boolean getDefaultRandomizeBetweenEpochs() {
+    return false;
+  }
+
+  /**
+   * Sets whether to randomize the data between epochs.
+   *
+   * @param value	true if to randomize
+   */
+  public void setRandomizeBetweenEpochs(boolean value) {
+    m_RandomizeBetweenEpochs = value;
+  }
+
+  /**
+   * Returns whether to randomize the data between epochs.
+   *
+   * @return		true if to randomize
+   */
+  public boolean getRandomizeBetweenEpochs() {
+    return m_RandomizeBetweenEpochs;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String randomizeBetweenEpochsTipText() {
+    return "If enabled, the data gets randomized between epochs.";
   }
 
   /**
@@ -895,6 +941,8 @@ public class DL4JMultiLayerNetwork
     ArrayList<IterationListener> 	listeners;
     DataSetIterator 			iter;
     int					i;
+    Random				rand;
+    int					seed;
 
     // Can classifier handle the data?
     getCapabilities().testWithFail(data);
@@ -941,11 +989,15 @@ public class DL4JMultiLayerNetwork
     m_Model.setListeners(listeners);
 
     // build
+    rand = new Random(getSeed());
+    seed = getSeed();
     for (i = 0; i < getNumEpochs(); i++) {
+      if (m_RandomizeBetweenEpochs)
+	seed = rand.nextInt();
       if (m_MiniBatchSize < 1)
-	iter = m_Iterator.getIterator(data, getSeed());
+	iter = m_Iterator.getIterator(data, seed);
       else
-	iter = m_Iterator.getIterator(data, getSeed(), m_MiniBatchSize);
+	iter = m_Iterator.getIterator(data, seed, m_MiniBatchSize);
       m_Model.fit(iter);
       if (getDebug() && ((i+1) % 100 == 0))
 	System.out.println("Epoch #" + (i+1) + " finished");
