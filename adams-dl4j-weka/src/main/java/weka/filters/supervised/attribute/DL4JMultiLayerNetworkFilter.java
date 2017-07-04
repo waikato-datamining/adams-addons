@@ -320,10 +320,11 @@ public class DL4JMultiLayerNetworkFilter extends SimpleBatchFilter implements Su
     result.enable(Capabilities.Capability.NUMERIC_ATTRIBUTES);
     result.enable(Capabilities.Capability.DATE_ATTRIBUTES);
     result.enable(Capabilities.Capability.MISSING_VALUES);
-
+    result.enable(Capabilities.Capability.STRING_ATTRIBUTES);
+    result.enable(Capabilities.Capability.NOMINAL_ATTRIBUTES);
     // class
     result.enable(Capabilities.Capability.NUMERIC_CLASS);
-
+    result.enable(Capabilities.Capability.NOMINAL_CLASS);
     return result;
   }
 
