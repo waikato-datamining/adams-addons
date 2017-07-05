@@ -31,25 +31,25 @@ import adams.core.option.AbstractOption;
 public enum EvaluationStatistic
   implements EnumWithCustomDisplay<EvaluationStatistic> {
 
-  ACCURACY("Accuracy", false, true),
-  CLASS_COUNT("Class count", true, true),
-  F1("F1", false, true),
-  F1_CLASS("F1", true, true),
-  FALSE_ALARM_RATE("False alarm rate", false, true),
-  FALSE_NEGATIVE_RATE("False negative rate", false, true),
-  FALSE_NEGATIVE_RATE_CLASS("False negative rate", true, true),
-  FALSE_POSITIVE_RATE("False positive rate", false, true),
-  FALSE_POSITIVE_RATE_CLASS("False positive rate", true, true),
-  PRECISION("Precision", false, true),
-  PRECISION_CLASS("Precision", true, true),
-  RECALL("Recall", false, true),
-  RECALL_CLASS("Recall", true, true),
-  ROW_COUNT("Row count", false, true),
-  CORRELATION_R_SQUARED("Correlation R^2", false, false),
-  MEAN_ABSOLUTE_ERROR("Mean absolute error", false, false),
-  MEAN_SQUARED_ERROR("Mean squared error", false, false),
-  RELATIVE_SQUARED_ERROR("Relative squared error", false, false),
-  ROOT_MEAN_SQUARED_ERROR("Root mean squared error", false, false);
+  ACCURACY("Accuracy", false, true, true),
+  CLASS_COUNT("Class count", true, true, true),
+  F1("F1", false, true, true),
+  F1_CLASS("F1", true, true, true),
+  FALSE_ALARM_RATE("False alarm rate", false, true, false),
+  FALSE_NEGATIVE_RATE("False negative rate", false, true, false),
+  FALSE_NEGATIVE_RATE_CLASS("False negative rate", true, true, false),
+  FALSE_POSITIVE_RATE("False positive rate", false, true, false),
+  FALSE_POSITIVE_RATE_CLASS("False positive rate", true, true, false),
+  PRECISION("Precision", false, true, true),
+  PRECISION_CLASS("Precision", true, true, true),
+  RECALL("Recall", false, true, true),
+  RECALL_CLASS("Recall", true, true, true),
+  ROW_COUNT("Row count", false, true, true),
+  CORRELATION_R_SQUARED("Correlation R^2", false, false, true),
+  MEAN_ABSOLUTE_ERROR("Mean absolute error", false, false, false),
+  MEAN_SQUARED_ERROR("Mean squared error", false, false, false),
+  RELATIVE_SQUARED_ERROR("Relative squared error", false, false, false),
+  ROOT_MEAN_SQUARED_ERROR("Root mean squared error", false, false, false);
 
   /** the display value. */
   private String m_Display;
@@ -63,17 +63,21 @@ public enum EvaluationStatistic
   /** classification (true), regression (false), both (null). */
   private Boolean m_Type;
 
+  /** whether higher is better. */
+  protected boolean m_HigherIsBetter;
+
   /**
    * Initializes the element.
    *
    * @param display	the display value
    * @param perClass	whether this element is per class
    */
-  private EvaluationStatistic(String display, boolean perClass, Boolean type) {
-    m_Display     = display + (perClass ? " (class)" : "");
-    m_Raw         = super.toString();
-    m_PerClass    = perClass;
-    m_Type        = type;
+  private EvaluationStatistic(String display, boolean perClass, Boolean type, boolean higherIsBetter) {
+    m_Display        = display + (perClass ? " (class)" : "");
+    m_Raw            = super.toString();
+    m_PerClass       = perClass;
+    m_Type           = type;
+    m_HigherIsBetter = higherIsBetter;
   }
   
   /**
@@ -101,6 +105,15 @@ public enum EvaluationStatistic
    */
   public boolean isRegression() {
     return (m_Type == null) || !m_Type;
+  }
+
+  /**
+   * Returns whether a higher numeric value is considered better.
+   *
+   * @return		true if higher value is better
+   */
+  public boolean isHigherIsBetter() {
+    return m_HigherIsBetter;
   }
 
   /**
@@ -139,6 +152,21 @@ public enum EvaluationStatistic
   @Override
   public String toString() {
     return m_Display;
+  }
+
+  /**
+   * Returns >0 if stat2 is better than stat1, 0 if the same, or <0 if
+   * stat2 is worse than stat1.
+   *
+   * @param stat1	the first statistic
+   * @param stat2	the second statistic
+   * @return		the comparison
+   */
+  public int compare(double stat1, double stat2) {
+    if (m_HigherIsBetter)
+      return Double.compare(stat1, stat2);
+    else
+      return -Double.compare(stat1, stat2);
   }
 
   /**
