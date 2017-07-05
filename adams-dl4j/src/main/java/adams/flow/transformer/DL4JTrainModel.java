@@ -46,6 +46,8 @@ import adams.ml.dl4j.EvaluationStatistic;
 import adams.ml.dl4j.datasetiterator.ShufflingDataSetIterator;
 import adams.ml.dl4j.iterationlistener.IterationListenerConfigurator;
 import adams.ml.dl4j.model.ModelConfigurator;
+import adams.ml.dl4j.trainstopcriterion.AbstractTrainStopCriterion;
+import adams.ml.dl4j.trainstopcriterion.MaxEpoch;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.eval.RegressionEvaluation;
 import org.deeplearning4j.nn.api.Layer;
@@ -119,10 +121,9 @@ import java.util.Map;
  * &nbsp;&nbsp;&nbsp;default: DL4JModelConfigurator
  * </pre>
  * 
- * <pre>-num-epochs &lt;int&gt; (property: numEpochs)
- * &nbsp;&nbsp;&nbsp;The number of epochs to perform.
- * &nbsp;&nbsp;&nbsp;default: 1000
- * &nbsp;&nbsp;&nbsp;minimum: 1
+ * <pre>-train-stop &lt;adams.ml.dl4j.trainstopcriterion.AbstractTrainStopCriterion&gt; (property: trainStop)
+ * &nbsp;&nbsp;&nbsp;The criterion for stopping training.
+ * &nbsp;&nbsp;&nbsp;default: adams.ml.dl4j.trainstopcriterion.MaxEpoch
  * </pre>
  * 
  * <pre>-mini-batch-size &lt;int&gt; (property: miniBatchSize)
@@ -218,6 +219,9 @@ public class DL4JTrainModel
   /** the key for storing the best statistics in the backup. */
   public final static String BACKUP_BEST_STATISTICS = "best statistics";
 
+  /** the key for storing the current training finished flag in the backup. */
+  public final static String BACKUP_TRAINING_FINISHED = "training finished";
+
   /** the name of the callable model. */
   protected CallableActorReference m_Model;
 
@@ -230,8 +234,8 @@ public class DL4JTrainModel
   /** the currently best statistics. */
   protected Map<String,Double> m_BestStatistics;
 
-  /** the number of epochs. */
-  protected int m_NumEpochs;
+  /** the criterion for stopping training. */
+  protected AbstractTrainStopCriterion m_TrainStop;
 
   /** the minibatch size. */
   protected int m_MiniBatchSize;
@@ -275,6 +279,9 @@ public class DL4JTrainModel
   /** the test data. */
   protected DataSet m_TestData;
 
+  /** whether training has finished. */
+  protected boolean m_TrainingFinished;
+
   /**
    * Returns a string describing the object.
    *
@@ -303,8 +310,8 @@ public class DL4JTrainModel
       new CallableActorReference(DL4JModelConfigurator.class.getSimpleName()));
 
     m_OptionManager.add(
-      "num-epochs", "numEpochs",
-      1000, 1, null);
+      "train-stop", "trainStop",
+      new MaxEpoch());
 
     m_OptionManager.add(
       "mini-batch-size", "miniBatchSize",
@@ -384,22 +391,22 @@ public class DL4JTrainModel
   }
 
   /**
-   * Sets the number of epochs.
+   * Sets the criterion for stopping training.
    *
-   * @param value	the epochs
+   * @param value	the criterion
    */
-  public void setNumEpochs(int value) {
-    m_NumEpochs = value;
+  public void setTrainStop(AbstractTrainStopCriterion value) {
+    m_TrainStop = value;
     reset();
   }
 
   /**
-   * Returns the number of epochs.
+   * Returns the criterion for stopping training.
    *
-   * @return  		the epochs
+   * @return  		the criterion
    */
-  public int getNumEpochs() {
-    return m_NumEpochs;
+  public AbstractTrainStopCriterion getTrainStop() {
+    return m_TrainStop;
   }
 
   /**
@@ -408,8 +415,8 @@ public class DL4JTrainModel
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String numEpochsTipText() {
-    return "The number of epochs to perform.";
+  public String trainStopTipText() {
+    return "The criterion for stopping training.";
   }
 
   /**
@@ -754,7 +761,7 @@ public class DL4JTrainModel
     String	result;
 
     result  = QuickInfoHelper.toString(this, "model", m_Model, "model: ");
-    result += QuickInfoHelper.toString(this, "numEpochs", m_NumEpochs, ", epochs: ");
+    result += QuickInfoHelper.toString(this, "trainStop", m_TrainStop, ", stop: ");
     result += QuickInfoHelper.toString(this, "miniBatchSize", m_MiniBatchSize, ", minibatch: ");
     result += QuickInfoHelper.toString(this, "variableName", m_VariableName.paddedValue(), ", monitor: ");
     result += QuickInfoHelper.toString(this, "testPercentage", m_TestPercentage, ", test %: ");
@@ -776,6 +783,7 @@ public class DL4JTrainModel
     pruneBackup(BACKUP_EPOCH);
     pruneBackup(BACKUP_TRAINDATA);
     pruneBackup(BACKUP_TESTDATA);
+    pruneBackup(BACKUP_TRAINING_FINISHED);
   }
 
   /**
@@ -799,6 +807,7 @@ public class DL4JTrainModel
       result.put(BACKUP_TRAINDATA, m_TrainData);
     if (m_TestData != null)
       result.put(BACKUP_TESTDATA, m_TestData);
+    result.put(BACKUP_TRAINING_FINISHED, m_TrainingFinished);
 
     return result;
   }
@@ -834,6 +843,10 @@ public class DL4JTrainModel
       m_TestData = (DataSet) state.get(BACKUP_TESTDATA);
       state.remove(BACKUP_TESTDATA);
     }
+    if (state.containsKey(BACKUP_TRAINING_FINISHED)) {
+      m_TrainingFinished = (Boolean) state.get(BACKUP_TRAINING_FINISHED);
+      state.remove(BACKUP_TRAINING_FINISHED);
+    }
 
     super.restoreState(state);
   }
@@ -868,12 +881,13 @@ public class DL4JTrainModel
    * Resets the model.
    */
   protected void resetModel() {
-    m_ActualModel    = null;
-    m_BestModel      = null;
-    m_BestStatistics = new HashMap<>();
-    m_Epoch          = 0;
-    m_TrainData      = null;
-    m_TestData       = null;
+    m_ActualModel      = null;
+    m_BestModel        = null;
+    m_BestStatistics   = new HashMap<>();
+    m_Epoch            = 0;
+    m_TrainData        = null;
+    m_TestData         = null;
+    m_TrainingFinished = false;
   }
 
   /**
@@ -980,7 +994,7 @@ public class DL4JTrainModel
     evalReg = null;
 
     try {
-      while (m_Epoch < m_NumEpochs) {
+      do {
 	m_Epoch++;
 	if (isLoggingEnabled() && (m_Epoch % 100 == 0))
 	  getLogger().info("#epoch: " + m_Epoch);
@@ -1008,7 +1022,12 @@ public class DL4JTrainModel
 	  break;
 	if (isStopped())
 	  break;
+
+	// check whether training should be stopped
+	m_TrainingFinished = m_TrainStop.checkStopping(
+	  new DL4JModelContainer(m_ActualModel, m_TrainData, m_Epoch));
       }
+      while (!m_TrainingFinished);
 
       // testing?
       if ((m_TestData != null) && !isStopped()) {
@@ -1039,6 +1058,10 @@ public class DL4JTrainModel
 	else
 	  cont = new DL4JModelContainer(m_ActualModel, m_TrainData, m_Epoch, null, (m_OutputBestModel ? m_BestModel : null), m_BestStatistics);
 	m_OutputToken = new Token(cont);
+
+	// check whether training should be stopped
+	if (!m_TrainingFinished)
+	  m_TrainingFinished = m_TrainStop.checkStopping(cont);
       }
     }
     catch (Exception e) {
@@ -1068,6 +1091,8 @@ public class DL4JTrainModel
     result = null;
 
     try {
+      m_TrainingFinished = false;
+
       // data
       data = (DataSet) m_InputToken.getPayload();
       if (m_TestPercentage > 0) {
@@ -1111,8 +1136,10 @@ public class DL4JTrainModel
       result        = handleException("Failed to process data:", e);
     }
 
-    if (result == null)
+    if (result == null) {
+      m_TrainStop.start();
       result = iterate();
+    }
 
     return result;
   }
@@ -1138,7 +1165,7 @@ public class DL4JTrainModel
    */
   @Override
   public boolean hasPendingOutput() {
-    return super.hasPendingOutput() || ((m_Epoch > 0) && (m_Epoch < m_NumEpochs));
+    return super.hasPendingOutput() || ((m_Epoch > 0) && !m_TrainingFinished);
   }
 
   /**
@@ -1150,8 +1177,10 @@ public class DL4JTrainModel
   public Token output() {
     Token	result;
 
-    if (m_OutputToken == null)
-      iterate();
+    if (m_OutputToken == null) {
+      if (!m_TrainingFinished)
+	iterate();
+    }
 
     result        = m_OutputToken;
     m_OutputToken = null;
