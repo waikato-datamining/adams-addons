@@ -1,1 +1,1 @@
-model: DL4JModelConfigurator, epochs: 1000, minibatch: -1, monitor: @{variable}, test %: 0.0
+model: DL4JModelConfigurator, stop: MaxEpoch, minibatch: -1, monitor: @{variable}, test %: 0.0
