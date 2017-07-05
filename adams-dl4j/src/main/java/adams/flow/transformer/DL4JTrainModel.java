@@ -23,7 +23,11 @@ package adams.flow.transformer;
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.core.Randomizable;
+import adams.core.Range;
 import adams.core.VariableName;
+import adams.core.option.AbstractOption;
+import adams.data.spreadsheet.Row;
+import adams.data.spreadsheet.SpreadSheet;
 import adams.event.VariableChangeEvent;
 import adams.event.VariableChangeEvent.Type;
 import adams.flow.container.DL4JModelContainer;
@@ -37,22 +41,29 @@ import adams.flow.provenance.ProvenanceContainer;
 import adams.flow.provenance.ProvenanceInformation;
 import adams.flow.provenance.ProvenanceSupporter;
 import adams.flow.source.DL4JModelConfigurator;
+import adams.ml.dl4j.DataSetHelper;
+import adams.ml.dl4j.EvaluationStatistic;
 import adams.ml.dl4j.datasetiterator.ShufflingDataSetIterator;
 import adams.ml.dl4j.iterationlistener.IterationListenerConfigurator;
 import adams.ml.dl4j.model.ModelConfigurator;
+import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.eval.RegressionEvaluation;
+import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.optimize.api.IterationListener;
 import org.nd4j.linalg.dataset.DataSet;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 /**
  <!-- globalinfo-start -->
  * Trains a model based on the incoming dataset and outputs the built model alongside the dataset (in a model container).<br>
- * The model can be reset using the monitor variable option, i.e, whenever this variable changes value, the model gets reset. Useful when training sequentually on multiple datasets (using the file name as monitor variable).
+ * The model can be reset using the monitor variable option, i.e, whenever this variable changes value, the model gets reset. Useful when training sequentially on multiple datasets (using the file name as monitor variable).
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -64,7 +75,7 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;adams.flow.container.DL4JModelContainer<br>
  * <br><br>
  * Container information:<br>
- * - adams.flow.container.DL4JModelContainer: Model, Dataset, Epoch
+ * - adams.flow.container.DL4JModelContainer: Model, Best Model, Best Statistics, Dataset, Epoch, Evaluation
  * <br><br>
  <!-- flow-summary-end -->
  *
@@ -141,6 +152,42 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: variable
  * </pre>
  * 
+ * <pre>-test-percentage &lt;double&gt; (property: testPercentage)
+ * &nbsp;&nbsp;&nbsp;The percentage (0-1) of the training data to set aside for evaluating the 
+ * &nbsp;&nbsp;&nbsp;model; no testing performed if 0.
+ * &nbsp;&nbsp;&nbsp;default: 0.0
+ * &nbsp;&nbsp;&nbsp;minimum: 0.0
+ * &nbsp;&nbsp;&nbsp;maximum: 1.0
+ * </pre>
+ * 
+ * <pre>-type &lt;CLASSIFICATION|REGRESSION&gt; (property: type)
+ * &nbsp;&nbsp;&nbsp;The type of evaluation to perform.
+ * &nbsp;&nbsp;&nbsp;default: CLASSIFICATION
+ * </pre>
+ * 
+ * <pre>-output-best-model &lt;boolean&gt; (property: outputBestModel)
+ * &nbsp;&nbsp;&nbsp;If enabled and testing is performed, the best model found so far is output 
+ * &nbsp;&nbsp;&nbsp;in the container as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-statistic &lt;Accuracy|Class count (class)|F1|F1 (class)|False alarm rate|False negative rate|False negative rate (class)|False positive rate|False positive rate (class)|Precision|Precision (class)|Recall|Recall (class)|Row count|Correlation R^2|Mean absolute error|Mean squared error|Relative squared error|Root mean squared error&gt; [-statistic ...] (property: statisticValues)
+ * &nbsp;&nbsp;&nbsp;The evaluation values to extract and turn into a spreadsheet.
+ * &nbsp;&nbsp;&nbsp;default: ACCURACY, F1
+ * </pre>
+ * 
+ * <pre>-index &lt;adams.core.Range&gt; (property: classIndex)
+ * &nbsp;&nbsp;&nbsp;The range of class label indices (eg used for AUC).
+ * &nbsp;&nbsp;&nbsp;default: first
+ * &nbsp;&nbsp;&nbsp;example: A range is a comma-separated list of single 1-based indices or sub-ranges of indices ('start-end'); 'inv(...)' inverts the range '...'; the following placeholders can be used as well: first, second, third, last_2, last_1, last
+ * </pre>
+ * 
+ * <pre>-regression-columns &lt;adams.core.Range&gt; (property: regressionColumns)
+ * &nbsp;&nbsp;&nbsp;The range of columns to get regression statistics for.
+ * &nbsp;&nbsp;&nbsp;default: last
+ * &nbsp;&nbsp;&nbsp;example: A range is a comma-separated list of single 1-based indices or sub-ranges of indices ('start-end'); 'inv(...)' inverts the range '...'; the following placeholders can be used as well: first, second, third, last_2, last_1, last
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -156,17 +203,32 @@ public class DL4JTrainModel
   /** the key for storing the current model in the backup. */
   public final static String BACKUP_MODEL = "model";
 
+  /** the key for storing the current best model in the backup. */
+  public final static String BACKUP_BEST_MODEL = "best model";
+
   /** the key for storing the current epoch in the backup. */
   public final static String BACKUP_EPOCH = "epoch";
 
   /** the key for storing the current training data in the backup. */
   public final static String BACKUP_TRAINDATA = "traindata";
 
+  /** the key for storing the current test data in the backup. */
+  public final static String BACKUP_TESTDATA = "testdata";
+
+  /** the key for storing the best statistics in the backup. */
+  public final static String BACKUP_BEST_STATISTICS = "best statistics";
+
   /** the name of the callable model. */
   protected CallableActorReference m_Model;
 
   /** the actual model. */
   protected Model m_ActualModel;
+
+  /** the best model. */
+  protected Model m_BestModel;
+
+  /** the currently best statistics. */
+  protected Map<String,Double> m_BestStatistics;
 
   /** the number of epochs. */
   protected int m_NumEpochs;
@@ -186,11 +248,32 @@ public class DL4JTrainModel
   /** the variable to listen to. */
   protected VariableName m_VariableName;
 
+  /** the test set percentage. */
+  protected double m_TestPercentage;
+
+  /** the evaluation type. */
+  protected DL4JEvaluationType m_Type;
+
+  /** whether to output the best model in the container as well (if test percentage >0). */
+  protected boolean m_OutputBestModel;
+
+  /** the comparison fields. */
+  protected EvaluationStatistic[] m_StatisticValues;
+
+  /** the range of the class labels. */
+  protected Range m_ClassIndex;
+
+  /** the regression columns to get statistics for. */
+  protected Range m_RegressionColumns;
+
   /** the current epoch. */
   protected int m_Epoch;
 
   /** the training data. */
   protected DataSet m_TrainData;
+
+  /** the test data. */
+  protected DataSet m_TestData;
 
   /**
    * Returns a string describing the object.
@@ -204,7 +287,7 @@ public class DL4JTrainModel
 	+ "built model alongside the dataset (in a model container).\n"
         + "The model can be reset using the monitor variable option, i.e, "
 	+ "whenever this variable changes value, the model gets reset. "
-	+ "Useful when training sequentually on multiple datasets (using the "
+	+ "Useful when training sequentially on multiple datasets (using the "
 	+ "file name as monitor variable).";
   }
 
@@ -242,6 +325,33 @@ public class DL4JTrainModel
     m_OptionManager.add(
       "var-name", "variableName",
       new VariableName());
+
+    m_OptionManager.add(
+      "test-percentage", "testPercentage",
+      0.0, 0.0, 1.0);
+
+    m_OptionManager.add(
+      "type", "type",
+      DL4JEvaluationType.CLASSIFICATION);
+
+    m_OptionManager.add(
+      "output-best-model", "outputBestModel",
+      false);
+
+    m_OptionManager.add(
+      "statistic", "statisticValues",
+      new EvaluationStatistic[]{
+        EvaluationStatistic.ACCURACY,
+        EvaluationStatistic.F1
+      });
+
+    m_OptionManager.add(
+      "index", "classIndex",
+      new Range(Range.FIRST));
+
+    m_OptionManager.add(
+      "regression-columns", "regressionColumns",
+      new Range(Range.LAST));
   }
 
   /**
@@ -448,6 +558,193 @@ public class DL4JTrainModel
   }
 
   /**
+   * Sets the percentage of the training data to set aside for testing
+   * the model; not testing performed if 0.
+   *
+   * @param value	the percentage (0-1)
+   */
+  public void setTestPercentage(double value) {
+    if (getOptionManager().isValid("testPercentage", value)) {
+      m_TestPercentage = value;
+      reset();
+    }
+  }
+
+  /**
+   * Returns the percentage of the training data to set aside for testing
+   * the model; not testing performed if 0.
+   *
+   * @return  		the percentage (0-1)
+   */
+  public double getTestPercentage() {
+    return m_TestPercentage;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String testPercentageTipText() {
+    return
+      "The percentage (0-1) of the training data to set aside for evaluating "
+        + "the model; no testing performed if 0.";
+  }
+
+  /**
+   * Sets the type of evaluation to perform.
+   *
+   * @param value	the type
+   */
+  public void setType(DL4JEvaluationType value) {
+    m_Type = value;
+    reset();
+  }
+
+  /**
+   * Returns the type of evaluation to perform.
+   *
+   * @return  		the type
+   */
+  public DL4JEvaluationType getType() {
+    return m_Type;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String typeTipText() {
+    return "The type of evaluation to perform.";
+  }
+
+  /**
+   * Sets whether to output the best model in the container as well.
+   * Requires testing to be performed.
+   *
+   * @param value	true if to output
+   * @see		#getTestPercentage()
+   */
+  public void setOutputBestModel(boolean value) {
+    m_OutputBestModel = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to output the best model in the container as well.
+   * Requires testing to be performed.
+   *
+   * @return  		true if to output
+   * @see		#getTestPercentage()
+   */
+  public boolean getOutputBestModel() {
+    return m_OutputBestModel;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   * @see		#getTestPercentage()
+   */
+  public String outputBestModelTipText() {
+    return
+      "If enabled and testing is performed, the best model found so far is "
+	+ "output in the container as well.";
+  }
+
+  /**
+   * Sets the values to extract.
+   *
+   * @param value	the value
+   */
+  public void setStatisticValues(EvaluationStatistic[] value) {
+    m_StatisticValues = value;
+    reset();
+  }
+
+  /**
+   * Returns the values to extract.
+   *
+   * @return		the value
+   */
+  public EvaluationStatistic[] getStatisticValues() {
+    return m_StatisticValues;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String statisticValuesTipText() {
+    return "The evaluation values to extract and turn into a spreadsheet.";
+  }
+
+  /**
+   * Sets the range of class labels indices (1-based).
+   *
+   * @param value	the label indices
+   */
+  public void setClassIndex(Range value) {
+    m_ClassIndex = value;
+    reset();
+  }
+
+  /**
+   * Returns the current range of class label indices (1-based).
+   *
+   * @return		the label indices
+   */
+  public Range getClassIndex() {
+    return m_ClassIndex;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String classIndexTipText() {
+    return "The range of class label indices (eg used for AUC).";
+  }
+
+  /**
+   * Sets the range of columns to get regression statistics for.
+   *
+   * @param value	the column indices
+   */
+  public void setRegressionColumns(Range value) {
+    m_RegressionColumns = value;
+    reset();
+  }
+
+  /**
+   * Returns the range of columns to get regression statistics for.
+   *
+   * @return		the column indices
+   */
+  public Range getRegressionColumns() {
+    return m_RegressionColumns;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String regressionColumnsTipText() {
+    return "The range of columns to get regression statistics for.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -460,6 +757,8 @@ public class DL4JTrainModel
     result += QuickInfoHelper.toString(this, "numEpochs", m_NumEpochs, ", epochs: ");
     result += QuickInfoHelper.toString(this, "miniBatchSize", m_MiniBatchSize, ", minibatch: ");
     result += QuickInfoHelper.toString(this, "variableName", m_VariableName.paddedValue(), ", monitor: ");
+    result += QuickInfoHelper.toString(this, "testPercentage", m_TestPercentage, ", test %: ");
+    result += QuickInfoHelper.toString(this, "outputBestModel", m_OutputBestModel, "best model", ", ");
 
     return result;
   }
@@ -472,8 +771,11 @@ public class DL4JTrainModel
     super.pruneBackup();
 
     pruneBackup(BACKUP_MODEL);
+    pruneBackup(BACKUP_BEST_MODEL);
+    pruneBackup(BACKUP_BEST_STATISTICS);
     pruneBackup(BACKUP_EPOCH);
     pruneBackup(BACKUP_TRAINDATA);
+    pruneBackup(BACKUP_TESTDATA);
   }
 
   /**
@@ -488,9 +790,15 @@ public class DL4JTrainModel
     result = super.backupState();
     if (m_ActualModel != null)
       result.put(BACKUP_MODEL, m_ActualModel);
+    if (m_BestModel != null)
+      result.put(BACKUP_BEST_MODEL, m_BestModel);
+    if (m_BestStatistics != null)
+      result.put(BACKUP_BEST_STATISTICS, m_BestStatistics);
     result.put(BACKUP_EPOCH, m_Epoch);
     if (m_TrainData != null)
       result.put(BACKUP_TRAINDATA, m_TrainData);
+    if (m_TestData != null)
+      result.put(BACKUP_TESTDATA, m_TestData);
 
     return result;
   }
@@ -506,6 +814,14 @@ public class DL4JTrainModel
       m_ActualModel = (Model) state.get(BACKUP_MODEL);
       state.remove(BACKUP_MODEL);
     }
+    if (state.containsKey(BACKUP_BEST_MODEL)) {
+      m_BestModel = (Model) state.get(BACKUP_BEST_MODEL);
+      state.remove(BACKUP_BEST_MODEL);
+    }
+    if (state.containsKey(BACKUP_BEST_STATISTICS)) {
+      m_BestStatistics = (Map<String,Double>) state.get(BACKUP_BEST_STATISTICS);
+      state.remove(BACKUP_BEST_STATISTICS);
+    }
     if (state.containsKey(BACKUP_EPOCH)) {
       m_Epoch = (Integer) state.get(BACKUP_EPOCH);
       state.remove(BACKUP_EPOCH);
@@ -513,6 +829,10 @@ public class DL4JTrainModel
     if (state.containsKey(BACKUP_TRAINDATA)) {
       m_TrainData = (DataSet) state.get(BACKUP_TRAINDATA);
       state.remove(BACKUP_TRAINDATA);
+    }
+    if (state.containsKey(BACKUP_TESTDATA)) {
+      m_TestData = (DataSet) state.get(BACKUP_TESTDATA);
+      state.remove(BACKUP_TESTDATA);
     }
 
     super.restoreState(state);
@@ -548,9 +868,12 @@ public class DL4JTrainModel
    * Resets the model.
    */
   protected void resetModel() {
-    m_ActualModel = null;
-    m_Epoch       = 0;
-    m_TrainData   = null;
+    m_ActualModel    = null;
+    m_BestModel      = null;
+    m_BestStatistics = new HashMap<>();
+    m_Epoch          = 0;
+    m_TrainData      = null;
+    m_TestData       = null;
   }
 
   /**
@@ -594,6 +917,53 @@ public class DL4JTrainModel
   }
 
   /**
+   * Updates the best model, if applicable.
+   *
+   * @param evalCls	the evaluation in case of classification
+   * @param evalReg	the evaluation in case of regression
+   */
+  protected void updateBestModel(Evaluation evalCls, RegressionEvaluation evalReg) {
+    String			result;
+    DL4JEvaluationValues	eval;
+    SpreadSheet			stats;
+    String			statName;
+    Double			statValue;
+    boolean			better;
+    EvaluationStatistic		statEnum;
+
+    eval = new DL4JEvaluationValues();
+    eval.setStatisticValues(m_StatisticValues);
+    eval.setClassIndex(m_ClassIndex);
+    eval.setRegressionColumns(m_RegressionColumns);
+    eval.input(new Token((evalCls != null) ? evalCls : evalReg));
+    result = eval.execute();
+    if (result == null) {
+      stats = (SpreadSheet) eval.output().getPayload();
+      better = true;
+      if (!m_BestStatistics.isEmpty()) {
+	for (Row row: stats.rows()) {
+	  statName  = row.getCell(0).getContent();
+	  statValue = row.getCell(1).toDouble();
+	  statEnum  = EvaluationStatistic.valueOf((AbstractOption) null, statName);
+	  if (statEnum.compare(statValue, m_BestStatistics.get(statName)) > 0) {
+	    better = false;
+	    break;
+	  }
+	}
+      }
+      // better model found?
+      if (better) {
+	m_BestModel = m_ActualModel;
+	for (Row row: stats.rows()) {
+	  statName  = row.getCell(0).getContent();
+	  statValue = row.getCell(1).toDouble();
+	  m_BestStatistics.put(statName, statValue);
+	}
+      }
+    }
+  }
+
+  /**
    * Iterates through the epochs.
    *
    * @return		null if successful, otherwise error message
@@ -601,8 +971,13 @@ public class DL4JTrainModel
   protected String iterate() {
     String			result;
     ShufflingDataSetIterator 	iter;
+    Evaluation 			evalCls;
+    RegressionEvaluation 	evalReg;
+    DL4JModelContainer		cont;
 
-    result = null;
+    result  = null;
+    evalCls = null;
+    evalReg = null;
 
     try {
       while (m_Epoch < m_NumEpochs) {
@@ -635,8 +1010,36 @@ public class DL4JTrainModel
 	  break;
       }
 
-      if (!isStopped())
-	m_OutputToken = new Token(new DL4JModelContainer(m_ActualModel, m_TrainData, m_Epoch));
+      // testing?
+      if ((m_TestData != null) && !isStopped()) {
+	switch (m_Type) {
+	  case CLASSIFICATION:
+	    evalCls = new Evaluation(m_TrainData.numOutcomes());
+	    evalCls.eval(m_TestData.getLabels(), ((MultiLayerNetwork) m_ActualModel).output(m_TestData.getFeatureMatrix(), Layer.TrainingMode.TEST));
+	    break;
+
+	  case REGRESSION:
+	    evalReg = new RegressionEvaluation(m_TrainData.numOutcomes());
+	    evalReg.eval(m_TestData.getLabels(), ((MultiLayerNetwork) m_ActualModel).output(m_TestData.getFeatureMatrix(), Layer.TrainingMode.TEST));
+	    break;
+
+	  default:
+	    throw new IllegalStateException("Unhandled evaluation type: " + m_Type);
+	}
+
+	// best model?
+	updateBestModel(evalCls, evalReg);
+      }
+
+      if (!isStopped()) {
+	if (evalCls != null)
+	  cont = new DL4JModelContainer(m_ActualModel, m_TrainData, m_Epoch, evalCls, (m_OutputBestModel ? m_BestModel : null), m_BestStatistics);
+	else if (evalReg != null)
+	  cont = new DL4JModelContainer(m_ActualModel, m_TrainData, m_Epoch, evalReg, (m_OutputBestModel ? m_BestModel : null), m_BestStatistics);
+	else
+	  cont = new DL4JModelContainer(m_ActualModel, m_TrainData, m_Epoch, null, (m_OutputBestModel ? m_BestModel : null), m_BestStatistics);
+	m_OutputToken = new Token(cont);
+      }
     }
     catch (Exception e) {
       m_OutputToken = null;
@@ -657,13 +1060,31 @@ public class DL4JTrainModel
   @Override
   protected String doExecute() {
     String			result;
+    DataSet			data;
+    DataSet[]			split;
     ModelConfigurator		conf;
     List<IterationListener> 	listeners;
 
     result = null;
 
     try {
-      m_TrainData = (DataSet) m_InputToken.getPayload();
+      // data
+      data = (DataSet) m_InputToken.getPayload();
+      if (m_TestPercentage > 0) {
+	split       = DataSetHelper.split(data, 1.0 - m_TestPercentage, m_Seed);
+	m_TrainData = split[0];
+	m_TestData  = split[1];
+	if (isLoggingEnabled())
+	  getLogger().info("Splitting data into train/test using " + m_TestPercentage + " for training.");
+      }
+      else {
+	m_TrainData = data;
+	m_TestData  = null;
+	if (isLoggingEnabled())
+	  getLogger().info("Using all data for training.");
+      }
+
+      // set up model
       if (m_ActualModel == null) {
 	conf          = getModelConfiguratorInstance();
 	m_ActualModel = conf.configureModel(m_TrainData.numInputs(), m_TrainData.numOutcomes());
@@ -672,15 +1093,17 @@ public class DL4JTrainModel
       }
 
       if (result == null) {
-	if (m_ActualModel instanceof MultiLayerNetwork) {
-	  listeners = new ArrayList<>();
-	  for (IterationListenerConfigurator l: m_IterationListeners) {
-	    l.setFlowContext(this);
-	    listeners.addAll(l.configureIterationListeners());
-	  }
-	  ((MultiLayerNetwork) m_ActualModel).setListeners(listeners);
-	  ((MultiLayerNetwork) m_ActualModel).init();
+	// set listeners
+	listeners = new ArrayList<>();
+	for (IterationListenerConfigurator l: m_IterationListeners) {
+	  l.setFlowContext(this);
+	  listeners.addAll(l.configureIterationListeners());
 	}
+	m_ActualModel.setListeners(listeners);
+
+	// init
+	if (m_ActualModel instanceof MultiLayerNetwork)
+	  ((MultiLayerNetwork) m_ActualModel).init();
       }
     }
     catch (Exception e) {
