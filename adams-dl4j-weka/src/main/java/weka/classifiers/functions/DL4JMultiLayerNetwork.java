@@ -26,11 +26,14 @@ import adams.core.io.PlaceholderFile;
 import adams.data.conversion.DL4JJsonToModel;
 import adams.data.conversion.DL4JYamlToModel;
 import adams.flow.container.DL4JModelContainer;
+import adams.flow.container.WekaTrainTestSetContainer;
 import adams.ml.dl4j.iterationlistener.IterationListenerConfigurator;
 import adams.ml.dl4j.model.Dl4jMlpClassifier.DropType;
 import adams.ml.dl4j.model.ModelType;
 import adams.ml.dl4j.trainstopcriterion.AbstractTrainStopCriterion;
 import adams.ml.dl4j.trainstopcriterion.MaxEpoch;
+import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.eval.RegressionEvaluation;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -44,6 +47,7 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.classifiers.DL4JFilteredMultiLayerNetworkProvider;
 import weka.classifiers.DL4JMultiLayerNetworkProvider;
+import weka.classifiers.RandomSplitGenerator;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.rules.ZeroR;
 import weka.core.Capabilities;
@@ -105,6 +109,10 @@ public class DL4JMultiLayerNetwork
   public final static String MODEL_FILE_TYPE = "model-file-type";
 
   public final static String FILTER = "filter";
+
+  public final static String TEST_INTERVAL = "test-interval";
+
+  public final static String TEST_PERCENTAGE = "test-percentage";
 
   public enum ModelFileType {
     YAML,
@@ -170,6 +178,15 @@ public class DL4JMultiLayerNetwork
   /** the iterator. */
   protected DefaultInstancesIterator m_Iterator = null;
 
+  /** test the model every number of epochs. */
+  protected int m_TestInterval = getDefaultTestInterval();
+
+  /** the test set percentage. */
+  protected double m_TestPercentage = getDefaultTestPercentage();
+
+  /** the training header. */
+  protected Instances m_Header;
+
   /**
    * Returns a string describing the object.
    *
@@ -200,6 +217,8 @@ public class DL4JMultiLayerNetwork
     WekaOptionUtils.addOption(result, modelFileTipText(), "" + getDefaultModelFile(), MODEL_FILE);
     WekaOptionUtils.addOption(result, modelFileTypeTipText(), "" + getDefaultModelFileType(), MODEL_FILE_TYPE);
     WekaOptionUtils.addOption(result, filterTipText(), getDefaultFilter(), FILTER);
+    WekaOptionUtils.addOption(result, testIntervalTipText(), "" + getDefaultTestInterval(), TEST_INTERVAL);
+    WekaOptionUtils.addOption(result, testPercentageTipText(), "" + getDefaultTestPercentage(), TEST_PERCENTAGE);
     WekaOptionUtils.add(result, super.listOptions());
     return WekaOptionUtils.toEnumeration(result);
   }
@@ -222,6 +241,8 @@ public class DL4JMultiLayerNetwork
     setModelFile(WekaOptionUtils.parse(options, MODEL_FILE, getDefaultModelFile()));
     setModelFileType((ModelFileType) WekaOptionUtils.parse(options, MODEL_FILE_TYPE, getDefaultModelFileType()));
     setFilter((Filter) WekaOptionUtils.parse(options, FILTER, getDefaultFilter()));
+    setTestInterval(WekaOptionUtils.parse(options, TEST_INTERVAL, getDefaultTestInterval()));
+    setTestPercentage(WekaOptionUtils.parse(options, TEST_PERCENTAGE, getDefaultTestPercentage()));
     super.setOptions(options);
   }
 
@@ -247,6 +268,9 @@ public class DL4JMultiLayerNetwork
     WekaOptionUtils.add(result, RANDOMIZE_BETWEEN_EPOCHS, getRandomizeBetweenEpochs());
     WekaOptionUtils.add(result, ITERATION_LISTENER, getIterationListeners());
     WekaOptionUtils.add(result, FILTER, getFilter());
+    WekaOptionUtils.add(result, TEST_PERCENTAGE, getTestPercentage());
+    if (getTestPercentage() > 0)
+      WekaOptionUtils.add(result, TEST_INTERVAL, getTestInterval());
     WekaOptionUtils.add(result, super.getOptions());
     return WekaOptionUtils.toArray(result);
   }
@@ -775,6 +799,86 @@ public class DL4JMultiLayerNetwork
   }
 
   /**
+   * Returns the default epoch interval to test the model.
+   *
+   * @return		the default
+   */
+  protected int getDefaultTestInterval() {
+    return 100;
+  }
+
+  /**
+   * Sets the epoch interval to test the model.
+   *
+   * @param value	the number of epochs
+   */
+  public void setTestInterval(int value) {
+    if (value > 0)
+      m_TestInterval = value;
+  }
+
+  /**
+   * Returns the epoch interval to test the model.
+   *
+   * @return  		the number of epochs
+   */
+  public int getTestInterval() {
+    return m_TestInterval;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String testIntervalTipText() {
+    return "The interval (of epochs) to test the model, if a test percentage is specified.";
+  }
+
+  /**
+   * Returns the default test percentage to use.
+   *
+   * @return		the default percentage
+   */
+  protected double getDefaultTestPercentage() {
+    return 0.0;
+  }
+
+  /**
+   * Sets the percentage of the training data to set aside for testing
+   * the model; not testing performed if 0.
+   *
+   * @param value	the percentage (0-1)
+   */
+  public void setTestPercentage(double value) {
+    if ((value >= 0.0) && (value < 1.0))
+      m_TestPercentage = value;
+  }
+
+  /**
+   * Returns the percentage of the training data to set aside for testing
+   * the model; not testing performed if 0.
+   *
+   * @return  		the percentage (0-1)
+   */
+  public double getTestPercentage() {
+    return m_TestPercentage;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String testPercentageTipText() {
+    return
+      "The percentage (0-1) of the training data to set aside for evaluating "
+        + "the model; no testing performed if 0.";
+  }
+
+  /**
    * Get the current number of units for a particular layer. Returns -1 for
    * anything that is not a DenseLayer or an OutputLayer.
    *
@@ -944,9 +1048,20 @@ public class DL4JMultiLayerNetwork
   public void buildClassifier(Instances data) throws Exception {
     ArrayList<IterationListener> 	listeners;
     DataSetIterator 			iter;
+    Instances				train;
+    Instances				test;
+    DataSet 				dtrain;
+    DataSet 				dtest;
     int					i;
     Random				rand;
     int					seed;
+    boolean				stop;
+    boolean				nominal;
+    Evaluation 				evalCls;
+    RegressionEvaluation		evalReg;
+    RandomSplitGenerator		split;
+    WekaTrainTestSetContainer		trainTest;
+    DL4JModelContainer			modelCont;
 
     // Can classifier handle the data?
     getCapabilities().testWithFail(data);
@@ -973,6 +1088,10 @@ public class DL4JMultiLayerNetwork
       data = Filter.useFilter(data, m_ActualFilter);
     }
 
+    // store header
+    m_Header = new Instances(data, 0);
+    nominal  = m_Header.classAttribute().isNominal();
+
     // load model from file?
     if (m_ModelFile.exists() && !m_ModelFile.isDirectory())
       m_Model = loadModel();
@@ -993,22 +1112,64 @@ public class DL4JMultiLayerNetwork
     m_Model.setListeners(listeners);
 
     // build
-    rand = new Random(getSeed());
-    seed = getSeed();
-    i    = 0;
+    if (m_TestPercentage > 0) {
+      split     = new RandomSplitGenerator(data, m_Seed, 1.0 - m_TestPercentage);
+      trainTest = split.next();
+      train     = (Instances) trainTest.getValue(WekaTrainTestSetContainer.VALUE_TRAIN);
+      test      = (Instances) trainTest.getValue(WekaTrainTestSetContainer.VALUE_TEST);
+    }
+    else {
+      train = data;
+      test  = null;
+    }
+    dtrain = weka.classifiers.functions.dl4j.Utils.instancesToDataSet(train);
+    if (test != null)
+      dtest = weka.classifiers.functions.dl4j.Utils.instancesToDataSet(test);
+    else
+      dtest = null;
+    rand     = new Random(getSeed());
+    seed     = getSeed();
+    i        = 0;
     do {
       if (m_RandomizeBetweenEpochs)
 	seed = rand.nextInt();
       if (m_MiniBatchSize < 1)
-	iter = m_Iterator.getIterator(data, seed);
+	iter = m_Iterator.getIterator(train, seed);
       else
-	iter = m_Iterator.getIterator(data, seed, m_MiniBatchSize);
+	iter = m_Iterator.getIterator(train, seed, m_MiniBatchSize);
+
       m_Model.fit(iter);
       if (getDebug() && ((i+1) % 100 == 0))
 	System.out.println("Epoch #" + (i+1) + " finished");
+
+      // stop training?
+      evalCls = null;
+      evalReg = null;
+      if ((m_TestPercentage > 0) && (i % m_TestInterval == 0) && (dtest != null)) {
+	if (getDebug())
+	  System.out.println("Evaluating on test set...");
+	if (nominal) {
+	  evalCls = new Evaluation(dtrain.numOutcomes());
+	  evalCls.eval(dtest.getLabels(), m_Model.output(dtest.getFeatureMatrix(), org.deeplearning4j.nn.api.Layer.TrainingMode.TEST));
+	}
+	else {
+	  evalReg = new RegressionEvaluation(dtrain.numOutcomes());
+	  evalReg.eval(dtest.getLabels(), m_Model.output(dtest.getFeatureMatrix(), org.deeplearning4j.nn.api.Layer.TrainingMode.TEST));
+	}
+      }
+      if (evalCls != null)
+	modelCont = new DL4JModelContainer(m_Model, dtrain, i, evalCls);
+      else if (evalReg != null)
+	modelCont = new DL4JModelContainer(m_Model, dtrain, i, evalReg);
+      else
+	modelCont = new DL4JModelContainer(m_Model, null, i);
+      stop = m_TrainStop.checkStopping(modelCont);
+      if (stop && getDebug())
+	System.out.println("Training stopped!");
+
       i++;
     }
-    while (!m_TrainStop.checkStopping(new DL4JModelContainer(m_Model, null, i)));
+    while (!stop);
 
 
     m_Trained = true;
