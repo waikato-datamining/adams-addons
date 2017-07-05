@@ -329,7 +329,8 @@ public class Statistic
     double			stat;
 
     if (!cont.hasValue(DL4JModelContainer.VALUE_EVALUATION)) {
-      getLogger().warning("No evaluation object in container, cannot evaluate statistic!");
+      if (isLoggingEnabled())
+        getLogger().warning("No evaluation object in container, cannot evaluate statistic!");
       return false;
     }
 
