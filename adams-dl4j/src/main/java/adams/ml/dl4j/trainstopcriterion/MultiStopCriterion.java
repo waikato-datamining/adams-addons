@@ -172,6 +172,17 @@ public class MultiStopCriterion
   }
 
   /**
+   * For initializing the scheme.
+   */
+  public void start() {
+    super.start();
+    if (m_Criteria != null) {
+      for (AbstractTrainStopCriterion criterion : m_Criteria)
+	criterion.start();
+    }
+  }
+
+  /**
    * Performs the actual checking for stopping the training.
    *
    * @param cont	the container to use for stopping
