@@ -15,7 +15,7 @@
 
 /*
  * DL4JDatasetAppend.java
- * Copyright (C) 2012 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -33,12 +33,54 @@ import java.util.Arrays;
 
 /**
  <!-- globalinfo-start -->
+ * Creates one large dataset by appending all, one after the other.
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
+ * Input&#47;output:<br>
+ * - accepts:<br>
+ * &nbsp;&nbsp;&nbsp;org.nd4j.linalg.dataset.DataSet[]<br>
+ * - generates:<br>
+ * &nbsp;&nbsp;&nbsp;org.nd4j.linalg.dataset.DataSet<br>
+ * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-name &lt;java.lang.String&gt; (property: name)
+ * &nbsp;&nbsp;&nbsp;The name of the actor.
+ * &nbsp;&nbsp;&nbsp;default: DL4JDatasetAppend
+ * </pre>
+ * 
+ * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
+ * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
+ * &nbsp;&nbsp;&nbsp;default: 
+ * </pre>
+ * 
+ * <pre>-skip &lt;boolean&gt; (property: skip)
+ * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
+ * &nbsp;&nbsp;&nbsp;as it is.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this 
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical 
+ * &nbsp;&nbsp;&nbsp;actors.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing 
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -65,7 +107,7 @@ public class DL4JDatasetAppend
   /**
    * Returns the class that the consumer accepts.
    *
-   * @return		<!-- flow-accepts-start -->java.lang.String[].class, java.io.File[].class, weka.core.Instances[].class<!-- flow-accepts-end -->
+   * @return		<!-- flow-accepts-start -->org.nd4j.linalg.dataset.DataSet[].class<!-- flow-accepts-end -->
    */
   public Class[] accepts() {
     return new Class[]{DataSet[].class};
@@ -74,7 +116,7 @@ public class DL4JDatasetAppend
   /**
    * Returns the class of objects that it generates.
    *
-   * @return		<!-- flow-generates-start -->weka.core.Instances.class<!-- flow-generates-end -->
+   * @return		<!-- flow-generates-start -->org.nd4j.linalg.dataset.DataSet.class<!-- flow-generates-end -->
    */
   public Class[] generates() {
     return new Class[]{DataSet.class};
