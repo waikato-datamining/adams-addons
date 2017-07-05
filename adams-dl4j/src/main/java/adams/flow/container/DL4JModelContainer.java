@@ -27,6 +27,7 @@ import org.nd4j.linalg.dataset.DataSet;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A container for models.
@@ -45,6 +46,9 @@ public class DL4JModelContainer
 
   /** the identifier for the Best Model. */
   public final static String VALUE_BEST_MODEL = "Best Model";
+
+  /** the identifier for the Best statistics. */
+  public final static String VALUE_BEST_STATISTICS = "Best Statistics";
 
   /** the identifier for the full dataset. */
   public final static String VALUE_DATASET = "Dataset";
@@ -103,7 +107,7 @@ public class DL4JModelContainer
    * @param evaluation  the evaluation object
    */
   public DL4JModelContainer(Object model, DataSet data, Integer epoch, Object evaluation) {
-    this(model, data, epoch, evaluation, null);
+    this(model, data, epoch, evaluation, null, null);
   }
 
   /**
@@ -114,15 +118,17 @@ public class DL4JModelContainer
    * @param epoch 	the epoch this model stems from
    * @param evaluation  the evaluation object
    * @param bestModel	the best model
+   * @param bestStats	the statistics associated with the best model
    */
-  public DL4JModelContainer(Object model, DataSet data, Integer epoch, Object evaluation, Object bestModel) {
+  public DL4JModelContainer(Object model, DataSet data, Integer epoch, Object evaluation, Object bestModel, Map<String,Double> bestStats) {
     super();
 
-    store(VALUE_MODEL,      model);
-    store(VALUE_BEST_MODEL, bestModel);
-    store(VALUE_DATASET,    data);
-    store(VALUE_EPOCH,      epoch);
-    store(VALUE_EVALUATION, evaluation);
+    store(VALUE_MODEL,           model);
+    store(VALUE_BEST_MODEL,      bestModel);
+    store(VALUE_BEST_STATISTICS, bestStats);
+    store(VALUE_DATASET,         data);
+    store(VALUE_EPOCH,           epoch);
+    store(VALUE_EVALUATION,      evaluation);
   }
 
   /**
@@ -133,6 +139,7 @@ public class DL4JModelContainer
 
     addHelp(VALUE_MODEL, "model object; " + Object.class.getName());
     addHelp(VALUE_BEST_MODEL, "best model object; " + Object.class.getName());
+    addHelp(VALUE_BEST_STATISTICS, "best model statistics; " + Map.class.getName());
     addHelp(VALUE_DATASET, "full dataset; " + DataSet.class.getName());
     addHelp(VALUE_EPOCH, "epoch; " + Integer.class.getName());
     addHelp(VALUE_EVALUATION, "evaluation; " + Evaluation.class.getName() + " or " + RegressionEvaluation.class.getName());
@@ -151,6 +158,7 @@ public class DL4JModelContainer
 
     result.add(VALUE_MODEL);
     result.add(VALUE_BEST_MODEL);
+    result.add(VALUE_BEST_STATISTICS);
     result.add(VALUE_DATASET);
     result.add(VALUE_EPOCH);
     result.add(VALUE_EVALUATION);
