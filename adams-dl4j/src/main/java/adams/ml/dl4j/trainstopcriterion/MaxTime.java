@@ -133,6 +133,6 @@ public class MaxTime
    */
   @Override
   protected boolean doCheckStopping(DL4JModelContainer cont) {
-    return (m_Start + m_MaxSeconds*1000 >= System.currentTimeMillis());
+    return (System.currentTimeMillis() >= m_Start + m_MaxSeconds*1000);
   }
 }
