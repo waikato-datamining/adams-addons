@@ -1,20 +1,29 @@
 package weka.filters.supervised.attribute;
 
 import adams.core.io.PlaceholderFile;
+import adams.ml.dl4j.trainstopcriterion.MaxEpoch;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.layers.FeedForwardLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import weka.classifiers.functions.DL4JMultiLayerNetwork;
-import weka.classifiers.functions.Dl4jMlpClassifierExtended;
-import weka.core.*;
+import weka.core.Attribute;
+import weka.core.Capabilities;
+import weka.core.DenseInstance;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.Option;
+import weka.core.RevisionUtils;
+import weka.core.TechnicalInformation;
+import weka.core.TechnicalInformationHandler;
+import weka.core.Utils;
+import weka.core.WekaOptionUtils;
 import weka.dl4j.iterators.DefaultInstancesIterator;
 import weka.filters.Filter;
 import weka.filters.SimpleBatchFilter;
 import weka.filters.SupervisedFilter;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -355,7 +364,9 @@ public class DL4JMultiLayerNetworkFilter extends SimpleBatchFilter implements Su
 
     if (!getPreTrained() && !isFirstBatchDone()){
       // train
-      m_model.setNumEpochs(getEpochs());
+      MaxEpoch trainstop = new MaxEpoch();
+      trainstop.setNumEpochs(getEpochs());
+      m_model.setTrainStop(trainstop);
       m_model.buildClassifier(instances);
     }
 

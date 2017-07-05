@@ -25,9 +25,12 @@ import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 import adams.data.conversion.DL4JJsonToModel;
 import adams.data.conversion.DL4JYamlToModel;
+import adams.flow.container.DL4JModelContainer;
 import adams.ml.dl4j.iterationlistener.IterationListenerConfigurator;
 import adams.ml.dl4j.model.Dl4jMlpClassifier.DropType;
 import adams.ml.dl4j.model.ModelType;
+import adams.ml.dl4j.trainstopcriterion.AbstractTrainStopCriterion;
+import adams.ml.dl4j.trainstopcriterion.MaxEpoch;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -85,7 +88,7 @@ public class DL4JMultiLayerNetwork
 
   public final static String OPTIMIZATION_ALGORITHM = "optimization-algorithm";
 
-  public final static String NUM_EPOCHS = "num-epochs";
+  public final static String TRAIN_STOP = "train-stop";
 
   public final static String MINI_BATCH_SIZE = "mini-batch-size";
 
@@ -131,8 +134,8 @@ public class DL4JMultiLayerNetwork
   /** The configuration parameters of the network. */
   protected OptimizationAlgorithm m_Algorithm = getDefaultOptimizationAlgorithm();
 
-  /** The number of epochs to perform. */
-  protected int m_NumEpochs = getDefaultNumEpochs();
+  /** the criterion for stopping training. */
+  protected AbstractTrainStopCriterion m_TrainStop = getDefaultTrainStop();
 
   /** the minibatch size. */
   protected int m_MiniBatchSize = getDefaultMiniBatchSize();
@@ -188,7 +191,7 @@ public class DL4JMultiLayerNetwork
 
     WekaOptionUtils.addOption(result, layersTipText(), Utils.arrayToString(getDefaultLayers()), LAYER);
     WekaOptionUtils.addOption(result, optimizationAlgorithmTipText(), "" + getDefaultOptimizationAlgorithm(), OPTIMIZATION_ALGORITHM);
-    WekaOptionUtils.addOption(result, numEpochsTipText(), "" + getDefaultNumEpochs(), NUM_EPOCHS);
+    WekaOptionUtils.addOption(result, trainStopTipText(), "" + getDefaultTrainStop(), TRAIN_STOP);
     WekaOptionUtils.addOption(result, miniBatchSizeTipText(), "" + getDefaultMiniBatchSize(), MINI_BATCH_SIZE);
     WekaOptionUtils.addOption(result, randomizeBetweenEpochsTipText(), "" + getDefaultRandomizeBetweenEpochs(), RANDOMIZE_BETWEEN_EPOCHS);
     WekaOptionUtils.addOption(result, dropTypeTipText(), "" + getDefaultDropType(), DROP_TYPE);
@@ -210,7 +213,7 @@ public class DL4JMultiLayerNetwork
   public void setOptions(String[] options) throws Exception {
     setLayers((Layer[]) WekaOptionUtils.parse(options, LAYER, getDefaultLayers(), Layer.class));
     setOptimizationAlgorithm((OptimizationAlgorithm) WekaOptionUtils.parse(options, OPTIMIZATION_ALGORITHM, getDefaultOptimizationAlgorithm()));
-    setNumEpochs(WekaOptionUtils.parse(options, NUM_EPOCHS, getDefaultNumEpochs()));
+    setTrainStop((AbstractTrainStopCriterion) WekaOptionUtils.parse(options, TRAIN_STOP, getDefaultTrainStop()));
     setMiniBatchSize(WekaOptionUtils.parse(options, MINI_BATCH_SIZE, getDefaultMiniBatchSize()));
     setRandomizeBetweenEpochs(Utils.getFlag(RANDOMIZE_BETWEEN_EPOCHS, options));
     setDropType((DropType) WekaOptionUtils.parse(options, DROP_TYPE, getDefaultDropType()));
@@ -239,7 +242,7 @@ public class DL4JMultiLayerNetwork
       WekaOptionUtils.add(result, MODEL_FILE, getModelFile());
       WekaOptionUtils.add(result, MODEL_FILE_TYPE, getModelFileType());
     }
-    WekaOptionUtils.add(result, NUM_EPOCHS, getNumEpochs());
+    WekaOptionUtils.add(result, TRAIN_STOP, getTrainStop());
     WekaOptionUtils.add(result, MINI_BATCH_SIZE, getMiniBatchSize());
     WekaOptionUtils.add(result, RANDOMIZE_BETWEEN_EPOCHS, getRandomizeBetweenEpochs());
     WekaOptionUtils.add(result, ITERATION_LISTENER, getIterationListeners());
@@ -366,8 +369,8 @@ public class DL4JMultiLayerNetwork
    *
    * @return		the default
    */
-  protected int getDefaultNumEpochs() {
-    return 1000;
+  protected AbstractTrainStopCriterion getDefaultTrainStop() {
+    return new MaxEpoch();
   }
 
   /**
@@ -375,8 +378,8 @@ public class DL4JMultiLayerNetwork
    *
    * @param value	the number of epochs
    */
-  public void setNumEpochs(int value) {
-    m_NumEpochs = value;
+  public void setTrainStop(AbstractTrainStopCriterion value) {
+    m_TrainStop = value;
   }
 
   /**
@@ -384,8 +387,8 @@ public class DL4JMultiLayerNetwork
    *
    * @return		the number of epochs
    */
-  public int getNumEpochs() {
-    return m_NumEpochs;
+  public AbstractTrainStopCriterion getTrainStop() {
+    return m_TrainStop;
   }
 
   /**
@@ -394,8 +397,8 @@ public class DL4JMultiLayerNetwork
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String numEpochsTipText() {
-    return "The number of epochs to use.";
+  public String trainStopTipText() {
+    return "The criterion for stopping training.";
   }
 
   /**
@@ -992,7 +995,8 @@ public class DL4JMultiLayerNetwork
     // build
     rand = new Random(getSeed());
     seed = getSeed();
-    for (i = 0; i < getNumEpochs(); i++) {
+    i    = 0;
+    do {
       if (m_RandomizeBetweenEpochs)
 	seed = rand.nextInt();
       if (m_MiniBatchSize < 1)
@@ -1002,7 +1006,10 @@ public class DL4JMultiLayerNetwork
       m_Model.fit(iter);
       if (getDebug() && ((i+1) % 100 == 0))
 	System.out.println("Epoch #" + (i+1) + " finished");
+      i++;
     }
+    while (!m_TrainStop.checkStopping(new DL4JModelContainer(m_Model, null, i)));
+
 
     m_Trained = true;
   }
