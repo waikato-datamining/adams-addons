@@ -323,18 +323,17 @@ public class Statistic
    */
   @Override
   protected boolean doCheckStopping(DL4JModelContainer cont) {
+    boolean			result;
     Object			eval;
     Evaluation			evalCls;
     RegressionEvaluation	evalReg;
     double			stat;
 
-    if (!cont.hasValue(DL4JModelContainer.VALUE_EVALUATION)) {
-      if (isLoggingEnabled())
-        getLogger().warning("No evaluation object in container, cannot evaluate statistic!");
+    if (!cont.hasValue(DL4JModelContainer.VALUE_EVALUATION))
       return false;
-    }
 
     eval = cont.getValue(DL4JModelContainer.VALUE_EVALUATION);
+    stat = Double.NaN;
     try {
       if (eval instanceof Evaluation) {
 	evalCls = (Evaluation) eval;
@@ -351,20 +350,29 @@ public class Statistic
       }
       switch (m_ThresholdCheck) {
 	case GREATER:
-	  return (stat > m_Threshold);
+	  result = (stat > m_Threshold);
+	  break;
 	case GREATER_OR_EQUAL:
-	  return (stat >= m_Threshold);
+	  result = (stat >= m_Threshold);
+	  break;
 	case LESS:
-	  return (stat < m_Threshold);
+	  result = (stat < m_Threshold);
+	  break;
 	case LESS_OR_EQUAL:
-	  return (stat <= m_Threshold);
+	  result = (stat <= m_Threshold);
+	  break;
 	default:
 	  throw new IllegalStateException("Unhandled threshold check: " + m_ThresholdCheck);
       }
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to obtain statistic " + m_Statistic + " from " + eval.getClass().getName() + " object!", e);
-      return false;
+      result = false;
     }
+
+    if (result && isLoggingEnabled())
+      getLogger().info(m_Statistic + ": " + stat + " " + m_ThresholdCheck + " " + m_Threshold);
+
+    return result;
   }
 }
