@@ -69,6 +69,25 @@ public class DataSetHelper {
   }
 
   /**
+   * Randomizes the dataset.
+   *
+   * @param data	the data to randomize
+   * @param seed	the seed to use
+   * @param copy	whether to create a copy first
+   * @return		the randomized dataset
+   */
+  public static DataSet randomize(DataSet data, long seed, boolean copy) {
+    if (copy)
+      data = data.copy();
+
+    Nd4j.shuffle(data.getFeatureMatrix(), new Random(seed), 1);
+    if (data.getLabels() != null)
+      Nd4j.shuffle(data.getLabels(), new Random(seed), 1);
+
+    return data;
+  }
+
+  /**
    * Performs a train/test split, preserving order.
    *
    * @param data	the data to split
@@ -90,11 +109,8 @@ public class DataSetHelper {
   public static DataSet[] split(DataSet data, double perc, Long seed) {
     SplitTestAndTrain	split;
 
-    if (seed != null) {
-      Nd4j.shuffle(data.getFeatureMatrix(), new Random(seed), 1);
-      if (data.getLabels() != null)
-        Nd4j.shuffle(data.getLabels(), new Random(seed), 1);
-    }
+    if (seed != null)
+      data = randomize(data, seed, true);
 
     split = data.splitTestAndTrain(perc);
     return new DataSet[]{split.getTrain(), split.getTest()};
