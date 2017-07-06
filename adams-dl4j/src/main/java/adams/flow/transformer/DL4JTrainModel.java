@@ -1143,6 +1143,7 @@ public class DL4JTrainModel
     }
 
     if (result == null) {
+      m_TrainStop.setFlowContext(this);
       m_TrainStop.start();
       result = iterate();
     }
