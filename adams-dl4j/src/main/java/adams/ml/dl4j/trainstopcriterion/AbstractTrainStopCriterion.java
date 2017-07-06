@@ -155,8 +155,8 @@ public abstract class AbstractTrainStopCriterion
 
   /**
    * Gets called if the criterion triggered and adds a message to the
-   * trigger message collection, using either the supplied (name or
-   * the classname).
+   * trigger message collection, using either the supplied name or
+   * 'unnamed'.
    *
    * @param triggers	the message collection to add the message to
    */
