@@ -15,19 +15,20 @@
 
 /*
  * HeatmapDisplay.java
- * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
 
 import adams.core.QuickInfoHelper;
+import adams.core.option.OptionUtils;
 import adams.data.heatmap.Heatmap;
 import adams.flow.core.Token;
 import adams.gui.core.BasePanel;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
 import adams.gui.visualization.heatmap.HeatmapPanel;
-import adams.gui.visualization.heatmap.overlay.*;
+import adams.gui.visualization.heatmap.overlay.AbstractHeatmapOverlay;
 
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
@@ -471,7 +472,7 @@ public class HeatmapDisplay
 	super.initGUI();
 	setLayout(new BorderLayout());
 	m_HeatmapPanel = new HeatmapPanel(null);
-	m_HeatmapPanel.setColorGenerator(m_ColorGenerator);
+	m_HeatmapPanel.setColorGenerator((AbstractColorGradientGenerator) OptionUtils.shallowCopy(m_ColorGenerator));
         for (AbstractHeatmapOverlay overlay: m_Overlays)
           m_HeatmapPanel.addOverlay(overlay);
 	m_HeatmapPanel.setMissingValueColor(m_MissingValueColor);
