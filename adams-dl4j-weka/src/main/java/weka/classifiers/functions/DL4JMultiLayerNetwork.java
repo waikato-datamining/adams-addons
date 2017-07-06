@@ -20,6 +20,7 @@
  */
 package weka.classifiers.functions;
 
+import adams.core.MessageCollection;
 import adams.core.SerializationHelper;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
@@ -1062,6 +1063,7 @@ public class DL4JMultiLayerNetwork
     RandomSplitGenerator		split;
     WekaTrainTestSetContainer		trainTest;
     DL4JModelContainer			modelCont;
+    MessageCollection			triggers;
 
     // Can classifier handle the data?
     getCapabilities().testWithFail(data);
@@ -1129,6 +1131,7 @@ public class DL4JMultiLayerNetwork
       dtest = null;
     rand     = new Random(getSeed());
     seed     = getSeed();
+    triggers = new MessageCollection();
     i        = 0;
     do {
       if (m_RandomizeBetweenEpochs)
@@ -1163,9 +1166,9 @@ public class DL4JMultiLayerNetwork
 	modelCont = new DL4JModelContainer(m_Model, dtrain, i, evalReg);
       else
 	modelCont = new DL4JModelContainer(m_Model, null, i);
-      stop = m_TrainStop.checkStopping(modelCont);
+      stop = m_TrainStop.checkStopping(modelCont, triggers);
       if (stop && getDebug())
-	System.out.println("Training stopped!");
+	System.out.println("Training stopped:\n" + triggers);
 
       i++;
     }
