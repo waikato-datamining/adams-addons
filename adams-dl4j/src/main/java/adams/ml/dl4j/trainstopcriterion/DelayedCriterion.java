@@ -72,8 +72,7 @@ public class DelayedCriterion
   @Override
   public String globalInfo() {
     return
-      "Applies the specified criteria sequentially, combining the results "
-	+ "according to the specified combination type.";
+      "The base criterion only gets applied after the delay criterion triggered.";
   }
 
   /**
