@@ -20,6 +20,7 @@
 
 package adams.ml.dl4j.trainstopcriterion;
 
+import adams.core.MessageCollection;
 import adams.flow.container.DL4JModelContainer;
 
 /**
@@ -186,10 +187,11 @@ public class MultiStopCriterion
    * Performs the actual checking for stopping the training.
    *
    * @param cont	the container to use for stopping
+   * @param triggers	for storing trigger messages
    * @return		true if to stop training
    */
   @Override
-  protected boolean doCheckStopping(DL4JModelContainer cont) {
+  protected boolean doCheckStopping(DL4JModelContainer cont, MessageCollection triggers) {
     boolean	result;
     boolean	sub;
     int		i;
@@ -197,7 +199,7 @@ public class MultiStopCriterion
     result = false;
 
     for (i = 0; i < m_Criteria.length; i++) {
-      sub = m_Criteria[i].checkStopping(cont);
+      sub = m_Criteria[i].checkStopping(cont, triggers);
       if (i == 0) {
 	result = sub;
       }

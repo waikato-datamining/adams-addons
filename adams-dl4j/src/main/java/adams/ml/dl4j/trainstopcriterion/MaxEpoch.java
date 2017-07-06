@@ -20,6 +20,7 @@
 
 package adams.ml.dl4j.trainstopcriterion;
 
+import adams.core.MessageCollection;
 import adams.flow.container.DL4JModelContainer;
 
 /**
@@ -129,10 +130,11 @@ public class MaxEpoch
    * Performs the actual checking for stopping the training.
    *
    * @param cont	the container to use for stopping
+   * @param triggers	for storing trigger messages
    * @return		true if to stop training
    */
   @Override
-  protected boolean doCheckStopping(DL4JModelContainer cont) {
+  protected boolean doCheckStopping(DL4JModelContainer cont, MessageCollection triggers) {
     m_Epoch++;
     return (m_Epoch >= m_NumEpochs);
   }

@@ -20,6 +20,7 @@
 
 package adams.ml.dl4j.trainstopcriterion;
 
+import adams.core.MessageCollection;
 import adams.flow.container.DL4JModelContainer;
 
 /**
@@ -68,10 +69,11 @@ public class NeverStop
    * Performs the actual checking for stopping the training.
    *
    * @param cont	the container to use for stopping
+   * @param triggers	for storing trigger messages
    * @return		always false
    */
   @Override
-  protected boolean doCheckStopping(DL4JModelContainer cont) {
+  protected boolean doCheckStopping(DL4JModelContainer cont, MessageCollection triggers) {
     return false;
   }
 }

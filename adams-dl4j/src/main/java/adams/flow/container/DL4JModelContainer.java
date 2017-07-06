@@ -59,6 +59,9 @@ public class DL4JModelContainer
   /** the identifier for the evaluation. */
   public final static String VALUE_EVALUATION = "Evaluation";
 
+  /** the identifier for the train stop messages. */
+  public final static String VALUE_TRAIN_STOP_MESSAGES = "Train Stop Messages";
+
   /**
    * Initializes the container.
    * <br><br>
@@ -143,6 +146,7 @@ public class DL4JModelContainer
     addHelp(VALUE_DATASET, "full dataset; " + DataSet.class.getName());
     addHelp(VALUE_EPOCH, "epoch; " + Integer.class.getName());
     addHelp(VALUE_EVALUATION, "evaluation; " + Evaluation.class.getName() + " or " + RegressionEvaluation.class.getName());
+    addHelp(VALUE_TRAIN_STOP_MESSAGES, "train stop criteria that triggered; array of " + String.class.getName());
   }
 
   /**
@@ -162,6 +166,7 @@ public class DL4JModelContainer
     result.add(VALUE_DATASET);
     result.add(VALUE_EPOCH);
     result.add(VALUE_EVALUATION);
+    result.add(VALUE_TRAIN_STOP_MESSAGES);
 
     return result.iterator();
   }

@@ -988,10 +988,12 @@ public class DL4JTrainModel
     Evaluation 			evalCls;
     RegressionEvaluation 	evalReg;
     DL4JModelContainer		cont;
+    MessageCollection		triggers;
 
-    result  = null;
-    evalCls = null;
-    evalReg = null;
+    result   = null;
+    evalCls  = null;
+    evalReg  = null;
+    triggers = new MessageCollection();
 
     try {
       do {
@@ -1025,7 +1027,7 @@ public class DL4JTrainModel
 
 	// check whether training should be stopped
 	m_TrainingFinished = m_TrainStop.checkStopping(
-	  new DL4JModelContainer(m_ActualModel, m_TrainData, m_Epoch));
+	  new DL4JModelContainer(m_ActualModel, m_TrainData, m_Epoch), triggers);
       }
       while (!m_TrainingFinished);
 
@@ -1061,7 +1063,11 @@ public class DL4JTrainModel
 
 	// check whether training should be stopped
 	if (!m_TrainingFinished)
-	  m_TrainingFinished = m_TrainStop.checkStopping(cont);
+	  m_TrainingFinished = m_TrainStop.checkStopping(cont, triggers);
+
+	// add trigger messages
+	if (m_TrainingFinished)
+	  cont.setValue(DL4JModelContainer.VALUE_TRAIN_STOP_MESSAGES, triggers.toList().toArray(new String[triggers.size()]));
       }
     }
     catch (Exception e) {

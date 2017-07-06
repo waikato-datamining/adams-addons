@@ -21,6 +21,7 @@
 package adams.ml.dl4j.trainstopcriterion;
 
 import adams.core.Index;
+import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.flow.container.DL4JModelContainer;
 import adams.ml.dl4j.EvaluationHelper;
@@ -319,10 +320,11 @@ public class Statistic
    * Performs the actual checking for stopping the training.
    *
    * @param cont	the container to use for stopping
+   * @param triggers	for storing trigger messages
    * @return		true if to stop training
    */
   @Override
-  protected boolean doCheckStopping(DL4JModelContainer cont) {
+  protected boolean doCheckStopping(DL4JModelContainer cont, MessageCollection triggers) {
     boolean			result;
     Object			eval;
     Evaluation			evalCls;

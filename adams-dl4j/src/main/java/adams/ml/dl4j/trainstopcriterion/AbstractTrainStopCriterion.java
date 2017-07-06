@@ -20,6 +20,7 @@
 
 package adams.ml.dl4j.trainstopcriterion;
 
+import adams.core.MessageCollection;
 import adams.core.QuickInfoSupporter;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.container.DL4JModelContainer;
@@ -41,6 +42,9 @@ public abstract class AbstractTrainStopCriterion
   /** the flow context. */
   protected Actor m_FlowContext;
 
+  /** the (optional) name of the criterion. */
+  protected String m_Name;
+
   /**
    * Initializes the scheme.
    */
@@ -48,6 +52,49 @@ public abstract class AbstractTrainStopCriterion
   protected void reset() {
     super.reset();
     start();
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "name", "name",
+      "");
+  }
+
+  /**
+   * Sets the name for the criterion, which is used in the trigger messages.
+   *
+   * @param value	the name
+   */
+  public void setName(String value) {
+    m_Name = value;
+    reset();
+  }
+
+  /**
+   * Returns the name for the criterion, which is used in the trigger messages.
+   *
+   * @return  		the name
+   */
+  public String getName() {
+    return m_Name;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String nameTipText() {
+    return
+      "The (optional) name for the criterion, which is used in the trigger "
+	+ "messages; can be used to create unique name.";
   }
 
   /**
@@ -107,20 +154,37 @@ public abstract class AbstractTrainStopCriterion
   }
 
   /**
+   * Gets called if the criterion triggered and adds a message to the
+   * trigger message collection, using either the supplied (name or
+   * the classname).
+   *
+   * @param triggers	the message collection to add the message to
+   */
+  protected void addTriggerMessage(MessageCollection triggers) {
+    String	name;
+
+    name = (m_Name.isEmpty() ? "unnamed" : m_Name);
+    triggers.add(name + ": " + toCommandLine());
+  }
+
+  /**
    * Performs the actual checking for stopping the training.
    *
    * @param cont	the container to use for stopping
+   * @param triggers	for storing trigger messages
    * @return		true if to stop training
    */
-  protected abstract boolean doCheckStopping(DL4JModelContainer cont);
+  protected abstract boolean doCheckStopping(DL4JModelContainer cont, MessageCollection triggers);
 
   /**
    * Checks the stopping.
    *
    * @param cont	the container to use for stopping
+   * @param triggers	for storing trigger messages
    * @return		true if to stop training
    */
-  public boolean checkStopping(DL4JModelContainer cont) {
+  public boolean checkStopping(DL4JModelContainer cont, MessageCollection triggers) {
+    boolean	result;
     String	msg;
 
     msg = check(cont);
@@ -129,6 +193,10 @@ public abstract class AbstractTrainStopCriterion
       return false;
     }
 
-    return doCheckStopping(cont);
+    result = doCheckStopping(cont, triggers);
+    if (result)
+      addTriggerMessage(triggers);
+
+    return result;
   }
 }
