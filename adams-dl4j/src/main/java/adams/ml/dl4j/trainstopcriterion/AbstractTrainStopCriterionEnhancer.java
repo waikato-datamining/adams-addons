@@ -14,7 +14,7 @@
  */
 
 /**
- * AbstractCriterionEnhancer.java
+ * AbstractTrainStopCriterionEnhancer.java
  * Copyright (C) 2017 University of Waikato, Hamilton, NZ
  */
 
@@ -26,7 +26,7 @@ package adams.ml.dl4j.trainstopcriterion;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public abstract class AbstractCriterionEnhancer
+public abstract class AbstractTrainStopCriterionEnhancer
   extends AbstractTrainStopCriterion {
 
   private static final long serialVersionUID = 6975594226423139162L;

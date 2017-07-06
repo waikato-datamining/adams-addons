@@ -53,7 +53,7 @@ import adams.flow.container.DL4JModelContainer;
  * @version $Revision$
  */
 public class DelayedCriterion
-  extends AbstractCriterionEnhancer {
+  extends AbstractTrainStopCriterionEnhancer {
 
   private static final long serialVersionUID = 6975594226423139162L;
 
