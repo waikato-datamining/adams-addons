@@ -58,6 +58,34 @@
 %\listoftables
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{CNTK}
+CNTK, the Microsoft Cognitive Toolkit\cite{cntk}, is a deeplearning C++
+library which can be configured via the BrainScript Network
+Builder\footnote{\url{https://docs.microsoft.com/en-us/cognitive-toolkit/BrainScript-Network-Builder}{}}
+or Python. It comes with binaries for 64-bit Windows and Linux. It has
+experimetnal bindings for Java as well, but only for prediction time.
+
+\section{Installation}
+Follow the installation instructions for CNTK: \\
+\url{https://docs.microsoft.com/en-us/cognitive-toolkit/Setup-CNTK-on-your-machine}{} \\
+
+\noindent For the Java bindings to work, you need to do the following:
+\begin{itemize}
+  \item Download binaries for your platform.
+  \item Create a new directory to contain all the libraries
+  \item Copy the libraries from the \textit{lib} and \textit{dependencies/lib}
+  directories into the newly created directory. For older Linux versions that
+  required a custom build of the openmpi libraries, copy these libraries as well.
+  \item Either supply the new library directory to the JVM using
+  \textit{-Djava.library.path=...}, or, when using the \textit{Launcher} class,
+  (package \textit{adams.core.management}), you can use the
+  \textit{ADAMS\_LIBRARY\_PATH} environment variable to supply the directory.
+  The launcher will automatically add the content of the variable to the
+  command-line.
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
 The following transformers are available:
 \begin{itemize}
