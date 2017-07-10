@@ -64,6 +64,23 @@ public abstract class AbstractNumericArrayApplier<I>
    * @return		the score
    */
   protected float[] applyModel(double[] input) {
+    float[]	values;
+    int		i;
+
+    values = new float[input.length];
+    for (i = 0; i < input.length; i++)
+      values[i] = (float) input[i];
+
+    return applyModel(values);
+  }
+
+  /**
+   * Performs the actual application of the model.
+   *
+   * @param input	the input
+   * @return		the score
+   */
+  protected float[] applyModel(float[] input) {
     Variable outputVar = m_Model.getOutputs().get(0);
     Variable inputVar = m_Model.getArguments().get(0);
     if (isLoggingEnabled()) {
@@ -81,8 +98,8 @@ public abstract class AbstractNumericArrayApplier<I>
       getLogger().info("width=" + width);
 
     FloatVector floatVec = new FloatVector();
-    for (double d: input)
-      floatVec.add(((float) d));
+    for (float f : input)
+      floatVec.add(f);
 
     FloatVectorVector floatVecVec = new FloatVectorVector();
     floatVecVec.add(floatVec);
