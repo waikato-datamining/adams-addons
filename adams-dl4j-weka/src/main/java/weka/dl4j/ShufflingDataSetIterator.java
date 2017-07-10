@@ -20,13 +20,13 @@
  */
 package weka.dl4j;
 
+import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
-
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 
 /**
  * An nd4j mini-batch iterator that shuffles the data whenever it is reset.
@@ -73,7 +73,7 @@ public class ShufflingDataSetIterator implements DataSetIterator, Serializable {
    * @return true if another batch is still available
    */
   @Override
-  public boolean hasNext() { return ( m_cursor + m_batchSize < m_data.numExamples() ); }
+  public boolean hasNext() { return ( m_cursor + m_batchSize <= m_data.numExamples() ); }
 
   /**
    * Returns the next mini batch of data.

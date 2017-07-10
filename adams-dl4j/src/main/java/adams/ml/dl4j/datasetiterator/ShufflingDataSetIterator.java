@@ -74,7 +74,7 @@ public class ShufflingDataSetIterator implements DataSetIterator, Serializable {
    */
   @Override
   public boolean hasNext() {
-    return (m_cursor + m_batchSize < m_data.numExamples());
+    return (m_cursor + m_batchSize <= m_data.numExamples());
   }
 
   /**
