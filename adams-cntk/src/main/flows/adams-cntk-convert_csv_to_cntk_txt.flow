@@ -1,8 +1,8 @@
 # Project: adams
-# Date: 2017-07-19 14:32:33
+# Date: 2017-07-19 14:34:08
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Loads the bolts UCI dataset (as CSV) and saves it in CNTK text file format." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.source.FileSupplier -file ${FLOWS}/data/bolts.csv
  adams.flow.transformer.SpreadSheetFileReader -reader "adams.data.io.input.CsvSpreadSheetReader -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.DefaultSpreadSheet"
- adams.flow.sink.SpreadSheetFileWriter -writer "adams.data.io.output.CNTKSpreadSheetWriter -missing X -row-id 1 -input 2-last_2 -input last -input-name features -input-name class"
+ adams.flow.sink.SpreadSheetFileWriter -output ${FLOWS}/output/bolts.txt -writer "adams.data.io.output.CNTKSpreadSheetWriter -missing X -row-id 1 -input 2-last_2 -input last -input-name features -input-name class"
