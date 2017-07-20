@@ -90,12 +90,24 @@ public abstract class AbstractNumericArrayApplier<I>
     }
 
     NDShape inputShape = inputVar.getShape();
-    int width = (int)inputShape.getDimensions()[0];
-    if (width != input.length)
-      throw new IllegalStateException("Input length and model dimension #0 differ: " + input.length + " != " + width);
+    int width;
+    int height = 1;
+    int channels = 1;
+    width = (int)inputShape.getDimensions()[0];
+    if (inputShape.getDimensions().length > 1)
+      height = (int)inputShape.getDimensions()[1];
+    if (inputShape.getDimensions().length > 2)
+      channels = (int)inputShape.getDimensions()[2];
+    if (width*height*channels != input.length)
+      throw new IllegalStateException(
+	"Input length and model dimensions differ: "
+	  + input.length + " != " + (width*height*channels));
 
-    if (isLoggingEnabled())
+    if (isLoggingEnabled()) {
       getLogger().info("width=" + width);
+      getLogger().info("height=" + height);
+      getLogger().info("channels=" + channels);
+    }
 
     FloatVector floatVec = new FloatVector();
     for (float f : input)
