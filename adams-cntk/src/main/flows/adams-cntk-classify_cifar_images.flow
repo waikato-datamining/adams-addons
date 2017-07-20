@@ -9,7 +9,7 @@ adams.flow.control.Flow -annotation "Applies a CNTK model trained on the CIFAR-1
   adams.flow.sink.HistoryDisplay -name Category -entry-name-variable file
  adams.flow.source.Start
  adams.flow.control.Trigger -name categories
-  adams.flow.source.StringConstants -output-array true -string "airplane \\t\\t\\t\\t\\t\\t\\t\\t\\t\\t" -string "automobile \\t\\t\\t\\t\\t\\t\\t\\t\\t\\t" -string "bird \\t\\t\\t\\t\\t\\t\\t\\t\\t\\t" -string "cat \\t\\t\\t\\t\\t\\t\\t\\t\\t\\t" -string "deer \\t\\t\\t\\t\\t\\t\\t\\t\\t\\t" -string "dog \\t\\t\\t\\t\\t\\t\\t\\t\\t\\t" -string "frog \\t\\t\\t\\t\\t\\t\\t\\t\\t\\t" -string "horse \\t\\t\\t\\t\\t\\t\\t\\t\\t\\t" -string "ship \\t\\t\\t\\t\\t\\t\\t\\t\\t\\t" -string truck -conversion adams.data.conversion.StringToString
+  adams.flow.source.StringConstants -output-array true -string airplane -string automobile -string bird -string cat -string deer -string dog -string frog -string horse -string ship -string truck -conversion adams.data.conversion.StringToString
   adams.flow.transformer.SetStorageValue -storage-name categories
  adams.flow.control.Trigger -name "apply model"
   adams.flow.source.FileSystemSearch -search "adams.flow.source.filesystemsearch.LocalFileSearch -directory ${FLOWS}/data -regexp 0.*\\\\.png -sorting SORT_BY_NAME"
