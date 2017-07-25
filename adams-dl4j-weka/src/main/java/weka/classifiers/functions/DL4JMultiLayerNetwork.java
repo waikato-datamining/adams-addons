@@ -733,7 +733,7 @@ public class DL4JMultiLayerNetwork
   }
 
   /**
-   * Sets the model file to load; ignored if directory.
+   * Sets the model file to load (only used as template for network structure!); ignored if directory.
    *
    * @param value	the file
    */
@@ -742,7 +742,7 @@ public class DL4JMultiLayerNetwork
   }
 
   /**
-   * Returns the model file to load; ignored if directory.
+   * Returns the model file to load (only used as template for network structure!); ignored if directory.
    *
    * @return		the file
    */
@@ -757,7 +757,10 @@ public class DL4JMultiLayerNetwork
    * 			displaying in the GUI or for listing the options.
    */
   public String modelFileTipText() {
-    return "The (optional) file to load a model from (trained or just structure); ignored if pointing to a directory.";
+    return
+      "The (optional) file to load a model from (trained or just structure), "
+	+ "which will be used as template for the network structure; ignored "
+	+ "if pointing to a directory.";
   }
 
   /**
@@ -1099,10 +1102,7 @@ public class DL4JMultiLayerNetwork
       m_Model = loadModel();
     else
       m_Model = generateModel(data);
-
-    // initialized?
-    if (!m_Model.isInitCalled())
-      m_Model.init();
+    m_Model.init();
 
     if (getDebug())
       System.out.println("Network:\n" + m_Model.getLayerWiseConfigurations().toYaml());
