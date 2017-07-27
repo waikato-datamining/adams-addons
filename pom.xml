@@ -36,6 +36,7 @@
   <modules>
     <module>adams-cntk</module>
     <module>adams-cntk-weka</module>
+    <module>adams-cqengine</module>
     <module>adams-dl4j</module>
     <module>adams-dl4j-insight</module>
     <module>adams-dl4j-weka</module>
