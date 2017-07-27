@@ -22,6 +22,7 @@ package adams.ml.dl4j.trainstopcriterion;
 
 import adams.core.MessageCollection;
 import adams.flow.container.DL4JModelContainer;
+import adams.flow.core.Actor;
 
 /**
  <!-- globalinfo-start -->
@@ -105,6 +106,7 @@ public class MultiStopCriterion
   public void setCriteria(AbstractTrainStopCriterion[] value) {
     m_Criteria = value;
     reset();
+    setFlowContext(getFlowContext());
   }
 
   /**
@@ -153,6 +155,17 @@ public class MultiStopCriterion
    */
   public String combinationTypeTipText() {
     return "How to combine the results of the criteria.";
+  }
+
+  /**
+   * Sets the flow context.
+   *
+   * @param value	the actor
+   */
+  public void setFlowContext(Actor value) {
+    super.setFlowContext(value);
+    for (AbstractTrainStopCriterion c: m_Criteria)
+      c.setFlowContext(value);
   }
 
   /**
