@@ -1,0 +1,10 @@
+# Configurations for CQEngine table classes.
+#
+# Author: FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision$
+
+# Whether a table is enabled
+#<classname>.Enabled=true
+
+# Whether a table has debugging output enabled
+#<classname>.Debug=false
