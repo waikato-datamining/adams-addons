@@ -42,8 +42,9 @@ public class DL4JMultiLayerNetworkFilter extends SimpleBatchFilter implements Su
   protected static String SEED="seed";
   protected static String PRE_TRAINED="pre-trained";
   protected static String MODEL_FILE="model-file";
-  protected static String LOG_FILE="log-file";
+  //protected static String LOG_FILE="log-file";
   protected static String EPOCHS="epochs";
+  protected static String LAYER="layer";
   protected Filter m_Filter=null;
 
   protected DL4JMultiLayerNetwork m_model;
@@ -51,9 +52,10 @@ public class DL4JMultiLayerNetworkFilter extends SimpleBatchFilter implements Su
   DefaultInstancesIterator m_Iterator = new DefaultInstancesIterator();
 
   protected int m_epochs=500;
+  protected int m_layer=-1;
   protected int m_seed=1;
   protected PlaceholderFile m_modelFile=new PlaceholderFile();
-  protected PlaceholderFile m_logFile=new PlaceholderFile();
+ // protected PlaceholderFile m_logFile=new PlaceholderFile();
   protected boolean m_preTrained=true;
 
   /**
@@ -124,10 +126,11 @@ public class DL4JMultiLayerNetworkFilter extends SimpleBatchFilter implements Su
   public PlaceholderFile getModelFile(){
     return(m_modelFile);
   }
-  public PlaceholderFile getLogFile(){
-    return(m_logFile);
-  }
+  //public PlaceholderFile getLogFile(){
+    //return(m_logFile);
+  //}
   public int getEpochs() {return(m_epochs);};
+  public int getLayer() {return(m_layer);};
 
   // sets
   public void setPreTrained(boolean b){
@@ -139,10 +142,11 @@ public class DL4JMultiLayerNetworkFilter extends SimpleBatchFilter implements Su
   public void setModelFile(PlaceholderFile mf){
     m_modelFile=mf;
   }
-  public void setLogFile(PlaceholderFile mf){
-    m_logFile=mf;
-  }
+  //public void setLogFile(PlaceholderFile mf){
+  //  m_logFile=mf;
+  //}
   public void setEpochs(int e){m_epochs=e;};
+  public void setLayer(int l) {m_layer=l;}
 
   //TipTexxt
   public String modelFileTipText() {return "Model file to load";}
@@ -154,6 +158,7 @@ public class DL4JMultiLayerNetworkFilter extends SimpleBatchFilter implements Su
     return "Is the model already built?";
   }
   public String epochsTipText(){return"epochs to train with if not pre-trained";};
+  public String layerTipText(){return"layer to extract features from. -1 is last. Starts from 1. (0 is input layer)";}
 
   /**
    * Gets an enumeration describing the available options.
@@ -167,7 +172,7 @@ public class DL4JMultiLayerNetworkFilter extends SimpleBatchFilter implements Su
 
     result = new Vector();
 
-    WekaOptionUtils.addOption(result, logFileTipText(), "" + getLogFile(), LOG_FILE);
+    //WekaOptionUtils.addOption(result, logFileTipText(), "" + getLogFile(), LOG_FILE);
     WekaOptionUtils.addOption(result, modelFileTipText(), "" + getModelFile(), MODEL_FILE);
     WekaOptionUtils.addOption(result, preTrainedTipText(), ""+getPreTrained(), PRE_TRAINED);
     WekaOptionUtils.addOption(result, seedTipText(), ""+getSeed(), SEED);
@@ -196,9 +201,10 @@ public class DL4JMultiLayerNetworkFilter extends SimpleBatchFilter implements Su
     List<String> result = new ArrayList<>();
     WekaOptionUtils.add(result, SEED, getSeed());
     WekaOptionUtils.add(result, EPOCHS, getEpochs());
+    WekaOptionUtils.add(result, LAYER, getLayer());
     WekaOptionUtils.add(result, PRE_TRAINED, getPreTrained());
     WekaOptionUtils.add(result, MODEL_FILE, getModelFile());
-    WekaOptionUtils.add(result, LOG_FILE, getLogFile());
+    //WekaOptionUtils.add(result, LOG_FILE, getLogFile());
     WekaOptionUtils.add(result, super.getOptions());
     return WekaOptionUtils.toArray(result);
   }
@@ -255,8 +261,9 @@ public class DL4JMultiLayerNetworkFilter extends SimpleBatchFilter implements Su
     setSeed((int) WekaOptionUtils.parse(options, SEED, 1));
     setEpochs((int) WekaOptionUtils.parse(options, EPOCHS, 500));
     setModelFile(new PlaceholderFile(WekaOptionUtils.parse(options, MODEL_FILE, new PlaceholderFile())));
-    setLogFile(new PlaceholderFile(WekaOptionUtils.parse(options, LOG_FILE, new PlaceholderFile())));
+    //setLogFile(new PlaceholderFile(WekaOptionUtils.parse(options, LOG_FILE, new PlaceholderFile())));
     setPreTrained(Utils.getFlag(PRE_TRAINED,options));
+    setLayer((int) WekaOptionUtils.parse(options, LAYER, -1));
     super.setOptions(options);
   }
 
@@ -266,6 +273,22 @@ public class DL4JMultiLayerNetworkFilter extends SimpleBatchFilter implements Su
     int numLayers=layers.length;
     List<NeuralNetConfiguration> ll=mln.getLayerWiseConfigurations().getConfs();
     int numAtts =((FeedForwardLayer)ll.get(ll.size()-1).getLayer()).getNIn();
+    return(numAtts);
+  }
+
+  public int getUnitsFromLayer(int layernum){
+
+    MultiLayerNetwork mln=m_model.getMultiLayerNetwork();
+    org.deeplearning4j.nn.api.Layer[] layers=mln.getLayers();//((MultiLayerNetwork)m_model).getLayers();
+    int numLayers=layers.length;
+    List<NeuralNetConfiguration> ll=mln.getLayerWiseConfigurations().getConfs();
+    if (layernum >= ll.size()){
+      return(1);
+    }
+    if (layernum == -1 ){ // final (non target) layer
+      layernum = ll.size()-1;
+    }
+    int numAtts =((FeedForwardLayer)ll.get(layernum).getLayer()).getNIn();
     return(numAtts);
   }
 
@@ -306,8 +329,8 @@ public class DL4JMultiLayerNetworkFilter extends SimpleBatchFilter implements Su
     loadModel();
     // generate header
     ArrayList<Attribute> atts = new ArrayList<Attribute>();
-    int numAtts=getUnitsFinalLayer();
-
+    //int numAtts=getUnitsFinalLayer();
+    int numAtts=getUnitsFromLayer(m_layer);
     String prefix = "unit";
     for (int i = 0; i < numAtts; i++) {
       atts.add(new Attribute(prefix + "_" + (i + 1)));
@@ -379,7 +402,15 @@ public class DL4JMultiLayerNetworkFilter extends SimpleBatchFilter implements Su
       double[] values=new double[header.numAttributes()];
       List<INDArray> list_of_vals=getUnitScores(instances.get(i));
       // break here to see what comes out of this!!
-      INDArray ia=list_of_vals.get(list_of_vals.size()-2);
+      INDArray ia;
+      if (m_layer < 0) {
+        ia=list_of_vals.get(list_of_vals.size()-2);
+      } else if (m_layer >= list_of_vals.size()-1 ){
+        ia=list_of_vals.get(list_of_vals.size()-1);
+      } else {
+        ia=list_of_vals.get(m_layer);
+      }
+
       for (int j=0;j<ia.length();j++){
         values[j]=ia.getDouble(j);
       }
