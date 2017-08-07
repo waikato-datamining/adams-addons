@@ -188,6 +188,9 @@ public class DL4JMultiLayerNetwork
   /** the training header. */
   protected Instances m_Header;
 
+  /** whether the classifier got intialized programmatically. */
+  protected boolean m_ProgrammaticInitialization;
+
   /**
    * Returns a string describing the object.
    *
@@ -254,25 +257,30 @@ public class DL4JMultiLayerNetwork
    */
   public String [] getOptions() {
     List<String> result = new ArrayList<>();
-    if (getModelFile().isDirectory()) {
-      WekaOptionUtils.add(result, LAYER, getLayers());
-      WekaOptionUtils.add(result, OPTIMIZATION_ALGORITHM, getOptimizationAlgorithm());
-      WekaOptionUtils.add(result, DROP_TYPE, getDropType());
-      WekaOptionUtils.add(result, DROP_OUT, getDropOut());
+
+    if (!m_ProgrammaticInitialization) {
+      if (getModelFile().isDirectory()) {
+	WekaOptionUtils.add(result, LAYER, getLayers());
+	WekaOptionUtils.add(result, OPTIMIZATION_ALGORITHM, getOptimizationAlgorithm());
+	WekaOptionUtils.add(result, DROP_TYPE, getDropType());
+	WekaOptionUtils.add(result, DROP_OUT, getDropOut());
+      }
+      else {
+	WekaOptionUtils.add(result, MODEL_FILE, getModelFile());
+	WekaOptionUtils.add(result, MODEL_FILE_TYPE, getModelFileType());
+      }
+      WekaOptionUtils.add(result, TRAIN_STOP, getTrainStop());
+      WekaOptionUtils.add(result, MINI_BATCH_SIZE, getMiniBatchSize());
+      WekaOptionUtils.add(result, RANDOMIZE_BETWEEN_EPOCHS, getRandomizeBetweenEpochs());
+      WekaOptionUtils.add(result, ITERATION_LISTENER, getIterationListeners());
+      WekaOptionUtils.add(result, FILTER, getFilter());
+      WekaOptionUtils.add(result, TEST_PERCENTAGE, getTestPercentage());
+      if (getTestPercentage() > 0)
+	WekaOptionUtils.add(result, TEST_INTERVAL, getTestInterval());
     }
-    else {
-      WekaOptionUtils.add(result, MODEL_FILE, getModelFile());
-      WekaOptionUtils.add(result, MODEL_FILE_TYPE, getModelFileType());
-    }
-    WekaOptionUtils.add(result, TRAIN_STOP, getTrainStop());
-    WekaOptionUtils.add(result, MINI_BATCH_SIZE, getMiniBatchSize());
-    WekaOptionUtils.add(result, RANDOMIZE_BETWEEN_EPOCHS, getRandomizeBetweenEpochs());
-    WekaOptionUtils.add(result, ITERATION_LISTENER, getIterationListeners());
-    WekaOptionUtils.add(result, FILTER, getFilter());
-    WekaOptionUtils.add(result, TEST_PERCENTAGE, getTestPercentage());
-    if (getTestPercentage() > 0)
-      WekaOptionUtils.add(result, TEST_INTERVAL, getTestInterval());
+
     WekaOptionUtils.add(result, super.getOptions());
+
     return WekaOptionUtils.toArray(result);
   }
 
@@ -312,9 +320,9 @@ public class DL4JMultiLayerNetwork
    * Simply serializing into the stream doesn't work, as models cannot be
    * deserialized anymore if the classifier is inside a FilteredClassifier.
    *
-   * @param oos the object output stream
-   * @throws IOException
-   * @see #m_ModelData
+   * @param oos 		the object output stream
+   * @throws IOException 	if loading from stream fails
+   * @see 			#m_ModelData
    */
   private void writeObject(ObjectOutputStream oos) throws IOException {
     ByteArrayOutputStream 	bos;
@@ -334,10 +342,10 @@ public class DL4JMultiLayerNetwork
   /**
    * Custom deserialization method
    *
-   * @param ois the object input stream
-   * @throws ClassNotFoundException
-   * @throws IOException
-   * @see #m_ModelData
+   * @param ois 			the object input stream
+   * @throws ClassNotFoundException 	if reading of objects fails
+   * @throws IOException		if restoring from stream fails
+   * @see 				#m_ModelData
    */
   private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
     ByteArrayInputStream 	bis;
@@ -879,7 +887,7 @@ public class DL4JMultiLayerNetwork
   public String testPercentageTipText() {
     return
       "The percentage (0-1) of the training data to set aside for evaluating "
-        + "the model; no testing performed if 0.";
+	+ "the model; no testing performed if 0.";
   }
 
   /**
@@ -1175,7 +1183,8 @@ public class DL4JMultiLayerNetwork
     while (!stop);
 
 
-    m_Trained = true;
+    m_Trained                    = true;
+    m_ProgrammaticInitialization = false;
   }
 
   /**
@@ -1232,6 +1241,29 @@ public class DL4JMultiLayerNetwork
   }
 
   /**
+   * Sets the trained network.
+   *
+   * @param model	the trained network to use
+   * @see		#setTrainingData(Instances)
+   */
+  public void setTrainedMultiLayerNetwork(MultiLayerNetwork model) {
+    m_Model                      = model;
+    m_ProgrammaticInitialization = true;
+    m_Trained                    = (m_Model != null);
+    m_Iterator                   = new DefaultInstancesIterator();
+  }
+
+  /**
+   * Sets the data used to train the network.
+   *
+   * @param data	the training data
+   * @see		#setTrainedMultiLayerNetwork(MultiLayerNetwork)
+   */
+  public void setTrainingData(Instances data) {
+    m_Header = new Instances(data, 0);
+  }
+
+  /**
    * Returns the filter that is used to filter the data before presenting it
    * to the network.
    *
@@ -1239,6 +1271,15 @@ public class DL4JMultiLayerNetwork
    */
   public Filter getPreFilter() {
     return m_ActualFilter;
+  }
+
+  /**
+   * Sets the trained filter to use.
+   *
+   * @param filter	the filter to use
+   */
+  public void setTrainedPreFilter(Filter filter) {
+    m_ActualFilter = filter;
   }
 
   /**

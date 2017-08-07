@@ -21,6 +21,7 @@
 package weka.classifiers;
 
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import weka.core.Instances;
 
 /**
  * Interface for classes that allow access to a MultiLayerNetwork isntance.
@@ -36,4 +37,20 @@ public interface DL4JMultiLayerNetworkProvider {
    * @return		the network, null if none available
    */
   public MultiLayerNetwork getMultiLayerNetwork();
+
+  /**
+   * Sets the trained network.
+   *
+   * @param model	the trained network to use
+   * @see		#setTrainingData(Instances)
+   */
+  public void setTrainedMultiLayerNetwork(MultiLayerNetwork model);
+
+  /**
+   * Sets the data used to train the network.
+   *
+   * @param data	the training data
+   * @see		#setTrainedMultiLayerNetwork(MultiLayerNetwork)
+   */
+  public void setTrainingData(Instances data);
 }

@@ -39,4 +39,11 @@ public interface DL4JFilteredMultiLayerNetworkProvider
    * @return		the filter in use
    */
   public Filter getPreFilter();
+
+  /**
+   * Sets the trained filter to use.
+   *
+   * @param filter	the filter to use
+   */
+  public void setTrainedPreFilter(Filter filter);
 }
