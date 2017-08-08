@@ -21,6 +21,8 @@
 package adams.db;
 
 import adams.core.Properties;
+import adams.core.Utils;
+import adams.core.base.BaseRegExp;
 import adams.core.logging.LoggingHelper;
 import adams.core.logging.LoggingObject;
 import adams.env.CQETableDefinition;
@@ -131,6 +133,34 @@ public abstract class AbstractCQETable<T>
     prefix   = getClass().getName() + "(" + getDatabaseConnection().toStringShort() + "/" + getDatabaseConnection().hashCode() + ")";
     m_Logger = LoggingHelper.getLogger(prefix);
     m_Logger.setLevel(getDebug() ? Level.INFO : Level.OFF);
+  }
+
+  /**
+   * Backquotes the regular expression and ensures that it is surrounded by single
+   * quotes.
+   *
+   * @param s		the regular expression to backquote and enclose
+   * @return		the processed string
+   */
+  public static String backquote(BaseRegExp s) {
+    return backquote(s.getValue());
+  }
+
+  /**
+   * Backquotes the string and ensures that it is surrounded by single
+   * quotes.
+   *
+   * @param s		the string to backquote and enclose
+   * @return		the processed string
+   */
+  public static String backquote(String s) {
+    String	result;
+
+    result = Utils.backQuoteChars(s);
+    if (!result.startsWith("'"))
+      result = "'" + result + "'";
+
+    return result;
   }
 
   /**
