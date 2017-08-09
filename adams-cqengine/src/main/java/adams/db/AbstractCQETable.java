@@ -29,6 +29,7 @@ import adams.core.logging.LoggingObject;
 import adams.env.CQETableDefinition;
 import adams.env.Environment;
 import com.googlecode.cqengine.IndexedCollection;
+import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.parser.sql.SQLParser;
 import com.googlecode.cqengine.resultset.ResultSet;
 
@@ -227,12 +228,40 @@ public abstract class AbstractCQETable<T>
   }
 
   /**
+   * Returns true if this table holds data that satisfies the query condition.
+   *
+   * @param query	the query to use
+   * @return  		true if condition holds for tablename
+   */
+  public boolean isThere(Query<T> query) {
+    ResultSet<T>	rs;
+    Iterator<T>		iter;
+
+    try {
+      rs   = getCollection().retrieve(query);
+      iter = rs.iterator();
+      if (!iter.hasNext()) {
+	closeAll(rs);
+	return false;
+      }
+      else{
+	closeAll(rs);
+	return true;
+      }
+    }
+    catch (Exception e) {
+      return false;
+    }
+  }
+
+  /**
    * Do a select on all columns for all data in, with condition.
    *
    * @param where	condition
    * @return		resultset of data
+   * @throws Exception	if SQL fails to parse
    */
-  public ResultSet<T> select(String where) {
+  public ResultSet<T> select(String where) throws Exception {
     return doSelect(false, where);
   }
 
@@ -242,8 +271,9 @@ public abstract class AbstractCQETable<T>
    *
    * @param where	condition
    * @return		resultset of data
+   * @throws Exception	if SQL fails to parse
    */
-  public ResultSet<T> selectDistinct(String where) {
+  public ResultSet<T> selectDistinct(String where) throws Exception {
     return doSelect(true, where);
   }
 
@@ -254,8 +284,9 @@ public abstract class AbstractCQETable<T>
    * @param distinct	whether values in columns has to be distinct
    * @param where	condition, can be null
    * @return		resultset of data
+   * @throws Exception	if SQL fails to parse
    */
-  protected ResultSet<T> doSelect(boolean distinct, String where) {
+  protected ResultSet<T> doSelect(boolean distinct, String where) throws Exception {
     String	query;
 
     // select
@@ -277,7 +308,13 @@ public abstract class AbstractCQETable<T>
 
     getLogger().info("doSelect: " + query);
 
-    return getParser().retrieve(getCollection(), query);
+    try {
+      return getParser().retrieve(getCollection(), query);
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to execute query: " + query, e);
+      throw e;
+    }
   }
 
   /**
