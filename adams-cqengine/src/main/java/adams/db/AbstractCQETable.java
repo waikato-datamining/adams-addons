@@ -23,13 +23,18 @@ package adams.db;
 import adams.core.Properties;
 import adams.core.Utils;
 import adams.core.base.BaseRegExp;
+import adams.core.logging.Logger;
 import adams.core.logging.LoggingHelper;
 import adams.core.logging.LoggingObject;
 import adams.env.CQETableDefinition;
 import adams.env.Environment;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.query.parser.sql.SQLParser;
+import com.googlecode.cqengine.resultset.ResultSet;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -49,6 +54,9 @@ public abstract class AbstractCQETable<T>
 
   /** the properties file. */
   protected static Properties m_Properties;
+
+  /** the static logger. */
+  protected static Logger LOGGER = LoggingHelper.getConsoleLogger(AbstractCQETable.class);
 
   /** name of the table. */
   protected String m_TableName;
@@ -189,6 +197,133 @@ public abstract class AbstractCQETable<T>
    */
   public boolean getDebug() {
     return m_Debug;
+  }
+
+  /**
+   * Returns true if this table holds data that satisfies 'condition'.
+   *
+   * @param condition  boolean SQL eg "JOBNO=100 AND SAMPLENO=2"
+   * @return  true if condition holds for tablename
+   */
+  public boolean isThere(String condition) {
+    ResultSet<T> 	rs;
+    Iterator<T>		iter;
+
+    try{
+      rs   = select(condition);
+      iter = rs.iterator();
+      if (!iter.hasNext()) {
+	closeAll(rs);
+	return false;
+      }
+      else{
+	closeAll(rs);
+	return true;
+      }
+    }
+    catch(Exception e) {
+      return false;
+    }
+  }
+
+  /**
+   * Do a select on all columns for all data in, with condition.
+   *
+   * @param where	condition
+   * @return		resultset of data
+   */
+  public ResultSet<T> select(String where) {
+    return doSelect(false, where);
+  }
+
+  /**
+   * Do a select distinct on all columns for all data, with
+   * condition.
+   *
+   * @param where	condition
+   * @return		resultset of data
+   */
+  public ResultSet<T> selectDistinct(String where) {
+    return doSelect(true, where);
+  }
+
+  /**
+   * Do a select on given columns for all data, with condition.
+   * Can be distinct.
+   *
+   * @param distinct	whether values in columns has to be distinct
+   * @param where	condition, can be null
+   * @return		resultset of data
+   */
+  protected ResultSet<T> doSelect(boolean distinct, String where) {
+    String	query;
+
+    // select
+    query = "SELECT ";
+    if (distinct)
+      query += "DISTINCT ";
+    query += "*";
+
+    // from
+    query += " FROM " + getTableName();
+
+    // where
+    if ((where != null) && (where.length() > 0)) {
+      if (   !where.trim().toUpperCase().startsWith("LIMIT ")
+	  && !where.trim().toUpperCase().startsWith("ORDER ") )
+	query += " WHERE";
+      query += " " + where;
+    }
+
+    getLogger().info("doSelect: " + query);
+
+    return getParser().retrieve(getCollection(), query);
+  }
+
+  /**
+   * Removes all objects in the result set.
+   *
+   * @param rs		the result of objects to remove
+   * @return		true if successfully removed
+   */
+  protected boolean remove(ResultSet<T> rs) {
+    boolean	result;
+    Iterator<T>	iter;
+    List<T> 	objs;
+
+    objs = new ArrayList<>();
+    iter = rs.iterator();
+    while (iter.hasNext())
+      objs.add(iter.next());
+    rs.close();
+
+    if (getDebug())
+      getLogger().info("Removing " + objs.size() + " object(s)");
+
+    result = getCollection().removeAll(objs);
+
+    if (getDebug()) {
+      getLogger().info("Removed: " + result);
+      getLogger().info("Size: " + getCollection().size());
+    }
+
+    return result;
+  }
+
+  /**
+   * Close objects related to this ResultSet.
+   *
+   * @param r  The ResultSet to clean up after
+   */
+  public static void closeAll(ResultSet r) {
+    if (r != null) {
+      try {
+	r.close();
+      }
+      catch (Exception e) {
+	LOGGER.log(Level.SEVERE, "Error closing resultset", e);
+      }
+    }
   }
 
   /**
