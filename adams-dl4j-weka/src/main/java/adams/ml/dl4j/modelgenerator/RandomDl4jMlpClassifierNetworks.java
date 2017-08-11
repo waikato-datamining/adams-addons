@@ -13,7 +13,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * RandomDl4jMlpClassifierNetworks.java
  * Copyright (C) 2017 University of Waikato, Hamilton, NZ
  */
@@ -35,8 +35,10 @@ import weka.dl4j.layers.OutputLayer;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -91,6 +93,18 @@ public class RandomDl4jMlpClassifierNetworks
 
   /** the drop out (per layer). */
   protected BaseDouble[] m_DropOut;
+
+  /** the epochs for the learning rate schedule. */
+  protected BaseInteger[] m_LearningRateScheduleEpochs;
+
+  /** the learning rate divisors for the learning rate schedule. */
+  protected BaseDouble[] m_LearningRateScheduleDivisors;
+
+  /** the epochs for the momentum schedule. */
+  protected BaseInteger[] m_MomentumScheduleEpochs;
+
+  /** the momentum divisors for the momentum schedule. */
+  protected BaseDouble[] m_MomentumScheduleDivisors;
 
   /**
    * Returns a string describing the object.
@@ -161,6 +175,22 @@ public class RandomDl4jMlpClassifierNetworks
 
     m_OptionManager.add(
       "drop-out", "dropOut",
+      new BaseDouble[0]);
+
+    m_OptionManager.add(
+      "learning-rate-schedule-epochs", "learningRateScheduleEpochs",
+      new BaseInteger[0]);
+
+    m_OptionManager.add(
+      "learning-rate-schedule-divisors", "learningRateScheduleDivisors",
+      new BaseDouble[0]);
+
+    m_OptionManager.add(
+      "momentum-schedule-epochs", "momentumScheduleEpochs",
+      new BaseInteger[0]);
+
+    m_OptionManager.add(
+      "momentum-schedule-divisors", "momentumScheduleDivisors",
       new BaseDouble[0]);
   }
 
@@ -544,6 +574,128 @@ public class RandomDl4jMlpClassifierNetworks
   }
 
   /**
+   * Sets the epochs to use for the learning rate schedule; not used if empty.
+   *
+   * @param value	the list
+   */
+  public void setLearningRateScheduleEpochs(BaseInteger[] value) {
+    m_LearningRateScheduleEpochs = value;
+    reset();
+  }
+
+  /**
+   * Returns the list of epochs to use for the learning rate schedule; not used if empty.
+   *
+   * @return  		the list
+   */
+  public BaseInteger[] getLearningRateScheduleEpochs() {
+    return m_LearningRateScheduleEpochs;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String learningRateScheduleEpochsTipText() {
+    return "The list of epochs for the learning rate schedule; not used if empty.";
+  }
+
+  /**
+   * Sets the divisors to use for the learning rate schedule; not used if empty.
+   *
+   * @param value	the list
+   */
+  public void setLearningRateScheduleDivisors(BaseDouble[] value) {
+    m_LearningRateScheduleDivisors = value;
+    reset();
+  }
+
+  /**
+   * Returns the list of divisors to use for the learning rate schedule; not used if empty.
+   *
+   * @return  		the list
+   */
+  public BaseDouble[] getLearningRateScheduleDivisors() {
+    return m_LearningRateScheduleDivisors;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String learningRateScheduleDivisorsTipText() {
+    return 
+      "The list of divisors for calculating learning rate used in the learning " 
+	+ "rate schedule to choose from; each subsequent value is calculated by " 
+	+ "dividing the previous one by the chosen divisor.";
+  }
+
+  /**
+   * Sets the epochs to use for the momentum schedule; not used if empty.
+   *
+   * @param value	the list
+   */
+  public void setMomentumScheduleEpochs(BaseInteger[] value) {
+    m_MomentumScheduleEpochs = value;
+    reset();
+  }
+
+  /**
+   * Returns the list of epochs to use for the momentum schedule; not used if empty.
+   *
+   * @return  		the list
+   */
+  public BaseInteger[] getMomentumScheduleEpochs() {
+    return m_MomentumScheduleEpochs;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String momentumScheduleEpochsTipText() {
+    return "The list of epochs for the momentum schedule; not used if empty.";
+  }
+
+  /**
+   * Sets the divisors to use for the momentum schedule; not used if empty.
+   *
+   * @param value	the list
+   */
+  public void setMomentumScheduleDivisors(BaseDouble[] value) {
+    m_MomentumScheduleDivisors = value;
+    reset();
+  }
+
+  /**
+   * Returns the list of divisors to use for the momentum schedule; not used if empty.
+   *
+   * @return  		the list
+   */
+  public BaseDouble[] getMomentumScheduleDivisors() {
+    return m_MomentumScheduleDivisors;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String momentumScheduleDivisorsTipText() {
+    return 
+      "The list of divisors for calculating momentum used in the momentum "
+	+ "schedule to choose from; each subsequent value is calculated by "
+	+ "dividing the previous one by the chosen divisor.";
+  }
+
+  /**
    * Hook method for performing checks.
    *
    * @return		null if successful, otherwise error message
@@ -593,9 +745,13 @@ public class RandomDl4jMlpClassifierNetworks
     String		yaml;
     Random 		rand;
     int			i;
+    int			n;
     Dl4jMlpClassifier	conf;
     Layer[]		layers;
     DropType		dropType;
+    double		lr;
+    double		momentum;
+    Map<Integer,Double> schedule;
 
     result    = new ArrayList<>();
     rand      = new Random(m_Seed);
@@ -661,6 +817,28 @@ public class RandomDl4jMlpClassifierNetworks
 	    default:
 	      throw new IllegalStateException("Unhandled drop type: " + dropType);
 	  }
+	}
+
+	// learning rate schedule
+	if (m_LearningRateScheduleEpochs.length > 0) {
+	  lr       = layers[i].getLearningRate();
+	  schedule = new HashMap<>();
+	  for (n = 0; n < m_LearningRateScheduleEpochs.length; n++) {
+	    lr /= ((BaseDouble) pick(rand, m_LearningRateScheduleDivisors)).doubleValue();
+	    schedule.put(m_LearningRateScheduleEpochs[n].intValue(), lr);
+	  }
+	  layers[i].setLearningRateSchedule(schedule);
+	}
+
+	// momentum schedule
+	if (m_MomentumScheduleEpochs.length > 0) {
+	  momentum = layers[i].getMomentum();
+	  schedule = new HashMap<>();
+	  for (n = 0; n < m_MomentumScheduleEpochs.length; n++) {
+	    momentum /= ((BaseDouble) pick(rand, m_MomentumScheduleDivisors)).doubleValue();
+	    schedule.put(m_MomentumScheduleEpochs[n].intValue(), momentum);
+	  }
+	  layers[i].setMomentumSchedule(schedule);
 	}
       }
       conf.setLayers(layers);
