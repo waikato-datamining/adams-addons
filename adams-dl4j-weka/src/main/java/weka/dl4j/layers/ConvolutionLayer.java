@@ -286,30 +286,6 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
   }
 
   @OptionMetadata(
-    displayName = "momentum",
-    description = "The momentum (default = 0.9).",
-    commandLineParamName = "momentum", commandLineParamSynopsis = "-momentum <double>",
-    displayOrder = 9)
-  public double getMomentum() {
-    return this.momentum;
-  }
-  public void setMomentum(double momentum) {
-    this.momentum = momentum;
-  }
-
-  @OptionMetadata(
-    displayName = "momentum schedule",
-    description = "The momentum schedule.",
-    commandLineParamName = "momentumSchedule", commandLineParamSynopsis = "-momentumSchedule <specification>",
-    displayOrder = 10)
-  public Map<Integer, Double> getMomentumSchedule() {
-    return this.momentumSchedule;
-  }
-  public void setMomentumSchedule(Map<Integer, Double> momentumSchedule) {
-    this.momentumSchedule = momentumSchedule;
-  }
-
-  @OptionMetadata(
     displayName = "L1",
     description = "The L1 parameter (default = 0).",
     commandLineParamName = "L1", commandLineParamSynopsis = "-L1 <double>",
