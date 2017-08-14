@@ -1,12 +1,12 @@
 # Project: adams
-# Date: 2017-05-17 14:32:43
+# Date: 2017-08-15 10:09:37
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Here we train a model on the bolts UCI  regression \\ndataset and  then test it against this dataset as well.\\n" -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
-  adams.flow.source.DL4JModelConfigurator -model-configurator "adams.ml.dl4j.model.SimpleRegressionMultiLayerNetwork -num-iterations 1000 -learning-rate 1.5E-4"
+  adams.flow.source.DL4JModelConfigurator -model-configurator "adams.ml.dl4j.model.SimpleRegressionMultiLayerNetwork -learning-rate 1.5E-4"
   adams.flow.source.DL4JDatasetIterator -name Testset -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.CSVRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.SingleFileSplitConfigurator -source ${FLOWS}/data/bolts.csv\\\" -skip-num-lines 1\" -batch-size 150 -label-index 7 -regression true" -preprocessor adams.ml.dl4j.datasetpreprocessor.NormalizerMinMaxScaler
  adams.flow.source.DL4JDatasetIterator -iterator "adams.ml.dl4j.datasetiterator.RecordReaderDataSetIteratorConfigurator -record-reader \"adams.ml.dl4j.recordreader.CSVRecordReaderConfigurator -input-split \\\"adams.ml.dl4j.inputsplit.SingleFileSplitConfigurator -source ${FLOWS}/data/bolts.csv\\\" -skip-num-lines 1\" -batch-size 150 -label-index 7 -regression true" -preprocessor adams.ml.dl4j.datasetpreprocessor.NormalizerMinMaxScaler
- adams.flow.transformer.DL4JTrainModel
+ adams.flow.transformer.DL4JTrainModel -train-stop "adams.ml.dl4j.trainstopcriterion.MaxEpoch -num-epochs 10000" -mini-batch-size 20
  adams.flow.transformer.DL4JTestSetEvaluator -type REGRESSION
  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
