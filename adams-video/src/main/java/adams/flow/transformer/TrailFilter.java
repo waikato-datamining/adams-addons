@@ -13,7 +13,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * TrailFilter.java
  * Copyright (C) 2015-2017 University of Waikato, Hamilton, New Zealand
  */
@@ -21,6 +21,7 @@ package adams.flow.transformer;
 
 import adams.data.trail.Trail;
 import adams.db.AbstractDatabaseConnection;
+import adams.flow.container.TrailFilterContainer;
 import adams.flow.core.ActorUtils;
 
 /**
@@ -92,6 +93,16 @@ public class TrailFilter
   @Override
   protected Class getDataContainerClass() {
     return Trail.class;
+  }
+
+  /**
+   * Returns the container class in use for the output.
+   *
+   * @return		the container class
+   */
+  @Override
+  protected Class getOutputContainerClass() {
+    return TrailFilterContainer.class;
   }
 
   /**

@@ -21,6 +21,7 @@
 package adams.flow.transformer;
 
 import adams.data.heatmap.Heatmap;
+import adams.flow.container.HeatmapFilterContainer;
 import adams.flow.core.ActorUtils;
 
 /**
@@ -93,6 +94,16 @@ public class HeatmapFilter
    */
   protected Class getDataContainerClass() {
     return Heatmap.class;
+  }
+
+  /**
+   * Returns the container class in use for the output.
+   *
+   * @return		the container class
+   */
+  @Override
+  protected Class getOutputContainerClass() {
+    return HeatmapFilterContainer.class;
   }
 
   /**
