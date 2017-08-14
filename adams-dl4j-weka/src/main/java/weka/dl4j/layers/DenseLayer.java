@@ -32,6 +32,7 @@ import org.nd4j.linalg.activations.impl.ActivationIdentity;
 import org.nd4j.linalg.activations.impl.ActivationLReLU;
 import org.nd4j.linalg.activations.impl.ActivationRReLU;
 import org.nd4j.linalg.activations.impl.ActivationReLU;
+import org.nd4j.linalg.activations.impl.ActivationSELU;
 import org.nd4j.linalg.activations.impl.ActivationSigmoid;
 import org.nd4j.linalg.activations.impl.ActivationSoftPlus;
 import org.nd4j.linalg.activations.impl.ActivationSoftSign;
@@ -139,6 +140,9 @@ public class DenseLayer extends org.deeplearning4j.nn.conf.layers.DenseLayer imp
     if (this.getActivationFn() instanceof ActivationELU){
       return("elu");
     }
+    if (this.getActivationFn() instanceof ActivationSELU){
+      return("selu");
+    }
     if (this.getActivationFn() instanceof ActivationHardSigmoid){
       return("hardsigmoid");
     }
@@ -192,6 +196,10 @@ public class DenseLayer extends org.deeplearning4j.nn.conf.layers.DenseLayer imp
     }
     if(activationFunction.equals("elu")){
       this.setActivationFn(new ActivationELU());
+      return;
+    }
+    if(activationFunction.equals("selu")){
+      this.setActivationFn(new ActivationSELU());
       return;
     }
     if(activationFunction.equals("hardsigmoid")){
