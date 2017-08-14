@@ -502,7 +502,6 @@ public class AnimalsLeNet
       .weightInit(m_WeightInit)
       .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
       .updater(Updater.RMSPROP)
-      .momentum(0.9)
       .list()
       .layer(0, convInit("cnn1", channels, 50, new int[]{5, 5}, new int[]{1, 1}, new int[]{0, 0}, 0))
       .layer(1, maxPool("maxpool1", new int[]{2, 2}))

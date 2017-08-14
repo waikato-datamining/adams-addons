@@ -58,12 +58,6 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
  * &nbsp;&nbsp;&nbsp;minimum: 0.0
  * </pre>
  *
- * <pre>-momentum &lt;double&gt; (property: momentum)
- * &nbsp;&nbsp;&nbsp;The momentum to use.
- * &nbsp;&nbsp;&nbsp;default: 0.9
- * &nbsp;&nbsp;&nbsp;minimum: 0.0
- * </pre>
- *
  * <pre>-seed &lt;long&gt; (property: seed)
  * &nbsp;&nbsp;&nbsp;The seed value for the weight initialization.
  * &nbsp;&nbsp;&nbsp;default: 140
@@ -119,9 +113,6 @@ public class SimpleRegressionMultiLayerNetwork
   /** the number of iterations. */
   protected int m_NumIterations;
 
-  /** the momentum. */
-  protected double m_Momentum;
-
   /** the learning rate. */
   protected double m_LearningRate;
 
@@ -175,10 +166,6 @@ public class SimpleRegressionMultiLayerNetwork
     m_OptionManager.add(
       "learning-rate", "learningRate",
       0.0015, 0.0, null);
-
-    m_OptionManager.add(
-      "momentum", "momentum",
-      0.9, 0.0, null);
 
     m_OptionManager.add(
       "seed", "seed",
@@ -273,37 +260,6 @@ public class SimpleRegressionMultiLayerNetwork
    */
   public String learningRateTipText() {
     return "The learning rate to use.";
-  }
-
-  /**
-   * Sets the momentum.
-   *
-   * @param value	the momentum
-   */
-  public void setMomentum(double value) {
-    if (getOptionManager().isValid("momentum", value)) {
-      m_Momentum = value;
-      reset();
-    }
-  }
-
-  /**
-   * Returns the momentum.
-   *
-   * @return 		the momentum
-   */
-  public double getMomentum() {
-    return m_Momentum;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return		tip text for this property suitable for
-   *             	displaying in the GUI or for listing the options.
-   */
-  public String momentumTipText() {
-    return "The momentum to use.";
   }
 
   /**
@@ -559,9 +515,7 @@ public class SimpleRegressionMultiLayerNetwork
 	  .nIn(numInput)
 	  .nOut(m_HiddenNodes)
 	  .biasLearningRate(0.01)
-	  .epsilon(0.000001)
 	  .activation(m_Activation)
-	  .momentum(m_Momentum)
 	  .learningRate(m_LearningRate)
 	  .weightInit(m_WeightInit)
 	  .updater(m_Updater)
@@ -572,9 +526,7 @@ public class SimpleRegressionMultiLayerNetwork
 	  .nIn(m_HiddenNodes)
 	  .nOut(1)
 	  .biasLearningRate(0.01)
-	  .epsilon(0.000001)
 	  .activation(m_OutputActivation)
-	  .momentum(m_Momentum)
 	  .learningRate(m_LearningRate)
 	  .weightInit(m_WeightInit)
 	  .updater(m_Updater)
