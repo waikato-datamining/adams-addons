@@ -134,6 +134,13 @@ public abstract class AbstractCQETable<T>
   }
 
   /**
+   * Clears the collection.
+   */
+  public void clear() {
+    m_Collection.clear();
+  }
+
+  /**
    * Updates the prefix of the console object output streams.
    */
   protected void updatePrefix() {
