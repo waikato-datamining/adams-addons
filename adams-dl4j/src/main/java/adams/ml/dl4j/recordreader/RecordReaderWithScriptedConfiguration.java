@@ -284,6 +284,27 @@ public class RecordReaderWithScriptedConfiguration
   }
 
   /**
+   * This method returns true, if next(int) signature is supported by this RecordReader implementation.
+   *
+   * @return
+   */
+  @Override
+  public boolean batchesSupported() {
+    return getRecordReader().batchesSupported();
+  }
+
+  /**
+   * This method will be used, if batchesSupported() returns true.
+   *
+   * @param num
+   * @return
+   */
+  @Override
+  public List<Writable> next(int num) {
+    return getRecordReader().next(num);
+  }
+
+  /**
    * Get the next record
    * @return
    */

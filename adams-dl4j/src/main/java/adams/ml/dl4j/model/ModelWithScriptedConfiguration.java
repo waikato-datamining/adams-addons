@@ -22,13 +22,13 @@ package adams.ml.dl4j.model;
 
 import adams.core.scripting.AbstractScriptingHandler;
 import adams.core.scripting.Dummy;
-import org.deeplearning4j.berkeley.Pair;
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.gradient.Gradient;
 import org.deeplearning4j.optimize.api.ConvexOptimizer;
 import org.deeplearning4j.optimize.api.IterationListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.primitives.Pair;
 
 import java.util.Collection;
 import java.util.Map;
@@ -328,6 +328,11 @@ public class ModelWithScriptedConfiguration
     getModel().setParamsViewArray(indArray);
   }
 
+  @Override
+  public INDArray getGradientsViewArray() {
+    return getModel().getGradientsViewArray();
+  }
+
   /**
    * Set the gradients array as a view of the full (backprop) network parameters
    * NOTE: this is intended to be used internally in MultiLayerNetwork and ComputationGraph, not by users.
@@ -349,6 +354,14 @@ public class ModelWithScriptedConfiguration
   }
 
   /**
+   * Init the model
+   */
+  @Override
+  public void init() {
+    getModel().init();
+  }
+
+  /**
    * Set the IterationListeners for the ComputationGraph (and all layers in the network)
    */
   @Override
@@ -362,6 +375,16 @@ public class ModelWithScriptedConfiguration
   @Override
   public void setListeners(IterationListener... listeners) {
     getModel().setListeners(listeners);
+  }
+
+  /**
+   * This method ADDS additional IterationListener to existing listeners
+   *
+   * @param listener
+   */
+  @Override
+  public void addListeners(IterationListener... listener) {
+    getModel().addListeners(listener);
   }
 
   /**

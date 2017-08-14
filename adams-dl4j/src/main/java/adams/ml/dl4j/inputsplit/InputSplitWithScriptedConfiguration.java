@@ -23,6 +23,8 @@ package adams.ml.dl4j.inputsplit;
 import adams.core.scripting.AbstractScriptingHandler;
 import adams.core.scripting.Dummy;
 import org.datavec.api.split.InputSplit;
+import org.datavec.api.writable.WritableFactory;
+import org.datavec.api.writable.WritableType;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -290,6 +292,17 @@ public class InputSplitWithScriptedConfiguration
     getInputSplit().readFields(in);
   }
 
+  /**
+   * Write the type (a single short value) to the DataOutput. See {@link WritableFactory} for details.
+   *
+   * @param dataOutput DataOutput to write to
+   * @throws IOException For errors during writing
+   */
+  @Override
+  public void writeType(DataOutput dataOutput) throws IOException {
+    getInputSplit().writeType(dataOutput);
+  }
+
   /** Convert Writable to double. Whether this is supported depends on the specific writable. */
   @Override
   public double toDouble() {
@@ -312,5 +325,10 @@ public class InputSplitWithScriptedConfiguration
   @Override
   public long toLong() {
     return getInputSplit().toLong();
+  }
+
+  @Override
+  public WritableType getType() {
+    return getInputSplit().getType();
   }
 }

@@ -20,19 +20,23 @@
  */
 package weka.dl4j;
 
+import org.datavec.api.split.InputSplit;
+import org.datavec.api.util.ndarray.RecordConverter;
+import org.datavec.api.writable.DoubleWritable;
+import org.datavec.api.writable.Writable;
+import org.datavec.image.loader.ImageLoader;
+import org.datavec.image.recordreader.BaseImageRecordReader;
+import org.nd4j.linalg.api.ndarray.INDArray;
+
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.*;
-
-import org.datavec.api.writable.DoubleWritable;
-import org.datavec.api.split.InputSplit;
-import org.datavec.api.writable.Writable;
-import org.datavec.common.RecordConverter;
-import org.datavec.image.loader.ImageLoader;
-import org.datavec.image.recordreader.BaseImageRecordReader;
-import org.nd4j.linalg.api.ndarray.INDArray;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 /**
  * ImageRecordReader in DeepLearning4j assumes that your images are separated into different folders,

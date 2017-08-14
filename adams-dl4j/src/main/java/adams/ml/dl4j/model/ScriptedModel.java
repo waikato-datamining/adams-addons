@@ -22,13 +22,13 @@ package adams.ml.dl4j.model;
 
 import adams.core.scripting.AbstractScriptingHandler;
 import adams.core.scripting.Dummy;
-import org.deeplearning4j.berkeley.Pair;
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.gradient.Gradient;
 import org.deeplearning4j.optimize.api.ConvexOptimizer;
 import org.deeplearning4j.optimize.api.IterationListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.primitives.Pair;
 
 import java.util.Collection;
 import java.util.Map;
@@ -298,6 +298,11 @@ public class ScriptedModel
   }
 
   @Override
+  public INDArray getGradientsViewArray() {
+    return getModel().getGradientsViewArray();
+  }
+
+  @Override
   public void setBackpropGradientsViewArray(INDArray indArray) {
     getModel().setBackpropGradientsViewArray(indArray);
   }
@@ -310,6 +315,14 @@ public class ScriptedModel
   @Override
   public void applyLearningRateScoreDecay() {
     getModel().applyLearningRateScoreDecay();
+  }
+
+  /**
+   * Init the model
+   */
+  @Override
+  public void init() {
+    getModel().init();
   }
 
   /**
@@ -326,6 +339,16 @@ public class ScriptedModel
   @Override
   public void setListeners(IterationListener... listeners) {
     getModel().setListeners(listeners);
+  }
+
+  /**
+   * This method ADDS additional IterationListener to existing listeners
+   *
+   * @param listener
+   */
+  @Override
+  public void addListeners(IterationListener... listener) {
+    getModel().addListeners(listener);
   }
 
   /**

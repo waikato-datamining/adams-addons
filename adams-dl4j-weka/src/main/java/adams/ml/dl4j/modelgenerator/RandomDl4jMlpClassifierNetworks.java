@@ -28,6 +28,7 @@ import adams.core.option.OptionUtils;
 import adams.ml.dl4j.model.Dl4jMlpClassifier;
 import adams.ml.dl4j.model.Dl4jMlpClassifier.DropType;
 import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.nn.conf.layers.BaseLayer;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import weka.dl4j.layers.DenseLayer;
@@ -99,12 +100,6 @@ public class RandomDl4jMlpClassifierNetworks
 
   /** the learning rate divisors for the learning rate schedule. */
   protected BaseDouble[] m_LearningRateScheduleDivisors;
-
-  /** the epochs for the momentum schedule. */
-  protected BaseInteger[] m_MomentumScheduleEpochs;
-
-  /** the momentum divisors for the momentum schedule. */
-  protected BaseDouble[] m_MomentumScheduleDivisors;
 
   /**
    * Returns a string describing the object.
@@ -183,14 +178,6 @@ public class RandomDl4jMlpClassifierNetworks
 
     m_OptionManager.add(
       "learning-rate-schedule-divisors", "learningRateScheduleDivisors",
-      new BaseDouble[0]);
-
-    m_OptionManager.add(
-      "momentum-schedule-epochs", "momentumScheduleEpochs",
-      new BaseInteger[0]);
-
-    m_OptionManager.add(
-      "momentum-schedule-divisors", "momentumScheduleDivisors",
       new BaseDouble[0]);
   }
 
@@ -635,67 +622,6 @@ public class RandomDl4jMlpClassifierNetworks
   }
 
   /**
-   * Sets the epochs to use for the momentum schedule; not used if empty.
-   *
-   * @param value	the list
-   */
-  public void setMomentumScheduleEpochs(BaseInteger[] value) {
-    m_MomentumScheduleEpochs = value;
-    reset();
-  }
-
-  /**
-   * Returns the list of epochs to use for the momentum schedule; not used if empty.
-   *
-   * @return  		the list
-   */
-  public BaseInteger[] getMomentumScheduleEpochs() {
-    return m_MomentumScheduleEpochs;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String momentumScheduleEpochsTipText() {
-    return "The list of epochs for the momentum schedule; not used if empty.";
-  }
-
-  /**
-   * Sets the divisors to use for the momentum schedule; not used if empty.
-   *
-   * @param value	the list
-   */
-  public void setMomentumScheduleDivisors(BaseDouble[] value) {
-    m_MomentumScheduleDivisors = value;
-    reset();
-  }
-
-  /**
-   * Returns the list of divisors to use for the momentum schedule; not used if empty.
-   *
-   * @return  		the list
-   */
-  public BaseDouble[] getMomentumScheduleDivisors() {
-    return m_MomentumScheduleDivisors;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String momentumScheduleDivisorsTipText() {
-    return 
-      "The list of divisors for calculating momentum used in the momentum "
-	+ "schedule to choose from; each subsequent value is calculated by "
-	+ "dividing the previous one by the chosen divisor.";
-  }
-
-  /**
    * Hook method for performing checks.
    *
    * @return		null if successful, otherwise error message
@@ -791,14 +717,14 @@ public class RandomDl4jMlpClassifierNetworks
         }
 
 	if (m_LearningRate.length > 0)
-          layers[i].setLearningRate(((BaseDouble) pick(rand, m_LearningRate)).doubleValue());
+          ((BaseLayer) layers[i]).setLearningRate(((BaseDouble) pick(rand, m_LearningRate)).doubleValue());
 
 	// regularization
 	if (conf.getUseRegularization()) {
           if (m_L1.length > 0)
-            layers[i].setL1(((BaseDouble) pick(rand, m_L1)).doubleValue());
+            ((BaseLayer) layers[i]).setL1(((BaseDouble) pick(rand, m_L1)).doubleValue());
           if (m_L2.length > 0)
-            layers[i].setL2(((BaseDouble) pick(rand, m_L2)).doubleValue());
+            ((BaseLayer) layers[i]).setL2(((BaseDouble) pick(rand, m_L2)).doubleValue());
         }
 
 	// drop-type/-out
@@ -821,24 +747,13 @@ public class RandomDl4jMlpClassifierNetworks
 
 	// learning rate schedule
 	if (m_LearningRateScheduleEpochs.length > 0) {
-	  lr       = layers[i].getLearningRate();
+	  lr       = ((BaseLayer) layers[i]).getLearningRate();
 	  schedule = new HashMap<>();
 	  for (n = 0; n < m_LearningRateScheduleEpochs.length; n++) {
 	    lr /= ((BaseDouble) pick(rand, m_LearningRateScheduleDivisors)).doubleValue();
 	    schedule.put(m_LearningRateScheduleEpochs[n].intValue(), lr);
 	  }
-	  layers[i].setLearningRateSchedule(schedule);
-	}
-
-	// momentum schedule
-	if (m_MomentumScheduleEpochs.length > 0) {
-	  momentum = layers[i].getMomentum();
-	  schedule = new HashMap<>();
-	  for (n = 0; n < m_MomentumScheduleEpochs.length; n++) {
-	    momentum /= ((BaseDouble) pick(rand, m_MomentumScheduleDivisors)).doubleValue();
-	    schedule.put(m_MomentumScheduleEpochs[n].intValue(), momentum);
-	  }
-	  layers[i].setMomentumSchedule(schedule);
+	  ((BaseLayer) layers[i]).setLearningRateSchedule(schedule);
 	}
       }
       conf.setLayers(layers);
