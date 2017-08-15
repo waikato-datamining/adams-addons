@@ -61,11 +61,6 @@ public class OutputLayer extends org.deeplearning4j.nn.conf.layers.OutputLayer i
     setLossFn(new LossMSE());
     setLearningRate(0.01);
     setBiasLearningRate(getLearningRate());
-    setMomentum(0.9);
     setBiasInit(1.0);
-    setAdamMeanDecay(0.9);
-    setAdamVarDecay(0.999);
-    setEpsilon(1e-6);
-    setRmsDecay(0.95);
   }
 }

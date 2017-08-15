@@ -61,12 +61,7 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
     setIUpdater(new Nesterovs());
     setLearningRate(0.01);
     setBiasLearningRate(getLearningRate());
-    setMomentum(0.9);
     setBiasInit(1.0);
-    setAdamMeanDecay(0.9);
-    setAdamVarDecay(0.999);
-    setEpsilon(1e-6);
-    setRmsDecay(0.95);
     setConvolutionMode(ConvolutionMode.Truncate);
     setKernelSize(new int[] {5, 5});
     setStride(new int[] {1, 1});

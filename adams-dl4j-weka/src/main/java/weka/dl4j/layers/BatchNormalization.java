@@ -60,12 +60,7 @@ public class BatchNormalization extends org.deeplearning4j.nn.conf.layers.BatchN
     setIUpdater(new Nesterovs());
     setLearningRate(0.01);
     setBiasLearningRate(getLearningRate());
-    setMomentum(0.9);
     setBiasInit(1.0);
-    setAdamMeanDecay(0.9);
-    setAdamVarDecay(0.999);
-    setEpsilon(1e-6);
-    setRmsDecay(0.95);
     setDecay(0.9);
     setEps(1e-5);
     setGamma(1.0);
