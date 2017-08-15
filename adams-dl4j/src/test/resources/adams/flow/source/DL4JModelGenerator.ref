@@ -2,8 +2,10 @@
 ---
 backprop: true
 backpropType: "Standard"
+cacheMode: "NONE"
 confs:
-- iterationCount: 0
+- cacheMode: "NONE"
+  iterationCount: 0
   l1ByParam: {}
   l2ByParam: {}
   layer: !<dense>
@@ -17,6 +19,8 @@ confs:
     epsilon: NaN
     gradientNormalization: "None"
     gradientNormalizationThreshold: 1.0
+    iupdater: !<org.nd4j.linalg.learning.config.Sgd>
+      learningRate: 0.1
     l1: 0.0
     l1Bias: 0.0
     l2: 1.0E-4
@@ -49,7 +53,8 @@ confs:
   useDropConnect: false
   useRegularization: true
   variables: []
-- iterationCount: 0
+- cacheMode: "NONE"
+  iterationCount: 0
   l1ByParam: {}
   l2ByParam: {}
   layer: !<dense>
@@ -63,6 +68,8 @@ confs:
     epsilon: NaN
     gradientNormalization: "None"
     gradientNormalizationThreshold: 1.0
+    iupdater: !<org.nd4j.linalg.learning.config.Sgd>
+      learningRate: 0.1
     l1: 0.0
     l1Bias: 0.0
     l2: 1.0E-4
@@ -95,7 +102,8 @@ confs:
   useDropConnect: false
   useRegularization: true
   variables: []
-- iterationCount: 0
+- cacheMode: "NONE"
+  iterationCount: 0
   l1ByParam: {}
   l2ByParam: {}
   layer: !<output>
@@ -109,6 +117,8 @@ confs:
     epsilon: NaN
     gradientNormalization: "None"
     gradientNormalizationThreshold: 1.0
+    iupdater: !<org.nd4j.linalg.learning.config.Sgd>
+      learningRate: 0.1
     l1: 0.0
     l1Bias: 0.0
     l2: 1.0E-4
@@ -116,7 +126,8 @@ confs:
     layerName: "layer2"
     learningRate: 0.1
     learningRateSchedule: null
-    lossFn: !<NegativeLogLikelihood> {}
+    lossFn: !<NegativeLogLikelihood>
+      softmaxClipEps: 1.0E-10
     lossFunction: "NEGATIVELOGLIKELIHOOD"
     momentum: NaN
     momentumSchedule: null
@@ -143,10 +154,12 @@ confs:
   useDropConnect: false
   useRegularization: true
   variables: []
+inferenceWorkspaceMode: "SEPARATE"
 inputPreProcessors: {}
 iterationCount: 0
 pretrain: false
 tbpttBackLength: 20
 tbpttFwdLength: 20
+trainingWorkspaceMode: "NONE"
 
 
