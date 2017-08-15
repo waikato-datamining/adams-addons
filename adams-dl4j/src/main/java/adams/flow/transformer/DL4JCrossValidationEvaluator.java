@@ -471,64 +471,43 @@ public class DL4JCrossValidationEvaluator
 	switch (m_Type) {
 	  case CLASSIFICATION:
 	    eval = new Evaluation(data.numOutcomes());
-	    iter = new KFoldIterator(m_Folds, data);
-	    while (iter.hasNext() && !isStopped()) {
-	      train = iter.next();
-	      test  = iter.testFold();
-	      model = conf.configureModel(data.numInputs(), data.numOutcomes());
-	      listeners = new ArrayList<>();
-	      for (IterationListenerConfigurator l: m_IterationListeners) {
-		l.setFlowContext(this);
-		listeners.addAll(l.configureIterationListeners());
-	      }
-	      ((MultiLayerNetwork) model).setListeners(listeners);
-	      for (i = 0; i < m_NumEpochs; i++) {
-		if (m_MiniBatchSize < 1) {
-		  ((MultiLayerNetwork) model).fit(train);
-		}
-		else {
-		  shuffle = new ShufflingDataSetIterator(train, m_MiniBatchSize, (int) m_Seed);
-		  while (shuffle.hasNext() && !isStopped())
-		    ((MultiLayerNetwork) model).fit(shuffle.next());
-		}
-		if (isStopped())
-		  break;
-	      }
-	      eval.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
-	    }
 	    break;
-
 	  case REGRESSION:
 	    eval = new RegressionEvaluation(data.numOutcomes());
-	    iter = new KFoldIterator(m_Folds, data);
-	    while (iter.hasNext() && !isStopped()) {
-	      train = iter.next();
-	      test  = iter.testFold();
-	      model = conf.configureModel(data.numInputs(), data.numOutcomes());
-	      for (i = 0; i < m_NumEpochs; i++) {
-		if (isLoggingEnabled() && ((i+1) % 100 == 0))
-		  getLogger().info("#epoch: " + i);
-		if (m_MiniBatchSize < 1) {
-		  ((MultiLayerNetwork) model).fit(train);
-		}
-		else {
-		  shuffle = new ShufflingDataSetIterator(train, m_MiniBatchSize, (int) m_Seed);
-		  while (shuffle.hasNext() && !isStopped())
-		    ((MultiLayerNetwork) model).fit(shuffle.next());
-		}
-		if (isStopped())
-		  break;
-	      }
-	      eval.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
-	    }
 	    break;
-
 	  default:
 	    throw new IllegalStateException("Unhandled evaluation type: " + m_Type);
 	}
-	if (isStopped()) {
-	  eval = null;
+
+	iter = new KFoldIterator(m_Folds, data);
+	while (iter.hasNext() && !isStopped()) {
+	  train = iter.next();
+	  test  = iter.testFold();
+	  model = conf.configureModel(data.numInputs(), data.numOutcomes());
+	  listeners = new ArrayList<>();
+	  for (IterationListenerConfigurator l: m_IterationListeners) {
+	    l.setFlowContext(this);
+	    listeners.addAll(l.configureIterationListeners());
+	  }
+	  model.setListeners(listeners);
+	  for (i = 0; i < m_NumEpochs; i++) {
+	    if (m_MiniBatchSize < 1) {
+	      ((MultiLayerNetwork) model).fit(train);
+	    }
+	    else {
+	      shuffle = new ShufflingDataSetIterator(train, m_MiniBatchSize, (int) m_Seed);
+	      while (shuffle.hasNext() && !isStopped())
+		((MultiLayerNetwork) model).fit(shuffle.next());
+	    }
+	    if (isStopped())
+	      break;
+	  }
+	  eval.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
+	  model.clear();
 	}
+
+	if (isStopped())
+	  eval = null;
       }
 
       // broadcast result
