@@ -1137,8 +1137,7 @@ public class DL4JTrainModel
 	m_ActualModel.setListeners(listeners);
 
 	// init
-	if (m_ActualModel instanceof MultiLayerNetwork)
-	  ((MultiLayerNetwork) m_ActualModel).init();
+	m_ActualModel.init();
       }
     }
     catch (Exception e) {
