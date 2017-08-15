@@ -103,3 +103,15 @@ org.nd4j.linalg.activations.IActivation=\
 # train stop criteria
 adams.ml.dl4j.trainstopcriterion.AbstractTrainStopCriterion=\
   adams.ml.dl4j.trainstopcriterion
+
+# layers
+org.deeplearning4j.nn.conf.layers.Layer=\
+  org.deeplearning4j.nn.conf.layers
+
+# updaters
+org.nd4j.linalg.learning.config.IUpdater=\
+  org.nd4j.linalg.learning.config
+
+# distributions
+org.deeplearning4j.nn.conf.distribution.Distribution=\
+  org.deeplearning4j.nn.conf.distribution
