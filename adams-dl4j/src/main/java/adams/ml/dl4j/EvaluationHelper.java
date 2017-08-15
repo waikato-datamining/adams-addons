@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * EvaluationHelper.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.ml.dl4j;
 
@@ -69,6 +69,14 @@ public class EvaluationHelper {
         return eval.recall(classIndex);
       case ROW_COUNT:
 	return eval.getNumRowCounter();
+      case AVG_F1_NUM_CLASSES_EXCLUDED:
+        return eval.averageF1NumClassesExcluded();
+      case AVG_F_BETA_NUM_CLASSES_EXCLUDED:
+        return eval.averageFBetaNumClassesExcluded();
+      case AVG_PRECISION_NUM_CLASSES_EXCLUDED:
+        return eval.averagePrecisionNumClassesExcluded();
+      case AVG_RECALL_NUM_CLASSES_EXCLUDED:
+        return eval.averageRecallNumClassesExcluded();
       default:
         if (statistic.isRegression() && !statistic.isClassification())
           throw new IllegalArgumentException("Regression statistic cannot be used on classification evaluation: " + statistic);
@@ -98,6 +106,16 @@ public class EvaluationHelper {
         return eval.relativeSquaredError(column);
       case ROOT_MEAN_SQUARED_ERROR:
         return eval.rootMeanSquaredError(column);
+      case AVG_CORRELATION_R_SQUARED:
+        return eval.averagecorrelationR2();
+      case AVG_MEAN_ABSOLUTE_ERROR:
+        return eval.averageMeanAbsoluteError();
+      case AVG_MEAN_SQUARED_ERROR:
+        return eval.averageMeanSquaredError();
+      case AVG_RELATIVE_SQUARED_ERROR:
+        return eval.averagerelativeSquaredError();
+      case AVG_ROOT_MEAN_SQUARED_ERROR:
+        return eval.averagerootMeanSquaredError();
       default:
         if (!statistic.isRegression() && statistic.isClassification())
           throw new IllegalArgumentException("Classification statistic cannot be used on regression evaluation: " + statistic);

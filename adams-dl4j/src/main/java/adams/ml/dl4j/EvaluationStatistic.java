@@ -31,6 +31,7 @@ import adams.core.option.AbstractOption;
 public enum EvaluationStatistic
   implements EnumWithCustomDisplay<EvaluationStatistic> {
 
+  // classification
   ACCURACY("Accuracy", false, true, true),
   CLASS_COUNT("Class count", true, true, true),
   F1("F1", false, true, true),
@@ -45,11 +46,23 @@ public enum EvaluationStatistic
   RECALL("Recall", false, true, true),
   RECALL_CLASS("Recall", true, true, true),
   ROW_COUNT("Row count", false, true, true),
+  AVG_F1_NUM_CLASSES_EXCLUDED("Average F1 num classes excluded", false, true, false),
+  AVG_F_BETA_NUM_CLASSES_EXCLUDED("Average F Beta num classes excluded", false, true, false),
+  AVG_PRECISION_NUM_CLASSES_EXCLUDED("Average Precision num classes excluded", false, true, false),
+  AVG_RECALL_NUM_CLASSES_EXCLUDED("Average Recall num classes excluded", false, true, false),
+
+  // regression
   CORRELATION_R_SQUARED("Correlation R^2", false, false, true),
   MEAN_ABSOLUTE_ERROR("Mean absolute error", false, false, false),
   MEAN_SQUARED_ERROR("Mean squared error", false, false, false),
   RELATIVE_SQUARED_ERROR("Relative squared error", false, false, false),
-  ROOT_MEAN_SQUARED_ERROR("Root mean squared error", false, false, false);
+  ROOT_MEAN_SQUARED_ERROR("Root mean squared error", false, false, false),
+  AVG_CORRELATION_R_SQUARED("Average Correlation R^2", false, false, true),
+  AVG_MEAN_ABSOLUTE_ERROR("Average Mean absolute error", false, false, false),
+  AVG_MEAN_SQUARED_ERROR("Average Mean squared error", false, false, false),
+  AVG_RELATIVE_SQUARED_ERROR("Average Relative squared error", false, false, false),
+  AVG_ROOT_MEAN_SQUARED_ERROR("Average Root mean squared error", false, false, false),
+  ;
 
   /** the display value. */
   private String m_Display;
