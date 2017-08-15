@@ -31,6 +31,7 @@ import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.conf.layers.BaseLayer;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import weka.dl4j.layers.BatchNormalization;
 import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.layers.OutputLayer;
 
@@ -100,6 +101,9 @@ public class RandomDl4jMlpClassifierNetworks
 
   /** the learning rate divisors for the learning rate schedule. */
   protected BaseDouble[] m_LearningRateScheduleDivisors;
+
+  /** whether to insert batchnorm layers. */
+  protected boolean m_InsertBatchNormLayers;
 
   /**
    * Returns a string describing the object.
@@ -179,6 +183,10 @@ public class RandomDl4jMlpClassifierNetworks
     m_OptionManager.add(
       "learning-rate-schedule-divisors", "learningRateScheduleDivisors",
       new BaseDouble[0]);
+
+    m_OptionManager.add(
+      "insert-batch-norm-layers", "insertBatchNormLayers",
+      false);
   }
 
   /**
@@ -622,6 +630,35 @@ public class RandomDl4jMlpClassifierNetworks
   }
 
   /**
+   * Sets whether to insert batchnorm layers after each layer.
+   *
+   * @param value	true if to insert
+   */
+  public void setInsertBatchNormLayers(boolean value) {
+    m_InsertBatchNormLayers = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to insert batchnorm layers after each layer.
+   *
+   * @return  		true if to insert
+   */
+  public boolean getInsertBatchNormLayers() {
+    return m_InsertBatchNormLayers;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String insertBatchNormLayersTipText() {
+    return "If enabled, batchnorm layers get inserted after each layer (except output layer).";
+  }
+
+  /**
    * Hook method for performing checks.
    *
    * @return		null if successful, otherwise error message
@@ -672,11 +709,12 @@ public class RandomDl4jMlpClassifierNetworks
     Random 		rand;
     int			i;
     int			n;
+    int			numLayers;
     Dl4jMlpClassifier	conf;
-    Layer[]		layers;
+    Layer		layer;
+    List<Layer>		layers;
     DropType		dropType;
     double		lr;
-    double		momentum;
     Map<Integer,Double> schedule;
 
     result    = new ArrayList<>();
@@ -702,29 +740,30 @@ public class RandomDl4jMlpClassifierNetworks
         conf.setDropOut(((BaseDouble) pick(rand, m_DropOut)).doubleValue());
 
       // layers
-      layers = new Layer[((BaseInteger) pick(rand, m_NumLayers)).intValue()];
+      layers    = new ArrayList<>();
+      numLayers = ((BaseInteger) pick(rand, m_NumLayers)).intValue();
       if (isLoggingEnabled())
-        getLogger().info("# layers: " + layers.length);
-      for (i = 0; i < layers.length; i++) {
-        if (i == layers.length - 1) {
-          layers[i] = (OutputLayer) OptionUtils.shallowCopy(m_DefaultOutputLayer);
-          layers[i].setLayerName("output-" + i);
+        getLogger().info("# layers: " + numLayers);
+      for (i = 0; i < numLayers; i++) {
+        if (i == numLayers - 1) {
+          layer = (OutputLayer) OptionUtils.shallowCopy(m_DefaultOutputLayer);
+          layer.setLayerName("output-" + i);
         }
         else {
-          layers[i] = (DenseLayer) OptionUtils.shallowCopy(m_DefaultDenseLayer);
-          layers[i].setLayerName("dense-" + i);
-          ((DenseLayer) layers[i]).setNOut(((BaseInteger) pick(rand, m_NumNodes)).intValue());
+          layer = (DenseLayer) OptionUtils.shallowCopy(m_DefaultDenseLayer);
+          layer.setLayerName("dense-" + i);
+          ((DenseLayer) layer).setNOut(((BaseInteger) pick(rand, m_NumNodes)).intValue());
         }
 
 	if (m_LearningRate.length > 0)
-          ((BaseLayer) layers[i]).setLearningRate(((BaseDouble) pick(rand, m_LearningRate)).doubleValue());
+          ((BaseLayer) layer).setLearningRate(((BaseDouble) pick(rand, m_LearningRate)).doubleValue());
 
 	// regularization
 	if (conf.getUseRegularization()) {
           if (m_L1.length > 0)
-            ((BaseLayer) layers[i]).setL1(((BaseDouble) pick(rand, m_L1)).doubleValue());
+            ((BaseLayer) layer).setL1(((BaseDouble) pick(rand, m_L1)).doubleValue());
           if (m_L2.length > 0)
-            ((BaseLayer) layers[i]).setL2(((BaseDouble) pick(rand, m_L2)).doubleValue());
+            ((BaseLayer) layer).setL2(((BaseDouble) pick(rand, m_L2)).doubleValue());
         }
 
 	// drop-type/-out
@@ -732,13 +771,13 @@ public class RandomDl4jMlpClassifierNetworks
 	  dropType = (DropType) pick(rand, m_DropType);
 	  switch (dropType) {
 	    case NONE:
-	      layers[i].setDropOut(0.0);
+	      layer.setDropOut(0.0);
 	      break;
 	    case DROP_OUT:
-	      layers[i].setDropOut(((BaseDouble) pick(rand, m_DropOut)).doubleValue());
+	      layer.setDropOut(((BaseDouble) pick(rand, m_DropOut)).doubleValue());
 	      break;
 	    case DROP_CONNECT:
-	      layers[i].setDropOut(((BaseDouble) pick(rand, m_DropOut)).doubleValue());
+	      layer.setDropOut(((BaseDouble) pick(rand, m_DropOut)).doubleValue());
 	      break;
 	    default:
 	      throw new IllegalStateException("Unhandled drop type: " + dropType);
@@ -747,16 +786,21 @@ public class RandomDl4jMlpClassifierNetworks
 
 	// learning rate schedule
 	if (m_LearningRateScheduleEpochs.length > 0) {
-	  lr       = ((BaseLayer) layers[i]).getLearningRate();
+	  lr       = ((BaseLayer) layer).getLearningRate();
 	  schedule = new HashMap<>();
 	  for (n = 0; n < m_LearningRateScheduleEpochs.length; n++) {
 	    lr /= ((BaseDouble) pick(rand, m_LearningRateScheduleDivisors)).doubleValue();
 	    schedule.put(m_LearningRateScheduleEpochs[n].intValue(), lr);
 	  }
-	  ((BaseLayer) layers[i]).setLearningRateSchedule(schedule);
+	  ((BaseLayer) layer).setLearningRateSchedule(schedule);
 	}
+
+	layers.add(layer);
+	if (m_InsertBatchNormLayers && !(layer instanceof OutputLayer))
+	  layers.add(new BatchNormalization());
       }
-      conf.setLayers(layers);
+
+      conf.setLayers(layers.toArray(new Layer[layers.size()]));
 
       result.add(conf.configureModel(numInput, numOutput));
     }
