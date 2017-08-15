@@ -20,8 +20,8 @@
 
 package adams.flow.container;
 
+import org.deeplearning4j.eval.BaseEvaluation;
 import org.deeplearning4j.eval.Evaluation;
-import org.deeplearning4j.eval.RegressionEvaluation;
 import org.deeplearning4j.nn.api.Model;
 
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ public class DL4JEvaluationContainer
    *
    * @param eval	the evaluation to use
    */
-  public DL4JEvaluationContainer(Evaluation eval) {
+  public DL4JEvaluationContainer(BaseEvaluation eval) {
     this(eval, null);
   }
 
@@ -73,7 +73,7 @@ public class DL4JEvaluationContainer
    * @param eval	the evaluation to use
    * @param model	the model to use
    */
-  public DL4JEvaluationContainer(Evaluation eval, Object model) {
+  public DL4JEvaluationContainer(BaseEvaluation eval, Object model) {
     this(eval, model, null);
   }
 
@@ -84,41 +84,7 @@ public class DL4JEvaluationContainer
    * @param model	the model to use
    * @param epoch 	the epoch this model stems from
    */
-  public DL4JEvaluationContainer(Evaluation eval, Object model, Integer epoch) {
-    super();
-
-    store(VALUE_EVALUATION, eval);
-    store(VALUE_MODEL,      model);
-    store(VALUE_EPOCH,      epoch);
-  }
-
-  /**
-   * Initializes the container with no model.
-   *
-   * @param eval	the evaluation to use
-   */
-  public DL4JEvaluationContainer(RegressionEvaluation eval) {
-    this(eval, null);
-  }
-
-  /**
-   * Initializes the container with evaluation and model.
-   *
-   * @param eval	the evaluation to use
-   * @param model	the model to use
-   */
-  public DL4JEvaluationContainer(RegressionEvaluation eval, Object model) {
-    this(eval, model, null);
-  }
-
-  /**
-   * Initializes the container with evaluation and model.
-   *
-   * @param eval	the evaluation to use
-   * @param model	the model to use
-   * @param epoch 	the epoch this model stems from
-   */
-  public DL4JEvaluationContainer(RegressionEvaluation eval, Object model, Integer epoch) {
+  public DL4JEvaluationContainer(BaseEvaluation eval, Object model, Integer epoch) {
     super();
 
     store(VALUE_EVALUATION, eval);
@@ -132,7 +98,7 @@ public class DL4JEvaluationContainer
   protected void initHelp() {
     super.initHelp();
 
-    addHelp(VALUE_EVALUATION, "evaluation object " + Evaluation.class.getName() + " or " + RegressionEvaluation.class.getName());
+    addHelp(VALUE_EVALUATION, "evaluation object " + BaseEvaluation.class.getName());
     addHelp(VALUE_MODEL, "model object; " + Model.class.getName());
     addHelp(VALUE_EPOCH, "epoch; " + Integer.class.getName());
   }
