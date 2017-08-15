@@ -881,7 +881,11 @@ public class DL4JTrainModel
    * Resets the model.
    */
   protected void resetModel() {
+    if (m_ActualModel != null)
+      m_ActualModel.clear();
     m_ActualModel      = null;
+    if (m_BestModel != null)
+      m_BestModel.clear();
     m_BestModel        = null;
     m_BestStatistics   = new HashMap<>();
     m_Epoch            = 0;
