@@ -31,6 +31,7 @@ import adams.flow.provenance.ProvenanceContainer;
 import adams.flow.provenance.ProvenanceInformation;
 import adams.flow.provenance.ProvenanceSupporter;
 import adams.flow.source.CallableSource;
+import org.deeplearning4j.eval.BaseEvaluation;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.eval.RegressionEvaluation;
 import org.deeplearning4j.nn.api.Layer;
@@ -244,8 +245,7 @@ public class DL4JTestSetEvaluator
   protected String doExecute() {
     String			result;
     DataSet 			test;
-    Evaluation 			evalCls;
-    RegressionEvaluation 	evalReg;
+    BaseEvaluation		eval;
     Model 			model;
     CallableSource		gs;
     Token			output;
@@ -273,18 +273,17 @@ public class DL4JTestSetEvaluator
 	  model = (Model) m_InputToken.getPayload();
 	else
 	  model = (Model) ((DL4JModelContainer) m_InputToken.getPayload()).getValue(DL4JModelContainer.VALUE_MODEL);
-	evalCls = null;
-	evalReg = null;
+	eval = null;
 	if (model instanceof MultiLayerNetwork) {
 	  switch (m_Type) {
 	    case CLASSIFICATION:
-	      evalCls = new Evaluation(test.numOutcomes());
-	      evalCls.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
+	      eval = new Evaluation(test.numOutcomes());
+	      eval.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
 	      break;
 
 	    case REGRESSION:
-	      evalReg = new RegressionEvaluation(test.numOutcomes());
-	      evalReg.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
+	      eval = new RegressionEvaluation(test.numOutcomes());
+	      eval.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
 	      break;
 
 	    default:
@@ -296,17 +295,11 @@ public class DL4JTestSetEvaluator
 	}
 
 	// broadcast result
-	if (evalCls != null) {
+	if (eval != null) {
 	  if (m_AlwaysUseContainer)
-	    m_OutputToken = new Token(new DL4JEvaluationContainer(evalCls, model));
+	    m_OutputToken = new Token(new DL4JEvaluationContainer(eval, model));
 	  else
-	    m_OutputToken = new Token(evalCls.stats());
-	}
-	else if (evalReg != null) {
-	  if (m_AlwaysUseContainer)
-	    m_OutputToken = new Token(new DL4JEvaluationContainer(evalReg, model));
-	  else
-	    m_OutputToken = new Token(evalReg.stats());
+	    m_OutputToken = new Token(eval.stats());
 	}
       }
     }

@@ -33,6 +33,7 @@ import adams.flow.provenance.ProvenanceSupporter;
 import adams.ml.dl4j.datasetiterator.ShufflingDataSetIterator;
 import adams.ml.dl4j.iterationlistener.IterationListenerConfigurator;
 import adams.ml.dl4j.model.ModelConfigurator;
+import org.deeplearning4j.eval.BaseEvaluation;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.eval.RegressionEvaluation;
 import org.deeplearning4j.nn.api.Layer;
@@ -398,8 +399,7 @@ public class DL4JTrainTestSetEvaluator
     DataSet			test;
     ModelConfigurator 		conf;
     Model			model;
-    Evaluation 			evalCls;
-    RegressionEvaluation 	evalReg;
+    BaseEvaluation 		eval;
     DL4JTrainTestSetContainer	cont;
     ShufflingDataSetIterator	iter;
     List<IterationListener> 	listeners;
@@ -416,8 +416,7 @@ public class DL4JTrainTestSetEvaluator
       train = (DataSet) cont.getValue(DL4JTrainTestSetContainer.VALUE_TRAIN);
       test  = (DataSet) cont.getValue(DL4JTrainTestSetContainer.VALUE_TEST);
       model = conf.configureModel(train.numInputs(), train.numOutcomes());
-      evalCls = null;
-      evalReg = null;
+      eval  = null;
       if (model instanceof MultiLayerNetwork) {
 	listeners = new ArrayList<>();
 	for (IterationListenerConfigurator l: m_IterationListeners) {
@@ -446,13 +445,13 @@ public class DL4JTrainTestSetEvaluator
       if ((result == null) && !isStopped()) {
 	switch (m_Type) {
 	  case CLASSIFICATION:
-	    evalCls = new Evaluation(train.numOutcomes());
-	    evalCls.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
+	    eval = new Evaluation(train.numOutcomes());
+	    eval.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
 	    break;
 
 	  case REGRESSION:
-	    evalReg = new RegressionEvaluation(train.numOutcomes());
-	    evalReg.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
+	    eval = new RegressionEvaluation(train.numOutcomes());
+	    eval.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
 	    break;
 
 	  default:
@@ -461,17 +460,11 @@ public class DL4JTrainTestSetEvaluator
       }
 
       // broadcast result
-      if (evalCls != null) {
+      if (eval != null) {
 	if (m_AlwaysUseContainer)
-	  m_OutputToken = new Token(new DL4JEvaluationContainer(evalCls, model, m_NumEpochs));
+	  m_OutputToken = new Token(new DL4JEvaluationContainer(eval, model, m_NumEpochs));
 	else
-	  m_OutputToken = new Token(evalCls.stats());
-      }
-      else if (evalReg != null) {
-	if (m_AlwaysUseContainer)
-	  m_OutputToken = new Token(new DL4JEvaluationContainer(evalReg, model, m_NumEpochs));
-	else
-	  m_OutputToken = new Token(evalReg.stats());
+	  m_OutputToken = new Token(eval.stats());
       }
     }
     catch (Exception e) {

@@ -32,6 +32,7 @@ import adams.flow.provenance.ProvenanceSupporter;
 import adams.ml.dl4j.datasetiterator.ShufflingDataSetIterator;
 import adams.ml.dl4j.iterationlistener.IterationListenerConfigurator;
 import adams.ml.dl4j.model.ModelConfigurator;
+import org.deeplearning4j.eval.BaseEvaluation;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.eval.RegressionEvaluation;
 import org.deeplearning4j.nn.api.Layer;
@@ -444,8 +445,7 @@ public class DL4JCrossValidationEvaluator
     DataSet 			test;
     ModelConfigurator 		conf;
     Model			model;
-    Evaluation 			evalCls;
-    RegressionEvaluation	evalReg;
+    BaseEvaluation 		eval;
     KFoldIterator		iter;
     ShufflingDataSetIterator 	shuffle;
     List<IterationListener> 	listeners;
@@ -466,12 +466,11 @@ public class DL4JCrossValidationEvaluator
       if (!(conf.configureModel(data.numInputs(), data.numOutcomes()) instanceof MultiLayerNetwork))
 	result = "Can only evaluate " + MultiLayerNetwork.class.getName() + "!";
 
-      evalCls = null;
-      evalReg = null;
+      eval = null;
       if (result == null) {
 	switch (m_Type) {
 	  case CLASSIFICATION:
-	    evalCls = new Evaluation(data.numOutcomes());
+	    eval = new Evaluation(data.numOutcomes());
 	    iter = new KFoldIterator(m_Folds, data);
 	    while (iter.hasNext() && !isStopped()) {
 	      train = iter.next();
@@ -495,12 +494,12 @@ public class DL4JCrossValidationEvaluator
 		if (isStopped())
 		  break;
 	      }
-	      evalCls.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
+	      eval.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
 	    }
 	    break;
 
 	  case REGRESSION:
-	    evalReg = new RegressionEvaluation(data.numOutcomes());
+	    eval = new RegressionEvaluation(data.numOutcomes());
 	    iter = new KFoldIterator(m_Folds, data);
 	    while (iter.hasNext() && !isStopped()) {
 	      train = iter.next();
@@ -520,7 +519,7 @@ public class DL4JCrossValidationEvaluator
 		if (isStopped())
 		  break;
 	      }
-	      evalReg.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
+	      eval.eval(test.getLabels(), ((MultiLayerNetwork) model).output(test.getFeatureMatrix(), Layer.TrainingMode.TEST));
 	    }
 	    break;
 
@@ -528,24 +527,17 @@ public class DL4JCrossValidationEvaluator
 	    throw new IllegalStateException("Unhandled evaluation type: " + m_Type);
 	}
 	if (isStopped()) {
-	  evalCls = null;
-	  evalReg = null;
+	  eval = null;
 	}
       }
 
       // broadcast result
       model = conf.configureModel(data.numInputs(), data.numOutcomes());
-      if (evalCls != null) {
+      if (eval != null) {
 	if (m_AlwaysUseContainer)
-	  m_OutputToken = new Token(new DL4JEvaluationContainer(evalCls, model, m_NumEpochs));
+	  m_OutputToken = new Token(new DL4JEvaluationContainer(eval, model, m_NumEpochs));
 	else
-	  m_OutputToken = new Token(evalCls.stats());
-      }
-      else if (evalReg != null) {
-	if (m_AlwaysUseContainer)
-	  m_OutputToken = new Token(new DL4JEvaluationContainer(evalReg, model, m_NumEpochs));
-	else
-	  m_OutputToken = new Token(evalReg.stats());
+	  m_OutputToken = new Token(eval.stats());
       }
     }
     catch (Exception e) {
