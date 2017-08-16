@@ -229,6 +229,25 @@ variables for deeplearning4j to pick up.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Off-heap memory}
+dl4j uses JavaCPP's feature for off-heap memory usage. By default, this uses
+a maximum size that is twice Java's physical memory size. However, when
+running large networks, this heuristic may be not enough, as the Java side
+of things may not actually require a lot of memory, but the off-heap one.
+
+In order to manually set the off-heap maximum memory, you can use the following
+JVM parameter on the command-line to set a limit of 20GB:
+\begin{verbatim}
+-Dorg.byteco.javacpp.maxphysicalbytes=20000000000
+\begin{verbatim}
+
+When using the launcher script or one of the other ADAMS supplied scripts, you
+can use the following command-line to pass the parameter to the JVM:
+\begin{verbatim}
+-jvm -Dorg.byteco.javacpp.maxphysicalbytes=20000000000
+\begin{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
 
 \end{document}
