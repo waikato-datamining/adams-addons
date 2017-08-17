@@ -21,7 +21,7 @@
 package adams.flow.source;
 
 import adams.core.QuickInfoHelper;
-import adams.ml.cntk.modelgenerator.ManualModel;
+import adams.ml.cntk.modelgenerator.ManualBrainScriptModel;
 import adams.ml.cntk.modelgenerator.ModelGenerator;
 
 /**
@@ -71,7 +71,7 @@ public class CNTKModelGenerator
 
     m_OptionManager.add(
       "model-generator", "modelGenerator",
-      new ManualModel());
+      new ManualBrainScriptModel());
 
     m_OptionManager.add(
       "num-input", "numInput",

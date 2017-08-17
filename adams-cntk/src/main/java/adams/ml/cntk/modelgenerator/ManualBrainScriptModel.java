@@ -14,7 +14,7 @@
  */
 
 /*
- * ManualModel.java
+ * ManualBrainScriptModel.java
  * Copyright (C) 2017 University of Waikato, Hamilton, NZ
  */
 
@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class ManualModel
+public class ManualBrainScriptModel
   extends AbstractModelGenerator {
 
   private static final long serialVersionUID = -4683549348343064989L;

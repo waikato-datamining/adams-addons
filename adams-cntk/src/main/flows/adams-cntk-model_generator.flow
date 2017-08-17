@@ -3,5 +3,5 @@
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Shows how to generate a model using the model generator source." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.source.CNTKModelGenerator -model-generator adams.ml.cntk.modelgenerator.ManualModel -num-input 768 -num-output 100
+ adams.flow.source.CNTKModelGenerator -model-generator adams.ml.cntk.modelgenerator.ManualBrainScriptModel -num-input 768 -num-output 100
  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
