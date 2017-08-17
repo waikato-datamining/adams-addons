@@ -266,7 +266,7 @@ public class DL4JModelGenerator
   public String getQuickInfo() {
     String	result;
 
-    result  = QuickInfoHelper.toString(this, "model", m_ModelGenerator, "generator: ");
+    result  = QuickInfoHelper.toString(this, "modelGenerator", m_ModelGenerator, "generator: ");
     result += QuickInfoHelper.toString(this, "numInput", m_NumInput, ", input: ");
     result += QuickInfoHelper.toString(this, "numOutput", m_NumOutput, ", output: ");
 
