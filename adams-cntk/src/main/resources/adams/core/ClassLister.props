@@ -10,3 +10,7 @@
 # model appliers
 adams.ml.cntk.modelapplier.AbstractModelApplier=\
   adams.ml.cntk.modelapplier
+
+# model generators
+adams.ml.cntk.modelgenerator.ModelGenerator=\
+  adams.ml.cntk.modelgenerator
