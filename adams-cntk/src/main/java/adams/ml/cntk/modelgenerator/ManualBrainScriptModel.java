@@ -116,14 +116,16 @@ public class ManualBrainScriptModel
   protected List<String> doGenerate(int numInput, int numOutput) {
     List<String> 	result;
     String 		model;
+    String		script;
 
     result = new ArrayList<>();
 
+    script = m_FlowContext.getVariables().expand(m_Script.getValue());
     model =
       INPUT_DIM + " = " + numInput + "\n"
 	+ OUTPUT_DIM + " = " + numOutput + "\n"
 	+ "\n"
-	+ m_Script.getValue();
+	+ script;
     if (!model.endsWith("\n"))
       model = model + "\n";
 
