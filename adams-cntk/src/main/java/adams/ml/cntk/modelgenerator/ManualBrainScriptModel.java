@@ -31,7 +31,7 @@ import java.util.List;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class ManualBrainScriptModel
-  extends AbstactBrainScriptModelGenerator {
+  extends AbstractBrainScriptModelGenerator {
 
   private static final long serialVersionUID = -4683549348343064989L;
 

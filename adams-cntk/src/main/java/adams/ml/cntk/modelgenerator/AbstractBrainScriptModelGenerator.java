@@ -14,7 +14,7 @@
  */
 
 /*
- * AbstactBrainScriptModelGenerator.java
+ * AbstractBrainScriptModelGenerator.java
  * Copyright (C) 2017 University of Waikato, Hamilton, NZ
  */
 
@@ -25,7 +25,7 @@ package adams.ml.cntk.modelgenerator;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public abstract class AbstactBrainScriptModelGenerator
+public abstract class AbstractBrainScriptModelGenerator
   extends AbstractModelGenerator {
 
   private static final long serialVersionUID = -4683549348343064989L;
