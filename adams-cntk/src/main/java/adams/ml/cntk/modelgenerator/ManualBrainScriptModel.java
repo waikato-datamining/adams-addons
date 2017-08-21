@@ -26,12 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Just outputs a single manually defined model.
+ * Just outputs a single, manually defined model.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class ManualBrainScriptModel
-  extends AbstractModelGenerator {
+  extends AbstactBrainScriptModelGenerator {
 
   private static final long serialVersionUID = -4683549348343064989L;
 
@@ -52,10 +52,12 @@ public class ManualBrainScriptModel
   @Override
   public String globalInfo() {
     return
-      "Just outputs a single manually defined model.\n"
-        + "Inserts the following variables for input and output dimensions:\n"
-        + "- input: " + INPUT_DIM + "\n"
-        + "- output: " + OUTPUT_DIM;
+      "Just outputs a single, manually defined BrainScript model.\n"
+	+ "Inserts the following variables for input and output dimensions:\n"
+	+ "- input: " + INPUT_DIM + "\n"
+	+ "- output: " + OUTPUT_DIM + "\n"
+	+ "\n"
+	+ getBrainScriptInfo();
   }
 
   /**
@@ -67,13 +69,20 @@ public class ManualBrainScriptModel
 
     m_OptionManager.add(
       "script", "script",
-      new BaseText("model = Sequential (\n" +
-        "  Scale {featScale} :\n" +
-        "  DenseLayer  {inputDim, init=\"gaussian\", initValueScale=1.5} : Dropout: ReLU : \n" +
-        "  DenseLayer  {512, init=\"gaussian\", initValueScale=1.5} : Dropout: ReLU : \n" +
-        "  DenseLayer  {256, init=\"gaussian\", initValueScale=1.5} : Dropout: ReLU :  \n" +
-        "  LinearLayer {outputDim}\n" +
-        ")\n"));
+      new BaseText(
+	"model = Sequential (\n" +
+	  "  Scale {featScale} :\n" +
+	  "  DenseLayer  {inputDim, init=\"gaussian\", initValueScale=1.5} : Dropout: ReLU : \n" +
+	  "  DenseLayer  {512, init=\"gaussian\", initValueScale=1.5} : Dropout: ReLU : \n" +
+	  "  DenseLayer  {256, init=\"gaussian\", initValueScale=1.5} : Dropout: ReLU :  \n" +
+	  "  LinearLayer {outputDim}\n" +
+	  ")\n" +
+	  "\n" +
+	  "SGD = {\n" +
+	  "  maxEpochs = 100\n" +
+	  "  dropoutRate = 0\n" +
+	  "  minibatchSize = 256\n" +
+	  "}\n"));
   }
 
   /**
