@@ -1,0 +1,9 @@
+# Project: adams
+# Date: 2017-08-21 14:22:48
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Shows how to generate a model using the model generator source\\nwith a generator that outputs randomly generated model setups." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.SetVariable -var-name idx -var-value 0
+ adams.flow.source.CNTKModelGenerator -model-generator "adams.ml.cntk.modelgenerator.RandomBrainScriptGenerator -seed @{seed} -num-networks 1000 -num-layers 2 -num-layers 3 -num-layers 4 -num-layers 5 -num-nodes 40 -num-nodes 35 -num-nodes 30 -num-nodes 25 -num-nodes 24 -num-nodes 23 -num-nodes 22 -num-nodes 21 -num-nodes 2 -num-nodes 3 -num-nodes 4 -num-nodes 5 -num-nodes 6 -num-nodes 7 -num-nodes 8 -num-nodes 9 -num-nodes 10 -num-nodes 11 -num-nodes 12 -num-nodes 13 -num-nodes 14 -num-nodes 15 -num-nodes 16 -num-nodes 17 -num-nodes 18 -num-nodes 19 -num-nodes 20 -learning-rate 0.005 -learning-rate 0.001 -learning-rate 1.0E-4 -learning-rate 5.0E-4 -learning-rate 1.0E-5 -learning-rate 5.0E-5 -learning-rate 1.0E-6 -learning-rate 5.0E-6 -use-regularization false -use-regularization true -l1 0.0 -l1 5.0E-6 -l1 1.0E-6 -l1 5.0E-5 -l1 1.0E-5 -l1 5.0E-4 -l1 1.0E-4 -l2 0.001 -l2 5.0E-6 -l2 5.0E-5 -l2 5.0E-4 -l2 1.0E-4 -l2 1.0E-5 -l2 1.0E-6 -drop-out 1.0 -drop-out 0.05 -drop-out 0.1 -drop-out 0.15 -drop-out 0.2" -num-input 768 -num-output 100
+ adams.flow.transformer.IncVariable -var-name idx
+ adams.flow.sink.HistoryDisplay -entry-name-variable idx
