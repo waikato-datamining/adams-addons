@@ -339,7 +339,7 @@ public abstract class AbstractCQETable<T>
     iter = rs.iterator();
     while (iter.hasNext())
       objs.add(iter.next());
-    rs.close();
+    closeAll(rs);
 
     if (getDebug())
       getLogger().info("Removing " + objs.size() + " object(s)");
