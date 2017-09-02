@@ -22,9 +22,10 @@
   </organization>
 
   <scm>
-    <connection>scm:svn:https://svn.cms.waikato.ac.nz/svn/adams/addons/trunk</connection>
-    <developerConnection>scm:svn:https://svn.cms.waikato.ac.nz/svn/adams/addons/trunk</developerConnection>
-    <url>https://svn.cms.waikato.ac.nz/svn/adams/addons/trunk</url>
+    <connection>scm:git:https://github.com/waikato/adams-addons</connection>
+    <developerConnection>scm:git:https://github.com/waikato/adams-addons</developerConnection>
+    <url>https://github.com/waikato/adams-addons</url>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
