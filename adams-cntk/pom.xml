@@ -98,7 +98,7 @@
     </dependency>
 
     <dependency>
-      <groupId>com.github.microsoft</groupId>
+      <groupId>com.microsoft.cntk</groupId>
       <artifactId>cntk</artifactId>
       <version>2.1</version>
     </dependency>

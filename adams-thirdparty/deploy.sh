@@ -11,14 +11,14 @@ REPO_URL=$HOST/nexus/content/repositories/$REPO
 
 LIB_DIR=./
 
-GROUP=com.github.microsoft
+GROUP=...
 mvn deploy:deploy-file -DgroupId=$GROUP \
-  -DartifactId=cntk \
-  -Dversion=2.1 \
+  -DartifactId=... \
+  -Dversion=... \
   -Dpackaging=jar \
-  -Dfile=$LIB_DIR/cntk.jar \
-  -Dsources=$LIB_DIR/cntk-sources.jar \
-  -DgeneratePom.description="CNTK Java bindings for prediction time" \
+  -Dfile=$LIB_DIR/....jar \
+  -Dsources=$LIB_DIR/...-sources.jar \
+  -DgeneratePom.description="..." \
   -DrepositoryId=$REPO \
   -Durl=$REPO_URL
 
