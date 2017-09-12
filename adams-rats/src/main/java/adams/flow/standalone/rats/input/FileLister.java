@@ -13,23 +13,24 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * FileLister.java
- * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
+import adams.core.ArrayProvider;
 import adams.core.AtomicMoveSupporter;
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.core.base.BaseRegExp;
-import adams.core.io.lister.LocalDirectoryLister;
-import adams.core.io.lister.Sorting;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
 import adams.core.io.fileuse.AbstractFileUseCheck;
 import adams.core.io.fileuse.Default;
+import adams.core.io.lister.LocalDirectoryLister;
+import adams.core.io.lister.Sorting;
 import adams.core.logging.LoggingLevel;
 
 import java.io.File;
@@ -111,6 +112,11 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: ${CWD}
  * </pre>
  * 
+ * <pre>-output-array &lt;boolean&gt; (property: outputArray)
+ * &nbsp;&nbsp;&nbsp;If enabled, the files get output as array rather than one-by-one.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -118,7 +124,7 @@ import java.util.List;
  */
 public class FileLister
   extends AbstractRatInput
-  implements AtomicMoveSupporter {
+  implements AtomicMoveSupporter, ArrayProvider {
 
   /** for serialization. */
   private static final long serialVersionUID = 4089376907540465883L;
@@ -146,7 +152,10 @@ public class FileLister
 
   /** the directory to move the files to. */
   protected PlaceholderDirectory m_Target;
-  
+
+  /** whether to output an array instead of single items. */
+  protected boolean m_OutputArray;
+
   /**
    * Returns a string describing the object.
    *
@@ -213,6 +222,10 @@ public class FileLister
     m_OptionManager.add(
       "target", "target",
       new PlaceholderDirectory());
+
+    m_OptionManager.add(
+      "output-array", "outputArray",
+      false);
   }
 
   /**
@@ -573,6 +586,35 @@ public class FileLister
   }
 
   /**
+   * Sets whether to generate data as array or as single objects.
+   *
+   * @param value	true if output is an array
+   */
+  public void setOutputArray(boolean value) {
+    m_OutputArray = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to generate the as array or as single objects.
+   *
+   * @return		true if output is an array
+   */
+  public boolean getOutputArray() {
+    return m_OutputArray;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String outputArrayTipText() {
+    return "If enabled, the files get output as array rather than one-by-one.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -586,7 +628,8 @@ public class FileLister
     result += QuickInfoHelper.toString(this, "waitList", getWaitList(), ", wait-list: ");
     result += QuickInfoHelper.toString(this, "moveFiles", (getMoveFiles() ? "move" : "keep"), ", ");
     result += QuickInfoHelper.toString(this, "target", getTarget(), ", target: ");
-    
+    result += QuickInfoHelper.toString(this, "outputArray", (getOutputArray() ? "as array" : "one-by-one"), ", ");
+
     return result;
   }
   
@@ -623,7 +666,10 @@ public class FileLister
    */
   @Override
   public Class generates() {
-    return String.class;
+    if (m_OutputArray)
+      return String[].class;
+    else
+      return String.class;
   }
 
   /**
@@ -643,7 +689,10 @@ public class FileLister
    */
   @Override
   public Object output() {
-    return m_Files.remove(0);
+    if (m_OutputArray)
+      return m_Files.toArray(new String[m_Files.size()]);
+    else
+      return m_Files.remove(0);
   }
 
   /**
