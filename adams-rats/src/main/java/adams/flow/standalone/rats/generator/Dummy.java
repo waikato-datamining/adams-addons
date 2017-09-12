@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Dummy.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.generator;
 
@@ -72,18 +72,19 @@ public class Dummy
   }
 
   /**
-   * Generates the actual setup.
+   * Generates the actual setups.
    * 
-   * @return		the generated setup
+   * @return		the generated setups
    */
   @Override
-  protected Rat doGenerate() {
-    Rat		result;
-    
-    result = new Rat();
-    result.setLog(m_Log);
-    result.setSendErrorQueue(m_SendErrorQueue);
-    result.setShowInControl(m_ShowInControl);
+  protected Rat[] doGenerate() {
+    Rat[]	result;
+
+    result    = new Rat[1];
+    result[0] = new Rat();
+    result[0].setLog(m_Log);
+    result[0].setSendErrorQueue(m_SendErrorQueue);
+    result[0].setShowInControl(m_ShowInControl);
     
     return result;
   }

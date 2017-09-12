@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractRatGenerator.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.generator;
 
@@ -162,18 +162,18 @@ public abstract class AbstractRatGenerator
   }
   
   /**
-   * Generates the actual setup.
+   * Generates the actual setups.
    * 
-   * @return		the generated setup
+   * @return		the generated setups
    */
-  protected abstract Rat doGenerate();
+  protected abstract Rat[] doGenerate();
   
   /**
-   * Generates a Rat setup.
+   * Generates Rat setups.
    * 
-   * @return		the setup
+   * @return		the setups
    */
-  public Rat generate() {
+  public Rat[] generate() {
     check();
     return doGenerate();
   }
