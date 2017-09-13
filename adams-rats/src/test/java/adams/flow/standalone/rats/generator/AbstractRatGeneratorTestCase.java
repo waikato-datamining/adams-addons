@@ -21,8 +21,9 @@ package adams.flow.standalone.rats.generator;
 
 import adams.core.CleanUpHandler;
 import adams.core.Destroyable;
-import adams.core.Utils;
 import adams.core.io.FileUtils;
+import adams.core.option.OptionUtils;
+import adams.flow.standalone.Rat;
 import adams.test.AbstractTestHelper;
 import adams.test.AdamsTestCase;
 import adams.test.TestHelper;
@@ -72,7 +73,19 @@ public abstract class AbstractRatGeneratorTestCase
    * @return		the generated statistics
    */
   protected String generate(AbstractRatGenerator scheme) {
-    return Utils.classesToString(scheme.generate());
+    StringBuilder	result;
+    Rat[]		rats;
+
+    result = new StringBuilder();
+
+    rats   = scheme.generate();
+    for (Rat rat: rats) {
+      if (result.length() > 0)
+        result.append("\n");
+      result.append(OptionUtils.getCommandLine(rat));
+    }
+
+    return result.toString();
   }
 
   /**
