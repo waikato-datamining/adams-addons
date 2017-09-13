@@ -89,7 +89,7 @@ public class DefaultNumericArrayApplier
     else if (input instanceof Double[])
       numArray = (Number[]) input;
     else
-      throw new IllegalStateException("Unhandled input class: " + Utils.classToString(input.getClass()));
+      throw new IllegalStateException("Unhandled input class: " + Utils.classToString(input));
 
     values = new TFloatArrayList();
     for (i = 0; i < numArray.length; i++)

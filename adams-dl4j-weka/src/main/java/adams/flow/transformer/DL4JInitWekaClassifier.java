@@ -95,11 +95,11 @@ public class DL4JInitWekaClassifier
     }
     else {
       if (!(input[0] instanceof MultiLayerNetwork))
-        result = "1st array element wrong (found: " + Utils.classToString(input[0].getClass()) + ")! " + DEFAULT_ERROR;
+        result = "1st array element wrong (found: " + Utils.classToString(input[0]) + ")! " + DEFAULT_ERROR;
       else if (!(input[1] instanceof Filter))
-        result = "2nd array element wrong (found: " + Utils.classToString(input[1].getClass()) + ")! " + DEFAULT_ERROR;
+        result = "2nd array element wrong (found: " + Utils.classToString(input[1]) + ")! " + DEFAULT_ERROR;
       else if (!(input[2] instanceof Instances))
-        result = "3rd array element wrong (found: " + Utils.classToString(input[2].getClass()) + ")! " + DEFAULT_ERROR;
+        result = "3rd array element wrong (found: " + Utils.classToString(input[2]) + ")! " + DEFAULT_ERROR;
     }
 
     if (result == null) {

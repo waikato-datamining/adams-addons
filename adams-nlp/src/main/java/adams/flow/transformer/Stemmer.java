@@ -204,7 +204,7 @@ public class Stemmer
       m_OutputToken = new Token(multiOut);
     }
     else {
-      result = "Unhandled input: " + Utils.classToString(m_InputToken.getPayload().getClass());
+      result = "Unhandled input: " + Utils.classToString(m_InputToken.getPayload());
     }
 
     return result;

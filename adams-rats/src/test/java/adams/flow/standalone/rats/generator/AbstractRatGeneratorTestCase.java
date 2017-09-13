@@ -19,16 +19,16 @@
  */
 package adams.flow.standalone.rats.generator;
 
-import java.io.File;
-
 import adams.core.CleanUpHandler;
 import adams.core.Destroyable;
+import adams.core.Utils;
 import adams.core.io.FileUtils;
-import adams.core.option.OptionUtils;
 import adams.test.AbstractTestHelper;
 import adams.test.AdamsTestCase;
 import adams.test.TestHelper;
 import adams.test.TmpFile;
+
+import java.io.File;
 
 /**
  * Ancestor for rat generator test cases.
@@ -68,12 +68,11 @@ public abstract class AbstractRatGeneratorTestCase
   /**
    * Generates the statistics from the input data.
    *
-   * @param data	the data to work on
    * @param scheme	the scheme to process the data with
    * @return		the generated statistics
    */
   protected String generate(AbstractRatGenerator scheme) {
-    return OptionUtils.getCommandLine(scheme.generate());
+    return Utils.classesToString(scheme.generate());
   }
 
   /**

@@ -336,7 +336,7 @@ public class MjpegImageSequence
       }
     }
     else {
-      result = "Unhandled input type: " + Utils.classToString(payload.getClass());
+      result = "Unhandled input type: " + Utils.classToString(payload);
     }
 
     return result;
