@@ -38,6 +38,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -46,7 +47,7 @@ import java.util.logging.Level;
  * Default XML Logging interceptor.
  *
  * @author greenbird Integration Technology
- * @author FracPete (fracpete at waikato dot ac dot nz) - simplified
+ * @author FracPete (fracpete at waikato dot ac dot nz) - simplified, pretty printing
  */
 @MixedCopyright(
   license = License.APACHE2,
@@ -87,6 +88,55 @@ public class XMLLoggingInInterceptor
   }
 
   /**
+   * Splits the message into (if possible): header, actual message and footer.
+   *
+   * @param msg		the message to split
+   * @return		the split message
+   */
+  protected StringBuilder[] splitMessage(StringBuilder msg) {
+    List<StringBuilder>	result;
+    String[]		lines;
+    int			i;
+    StringBuilder	header;
+    StringBuilder	message;
+    StringBuilder	footer;
+    int			part;
+
+    result = new ArrayList<>();
+    result.add(msg);
+
+    lines     = msg.toString().split("\r\n");
+    header    = new StringBuilder();
+    message   = new StringBuilder();
+    footer    = new StringBuilder();
+    part      = 0;
+    for (i = 0; i < lines.length; i++) {
+      if (part == 0) {
+	header.append(lines[i]);
+	header.append("\r\n");
+      }
+      else if (part == 1) {
+        message.append(lines[i]);
+        part++;
+      }
+      else if (part == 2) {
+        footer.append(lines[i]);
+      }
+      if (lines[i].trim().length() == 0)
+	part++;
+    }
+
+    if (message.length() > 0) {
+      result.clear();
+      result.add(header);
+      result.add(message);
+      result.add(footer);
+    }
+
+    return result.toArray(new StringBuilder[result.size()]);
+  }
+
+  /**
    * Pretty prints the buffer, if enabled.
    *
    * @param buffer	the buffer to turn into "pretty" XML
@@ -95,16 +145,32 @@ public class XMLLoggingInInterceptor
   protected StringBuilder prettyPrint(StringBuilder buffer) {
     StringBuilder	result;
     String		msg;
+    StringBuilder[]	parts;
 
     if (prettyPrint) {
-      if (convert == null)
-	convert = new PrettyPrintXML();
-      convert.setInput(buffer.toString());
-      msg = convert.convert();
-      if (msg == null)
-	result = new StringBuilder((String) convert.getOutput());
-      else
-	result = buffer;
+      // multipart message? try to extract actual message
+      if (buffer.indexOf("Content-Type") != -1) {
+	parts = splitMessage(buffer);
+	if (parts.length == 3) {
+	  result = new StringBuilder();
+	  result.append(parts[0].toString());
+	  result.append(prettyPrint(parts[1]));
+	  result.append(parts[2].toString().trim());
+	}
+	else {
+	  result = buffer;
+	}
+      }
+      else {
+	if (convert == null)
+	  convert = new PrettyPrintXML();
+	convert.setInput(buffer.toString());
+	msg = convert.convert();
+	if (msg == null)
+	  result = new StringBuilder((String) convert.getOutput());
+	else
+	  result = buffer;
+      }
     }
     else {
       result = buffer;
