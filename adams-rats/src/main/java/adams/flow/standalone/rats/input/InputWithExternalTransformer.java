@@ -19,8 +19,8 @@
  */
 package adams.flow.standalone.rats.input;
 
+import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
 import adams.core.io.FlowFile;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
@@ -31,7 +31,6 @@ import adams.flow.core.Token;
 import adams.flow.core.Unknown;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -143,7 +142,7 @@ public class InputWithExternalTransformer
    */
   public String setUpExternalActor() {
     String		result;
-    List<String>	errors;
+    MessageCollection 	errors;
     String		warning;
 
     result = null;
@@ -152,10 +151,10 @@ public class InputWithExternalTransformer
       result = "'" + m_ActorFile.getAbsolutePath() + "' does not point to a file!";
     }
     else {
-      errors = new ArrayList<String>();
+      errors = new MessageCollection();
       m_ExternalActor = ActorUtils.read(m_ActorFile.getAbsolutePath(), errors);
       if (!errors.isEmpty()) {
-	result = "Error loading external actor '" + m_ActorFile.getAbsolutePath() + "':\n" + Utils.flatten(errors, "\n");
+	result = "Error loading external actor '" + m_ActorFile.getAbsolutePath() + "':\n" + errors;
       }
       else if (m_ExternalActor == null) {
 	result = "Error loading external actor '" + m_ActorFile.getAbsolutePath() + "'!";
