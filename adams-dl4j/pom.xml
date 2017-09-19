@@ -129,6 +129,30 @@
     </dependency>
 
     <dependency>
+      <groupId>org.bytedeco.javacpp-presets</groupId>
+      <artifactId>openblas</artifactId>
+      <version>${openblas.version}</version>
+      <scope>package</scope>
+      <classifier>linux-x86_64</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.bytedeco.javacpp-presets</groupId>
+      <artifactId>openblas</artifactId>
+      <version>${openblas.version}</version>
+      <scope>package</scope>
+      <classifier>macosx-x86_64</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.bytedeco.javacpp-presets</groupId>
+      <artifactId>openblas</artifactId>
+      <version>${openblas.version}</version>
+      <scope>package</scope>
+      <classifier>windows-x86_64</classifier>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>19.0</version>
