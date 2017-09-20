@@ -15,7 +15,7 @@
 
 /*
  * RatReferenceEditor.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -24,6 +24,7 @@ package adams.gui.goe;
 import adams.core.Utils;
 import adams.core.option.AbstractOption;
 import adams.flow.core.RatReference;
+import adams.flow.standalone.Rats;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseTreeNode;
 import adams.gui.core.MouseUtils;
@@ -353,7 +354,7 @@ public class RatReferenceEditor
 
     result = new ArrayList<>();
 
-    callables = RatFlowHelper.findRats(m_CustomEditor);
+    callables = FlowHelper.findNodes(m_CustomEditor, Rats.class);
     for (Node callable: callables) {
       result.add(callable.getFullName());
       for (i = 0; i < callable.getChildCount(); i++) {
