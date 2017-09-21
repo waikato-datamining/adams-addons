@@ -13,7 +13,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractCQETable.java
  * Copyright (C) 2017 University of Waikato, Hamilton, NZ
  */
@@ -59,6 +59,9 @@ public abstract class AbstractCQETable<T>
   /** the static logger. */
   protected static Logger LOGGER = LoggingHelper.getConsoleLogger(AbstractCQETable.class);
 
+  /** the SQL parser. */
+  protected static SQLParser m_Parser;
+
   /** name of the table. */
   protected String m_TableName;
 
@@ -67,9 +70,6 @@ public abstract class AbstractCQETable<T>
 
   /** connection to database. */
   protected AbstractDatabaseConnection m_DatabaseConnection;
-
-  /** the SQL parser. */
-  protected SQLParser<T> m_Parser;
 
   /** the object collection. */
   protected IndexedCollection<T> m_Collection;
@@ -85,9 +85,11 @@ public abstract class AbstractCQETable<T>
 
     m_TableName          = tableName;
     m_DatabaseConnection = dbcon;
-    m_Parser             = newParser();
     m_Collection         = newCollection();
     m_Debug              = getProperties().getBoolean(getClass().getName() + ".Debug", false);
+
+    if (m_Parser == null)
+      m_Parser = newParser();
 
     updatePrefix();
   }
