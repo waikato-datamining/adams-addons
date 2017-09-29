@@ -62,20 +62,4 @@
     <module>adams-webservice</module>
     <module>adams-weka-webservice</module>
   </modules>
-
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
-          <version>2.5</version>
-          <configuration>
-            <tagBase>https://svn.cms.waikato.ac.nz/svn/adams/addons/tags</tagBase>
-            <useReleaseProfile>false</useReleaseProfile>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
 </project>
