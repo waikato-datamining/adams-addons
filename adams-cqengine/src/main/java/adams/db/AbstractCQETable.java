@@ -346,7 +346,13 @@ public abstract class AbstractCQETable<T>
     if (getDebug())
       getLogger().info("Removing " + objs.size() + " object(s)");
 
-    result = getCollection().removeAll(objs);
+    try {
+      result = getCollection().removeAll(objs);
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to remove objects!", e);
+      return false;
+    }
 
     if (getDebug()) {
       getLogger().info("Removed: " + result);
