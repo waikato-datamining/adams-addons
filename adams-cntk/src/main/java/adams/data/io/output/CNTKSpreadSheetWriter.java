@@ -13,7 +13,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * CNTKSpreadSheetWriter.java
  * Copyright (C) 2017 University of Waikato, Hamilton, NZ
  */
@@ -32,6 +32,8 @@ import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.SpreadSheetColumnIndex;
 import adams.data.spreadsheet.SpreadSheetColumnRange;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
 
 import java.io.Writer;
 import java.util.logging.Level;
@@ -87,6 +89,12 @@ import java.util.logging.Level;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
+ * <pre>-suppress-missing &lt;boolean&gt; (property: suppressMissing)
+ * &nbsp;&nbsp;&nbsp;If enabled, sequences that contain at least one missing value get suppressed
+ * &nbsp;&nbsp;&nbsp;completely.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -109,6 +117,9 @@ public class CNTKSpreadSheetWriter
 
   /** whether to output sparse format. */
   protected boolean m_UseSparseFormat;
+
+  /** whether to suppress sequences with missing values. */
+  protected boolean m_SuppressMissing;
 
   /**
    * Returns a string describing the object.
@@ -143,6 +154,10 @@ public class CNTKSpreadSheetWriter
 
     m_OptionManager.add(
       "use-sparse-format", "useSparseFormat",
+      false);
+
+    m_OptionManager.add(
+      "suppress-missing", "suppressMissing",
       false);
   }
 
@@ -265,6 +280,35 @@ public class CNTKSpreadSheetWriter
   }
 
   /**
+   * Sets whether to suppress sequences with missing values.
+   *
+   * @param value	true if to suppress missing
+   */
+  public void setSuppressMissing(boolean value) {
+    m_SuppressMissing = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to suppress sequences with missing values.
+   *
+   * @return 		true if to suppress missing
+   */
+  public boolean getSuppressMissing() {
+    return m_SuppressMissing;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String suppressMissingTipText() {
+    return "If enabled, sequences that contain at least one missing value get suppressed completely.";
+  }
+
+  /**
    * Returns, if available, the corresponding reader.
    *
    * @return		the reader, null if none available
@@ -338,9 +382,12 @@ public class CNTKSpreadSheetWriter
     int[][]	inputs;
     int		i;
     int		n;
+    int		m;
     Cell 	cell;
     String[]	names;
     Double	value;
+    TIntList	canOutput;
+    boolean	missing;
 
     if (m_Inputs.length == 0) {
       getLogger().severe("No input ranges defined!");
@@ -365,8 +412,34 @@ public class CNTKSpreadSheetWriter
       inputs[i] = m_Inputs[i].getIntIndices();
     }
 
+    canOutput = new TIntArrayList();
+    if (!m_SuppressMissing) {
+      for (i = 0; i < m_Inputs.length; i++)
+        canOutput.add(i);
+    }
+
     // write data
     for (Row row : content.rows()) {
+      // check which sequences can be output when suppressing sequences with missing values
+      if (m_SuppressMissing) {
+        canOutput.clear();
+	for (i = 0; i < inputs.length; i++) {
+	  missing = false;
+	  for (n = 0; n < inputs[i].length; n++) {
+	    cell = row.getCell(inputs[i][n]);
+	    if ((cell == null) || cell.isMissing()) {
+	      missing = true;
+	      break;
+	    }
+	  }
+	  if (!missing)
+	    canOutput.add(i);
+	}
+      }
+      // skip whole row?
+      if (canOutput.size() == 0)
+        continue;
+
       try {
 	// ID
 	if (rowID > -1) {
@@ -378,7 +451,9 @@ public class CNTKSpreadSheetWriter
 	}
 
 	// inputs
-	for (i = 0; i < inputs.length; i++) {
+	for (m = 0; m < canOutput.size(); m++) {
+	  i = canOutput.get(m);
+
 	  // separator
 	  writer.write("|");
 
