@@ -90,7 +90,7 @@ import java.util.logging.Level;
  * </pre>
  * 
  * <pre>-suppress-missing &lt;boolean&gt; (property: suppressMissing)
- * &nbsp;&nbsp;&nbsp;If enabled, sequences that contain at least one missing value get suppressed
+ * &nbsp;&nbsp;&nbsp;If enabled, groups that contain at least one missing value get suppressed
  * &nbsp;&nbsp;&nbsp;completely.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
@@ -118,7 +118,7 @@ public class CNTKSpreadSheetWriter
   /** whether to output sparse format. */
   protected boolean m_UseSparseFormat;
 
-  /** whether to suppress sequences with missing values. */
+  /** whether to suppress groups with missing values. */
   protected boolean m_SuppressMissing;
 
   /**
@@ -280,7 +280,7 @@ public class CNTKSpreadSheetWriter
   }
 
   /**
-   * Sets whether to suppress sequences with missing values.
+   * Sets whether to suppress groups with missing values.
    *
    * @param value	true if to suppress missing
    */
@@ -290,7 +290,7 @@ public class CNTKSpreadSheetWriter
   }
 
   /**
-   * Returns whether to suppress sequences with missing values.
+   * Returns whether to suppress groups with missing values.
    *
    * @return 		true if to suppress missing
    */
@@ -305,7 +305,7 @@ public class CNTKSpreadSheetWriter
    * 			displaying in the GUI or for listing the options.
    */
   public String suppressMissingTipText() {
-    return "If enabled, sequences that contain at least one missing value get suppressed completely.";
+    return "If enabled, groups that contain at least one missing value get suppressed completely.";
   }
 
   /**
@@ -420,7 +420,7 @@ public class CNTKSpreadSheetWriter
 
     // write data
     for (Row row : content.rows()) {
-      // check which sequences can be output when suppressing sequences with missing values
+      // check which groups can be output when suppressing groups with missing values
       if (m_SuppressMissing) {
         canOutput.clear();
 	for (i = 0; i < inputs.length; i++) {
