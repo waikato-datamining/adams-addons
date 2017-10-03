@@ -383,6 +383,7 @@ public class CNTKSpreadSheetWriter
     int		i;
     int		n;
     int		m;
+    int		r;
     Cell 	cell;
     String[]	names;
     Double	value;
@@ -425,7 +426,9 @@ public class CNTKSpreadSheetWriter
     }
 
     // write data
+    r = 0;
     for (Row row : content.rows()) {
+      r++;
       // check which groups can be output when suppressing groups with missing values
       if (m_SuppressMissing) {
         canOutput.clear();
@@ -443,6 +446,8 @@ public class CNTKSpreadSheetWriter
 	}
       }
       // skip whole row?
+      if (m_SuppressMissing && isLoggingEnabled())
+        getLogger().fine("Row #" + r + " / inputs to output: " + canOutput);
       if (canOutput.size() == 0)
         continue;
 
