@@ -406,10 +406,16 @@ public class CNTKSpreadSheetWriter
     // determine columns
     m_RowID.setData(content);
     rowID = m_RowID.getIntIndex();
+    if (isLoggingEnabled())
+      getLogger().info("row ID col (0-based, ignored if -1): " + rowID);
     inputs = new int[m_Inputs.length][];
+    if (isLoggingEnabled())
+      getLogger().info("# of inputs: " + m_Inputs.length);
     for (i = 0; i < m_Inputs.length; i++) {
       m_Inputs[i].setData(content);
       inputs[i] = m_Inputs[i].getIntIndices();
+      if (isLoggingEnabled())
+	getLogger().info("input " + (i+1) + " (0-based): " + Utils.arrayToString(inputs[i]));
     }
 
     canOutput = new TIntArrayList();
