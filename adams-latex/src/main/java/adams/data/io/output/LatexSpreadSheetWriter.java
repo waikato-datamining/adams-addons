@@ -234,6 +234,9 @@ public class LatexSpreadSheetWriter
       newline = System.getProperty("line.separator");
 
       for (SpreadSheet cont: content) {
+        if (m_Stopped)
+          return false;
+
 	// comments?
 	for (i = 0; i < cont.getComments().size(); i++)
 	  writer.write("% " + cont.getComments().get(i) + newline);
@@ -272,6 +275,9 @@ public class LatexSpreadSheetWriter
 
 	// write data rows
 	for (DataRow row: cont.rows()) {
+	  if (m_Stopped)
+	    return false;
+
 	  writer.write("  \\hline" + newline);
 	  first = true;
 	  for (String key: cont.getHeaderRow().cellKeys()) {

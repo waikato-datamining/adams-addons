@@ -428,6 +428,9 @@ public class CNTKSpreadSheetWriter
     // write data
     r = 0;
     for (Row row : content.rows()) {
+      if (m_Stopped)
+	return false;
+
       r++;
       // check which groups can be output when suppressing groups with missing values
       if (m_SuppressMissing) {

@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * GnuplotSpreadSheetWriter.java
- * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.output;
 
@@ -462,6 +462,9 @@ public class GnuplotSpreadSheetWriter
       // write data rows
       header = content.getHeaderRow();
       for (DataRow row: content.rows()) {
+        if (m_Stopped)
+          return false;
+
 	first = true;
 	for (i = 0; i < indices.length; i++) {
 	  colName = header.getCellKey(indices[i]);
