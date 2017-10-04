@@ -31,6 +31,7 @@ import adams.flow.core.ActorUtils;
 import adams.flow.core.PauseStateHandler;
 import adams.flow.core.PauseStateManager;
 import adams.flow.core.RatMode;
+import adams.flow.core.RatState;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.GUIHelper;
@@ -288,10 +289,14 @@ public class RatControl
 	return null;
 
       result = null;
-      if (m_Actor.isRunnableActive())
-	m_Actor.stopRunnable();
-      else
-	result = m_Actor.startRunnable();
+      if (m_Actor.isRunnableActive()) {
+        m_Actor.stopRunnable();
+      }
+      else {
+        if (m_Actor.getInitialState() == RatState.PAUSED)
+          m_Actor.setInitialState(RatState.RUNNING);
+        result = m_Actor.startRunnable();
+      }
 
       updateButtons();
 

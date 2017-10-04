@@ -13,7 +13,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Rat.java
  * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
@@ -357,6 +357,7 @@ public class Rat
     
     m_Actors = new LocalScopeTransformer();
     m_Actors.setParent(this);
+
     m_Helper         = new CallableActorHelper();
     m_StateListeners = new HashSet<>();
   }
@@ -1337,6 +1338,9 @@ public class Rat
     result = null;
 
     try {
+      // re-setup actors after manual stop
+      if (m_Actors.isStopped())
+        m_Actors.setUp();
       // make sure we have all the latest variable values
       m_Receiver.initReception();
       m_Transmitter.initTransmission();
@@ -1424,7 +1428,7 @@ public class Rat
   public void stopRunnable() {
     if (m_Runnable != null) {
       m_Runnable.stopExecution();
-      while (m_Runnable.isRunning()) {
+      while ((m_Runnable != null) && m_Runnable.isRunning()) {
 	try {
 	  synchronized(this) {
 	    wait(10);

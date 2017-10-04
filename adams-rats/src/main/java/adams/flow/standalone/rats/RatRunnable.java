@@ -265,6 +265,7 @@ public class RatRunnable
   @Override
   public void stopExecution() {
     super.stopExecution();
+    m_Owner.getActorHandler().stopExecution();
     m_Owner.getReceiver().stopExecution();
     m_Owner.getTransmitter().stopExecution();
   }
