@@ -1380,7 +1380,14 @@ public class Rat
    */
   @Override
   protected String doExecute() {
-    return startRunnable();
+    switch (m_Mode) {
+      case CONTINUOUS:
+        return startRunnable();
+      case MANUAL:
+        return null;
+      default:
+        throw new IllegalStateException("Unhandled rat mode: " + m_Mode);
+    }
   }
 
   /**
