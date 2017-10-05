@@ -23,12 +23,12 @@ package adams.flow.source;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.io.PlaceholderFile;
-import adams.core.io.streamingprocess.OutputType;
-import adams.core.io.streamingprocess.StreamingProcessOutput;
-import adams.core.io.streamingprocess.StreamingProcessOwner;
 import adams.flow.core.RunnableWithLogging;
 import adams.flow.core.Token;
 import adams.ml.cntk.CNTK;
+import com.github.fracpete.processoutput4j.core.StreamingProcessOutputType;
+import com.github.fracpete.processoutput4j.core.StreamingProcessOwner;
+import com.github.fracpete.processoutput4j.output.StreamingProcessOutput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,7 +118,7 @@ public class CNTKBrainScriptExec
   protected PlaceholderFile m_Script;
 
   /** whether to output stderr instead of stdout or both. */
-  protected OutputType m_OutputType;
+  protected StreamingProcessOutputType m_OutputType;
 
   /** the stdout prefix. */
   protected String m_PrefixStdOut;
@@ -161,7 +161,7 @@ public class CNTKBrainScriptExec
 
     m_OptionManager.add(
       "output-type", "outputType",
-      OutputType.STDOUT);
+      StreamingProcessOutputType.STDOUT);
 
     m_OptionManager.add(
       "prefix-stdout", "prefixStdOut",
@@ -236,7 +236,7 @@ public class CNTKBrainScriptExec
    *
    * @param value	the output type
    */
-  public void setOutputType(OutputType value) {
+  public void setOutputType(StreamingProcessOutputType value) {
     m_OutputType = value;
     reset();
   }
@@ -246,7 +246,7 @@ public class CNTKBrainScriptExec
    *
    * @return 		the output type
    */
-  public OutputType getOutputType() {
+  public StreamingProcessOutputType getOutputType() {
     return m_OutputType;
   }
 
@@ -258,7 +258,7 @@ public class CNTKBrainScriptExec
    */
   public String outputTypeTipText() {
     return
-      "Determines the output type; if " + OutputType.BOTH + " is selected "
+      "Determines the output type; if " + StreamingProcessOutputType.BOTH + " is selected "
 	+ "then an array is output with stdout as first element and stderr as "
 	+ "second";
   }
@@ -387,7 +387,7 @@ public class CNTKBrainScriptExec
    * @param line	the line to add
    * @param stdout	whether stdout or stderr
    */
-  public void add(String line, boolean stdout) {
+  public void processOutput(String line, boolean stdout) {
     if (stdout)
       m_Output.add(m_PrefixStdOut + line);
     else
