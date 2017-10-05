@@ -13,7 +13,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Exec.java
  * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
@@ -86,6 +86,9 @@ public class Exec
 
   /** the output. */
   protected String m_Output;
+
+  /** for executing the command. */
+  protected transient CollectingProcessOutput m_ProcessOutput;
 
   /**
    * Returns a string describing the object.
@@ -260,7 +263,6 @@ public class Exec
   protected String doReceive() {
     String		result;
     String		cmd;
-    CollectingProcessOutput proc;
 
     result = null;
 
@@ -271,20 +273,21 @@ public class Exec
       cmd = Placeholders.getSingleton().expand(cmd).replace("\\", "/");
 
     try {
-      proc = ProcessUtils.execute(OptionUtils.splitOptions(cmd));
-      if (!proc.hasSucceeded()) {
-	result = ProcessUtils.toErrorOutput(proc);
+      m_ProcessOutput = ProcessUtils.execute(OptionUtils.splitOptions(cmd));
+      if (!m_ProcessOutput.hasSucceeded()) {
+	result = ProcessUtils.toErrorOutput(m_ProcessOutput);
       }
       else {
 	if (m_OutputStdErr)
-	  m_Output = proc.getStdErr();
+	  m_Output = m_ProcessOutput.getStdErr();
 	else
-	  m_Output = proc.getStdOut();
+	  m_Output = m_ProcessOutput.getStdOut();
       }
     }
     catch (Exception e) {
       result = handleException("Failed to execute command: " + cmd, e);
     }
+    m_ProcessOutput = null;
 
     return result;
   }
@@ -322,5 +325,15 @@ public class Exec
     m_Output = null;
 
     return result;
+  }
+
+  /**
+   * Stops the execution. No message set.
+   */
+  @Override
+  public void stopExecution() {
+    if (m_ProcessOutput != null)
+      m_ProcessOutput.destroy();
+    super.stopExecution();
   }
 }

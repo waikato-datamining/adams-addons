@@ -93,6 +93,9 @@ public class Gnuplot
   /** the script file to execute. */
   protected PlaceholderFile m_ScriptFile;
 
+  /** for executing gnuplot. */
+  protected transient CollectingProcessOutput m_ProcessOutput;
+
   /**
    * Returns a string describing the object.
    *
@@ -202,7 +205,6 @@ public class Gnuplot
   protected String doExecute() {
     String		result;
     String[]		cmd;
-    CollectingProcessOutput proc;
 
     result = null;
 
@@ -220,16 +222,27 @@ public class Gnuplot
     };
     
     try {
-      proc = ProcessUtils.execute(cmd);
-      if (!proc.hasSucceeded())
-	result = ProcessUtils.toErrorOutput(proc);
+      m_ProcessOutput = ProcessUtils.execute(cmd);
+      if (!m_ProcessOutput.hasSucceeded())
+	result = ProcessUtils.toErrorOutput(m_ProcessOutput);
       else
-	getLogger().severe(proc.getStdErr());
+	getLogger().severe(m_ProcessOutput.getStdErr());
     }
     catch (Exception e) {
       result = handleException("Failed to run Gnuplot with script '" + m_ScriptFile + "':", e);
     }
+    m_ProcessOutput = null;
 
     return result;
+  }
+
+  /**
+   * Stops the execution. No message set.
+   */
+  @Override
+  public void stopExecution() {
+    if (m_ProcessOutput != null)
+      m_ProcessOutput.destroy();
+    super.stopExecution();
   }
 }

@@ -13,7 +13,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * TweeboParser.java
  * Copyright (C) 2015-2017 University of Waikato, Hamilton, NZ
  */
@@ -110,6 +110,9 @@ public class TweeboParser
 
   /** the tweebo parser shell script. */
   protected PlaceholderFile m_Script;
+
+  /** for executing the tweebo parser. */
+  protected transient CollectingProcessOutput m_ProcessOutput;
 
   /**
    * Returns a string describing the object.
@@ -230,7 +233,6 @@ public class TweeboParser
     File		tmpFile;
     File		inFile;
     List<String>	lines;
-    CollectingProcessOutput procresult;
 
     m_Queue.clear();
 
@@ -247,19 +249,20 @@ public class TweeboParser
     // parse tweets
     if (result == null) {
       try {
-	procresult = ProcessUtils.execute(
+	m_ProcessOutput = ProcessUtils.execute(
 	  new String[]{
 	    m_Script.getAbsolutePath(),
 	    tmpFile.getAbsolutePath()
 	  },
 	  new PlaceholderDirectory(m_Script.getParentFile())
 	);
-	if (!procresult.hasSucceeded())
-	  result = "Failed to execute TweeboParser: " + Utils.flatten(procresult.getCommand(), " ") + "\n" + procresult.getStdErr();
+	if (!m_ProcessOutput.hasSucceeded())
+	  result = "Failed to execute TweeboParser: " + Utils.flatten(m_ProcessOutput.getCommand(), " ") + "\n" + m_ProcessOutput.getStdErr();
       }
       catch (Exception e) {
 	result = handleException("Failed to execute TweeboParser: " + m_Script, e);
       }
+      m_ProcessOutput = null;
     }
 
     // collect generated data
@@ -279,5 +282,15 @@ public class TweeboParser
       FileUtils.delete(inFile);
 
     return result;
+  }
+
+  /**
+   * Stops the execution. No message set.
+   */
+  @Override
+  public void stopExecution() {
+    if (m_ProcessOutput != null)
+      m_ProcessOutput.destroy();
+    super.stopExecution();
   }
 }

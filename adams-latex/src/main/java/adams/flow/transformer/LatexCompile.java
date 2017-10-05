@@ -13,7 +13,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * LatexCompile.java
  * Copyright (C) 2017 University of Waikato, Hamilton, NZ
  */
@@ -121,6 +121,9 @@ public class LatexCompile
   /** the latex setup. */
   protected LatexSetup m_LatexSetup;
 
+  /** for executing latex. */
+  protected transient CollectingProcessOutput m_ProcessOutput;
+
   /**
    * Returns a string describing the object.
    *
@@ -185,7 +188,6 @@ public class LatexCompile
     PlaceholderDirectory	cwd;
     LocalFileSearch		search;
     List<String> 		list;
-    CollectingProcessOutput 	proc;
     boolean			compiling;
 
     result = null;
@@ -225,9 +227,9 @@ public class LatexCompile
     try {
       list = search.search();
       for (String file: list) {
-	proc = ProcessUtils.execute(new String[]{bibtex, file}, cwd);
-	if (!proc.hasSucceeded()) {
-	  result = ProcessUtils.toErrorOutput(proc);
+	m_ProcessOutput = ProcessUtils.execute(new String[]{bibtex, file}, cwd);
+	if (!m_ProcessOutput.hasSucceeded()) {
+	  result = ProcessUtils.toErrorOutput(m_ProcessOutput);
 	  break;
 	}
       }
@@ -235,6 +237,7 @@ public class LatexCompile
     catch (Exception e) {
       result = handleException("Failed to check for bibtex file(s)!", e);
     }
+    m_ProcessOutput = null;
 
     // compile latex document
     if (result == null) {
@@ -248,9 +251,9 @@ public class LatexCompile
       compiling = true;
       while (compiling) {
 	try {
-	  proc = ProcessUtils.execute(cmdline.toArray(new String[cmdline.size()]), cwd);
+	  m_ProcessOutput = ProcessUtils.execute(cmdline.toArray(new String[cmdline.size()]), cwd);
 	  compiling = false;
-	  if (proc.hasSucceeded()) {
+	  if (m_ProcessOutput.hasSucceeded()) {
 	    if (FileUtils.fileExists(log)) {
 	      list = FileUtils.loadFromFile(new PlaceholderFile(log));
 	      for (String line : list) {
@@ -259,7 +262,7 @@ public class LatexCompile
 		}
 		else if (line.contains(EMERGENCY_STOP)) {
 		  compiling = false;
-		  result = ProcessUtils.toErrorOutput(proc);
+		  result = ProcessUtils.toErrorOutput(m_ProcessOutput);
 		}
 	      }
 	    }
@@ -269,9 +272,20 @@ public class LatexCompile
 	  compiling = false;
 	  result = handleException("Failed to compile LaTeX document: " + latex, e);
 	}
+	m_ProcessOutput = null;
       }
     }
 
     return result;
+  }
+
+  /**
+   * Stops the execution. No message set.
+   */
+  @Override
+  public void stopExecution() {
+    if (m_ProcessOutput != null)
+      m_ProcessOutput.destroy();
+    super.stopExecution();
   }
 }

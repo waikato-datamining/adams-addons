@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Exec.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone.rats.output;
@@ -77,6 +77,9 @@ public class Exec
   /** whether the replace string contains a variable, which needs to be
    * expanded first. */
   protected boolean m_CommandContainsVariable;
+
+  /** for executing the command. */
+  protected transient CollectingProcessOutput m_ProcessOutput;
 
   /**
    * Returns a string describing the object.
@@ -230,7 +233,6 @@ public class Exec
   protected String doTransmit() {
     String		result;
     String		cmd;
-    CollectingProcessOutput proc;
 
     result = null;
 
@@ -241,14 +243,25 @@ public class Exec
       cmd = Placeholders.getSingleton().expand(cmd).replace("\\", "/");
 
     try {
-      proc = ProcessUtils.execute(OptionUtils.splitOptions(cmd));
-      if (!proc.hasSucceeded())
-	result = ProcessUtils.toErrorOutput(proc);
+      m_ProcessOutput = ProcessUtils.execute(OptionUtils.splitOptions(cmd));
+      if (!m_ProcessOutput.hasSucceeded())
+	result = ProcessUtils.toErrorOutput(m_ProcessOutput);
     }
     catch (Exception e) {
       result = handleException("Failed to execute command: " + cmd, e);
     }
+    m_ProcessOutput = null;
 
     return result;
+  }
+
+  /**
+   * Stops the execution. No message set.
+   */
+  @Override
+  public void stopExecution() {
+    if (m_ProcessOutput != null)
+      m_ProcessOutput.destroy();
+    super.stopExecution();
   }
 }
