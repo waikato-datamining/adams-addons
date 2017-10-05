@@ -23,8 +23,10 @@ package adams.flow.source;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.io.PlaceholderFile;
+import adams.flow.core.ActorUtils;
 import adams.flow.core.RunnableWithLogging;
 import adams.flow.core.Token;
+import adams.flow.standalone.CNTKSetup;
 import adams.ml.cntk.CNTK;
 import com.github.fracpete.processoutput4j.core.StreamingProcessOutputType;
 import com.github.fracpete.processoutput4j.core.StreamingProcessOwner;
@@ -137,6 +139,9 @@ public class CNTKBrainScriptExec
 
   /** in case an exception occurred executing the command (gets rethrown). */
   protected IllegalStateException m_ExecutionFailure;
+
+  /** the (optional) setup. */
+  protected CNTKSetup m_Setup;
 
   /**
    * Returns a string describing the object.
@@ -332,6 +337,32 @@ public class CNTKBrainScriptExec
   }
 
   /**
+   * Determines the (optional) CNTK setup standalone.
+   *
+   * @return		the setup to use, null if none found
+   */
+  protected CNTKSetup getConnection() {
+    return (CNTKSetup) ActorUtils.findClosestType(this, CNTKSetup.class, true);
+  }
+
+  /**
+   * Initializes the item for flow execution.
+   *
+   * @return		null if everything is fine, otherwise error message
+   */
+  @Override
+  public String setUp() {
+    String	result;
+
+    result = super.setUp();
+
+    if (result == null)
+      m_Setup = getConnection();
+
+    return result;
+  }
+
+  /**
    * Executes the flow item.
    *
    * @return		null if everything is fine, otherwise error message
@@ -344,7 +375,7 @@ public class CNTKBrainScriptExec
     m_Output.clear();
 
     // preprocess command
-    cmd = CNTK.getBinary().getAbsolutePath();
+    cmd = (m_Setup == null) ? CNTK.getBinary().getAbsolutePath() : m_Setup.getBinary().getAbsolutePath();
     cmd += " configFile=" + m_Script.getAbsolutePath();
     fCmd = cmd;
     if (isLoggingEnabled())
