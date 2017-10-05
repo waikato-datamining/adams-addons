@@ -13,7 +13,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * CNTKPrebuiltModel.java
  * Copyright (C) 2017 University of Waikato, Hamilton, NZ
  */
@@ -45,9 +45,31 @@ import java.util.Vector;
 
 /**
  <!-- globalinfo-start -->
+ * Applies the pre-built CNTK model to the data for making predictions.
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * Valid options are: <p>
+ *
+ * <pre> -${CWD} &lt;value&gt;
+ *  The prebuilt CNTK model to use.
+ *  (default: ${CWD})</pre>
+ *
+ * <pre> -output-debug-info
+ *  If set, classifier is run in debug mode and
+ *  may output additional info to the console</pre>
+ *
+ * <pre> -do-not-check-capabilities
+ *  If set, classifier capabilities are not checked before classifier is built
+ *  (use with caution).</pre>
+ *
+ * <pre> -num-decimal-places
+ *  The number of decimal places for the output of numbers in the model (default 2).</pre>
+ *
+ * <pre> -batch-size
+ *  The desired batch size for batch prediction  (default 100).</pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -76,16 +98,7 @@ public class CNTKPrebuiltModel
    * 			displaying in the explorer/experimenter gui
    */
   public String globalInfo() {
-    return
-      "Generates a classifier cascade, with each deeper level of classifiers "
-	+ "being built on the input data and either the class distributions "
-	+ "(nominal class) or classification (numeric class) of the classifiers "
-	+ "of the previous level in the cascade.\n"
-	+ "The build process is stopped when either the maximum number of levels "
-	+ "is reached, the termination criterion is satisfied or no further "
-	+ "improvement is achieved.\n"
-	+ "In case of a level performing worse than the prior one, the build "
-	+ "process is terminated immediately and the current level discarded.";
+    return "Applies the pre-built CNTK model to the data for making predictions.";
   }
 
   /**
