@@ -392,7 +392,6 @@ public class CNTKBrainScriptExec
         try {
 	  m_Process = Runtime.getRuntime().exec(fCmd, null, null);
 	  m_ProcessOutput.monitor(fCmd, null, m_Process);
-	  m_Process.destroy();
 	}
 	catch (Exception e) {
           m_ExecutionFailure = new IllegalStateException("Failed to execute: " + fCmd, e);
@@ -431,7 +430,8 @@ public class CNTKBrainScriptExec
    * @return		the generated token
    */
   public Token output() {
-    Token	result;
+    Token			result;
+    IllegalStateException	exc;
 
     result = null;
 
@@ -439,10 +439,13 @@ public class CNTKBrainScriptExec
       Utils.wait(this, this, 1000, 100);
     }
 
-    if (m_ExecutionFailure != null)
-      throw m_ExecutionFailure;
+    if (m_ExecutionFailure != null) {
+      exc                = m_ExecutionFailure;
+      m_ExecutionFailure = null;
+      throw exc;
+    }
 
-    if (!isStopped() && (m_Monitor != null)) {
+    if (!isStopped() && (m_Output.size() > 0)) {
       result = new Token(m_Output.get(0));
       m_Output.remove(0);
     }
