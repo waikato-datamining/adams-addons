@@ -22,7 +22,12 @@ package adams.flow.source;
 
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
+import adams.core.base.BaseRegExp;
+import adams.core.io.FileUtils;
+import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
+import adams.core.io.TempUtils;
+import adams.core.io.lister.LocalDirectoryLister;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.RunnableWithLogging;
 import adams.flow.core.Token;
@@ -88,6 +93,12 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: ${CWD}
  * </pre>
  *
+ * <pre>-script-contains-variables &lt;boolean&gt; (property: scriptContainsVariables)
+ * &nbsp;&nbsp;&nbsp;If enabled, any variables that might be present in the script file get expanded
+ * &nbsp;&nbsp;&nbsp;first.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  * <pre>-output-type &lt;STDOUT|STDERR|BOTH&gt; (property: outputType)
  * &nbsp;&nbsp;&nbsp;Determines the output type; if BOTH is selected then an array is output
  * &nbsp;&nbsp;&nbsp;with stdout as first element and stderr as second
@@ -102,6 +113,21 @@ import java.util.List;
  * <pre>-prefix-stderr &lt;java.lang.String&gt; (property: prefixStdErr)
  * &nbsp;&nbsp;&nbsp;The (optional) prefix to use for output from stderr.
  * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
+ * <pre>-delete-temp-models &lt;boolean&gt; (property: deleteTempModels)
+ * &nbsp;&nbsp;&nbsp;If enabled, any temporary models get deleted.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-delete-checkpoint-files &lt;boolean&gt; (property: deleteCheckPointFiles)
+ * &nbsp;&nbsp;&nbsp;If enabled, any checkpoint files get deleted.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-model-directory &lt;adams.core.io.PlaceholderDirectory&gt; (property: modelDirectory)
+ * &nbsp;&nbsp;&nbsp;The directory containing the models, temp models and checkpoint files.
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
  * </pre>
  *
  <!-- options-end -->
@@ -119,6 +145,9 @@ public class CNTKBrainScriptExec
   /** the brainscript to execute. */
   protected PlaceholderFile m_Script;
 
+  /** whether to script contains variables that need expanding first. */
+  protected boolean m_ScriptContainsVariables;
+
   /** whether to output stderr instead of stdout or both. */
   protected StreamingProcessOutputType m_OutputType;
 
@@ -127,6 +156,15 @@ public class CNTKBrainScriptExec
 
   /** the stderr prefix. */
   protected String m_PrefixStdErr;
+
+  /** whether to delete tmp models. */
+  protected boolean m_DeleteTempModels;
+
+  /** whether to delete checkpoint file. */
+  protected boolean m_DeleteCheckPointFiles;
+
+  /** the directory containing the models. */
+  protected PlaceholderDirectory m_ModelDirectory;
 
   /** the tokens to forward. */
   protected List m_Output;
@@ -142,6 +180,9 @@ public class CNTKBrainScriptExec
 
   /** the (optional) setup. */
   protected CNTKSetup m_Setup;
+
+  /** for identifying the temp and checkpoint files. */
+  protected LocalDirectoryLister m_Lister;
 
   /**
    * Returns a string describing the object.
@@ -165,6 +206,10 @@ public class CNTKBrainScriptExec
       new PlaceholderFile());
 
     m_OptionManager.add(
+      "script-contains-variables", "scriptContainsVariables",
+      false);
+
+    m_OptionManager.add(
       "output-type", "outputType",
       StreamingProcessOutputType.STDOUT);
 
@@ -175,6 +220,18 @@ public class CNTKBrainScriptExec
     m_OptionManager.add(
       "prefix-stderr", "prefixStdErr",
       "");
+
+    m_OptionManager.add(
+      "delete-temp-models", "deleteTempModels",
+      false);
+
+    m_OptionManager.add(
+      "delete-checkpoint-files", "deleteCheckPointFiles",
+      false);
+
+    m_OptionManager.add(
+      "model-directory", "modelDirectory",
+      new PlaceholderDirectory());
   }
 
   /**
@@ -218,7 +275,7 @@ public class CNTKBrainScriptExec
   }
 
   /**
-   * Returns the sript to run.
+   * Returns the script to run.
    *
    * @return 		the script
    */
@@ -234,6 +291,35 @@ public class CNTKBrainScriptExec
    */
   public String scriptTipText() {
     return "The BrainScript to run.";
+  }
+
+  /**
+   * Sets whether the script contains variables that require expanding first.
+   *
+   * @param value	true if contains variables
+   */
+  public void setScriptContainsVariables(boolean value) {
+    m_ScriptContainsVariables = value;
+    reset();
+  }
+
+  /**
+   * Returns whether the script contains variables that require expanding first.
+   *
+   * @return 		true if contains variables
+   */
+  public boolean getScriptContainsVariables() {
+    return m_ScriptContainsVariables;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String scriptContainsVariablesTipText() {
+    return "If enabled, any variables that might be present in the script file get expanded first.";
   }
 
   /**
@@ -327,6 +413,93 @@ public class CNTKBrainScriptExec
   }
 
   /**
+   * Sets whether to delete temporary models.
+   *
+   * @param value	true if to delete
+   */
+  public void setDeleteTempModels(boolean value) {
+    m_DeleteTempModels = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to delete temporary models.
+   *
+   * @return 		true if to delete
+   */
+  public boolean getDeleteTempModels() {
+    return m_DeleteTempModels;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String deleteTempModelsTipText() {
+    return "If enabled, any temporary models get deleted.";
+  }
+
+  /**
+   * Sets whether to delete checkpoint files models.
+   *
+   * @param value	true if to delete
+   */
+  public void setDeleteCheckPointFiles(boolean value) {
+    m_DeleteCheckPointFiles = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to delete checkpoint files models.
+   *
+   * @return 		true if to delete
+   */
+  public boolean getDeleteCheckPointFiles() {
+    return m_DeleteCheckPointFiles;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String deleteCheckPointFilesTipText() {
+    return "If enabled, any checkpoint files get deleted.";
+  }
+
+  /**
+   * Sets the directory containing the models, temp models and checkpoint files.
+   *
+   * @param value	the directory
+   */
+  public void setModelDirectory(PlaceholderDirectory value) {
+    m_ModelDirectory = value;
+    reset();
+  }
+
+  /**
+   * Returns the directory containing the models, temp models and checkpoint files.
+   *
+   * @return 		the directory
+   */
+  public PlaceholderDirectory getModelDirectory() {
+    return m_ModelDirectory;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String modelDirectoryTipText() {
+    return "The directory containing the models, temp models and checkpoint files.";
+  }
+
+  /**
    * Returns the class of objects that it generates.
    *
    * @return		<!-- flow-generates-start -->java.lang.String.class<!-- flow-generates-end -->
@@ -363,6 +536,34 @@ public class CNTKBrainScriptExec
   }
 
   /**
+   * Preprocesses the script if necessary.
+   *
+   * @return		the script filename
+   */
+  protected String preprocessScript() {
+    String		result;
+    List<String>	lines;
+    String		content;
+    String		msg;
+
+    result = m_Script.getAbsolutePath();
+
+    if (m_ScriptContainsVariables) {
+      lines = FileUtils.loadFromFile(m_Script);
+      if (lines != null) {
+        result  = TempUtils.createTempFile("adams-cntk-bs-", ".bs").getAbsolutePath();
+	content = Utils.flatten(lines, "\n");
+	content = getVariables().expand(content);
+	msg     = FileUtils.writeToFileMsg(result, content, false, null);
+	if (msg != null)
+	  throw new IllegalStateException("Failed to write expanded script!\n" + msg);
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Executes the flow item.
    *
    * @return		null if everything is fine, otherwise error message
@@ -371,15 +572,35 @@ public class CNTKBrainScriptExec
   protected String doExecute() {
     String		cmd;
     final String	fCmd;
+    String		script;
 
     m_Output.clear();
 
+    // preprocess script
+    script = preprocessScript();
+
     // preprocess command
     cmd = (m_Setup == null) ? CNTK.getBinary().getAbsolutePath() : m_Setup.getBinary().getAbsolutePath();
-    cmd += " configFile=" + m_Script.getAbsolutePath();
+    cmd += " configFile=" + script;
     fCmd = cmd;
     if (isLoggingEnabled())
       getLogger().info("Command: " + cmd);
+
+    // remove files?
+    m_Lister = null;
+    if (m_DeleteTempModels || m_DeleteCheckPointFiles) {
+      m_Lister = new LocalDirectoryLister();
+      m_Lister.setWatchDir(m_ModelDirectory.getAbsolutePath());
+      if (m_DeleteTempModels && m_DeleteCheckPointFiles)
+        m_Lister.setRegExp(new BaseRegExp(".*\\.cmf\\.([0-9]+|ckp)$"));
+      else if (m_DeleteTempModels)
+        m_Lister.setRegExp(new BaseRegExp(".*\\.cmf\\.[0-9]+$"));
+      else if (m_DeleteCheckPointFiles)
+        m_Lister.setRegExp(new BaseRegExp(".*\\.cmf\\.ckp$"));
+      m_Lister.setRecursive(false);
+      m_Lister.setListDirs(false);
+      m_Lister.setListFiles(true);
+    }
 
     // setup thread
     m_ExecutionFailure = null;
@@ -418,10 +639,19 @@ public class CNTKBrainScriptExec
    * @param stdout	whether stdout or stderr
    */
   public void processOutput(String line, boolean stdout) {
+    String[]	files;
+
     if (stdout)
       m_Output.add(m_PrefixStdOut + line);
     else
       m_Output.add(m_PrefixStdErr + line);
+
+    // remove temp/checkpoint files
+    if (m_Lister != null) {
+      files = m_Lister.list();
+      for (String file : files)
+	FileUtils.delete(file);
+    }
   }
 
   /**
