@@ -145,6 +145,9 @@ public class CNTKBrainScriptExec
   /** the brainscript to execute. */
   protected PlaceholderFile m_Script;
 
+  /** the tmp brainscript to execute (if necessary). */
+  protected PlaceholderFile m_TmpScript;
+
   /** whether to script contains variables that need expanding first. */
   protected boolean m_ScriptContainsVariables;
 
@@ -546,7 +549,8 @@ public class CNTKBrainScriptExec
     String		content;
     String		msg;
 
-    result = m_Script.getAbsolutePath();
+    result      = m_Script.getAbsolutePath();
+    m_TmpScript = null;
 
     if (m_ScriptContainsVariables) {
       lines = FileUtils.loadFromFile(m_Script);
@@ -557,6 +561,7 @@ public class CNTKBrainScriptExec
 	msg     = FileUtils.writeToFileMsg(result, content, false, null);
 	if (msg != null)
 	  throw new IllegalStateException("Failed to write expanded script!\n" + msg);
+	m_TmpScript = new PlaceholderFile(result);
       }
     }
 
@@ -619,6 +624,8 @@ public class CNTKBrainScriptExec
 	}
 	m_Monitor       = null;
         m_ProcessOutput = null;
+        if (m_TmpScript != null)
+	  m_TmpScript.delete();
       }
       @Override
       public void stopExecution() {
