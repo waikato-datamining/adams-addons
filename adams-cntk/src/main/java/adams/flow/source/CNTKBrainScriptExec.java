@@ -102,7 +102,7 @@ import java.util.List;
  * <pre>-output-type &lt;STDOUT|STDERR|BOTH&gt; (property: outputType)
  * &nbsp;&nbsp;&nbsp;Determines the output type; if BOTH is selected then an array is output
  * &nbsp;&nbsp;&nbsp;with stdout as first element and stderr as second
- * &nbsp;&nbsp;&nbsp;default: STDOUT
+ * &nbsp;&nbsp;&nbsp;default: STDERR
  * </pre>
  *
  * <pre>-prefix-stdout &lt;java.lang.String&gt; (property: prefixStdOut)
@@ -214,7 +214,7 @@ public class CNTKBrainScriptExec
 
     m_OptionManager.add(
       "output-type", "outputType",
-      StreamingProcessOutputType.STDOUT);
+      StreamingProcessOutputType.STDERR);
 
     m_OptionManager.add(
       "prefix-stdout", "prefixStdOut",
