@@ -1,0 +1,19 @@
+Setup
+=====
+
+weka.classifiers.meta.FilteredClassifier -F "weka.filters.unsupervised.attribute.RemoveType -T string" -W weka.classifiers.meta.FilteredClassifier -- -F "weka.filters.supervised.attribute.PLS -algorithm adams.data.instancesanalysis.pls.PLS1" -W weka.classifiers.lazy.LWLSynchro -- -U 0 -K 250 -A "weka.core.neighboursearch.LinearNNSearch -A \"weka.core.EuclideanDistance -R first-last\"" -W weka.classifiers.functions.GPD -- -G 0.01 -L 0.01 -N 0
+
+
+Statistics
+==========
+
+Correlation coefficient                  0.8539
+Bias                                     0.0228
+Ratio of Performance to Deviation        1.7201
+R^2                                      0.7272
+Standard Deviation of Residuals          8.0829
+Mean absolute error                      4.4964
+Root mean squared error                  8.083
+Relative absolute error                 39.7162 %
+Root relative squared error             52.2095 %
+Total Number of Instances             3827

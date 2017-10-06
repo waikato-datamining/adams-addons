@@ -1,0 +1,124 @@
+# RegrSimple_CIFAR10.cntk shows how to train a regression model on CIFAR-10 image data.
+# It uses a very simple network and a composite reader using both the ImageReader
+# and CNTKTextFormatReader and defines the RMSE (root mean square error) as the
+# loss function. The value that the network learns to predict are simply the
+# average rgb values of an image normalized to [0, 1].
+
+command = Train:Test:Output
+
+makeMode = false
+traceLevel = 0
+deviceId = "auto"
+
+rootDir = ".."
+outputDir = "@{flow_dir}/output"
+modelDir = "@{model_dir}"
+
+modelPath = "$modelDir$/checm.ca.cmf"
+
+# Training action
+Train = {
+    action = "train"
+
+    BrainScriptNetworkBuilder = [
+        labelDim = 1
+        inDim = @{numatts}
+
+        model = Sequential (
+            ConvolutionalLayer {8, (1:8), pad = true} : ReLU :
+            DenseLayer {64} : ReLU :
+            Dropout :
+            DenseLayer {48} : ReLU :
+            DenseLayer {32} : ReLU :
+            LinearLayer {labelDim}
+        )
+
+        # inputs
+        spectrum = Input {1:inDim:1}
+        ref = Input {labelDim}
+        
+        # apply model to features
+        ol = model (spectrum)
+
+        # define regression loss
+        diff = ref - ol
+        sqerr = ReduceSum (diff.*diff, axis=1)
+        rmse =  Sqrt (sqerr / labelDim)
+
+        featureNodes    = (spectrum)
+        labelNodes      = (ref)
+        criterionNodes  = (rmse)
+        evaluationNodes = (rmse)
+        OutputNodes     = (ol)
+    ]
+
+    SGD = {
+        epochSize = 0
+        maxEpochs = 1000
+        minibatchSize = 128
+        learningRatesPerSample = 0.001*650:0.0001*800:.00001
+        momentumAsTimeConstant = 100
+        L2RegWeight = .0001
+        dropoutRate = 0*20:0.5
+        firstMBsToShowResult = 5
+        numMBsToShowResult = 50
+    }
+
+    reader = [
+	readerType = "CNTKTextFormatReader"
+	file = "@{train}"
+	input = [
+		spectrum = [
+			dim = @{numatts}
+			format = "dense"
+		]
+		ref = [
+			dim = 1
+			format = "dense"
+		]
+	]
+    ]
+}
+
+# Test action
+Test = {
+    action = "test"
+    minibatchSize = 512
+    outputNodeNames = (ol, ref, rmse)
+    outputPath = "$modelDir$"
+    reader = [
+	readerType = "CNTKTextFormatReader"
+	file = "@{test}"
+	input = [
+		spectrum = [
+			dim = @{numatts}
+			format = "dense"
+		]
+		ref = [
+			dim = 1
+			format = "dense"
+		]
+	]
+    ]
+}
+
+# Output action
+Output = {
+    action = "write"
+    outputNodeNames = (ol, ref)
+    reader = {
+        readerType = "CNTKTextFormatReader"
+	file = "@{test}"
+        input = [
+		spectrum = [
+			dim = @{numatts}
+			format = "dense"
+		]
+		ref = [
+			dim = 1
+			format = "dense"
+		]
+	]
+    }
+    outputPath = "@{eval_prefix}"
+}

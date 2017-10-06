@@ -1,0 +1,17 @@
+The "Africa Soil Information Service (AfSIS)" lists the copyrighted
+ICRAF/ISRIC spectral library ("A Globally Distributed Soil Spectral
+Library: Visible Near Infrared Diffuse Reflectance Spectra") on their
+homepage:
+http://africasoils.net/data/spectral-libraries
+http://www.isric.org/data/icrafisric-spectral-library
+
+The download contains a Microsoft Access database with roughly 4500
+spectra (wave numbers: 350-2500).
+
+Figuring out any use constraints is a bit tricky, as the mentioned URL
+in the archive is dead. But it looks like you can use it for
+non-commercial/research. Here is the data policy document:
+http://www.isric.org/data/data-policy?format=simple
+
+BTW Wageningen university is a partner of ISRIC, apparently:
+http://www.isric.org/content/partnerships
