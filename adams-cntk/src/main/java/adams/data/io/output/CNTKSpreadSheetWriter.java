@@ -26,6 +26,7 @@ import adams.core.TechnicalInformation.Type;
 import adams.core.TechnicalInformationHandler;
 import adams.core.Utils;
 import adams.core.base.BaseString;
+import adams.data.io.input.CNTKSpreadSheetReader;
 import adams.data.io.input.SpreadSheetReader;
 import adams.data.spreadsheet.Cell;
 import adams.data.spreadsheet.Row;
@@ -130,7 +131,9 @@ public class CNTKSpreadSheetWriter
   public String globalInfo() {
     return
       "Outputs spreadsheets in CNTK text file format.\n"
-      + "Requires all cells to be numeric (apart from row ID column).";
+      + "Requires all cells to be numeric (apart from row ID column).\n"
+      + "For more details, see:\n"
+      + getTechnicalInformation();
   }
 
   /**
@@ -315,7 +318,7 @@ public class CNTKSpreadSheetWriter
    */
   @Override
   public SpreadSheetReader getCorrespondingReader() {
-    return null;
+    return new CNTKSpreadSheetReader();
   }
 
   /**
