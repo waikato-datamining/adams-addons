@@ -1,0 +1,9 @@
+# Project: adams
+# Date: 2017-10-13 13:26:24
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Outputs some information about a model." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/ResNet20_CIFAR10_Python.model
+ adams.flow.transformer.CNTKModelReader
+ adams.flow.transformer.CNTKModelInfo -type ARGUMENTS
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter
