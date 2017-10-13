@@ -13,7 +13,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractModelApplier.java
  * Copyright (C) 2017 University of Waikato, Hamilton, NZ
  */
@@ -35,6 +35,7 @@ import adams.flow.core.Compatibility;
 import adams.flow.core.FlowContextHandler;
 import adams.flow.core.OutputProducer;
 import adams.flow.core.Token;
+import adams.ml.cntk.DeviceType;
 import com.microsoft.CNTK.DeviceDescriptor;
 import com.microsoft.CNTK.Function;
 
@@ -61,6 +62,12 @@ public abstract class AbstractModelApplier<I, O>
 
   /** file containing the model. */
   protected PlaceholderFile m_ModelFile;
+
+  /** the device to use. */
+  protected DeviceType m_DeviceType;
+
+  /** the GPU device ID. */
+  protected long m_GPUDeviceID;
 
   /** the source actor. */
   protected CallableActorReference m_Source;
@@ -91,6 +98,14 @@ public abstract class AbstractModelApplier<I, O>
     m_OptionManager.add(
       "model-file", "modelFile",
       new PlaceholderFile());
+
+    m_OptionManager.add(
+      "device-type", "deviceType",
+      DeviceType.DEFAULT);
+
+    m_OptionManager.add(
+      "gpu-device-id", "GPUDeviceID",
+      0L);
 
     m_OptionManager.add(
       "source", "source",
@@ -166,6 +181,64 @@ public abstract class AbstractModelApplier<I, O>
    */
   public String modelFileTipText() {
     return "The file containing the model.";
+  }
+
+  /**
+   * Sets the device to use.
+   *
+   * @param value	the device
+   */
+  public void setDeviceType(DeviceType value) {
+    m_DeviceType = value;
+    reset();
+  }
+
+  /**
+   * Returns the device to use.
+   *
+   * @return  		the device
+   */
+  public DeviceType getDeviceType() {
+    return m_DeviceType;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String deviceTypeTipText() {
+    return "The device type to use.";
+  }
+
+  /**
+   * Sets the GPU device ID.
+   *
+   * @param value	the ID
+   */
+  public void setGPUDeviceID(long value) {
+    m_GPUDeviceID = value;
+    reset();
+  }
+
+  /**
+   * Returns the GPU device ID.
+   *
+   * @return  		the ID
+   */
+  public long getGPUDeviceID() {
+    return m_GPUDeviceID;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String GPUDeviceIDTipText() {
+    return "The GPU device ID.";
   }
 
   /**
@@ -324,7 +397,19 @@ public abstract class AbstractModelApplier<I, O>
 	if (m_ModelFile.exists() && !m_ModelFile.isDirectory()) {
 	  if (isLoggingEnabled())
 	    getLogger().info("Loading serialized filter from: " + m_ModelFile);
-	  m_Device = DeviceDescriptor.useDefaultDevice(); // TODO option?
+	  switch (m_DeviceType) {
+	    case DEFAULT:
+	      m_Device = DeviceDescriptor.useDefaultDevice();
+	      break;
+	    case CPU:
+	      m_Device = DeviceDescriptor.getCPUDevice();
+	      break;
+	    case GPU:
+	      m_Device = DeviceDescriptor.getGPUDevice(m_GPUDeviceID);
+	      break;
+	    default:
+	      throw new IllegalStateException("Unhandled device type: " + m_DeviceType);
+	  }
 	  m_Model = Function.load(m_ModelFile.getAbsolutePath(), m_Device);
 	  return null;
 	}
