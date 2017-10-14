@@ -115,7 +115,7 @@ public class DefaultWekaInstanceApplier
     m_Attributes.setData(input.dataset());
     indices = m_Attributes.getIntIndices();
     for (int index: indices) {
-      if (input.attribute(index).isNumeric() && !input.isMissing(index))
+      if (input.attribute(index).isNumeric() && !input.isMissing(index) && (input.classIndex() != index))
 	values.add(input.value(index));
     }
 
