@@ -23,6 +23,7 @@ package weka.classifiers.functions;
 import adams.core.Range;
 import adams.core.Utils;
 import adams.core.base.BaseString;
+import adams.core.io.PlaceholderFile;
 import adams.ml.cntk.DeviceType;
 import com.microsoft.CNTK.DeviceDescriptor;
 import com.microsoft.CNTK.FloatVector;
@@ -42,7 +43,6 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.WekaOptionUtils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -61,7 +61,7 @@ import java.util.Vector;
  *
  * <pre> -model &lt;value&gt;
  *  The prebuilt CNTK model to use.
- *  (default: .)</pre>
+ *  (default: ${CWD})</pre>
  *
  * <pre> -device-type &lt;value&gt;
  *  The device type to use.
@@ -126,7 +126,7 @@ public class CNTKPrebuiltModel
   protected static String OUTPUTNAME = "output-name";
 
   /** the model to load. */
-  protected File m_Model = getDefaultModel();
+  protected PlaceholderFile m_Model = getDefaultModel();
 
   /** the device to use. */
   protected DeviceType m_DeviceType = getDefaultDeviceType();
@@ -241,8 +241,8 @@ public class CNTKPrebuiltModel
    *
    * @return		the default
    */
-  protected File getDefaultModel() {
-    return new File(".");
+  protected PlaceholderFile getDefaultModel() {
+    return new PlaceholderFile();
   }
 
   /**
@@ -250,7 +250,7 @@ public class CNTKPrebuiltModel
    *
    * @param value	the model
    */
-  public void setModel(File value) {
+  public void setModel(PlaceholderFile value) {
     m_Model = value;
   }
 
@@ -259,7 +259,7 @@ public class CNTKPrebuiltModel
    *
    * @return		the model
    */
-  public File getModel() {
+  public PlaceholderFile getModel() {
     return m_Model;
   }
 
