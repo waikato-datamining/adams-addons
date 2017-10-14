@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2017-10-15 10:40:49
+# Date: 2017-10-15 10:43:52
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Generates train/test data, builds and evaluates a classification model." -flow-execution-listener adams.flow.execution.NullListener
@@ -31,18 +31,3 @@ adams.flow.control.Flow -annotation "Generates train/test data, builds and evalu
      adams.flow.transformer.Convert -conversion adams.data.conversion.StringToDouble
     adams.flow.transformer.MakePlotContainer
     adams.flow.sink.CallableSink -callable "Train performance"
- adams.flow.control.Trigger -name evaluate -skip true
-  adams.flow.source.Start
-  adams.flow.control.Trigger -name "combine files"
-   adams.flow.source.VariablesArray -var-name eval_ref -var-name eval_pred -conversion adams.data.conversion.StringToString
-   adams.flow.sink.PasteFiles -output @{eval_comb} -delimiter ,
-  adams.flow.control.Trigger -name evaluate
-   adams.flow.source.Variable -var-name eval_comb -conversion adams.data.conversion.StringToString
-   adams.flow.transformer.SpreadSheetFileReader -reader "adams.data.io.input.CsvSpreadSheetReader -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.DefaultSpreadSheet -no-header true -custom-column-headers Actual,Predicted"
-   adams.flow.control.Tee -name plot
-    adams.flow.sink.CallableSink -callable ActualVsPredictedPlot
-   adams.flow.control.Tee -name stats
-    adams.flow.transformer.SpreadSheetStatistic -location 1 -location 2 -statistic "adams.data.statistics.MultiArrayStatistic -statistic adams.data.statistics.ArrayCorrelationCoefficient -statistic adams.data.statistics.ArrayRootMeanSquaredError -statistic adams.data.statistics.ArrayMeanAbsoluteError -statistic adams.data.statistics.ArrayRootRelativeSquaredError"
-    adams.flow.transformer.SpreadSheetTransformHeaderCells -transformer StringReplace
-    adams.flow.transformer.Convert -conversion "adams.data.conversion.TransposeSpreadSheet -use-header-as-first-column true"
-    adams.flow.sink.CallableSink -callable Statistics
