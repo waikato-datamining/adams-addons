@@ -108,7 +108,7 @@ Output = [
             ]
         ]
     ]
-    outputPath = "MC.txt"        # dump the output to this text file
+    outputPath = "@{model_dir}/MC.txt"        # dump the output to this text file
 ]
 
 # dump parameter values
