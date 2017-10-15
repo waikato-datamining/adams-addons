@@ -227,7 +227,8 @@ public class CNTKPrebuiltModel
     List<String> result = new ArrayList<>();
     WekaOptionUtils.add(result, MODEL, getModel());
     WekaOptionUtils.add(result, DEVICETYPE, getDeviceType());
-    WekaOptionUtils.add(result, GPUDEVICEID, getGPUDeviceID());
+    if (getDeviceType() == DeviceType.GPU)
+      WekaOptionUtils.add(result, GPUDEVICEID, getGPUDeviceID());
     WekaOptionUtils.add(result, INPUTS, getInputs());
     WekaOptionUtils.add(result, INPUTNAMES, getInputNames());
     WekaOptionUtils.add(result, CLASSNAME, getClassName());
