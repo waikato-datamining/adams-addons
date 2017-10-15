@@ -170,6 +170,9 @@ public class CNTKPrebuiltModel
   /** the ranges (input var name / indices). */
   protected transient Map<String,TIntHashSet> m_Ranges = null;
 
+  /** the training header. */
+  protected Instances m_Header;
+
   /**
    * Returns a string describing classifier.
    *
@@ -561,6 +564,15 @@ public class CNTKPrebuiltModel
     if (m_ActualModel == null)
       throw new IllegalStateException("Failed to load model: " + m_Model);
 
+    if (getDebug()) {
+      System.out.println("Arguments:");
+      for (int i = 0; i < m_ActualModel.getArguments().size(); i++)
+        System.out.println("- " + m_ActualModel.getArguments().get(i));
+      System.out.println("Outputs:");
+      for (int i = 0; i < m_ActualModel.getOutputs().size(); i++)
+        System.out.println("- " + m_ActualModel.getOutputs().get(i));
+    }
+
     // analyze model structure
     // 1. outputs
     m_OutputVar = null;
@@ -611,6 +623,9 @@ public class CNTKPrebuiltModel
 
     // reset ranges
     m_Ranges = null;
+
+    // keep header
+    m_Header = new Instances(data, 0);
   }
 
   /**
@@ -652,7 +667,8 @@ public class CNTKPrebuiltModel
     Map<String,FloatVector> floatVecs = new HashMap<>();
     if (m_Names.contains(m_ActualClassName)) {
       floatVecs.put(m_ActualClassName, new FloatVector());
-      floatVecs.get(m_ActualClassName).add(0.0f);
+      for (int i = 0; i < m_Header.numClasses(); i++)
+	floatVecs.get(m_ActualClassName).add(0.0f);
     }
     for (int i = 0; i < input.length; i++) {
       for (String name: m_Names) {
@@ -660,7 +676,8 @@ public class CNTKPrebuiltModel
         if ((range != null) && (range.contains(i))) {
           if (!floatVecs.containsKey(name))
             floatVecs.put(name, new FloatVector());
-	  floatVecs.get(name).add(input[i]);
+          if (!name.equals(m_ActualClassName))
+	    floatVecs.get(name).add(input[i]);
 	  break;
 	}
       }
@@ -719,11 +736,8 @@ public class CNTKPrebuiltModel
       initModel(instance.dataset());
 
     values = new TFloatArrayList();
-    for (i = 0; i < instance.numAttributes(); i++) {
-      if (i == instance.classIndex())
-	continue;
+    for (i = 0; i < instance.numAttributes(); i++)
       values.add((float) instance.value(i));
-    }
 
     scores = applyModel(values.toArray());
     result = new double[scores.length];
