@@ -28,8 +28,8 @@ import adams.core.option.AbstractOption;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseTextArea;
 import adams.gui.core.GUIHelper;
+import adams.gui.core.HelpFrame;
 import adams.gui.dialog.ApprovalDialog;
-import adams.gui.dialog.HelpDialog;
 import adams.parser.TwitterFilter;
 
 import javax.swing.BorderFactory;
@@ -40,7 +40,6 @@ import javax.swing.JPanel;
 import javax.swing.text.JTextComponent;
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dialog;
 import java.awt.FlowLayout;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -202,12 +201,7 @@ public class TwitterFilterExpressionEditor
     m_ButtonHelp.setToolTipText("Display grammar");
     m_ButtonHelp.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-	HelpDialog dialog = new HelpDialog((Dialog) null);
-        dialog.setDefaultCloseOperation(HelpDialog.DISPOSE_ON_CLOSE);
-	dialog.setHelp(new TwitterFilter().getGrammar(), false);
-	dialog.setSize(GUIHelper.getDefaultDialogDimension());
-	dialog.setLocationRelativeTo(null);
-	dialog.setVisible(true);
+        HelpFrame.showHelp(TwitterFilter.class, new TwitterFilter().getGrammar(), false);
       }
     });
     panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
