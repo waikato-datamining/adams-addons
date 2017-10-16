@@ -24,18 +24,10 @@ import adams.core.Range;
 import adams.core.Utils;
 import adams.core.base.BaseString;
 import adams.core.io.PlaceholderFile;
+import adams.ml.cntk.CNTKModelWrapper;
 import adams.ml.cntk.DeviceType;
-import com.microsoft.CNTK.DeviceDescriptor;
-import com.microsoft.CNTK.FloatVector;
-import com.microsoft.CNTK.FloatVectorVector;
-import com.microsoft.CNTK.Function;
-import com.microsoft.CNTK.NDShape;
-import com.microsoft.CNTK.UnorderedMapVariableValuePtr;
-import com.microsoft.CNTK.Value;
-import com.microsoft.CNTK.Variable;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.set.hash.TIntHashSet;
 import weka.classifiers.AbstractClassifier;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
@@ -45,9 +37,7 @@ import weka.core.WekaOptionUtils;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -134,44 +124,8 @@ public class CNTKPrebuiltModel
   /** the GPU device ID. */
   protected long m_GPUDeviceID = getDefaultGPUDeviceID();
 
-  /** the model to use. */
-  protected transient Function m_ActualModel;
-
-  /** the device to use. */
-  protected DeviceDescriptor m_Device;
-
-  /** the inputs. */
-  protected Range[] m_Inputs = getDefaultInputs();
-
-  /** the names of the inputs. */
-  protected BaseString[] m_InputNames = getDefaultInputNames();
-
-  /** the name of the class attribute in the model. */
-  protected String m_ClassName = getDefaultClassName();
-
-  /** the actual classname (eg if automatically determined). */
-  protected String m_ActualClassName;
-
-  /** the name of the output variable. */
-  protected String m_OutputName = getDefaultOutputName();
-
-  /** the output variable. */
-  protected transient Variable m_OutputVar = null;
-
-  /** the input variables (name / var). */
-  protected transient Map<String,Variable> m_InputVars = null;
-
-  /** the input shapes (name / shape). */
-  protected transient Map<String,NDShape> m_InputShapes = null;
-
-  /** the input variable names. */
-  protected transient List<String> m_Names = null;
-
-  /** the ranges (input var name / indices). */
-  protected transient Map<String,TIntHashSet> m_Ranges = null;
-
-  /** the training header. */
-  protected Instances m_Header;
+  /** the model wrapper. */
+  protected CNTKModelWrapper m_Wrapper = new CNTKModelWrapper();
 
   /**
    * Returns a string describing classifier.
@@ -366,8 +320,7 @@ public class CNTKPrebuiltModel
    * @param value	the column
    */
   public void setInputs(Range[] value) {
-    m_Inputs     = value;
-    m_InputNames = (BaseString[]) Utils.adjustArray(m_InputNames, m_Inputs.length, new BaseString());
+    m_Wrapper.setInputs(value);
   }
 
   /**
@@ -376,7 +329,7 @@ public class CNTKPrebuiltModel
    * @return 		the ranges
    */
   public Range[] getInputs() {
-    return m_Inputs;
+    return m_Wrapper.getInputs();
   }
 
   /**
@@ -386,7 +339,7 @@ public class CNTKPrebuiltModel
    * 			displaying in the GUI or for listing the options.
    */
   public String inputsTipText() {
-    return "The column ranges determining the inputs (eg for 'features' and 'class').";
+    return m_Wrapper.inputsTipText();
   }
 
   /**
@@ -404,8 +357,7 @@ public class CNTKPrebuiltModel
    * @param value	the names
    */
   public void setInputNames(BaseString[] value) {
-    m_InputNames = value;
-    m_Inputs     = (Range[]) Utils.adjustArray(m_Inputs, m_InputNames.length, new Range());
+    m_Wrapper.setInputNames(value);
   }
 
   /**
@@ -414,7 +366,7 @@ public class CNTKPrebuiltModel
    * @return 		the names
    */
   public BaseString[] getInputNames() {
-    return m_InputNames;
+    return m_Wrapper.getInputNames();
   }
 
   /**
@@ -424,7 +376,7 @@ public class CNTKPrebuiltModel
    * 			displaying in the GUI or for listing the options.
    */
   public String inputNamesTipText() {
-    return "The names of the inputs (eg 'features' and 'class').";
+    return m_Wrapper.inputNamesTipText();
   }
 
   /**
@@ -443,7 +395,7 @@ public class CNTKPrebuiltModel
    * @param value	the name
    */
   public void setClassName(String value) {
-    m_ClassName = value;
+    m_Wrapper.setClassName(value);
   }
 
   /**
@@ -453,7 +405,7 @@ public class CNTKPrebuiltModel
    * @return		the name
    */
   public String getClassName() {
-    return m_ClassName;
+    return m_Wrapper.getClassName();
   }
 
   /**
@@ -463,9 +415,7 @@ public class CNTKPrebuiltModel
    * 			displaying in the explorer/experimenter gui
    */
   public String classNameTipText() {
-    return
-      "The name of the class attribute in the model, in case it cannot be "
-	+ "determined automatically.";
+    return m_Wrapper.classNameTipText();
   }
 
   /**
@@ -484,7 +434,7 @@ public class CNTKPrebuiltModel
    * @param value	the name
    */
   public void setOutputName(String value) {
-    m_OutputName = value;
+    m_Wrapper.setOutputName(value);
   }
 
   /**
@@ -494,7 +444,7 @@ public class CNTKPrebuiltModel
    * @return		the name
    */
   public String getOutputName() {
-    return m_OutputName;
+    return m_Wrapper.getOutputName();
   }
 
   /**
@@ -504,9 +454,7 @@ public class CNTKPrebuiltModel
    * 			displaying in the explorer/experimenter gui
    */
   public String outputNameTipText() {
-    return
-      "The name of the output variable in the model, in case it cannot be "
-	+ "determined automatically based on its dimension.";
+    return m_Wrapper.outputNameTipText();
   }
 
   /**
@@ -542,91 +490,8 @@ public class CNTKPrebuiltModel
    * @throws Exception	if loading fails
    */
   protected void initModel(Instances data) throws Exception {
-    if (!m_Model.exists())
-      throw new IllegalStateException("Model does not exist: " + m_Model);
-    if (m_Model.isDirectory())
-      throw new IllegalStateException("Model points to directory: " + m_Model);
-
-    switch (m_DeviceType) {
-      case DEFAULT:
-	m_Device = DeviceDescriptor.useDefaultDevice();
-	break;
-      case CPU:
-	m_Device = DeviceDescriptor.getCPUDevice();
-	break;
-      case GPU:
-	m_Device = DeviceDescriptor.getGPUDevice(m_GPUDeviceID);
-	break;
-      default:
-	throw new IllegalStateException("Unhandled device type: " + m_DeviceType);
-    }
-    m_ActualModel = Function.load(m_Model.getAbsolutePath(), m_Device);
-    if (m_ActualModel == null)
-      throw new IllegalStateException("Failed to load model: " + m_Model);
-
-    if (getDebug()) {
-      System.out.println("Arguments:");
-      for (int i = 0; i < m_ActualModel.getArguments().size(); i++)
-        System.out.println("- " + m_ActualModel.getArguments().get(i));
-      System.out.println("Outputs:");
-      for (int i = 0; i < m_ActualModel.getOutputs().size(); i++)
-        System.out.println("- " + m_ActualModel.getOutputs().get(i));
-    }
-
-    // analyze model structure
-    // 1. outputs
-    m_OutputVar = null;
-    for (Variable var: m_ActualModel.getOutputs()) {
-      if (m_OutputName.isEmpty()) {
-	if (var.getShape().getTotalSize() == data.numClasses()) {
-	  m_OutputVar = var;
-	  break;
-	}
-      }
-      else {
-        if (var.getName().equals(m_OutputName) || var.getUid().equals(m_OutputName)) {
-	  m_OutputVar = var;
-	  break;
-	}
-      }
-    }
-    if (getDebug())
-      System.out.println("Output var: " + m_OutputVar);
-    if (m_OutputVar == null)
-      throw new IllegalStateException("Failed to determine output variable!");
-
-    // 2. inputs
-    m_InputVars       = new HashMap<>();
-    m_InputShapes     = new HashMap<>();
-    m_Names           = new ArrayList<>();
-    m_ActualClassName = m_ClassName;
-    for (Variable var: m_ActualModel.getArguments()) {
-      String name = var.getName();
-      String uid = var.getUid();
-      for (BaseString inputName: m_InputNames) {
-        if (inputName.getValue().equals(name) || inputName.getValue().equals(uid)) {
-          m_Names.add(inputName.getValue());
-          m_InputVars.put(inputName.getValue(), var);
-          m_InputShapes.put(inputName.getValue(), var.getShape());
-          if (m_ActualClassName.isEmpty()) {
-            if (var.getShape().getTotalSize() == data.numClasses()) {
-	      m_ActualClassName = inputName.getValue();
-	      if (getDebug())
-	        System.out.println("Actual classname: " + m_ActualClassName);
-	    }
-	  }
-	  if (getDebug())
-	    System.out.println("Input var '" + inputName.getValue() + "': " + var);
-          break;
-	}
-      }
-    }
-
-    // reset ranges
-    m_Ranges = null;
-
-    // keep header
-    m_Header = new Instances(data, 0);
+    m_Wrapper.loadModel(m_Model, m_DeviceType, m_GPUDeviceID);
+    m_Wrapper.initModel(data.numClasses());
   }
 
   /**
@@ -649,78 +514,6 @@ public class CNTKPrebuiltModel
   }
 
   /**
-   * Performs the actual application of the model.
-   *
-   * @param input	the input
-   * @return		the score
-   */
-  protected float[] applyModel(float[] input) {
-    // ranges initialized?
-    if (m_Ranges == null) {
-      m_Ranges = new HashMap<>();
-      for (int i = 0; i < m_Inputs.length; i++) {
-	m_Inputs[i].setMax(input.length + 1);  // +1 because class value already removed from array
-	m_Ranges.put(m_InputNames[i].getValue(), new TIntHashSet(m_Inputs[i].getIntIndices()));
-      }
-    }
-
-    // assemble input data
-    Map<String,FloatVector> floatVecs = new HashMap<>();
-    if (m_Names.contains(m_ActualClassName)) {
-      floatVecs.put(m_ActualClassName, new FloatVector());
-      for (int i = 0; i < m_Header.numClasses(); i++)
-	floatVecs.get(m_ActualClassName).add(0.0f);
-    }
-    for (int i = 0; i < input.length; i++) {
-      for (String name: m_Names) {
-        TIntHashSet range = m_Ranges.get(name);
-        if ((range != null) && (range.contains(i))) {
-          if (!floatVecs.containsKey(name))
-            floatVecs.put(name, new FloatVector());
-          if (!name.equals(m_ActualClassName))
-	    floatVecs.get(name).add(input[i]);
-	  break;
-	}
-      }
-    }
-
-    UnorderedMapVariableValuePtr inputDataMap = new UnorderedMapVariableValuePtr();
-    for (String name: m_Names) {
-      FloatVectorVector floatVecVec = new FloatVectorVector();
-      floatVecVec.add(floatVecs.get(name));
-      // Create input data map
-      Value inputVal = Value.createDenseFloat(m_InputShapes.get(name), floatVecVec, m_Device);
-      inputDataMap.add(m_InputVars.get(name), inputVal);
-    }
-
-    // Create output data map. Using null as Value to indicate using system allocated memory.
-    // Alternatively, create a Value object and add it to the data map.
-    UnorderedMapVariableValuePtr outputDataMap = new UnorderedMapVariableValuePtr();
-    outputDataMap.add(m_OutputVar, null);
-
-    // Start evaluation on the device
-    m_ActualModel.evaluate(inputDataMap, outputDataMap, m_Device);
-
-    // get evaluate result as dense output
-    FloatVectorVector outputBuffer = new FloatVectorVector();
-    outputDataMap.getitem(m_OutputVar).copyVariableValueToFloat(m_OutputVar, outputBuffer);
-
-    FloatVector results = outputBuffer.get(0);
-    float[] result = new float[(int) results.size()];
-    for (int i = 0; i < result.length; i++)
-      result[i] = results.get(i);
-
-    for (FloatVector floatVec: floatVecs.values())
-      floatVec.delete();
-    outputBuffer.delete();
-    inputDataMap.delete();
-    outputDataMap.delete();
-    results.delete();
-
-    return result;
-  }
-
-  /**
    * Predicts the class memberships for a given instance. If an instance is
    * unclassified, the returned array elements must be all zero. If the class is
    * numeric, the array must consist of only one element, which contains the
@@ -740,14 +533,14 @@ public class CNTKPrebuiltModel
     float	min;
     float	max;
 
-    if (m_ActualModel == null)
+    if (!m_Wrapper.isInitialized())
       initModel(instance.dataset());
 
     values = new TFloatArrayList();
     for (i = 0; i < instance.numAttributes(); i++)
       values.add((float) instance.value(i));
 
-    scores = applyModel(values.toArray());
+    scores = m_Wrapper.predict(values.toArray());
     result = new double[scores.length];
     if (scores.length > 1) {
       min = Float.POSITIVE_INFINITY;
@@ -775,8 +568,8 @@ public class CNTKPrebuiltModel
    */
   @Override
   public String toString() {
-    if (m_ActualModel == null)
+    if (m_Wrapper.getModel() == null)
       return "No model loaded yet!";
-    return m_ActualModel.toString();
+    return m_Wrapper.getModel().toString();
   }
 }
