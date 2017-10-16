@@ -1,8 +1,8 @@
 # Project: adams
-# Date: 2017-10-16 13:03:38
+# Date: 2017-10-16 13:13:00
 # User: fracpete
 # Charset: UTF-8
-adams.flow.control.Flow -flow-execution-listener adams.flow.execution.NullListener
+adams.flow.control.Flow -annotation "Re-evaluates a 3-class classification model." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
   adams.flow.source.WekaClassifierSetup -classifier "weka.classifiers.functions.CNTKPrebuiltModel -model ${FLOWS}/data/MC.cmf -device-type DEFAULT -inputs 1-2 -inputs 3-5 -input-names features -input-names labels -class-name \"\\\"\\\"\" -output-name \"\\\"\\\"\" -output-debug-info"
   adams.flow.sink.Display -name Predictions -writer adams.data.io.output.NullWriter
