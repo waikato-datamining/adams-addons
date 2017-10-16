@@ -584,7 +584,7 @@ public class CNTKPrebuiltModel
 	}
       }
       else {
-        if (var.getName().equals(m_OutputName)) {
+        if (var.getName().equals(m_OutputName) || var.getUid().equals(m_OutputName)) {
 	  m_OutputVar = var;
 	  break;
 	}
@@ -602,20 +602,21 @@ public class CNTKPrebuiltModel
     m_ActualClassName = m_ClassName;
     for (Variable var: m_ActualModel.getArguments()) {
       String name = var.getName();
+      String uid = var.getUid();
       for (BaseString inputName: m_InputNames) {
-        if (inputName.getValue().equals(name)) {
-          m_Names.add(name);
-          m_InputVars.put(name, var);
-          m_InputShapes.put(name, var.getShape());
+        if (inputName.getValue().equals(name) || inputName.getValue().equals(uid)) {
+          m_Names.add(inputName.getValue());
+          m_InputVars.put(inputName.getValue(), var);
+          m_InputShapes.put(inputName.getValue(), var.getShape());
           if (m_ActualClassName.isEmpty()) {
             if (var.getShape().getTotalSize() == data.numClasses()) {
-	      m_ActualClassName = var.getName();
+	      m_ActualClassName = inputName.getValue();
 	      if (getDebug())
 	        System.out.println("Actual classname: " + m_ActualClassName);
 	    }
 	  }
 	  if (getDebug())
-	    System.out.println("Input var '" + name + "': " + var);
+	    System.out.println("Input var '" + inputName.getValue() + "': " + var);
           break;
 	}
       }
