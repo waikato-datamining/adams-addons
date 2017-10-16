@@ -16,13 +16,16 @@
 /*
  * CNTKModelWrapper.java
  * Copyright (C) 2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) Microsoft
  */
 
 package adams.ml.cntk;
 
 import adams.core.CleanUpHandler;
+import adams.core.License;
 import adams.core.Range;
 import adams.core.Utils;
+import adams.core.annotation.MixedCopyright;
 import adams.core.base.BaseString;
 import adams.core.option.AbstractOptionHandler;
 import com.microsoft.CNTK.DeviceDescriptor;
@@ -46,6 +49,13 @@ import java.util.Map;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
+@MixedCopyright(
+  author = "CNTK",
+  copyright = "Microsoft",
+  license = License.MIT,
+  url = "https://github.com/Microsoft/CNTK/blob/v2.0/Tests/EndToEndTests/EvalClientTests/JavaEvalTest/src/Main.java",
+  note = "Original code based on CNTK example"
+)
 public class CNTKModelWrapper
   extends AbstractOptionHandler
   implements CleanUpHandler {

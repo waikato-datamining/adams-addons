@@ -24,6 +24,7 @@ import adams.core.Range;
 import adams.core.Utils;
 import adams.core.base.BaseString;
 import adams.core.io.PlaceholderFile;
+import adams.core.logging.LoggingLevel;
 import adams.ml.cntk.CNTKModelWrapper;
 import adams.ml.cntk.DeviceType;
 import gnu.trove.list.TFloatList;
@@ -192,6 +193,17 @@ public class CNTKPrebuiltModel
     WekaOptionUtils.add(result, OUTPUTNAME, getOutputName());
     WekaOptionUtils.add(result, super.getOptions());
     return WekaOptionUtils.toArray(result);
+  }
+
+  /**
+   * Set debugging mode.
+   *
+   * @param debug true if debug output should be printed
+   */
+  @Override
+  public void setDebug(boolean debug) {
+    super.setDebug(debug);
+    m_Wrapper.setLoggingLevel(debug ? LoggingLevel.INFO : LoggingLevel.WARNING);
   }
 
   /**
