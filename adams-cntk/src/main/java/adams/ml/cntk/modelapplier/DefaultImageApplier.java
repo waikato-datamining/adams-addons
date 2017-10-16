@@ -26,6 +26,8 @@ import adams.core.Utils;
 import adams.core.annotation.MixedCopyright;
 import adams.core.logging.LoggingHelper;
 import adams.data.image.AbstractImageContainer;
+import adams.ml.cntk.predictionpostprocessor.PassThrough;
+import adams.ml.cntk.predictionpostprocessor.PredictionPostProcessor;
 import com.microsoft.CNTK.NDShape;
 import com.microsoft.CNTK.Variable;
 
@@ -52,6 +54,9 @@ public class DefaultImageApplier
 
   private static final long serialVersionUID = 7933924670965842681L;
 
+  /** the post-processor to apply. */
+  protected PredictionPostProcessor m_PostProcessor;
+
   /**
    * Returns a string describing the object.
    *
@@ -60,6 +65,56 @@ public class DefaultImageApplier
   @Override
   public String globalInfo() {
     return "Applies the model to images and returns the score. Images get scaled according to the model inputs.";
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "post-processor", "postProcessor",
+      getDefaultPostProcessor());
+  }
+
+  /**
+   * Returns the default post-processor to use for the predictions.
+   *
+   * @return  		the post-processor
+   */
+  protected PredictionPostProcessor getDefaultPostProcessor() {
+    return new PassThrough();
+  }
+
+  /**
+   * Sets the post-processor to use for the predictions.
+   *
+   * @param value	the post-processor
+   */
+  public void setPostProcessor(PredictionPostProcessor value) {
+    m_PostProcessor = value;
+    reset();
+  }
+
+  /**
+   * Returns the post-processor to use for the predictions.
+   *
+   * @return  		the post-processor
+   */
+  public PredictionPostProcessor getPostProcessor() {
+    return m_PostProcessor;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String postProcessorTipText() {
+    return "The post-processor to apply to the predictions.";
   }
 
   /**
@@ -134,7 +189,8 @@ public class DefaultImageApplier
       getLogger().fine("resizedCHW=" + Utils.arrayToString(resizedCHW));
 
     try {
-      return m_Wrapper.predict(resizedCHW);
+      float[] preds = m_Wrapper.predict(resizedCHW);
+      return m_PostProcessor.postProcessPrediction(preds);
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to make prediction!", e);

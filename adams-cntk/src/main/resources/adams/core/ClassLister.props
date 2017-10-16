@@ -14,3 +14,7 @@ adams.ml.cntk.modelapplier.AbstractModelApplier=\
 # model generators
 adams.ml.cntk.modelgenerator.ModelGenerator=\
   adams.ml.cntk.modelgenerator
+
+# the post-processors for the predictions
+adams.ml.cntk.predictionpostprocessor.PredictionPostProcessor=\
+  adams.ml.cntk.predictionpostprocessor

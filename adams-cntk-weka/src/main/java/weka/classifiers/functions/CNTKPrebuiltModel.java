@@ -27,6 +27,7 @@ import adams.core.io.PlaceholderFile;
 import adams.core.logging.LoggingLevel;
 import adams.ml.cntk.CNTKModelWrapper;
 import adams.ml.cntk.DeviceType;
+import adams.ml.cntk.predictionpostprocessor.Normalize;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.array.TFloatArrayList;
 import weka.classifiers.AbstractClassifier;
@@ -127,6 +128,9 @@ public class CNTKPrebuiltModel
 
   /** the model wrapper. */
   protected CNTKModelWrapper m_Wrapper = new CNTKModelWrapper();
+
+  /** for normalizing the predictions. */
+  protected Normalize m_Normalize = new Normalize();
 
   /**
    * Returns a string describing classifier.
@@ -556,16 +560,9 @@ public class CNTKPrebuiltModel
     scores = m_Wrapper.predict(values.toArray());
     result = new double[scores.length];
     if (scores.length > 1) {
-      min = Float.POSITIVE_INFINITY;
-      max = Float.NEGATIVE_INFINITY;
-      for (i = 0; i < scores.length; i++) {
-	min = Math.min(min, scores[i]);
-	max = Math.max(max, scores[i]);
-      }
-      if (min != max) {
-	for (i = 0; i < scores.length; i++)
-	  result[i] = (scores[i] - min) / (max - min);
-      }
+      scores = m_Normalize.postProcessPrediction(scores);
+      for (i = 0; i < scores.length; i++)
+	result[i] = scores[i];
     }
     else if (scores.length == 1) {
       result[0] = scores[0];

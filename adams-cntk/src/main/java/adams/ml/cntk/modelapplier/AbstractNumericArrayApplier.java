@@ -22,6 +22,8 @@ package adams.ml.cntk.modelapplier;
 
 import adams.core.License;
 import adams.core.annotation.MixedCopyright;
+import adams.ml.cntk.predictionpostprocessor.PassThrough;
+import adams.ml.cntk.predictionpostprocessor.PredictionPostProcessor;
 
 import java.util.logging.Level;
 
@@ -39,9 +41,62 @@ import java.util.logging.Level;
   url = "https://github.com/Microsoft/CNTK/blob/v2.0/Tests/EndToEndTests/EvalClientTests/JavaEvalTest/src/Main.java"
 )
 public abstract class AbstractNumericArrayApplier<I>
-  extends AbstractModelApplier<I, float[]>{
+  extends AbstractModelApplier<I, float[]> {
 
   private static final long serialVersionUID = 7933924670965842681L;
+
+  /** the post-processor to apply. */
+  protected PredictionPostProcessor m_PostProcessor;
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "post-processor", "postProcessor",
+      getDefaultPostProcessor());
+  }
+
+  /**
+   * Returns the default post-processor to use for the predictions.
+   *
+   * @return  		the post-processor
+   */
+  protected PredictionPostProcessor getDefaultPostProcessor() {
+    return new PassThrough();
+  }
+
+  /**
+   * Sets the post-processor to use for the predictions.
+   *
+   * @param value	the post-processor
+   */
+  public void setPostProcessor(PredictionPostProcessor value) {
+    m_PostProcessor = value;
+    reset();
+  }
+
+  /**
+   * Returns the post-processor to use for the predictions.
+   *
+   * @return  		the post-processor
+   */
+  public PredictionPostProcessor getPostProcessor() {
+    return m_PostProcessor;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String postProcessorTipText() {
+    return "The post-processor to apply to the predictions.";
+  }
 
   /**
    * Returns the class that the applier generates.
@@ -76,8 +131,11 @@ public abstract class AbstractNumericArrayApplier<I>
    * @return		the score
    */
   protected float[] applyModel(float[] input) {
+    float[] 	preds;
+
     try {
-      return m_Wrapper.predict(input);
+      preds = m_Wrapper.predict(input);
+      return m_PostProcessor.postProcessPrediction(preds);
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to make prediction!", e);

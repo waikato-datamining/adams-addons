@@ -1,16 +1,19 @@
 # Project: adams
-# Date: 2017-10-16 17:23:29
+# Date: 2017-10-17 09:21:40
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Applies a CNTK model trained on the CIFAR-10 dataset \\non some test data and outputs the images and the \\nassociated scores.\\n\\nCIFAR-10 homepage:\\nhttps://www.cs.toronto.edu/~kriz/cifar.html" -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.standalone.GridView -width 1200 -num-cols 3 -add-headers true -writer adams.gui.print.NullWriter
+ adams.flow.standalone.GridView -width 1600 -num-cols 3 -add-headers true -writer adams.gui.print.NullWriter
   adams.flow.sink.DisplayPanelManager -name Image -width 740 -provider "adams.flow.sink.ImageViewer -name Image -writer adams.gui.print.NullWriter -zoom -1.0 -selection-processor adams.gui.visualization.image.selection.NullProcessor -left-click-processor adams.gui.visualization.image.leftclick.NullProcessor -image-overlay adams.gui.visualization.image.NullOverlay" -entry-name-variable file
   adams.flow.sink.HistoryDisplay -name Scores -entry-name-variable file
   adams.flow.sink.HistoryDisplay -name Category -entry-name-variable file
+  adams.flow.sink.Display -name Categories -short-title true -x -3 -writer adams.data.io.output.NullWriter
  adams.flow.source.Start
  adams.flow.control.Trigger -name categories
   adams.flow.source.StringConstants -output-array true -string airplane -string automobile -string bird -string cat -string deer -string dog -string frog -string horse -string ship -string truck -conversion adams.data.conversion.StringToString
   adams.flow.transformer.SetStorageValue -storage-name categories
+  adams.flow.transformer.StringJoin -glue \n
+  adams.flow.sink.CallableSink -callable Categories
  adams.flow.control.Trigger -name "apply model"
   adams.flow.source.FileSystemSearch -search "adams.flow.source.filesystemsearch.LocalFileSearch -directory ${FLOWS}/data -regexp 0.*\\\\.png -sorting SORT_BY_NAME"
   adams.flow.control.Tee -name filename
@@ -19,7 +22,7 @@ adams.flow.control.Flow -annotation "Applies a CNTK model trained on the CIFAR-1
   adams.flow.transformer.ImageReader -reader adams.data.io.input.JAIImageReader -meta-data-reader adams.data.io.input.DefaultSimpleReportReader
   adams.flow.control.Tee -name image
    adams.flow.sink.CallableSink -callable Image
-  adams.flow.transformer.CNTKModelApplier -applier "adams.ml.cntk.modelapplier.DefaultImageApplier -model-file ${FLOWS}/data/ResNet20_CIFAR10_Python.model -input 1-3072 -input-name Input3 -output-name Block5480_Output_0"
+  adams.flow.transformer.CNTKModelApplier -applier "adams.ml.cntk.modelapplier.DefaultImageApplier -model-file ${FLOWS}/data/ResNet20_CIFAR10_Python.model -input 1-3072 -input-name Input3 -output-name Block5480_Output_0 -post-processor adams.ml.cntk.predictionpostprocessor.Normalize"
   adams.flow.transformer.Convert -conversion adams.data.conversion.PrimitiveArrayToObjectArray
   adams.flow.control.ArrayProcess
    adams.flow.transformer.Convert -conversion adams.data.conversion.FloatToDouble

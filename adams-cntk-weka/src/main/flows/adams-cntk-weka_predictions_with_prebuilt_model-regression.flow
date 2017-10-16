@@ -1,24 +1,38 @@
 # Project: adams
-# Date: 2017-10-16 13:12:44
+# Date: 2017-10-17 09:30:35
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Re-evaluates a regression model on a test set." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
   adams.flow.source.WekaClassifierSetup -classifier "weka.classifiers.functions.CNTKPrebuiltModel -model ${FLOWS}/data/checm.ca.cmf -device-type DEFAULT -inputs 1-216 -inputs 217 -input-names spectrum -input-names ref -class-name \"\\\"\\\"\" -output-name \"\\\"\\\"\""
   adams.flow.sink.Display -name Predictions -writer adams.data.io.output.NullWriter
+  adams.flow.sink.ActualVsPredictedPlot -name "Actual vs Predicted" -short-title true -x -3 -writer adams.gui.print.NullWriter -limit ACTUAL -meta-data-color adams.gui.visualization.sequence.metadatacolor.Dummy
  adams.flow.source.FileSupplier -file ${FLOWS}/data/chem.ca-test.txt
  adams.flow.control.Trigger -name "init output"
   adams.flow.source.CombineVariables -expression "actual - predicted" -conversion adams.data.conversion.StringToString
   adams.flow.sink.CallableSink -callable Predictions
  adams.flow.transformer.WekaFileReader -use-custom true -loader "weka.core.converters.CNTKLoader -class-group ref"
  adams.flow.transformer.WekaClassSelector
- adams.flow.transformer.WekaInstanceBuffer -operation INSTANCES_TO_INSTANCE
- adams.flow.control.Tee -name "get class"
-  adams.flow.transformer.WekaGetInstanceValue -index last
-  adams.flow.transformer.SetVariable -var-name actual
- adams.flow.transformer.WekaClassifying -model-actor WekaClassifierSetup
- adams.flow.control.ContainerValuePicker
-  adams.flow.transformer.SetVariable -var-name predicted
- adams.flow.control.Trigger -name output
-  adams.flow.source.CombineVariables -expression "@{actual} - @{predicted}" -conversion adams.data.conversion.StringToString
-  adams.flow.sink.CallableSink -callable Predictions
+ adams.flow.control.Trigger -name "new sheet"
+  adams.flow.source.NewSpreadSheet -columns Actual,Predicted -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.DefaultSpreadSheet
+  adams.flow.transformer.SetStorageValue -storage-name preds
+ adams.flow.control.Tee -name classify
+  adams.flow.transformer.WekaInstanceBuffer -operation INSTANCES_TO_INSTANCE
+  adams.flow.control.Tee -name "get class"
+   adams.flow.transformer.WekaGetInstanceValue -index last
+   adams.flow.transformer.SetVariable -var-name actual
+  adams.flow.transformer.WekaClassifying -model-actor WekaClassifierSetup
+  adams.flow.control.ContainerValuePicker
+   adams.flow.transformer.SetVariable -var-name predicted
+  adams.flow.control.Trigger -name "append sheet"
+   adams.flow.source.StorageValue -storage-name preds -conversion adams.data.conversion.UnknownToUnknown
+   adams.flow.transformer.SpreadSheetInsertRow -no-copy true -after true
+   adams.flow.transformer.SpreadSheetSetCell -name actual -no-copy true -row last -value @{actual}
+   adams.flow.transformer.SpreadSheetSetCell -name predicted -no-copy true -row last -col 2 -value @{predicted}
+   adams.flow.transformer.SetStorageValue -storage-name preds
+  adams.flow.control.Trigger -name output
+   adams.flow.source.CombineVariables -expression "@{actual} - @{predicted}" -conversion adams.data.conversion.StringToString
+   adams.flow.sink.CallableSink -callable Predictions
+ adams.flow.control.Trigger -name "actual vs predicted"
+  adams.flow.source.StorageValue -storage-name preds -conversion adams.data.conversion.UnknownToUnknown
+  adams.flow.sink.CallableSink -callable "Actual vs Predicted"
