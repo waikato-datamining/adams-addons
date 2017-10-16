@@ -710,6 +710,13 @@ public class CNTKPrebuiltModel
     for (int i = 0; i < result.length; i++)
       result[i] = results.get(i);
 
+    for (FloatVector floatVec: floatVecs.values())
+      floatVec.delete();
+    outputBuffer.delete();
+    inputDataMap.delete();
+    outputDataMap.delete();
+    results.delete();
+
     return result;
   }
 
