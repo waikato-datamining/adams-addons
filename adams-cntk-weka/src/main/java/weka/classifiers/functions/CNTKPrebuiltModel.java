@@ -490,7 +490,8 @@ public class CNTKPrebuiltModel
    * @throws Exception	if loading fails
    */
   protected void initModel(Instances data) throws Exception {
-    m_Wrapper.loadModel(m_Model, m_DeviceType, m_GPUDeviceID);
+    m_Wrapper.initDevice(m_DeviceType, m_GPUDeviceID);
+    m_Wrapper.loadModel(m_Model);
     m_Wrapper.initModel(data.numClasses());
   }
 

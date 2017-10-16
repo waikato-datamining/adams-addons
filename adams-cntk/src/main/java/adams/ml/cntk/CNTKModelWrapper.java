@@ -132,7 +132,7 @@ public class CNTKModelWrapper
    * Resets the scheme.
    */
   @Override
-  protected void reset() {
+  public void reset() {
     super.reset();
 
     cleanUp();
@@ -362,19 +362,12 @@ public class CNTKModelWrapper
   }
 
   /**
-   * Loads the model from disk.
+   * Initializes the device.
    *
-   * @param model	the model to load
    * @param device	the type of device to use
    * @param gpu		GPU ID, only used if device type is {@link DeviceType#GPU}
-   * @throws Exception	if loading of model fails
    */
-  public void loadModel(File model, DeviceType device, long gpu) throws Exception {
-    if (!model.exists())
-      throw new IllegalStateException("Model does not exist: " + model);
-    if (model.isDirectory())
-      throw new IllegalStateException("Model points to directory: " + model);
-
+  public void initDevice(DeviceType device, long gpu) {
     switch (device) {
       case DEFAULT:
 	m_Device = DeviceDescriptor.useDefaultDevice();
@@ -388,6 +381,20 @@ public class CNTKModelWrapper
       default:
 	throw new IllegalStateException("Unhandled device type: " + device);
     }
+  }
+
+  /**
+   * Loads the model from disk. Device must be available.
+   *
+   * @param model	the model to load
+   * @throws Exception	if loading of model fails
+   */
+  public void loadModel(File model) throws Exception {
+    if (!model.exists())
+      throw new IllegalStateException("Model does not exist: " + model);
+    if (model.isDirectory())
+      throw new IllegalStateException("Model points to directory: " + model);
+
     m_Model = Function.load(model.getAbsolutePath(), m_Device);
     if (m_Model == null)
       throw new IllegalStateException("Failed to load model: " + model);
