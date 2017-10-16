@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2017-07-07 13:29:26
+# Date: 2017-10-16 17:23:29
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Applies a CNTK model trained on the CIFAR-10 dataset \\non some test data and outputs the images and the \\nassociated scores.\\n\\nCIFAR-10 homepage:\\nhttps://www.cs.toronto.edu/~kriz/cifar.html" -flow-execution-listener adams.flow.execution.NullListener
@@ -16,10 +16,10 @@ adams.flow.control.Flow -annotation "Applies a CNTK model trained on the CIFAR-1
   adams.flow.control.Tee -name filename
    adams.flow.transformer.BaseName -remove-extensions true
    adams.flow.transformer.SetVariable -var-name file
-  adams.flow.transformer.ImageReader -reader adams.data.io.input.JAIImageReader
+  adams.flow.transformer.ImageReader -reader adams.data.io.input.JAIImageReader -meta-data-reader adams.data.io.input.DefaultSimpleReportReader
   adams.flow.control.Tee -name image
    adams.flow.sink.CallableSink -callable Image
-  adams.flow.transformer.CNTKModelApplier -applier "adams.ml.cntk.modelapplier.DefaultImageApplier -model-file ${FLOWS}/data/ResNet20_CIFAR10_Python.model"
+  adams.flow.transformer.CNTKModelApplier -applier "adams.ml.cntk.modelapplier.DefaultImageApplier -model-file ${FLOWS}/data/ResNet20_CIFAR10_Python.model -input 1-3072 -input-name Input3 -output-name Block5480_Output_0"
   adams.flow.transformer.Convert -conversion adams.data.conversion.PrimitiveArrayToObjectArray
   adams.flow.control.ArrayProcess
    adams.flow.transformer.Convert -conversion adams.data.conversion.FloatToDouble

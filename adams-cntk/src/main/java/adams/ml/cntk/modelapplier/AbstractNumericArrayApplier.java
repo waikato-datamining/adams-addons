@@ -21,14 +21,9 @@
 package adams.ml.cntk.modelapplier;
 
 import adams.core.License;
-import adams.core.Utils;
 import adams.core.annotation.MixedCopyright;
-import com.microsoft.CNTK.FloatVector;
-import com.microsoft.CNTK.FloatVectorVector;
-import com.microsoft.CNTK.NDShape;
-import com.microsoft.CNTK.UnorderedMapVariableValuePtr;
-import com.microsoft.CNTK.Value;
-import com.microsoft.CNTK.Variable;
+
+import java.util.logging.Level;
 
 /**
  * Ancestor for scoring numeric arrays.
@@ -81,65 +76,12 @@ public abstract class AbstractNumericArrayApplier<I>
    * @return		the score
    */
   protected float[] applyModel(float[] input) {
-    Variable outputVar = m_Model.getOutputs().get(0);
-    Variable inputVar = m_Model.getArguments().get(0);
-    if (isLoggingEnabled()) {
-      getLogger().info("model=" + m_Model);
-      getLogger().info("outputVar=" + outputVar);
-      getLogger().info("inputVar=" + inputVar);
+    try {
+      return m_Wrapper.predict(input);
     }
-
-    NDShape inputShape = inputVar.getShape();
-    int width;
-    int height = 1;
-    int channels = 1;
-    width = (int)inputShape.getDimensions()[0];
-    if (inputShape.getDimensions().length > 1)
-      height = (int)inputShape.getDimensions()[1];
-    if (inputShape.getDimensions().length > 2)
-      channels = (int)inputShape.getDimensions()[2];
-    if (width*height*channels != input.length)
-      throw new IllegalStateException(
-	"Input length and model dimensions differ: "
-	  + input.length + " != " + (width*height*channels));
-
-    if (isLoggingEnabled()) {
-      getLogger().info("width=" + width);
-      getLogger().info("height=" + height);
-      getLogger().info("channels=" + channels);
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to make prediction!", e);
+      return new float[0];
     }
-
-    FloatVector floatVec = new FloatVector();
-    for (float f : input)
-      floatVec.add(f);
-
-    FloatVectorVector floatVecVec = new FloatVectorVector();
-    floatVecVec.add(floatVec);
-    // Create input data map
-    Value inputVal = Value.createDenseFloat(inputShape, floatVecVec, m_Device);
-    UnorderedMapVariableValuePtr inputDataMap = new UnorderedMapVariableValuePtr();
-    inputDataMap.add(inputVar, inputVal);
-
-    // Create output data map. Using null as Value to indicate using system allocated memory.
-    // Alternatively, create a Value object and add it to the data map.
-    UnorderedMapVariableValuePtr outputDataMap = new UnorderedMapVariableValuePtr();
-    outputDataMap.add(outputVar, null);
-
-    // Start evaluation on the device
-    m_Model.evaluate(inputDataMap, outputDataMap, m_Device);
-
-    // get evaluate result as dense output
-    FloatVectorVector outputBuffer = new FloatVectorVector();
-    outputDataMap.getitem(outputVar).copyVariableValueToFloat(outputVar, outputBuffer);
-
-    FloatVector results = outputBuffer.get(0);
-    float[] result = new float[(int) results.size()];
-    for (int i = 0; i < result.length; i++)
-      result[i] = results.get(i);
-
-    if (isLoggingEnabled())
-      getLogger().info("result=" + Utils.arrayToString(result));
-
-    return result;
   }
 }

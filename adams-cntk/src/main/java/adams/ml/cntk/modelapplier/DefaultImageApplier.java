@@ -13,9 +13,10 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * DefaultImageApplier.java
  * Copyright (C) 2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) Microsoft
  */
 
 package adams.ml.cntk.modelapplier;
@@ -25,11 +26,7 @@ import adams.core.Utils;
 import adams.core.annotation.MixedCopyright;
 import adams.core.logging.LoggingHelper;
 import adams.data.image.AbstractImageContainer;
-import com.microsoft.CNTK.FloatVector;
-import com.microsoft.CNTK.FloatVectorVector;
 import com.microsoft.CNTK.NDShape;
-import com.microsoft.CNTK.UnorderedMapVariableValuePtr;
-import com.microsoft.CNTK.Value;
 import com.microsoft.CNTK.Variable;
 
 import java.awt.Color;
@@ -47,7 +44,8 @@ import java.util.logging.Level;
   author = "CNTK",
   copyright = "Microsoft",
   license = License.MIT,
-  url = "https://github.com/Microsoft/CNTK/blob/v2.0/Tests/EndToEndTests/EvalClientTests/JavaEvalTest/src/Main.java"
+  url = "https://github.com/Microsoft/CNTK/blob/v2.0/Tests/EndToEndTests/EvalClientTests/JavaEvalTest/src/Main.java",
+  note = "Original code based on CNTK example"
 )
 public class DefaultImageApplier
   extends AbstractModelApplier<AbstractImageContainer, float[]>{
@@ -91,13 +89,7 @@ public class DefaultImageApplier
    */
   @Override
   protected float[] doApplyModel(AbstractImageContainer input) {
-    Variable outputVar = m_Model.getOutputs().get(0);
-    Variable inputVar = m_Model.getArguments().get(0);
-    if (isLoggingEnabled()) {
-      getLogger().info("m_Model=" + m_Model);
-      getLogger().info("outputVar=" + outputVar);
-      getLogger().info("inputVar=" + inputVar);
-    }
+    Variable inputVar = m_Wrapper.getModel().getArguments().get(0);
 
     NDShape inputShape = inputVar.getShape();
     int imageWidth = (int)inputShape.getDimensions()[0];
@@ -120,7 +112,7 @@ public class DefaultImageApplier
     // or use any other fitting type
     bImg.getGraphics().drawImage(resized, 0, 0, null);
 
-    int[] resizedCHW = new int[imageSize];
+    float[] resizedCHW = new float[imageSize];
 
     int i = 0;
     for (int c = 0; c < imageChannels; c++) {
@@ -141,37 +133,12 @@ public class DefaultImageApplier
     if (LoggingHelper.isAtLeast(getLogger(), Level.FINE))
       getLogger().fine("resizedCHW=" + Utils.arrayToString(resizedCHW));
 
-    FloatVector floatVec = new FloatVector();
-    for (int intensity : resizedCHW)
-      floatVec.add(((float) intensity));
-
-    FloatVectorVector floatVecVec = new FloatVectorVector();
-    floatVecVec.add(floatVec);
-    // Create input data map
-    Value inputVal = Value.createDenseFloat(inputShape, floatVecVec, m_Device);
-    UnorderedMapVariableValuePtr inputDataMap = new UnorderedMapVariableValuePtr();
-    inputDataMap.add(inputVar, inputVal);
-
-    // Create output data map. Using null as Value to indicate using system allocated memory.
-    // Alternatively, create a Value object and add it to the data map.
-    UnorderedMapVariableValuePtr outputDataMap = new UnorderedMapVariableValuePtr();
-    outputDataMap.add(outputVar, null);
-
-    // Start evaluation on the device
-    m_Model.evaluate(inputDataMap, outputDataMap, m_Device);
-
-    // get evaluate result as dense output
-    FloatVectorVector outputBuffer = new FloatVectorVector();
-    outputDataMap.getitem(outputVar).copyVariableValueToFloat(outputVar, outputBuffer);
-
-    FloatVector results = outputBuffer.get(0);
-    float[] result = new float[(int) results.size()];
-    for (i = 0; i < result.length; i++)
-      result[i] = results.get(i);
-
-    if (isLoggingEnabled())
-      getLogger().info("result=" + Utils.arrayToString(result));
-
-    return result;
+    try {
+      return m_Wrapper.predict(resizedCHW);
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to make prediction!", e);
+      return new float[0];
+    }
   }
 }

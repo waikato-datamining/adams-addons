@@ -121,6 +121,8 @@ public class DefaultSpreadSheetRowApplier
       cell = input.getCell(index);
       if (cell.isNumeric() && !cell.isMissing())
 	values.add(cell.toDouble().floatValue());
+      else
+        values.add(Float.NaN);
     }
 
     return applyModel(values.toArray());

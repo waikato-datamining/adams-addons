@@ -22,8 +22,12 @@ package adams.ml.cntk.modelapplier;
 
 import adams.core.QuickInfoHelper;
 import adams.core.QuickInfoSupporter;
+import adams.core.Range;
+import adams.core.Utils;
+import adams.core.base.BaseString;
 import adams.core.io.ModelFileHandler;
 import adams.core.io.PlaceholderFile;
+import adams.core.logging.LoggingLevel;
 import adams.core.option.AbstractOptionHandler;
 import adams.data.report.Report;
 import adams.flow.control.StorageName;
@@ -35,8 +39,8 @@ import adams.flow.core.Compatibility;
 import adams.flow.core.FlowContextHandler;
 import adams.flow.core.OutputProducer;
 import adams.flow.core.Token;
+import adams.ml.cntk.CNTKModelWrapper;
 import adams.ml.cntk.DeviceType;
-import com.microsoft.CNTK.DeviceDescriptor;
 import com.microsoft.CNTK.Function;
 
 /**
@@ -50,7 +54,7 @@ import com.microsoft.CNTK.Function;
 public abstract class AbstractModelApplier<I, O>
   extends AbstractOptionHandler
   implements FlowContextHandler, ModelFileHandler, StorageUser,
-             QuickInfoSupporter {
+  QuickInfoSupporter {
 
   private static final long serialVersionUID = 7541008225536782803L;
 
@@ -75,14 +79,14 @@ public abstract class AbstractModelApplier<I, O>
   /** the storage item. */
   protected StorageName m_Storage;
 
+  /** the number of classes. */
+  protected int m_NumClasses;
+
   /** the helper class. */
   protected CallableActorHelper m_Helper;
 
-  /** the model to use. */
-  protected transient Function m_Model;
-
-  /** the device to use. */
-  protected DeviceDescriptor m_Device;
+  /** the wrapper to use. */
+  protected CNTKModelWrapper m_Wrapper;
 
   /**
    * Adds options to the internal list of options.
@@ -114,6 +118,35 @@ public abstract class AbstractModelApplier<I, O>
     m_OptionManager.add(
       "storage", "storage",
       new StorageName());
+
+    m_OptionManager.add(
+      "input", "inputs",
+      getDefaultInputs());
+
+    m_OptionManager.add(
+      "input-name", "inputNames",
+      getDefaultInputNames());
+
+    m_OptionManager.add(
+      "class-name", "className",
+      getDefaultClassName());
+
+    m_OptionManager.add(
+      "output-name", "outputName",
+      getDefaultOutputName());
+
+    m_OptionManager.add(
+      "num-classes", "numClasses",
+      getDefaultNumClasses());
+  }
+
+  /**
+   * Initializes the members.
+   */
+  @Override
+  protected void initialize() {
+    super.initialize();
+    m_Wrapper = new CNTKModelWrapper();
   }
 
   /**
@@ -122,7 +155,18 @@ public abstract class AbstractModelApplier<I, O>
   @Override
   protected void reset() {
     super.reset();
-    resetModel();
+    m_Wrapper.reset();
+  }
+
+  /**
+   * Sets the logging level.
+   *
+   * @param value 	the level
+   */
+  @Override
+  public synchronized void setLoggingLevel(LoggingLevel value) {
+    super.setLoggingLevel(value);
+    m_Wrapper.setLoggingLevel(value);
   }
 
   /**
@@ -300,6 +344,200 @@ public abstract class AbstractModelApplier<I, O>
   }
 
   /**
+   * Returns the default inputs.
+   *
+   * @return		the default
+   */
+  protected Range[] getDefaultInputs() {
+    return new Range[0];
+  }
+
+  /**
+   * Sets the column ranges that make up the inputs (eg for 'features' and 'class').
+   *
+   * @param value	the column
+   */
+  public void setInputs(Range[] value) {
+    m_Wrapper.setInputs(value);
+    reset();
+  }
+
+  /**
+   * Returns the column ranges that make up the inputs (eg for 'features' and 'class').
+   *
+   * @return 		the ranges
+   */
+  public Range[] getInputs() {
+    return m_Wrapper.getInputs();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String inputsTipText() {
+    return m_Wrapper.inputsTipText();
+  }
+
+  /**
+   * Returns the default input names.
+   *
+   * @return		the default
+   */
+  protected BaseString[] getDefaultInputNames() {
+    return new BaseString[0];
+  }
+
+  /**
+   * Sets the names for the inputs.
+   *
+   * @param value	the names
+   */
+  public void setInputNames(BaseString[] value) {
+    m_Wrapper.setInputNames(value);
+    reset();
+  }
+
+  /**
+   * Returns the names for the inputs.
+   *
+   * @return 		the names
+   */
+  public BaseString[] getInputNames() {
+    return m_Wrapper.getInputNames();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String inputNamesTipText() {
+    return m_Wrapper.inputNamesTipText();
+  }
+
+  /**
+   * Returns the default name of the class attribute in the model.
+   *
+   * @return		the default
+   */
+  protected String getDefaultClassName() {
+    return "";
+  }
+
+  /**
+   * Sets the name of the class attribute in the model, in case it cannot
+   * be determined automatically.
+   *
+   * @param value	the name
+   */
+  public void setClassName(String value) {
+    m_Wrapper.setClassName(value);
+    reset();
+  }
+
+  /**
+   * Returns the name of the class attribute in the model, in case it cannot
+   * be determined automatically.
+   *
+   * @return		the name
+   */
+  public String getClassName() {
+    return m_Wrapper.getClassName();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the explorer/experimenter gui
+   */
+  public String classNameTipText() {
+    return m_Wrapper.classNameTipText();
+  }
+
+  /**
+   * Returns the default name of the class attribute in the model.
+   *
+   * @return		the default
+   */
+  protected String getDefaultOutputName() {
+    return "";
+  }
+
+  /**
+   * Sets the name of the output variable in the model, in case it cannot be
+   * determined automatically based on its dimension.
+   *
+   * @param value	the name
+   */
+  public void setOutputName(String value) {
+    m_Wrapper.setOutputName(value);
+    reset();
+  }
+
+  /**
+   * Returns the name of the output variable in the model, in case it cannot
+   * be determined automatically based on its dimension.
+   *
+   * @return		the name
+   */
+  public String getOutputName() {
+    return m_Wrapper.getOutputName();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the explorer/experimenter gui
+   */
+  public String outputNameTipText() {
+    return m_Wrapper.outputNameTipText();
+  }
+
+  /**
+   * Returns the default number of classes.
+   *
+   * @return		the default
+   */
+  protected int getDefaultNumClasses() {
+    return 1;
+  }
+
+  /**
+   * Sets the number of classes (numeric class = 1, otherwise number of class labels).
+   *
+   * @param value	the number of classes
+   */
+  public void setNumClasses(int value) {
+    m_NumClasses = value;
+    reset();
+  }
+
+  /**
+   * Returns the number of classes (numeric class = 1, otherwise number of class labels).
+   *
+   * @return		the number of classes
+   */
+  public int getNumClasses() {
+    return m_NumClasses;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the explorer/experimenter gui
+   */
+  public String numClassesTipText() {
+    return "The number of classes (numeric class = 1, otherwise number of class labels).";
+  }
+
+  /**
    * Returns a quick info about the object, which can be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -366,13 +604,6 @@ public abstract class AbstractModelApplier<I, O>
   }
 
   /**
-   * Resets the model.
-   */
-  public void resetModel() {
-    m_Model = null;
-  }
-
-  /**
    * Returns whether storage items are being used.
    *
    * @return		true if storage items are used
@@ -392,75 +623,67 @@ public abstract class AbstractModelApplier<I, O>
 
     result = null;
 
-    switch (m_Location) {
-      case FILE:
-	if (m_ModelFile.exists() && !m_ModelFile.isDirectory()) {
-	  if (isLoggingEnabled())
-	    getLogger().info("Loading serialized filter from: " + m_ModelFile);
-	  switch (m_DeviceType) {
-	    case DEFAULT:
-	      m_Device = DeviceDescriptor.useDefaultDevice();
-	      break;
-	    case CPU:
-	      m_Device = DeviceDescriptor.getCPUDevice();
-	      break;
-	    case GPU:
-	      m_Device = DeviceDescriptor.getGPUDevice(m_GPUDeviceID);
-	      break;
-	    default:
-	      throw new IllegalStateException("Unhandled device type: " + m_DeviceType);
-	  }
-	  m_Model = Function.load(m_ModelFile.getAbsolutePath(), m_Device);
-	  return null;
-	}
-	break;
+    m_Wrapper.initDevice(m_DeviceType, m_GPUDeviceID);
 
-      case SOURCE:
-	source = findCallableActor();
-	if (source != null) {
-	  if (source instanceof OutputProducer) {
-	    comp = new Compatibility();
-	    if (!comp.isCompatible(new Class[]{Report.class}, ((OutputProducer) source).generates()))
-	      result = "Callable actor '" + m_Source + "' does not produce output that is compatible with '" + Report.class.getName() + "'!";
-	  }
-	  else {
-	    result = "Callable actor '" + m_Source + "' does not produce any output!";
-	  }
-	  token = null;
-	  if (result == null) {
-	    result = source.execute();
-	    if (result != null) {
-	      result = "Callable actor '" + m_Source + "' execution failed:\n" + result;
+    try {
+      switch (m_Location) {
+	case FILE:
+	  m_Wrapper.loadModel(m_ModelFile);
+	  m_Wrapper.initModel(getNumClasses());
+	  break;
+
+	case SOURCE:
+	  source = findCallableActor();
+	  if (source != null) {
+	    if (source instanceof OutputProducer) {
+	      comp = new Compatibility();
+	      if (!comp.isCompatible(new Class[]{Report.class}, ((OutputProducer) source).generates()))
+		result = "Callable actor '" + m_Source + "' does not produce output that is compatible with '" + Report.class.getName() + "'!";
 	    }
 	    else {
-	      if (((OutputProducer) source).hasPendingOutput())
-		token = ((OutputProducer) source).output();
-	      else
-		result = "Callable actor '" + m_Source + "' did not generate any output!";
+	      result = "Callable actor '" + m_Source + "' does not produce any output!";
+	    }
+	    token = null;
+	    if (result == null) {
+	      result = source.execute();
+	      if (result != null) {
+		result = "Callable actor '" + m_Source + "' execution failed:\n" + result;
+	      }
+	      else {
+		if (((OutputProducer) source).hasPendingOutput())
+		  token = ((OutputProducer) source).output();
+		else
+		  result = "Callable actor '" + m_Source + "' did not generate any output!";
+	      }
+	    }
+	    if (result != null)
+	      return result;
+	    if (token != null) {
+	      m_Wrapper.setModel((Function) token.getPayload());
+	      m_Wrapper.initModel(getNumClasses());
+	      if (isLoggingEnabled())
+		getLogger().info("Using model from source: " + m_Source);
+	      return null;
 	    }
 	  }
-	  if (result != null)
-	    return result;
-	  if (token != null) {
-	    m_Model = (Function) token.getPayload();
+	  break;
+
+	case STORAGE:
+	  if (getFlowContext().getStorageHandler().getStorage().has(m_Storage)) {
+	    m_Wrapper.setModel((Function) getFlowContext().getStorageHandler().getStorage().get(m_Storage));
+	    m_Wrapper.initModel(getNumClasses());
 	    if (isLoggingEnabled())
-	      getLogger().info("Using model from source: " + m_Source);
+	      getLogger().info("Using model from storage: " + m_Storage);
 	    return null;
 	  }
-	}
-	break;
+	  break;
 
-      case STORAGE:
-	if (getFlowContext().getStorageHandler().getStorage().has(m_Storage)) {
-	  m_Model = (Function) getFlowContext().getStorageHandler().getStorage().get(m_Storage);
-	  if (isLoggingEnabled())
-	    getLogger().info("Using model from storage: " + m_Storage);
-	  return null;
-	}
-	break;
-
-      default:
-	return "Unhandled location type: " + m_Location;
+	default:
+	  return "Unhandled location type: " + m_Location;
+      }
+    }
+    catch (Exception e) {
+      return Utils.handleException(this, "Failed to initialize model!", e);
     }
 
     return null;
@@ -481,7 +704,7 @@ public abstract class AbstractModelApplier<I, O>
     if (m_FlowContext == null)
       return "No flow context set!";
 
-    if (m_Model == null) {
+    if (!m_Wrapper.isInitialized()) {
       result = initModel();
       if (result != null)
 	return result;
