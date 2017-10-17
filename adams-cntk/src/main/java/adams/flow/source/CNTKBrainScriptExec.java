@@ -130,6 +130,11 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: ${CWD}
  * </pre>
  *
+ * <pre>-model-extension &lt;java.lang.String&gt; (property: modelExtension)
+ * &nbsp;&nbsp;&nbsp;The file extension used by the models (incl dot).
+ * &nbsp;&nbsp;&nbsp;default: .cmf
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -168,6 +173,9 @@ public class CNTKBrainScriptExec
 
   /** the directory containing the models. */
   protected PlaceholderDirectory m_ModelDirectory;
+
+  /** the extension used by the models. */
+  protected String m_ModelExtension;
 
   /** the tokens to forward. */
   protected List m_Output;
@@ -235,6 +243,10 @@ public class CNTKBrainScriptExec
     m_OptionManager.add(
       "model-directory", "modelDirectory",
       new PlaceholderDirectory());
+
+    m_OptionManager.add(
+      "model-extension", "modelExtension",
+      ".cmf");
   }
 
   /**
@@ -503,6 +515,35 @@ public class CNTKBrainScriptExec
   }
 
   /**
+   * Sets the extension that the models use (incl dot).
+   *
+   * @param value	the extension
+   */
+  public void setModelExtension(String value) {
+    m_ModelExtension = value;
+    reset();
+  }
+
+  /**
+   * Returns the extension that the models use (incl dot).
+   *
+   * @return 		the extension
+   */
+  public String getModelExtension() {
+    return m_ModelExtension;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String modelExtensionTipText() {
+    return "The file extension used by the models (incl dot).";
+  }
+
+  /**
    * Returns the class of objects that it generates.
    *
    * @return		<!-- flow-generates-start -->java.lang.String.class<!-- flow-generates-end -->
@@ -597,11 +638,11 @@ public class CNTKBrainScriptExec
       m_Lister = new LocalDirectoryLister();
       m_Lister.setWatchDir(m_ModelDirectory.getAbsolutePath());
       if (m_DeleteTempModels && m_DeleteCheckPointFiles)
-        m_Lister.setRegExp(new BaseRegExp(".*\\.cmf\\.([0-9]+|ckp)$"));
+        m_Lister.setRegExp(new BaseRegExp(".*\\" + m_ModelExtension + "\\.([0-9]+|ckp)$"));
       else if (m_DeleteTempModels)
-        m_Lister.setRegExp(new BaseRegExp(".*\\.cmf\\.[0-9]+$"));
+        m_Lister.setRegExp(new BaseRegExp(".*\\" + m_ModelExtension + "\\.[0-9]+$"));
       else if (m_DeleteCheckPointFiles)
-        m_Lister.setRegExp(new BaseRegExp(".*\\.cmf\\.ckp$"));
+        m_Lister.setRegExp(new BaseRegExp(".*\\" + m_ModelExtension+ "\\.ckp$"));
       m_Lister.setRecursive(false);
       m_Lister.setListDirs(false);
       m_Lister.setListFiles(true);
