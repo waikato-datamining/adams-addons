@@ -659,6 +659,8 @@ public class CNTKBrainScriptExec
         try {
 	  m_Process = Runtime.getRuntime().exec(fCmd, null, null);
 	  m_ProcessOutput.monitor(fCmd, null, m_Process);
+	  if (m_ProcessOutput.getExitCode() != 0)
+	    m_ExecutionFailure = new IllegalStateException("Exit code " + m_ProcessOutput.getExitCode() + " when executing: " + fCmd);
 	}
 	catch (Exception e) {
           m_ExecutionFailure = new IllegalStateException("Failed to execute: " + fCmd, e);
