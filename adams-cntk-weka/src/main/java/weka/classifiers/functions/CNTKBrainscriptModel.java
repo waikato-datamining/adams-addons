@@ -14,7 +14,7 @@
  */
 
 /*
- * CNTKModel.java
+ * CNTKBrainscriptModel.java
  * Copyright (C) 2017 University of Waikato, Hamilton, NZ
  */
 
@@ -132,7 +132,7 @@ import java.util.Vector;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class CNTKModel
+public class CNTKBrainscriptModel
   extends AbstractClassifier
   implements StreamingProcessOwner {
 
