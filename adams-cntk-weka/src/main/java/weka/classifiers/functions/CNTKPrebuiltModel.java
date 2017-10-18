@@ -547,8 +547,6 @@ public class CNTKPrebuiltModel
     float[]	scores;
     TFloatList 	values;
     int		i;
-    float	min;
-    float	max;
 
     if (!m_Wrapper.isInitialized())
       initModel(instance.dataset());
