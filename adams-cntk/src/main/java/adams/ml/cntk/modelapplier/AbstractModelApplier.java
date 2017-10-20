@@ -39,7 +39,7 @@ import adams.flow.core.Compatibility;
 import adams.flow.core.FlowContextHandler;
 import adams.flow.core.OutputProducer;
 import adams.flow.core.Token;
-import adams.ml.cntk.CNTKModelWrapper;
+import adams.ml.cntk.CNTKPredictionWrapper;
 import adams.ml.cntk.DeviceType;
 import com.microsoft.CNTK.Function;
 
@@ -86,7 +86,7 @@ public abstract class AbstractModelApplier<I, O>
   protected CallableActorHelper m_Helper;
 
   /** the wrapper to use. */
-  protected CNTKModelWrapper m_Wrapper;
+  protected CNTKPredictionWrapper m_Wrapper;
 
   /**
    * Adds options to the internal list of options.
@@ -146,7 +146,7 @@ public abstract class AbstractModelApplier<I, O>
   @Override
   protected void initialize() {
     super.initialize();
-    m_Wrapper = new CNTKModelWrapper();
+    m_Wrapper = new CNTKPredictionWrapper();
   }
 
   /**

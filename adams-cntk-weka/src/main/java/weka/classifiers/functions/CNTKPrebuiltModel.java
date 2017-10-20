@@ -25,7 +25,7 @@ import adams.core.Utils;
 import adams.core.base.BaseString;
 import adams.core.io.PlaceholderFile;
 import adams.core.logging.LoggingLevel;
-import adams.ml.cntk.CNTKModelWrapper;
+import adams.ml.cntk.CNTKPredictionWrapper;
 import adams.ml.cntk.DeviceType;
 import adams.ml.cntk.predictionpostprocessor.Normalize;
 import gnu.trove.list.TFloatList;
@@ -127,7 +127,7 @@ public class CNTKPrebuiltModel
   protected long m_GPUDeviceID = getDefaultGPUDeviceID();
 
   /** the model wrapper. */
-  protected CNTKModelWrapper m_Wrapper = new CNTKModelWrapper();
+  protected CNTKPredictionWrapper m_Wrapper = new CNTKPredictionWrapper();
 
   /** for normalizing the predictions. */
   protected Normalize m_Normalize = new Normalize();

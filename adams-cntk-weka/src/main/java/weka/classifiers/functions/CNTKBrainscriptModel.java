@@ -34,7 +34,7 @@ import adams.core.io.lister.LocalDirectoryLister;
 import adams.core.logging.LoggingLevel;
 import adams.flow.core.RunnableWithLogging;
 import adams.ml.cntk.CNTK;
-import adams.ml.cntk.CNTKModelWrapper;
+import adams.ml.cntk.CNTKPredictionWrapper;
 import adams.ml.cntk.DeviceType;
 import adams.ml.cntk.predictionpostprocessor.Normalize;
 import com.github.fracpete.processoutput4j.core.StreamingProcessOutputType;
@@ -190,7 +190,7 @@ public class CNTKBrainscriptModel
   protected BaseKeyValuePair[] m_Variables = getDefaultVariables();
 
   /** the model wrapper. */
-  protected CNTKModelWrapper m_Wrapper = new CNTKModelWrapper();
+  protected CNTKPredictionWrapper m_Wrapper = new CNTKPredictionWrapper();
 
   /** for normalizing the predictions. */
   protected Normalize m_Normalize = new Normalize();

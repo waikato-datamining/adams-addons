@@ -29,12 +29,8 @@ import adams.core.annotation.MixedCopyright;
 import adams.core.base.BaseString;
 import adams.core.option.AbstractOptionHandler;
 import com.microsoft.CNTK.DeviceDescriptor;
-import com.microsoft.CNTK.FloatVector;
-import com.microsoft.CNTK.FloatVectorVector;
 import com.microsoft.CNTK.Function;
 import com.microsoft.CNTK.NDShape;
-import com.microsoft.CNTK.UnorderedMapVariableValuePtr;
-import com.microsoft.CNTK.Value;
 import com.microsoft.CNTK.Variable;
 import gnu.trove.set.hash.TIntHashSet;
 
@@ -56,7 +52,7 @@ import java.util.Map;
   url = "https://github.com/Microsoft/CNTK/blob/v2.0/Tests/EndToEndTests/EvalClientTests/JavaEvalTest/src/Main.java",
   note = "Original code based on CNTK example"
 )
-public class CNTKModelWrapper
+public abstract class AbstractCNTKModelWrapper
   extends AbstractOptionHandler
   implements CleanUpHandler {
 
@@ -74,18 +70,6 @@ public class CNTKModelWrapper
   /** the names of the inputs. */
   protected BaseString[] m_InputNames;
 
-  /** the name of the class attribute in the model. */
-  protected String m_ClassName;
-
-  /** the actual classname (eg if automatically determined). */
-  protected String m_ActualClassName;
-
-  /** the name of the output variable. */
-  protected String m_OutputName;
-
-  /** the output variable. */
-  protected transient Variable m_OutputVar;
-
   /** the input variables (name / var). */
   protected transient Map<String,Variable> m_InputVars;
 
@@ -98,21 +82,8 @@ public class CNTKModelWrapper
   /** the ranges (input var name / indices). */
   protected transient Map<String,TIntHashSet> m_Ranges;
 
-  /** the number of classes in the data. */
-  protected int m_NumClasses;
-
   /** whether the model has been successfully initialized. */
   protected transient boolean m_Initialized;
-
-  /**
-   * Returns a string describing the object.
-   *
-   * @return 			a description suitable for displaying in the gui
-   */
-  @Override
-  public String globalInfo() {
-    return "Encapsulates a CNTK model for making predictions.";
-  }
 
   /**
    * Adds options to the internal list of options.
@@ -128,14 +99,6 @@ public class CNTKModelWrapper
     m_OptionManager.add(
       "input-name", "inputNames",
       getDefaultInputNames());
-
-    m_OptionManager.add(
-      "class-name", "className",
-      getDefaultClassName());
-
-    m_OptionManager.add(
-      "output-name", "outputName",
-      getDefaultOutputName());
   }
 
   /**
@@ -147,7 +110,6 @@ public class CNTKModelWrapper
 
     cleanUp();
 
-    m_NumClasses  = -1;
     m_Initialized = false;
   }
 
@@ -268,104 +230,10 @@ public class CNTKModelWrapper
   }
 
   /**
-   * Returns the default name of the class attribute in the model.
-   *
-   * @return		the default
-   */
-  protected String getDefaultClassName() {
-    return "";
-  }
-
-  /**
-   * Sets the name of the class attribute in the model, in case it cannot
-   * be determined automatically.
-   *
-   * @param value	the name
-   */
-  public void setClassName(String value) {
-    m_ClassName = value;
-    reset();
-  }
-
-  /**
-   * Returns the name of the class attribute in the model, in case it cannot
-   * be determined automatically.
-   *
-   * @return		the name
-   */
-  public String getClassName() {
-    return m_ClassName;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the explorer/experimenter gui
-   */
-  public String classNameTipText() {
-    return
-      "The name of the class attribute in the model, in case it cannot be "
-	+ "determined automatically.";
-  }
-
-  /**
-   * Returns the default name of the class attribute in the model.
-   *
-   * @return		the default
-   */
-  protected String getDefaultOutputName() {
-    return "";
-  }
-
-  /**
-   * Sets the name of the output variable in the model, in case it cannot be
-   * determined automatically based on its dimension.
-   *
-   * @param value	the name
-   */
-  public void setOutputName(String value) {
-    m_OutputName = value;
-    reset();
-  }
-
-  /**
-   * Returns the name of the output variable in the model, in case it cannot
-   * be determined automatically based on its dimension.
-   *
-   * @return		the name
-   */
-  public String getOutputName() {
-    return m_OutputName;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the explorer/experimenter gui
-   */
-  public String outputNameTipText() {
-    return
-      "The name of the output variable in the model, in case it cannot be "
-	+ "determined automatically based on its dimension.";
-  }
-
-  /**
-   * Returns the currently set # of classes.
-   *
-   * @return		the number of classes (1 for numeric classes, otherwise
-   * 			the number of labels)
-   */
-  public int getNumClasses() {
-    return m_NumClasses;
-  }
-
-  /**
    * Returns whether the model has been initialized.
    *
    * @return		true if initialized
-   * @see		#initModel(int)
+   * @see		#initModel()
    */
   public boolean isInitialized() {
     return m_Initialized;
@@ -413,18 +281,13 @@ public class CNTKModelWrapper
   /**
    * Initializes the model.
    *
-   * @param numClasses	the number of classes in the data: 1 for numeric classes,
-   *                    otherwise the number of labels
    * @throws Exception	if loading fails
    */
-  public void initModel(int numClasses) throws Exception {
+  protected void initModel() throws Exception {
     if (m_Model == null)
       throw new IllegalStateException("No model present!");
     if (m_Device == null)
       throw new IllegalStateException("No device present!");
-
-    // keep # classes
-    m_NumClasses = numClasses;
 
     if (isLoggingEnabled()) {
       getLogger().info("Arguments:");
@@ -436,32 +299,9 @@ public class CNTKModelWrapper
     }
 
     // analyze model structure
-    // 1. outputs
-    m_OutputVar = null;
-    for (Variable var: m_Model.getOutputs()) {
-      if (m_OutputName.isEmpty()) {
-	if (var.getShape().getTotalSize() == m_NumClasses) {
-	  m_OutputVar = var;
-	  break;
-	}
-      }
-      else {
-        if (var.getName().equals(m_OutputName) || var.getUid().equals(m_OutputName)) {
-	  m_OutputVar = var;
-	  break;
-	}
-      }
-    }
-    if (isLoggingEnabled())
-      getLogger().info("Output var: " + m_OutputVar);
-    if (m_OutputVar == null)
-      throw new IllegalStateException("Failed to determine output variable!");
-
-    // 2. inputs
     m_InputVars       = new HashMap<>();
     m_InputShapes     = new HashMap<>();
     m_Names           = new ArrayList<>();
-    m_ActualClassName = m_ClassName;
     for (Variable var: m_Model.getArguments()) {
       String name = var.getName();
       String uid = var.getUid();
@@ -470,13 +310,6 @@ public class CNTKModelWrapper
           m_Names.add(inputName.getValue());
           m_InputVars.put(inputName.getValue(), var);
           m_InputShapes.put(inputName.getValue(), var.getShape());
-          if (m_ActualClassName.isEmpty()) {
-            if (var.getShape().getTotalSize() == m_NumClasses) {
-	      m_ActualClassName = inputName.getValue();
-	      if (isLoggingEnabled())
-	        getLogger().info("Actual classname: " + m_ActualClassName);
-	    }
-	  }
 	  if (isLoggingEnabled())
 	    getLogger().info("Input var '" + inputName.getValue() + "': " + var);
           break;
@@ -491,100 +324,10 @@ public class CNTKModelWrapper
   }
 
   /**
-   * Generates a prediction on the input data.
-   *
-   * @param input	the input
-   * @return		the score
-   */
-  public float[] predict(float[] input) throws Exception {
-    int					i;
-    Map<String,FloatVector> 		floatVecs;
-    TIntHashSet 			range;
-    UnorderedMapVariableValuePtr 	inputDataMap;
-    FloatVectorVector 			floatVecVec;
-    Value 				inputVal;
-    UnorderedMapVariableValuePtr 	outputDataMap;
-    FloatVectorVector 			outputBuffer;
-    FloatVector 			results;
-    float[] 				result;
-
-    if (!isInitialized())
-      throw new Exception("Model not initialized!");
-
-    // ranges initialized?
-    if (m_Ranges == null) {
-      m_Ranges = new HashMap<>();
-      for (i = 0; i < m_Inputs.length; i++) {
-	m_Inputs[i].setMax(input.length + 1);  // +1 because class value already removed from array
-	m_Ranges.put(m_InputNames[i].getValue(), new TIntHashSet(m_Inputs[i].getIntIndices()));
-      }
-    }
-
-    // assemble input data
-    floatVecs = new HashMap<>();
-    if (m_Names.contains(m_ActualClassName)) {
-      floatVecs.put(m_ActualClassName, new FloatVector());
-      for (i = 0; i < m_NumClasses; i++)
-	floatVecs.get(m_ActualClassName).add(0.0f);
-    }
-    for (i = 0; i < input.length; i++) {
-      for (String name: m_Names) {
-        range = m_Ranges.get(name);
-        if ((range != null) && (range.contains(i))) {
-          if (!floatVecs.containsKey(name))
-            floatVecs.put(name, new FloatVector());
-          if (!name.equals(m_ActualClassName))
-	    floatVecs.get(name).add(input[i]);
-	  break;
-	}
-      }
-    }
-
-    inputDataMap = new UnorderedMapVariableValuePtr();
-    for (String name: m_Names) {
-      floatVecVec = new FloatVectorVector();
-      floatVecVec.add(floatVecs.get(name));
-      // Create input data map
-      inputVal = Value.createDenseFloat(m_InputShapes.get(name), floatVecVec, m_Device);
-      inputDataMap.add(m_InputVars.get(name), inputVal);
-    }
-
-    // Create output data map. Using null as Value to indicate using system allocated memory.
-    // Alternatively, create a Value object and add it to the data map.
-    outputDataMap = new UnorderedMapVariableValuePtr();
-    outputDataMap.add(m_OutputVar, null);
-
-    // Start evaluation on the device
-    m_Model.evaluate(inputDataMap, outputDataMap, m_Device);
-
-    // get evaluate result as dense output
-    outputBuffer = new FloatVectorVector();
-    outputDataMap.getitem(m_OutputVar).copyVariableValueToFloat(m_OutputVar, outputBuffer);
-
-    results = outputBuffer.get(0);
-    result = new float[(int) results.size()];
-    for (i = 0; i < result.length; i++)
-      result[i] = results.get(i);
-
-    for (FloatVector floatVec: floatVecs.values())
-      floatVec.delete();
-    outputBuffer.delete();
-    inputDataMap.delete();
-    outputDataMap.delete();
-    results.delete();
-
-    return result;
-  }
-
-  /**
    * Frees up memory.
    */
   @Override
   public void cleanUp() {
-    if (m_OutputVar != null) {
-      m_OutputVar.delete();
-      m_OutputVar = null;
-    }
     if (m_InputVars != null) {
       for (Variable in : m_InputVars.values())
 	in.delete();
