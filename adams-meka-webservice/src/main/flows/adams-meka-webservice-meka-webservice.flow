@@ -1,0 +1,14 @@
+# Project: adams
+# Date: 2017-10-29 11:38:53
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "The webservice that allows clients to:\\n- cross-validate classifier setups\\n- train (and cache) classifiers with data\\n- use trained classifiers to make predictions on \\n- evaluate trained classifiers on test data\\n- transform data with a callable transformer" -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.control.SubProcess -name "simple transform" -annotation "simply adds an ID attribute (of type STRING) and removes all NOMINAL attributes"
+   adams.flow.transformer.WekaFilter -filter "weka.filters.unsupervised.attribute.AddID -C first -N ID"
+   adams.flow.transformer.WekaFilter -name WekaFilter-1 -filter "weka.filters.unsupervised.attribute.RemoveType -T nominal"
+ adams.flow.standalone.WSServer -logging-level INFO -web-service "adams.flow.webservice.meka.MekaServiceWS -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -implementation adams.flow.webservice.meka.SimpleMekaService"
+ adams.flow.source.Start
+ adams.flow.control.WhileLoop -name "keep going" -condition adams.flow.condition.bool.True
+  adams.flow.source.Start
+  adams.flow.control.Sleep

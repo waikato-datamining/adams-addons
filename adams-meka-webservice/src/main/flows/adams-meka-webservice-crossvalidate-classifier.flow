@@ -1,0 +1,14 @@
+# Project: adams
+# Date: 2017-10-29 11:39:55
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Cross-validates a BR classifier on a dataset that the user chooses through \\nthe referenced webservice.\\nSee flow defined in \\\"adams-meka-webservice-weka-webservice.flow\\\" for running the webservice." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.source.MekaClassifierSetup -classifier "meka.classifiers.multilabel.BR -W weka.classifiers.trees.J48 -- -C 0.25 -M 2"
+ adams.flow.source.SelectFile -stop-if-canceled true -custom-stop-message "User canceled dataset selection!" -file-chooser-title "Select dataset to cross-validate" -initial-dir ${FLOWS}/data -extension ARFF -extension CSV -initial-file ${FLOWS}/data/Music.arff
+ adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
+ adams.flow.transformer.MekaPrepareData
+ adams.flow.transformer.MekaWSCrossValidationClassifier
+ adams.flow.transformer.WSTransformer -logging-level INFO -client "adams.flow.webservice.meka.CrossValidationClassifier -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator"
+ adams.flow.transformer.Convert -conversion adams.data.conversion.MekaDatasetToWekaInstances
+ adams.flow.sink.DisplayPanelManager -provider "adams.flow.sink.WekaInstancesDisplay -writer adams.gui.print.NullWriter"

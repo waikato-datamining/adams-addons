@@ -1,0 +1,8 @@
+# Project: adams
+# Date: 2016-02-15 15:28:22
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Lists all names of the currently stored classifier models on the webservice server.\\nSee \\\"adams-meka-webservice-train-classifier.flow\\\" flow for training (and storing) the classifier model on the server-side." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.WSSource -client "adams.flow.webservice.meka.ListClassifiers -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator"
+ adams.flow.transformer.CollectionToSequence
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter

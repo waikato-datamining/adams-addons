@@ -1,0 +1,7 @@
+# Project: adams
+# Date: 2016-02-15 15:28:40
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Displays a previously trained model (\\\'j48\\\').\\nSee \\\"adams-meka-webservice-train-classifier.flow\\\" flow for training the model on the server-side." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.WSSource -client "adams.flow.webservice.meka.DisplayClassifier -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator -classifier j48"
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter

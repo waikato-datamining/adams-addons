@@ -1,0 +1,20 @@
+# Configuration file listing the superclasses and the packages in which to
+# look for derived classes.
+#
+# Format:
+# class.name=package1,package2,...
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision$
+
+# the MEKA webservice implementations
+nz.ac.waikato.adams.webservice.meka.MekaService=\
+  adams.flow.webservice.meka
+
+# the servers
+adams.flow.webservice.WebServiceProvider=\
+  adams.flow.webservice.meka
+
+# the clients
+adams.flow.webservice.WebServiceClient=\
+  adams.flow.webservice.meka

@@ -1,0 +1,13 @@
+# Project: adams
+# Date: 2017-10-29 11:47:37
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Trains a BR classifier on a dataset that the user chooses through the referenced \\nwebservice and stores the model there as well.\\nSee flow defined in \\\"adams-meka-webservice-meka-webservice.flow\\\" for running the webservice." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.source.MekaClassifierSetup -classifier "meka.classifiers.multilabel.BR -W weka.classifiers.trees.J48 -- -C 0.25 -M 2"
+ adams.flow.source.SelectFile -stop-if-canceled true -custom-stop-message "User canceled dataset selection!" -file-chooser-title "Select dataset to cross-validate" -initial-dir ${FLOWS}/data -extension ARFF -extension CSV -initial-file ${FLOWS}/data/Music-train.arff
+ adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
+ adams.flow.transformer.MekaPrepareData
+ adams.flow.transformer.MekaWSTrainClassifier -model-name br
+ adams.flow.transformer.WSTransformer -logging-level INFO -client "adams.flow.webservice.meka.TrainClassifier -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator"
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter
