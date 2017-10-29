@@ -13,81 +13,73 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * DisplayCluster.java
- * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
+/*
+ * DownloadClassifier.java
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice;
 
-import nz.ac.waikato.adams.webservice.weka.DisplayClustererResponseObject;
+package adams.flow.webservice.weka;
+
+import adams.core.SerializationHelper;
+import adams.flow.webservice.AbstractWebServiceClientTransformer;
+import adams.flow.webservice.WebserviceUtils;
+import nz.ac.waikato.adams.webservice.weka.DownloadClassifierResponseObject;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
+import weka.classifiers.Classifier;
 
 import javax.xml.ws.BindingProvider;
 import java.net.URL;
 
 /**
- * Displays the string representation of a clusterer model.
+ * Client for download a classifier model.
  * 
- * @author msf8
+ * @author FracPete (fracpete at waikato ac dot nz)
  * @version $Revision$
  */
-public class DisplayCluster 
-extends AbstractWebServiceClientSource<String>{
+public class DownloadClassifier 
+extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.DownloadClassifier, Classifier> {
 
-  /** for serialization */
-  private static final long serialVersionUID = 8229995796562261847L;
+  /** for serialization*/
+  private static final long serialVersionUID = -4596049331963785695L;
 
-  /** clusterer to display */
-  protected String m_Clusterer;
+  /** download input object */
+  protected nz.ac.waikato.adams.webservice.weka.DownloadClassifier m_Download;
+
+  /** response object */
+  protected DownloadClassifierResponseObject m_Returned;
 
   /**
-   * Adds options to the internal list of options.
+   * Returns a string describing the object.
+   *
+   * @return 			a description suitable for displaying in the gui
    */
   @Override
   public String globalInfo() {
-    return "displays a string representing a clusterer";
+    return "Downloads a previously generated classifier model.";
   }
-  
+
   /**
-   * Adds options to the internal list of options.
+   * Returns the classes that are accepted input.
+   * 
+   * @return		the classes that are accepted
    */
   @Override
-  public void defineOptions() {
-    super.defineOptions();
-    
-    m_OptionManager.add(
-	"clusterer", "clusterer", "");
+  public Class[] accepts() {
+    return new Class[]{nz.ac.waikato.adams.webservice.weka.DownloadClassifier.class};
   }
-  
+
   /**
-   * set the name of the clusterer.
+   * Sets the data for the request, if any.
    * 
-   * @param s	name of clusterer to display
+   * @param value	the request data
    */
-  public void setClusterer(String s) {
-    m_Clusterer = s;
-    reset();
+  @Override
+  public void setRequestData(nz.ac.waikato.adams.webservice.weka.DownloadClassifier value) {
+    m_Download = value;
+
   }
-  
-  /**
-   * get the name of the clusterer.
-   * 
-   * @return	name of the clusterer to display
-   */
-  public String getClusterer() {
-    return m_Clusterer;
-  }
-  
-  /**
-   * description of this option.
-   * 
-   * @return	Description of the clusterer name option
-   */
-  public String clusterTipText() {
-    return "name of clusterer to display";
-  }
-  
+
   /**
    * Returns the classes that this client generates.
    * 
@@ -95,7 +87,7 @@ extends AbstractWebServiceClientSource<String>{
    */
   @Override
   public Class[] generates() {
-    return new Class[] {String.class};
+    return new Class[]{Classifier.class};
   }
 
   /**
@@ -127,15 +119,16 @@ extends AbstractWebServiceClientSource<String>{
 	m_ReceiveTimeout, 
 	(getUseAlternativeURL() ? getAlternativeURL() : null),
 	m_InInterceptor,
-	null);
+	m_OutInterceptor);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
-    DisplayClustererResponseObject returned = wekaService.displayClusterer(m_Clusterer);
-    // failed to generate data?
-    if (returned.getErrorMessage() != null)
-      throw new IllegalStateException(returned.getErrorMessage());
-    setResponseData(returned.getDisplayString());
+    
+    m_Returned = wekaService.downloadClassifier(m_Download.getModelName()); 
+    // failed to download model?
+    if (m_Returned.getErrorMessage() != null)
+      throw new IllegalStateException(m_Returned.getErrorMessage());
+    setResponseData((Classifier) SerializationHelper.read(m_Returned.getModelData().getInputStream()));
 
-    m_Clusterer = null;
+    m_Download = null;
   }
 }

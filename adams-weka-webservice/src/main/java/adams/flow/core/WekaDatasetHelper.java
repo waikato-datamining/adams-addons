@@ -14,17 +14,14 @@
  */
 
 /*
- * DatasetHelper.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * WekaDatasetHelper.java
+ * Copyright (C) 2013-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.core;
 
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-
+import adams.core.DateFormat;
+import adams.core.DateUtils;
 import nz.ac.waikato.adams.webservice.weka.Attribute;
 import nz.ac.waikato.adams.webservice.weka.Attributes;
 import nz.ac.waikato.adams.webservice.weka.Body;
@@ -42,8 +39,11 @@ import weka.core.DenseInstance;
 import weka.core.SparseInstance;
 import weka.core.Utils;
 import weka.core.Version;
-import adams.core.DateFormat;
-import adams.core.DateUtils;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
 
 /**
  * Helper class for converting to and from xrff datasets
@@ -51,7 +51,7 @@ import adams.core.DateUtils;
  * @author msf8
  * 
  */
-public class DatasetHelper {
+public class WekaDatasetHelper {
   
   /** for formatting dates. */
   protected static DateFormat m_DateFormat = DateUtils.getTimestampFormatterMsecs();

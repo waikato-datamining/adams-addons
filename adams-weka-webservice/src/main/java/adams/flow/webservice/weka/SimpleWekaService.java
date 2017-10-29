@@ -18,7 +18,7 @@
  * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 
-package adams.flow.webservice;
+package adams.flow.webservice.weka;
 
 import adams.core.LRUCache;
 import adams.core.SerializationHelper;
@@ -31,10 +31,11 @@ import adams.flow.core.ActorUtils;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.Compatibility;
-import adams.flow.core.DatasetHelper;
 import adams.flow.core.InputConsumer;
 import adams.flow.core.OutputProducer;
 import adams.flow.core.Token;
+import adams.flow.core.WekaDatasetHelper;
+import adams.flow.webservice.WebserviceUtils;
 import nz.ac.waikato.adams.webservice.weka.Attributes;
 import nz.ac.waikato.adams.webservice.weka.Body;
 import nz.ac.waikato.adams.webservice.weka.CrossValidateResponseObject;
@@ -163,7 +164,7 @@ public class SimpleWekaService
     m_Owner.getLogger().info(classifier);
     m_Owner.getLogger().info(name);
     try {
-      data = DatasetHelper.toInstances(dataset);
+      data = WekaDatasetHelper.toInstances(dataset);
       cls  = (Classifier) OptionUtils.forAnyCommandLine(Classifier.class, classifier);
       cls.buildClassifier(data);
       m_Classifiers.put(name, cls);
@@ -202,11 +203,11 @@ public class SimpleWekaService
     }
 
     try {
-      data = DatasetHelper.toInstances(dataset);
+      data = WekaDatasetHelper.toInstances(dataset);
       cls  = m_Classifiers.get(modelName);
       eval = new Evaluation(data);
       eval.evaluateModel(cls, data);
-      result.setReturnDataset(DatasetHelper.evaluationToDataset(eval));
+      result.setReturnDataset(WekaDatasetHelper.evaluationToDataset(eval));
     } 
     catch (java.lang.Exception ex) {
       result.setErrorMessage(Utils.handleException(m_Owner, "Failed to test model '" + modelName + "'!", ex));
@@ -241,11 +242,11 @@ public class SimpleWekaService
     m_Owner.getLogger().info(classifier);
 
     try {
-      data = DatasetHelper.toInstances(dataset);
+      data = WekaDatasetHelper.toInstances(dataset);
       cls  = (Classifier) OptionUtils.forAnyCommandLine(Classifier.class, classifier);
       eval = new Evaluation(data);
       eval.crossValidateModel(cls, data, folds, new Random(seed));
-      result.setReturnDataset(DatasetHelper.evaluationToDataset(eval));
+      result.setReturnDataset(WekaDatasetHelper.evaluationToDataset(eval));
     } 
     catch (java.lang.Exception ex) {
       result.setErrorMessage(Utils.handleException(m_Owner, "Failed to cross-validate classifier '" + classifier + "'!", ex));
@@ -289,7 +290,7 @@ public class SimpleWekaService
       return result;
     }
 
-    data = DatasetHelper.toInstances(dataset);
+    data = WekaDatasetHelper.toInstances(dataset);
     // no class
     if (data.classIndex() == -1) {
       result.setErrorMessage("No class attribute set!");
@@ -303,16 +304,16 @@ public class SimpleWekaService
       pred    = new Dataset();
       result.setReturnDataset(pred);
       pred.setName("Predictions on '" + data.relationName() + "' using " + "'" + modelName + "'");
-      pred.setVersion(DatasetHelper.getDateFormat().format(new Date()));
+      pred.setVersion(WekaDatasetHelper.getDateFormat().format(new Date()));
       pred.setHeader(new Header());
       pred.getHeader().setAttributes(new Attributes());
       if (nominal) {
-	DatasetHelper.addAttribute(pred, "Classification", Type.STRING);
+	WekaDatasetHelper.addAttribute(pred, "Classification", Type.STRING);
 	for (i = 0; i < wAtt.numValues(); i++)
-	  DatasetHelper.addAttribute(pred, "Distribution (" + wAtt.value(i) + ")", Type.NUMERIC);
+	  WekaDatasetHelper.addAttribute(pred, "Distribution (" + wAtt.value(i) + ")", Type.NUMERIC);
       }
       else {
-	DatasetHelper.addAttribute(pred, "Classification", Type.NUMERIC);
+	WekaDatasetHelper.addAttribute(pred, "Classification", Type.NUMERIC);
       }
       pred.setBody(new Body());
       pred.getBody().setInstances(new Instances());
@@ -325,14 +326,14 @@ public class SimpleWekaService
 	pred.getBody().getInstances().getInstance().add(in);
 	if (nominal) {
 	  classification = cls.classifyInstance(inst);
-	  DatasetHelper.addValue(in, 0, wAtt.value((int) classification));
+	  WekaDatasetHelper.addValue(in, 0, wAtt.value((int) classification));
 	  distribution = cls.distributionForInstance(inst);
 	  for (n = 0; n < distribution.length; n++)
-	    DatasetHelper.addValue(in, 1 + n, distribution[n]);
+	    WekaDatasetHelper.addValue(in, 1 + n, distribution[n]);
 	}
 	else {
 	  classification = cls.classifyInstance(inst);
-	  DatasetHelper.addValue(in, 0, classification);
+	  WekaDatasetHelper.addValue(in, 0, classification);
 	}
       }
     } 
@@ -447,7 +448,7 @@ public class SimpleWekaService
       result.setErrorMessage("Callable transformer '" + actorName + "' does not generate " + weka.core.Instances.class.getName() + "!");
       return result;
     }
-    data = DatasetHelper.toInstances(dataset);
+    data = WekaDatasetHelper.toInstances(dataset);
     
     try {
       synchronized(callable) {
@@ -461,7 +462,7 @@ public class SimpleWekaService
 	  if (((OutputProducer) callable).hasPendingOutput()) {
 	    output = ((OutputProducer) callable).output();
 	    data   = (weka.core.Instances) output.getPayload();
-	    result.setReturnDataset(DatasetHelper.fromInstances(data));
+	    result.setReturnDataset(WekaDatasetHelper.fromInstances(data));
 	  }
 	  else {
 	    result.setErrorMessage("Callable transformer '" + actorName + "' did not produce any output!");
@@ -502,7 +503,7 @@ public class SimpleWekaService
     m_Owner.getLogger().info(clusterer);
     m_Owner.getLogger().info(modelName);
     try {
-      data = DatasetHelper.toInstances(dataset);
+      data = WekaDatasetHelper.toInstances(dataset);
       cls  = (Clusterer) OptionUtils.forAnyCommandLine(Clusterer.class, clusterer);
       cls.buildClusterer(data);
       m_Clusterers.put(modelName, cls);
@@ -550,7 +551,7 @@ public class SimpleWekaService
       return result;
     }
 
-    data = DatasetHelper.toInstances(dataset);
+    data = WekaDatasetHelper.toInstances(dataset);
     // class set
     if (data.classIndex() != -1) {
       result.setErrorMessage("Dataset cannot have class attribute set!");
@@ -562,13 +563,13 @@ public class SimpleWekaService
       pred = new Dataset();
       result.setReturnDataset(pred);
       pred.setName("Predictions on '" + data.relationName() + "' using " + "'" + modelName + "'");
-      pred.setVersion(DatasetHelper.getDateFormat().format(new Date()));
+      pred.setVersion(WekaDatasetHelper.getDateFormat().format(new Date()));
       pred.setHeader(new Header());
       pred.getHeader().setAttributes(new Attributes());
-      DatasetHelper.addAttribute(pred, "Cluster", Type.NUMERIC);
+      WekaDatasetHelper.addAttribute(pred, "Cluster", Type.NUMERIC);
       numClusters = cls.numberOfClusters();
       for (i = 0; i < numClusters; i++)
-	DatasetHelper.addAttribute(pred, "Cluster membership " + (i+1), Type.NUMERIC);
+	WekaDatasetHelper.addAttribute(pred, "Cluster membership " + (i+1), Type.NUMERIC);
       pred.setBody(new Body());
       pred.getBody().setInstances(new Instances());
       for (i = 0; i < data.numInstances(); i++) {
@@ -578,10 +579,10 @@ public class SimpleWekaService
 	in.setInstanceWeight(1.0);
 	pred.getBody().getInstances().getInstance().add(in);
 	cluster = cls.clusterInstance(inst);
-	DatasetHelper.addValue(in, 0, cluster + 1);
+	WekaDatasetHelper.addValue(in, 0, cluster + 1);
 	distribution = cls.distributionForInstance(inst);
 	for (n = 0; n < distribution.length; n++)
-	  DatasetHelper.addValue(in, 1 + n, distribution[n]);
+	  WekaDatasetHelper.addValue(in, 1 + n, distribution[n]);
       }
     } 
     catch (java.lang.Exception ex) {
@@ -725,7 +726,7 @@ public class SimpleWekaService
 
     if (result.getErrorMessage() == null) {
       try {
-	search.buildClassifier(DatasetHelper.toInstances(dataset));
+	search.buildClassifier(WekaDatasetHelper.toInstances(dataset));
 	result.setBestClassifierSetup(handler.toCommandLine(search.getBestClassifier()));
       } 
       catch (java.lang.Exception ex) {
@@ -745,6 +746,6 @@ public class SimpleWekaService
     if (!m_Owner.isLoggingEnabled())
       return;
     m_Owner.getLogger().info("Number of instances: \t " + dataset.getBody().getInstances().getInstance().size());
-    m_Owner.getLogger().info(DatasetHelper.datasetToString(dataset));
+    m_Owner.getLogger().info(WekaDatasetHelper.datasetToString(dataset));
   }
 }

@@ -13,15 +13,15 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * PredictClassifier.java
+/**
+ * DisplayClassifier.java
  * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
+package adams.flow.webservice.weka;
 
-package adams.flow.webservice;
-
-import nz.ac.waikato.adams.webservice.weka.Dataset;
-import nz.ac.waikato.adams.webservice.weka.PredictClassifierResponseObject;
+import adams.flow.webservice.AbstractWebServiceClientSource;
+import adams.flow.webservice.WebserviceUtils;
+import nz.ac.waikato.adams.webservice.weka.DisplayClassifierResponseObject;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
 
@@ -29,19 +29,19 @@ import javax.xml.ws.BindingProvider;
 import java.net.URL;
 
 /**
- * client for using the predict web service .
+ * Displays the string representation of a built classifier model.
  * 
- * @author msf8	
+ * @author msf8
  * @version $Revision$
  */
-public class PredictClassifier 
-extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.PredictClassifier, Dataset>{
+public class DisplayClassifier 
+extends AbstractWebServiceClientSource<String> {
 
   /** for serialization*/
-  private static final long serialVersionUID = -4596049331963785695L;
+  private static final long serialVersionUID = 1297440704076575307L;
 
-  /** predict input object */
-  protected nz.ac.waikato.adams.webservice.weka.PredictClassifier m_Predict;
+  /** name of model to display */
+  protected String m_Classifier;
 
   /**
    * Returns a string describing the object.
@@ -50,30 +50,48 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public String globalInfo() {
-    return "Makes a prediction using the weka web service.";
+    return "displays a string representing a classifier"; 
   }
-
+  
   /**
-   * Returns the classes that are accepted input.
-   * 
-   * @return		the classes that are accepted
+   * Adds options to the internal list of options.
    */
   @Override
-  public Class[] accepts() {
-    return new Class[] {nz.ac.waikato.adams.webservice.weka.PredictClassifier.class};
+  public void defineOptions() {
+    super.defineOptions();
+    
+    m_OptionManager.add(
+	"classifier", "classifier", "");
   }
-
+  
   /**
-   * Sets the data for the request, if any.
+   * set the name of the classifier to display.
    * 
-   * @param value	the request data
+   * @param s		name of classifier
    */
-  @Override
-  public void setRequestData(nz.ac.waikato.adams.webservice.weka.PredictClassifier value) {
-    m_Predict= value;
-
+  public void setClassifier(String s) {
+    m_Classifier = s;
+    reset();
   }
-
+  
+  /**
+   * get the name of the classifier to display.
+   * 
+   * @return		name of classifier
+   */
+  public String getClassifier() {
+    return m_Classifier;
+  }
+  
+  /**
+   * Description of this option.
+   * 
+   * @return		description of the classifier option
+   */
+  public String classifierTipText() {
+    return "name of the classifier to display";
+  }
+  
   /**
    * Returns the classes that this client generates.
    * 
@@ -81,7 +99,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public Class[] generates() {
-    return new Class[] {Dataset.class};
+    return new Class[] {String.class};
   }
 
   /**
@@ -112,16 +130,15 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
 	m_ReceiveTimeout, 
 	(getUseAlternativeURL() ? getAlternativeURL() : null),
 	m_InInterceptor,
-	m_OutInterceptor);
+	null);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
-    
-    PredictClassifierResponseObject returned = wekaService.predictClassifier(m_Predict.getDataset(), m_Predict.getModelName());
+    DisplayClassifierResponseObject returned = wekaService.displayClassifier(m_Classifier);
     // failed to generate data?
     if (returned.getErrorMessage() != null)
       throw new IllegalStateException(returned.getErrorMessage());
-    setResponseData(returned.getReturnDataset());
+    setResponseData(returned.getDisplayString());
 
-    m_Predict = null;
+    m_Classifier = null;
   }
 }

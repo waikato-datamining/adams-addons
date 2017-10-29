@@ -14,33 +14,35 @@
  */
 
 /**
- * OptimizeClassifierMultiSearch.java
+ * PredictClusterer.java
  * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice;
+package adams.flow.webservice.weka;
 
-import nz.ac.waikato.adams.webservice.weka.OptimizeReturnObject;
+import adams.flow.webservice.AbstractWebServiceClientTransformer;
+import adams.flow.webservice.WebserviceUtils;
+import nz.ac.waikato.adams.webservice.weka.Dataset;
+import nz.ac.waikato.adams.webservice.weka.PredictClustererResponseObject;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
-import weka.classifiers.meta.MultiSearch;
 
 import javax.xml.ws.BindingProvider;
 import java.net.URL;
 
 /**
- * client for using the optimize classifier multi search web service.
+ * Predicts the cluster that instances belong to.
  * 
  * @author msf8
  * @version $Revision$
  */
-public class OptimizeClassifierMultiSearch 
-extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.OptimizeClassifierMultiSearch, String> {
+public class PredictClusterer 
+extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.PredictClusterer, Dataset> {
 
-  /**for serialization*/
-  private static final long serialVersionUID = 4416594787276538808L;
+  /** for serialization*/
+  private static final long serialVersionUID = 7762416866236696720L;
 
-  /** optimize classifier multi search input object */
-  protected nz.ac.waikato.adams.webservice.weka.OptimizeClassifierMultiSearch m_Optimize;
+  /**predict cluster input */
+  protected nz.ac.waikato.adams.webservice.weka.PredictClusterer m_Predict;
 
   /**
    * Returns a string describing the object.
@@ -49,7 +51,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public String globalInfo() {
-    return "Triggers a parameter optimization on the server using " + MultiSearch.class.getName() + ".";
+    return "makes predictions of clusters for a dataset";
   }
   
   /**
@@ -59,7 +61,17 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public Class[] accepts() {
-   return new Class[]{nz.ac.waikato.adams.webservice.weka.OptimizeClassifierMultiSearch.class};
+    return new Class[] { nz.ac.waikato.adams.webservice.weka.PredictClusterer.class};
+  }
+
+  /**
+   * Returns the classes that this client generates.
+   * 
+   * @return		the classes
+   */
+  @Override
+  public Class[] generates() {
+    return new Class[] {Dataset.class};
   }
 
   /**
@@ -68,18 +80,8 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    * @param value	the request data
    */
   @Override
-  public void setRequestData(nz.ac.waikato.adams.webservice.weka.OptimizeClassifierMultiSearch value) {
-   m_Optimize = value;
-  }
-
-  /**
-   * Returns the classes that are accepted input.
-   * 
-   * @return		the classes that are accepted
-   */
-  @Override
-  public Class[] generates() {
-    return new Class[]{String.class};
+  public void setRequestData(nz.ac.waikato.adams.webservice.weka.PredictClusterer value) {
+    m_Predict = value;
   }
 
   /**
@@ -111,17 +113,14 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
 	(getUseAlternativeURL() ? getAlternativeURL() : null),
 	m_InInterceptor,
 	m_OutInterceptor);
-
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
-    
-    OptimizeReturnObject returned = wekaService.optimizeClassifierMultiSearch(m_Optimize.getClassifier(), m_Optimize.getSearchParameters(), m_Optimize.getDataset(), m_Optimize.getEvaluation());
+    PredictClustererResponseObject returned = wekaService.predictClusterer(m_Predict.getDataset(), m_Predict.getModelName());
+    // failed to generate data?
     if (returned.getErrorMessage() != null)
       throw new IllegalStateException(returned.getErrorMessage());
-    if (returned.getBestClassifierSetup() != null)
-      setResponseData(returned.getBestClassifierSetup());
-    if (returned.getWarningMessage() != null)
-      getOwner().getLogger().severe("WARNING: " + returned.getWarningMessage());
-    m_Optimize = null;
+    setResponseData(returned.getReturnDataset());
+
+    m_Predict = null;
   }
 }

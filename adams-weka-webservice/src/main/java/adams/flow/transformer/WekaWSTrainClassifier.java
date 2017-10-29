@@ -21,15 +21,15 @@
 package adams.flow.transformer;
 
 import adams.core.MessageCollection;
-import nz.ac.waikato.adams.webservice.weka.Dataset;
-import weka.core.Instances;
 import adams.core.QuickInfoHelper;
 import adams.core.option.OptionUtils;
-import adams.flow.core.CallableActorReference;
 import adams.flow.core.CallableActorHelper;
-import adams.flow.core.DatasetHelper;
+import adams.flow.core.CallableActorReference;
 import adams.flow.core.Token;
+import adams.flow.core.WekaDatasetHelper;
 import adams.flow.source.WekaClassifierSetup;
+import nz.ac.waikato.adams.webservice.weka.Dataset;
+import weka.core.Instances;
 
 /**
  * Trains a classifier on a dataset and makes the model available.
@@ -206,7 +206,7 @@ extends AbstractTransformer{
   @Override
   protected String doExecute() {
     nz.ac.waikato.adams.webservice.weka.TrainClassifier t =  new nz.ac.waikato.adams.webservice.weka.TrainClassifier();
-    Dataset d = DatasetHelper.fromInstances((Instances)m_InputToken.getPayload());
+    Dataset d = WekaDatasetHelper.fromInstances((Instances)m_InputToken.getPayload());
     t.setDataset(d);
     t.setClassifier(OptionUtils.getCommandLine(getClassifierInstance()));
     t.setName(m_ModelName);

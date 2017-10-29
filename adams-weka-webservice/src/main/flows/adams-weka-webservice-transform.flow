@@ -6,6 +6,6 @@ adams.flow.control.Flow -annotation "Uses the callable transformer \\\'simple tr
  adams.flow.source.SelectFile -stop-if-canceled true -custom-stop-message "User canceled dataset selection!" -file-chooser-title "Select dataset to cross-validate" -initial-dir ${FLOWS}/data -extension ARFF -extension CSV -initial-file ${FLOWS}/data/anneal.arff
  adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
  adams.flow.transformer.WekaWSTransform -actor-name "simple transform"
- adams.flow.transformer.WSTransformer -logging-level INFO -client "adams.flow.webservice.Transform -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator"
+ adams.flow.transformer.WSTransformer -logging-level INFO -client "adams.flow.webservice.weka.Transform -out-interceptor adams.flow.webservice.weka.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.weka.interceptor.incoming.NullGenerator"
  adams.flow.transformer.Convert -conversion adams.data.conversion.DatasetToWekaInstances
  adams.flow.sink.DisplayPanelManager -provider "adams.flow.sink.WekaInstancesDisplay -writer adams.gui.print.NullWriter"

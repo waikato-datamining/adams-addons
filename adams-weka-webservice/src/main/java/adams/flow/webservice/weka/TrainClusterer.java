@@ -14,12 +14,14 @@
  */
 
 /**
- * DisplayClassifier.java
+ * TrainClusterer.java
  * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice;
+package adams.flow.webservice.weka;
 
-import nz.ac.waikato.adams.webservice.weka.DisplayClassifierResponseObject;
+import adams.flow.webservice.AbstractWebServiceClientTransformer;
+import adams.flow.webservice.WebserviceUtils;
+import nz.ac.waikato.adams.webservice.weka.TrainClustererResponseObject;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
 
@@ -27,19 +29,19 @@ import javax.xml.ws.BindingProvider;
 import java.net.URL;
 
 /**
- * Displays the string representation of a built classifier model.
+ * Builds a clusterer model.
  * 
  * @author msf8
  * @version $Revision$
  */
-public class DisplayClassifier 
-extends AbstractWebServiceClientSource<String>{
+public class TrainClusterer 
+extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.TrainClusterer, String> {
 
-  /** for serialization*/
-  private static final long serialVersionUID = 1297440704076575307L;
-
-  /** name of model to display */
-  protected String m_Classifier;
+  /** fro serialization*/
+  private static final long serialVersionUID = -2621193325978827170L;
+  
+  /** train cluster input */
+  protected nz.ac.waikato.adams.webservice.weka.TrainClusterer m_Train;
 
   /**
    * Returns a string describing the object.
@@ -48,48 +50,29 @@ extends AbstractWebServiceClientSource<String>{
    */
   @Override
   public String globalInfo() {
-    return "displays a string representing a classifier"; 
+   return "trains a dataset into clusters";
   }
-  
+
   /**
-   * Adds options to the internal list of options.
+   * Returns the classes that are accepted input.
+   * 
+   * @return		the classes that are accepted
    */
   @Override
-  public void defineOptions() {
-    super.defineOptions();
-    
-    m_OptionManager.add(
-	"classifier", "classifier", "");
+  public Class[] accepts() {
+    return new Class[] {nz.ac.waikato.adams.webservice.weka.TrainClusterer.class};
   }
-  
+
   /**
-   * set the name of the classifier to display.
+   * Sets the data for the request, if any.
    * 
-   * @param s		name of classifier
+   * @param value	the request data
    */
-  public void setClassifier(String s) {
-    m_Classifier = s;
-    reset();
+  @Override
+  public void setRequestData(nz.ac.waikato.adams.webservice.weka.TrainClusterer value) {
+    m_Train = value;
   }
-  
-  /**
-   * get the name of the classifier to display.
-   * 
-   * @return		name of classifier
-   */
-  public String getClassifier() {
-    return m_Classifier;
-  }
-  
-  /**
-   * Description of this option.
-   * 
-   * @return		description of the classifier option
-   */
-  public String classifierTipText() {
-    return "name of the classifier to display";
-  }
-  
+
   /**
    * Returns the classes that this client generates.
    * 
@@ -97,7 +80,7 @@ extends AbstractWebServiceClientSource<String>{
    */
   @Override
   public Class[] generates() {
-    return new Class[] {String.class};
+   return new Class[] {String.class};
   }
 
   /**
@@ -128,15 +111,15 @@ extends AbstractWebServiceClientSource<String>{
 	m_ReceiveTimeout, 
 	(getUseAlternativeURL() ? getAlternativeURL() : null),
 	m_InInterceptor,
-	null);
+	m_OutInterceptor);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
-    DisplayClassifierResponseObject returned = wekaService.displayClassifier(m_Classifier);
+    TrainClustererResponseObject response = wekaService.trainClusterer(m_Train.getDataset(), m_Train.getClusterer(), m_Train.getModelName());
     // failed to generate data?
-    if (returned.getErrorMessage() != null)
-      throw new IllegalStateException(returned.getErrorMessage());
-    setResponseData(returned.getDisplayString());
+    if (response.getErrorMessage() != null)
+      throw new IllegalStateException(response.getErrorMessage());
+    setResponseData(response.getModel());
 
-    m_Classifier = null;
+    m_Train = null;
   }
 }

@@ -20,15 +20,15 @@
 package adams.flow.transformer;
 
 import adams.core.MessageCollection;
-import nz.ac.waikato.adams.webservice.weka.Dataset;
-import weka.core.Instances;
 import adams.core.QuickInfoHelper;
 import adams.core.option.OptionUtils;
-import adams.flow.core.CallableActorReference;
 import adams.flow.core.CallableActorHelper;
-import adams.flow.core.DatasetHelper;
+import adams.flow.core.CallableActorReference;
 import adams.flow.core.Token;
+import adams.flow.core.WekaDatasetHelper;
 import adams.flow.source.WekaClustererSetup;
+import nz.ac.waikato.adams.webservice.weka.Dataset;
+import weka.core.Instances;
 
 /**
  * Trains a clusterer.
@@ -208,7 +208,7 @@ extends AbstractTransformer{
     nz.ac.waikato.adams.webservice.weka.TrainClusterer t = new nz.ac.waikato.adams.webservice.weka.TrainClusterer();
     t.setClusterer(OptionUtils.getCommandLine(getClustererInstance()));
     t.setModelName(m_ModelName);
-    Dataset d = DatasetHelper.fromInstances((Instances)m_InputToken.getPayload());
+    Dataset d = WekaDatasetHelper.fromInstances((Instances)m_InputToken.getPayload());
     t.setDataset(d);
     m_OutputToken = new Token(t);
     return null;

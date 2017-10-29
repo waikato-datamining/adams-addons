@@ -1,5 +1,4 @@
-% Copyright (c) 2012-2014 University of Waikato, Hamilton, NZ
-% This work is made available under the terms of the 
+% This work is made available under the terms of the
 % Creative Commons Attribution-ShareAlike 4.0 license,
 % http://creativecommons.org/licenses/by-sa/4.0/.
 %
@@ -46,7 +45,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2012-2014} &
+		\parbox[c][2cm]{2cm}{\copyright 2012-2017} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}}
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -148,7 +147,7 @@ change that setting on the server
 (\textit{WSServer $\rightarrow$ webService $\rightarrow$ classifierCacheSize}).
 
 \section{Clusterers}
-The webservice offers the following functionaliuty for clusterers:
+The webservice offers the following functionality for clusterers:
 \begin{tight_itemize}
 	\item \textit{train} -- trains a clusterer setup on a provided dataset 
 	and caches the model for future use.\footnote{adams-weka-webservice-train-clusterer.flow}
@@ -180,7 +179,7 @@ and generate such one as well.\footnote{adams-weka-webservice-transform.flow}
 \end{figure}
 
 \chapter{Development}
-The default webservice implementation, \texttt{adams.flow.webservice.SimpleWekaService},
+The default webservice implementation, \texttt{adams.flow.webservice.weka.SimpleWekaService},
 is a very simply version providing the functionality. All processing happens
 in a single thread. If you require a version that scales better and can handle
 more and concurrent requests, then you might want to implement your own
@@ -188,14 +187,14 @@ backend. This is quite simple, as you only need to create a class that implement
 the following interfaces:
 \begin{tight_itemize}
 	\item \texttt{nz.ac.waikato.adams.webservice.weka.WekaService}
-	\item \texttt{adams.flow.webservice.OwnedByWekaServiceWS}
+	\item \texttt{adams.flow.webservice.weka.OwnedByWekaServiceWS}
 \end{tight_itemize}
-Or, you can simply subclass \texttt{adams.flow.webservice.SimpleWekaService}
+Or, you can simply subclass \texttt{adams.flow.webservice.weka.SimpleWekaService}
 and override the method that needs your attention.
 
 The class needs to be placed in the following package:
 \begin{verbatim}
-  adams.flow.webservice
+  adams.flow.webservice.weka
 \end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

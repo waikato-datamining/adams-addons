@@ -18,8 +18,10 @@
  * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 
-package adams.flow.webservice;
+package adams.flow.webservice.weka;
 
+import adams.flow.webservice.AbstractWebServiceClientTransformer;
+import adams.flow.webservice.WebserviceUtils;
 import nz.ac.waikato.adams.webservice.weka.CrossValidateClassifier;
 import nz.ac.waikato.adams.webservice.weka.CrossValidateResponseObject;
 import nz.ac.waikato.adams.webservice.weka.Dataset;
@@ -36,7 +38,7 @@ import java.net.URL;
  * @version $Revision$
  */
 public class CrossValidationClassifier 
-extends AbstractWebServiceClientTransformer<CrossValidateClassifier, Dataset>{
+extends AbstractWebServiceClientTransformer<CrossValidateClassifier, Dataset> {
 
   /** for serialization*/
   private static final long serialVersionUID = -3627934949295336741L;

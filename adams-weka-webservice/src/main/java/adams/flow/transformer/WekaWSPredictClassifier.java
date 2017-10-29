@@ -20,11 +20,11 @@
 
 package adams.flow.transformer;
 
+import adams.core.QuickInfoHelper;
+import adams.flow.core.Token;
+import adams.flow.core.WekaDatasetHelper;
 import nz.ac.waikato.adams.webservice.weka.Dataset;
 import weka.core.Instances;
-import adams.core.QuickInfoHelper;
-import adams.flow.core.DatasetHelper;
-import adams.flow.core.Token;
 
 /**
  * Performs predictions using a previously trained model.
@@ -146,7 +146,7 @@ extends AbstractTransformer{
   @Override
   protected String doExecute() {
     nz.ac.waikato.adams.webservice.weka.PredictClassifier p = new nz.ac.waikato.adams.webservice.weka.PredictClassifier();
-    Dataset d = DatasetHelper.fromInstances((Instances)m_InputToken.getPayload());
+    Dataset d = WekaDatasetHelper.fromInstances((Instances)m_InputToken.getPayload());
     p.setDataset(d);
     p.setModelName(m_ModelName);
     m_OutputToken = new Token(p);

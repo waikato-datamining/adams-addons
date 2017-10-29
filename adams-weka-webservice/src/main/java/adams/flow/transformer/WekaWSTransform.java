@@ -19,10 +19,10 @@
  */
 package adams.flow.transformer;
 
+import adams.flow.core.Token;
+import adams.flow.core.WekaDatasetHelper;
 import nz.ac.waikato.adams.webservice.weka.Dataset;
 import weka.core.Instances;
-import adams.flow.core.DatasetHelper;
-import adams.flow.core.Token;
 
 /**
  * Transforms data using a global actor offered by the webservice.
@@ -116,7 +116,7 @@ extends AbstractTransformer{
   @Override
   protected String doExecute() {
     nz.ac.waikato.adams.webservice.weka.Transform t = new nz.ac.waikato.adams.webservice.weka.Transform();
-    Dataset d = DatasetHelper.fromInstances((Instances)m_InputToken.getPayload());
+    Dataset d = WekaDatasetHelper.fromInstances((Instances)m_InputToken.getPayload());
     t.setDataset(d);
     t.setActorName(m_ActorName);
     m_OutputToken = new Token(t);

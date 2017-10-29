@@ -18,8 +18,10 @@
  * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
  */
 
-package adams.flow.webservice;
+package adams.flow.webservice.weka;
 
+import adams.flow.webservice.AbstractWebServiceProvider;
+import adams.flow.webservice.WebserviceUtils;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import org.apache.cxf.jaxws.EndpointImpl;
 

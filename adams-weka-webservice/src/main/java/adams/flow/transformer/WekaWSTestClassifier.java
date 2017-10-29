@@ -20,11 +20,11 @@
 
 package adams.flow.transformer;
 
+import adams.core.QuickInfoHelper;
+import adams.flow.core.Token;
+import adams.flow.core.WekaDatasetHelper;
 import nz.ac.waikato.adams.webservice.weka.Dataset;
 import weka.core.Instances;
-import adams.core.QuickInfoHelper;
-import adams.flow.core.DatasetHelper;
-import adams.flow.core.Token;
 
 /**
  * Transformer for performing tests of trained model.
@@ -146,7 +146,7 @@ extends AbstractTransformer{
   @Override
   protected String doExecute() {
     nz.ac.waikato.adams.webservice.weka.TestClassifier t = new nz.ac.waikato.adams.webservice.weka.TestClassifier();
-    Dataset d = DatasetHelper.fromInstances((Instances)m_InputToken.getPayload());
+    Dataset d = WekaDatasetHelper.fromInstances((Instances)m_InputToken.getPayload());
     t.setDataset(d);
     t.setModelName(m_ModelName);
     m_OutputToken = new Token(t);

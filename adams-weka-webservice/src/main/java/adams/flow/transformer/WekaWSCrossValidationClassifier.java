@@ -21,16 +21,16 @@
 package adams.flow.transformer;
 
 import adams.core.MessageCollection;
+import adams.core.QuickInfoHelper;
+import adams.core.option.OptionUtils;
+import adams.flow.core.CallableActorHelper;
+import adams.flow.core.CallableActorReference;
+import adams.flow.core.Token;
+import adams.flow.core.WekaDatasetHelper;
+import adams.flow.source.WekaClassifierSetup;
 import nz.ac.waikato.adams.webservice.weka.CrossValidateClassifier;
 import nz.ac.waikato.adams.webservice.weka.Dataset;
 import weka.core.Instances;
-import adams.core.QuickInfoHelper;
-import adams.core.option.OptionUtils;
-import adams.flow.core.CallableActorReference;
-import adams.flow.core.CallableActorHelper;
-import adams.flow.core.DatasetHelper;
-import adams.flow.core.Token;
-import adams.flow.source.WekaClassifierSetup;
 
 /**
  * Performs cross-validation of a classifier on a dataset.
@@ -224,7 +224,7 @@ extends AbstractTransformer {
     CrossValidateClassifier cV = new CrossValidateClassifier();
     m_Classifier = getClassifierInstance();
     cV.setClassifier(OptionUtils.getCommandLine(m_Classifier));
-    Dataset d = DatasetHelper.fromInstances((Instances)m_InputToken.getPayload());
+    Dataset d = WekaDatasetHelper.fromInstances((Instances)m_InputToken.getPayload());
     cV.setDataset(d);
     cV.setSeed(m_Seed);
     cV.setFolds(m_Folds);

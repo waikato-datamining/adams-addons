@@ -17,7 +17,7 @@
  * OwnedByWekaServiceWS.java
  * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice;
+package adams.flow.webservice.weka;
 
 /**
  * Interface for classes that are owned by {@link WekaServiceWS}.

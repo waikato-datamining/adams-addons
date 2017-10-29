@@ -9,5 +9,5 @@ adams.flow.control.Flow -annotation "Trains a SimpleKMeans clusterer on a datase
  adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
  adams.flow.transformer.WekaFilter -name "Remove class attribute" -filter "weka.filters.unsupervised.attribute.Remove -R last"
  adams.flow.transformer.WekaWSTrainClusterer -model-name simplekmeans
- adams.flow.transformer.WSTransformer -logging-level INFO -client "adams.flow.webservice.TrainClusterer -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator"
+ adams.flow.transformer.WSTransformer -logging-level INFO -client "adams.flow.webservice.weka.TrainClusterer -out-interceptor adams.flow.webservice.weka.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.weka.interceptor.incoming.NullGenerator"
  adams.flow.sink.Display -writer adams.data.io.output.NullWriter

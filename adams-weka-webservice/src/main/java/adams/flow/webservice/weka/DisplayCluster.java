@@ -13,15 +13,15 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * TestClassifier.java
+/**
+ * DisplayCluster.java
  * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
+package adams.flow.webservice.weka;
 
-package adams.flow.webservice;
-
-import nz.ac.waikato.adams.webservice.weka.Dataset;
-import nz.ac.waikato.adams.webservice.weka.TestClassifierResponseObject;
+import adams.flow.webservice.AbstractWebServiceClientSource;
+import adams.flow.webservice.WebserviceUtils;
+import nz.ac.waikato.adams.webservice.weka.DisplayClustererResponseObject;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
 
@@ -29,50 +29,67 @@ import javax.xml.ws.BindingProvider;
 import java.net.URL;
 
 /**
- * client for the test webservice.
+ * Displays the string representation of a clusterer model.
  * 
  * @author msf8
  * @version $Revision$
  */
-public class TestClassifier 
-extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.TestClassifier, Dataset>{
+public class DisplayCluster 
+extends AbstractWebServiceClientSource<String> {
 
-  /** for serialization*/
-  private static final long serialVersionUID = 1L;
+  /** for serialization */
+  private static final long serialVersionUID = 8229995796562261847L;
 
-  /** input object for the test web service */
-  protected nz.ac.waikato.adams.webservice.weka.TestClassifier m_Test;
+  /** clusterer to display */
+  protected String m_Clusterer;
 
   /**
-   * Returns a string describing the object.
-   *
-   * @return 			a description suitable for displaying in the gui
+   * Adds options to the internal list of options.
    */
   @Override
   public String globalInfo() {
-    return "Tests a dataset and returns the evaluation as a dataset.";
+    return "displays a string representing a clusterer";
   }
-
+  
   /**
-   * Returns the classes that are accepted input.
-   * 
-   * @return		the classes that are accepted
+   * Adds options to the internal list of options.
    */
   @Override
-  public Class[] accepts() {
-    return new Class[] {nz.ac.waikato.adams.webservice.weka.TestClassifier.class};
+  public void defineOptions() {
+    super.defineOptions();
+    
+    m_OptionManager.add(
+	"clusterer", "clusterer", "");
   }
-
+  
   /**
-   * Sets the data for the request, if any.
+   * set the name of the clusterer.
    * 
-   * @param value	the request data
+   * @param s	name of clusterer to display
    */
-  @Override
-  public void setRequestData(nz.ac.waikato.adams.webservice.weka.TestClassifier value) {
-    m_Test = value;
+  public void setClusterer(String s) {
+    m_Clusterer = s;
+    reset();
   }
-
+  
+  /**
+   * get the name of the clusterer.
+   * 
+   * @return	name of the clusterer to display
+   */
+  public String getClusterer() {
+    return m_Clusterer;
+  }
+  
+  /**
+   * description of this option.
+   * 
+   * @return	Description of the clusterer name option
+   */
+  public String clusterTipText() {
+    return "name of clusterer to display";
+  }
+  
   /**
    * Returns the classes that this client generates.
    * 
@@ -80,7 +97,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public Class[] generates() {
-    return new Class[] {Dataset.class};
+    return new Class[] {String.class};
   }
 
   /**
@@ -112,15 +129,15 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
 	m_ReceiveTimeout, 
 	(getUseAlternativeURL() ? getAlternativeURL() : null),
 	m_InInterceptor,
-	m_OutInterceptor);
+	null);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
-    TestClassifierResponseObject returned = wekaService.testClassifier(m_Test.getDataset(), m_Test.getModelName());
+    DisplayClustererResponseObject returned = wekaService.displayClusterer(m_Clusterer);
     // failed to generate data?
     if (returned.getErrorMessage() != null)
       throw new IllegalStateException(returned.getErrorMessage());
-    setResponseData(returned.getReturnDataset());
-    
-    m_Test = null;
+    setResponseData(returned.getDisplayString());
+
+    m_Clusterer = null;
   }
 }

@@ -13,33 +13,38 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * TrainClusterer.java
- * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
+/*
+ * DownloadClusterer.java
+ * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice;
 
-import nz.ac.waikato.adams.webservice.weka.TrainClustererResponseObject;
+package adams.flow.webservice.weka;
+
+import adams.core.SerializationHelper;
+import adams.flow.webservice.AbstractWebServiceClientTransformer;
+import adams.flow.webservice.WebserviceUtils;
+import nz.ac.waikato.adams.webservice.weka.DownloadClustererResponseObject;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
+import weka.clusterers.Clusterer;
 
 import javax.xml.ws.BindingProvider;
 import java.net.URL;
 
 /**
- * Builds a clusterer model.
+ * Client for download a cluster model.
  * 
- * @author msf8
+ * @author FracPete (fracpete at waikato ac dot nz)
  * @version $Revision$
  */
-public class TrainClusterer 
-extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.TrainClusterer, String>{
+public class DownloadClusterer 
+extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.DownloadClusterer, Clusterer> {
 
-  /** fro serialization*/
-  private static final long serialVersionUID = -2621193325978827170L;
-  
-  /** train cluster input */
-  protected nz.ac.waikato.adams.webservice.weka.TrainClusterer m_Train;
+  /** for serialization*/
+  private static final long serialVersionUID = -4596049331963785695L;
+
+  /** download input object */
+  protected nz.ac.waikato.adams.webservice.weka.DownloadClusterer m_Download;
 
   /**
    * Returns a string describing the object.
@@ -48,7 +53,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public String globalInfo() {
-   return "trains a dataset into clusters";
+    return "Downloads a previously generated cluster model.";
   }
 
   /**
@@ -58,7 +63,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public Class[] accepts() {
-    return new Class[] {nz.ac.waikato.adams.webservice.weka.TrainClusterer.class};
+    return new Class[]{nz.ac.waikato.adams.webservice.weka.DownloadClusterer.class};
   }
 
   /**
@@ -67,8 +72,9 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    * @param value	the request data
    */
   @Override
-  public void setRequestData(nz.ac.waikato.adams.webservice.weka.TrainClusterer value) {
-    m_Train = value;
+  public void setRequestData(nz.ac.waikato.adams.webservice.weka.DownloadClusterer value) {
+    m_Download = value;
+
   }
 
   /**
@@ -78,7 +84,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public Class[] generates() {
-   return new Class[] {String.class};
+    return new Class[]{Clusterer.class};
   }
 
   /**
@@ -89,6 +95,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   @Override
   public URL getWsdlLocation() {
     return getClass().getClassLoader().getResource("wsdl/weka/WekaService.wsdl");
+
   }
 
   /**
@@ -112,12 +119,13 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
 	m_OutInterceptor);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
-    TrainClustererResponseObject response = wekaService.trainClusterer(m_Train.getDataset(), m_Train.getClusterer(), m_Train.getModelName());
-    // failed to generate data?
-    if (response.getErrorMessage() != null)
-      throw new IllegalStateException(response.getErrorMessage());
-    setResponseData(response.getModel());
+    
+    DownloadClustererResponseObject returned = wekaService.downloadClusterer(m_Download.getModelName());
+    // failed to download model?
+    if (returned.getErrorMessage() != null)
+      throw new IllegalStateException(returned.getErrorMessage());
+    setResponseData((Clusterer) SerializationHelper.read(returned.getModelData().getInputStream()));
 
-    m_Train = null;
+    m_Download = null;
   }
 }

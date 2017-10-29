@@ -9,4 +9,12 @@
 
 # the WEKA webservice implementations
 nz.ac.waikato.adams.webservice.weka.WekaService=\
-  adams.flow.webservice
+  adams.flow.webservice.weka
+
+# the servers
+adams.flow.webservice.WebServiceProvider=\
+  adams.flow.webservice.weka
+
+# the clients
+adams.flow.webservice.WebServiceClient=\
+  adams.flow.webservice.weka

@@ -13,36 +13,36 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * DownloadClusterer.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+/**
+ * OptimizeClassifierMultiSearch.java
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
+package adams.flow.webservice.weka;
 
-package adams.flow.webservice;
-
-import adams.core.SerializationHelper;
-import nz.ac.waikato.adams.webservice.weka.DownloadClustererResponseObject;
+import adams.flow.webservice.AbstractWebServiceClientTransformer;
+import adams.flow.webservice.WebserviceUtils;
+import nz.ac.waikato.adams.webservice.weka.OptimizeReturnObject;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
-import weka.clusterers.Clusterer;
+import weka.classifiers.meta.MultiSearch;
 
 import javax.xml.ws.BindingProvider;
 import java.net.URL;
 
 /**
- * Client for download a cluster model.
+ * client for using the optimize classifier multi search web service.
  * 
- * @author FracPete (fracpete at waikato ac dot nz)
+ * @author msf8
  * @version $Revision$
  */
-public class DownloadClusterer 
-extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.DownloadClusterer, Clusterer>{
+public class OptimizeClassifierMultiSearch 
+extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.OptimizeClassifierMultiSearch, String> {
 
-  /** for serialization*/
-  private static final long serialVersionUID = -4596049331963785695L;
+  /**for serialization*/
+  private static final long serialVersionUID = 4416594787276538808L;
 
-  /** download input object */
-  protected nz.ac.waikato.adams.webservice.weka.DownloadClusterer m_Download;
+  /** optimize classifier multi search input object */
+  protected nz.ac.waikato.adams.webservice.weka.OptimizeClassifierMultiSearch m_Optimize;
 
   /**
    * Returns a string describing the object.
@@ -51,9 +51,9 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public String globalInfo() {
-    return "Downloads a previously generated cluster model.";
+    return "Triggers a parameter optimization on the server using " + MultiSearch.class.getName() + ".";
   }
-
+  
   /**
    * Returns the classes that are accepted input.
    * 
@@ -61,7 +61,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public Class[] accepts() {
-    return new Class[]{nz.ac.waikato.adams.webservice.weka.DownloadClusterer.class};
+   return new Class[]{nz.ac.waikato.adams.webservice.weka.OptimizeClassifierMultiSearch.class};
   }
 
   /**
@@ -70,19 +70,18 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    * @param value	the request data
    */
   @Override
-  public void setRequestData(nz.ac.waikato.adams.webservice.weka.DownloadClusterer value) {
-    m_Download = value;
-
+  public void setRequestData(nz.ac.waikato.adams.webservice.weka.OptimizeClassifierMultiSearch value) {
+   m_Optimize = value;
   }
 
   /**
-   * Returns the classes that this client generates.
+   * Returns the classes that are accepted input.
    * 
-   * @return		the classes
+   * @return		the classes that are accepted
    */
   @Override
   public Class[] generates() {
-    return new Class[]{Clusterer.class};
+    return new Class[]{String.class};
   }
 
   /**
@@ -93,7 +92,6 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   @Override
   public URL getWsdlLocation() {
     return getClass().getClassLoader().getResource("wsdl/weka/WekaService.wsdl");
-
   }
 
   /**
@@ -115,15 +113,17 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
 	(getUseAlternativeURL() ? getAlternativeURL() : null),
 	m_InInterceptor,
 	m_OutInterceptor);
+
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
     
-    DownloadClustererResponseObject returned = wekaService.downloadClusterer(m_Download.getModelName());
-    // failed to download model?
+    OptimizeReturnObject returned = wekaService.optimizeClassifierMultiSearch(m_Optimize.getClassifier(), m_Optimize.getSearchParameters(), m_Optimize.getDataset(), m_Optimize.getEvaluation());
     if (returned.getErrorMessage() != null)
       throw new IllegalStateException(returned.getErrorMessage());
-    setResponseData((Clusterer) SerializationHelper.read(returned.getModelData().getInputStream()));
-
-    m_Download = null;
+    if (returned.getBestClassifierSetup() != null)
+      setResponseData(returned.getBestClassifierSetup());
+    if (returned.getWarningMessage() != null)
+      getOwner().getLogger().severe("WARNING: " + returned.getWarningMessage());
+    m_Optimize = null;
   }
 }

@@ -13,16 +13,17 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * WekaWSPredictClusterer.java
- * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2017 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.transformer;import nz.ac.waikato.adams.webservice.weka.Dataset;
-import weka.core.Instances;
+package adams.flow.transformer;
+
 import adams.core.QuickInfoHelper;
-import adams.flow.core.DatasetHelper;
 import adams.flow.core.Token;
-;
+import adams.flow.core.WekaDatasetHelper;
+import nz.ac.waikato.adams.webservice.weka.Dataset;
+import weka.core.Instances;
 
 /**
  * Predicts clusters using a clusterer model.
@@ -142,7 +143,7 @@ extends AbstractTransformer{
   @Override
   protected String doExecute() {
    nz.ac.waikato.adams.webservice.weka.PredictClusterer p = new nz.ac.waikato.adams.webservice.weka.PredictClusterer();
-   Dataset d = DatasetHelper.fromInstances((Instances) m_InputToken.getPayload());
+   Dataset d = WekaDatasetHelper.fromInstances((Instances) m_InputToken.getPayload());
    p.setDataset(d);
    p.setModelName(m_ModelName);
    m_OutputToken = new Token(p);

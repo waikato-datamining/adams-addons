@@ -13,14 +13,17 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * PredictClusterer.java
+/*
+ * TestClassifier.java
  * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice;
 
+package adams.flow.webservice.weka;
+
+import adams.flow.webservice.AbstractWebServiceClientTransformer;
+import adams.flow.webservice.WebserviceUtils;
 import nz.ac.waikato.adams.webservice.weka.Dataset;
-import nz.ac.waikato.adams.webservice.weka.PredictClustererResponseObject;
+import nz.ac.waikato.adams.webservice.weka.TestClassifierResponseObject;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
 
@@ -28,19 +31,19 @@ import javax.xml.ws.BindingProvider;
 import java.net.URL;
 
 /**
- * Predicts the cluster that instances belong to.
+ * client for the test webservice.
  * 
  * @author msf8
  * @version $Revision$
  */
-public class PredictClusterer 
-extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.PredictClusterer, Dataset>{
+public class TestClassifier 
+extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.TestClassifier, Dataset> {
 
   /** for serialization*/
-  private static final long serialVersionUID = 7762416866236696720L;
+  private static final long serialVersionUID = 1L;
 
-  /**predict cluster input */
-  protected nz.ac.waikato.adams.webservice.weka.PredictClusterer m_Predict;
+  /** input object for the test web service */
+  protected nz.ac.waikato.adams.webservice.weka.TestClassifier m_Test;
 
   /**
    * Returns a string describing the object.
@@ -49,9 +52,9 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public String globalInfo() {
-    return "makes predictions of clusters for a dataset";
+    return "Tests a dataset and returns the evaluation as a dataset.";
   }
-  
+
   /**
    * Returns the classes that are accepted input.
    * 
@@ -59,7 +62,17 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public Class[] accepts() {
-    return new Class[] { nz.ac.waikato.adams.webservice.weka.PredictClusterer.class};
+    return new Class[] {nz.ac.waikato.adams.webservice.weka.TestClassifier.class};
+  }
+
+  /**
+   * Sets the data for the request, if any.
+   * 
+   * @param value	the request data
+   */
+  @Override
+  public void setRequestData(nz.ac.waikato.adams.webservice.weka.TestClassifier value) {
+    m_Test = value;
   }
 
   /**
@@ -73,16 +86,6 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   }
 
   /**
-   * Sets the data for the request, if any.
-   * 
-   * @param value	the request data
-   */
-  @Override
-  public void setRequestData(nz.ac.waikato.adams.webservice.weka.PredictClusterer value) {
-    m_Predict = value;
-  }
-
-  /**
    * Returns the WSDL location.
    * 
    * @return		the location
@@ -90,6 +93,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   @Override
   public URL getWsdlLocation() {
     return getClass().getClassLoader().getResource("wsdl/weka/WekaService.wsdl");
+
   }
 
   /**
@@ -113,12 +117,12 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
 	m_OutInterceptor);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
-    PredictClustererResponseObject returned = wekaService.predictClusterer(m_Predict.getDataset(), m_Predict.getModelName());
+    TestClassifierResponseObject returned = wekaService.testClassifier(m_Test.getDataset(), m_Test.getModelName());
     // failed to generate data?
     if (returned.getErrorMessage() != null)
       throw new IllegalStateException(returned.getErrorMessage());
     setResponseData(returned.getReturnDataset());
-
-    m_Predict = null;
+    
+    m_Test = null;
   }
 }

@@ -7,7 +7,7 @@ adams.flow.control.Flow -annotation "The webservice that allows clients to:\\n- 
   adams.flow.control.SubProcess -name "simple transform" -annotation "simply adds an ID attribute (of type STRING) and removes all NOMINAL attributes"
    adams.flow.transformer.WekaFilter -filter "weka.filters.unsupervised.attribute.AddID -C first -N ID"
    adams.flow.transformer.WekaFilter -name WekaFilter-1 -filter "weka.filters.unsupervised.attribute.RemoveType -T nominal"
- adams.flow.standalone.WSServer -logging-level INFO -web-service "adams.flow.webservice.WekaServiceWS -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -implementation adams.flow.webservice.SimpleWekaService"
+ adams.flow.standalone.WSServer -logging-level INFO -web-service "adams.flow.webservice.weka.WekaServiceWS -in-interceptor adams.flow.webservice.weka.interceptor.incoming.NullGenerator -out-interceptor adams.flow.webservice.weka.interceptor.outgoing.NullGenerator -implementation adams.flow.webservice.weka.SimpleWekaService"
  adams.flow.source.Start
  adams.flow.control.WhileLoop -name "keep going" -condition adams.flow.condition.bool.True
   adams.flow.source.Start

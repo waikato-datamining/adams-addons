@@ -13,30 +13,37 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * ListClusterers.java
- * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
+/*
+ * PredictClassifier.java
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice;
 
+package adams.flow.webservice.weka;
+
+import adams.flow.webservice.AbstractWebServiceClientTransformer;
+import adams.flow.webservice.WebserviceUtils;
+import nz.ac.waikato.adams.webservice.weka.Dataset;
+import nz.ac.waikato.adams.webservice.weka.PredictClassifierResponseObject;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
 
 import javax.xml.ws.BindingProvider;
 import java.net.URL;
-import java.util.ArrayList;
 
 /**
- * Lists all currently available clusterer models.
+ * client for using the predict web service .
  * 
- * @author msf8
+ * @author msf8	
  * @version $Revision$
  */
-public class ListClusterers 
-extends AbstractWebServiceClientSource<ArrayList<String>>{
+public class PredictClassifier 
+extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.PredictClassifier, Dataset> {
 
   /** for serialization*/
-  private static final long serialVersionUID = -5574821589508118074L;
+  private static final long serialVersionUID = -4596049331963785695L;
+
+  /** predict input object */
+  protected nz.ac.waikato.adams.webservice.weka.PredictClassifier m_Predict;
 
   /**
    * Returns a string describing the object.
@@ -45,7 +52,28 @@ extends AbstractWebServiceClientSource<ArrayList<String>>{
    */
   @Override
   public String globalInfo() {
-    return "displays a list of all the clusterers currently stored";
+    return "Makes a prediction using the weka web service.";
+  }
+
+  /**
+   * Returns the classes that are accepted input.
+   * 
+   * @return		the classes that are accepted
+   */
+  @Override
+  public Class[] accepts() {
+    return new Class[] {nz.ac.waikato.adams.webservice.weka.PredictClassifier.class};
+  }
+
+  /**
+   * Sets the data for the request, if any.
+   * 
+   * @param value	the request data
+   */
+  @Override
+  public void setRequestData(nz.ac.waikato.adams.webservice.weka.PredictClassifier value) {
+    m_Predict= value;
+
   }
 
   /**
@@ -55,7 +83,7 @@ extends AbstractWebServiceClientSource<ArrayList<String>>{
    */
   @Override
   public Class[] generates() {
-    return new Class[] {ArrayList.class};
+    return new Class[] {Dataset.class};
   }
 
   /**
@@ -86,9 +114,16 @@ extends AbstractWebServiceClientSource<ArrayList<String>>{
 	m_ReceiveTimeout, 
 	(getUseAlternativeURL() ? getAlternativeURL() : null),
 	m_InInterceptor,
-	null);
+	m_OutInterceptor);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
-    setResponseData((ArrayList<String>) wekaService.listClusterers());
+    
+    PredictClassifierResponseObject returned = wekaService.predictClassifier(m_Predict.getDataset(), m_Predict.getModelName());
+    // failed to generate data?
+    if (returned.getErrorMessage() != null)
+      throw new IllegalStateException(returned.getErrorMessage());
+    setResponseData(returned.getReturnDataset());
+
+    m_Predict = null;
   }
 }

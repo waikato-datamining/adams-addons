@@ -19,9 +19,9 @@
  */
 package adams.data.conversion;
 
+import adams.flow.core.WekaDatasetHelper;
 import nz.ac.waikato.adams.webservice.weka.Dataset;
 import weka.core.Instances;
-import adams.flow.core.DatasetHelper;
 
 /**
  * Converts a webservice {@link Dataset} object into a WEKA {@link Instances} object.
@@ -73,6 +73,6 @@ public class DatasetToWekaInstances
    */
   @Override
   protected Object doConvert() throws Exception {
-    return DatasetHelper.toInstances((Dataset) m_Input);
+    return WekaDatasetHelper.toInstances((Dataset) m_Input);
   }
 }

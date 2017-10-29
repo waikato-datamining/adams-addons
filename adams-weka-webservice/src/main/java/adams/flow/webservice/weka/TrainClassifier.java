@@ -14,38 +14,35 @@
  */
 
 /*
- * DownloadClassifier.java
- * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
+ * TrainClassifier.java
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 
-package adams.flow.webservice;
+package adams.flow.webservice.weka;
 
-import adams.core.SerializationHelper;
-import nz.ac.waikato.adams.webservice.weka.DownloadClassifierResponseObject;
+import adams.flow.webservice.AbstractWebServiceClientTransformer;
+import adams.flow.webservice.WebserviceUtils;
+import nz.ac.waikato.adams.webservice.weka.TrainClassifierResponseObject;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
-import weka.classifiers.Classifier;
 
 import javax.xml.ws.BindingProvider;
 import java.net.URL;
 
 /**
- * Client for download a classifier model.
+ * client for using the training webservice.
  * 
- * @author FracPete (fracpete at waikato ac dot nz)
+ * @author msf8
  * @version $Revision$
  */
-public class DownloadClassifier 
-extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.DownloadClassifier, Classifier>{
+public class TrainClassifier 
+extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.TrainClassifier, String> {
 
   /** for serialization*/
-  private static final long serialVersionUID = -4596049331963785695L;
+  private static final long serialVersionUID = 1L;
 
-  /** download input object */
-  protected nz.ac.waikato.adams.webservice.weka.DownloadClassifier m_Download;
-
-  /** response object */
-  protected DownloadClassifierResponseObject m_Returned;
+  /** input object for the train webservice */
+  protected nz.ac.waikato.adams.webservice.weka.TrainClassifier m_Train;
 
   /**
    * Returns a string describing the object.
@@ -54,9 +51,9 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public String globalInfo() {
-    return "Downloads a previously generated classifier model.";
+    return "Train a classifier on a dataset and returns whether it was succesful.";
   }
-
+  
   /**
    * Returns the classes that are accepted input.
    * 
@@ -64,7 +61,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public Class[] accepts() {
-    return new Class[]{nz.ac.waikato.adams.webservice.weka.DownloadClassifier.class};
+    return new Class[] {nz.ac.waikato.adams.webservice.weka.TrainClassifier.class};
   }
 
   /**
@@ -73,9 +70,8 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    * @param value	the request data
    */
   @Override
-  public void setRequestData(nz.ac.waikato.adams.webservice.weka.DownloadClassifier value) {
-    m_Download = value;
-
+  public void setRequestData(nz.ac.waikato.adams.webservice.weka.TrainClassifier value) {
+    m_Train = value;
   }
 
   /**
@@ -85,7 +81,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public Class[] generates() {
-    return new Class[]{Classifier.class};
+    return new Class[] {String.class};
   }
 
   /**
@@ -96,7 +92,6 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   @Override
   public URL getWsdlLocation() {
     return getClass().getClassLoader().getResource("wsdl/weka/WekaService.wsdl");
-
   }
 
   /**
@@ -120,13 +115,10 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
 	m_OutInterceptor);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
-    
-    m_Returned = wekaService.downloadClassifier(m_Download.getModelName()); 
-    // failed to download model?
-    if (m_Returned.getErrorMessage() != null)
-      throw new IllegalStateException(m_Returned.getErrorMessage());
-    setResponseData((Classifier) SerializationHelper.read(m_Returned.getModelData().getInputStream()));
-
-    m_Download = null;
+    TrainClassifierResponseObject response = wekaService.trainClassifier(m_Train.getDataset(), m_Train.getClassifier(), m_Train.getName());
+    if (response.getErrorMessage() != null)
+      throw new IllegalStateException(response.getErrorMessage());
+    setResponseData(response.getModel());
+    m_Train = null;
   }
 }

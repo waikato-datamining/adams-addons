@@ -14,33 +14,31 @@
  */
 
 /**
- * Transform.java
+ * ListClassifiers.java
  * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.webservice;
+package adams.flow.webservice.weka;
 
-import nz.ac.waikato.adams.webservice.weka.Dataset;
-import nz.ac.waikato.adams.webservice.weka.TransformResponseObject;
+import adams.flow.webservice.AbstractWebServiceClientSource;
+import adams.flow.webservice.WebserviceUtils;
 import nz.ac.waikato.adams.webservice.weka.WekaService;
 import nz.ac.waikato.adams.webservice.weka.WekaServiceService;
 
 import javax.xml.ws.BindingProvider;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
- * Transforms data.
+ * Lists all currently available classifier models.
  * 
  * @author msf8
  * @version $Revision$
  */
-public class Transform 
-extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.Transform, Dataset>{
+public class ListClassifiers 
+extends AbstractWebServiceClientSource<ArrayList<String>> {
 
   /** for serialization*/
-  private static final long serialVersionUID = -338043583699608760L;
-  
-  /** transform input object */
-  protected nz.ac.waikato.adams.webservice.weka.Transform m_Transform;
+  private static final long serialVersionUID = 6494416312486305534L;
 
   /**
    * Returns a string describing the object.
@@ -49,19 +47,9 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public String globalInfo() {
-    return "transforms a dataset using the weka web service";
+    return "displays a list of all the classifiers currently stored";
   }
-
-  /**
-   * Returns the classes that are accepted input.
-   * 
-   * @return		the classes that are accepted
-   */
-  @Override
-  public Class[] accepts() {
-    return new Class[] {nz.ac.waikato.adams.webservice.weka.Transform.class};
-  }
-
+  
   /**
    * Returns the classes that this client generates.
    * 
@@ -69,7 +57,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   public Class[] generates() {
-    return new Class[] {Dataset.class};
+    return new Class[] {ArrayList.class};
   }
 
   /**
@@ -80,16 +68,7 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   @Override
   public URL getWsdlLocation() {
     return getClass().getClassLoader().getResource("wsdl/weka/WekaService.wsdl");
-  }
 
-  /**
-   * Sets the data for the request, if any.
-   * 
-   * @param value	the request data
-   */
-  @Override
-  public void setRequestData(nz.ac.waikato.adams.webservice.weka.Transform value) {
-    m_Transform = value;
   }
 
   /**
@@ -110,17 +89,9 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
 	m_ReceiveTimeout, 
 	(getUseAlternativeURL() ? getAlternativeURL() : null),
 	m_InInterceptor,
-	m_OutInterceptor);
+	null);
     //check against schema
     WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
-   
-    TransformResponseObject returned = wekaService.transform(m_Transform.getDataset(), m_Transform.getActorName());
-    // failed to generate data?
-    if (returned.getErrorMessage() != null)
-      throw new IllegalStateException(returned.getErrorMessage());
-    setResponseData(returned.getReturnDataset());
-
-    m_Transform = null;
-    
+    setResponseData((ArrayList<String>)wekaService.listClassifiers());
   }
 }

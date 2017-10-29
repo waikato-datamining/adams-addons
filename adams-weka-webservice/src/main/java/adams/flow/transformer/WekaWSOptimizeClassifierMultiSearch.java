@@ -21,16 +21,16 @@
 package adams.flow.transformer;
 
 import adams.core.MessageCollection;
+import adams.core.QuickInfoHelper;
+import adams.core.option.OptionUtils;
+import adams.flow.core.CallableActorHelper;
+import adams.flow.core.CallableActorReference;
+import adams.flow.core.Token;
+import adams.flow.core.WekaDatasetHelper;
+import adams.flow.source.WekaClassifierSetup;
 import weka.classifiers.meta.MultiSearch;
 import weka.core.Instances;
 import weka.core.setupgenerator.AbstractParameter;
-import adams.core.QuickInfoHelper;
-import adams.core.option.OptionUtils;
-import adams.flow.core.CallableActorReference;
-import adams.flow.core.CallableActorHelper;
-import adams.flow.core.DatasetHelper;
-import adams.flow.core.Token;
-import adams.flow.source.WekaClassifierSetup;
 
 /**
  * Performs cross-validation of a classifier on a dataset.
@@ -260,7 +260,7 @@ extends AbstractTransformer {
     optimize.setClassifier(OptionUtils.getCommandLine(m_Classifier));
     for (int i = 0; i < m_Parameters.length; i++)
       optimize.getSearchParameters().add(OptionUtils.getCommandLine(m_Parameters[i]));
-    optimize.setDataset(DatasetHelper.fromInstances((Instances)m_InputToken.getPayload()));
+    optimize.setDataset(WekaDatasetHelper.fromInstances((Instances)m_InputToken.getPayload()));
     switch (m_Evaluation) {
       case ACCURACY:
 	optimize.setEvaluation("ACC");

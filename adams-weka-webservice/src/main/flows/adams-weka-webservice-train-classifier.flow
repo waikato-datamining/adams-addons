@@ -9,5 +9,5 @@ adams.flow.control.Flow -annotation "Trains a J48 classifier on a dataset that t
  adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
  adams.flow.transformer.WekaClassSelector
  adams.flow.transformer.WekaWSTrainClassifier -model-name j48
- adams.flow.transformer.WSTransformer -logging-level INFO -client "adams.flow.webservice.TrainClassifier -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator"
+ adams.flow.transformer.WSTransformer -logging-level INFO -client "adams.flow.webservice.weka.TrainClassifier -out-interceptor adams.flow.webservice.weka.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.weka.interceptor.incoming.NullGenerator"
  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
