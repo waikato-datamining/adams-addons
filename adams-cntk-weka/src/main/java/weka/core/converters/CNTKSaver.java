@@ -25,6 +25,7 @@ import adams.core.Range;
 import adams.core.base.BaseString;
 import adams.core.io.FileUtils;
 import adams.core.management.LocaleHelper;
+import adams.core.option.OptionUtils;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import weka.core.Capabilities;
@@ -34,6 +35,8 @@ import weka.core.Instances;
 import weka.core.RevisionUtils;
 import weka.core.Utils;
 import weka.core.WekaOptionUtils;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.NominalToBinary;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -49,7 +52,8 @@ import java.util.Vector;
 
 /**
  <!-- globalinfo-start -->
- * Writes the Instances to a CNTK text file.
+ * Writes the Instances to a CNTK text file.<br>
+ * Automatically turns a nominal class attribute into CNTK's '1-hot encoding'.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -128,7 +132,9 @@ public class CNTKSaver
    * 			displaying in the explorer/experimenter gui
    */
   public String globalInfo() {
-    return "Writes the Instances to a CNTK text file.";
+    return
+      "Writes the Instances to a CNTK text file.\n"
+      + "Automatically turns a nominal class attribute into CNTK's '1-hot encoding'.";
   }
 
   @Override
@@ -509,6 +515,11 @@ public class CNTKSaver
     Instances		data;
     FileWriter		fwriter;
     BufferedWriter	writer;
+    int			classIndex;
+    int			numLabels;
+    NominalToBinary	nom2bin;
+    TIntList		affected;
+    TIntList		fixed;
 
     if (getInstances() == null)
       throw new IOException("No instances to save!");
@@ -548,6 +559,59 @@ public class CNTKSaver
       inputs[i] = m_Inputs[i].getIntIndices();
       if (getDebug())
 	System.out.println("input " + (i+1) + " (0-based): " + adams.core.Utils.arrayToString(inputs[i]));
+    }
+
+    // nominal class? transformed data and fix indices
+    classIndex = data.classIndex();
+    if ((classIndex > -1) && (data.classAttribute().isNominal())) {
+      // transform data
+      numLabels   = data.classAttribute().numValues();
+      data        = new Instances(data);
+      data.setClassIndex(-1);
+      nom2bin     = new NominalToBinary();
+      nom2bin.setAttributeIndices("" + (classIndex + 1));
+      nom2bin.setTransformAllValues(true);
+      try {
+	nom2bin.setInputFormat(data);
+	data = Filter.useFilter(data, nom2bin);
+      }
+      catch (Exception e) {
+        throw new IOException("Failed to binarize class attribute, using: " + OptionUtils.getCommandLine(nom2bin), e);
+      }
+
+      // fix indices
+      affected = new TIntArrayList();
+      for (i = 0; i < inputs.length; i++) {
+        for (n = 0; n < inputs[i].length; n++) {
+	  if (inputs[i][n] > classIndex) {
+	    inputs[i][n] += (numLabels - 1);
+	  }
+	  else if (inputs[i][n] == classIndex) {
+	    // flag affected arrays
+	    if (!affected.contains(inputs[i][n]))
+	      affected.add(i);
+	  }
+	}
+      }
+      if (getDebug())
+        System.out.println("Arrays affected by binarization: " + affected);
+
+      // insert additional indices in affected arrays
+      for (i = 0; i < affected.size(); i++) {
+        fixed = new TIntArrayList();
+        for (n = 0; n < inputs[affected.get(i)].length; n++) {
+          fixed.add(inputs[affected.get(i)][n]);
+          if (inputs[affected.get(i)][n] == classIndex) {
+            for (r = 1; r < numLabels; r++)
+              fixed.add(classIndex + r);
+	  }
+	}
+	if (getDebug())
+	  System.out.println("Affected array #" + affected.get(i) + " (old): " + Utils.arrayToString(inputs[affected.get(i)]));
+	inputs[affected.get(i)] = fixed.toArray();
+	if (getDebug())
+	  System.out.println("Affected array #" + affected.get(i) + " (fixed): " + Utils.arrayToString(inputs[affected.get(i)]));
+      }
     }
 
     canOutput = new TIntArrayList();
