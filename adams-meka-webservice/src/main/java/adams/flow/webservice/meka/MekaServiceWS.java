@@ -44,9 +44,6 @@ public class MekaServiceWS
   
   /** the webservice implementation to use. */
   protected MekaService m_Implementation;
-  
-  /** the number of classifiers to store in cache. */
-  protected int m_ClassifierCacheSize;
 
   /**
    * Returns a string describing the object.
@@ -76,10 +73,6 @@ public class MekaServiceWS
     m_OptionManager.add(
 	"implementation", "implementation", 
 	new SimpleMekaService());
-  
-    m_OptionManager.add(
-	"classifier-cache-size", "classifierCacheSize", 
-	10, 1, null);
   }
 
   /**
@@ -118,39 +111,6 @@ public class MekaServiceWS
    */
   public String implementationTipText() {
     return "The implementation of the webservice to use.";
-  }
-
-  /**
-   * Sets the number of classifiers to keep in memory.
-   * 
-   * @param value	the number of classifiers to keep
-   */
-  public void setClassifierCacheSize(int value) {
-    if (value > 0) {
-      m_ClassifierCacheSize = value;
-      reset();
-    }
-    else {
-      getLogger().severe("At least 1 classifier must be kept in memory, provided: " + value);
-    }
-  }
-
-  /**
-   * Get the number of folds used for the cross validation
-   * 
-   * @return NUmber of folds in the cross validation
-   */
-  public int getClassifierCacheSize() {
-    return m_ClassifierCacheSize;
-  }
-
-  /**
-   * Description of this option
-   * 
-   * @return Description of the folds option
-   */
-  public String classifierCacheSizeTipText() {
-    return "The number of classifiers to keep in memory.";
   }
 
   /**
