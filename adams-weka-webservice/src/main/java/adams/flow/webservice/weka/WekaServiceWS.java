@@ -45,12 +45,6 @@ public class WekaServiceWS
   
   /** the webservice implementation to use. */
   protected WekaService m_Implementation;
-  
-  /** the number of classifiers to store in cache. */
-  protected int m_ClassifierCacheSize;
-  
-  /** the number of clusterers to store in cache. */
-  protected int m_ClustererCacheSize;
 
   /**
    * Returns a string describing the object.
@@ -80,14 +74,6 @@ public class WekaServiceWS
     m_OptionManager.add(
 	"implementation", "implementation", 
 	new SimpleWekaService());
-  
-    m_OptionManager.add(
-	"classifier-cache-size", "classifierCacheSize", 
-	10, 1, null);
-    
-    m_OptionManager.add(
-	"clusterer-cache-size", "clustererCacheSize", 
-	10, 1, null);
   }
 
   /**
@@ -126,72 +112,6 @@ public class WekaServiceWS
    */
   public String implementationTipText() {
     return "The implementation of the webservice to use.";
-  }
-
-  /**
-   * Sets the number of classifiers to keep in memory.
-   * 
-   * @param value	the number of classifiers to keep
-   */
-  public void setClassifierCacheSize(int value) {
-    if (value > 0) {
-      m_ClassifierCacheSize = value;
-      reset();
-    }
-    else {
-      getLogger().severe("At least 1 classifier must be kept in memory, provided: " + value);
-    }
-  }
-
-  /**
-   * Get the number of folds used for the cross validation
-   * 
-   * @return NUmber of folds in the cross validation
-   */
-  public int getClassifierCacheSize() {
-    return m_ClassifierCacheSize;
-  }
-
-  /**
-   * Description of this option
-   * 
-   * @return Description of the folds option
-   */
-  public String classifierCacheSizeTipText() {
-    return "The number of classifiers to keep in memory.";
-  }
-
-  /**
-   * Sets the number of clusterers to keep in memory.
-   * 
-   * @param value	the number of clusterers to keep
-   */
-  public void setClustererCacheSize(int value) {
-    if (value > 0) {
-      m_ClustererCacheSize = value;
-      reset();
-    }
-    else {
-      getLogger().severe("At least 1 clusterer must be kept in memory, provided: " + value);
-    }
-  }
-
-  /**
-   * Get the number of folds used for the cross validation
-   * 
-   * @return NUmber of folds in the cross validation
-   */
-  public int getClustererCacheSize() {
-    return m_ClustererCacheSize;
-  }
-
-  /**
-   * Description of this option
-   * 
-   * @return Description of the folds option
-   */
-  public String clustererCacheSizeTipText() {
-    return "The number of clusterers to keep in memory.";
   }
 
   /**
