@@ -100,7 +100,7 @@ public abstract class AbstractWebServiceProviderWithCallableTransformer<I,O>
     super.check();
 
     helper = new CallableActorHelper();
-    m_ActualTransformer = helper.findCallableActorRecursive(getOwner(), m_Transformer);
+    m_ActualTransformer = helper.findCallableActorRecursive(getFlowContext(), m_Transformer);
     if (m_ActualTransformer == null)
       throw new IllegalStateException("Failed to locate callable transformer '" + m_Transformer + "'!");
     if (!ActorUtils.isTransformer(m_ActualTransformer))

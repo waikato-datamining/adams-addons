@@ -84,7 +84,7 @@ public abstract class AbstractWebServiceProvider
    * @param value	the owner
    */
   @Override
-  public void setOwner(Actor value) {
+  public void setFlowContext(Actor value) {
     m_Owner = value;
   }
   
@@ -94,7 +94,7 @@ public abstract class AbstractWebServiceProvider
    * @return		the owner
    */
   @Override
-  public Actor getOwner() {
+  public Actor getFlowContext() {
     return m_Owner;
   }
   

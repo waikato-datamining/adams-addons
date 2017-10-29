@@ -151,7 +151,7 @@ public class WSServer
    */
   public void setWebService(WebServiceProvider value) {
     m_WebService = value;
-    m_WebService.setOwner(this);
+    m_WebService.setFlowContext(this);
     reset();
   }
   
@@ -343,7 +343,7 @@ public class WSServer
    */
   @Override
   protected String doExecute() {
-    m_WebService.setOwner(this);
+    m_WebService.setFlowContext(this);
     return m_WebService.start();
   }
 

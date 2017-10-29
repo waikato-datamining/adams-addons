@@ -426,7 +426,7 @@ public class SimpleWekaService
     
     m_Owner.getLogger().info("transform");
     helper = new CallableActorHelper();
-    callable = helper.findCallableActor(m_Owner.getOwner().getRoot(), new CallableActorReference(actorName));
+    callable = helper.findCallableActor(m_Owner.getFlowContext().getRoot(), new CallableActorReference(actorName));
     // not found
     if (callable == null) {
       result.setErrorMessage("Failed to find callable actor '" + actorName + "'!");

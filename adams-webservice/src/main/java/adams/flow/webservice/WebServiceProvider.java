@@ -13,14 +13,15 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * WebServiceProvider.java
- * Copyright (C) 2012-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
 import adams.core.CleanUpHandler;
 import adams.flow.core.Actor;
+import adams.flow.core.FlowContextHandler;
 import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
 
@@ -31,21 +32,21 @@ import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerato
  * @version $Revision$
  */
 public interface WebServiceProvider
-  extends CleanUpHandler {
+  extends CleanUpHandler, FlowContextHandler {
   
   /**
    * Sets the actor that executes this webservice.
    * 
    * @param value	the owner
    */
-  public void setOwner(Actor value);
+  public void setFlowContext(Actor value);
   
   /**
    * Returns the owning actor.
    * 
    * @return		the owner
    */
-  public Actor getOwner();
+  public Actor getFlowContext();
   
   /**
    * Sets the interceptor for incoming messages 
