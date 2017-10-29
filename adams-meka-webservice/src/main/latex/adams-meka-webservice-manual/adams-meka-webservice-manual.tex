@@ -125,20 +125,20 @@ The webservice offers the following functionality for classifiers:
 	\item \textit{cross-validation} -- cross-validates a specified classifier
 	setup on a provided dataset and returns the statistics.\footnote{adams-meka-webservice-crossvalidate-classifier.flow}
 	\item \textit{train} -- trains a classifier setup on a provided dataset 
-	and caches the model for future use.\footnote{adams-meka-webservice-train-classifier.flow}
-	\item \textit{test} -- evaluates a cached model with a new dataset and 
-	returns the statistics.\footnote{adams-meka-webservice-test-classifier.flow}
-	\item \textit{predict} -- uses a cached model to generate predictions for
+	and places the model into a lookup table in internal storage for future
+	use.\footnote{adams-meka-webservice-train-classifier.flow}
+	\item \textit{test} -- evaluates a model from the lookup table in internal
+	storage with a new dataset and returns the
+	statistics.\footnote{adams-meka-webservice-test-classifier.flow}
+	\item \textit{predict} -- uses a  model to generate predictions for
 	a provided dataset.\footnote{adams-meka-webservice-predict-classifier.flow}
-	\item \textit{list} -- lists all the names of the currently cached classifier
+	\item \textit{list} -- lists all the names of the currently stored classifier
 	models.\footnote{adams-meka-webservice-list-classifiers.flow}
-	\item \textit{display} -- returns the string representation of a cached
+	\item \textit{display} -- returns the string representation of a stored
 	classifier model.\footnote{adams-meka-webservice-display-classifier.flow}
 	\item \textit{download} -- downloads a previously trained a classifier 
 	model.\footnote{adams-meka-webservice-download-classifier.flow}
 \end{tight_itemize}
-\textbf{NB:} If the number of cached classifier models is to small, then simply 
-change that setting on the server
 (\textit{WSServer $\rightarrow$ webService $\rightarrow$ classifierCacheSize}).
 
 \section{Filters}
