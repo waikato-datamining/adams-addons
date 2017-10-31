@@ -43,7 +43,10 @@ public class DefaultNumericArrayApplier
    */
   @Override
   public String globalInfo() {
-    return "Applies the model to the specified numeric array of byte, int, long, float or double values (primitives or objects).";
+    return
+      "Applies the model to the specified numeric array of byte, int, long, "
+        + "float or double values (primitives or objects).\n"
+	+ m_ModelLoader.automaticOrderInfo();
   }
 
   /**

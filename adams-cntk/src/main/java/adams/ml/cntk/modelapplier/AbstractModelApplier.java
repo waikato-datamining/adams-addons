@@ -20,25 +20,21 @@
 
 package adams.ml.cntk.modelapplier;
 
+import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.core.QuickInfoSupporter;
 import adams.core.Range;
 import adams.core.Utils;
 import adams.core.base.BaseString;
-import adams.core.io.ModelFileHandler;
 import adams.core.io.PlaceholderFile;
 import adams.core.logging.LoggingLevel;
 import adams.core.option.AbstractOptionHandler;
-import adams.data.report.Report;
 import adams.flow.control.StorageName;
-import adams.flow.control.StorageUser;
+import adams.flow.core.AbstractModelLoader.ModelLoadingType;
 import adams.flow.core.Actor;
-import adams.flow.core.CallableActorHelper;
+import adams.flow.core.CNTKModelLoader;
 import adams.flow.core.CallableActorReference;
-import adams.flow.core.Compatibility;
-import adams.flow.core.FlowContextHandler;
-import adams.flow.core.OutputProducer;
-import adams.flow.core.Token;
+import adams.flow.core.ModelLoaderSupporter;
 import adams.ml.cntk.CNTKPredictionWrapper;
 import adams.ml.cntk.DeviceType;
 import com.microsoft.CNTK.Function;
@@ -53,19 +49,9 @@ import com.microsoft.CNTK.Function;
  */
 public abstract class AbstractModelApplier<I, O>
   extends AbstractOptionHandler
-  implements FlowContextHandler, ModelFileHandler, StorageUser,
-  QuickInfoSupporter {
+  implements ModelLoaderSupporter, QuickInfoSupporter {
 
   private static final long serialVersionUID = 7541008225536782803L;
-
-  /** the flow context. */
-  protected Actor m_FlowContext;
-
-  /** the model location. */
-  protected ModelLocation m_Location;
-
-  /** file containing the model. */
-  protected PlaceholderFile m_ModelFile;
 
   /** the device to use. */
   protected DeviceType m_DeviceType;
@@ -73,20 +59,23 @@ public abstract class AbstractModelApplier<I, O>
   /** the GPU device ID. */
   protected long m_GPUDeviceID;
 
-  /** the source actor. */
-  protected CallableActorReference m_Source;
-
-  /** the storage item. */
-  protected StorageName m_Storage;
-
   /** the number of classes. */
   protected int m_NumClasses;
 
-  /** the helper class. */
-  protected CallableActorHelper m_Helper;
-
   /** the wrapper to use. */
   protected CNTKPredictionWrapper m_Wrapper;
+
+  /** the model loader. */
+  protected CNTKModelLoader m_ModelLoader;
+
+  /**
+   * Returns information how the model is loaded in case of {@link ModelLoadingType#AUTO}.
+   *
+   * @return		the description
+   */
+  public String automaticOrderInfo() {
+    return m_ModelLoader.automaticOrderInfo();
+  }
 
   /**
    * Adds options to the internal list of options.
@@ -96,8 +85,8 @@ public abstract class AbstractModelApplier<I, O>
     super.defineOptions();
 
     m_OptionManager.add(
-      "location", "location",
-      ModelLocation.FILE);
+      "model-loading-type", "modelLoadingType",
+      ModelLoadingType.AUTO);
 
     m_OptionManager.add(
       "model-file", "modelFile",
@@ -112,11 +101,11 @@ public abstract class AbstractModelApplier<I, O>
       0L);
 
     m_OptionManager.add(
-      "source", "source",
+      "model-actor", "modelActor",
       new CallableActorReference());
 
     m_OptionManager.add(
-      "storage", "storage",
+      "model-storage", "modelStorage",
       new StorageName());
 
     m_OptionManager.add(
@@ -147,6 +136,7 @@ public abstract class AbstractModelApplier<I, O>
   protected void initialize() {
     super.initialize();
     m_Wrapper = new CNTKPredictionWrapper();
+    m_ModelLoader = new CNTKModelLoader();
   }
 
   /**
@@ -170,22 +160,24 @@ public abstract class AbstractModelApplier<I, O>
   }
 
   /**
-   * Sets the where to get the model from.
+   * Sets the loading type. In case of {@link ModelLoadingType#AUTO}, first
+   * file, then callable actor, then storage.
    *
-   * @param value	the location
+   * @param value	the type
    */
-  public void setLocation(ModelLocation value) {
-    m_Location = value;
+  public void setModelLoadingType(ModelLoadingType value) {
+    m_ModelLoader.setModelLoadingType(value);
     reset();
   }
 
   /**
-   * Returns where to get the model from.
+   * Returns the loading type. In case of {@link ModelLoadingType#AUTO}, first
+   * file, then callable actor, then storage.
    *
-   * @return  		the location
+   * @return		the type
    */
-  public ModelLocation getLocation() {
-    return m_Location;
+  public ModelLoadingType getModelLoadingType() {
+    return m_ModelLoader.getModelLoadingType();
   }
 
   /**
@@ -194,27 +186,27 @@ public abstract class AbstractModelApplier<I, O>
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String locationTipText() {
-    return "Determines where to get the model from.";
+  public String modelLoadingTypeTipText() {
+    return m_ModelLoader.modelLoadingTypeTipText();
   }
 
   /**
-   * Sets the model file to use.
+   * Sets the file to load the model from.
    *
    * @param value	the model file
    */
   public void setModelFile(PlaceholderFile value) {
-    m_ModelFile = value;
+    m_ModelLoader.setModelFile(value);
     reset();
   }
 
   /**
-   * Returns the model file to use.
+   * Returns the file to load the model from.
    *
-   * @return  		the model file
+   * @return		the model file
    */
   public PlaceholderFile getModelFile() {
-    return m_ModelFile;
+    return m_ModelLoader.getModelFile();
   }
 
   /**
@@ -224,7 +216,7 @@ public abstract class AbstractModelApplier<I, O>
    * 			displaying in the GUI or for listing the options.
    */
   public String modelFileTipText() {
-    return "The file containing the model.";
+    return m_ModelLoader.modelFileTipText();
   }
 
   /**
@@ -286,22 +278,22 @@ public abstract class AbstractModelApplier<I, O>
   }
 
   /**
-   * Sets the model source actor.
+   * Sets the filter source actor.
    *
    * @param value	the source
    */
-  public void setSource(CallableActorReference value) {
-    m_Source = value;
+  public void setModelActor(CallableActorReference value) {
+    m_ModelLoader.setModelActor(value);
     reset();
   }
 
   /**
-   * Returns the model source actor.
+   * Returns the filter source actor.
    *
    * @return		the source
    */
-  public CallableActorReference getSource() {
-    return m_Source;
+  public CallableActorReference getModelActor() {
+    return m_ModelLoader.getModelActor();
   }
 
   /**
@@ -310,27 +302,27 @@ public abstract class AbstractModelApplier<I, O>
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String sourceTipText() {
-    return "The source actor to obtain the model from.";
+  public String modelActorTipText() {
+    return m_ModelLoader.modelActorTipText();
   }
 
   /**
-   * Sets the model storage item.
+   * Sets the filter storage item.
    *
    * @param value	the storage item
    */
-  public void setStorage(StorageName value) {
-    m_Storage = value;
+  public void setModelStorage(StorageName value) {
+    m_ModelLoader.setModelStorage(value);
     reset();
   }
 
   /**
-   * Returns the model storage item.
+   * Returns the filter storage item.
    *
    * @return		the storage item
    */
-  public StorageName getStorage() {
-    return m_Storage;
+  public StorageName getModelStorage() {
+    return m_ModelLoader.getModelStorage();
   }
 
   /**
@@ -339,8 +331,8 @@ public abstract class AbstractModelApplier<I, O>
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String storageTipText() {
-    return "The storage item to obtain the model from.";
+  public String modelStorageTipText() {
+    return m_ModelLoader.modelStorageTipText();
   }
 
   /**
@@ -545,18 +537,21 @@ public abstract class AbstractModelApplier<I, O>
   public String getQuickInfo() {
     String	result;
 
-    switch (m_Location) {
+    switch (getModelLoadingType()) {
+      case AUTO:
+        result = "automatic";
+        break;
       case FILE:
-	result = QuickInfoHelper.toString(this, "modelFile", m_ModelFile, "file: ");
+	result = QuickInfoHelper.toString(this, "modelFile", getModelFile(), "file: ");
 	break;
-      case SOURCE:
-	result = QuickInfoHelper.toString(this, "source", m_Source, "source: ");
+      case SOURCE_ACTOR:
+	result = QuickInfoHelper.toString(this, "modelSource", getModelActor(), "source: ");
 	break;
       case STORAGE:
-	result = QuickInfoHelper.toString(this, "storage", m_Storage, "storage: ");
+	result = QuickInfoHelper.toString(this, "modelStorage", getModelStorage(), "storage: ");
 	break;
       default:
-	throw new IllegalStateException("Unhandled location type: " + m_Location);
+	throw new IllegalStateException("Unhandled location type: " + getModelLoadingType());
     }
 
     return result;
@@ -568,7 +563,7 @@ public abstract class AbstractModelApplier<I, O>
    * @param value	the actor
    */
   public void setFlowContext(Actor value) {
-    m_FlowContext = value;
+    m_ModelLoader.setFlowContext(value);
   }
 
   /**
@@ -577,7 +572,7 @@ public abstract class AbstractModelApplier<I, O>
    * @return		the actor, null if none available
    */
   public Actor getFlowContext() {
-    return m_FlowContext;
+    return m_ModelLoader.getFlowContext();
   }
 
   /**
@@ -595,92 +590,22 @@ public abstract class AbstractModelApplier<I, O>
   public abstract Class generates();
 
   /**
-   * Tries to find the callable actor referenced by its callable name.
-   *
-   * @return		the callable actor or null if not found
-   */
-  protected Actor findCallableActor() {
-    return m_Helper.findCallableActorRecursive(getFlowContext(), getSource());
-  }
-
-  /**
-   * Returns whether storage items are being used.
-   *
-   * @return		true if storage items are used
-   */
-  public boolean isUsingStorage() {
-    return (m_Location == ModelLocation.STORAGE);
-  }
-
-  /**
    * Initializes the model.
    */
   protected String initModel() {
-    String		result;
-    Actor 		source;
-    Token 		token;
-    Compatibility 	comp;
-
-    result = null;
+    MessageCollection	errors;
+    Function		model;
 
     m_Wrapper.initDevice(m_DeviceType, m_GPUDeviceID);
 
+    errors = new MessageCollection();
+    m_ModelLoader.setDevice(m_Wrapper.getDevice());
+    model = m_ModelLoader.getModel(errors);
+    if (model == null)
+      return errors.toString();
+    m_Wrapper.setModel(model);
     try {
-      switch (m_Location) {
-	case FILE:
-	  m_Wrapper.loadModel(m_ModelFile);
-	  m_Wrapper.initModel(getNumClasses());
-	  break;
-
-	case SOURCE:
-	  source = findCallableActor();
-	  if (source != null) {
-	    if (source instanceof OutputProducer) {
-	      comp = new Compatibility();
-	      if (!comp.isCompatible(new Class[]{Report.class}, ((OutputProducer) source).generates()))
-		result = "Callable actor '" + m_Source + "' does not produce output that is compatible with '" + Report.class.getName() + "'!";
-	    }
-	    else {
-	      result = "Callable actor '" + m_Source + "' does not produce any output!";
-	    }
-	    token = null;
-	    if (result == null) {
-	      result = source.execute();
-	      if (result != null) {
-		result = "Callable actor '" + m_Source + "' execution failed:\n" + result;
-	      }
-	      else {
-		if (((OutputProducer) source).hasPendingOutput())
-		  token = ((OutputProducer) source).output();
-		else
-		  result = "Callable actor '" + m_Source + "' did not generate any output!";
-	      }
-	    }
-	    if (result != null)
-	      return result;
-	    if (token != null) {
-	      m_Wrapper.setModel((Function) token.getPayload());
-	      m_Wrapper.initModel(getNumClasses());
-	      if (isLoggingEnabled())
-		getLogger().info("Using model from source: " + m_Source);
-	      return null;
-	    }
-	  }
-	  break;
-
-	case STORAGE:
-	  if (getFlowContext().getStorageHandler().getStorage().has(m_Storage)) {
-	    m_Wrapper.setModel((Function) getFlowContext().getStorageHandler().getStorage().get(m_Storage));
-	    m_Wrapper.initModel(getNumClasses());
-	    if (isLoggingEnabled())
-	      getLogger().info("Using model from storage: " + m_Storage);
-	    return null;
-	  }
-	  break;
-
-	default:
-	  return "Unhandled location type: " + m_Location;
-      }
+      m_Wrapper.initModel(getNumClasses());
     }
     catch (Exception e) {
       return Utils.handleException(this, "Failed to initialize model!", e);
@@ -701,7 +626,7 @@ public abstract class AbstractModelApplier<I, O>
   protected String check(I input) {
     String	result;
 
-    if (m_FlowContext == null)
+    if (getFlowContext() == null)
       return "No flow context set!";
 
     if (!m_Wrapper.isInitialized()) {

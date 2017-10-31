@@ -40,7 +40,9 @@ public class DefaultWekaInstanceApplier
    */
   @Override
   public String globalInfo() {
-    return "Applies the model to a Weka Instance.";
+    return
+      "Applies the model to a Weka Instance.\n"
+	+ m_ModelLoader.automaticOrderInfo();
   }
 
   /**

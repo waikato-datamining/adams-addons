@@ -44,7 +44,9 @@ public class DefaultSpreadSheetRowApplier
    */
   @Override
   public String globalInfo() {
-    return "Applies the model to a row of a spreadsheet.";
+    return
+      "Applies the model to a row of a spreadsheet.\n"
+	+ m_ModelLoader.automaticOrderInfo();
   }
 
   /**

@@ -100,7 +100,9 @@ public class CNTKModelApplier
    */
   @Override
   public String globalInfo() {
-    return "Uses the specified model applier on the input data and forwards the generated output.";
+    return
+      "Uses the specified model applier on the input data and forwards the "
+        + "generated output.";
   }
 
   /**

@@ -64,7 +64,10 @@ public class DefaultImageApplier
    */
   @Override
   public String globalInfo() {
-    return "Applies the model to images and returns the score. Images get scaled according to the model inputs.";
+    return
+      "Applies the model to images and returns the score. Images get scaled "
+        + "according to the model inputs.\n"
+	+ m_ModelLoader.automaticOrderInfo();
   }
 
   /**
