@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractProcessDL4JDatasetWithModel.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.transformer;
 
@@ -29,6 +29,7 @@ import adams.flow.container.AbstractContainer;
 import adams.flow.container.DL4JModelContainer;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
+import adams.flow.core.DynamicInitializer;
 import adams.flow.core.Token;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.dataset.DataSet;
@@ -45,7 +46,7 @@ import java.util.Hashtable;
  */
 public abstract class AbstractProcessDL4JDatasetWithModel<T>
   extends AbstractTransformer
-  implements ModelFileHandler {
+  implements ModelFileHandler, DynamicInitializer {
 
   /** for serialization. */
   private static final long serialVersionUID = -5275241130624220000L;
