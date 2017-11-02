@@ -146,6 +146,7 @@ public abstract class AbstractModelApplier<I, O>
   protected void reset() {
     super.reset();
     m_Wrapper.reset();
+    m_ModelLoader.reset();
   }
 
   /**
@@ -157,6 +158,7 @@ public abstract class AbstractModelApplier<I, O>
   public synchronized void setLoggingLevel(LoggingLevel value) {
     super.setLoggingLevel(value);
     m_Wrapper.setLoggingLevel(value);
+    m_ModelLoader.setLoggingLevel(value);
   }
 
   /**
