@@ -71,9 +71,9 @@ public class ErrorContainer
   protected void initHelp() {
     super.initHelp();
 
-    addHelp(VALUE_PAYLOAD, "generic payload; " + Object.class.getName());
-    addHelp(VALUE_ERROR, "error message; " + String.class.getName());
-    addHelp(VALUE_SOURCE, "source of error; " + String.class.getName());
+    addHelp(VALUE_PAYLOAD, "generic payload", Object.class);
+    addHelp(VALUE_ERROR, "error message", String.class);
+    addHelp(VALUE_SOURCE, "source of error", String.class);
   }
 
   /**

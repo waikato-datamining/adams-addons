@@ -81,8 +81,8 @@ public class MekaResultContainer
   protected void initHelp() {
     super.initHelp();
 
-    addHelp(VALUE_RESULT, "result container; " + Result.class.getName());
-    addHelp(VALUE_MODEL, "model object; " + Object.class.getName());
+    addHelp(VALUE_RESULT, "result container", Result.class);
+    addHelp(VALUE_MODEL, "model object", Object.class);
   }
 
   /**
@@ -94,7 +94,7 @@ public class MekaResultContainer
   public Iterator<String> names() {
     List<String>	result;
 
-    result = new ArrayList<String>();
+    result = new ArrayList<>();
 
     result.add(VALUE_RESULT);
     result.add(VALUE_MODEL);

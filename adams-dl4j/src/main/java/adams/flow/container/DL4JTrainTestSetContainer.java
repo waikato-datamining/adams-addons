@@ -89,9 +89,9 @@ public class DL4JTrainTestSetContainer
   protected void initHelp() {
     super.initHelp();
 
-    addHelp(VALUE_TRAIN, "training set; " + DataSet.class.getName());
-    addHelp(VALUE_TEST, "test set; " + DataSet.class.getName());
-    addHelp(VALUE_SEED, "seed value; " + Long.class.getName());
+    addHelp(VALUE_TRAIN, "training set", DataSet.class);
+    addHelp(VALUE_TEST, "test set", DataSet.class);
+    addHelp(VALUE_SEED, "seed value", Long.class);
   }
 
   /**

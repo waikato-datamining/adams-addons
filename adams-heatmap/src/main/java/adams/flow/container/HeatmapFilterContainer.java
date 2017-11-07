@@ -20,7 +20,6 @@
 
 package adams.flow.container;
 
-import adams.core.Utils;
 import adams.data.filter.Filter;
 import adams.data.heatmap.Heatmap;
 
@@ -57,8 +56,8 @@ public class HeatmapFilterContainer
    * Initializes help strings specific to the filter.
    */
   protected void initFilterHelp() {
-    addHelp(VALUE_INPUT, "input object; " + Utils.classesToString(new Class[]{Heatmap.class, Heatmap[].class}));
-    addHelp(VALUE_FILTER, "filter object; " + Filter.class.getName());
-    addHelp(VALUE_DATA, "data object; " + Utils.classesToString(new Class[]{Heatmap.class, Heatmap[].class}));
+    addHelp(VALUE_INPUT, "input object", new Class[]{Heatmap.class, Heatmap[].class});
+    addHelp(VALUE_FILTER, "filter object", Filter.class);
+    addHelp(VALUE_DATA, "data object", new Class[]{Heatmap.class, Heatmap[].class});
   }
 }

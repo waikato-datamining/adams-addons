@@ -99,8 +99,8 @@ public class DL4JEvaluationContainer
     super.initHelp();
 
     addHelp(VALUE_EVALUATION, "evaluation object " + BaseEvaluation.class.getName());
-    addHelp(VALUE_MODEL, "model object; " + Model.class.getName());
-    addHelp(VALUE_EPOCH, "epoch; " + Integer.class.getName());
+    addHelp(VALUE_MODEL, "model object", Model.class);
+    addHelp(VALUE_EPOCH, "epoch", Integer.class);
   }
 
   /**

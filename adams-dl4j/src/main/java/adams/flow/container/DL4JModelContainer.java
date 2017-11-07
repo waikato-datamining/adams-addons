@@ -140,13 +140,13 @@ public class DL4JModelContainer
   protected void initHelp() {
     super.initHelp();
 
-    addHelp(VALUE_MODEL, "model object; " + Object.class.getName());
-    addHelp(VALUE_BEST_MODEL, "best model object; " + Object.class.getName());
-    addHelp(VALUE_BEST_STATISTICS, "best model statistics; " + Map.class.getName());
-    addHelp(VALUE_DATASET, "full dataset; " + DataSet.class.getName());
-    addHelp(VALUE_EPOCH, "epoch; " + Integer.class.getName());
-    addHelp(VALUE_EVALUATION, "evaluation; " + Evaluation.class.getName() + " or " + RegressionEvaluation.class.getName());
-    addHelp(VALUE_TRAIN_STOP_MESSAGES, "train stop criteria that triggered; array of " + String.class.getName());
+    addHelp(VALUE_MODEL, "model object", Object.class);
+    addHelp(VALUE_BEST_MODEL, "best model object", Object.class);
+    addHelp(VALUE_BEST_STATISTICS, "best model statistics", Map.class);
+    addHelp(VALUE_DATASET, "full dataset", DataSet.class);
+    addHelp(VALUE_EPOCH, "epoch", Integer.class);
+    addHelp(VALUE_EVALUATION, "evaluation", new Class[]{Evaluation.class, RegressionEvaluation.class});
+    addHelp(VALUE_TRAIN_STOP_MESSAGES, "train stop criteria that triggered", String[].class);
   }
 
   /**

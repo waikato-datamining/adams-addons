@@ -74,8 +74,8 @@ public class DL4JPredictionContainer
   protected void initHelp() {
     super.initHelp();
 
-    addHelp(VALUE_DATASET, "data used for prediction; " + DataSet.class.getName());
-    addHelp(VALUE_SCORES, "predicted scores; " + INDArray.class.getName());
+    addHelp(VALUE_DATASET, "data used for prediction", DataSet.class);
+    addHelp(VALUE_SCORES, "predicted scores", INDArray.class);
   }
 
   /**
