@@ -13,13 +13,14 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Heatmap.java
- * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.heatmap;
 
 import adams.core.Constants;
+import adams.core.UniqueIDs;
 import adams.core.Utils;
 import adams.data.Notes;
 import adams.data.NotesHandler;
@@ -69,6 +70,9 @@ public class Heatmap
   /** the ID of the heatmap (basically the filename). */
   protected String m_ID;
 
+  /** the unique ID. */
+  protected long m_UUID;
+
   /** the actual heat map. */
   protected double[][] m_Map;
 
@@ -89,6 +93,7 @@ public class Heatmap
    */
   private Heatmap() {
     m_ID     = "";
+    m_UUID   = UniqueIDs.nextLong();
     m_Report = createEmptyReport();
     m_Notes  = new Notes();
     resetMinMax();
@@ -138,6 +143,15 @@ public class Heatmap
   @Override
   public String getID() {
     return m_ID;
+  }
+
+  /**
+   * Returns the unique ID.
+   *
+   * @return		the ID
+   */
+  public long getUUID() {
+    return m_UUID;
   }
 
   /**
