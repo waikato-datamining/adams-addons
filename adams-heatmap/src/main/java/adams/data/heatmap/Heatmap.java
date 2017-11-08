@@ -150,7 +150,7 @@ public class Heatmap
    *
    * @return		the ID
    */
-  public long getUUID() {
+  public long getUniqueID() {
     return m_UUID;
   }
 
