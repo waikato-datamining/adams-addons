@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * FixedIntervalBufferedImageSampler.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.transformer.movieimagesampler;
@@ -75,7 +75,6 @@ import java.util.concurrent.TimeUnit;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 @MixedCopyright(
   author = "Xuggle-Xuggler-Main",
@@ -274,8 +273,12 @@ public class FixedIntervalBufferedImageSampler
 		return;
 	    }
 	    // if uninitialized, backdate mLastPtsWrite so we get the very first frame
-	    if (m_LastPtsWrite == Global.NO_PTS)
-	      m_LastPtsWrite = event.getTimeStamp() + m_Offset.dateValue().getTime() - m_MicroSecondsBetweenFrames;
+	    if (m_LastPtsWrite == Global.NO_PTS) {
+	      if (m_Offset.isInfinity())
+		m_LastPtsWrite = event.getTimeStamp() + m_MicroSecondsBetweenFrames;
+	      else
+		m_LastPtsWrite = event.getTimeStamp() + m_Offset.dateValue().getTime() - m_MicroSecondsBetweenFrames;
+	    }
 	    // if it's time to write the next frame
 	    if (event.getTimeStamp() - m_LastPtsWrite >= m_MicroSecondsBetweenFrames) {
 	      BufferedImageContainer cont = new BufferedImageContainer();
