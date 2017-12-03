@@ -117,6 +117,12 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
+ * <pre>-report-moving-errors &lt;boolean&gt; (property: reportMovingErrors)
+ * &nbsp;&nbsp;&nbsp;If enabled, errors encountered while moving files get reported rather than
+ * &nbsp;&nbsp;&nbsp;just logged as warnings.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -155,6 +161,9 @@ public class FileLister
 
   /** whether to output an array instead of single items. */
   protected boolean m_OutputArray;
+
+  /** whether to return errors when moving files. */
+  protected boolean m_ReportMovingErrors;
 
   /**
    * Returns a string describing the object.
@@ -225,6 +234,10 @@ public class FileLister
 
     m_OptionManager.add(
       "output-array", "outputArray",
+      false);
+
+    m_OptionManager.add(
+      "report-moving-errors", "reportMovingErrors",
       false);
   }
 
@@ -615,6 +628,37 @@ public class FileLister
   }
 
   /**
+   * Sets whether to report errors encountered while moving files rather
+   * than just logging them as warnings.
+   *
+   * @param value	true if to report
+   */
+  public void setReportMovingErrors(boolean value) {
+    m_ReportMovingErrors = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to report errors encountered while moving files rather
+   * than just logging them as warnings.
+   *
+   * @return		true if to report
+   */
+  public boolean getReportMovingErrors() {
+    return m_ReportMovingErrors;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String reportMovingErrorsTipText() {
+    return "If enabled, errors encountered while moving files get reported rather than just logged as warnings.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -702,12 +746,14 @@ public class FileLister
    */
   @Override
   protected String doReceive() {
+    String		result;
     MessageCollection 	errors;
     List<String>	files;
     int			i;
     PlaceholderFile	file;
-    
-    files = new ArrayList<>(Arrays.asList(m_Lister.list()));
+
+    result = null;
+    files  = new ArrayList<>(Arrays.asList(m_Lister.list()));
     doWait(m_WaitList);
 
     if (files.size() > 0) {
@@ -738,14 +784,18 @@ public class FileLister
 	    errors.add("Failed to move '" + file + "' to '" + m_Target + "': ", e);
 	  }
 	}
-	if (!errors.isEmpty())
-	  getLogger().warning(errors.toString());
+	if (!errors.isEmpty()) {
+	  if (m_ReportMovingErrors)
+	    result = errors.toString();
+	  else
+	    getLogger().warning(errors.toString());
+	}
       }
       else {
 	m_Files.addAll(files);
       }
     }
 
-    return null;
+    return result;
   }
 }
