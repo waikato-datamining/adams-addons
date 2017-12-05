@@ -22,6 +22,7 @@ package adams.flow.webservice.text;
 
 import adams.core.option.AbstractOptionHandler;
 import adams.data.text.TextContainer;
+import adams.db.DatabaseConnectionUser;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.RatsTextHelper;
 import adams.flow.standalone.rats.input.BufferedRatInput;
@@ -34,11 +35,10 @@ import nz.ac.waikato.adams.webservice.rats.text.UploadResponse;
  * Class that implements the RATS spectrum web service.  
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2085 $
  */
 public class SimpleRatsTextService
   extends AbstractOptionHandler
-  implements RatsTextService, OwnedByRatsTextServiceWS {
+  implements RatsTextService, OwnedByRatsTextServiceWS, DatabaseConnectionUser {
 
   /** for serialization. */
   private static final long serialVersionUID = -6102580694812360595L;

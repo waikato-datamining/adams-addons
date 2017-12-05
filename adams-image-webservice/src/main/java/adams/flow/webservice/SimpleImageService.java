@@ -24,6 +24,7 @@ import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderDirectory;
 import adams.core.option.AbstractOptionHandler;
+import adams.db.DatabaseConnectionUser;
 import adams.flow.core.ActorUtils;
 import nz.ac.waikato.adams.webservice.image.ImageService;
 import nz.ac.waikato.adams.webservice.image.UploadRequest;
@@ -43,7 +44,7 @@ import java.util.logging.Level;
  */
 public class SimpleImageService
   extends AbstractOptionHandler
-  implements ImageService, OwnedByImageServiceWS {
+  implements ImageService, OwnedByImageServiceWS, DatabaseConnectionUser {
 
   /** for serialization. */
   private static final long serialVersionUID = -6102580694812360595L;

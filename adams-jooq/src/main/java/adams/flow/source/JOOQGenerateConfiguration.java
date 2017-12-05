@@ -13,7 +13,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * JOOQGenerateConfiguration.java
  * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
@@ -23,6 +23,7 @@ import adams.core.QuickInfoHelper;
 import adams.core.io.PlaceholderFile;
 import adams.data.jooq.AbstractJOOQConfigurationGenerator;
 import adams.data.jooq.BasicConfigurationGenerator;
+import adams.db.DatabaseConnectionUser;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.Token;
 
@@ -76,10 +77,10 @@ import adams.flow.core.Token;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 8697 $
  */
 public class JOOQGenerateConfiguration
-  extends AbstractSimpleSource {
+  extends AbstractSimpleSource
+  implements DatabaseConnectionUser {
 
   /** for serialization. */
   private static final long serialVersionUID = -5614004831683875187L;

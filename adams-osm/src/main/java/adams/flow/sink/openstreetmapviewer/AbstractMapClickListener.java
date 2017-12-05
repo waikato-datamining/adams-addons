@@ -13,7 +13,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractMapClickListener.java
  * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
@@ -22,6 +22,7 @@ package adams.flow.sink.openstreetmapviewer;
 import adams.core.ShallowCopySupporter;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.OptionUtils;
+import adams.db.DatabaseConnectionUser;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
 import adams.gui.event.MapClickEvent;
@@ -38,7 +39,7 @@ import java.awt.event.MouseEvent;
  */
 public abstract class AbstractMapClickListener
   extends AbstractOptionHandler
-  implements MapClickListener, ShallowCopySupporter<AbstractMapClickListener> {
+  implements MapClickListener, ShallowCopySupporter<AbstractMapClickListener>, DatabaseConnectionUser {
 
   /** for serialization. */
   private static final long serialVersionUID = 4468210013390130296L;

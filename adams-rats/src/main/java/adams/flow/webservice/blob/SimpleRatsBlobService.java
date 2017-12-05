@@ -22,6 +22,7 @@ package adams.flow.webservice.blob;
 
 import adams.core.option.AbstractOptionHandler;
 import adams.data.blob.BlobContainer;
+import adams.db.DatabaseConnectionUser;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.RatsBlobHelper;
 import adams.flow.standalone.rats.input.BufferedRatInput;
@@ -34,11 +35,10 @@ import nz.ac.waikato.adams.webservice.rats.blob.UploadResponse;
  * Class that implements the RATS spectrum web service.  
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2085 $
  */
 public class SimpleRatsBlobService
   extends AbstractOptionHandler
-  implements RatsBlobService, OwnedByRatsBlobServiceWS {
+  implements RatsBlobService, OwnedByRatsBlobServiceWS, DatabaseConnectionUser {
 
   /** for serialization. */
   private static final long serialVersionUID = -6102580694812360595L;
