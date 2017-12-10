@@ -55,7 +55,7 @@ public abstract class AbstractRatGenerator
 
     m_OptionManager.add(
 	    "log", "log",
-	    new CallableActorReference("unknown"));
+	    new CallableActorReference(CallableActorReference.UNKNOWN));
 
     m_OptionManager.add(
 	    "send-error-queue", "sendErrorQueue",

@@ -96,7 +96,7 @@ public class InputWithCallableTransformer
 
     m_OptionManager.add(
 	    "callable", "callableName",
-	    new CallableActorReference("unknown"));
+	    new CallableActorReference(CallableActorReference.UNKNOWN));
   }
 
   /**

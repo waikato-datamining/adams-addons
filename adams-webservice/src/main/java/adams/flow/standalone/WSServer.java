@@ -131,7 +131,7 @@ public class WSServer
 
     m_OptionManager.add(
 	    "log", "log",
-	    new CallableActorReference("unknown"));
+	    new CallableActorReference(CallableActorReference.UNKNOWN));
   }
 
   /**

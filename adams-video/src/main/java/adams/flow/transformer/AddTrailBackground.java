@@ -117,7 +117,7 @@ public class AddTrailBackground
 
     m_OptionManager.add(
 	    "background", "background",
-	    new CallableActorReference("unknown"));
+	    new CallableActorReference(CallableActorReference.UNKNOWN));
   }
 
   /**
