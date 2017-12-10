@@ -142,7 +142,7 @@ public abstract class AbstractSelectedTrailsViewerPlugin
    * @return		the size
    */
   protected Dimension getDialogSize() {
-    return new Dimension(600, 400);
+    return GUIHelper.getDefaultSmallDialogDimension();
   }
   
   /**
