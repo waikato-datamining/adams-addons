@@ -203,6 +203,16 @@ public class Rats
   }
 
   /**
+   * Returns whether actors have to be referenced elsewhere in the flow
+   * or whether it is optional.
+   *
+   * @return		true if required, false if optional
+   */
+  public boolean isReferencingRequired() {
+    return false;
+  }
+
+  /**
    * Checks the actor whether it is of the correct type.
    * 
    * @param actor	the actor to check
@@ -227,7 +237,7 @@ public class Rats
    */
   @Override
   public String check() {
-    return null;
+    return checkActorReferenceHandlers();
   }
   
   /**
