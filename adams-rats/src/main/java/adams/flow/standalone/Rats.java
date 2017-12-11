@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Rats.java
- * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
@@ -23,6 +23,8 @@ import adams.core.Pausable;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorExecution;
 import adams.flow.core.ActorHandlerInfo;
+import adams.flow.core.ActorReferenceHandler;
+import adams.flow.core.ActorReferenceHandlerHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,11 +74,10 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class Rats
   extends AbstractStandaloneMutableGroup<Rat>
-  implements Pausable {
+  implements Pausable, ActorReferenceHandler {
 
   /** for serialization. */
   private static final long serialVersionUID = -6092821156832607603L;
@@ -178,6 +179,27 @@ public class Rats
   @Override
   public ActorHandlerInfo getActorHandlerInfo() {
     return new ActorHandlerInfo(true, false, ActorExecution.UNDEFINED, false, new Class[]{Rat.class, LabRat.class});
+  }
+
+  /**
+   * Returns the classes that are prohibited to appear before this reference
+   * handler.
+   *
+   * @return		the classes
+   */
+  public Class[] getProhibitedPrecedingActorReferenceHandlers() {
+    return new Class[]{};
+  }
+
+  /**
+   * Ensures that the handlers appear in the correct order.
+   *
+   * @return		null if OK, otherwise error message
+   * @see		#getProhibitedPrecedingActorReferenceHandlers()
+   */
+  @Override
+  public String checkActorReferenceHandlers() {
+    return ActorReferenceHandlerHelper.checkActorReferenceHandlers(this);
   }
 
   /**
