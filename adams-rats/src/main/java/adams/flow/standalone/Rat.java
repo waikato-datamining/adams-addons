@@ -32,6 +32,7 @@ import adams.event.FlowPauseStateListener;
 import adams.event.RatStateEvent;
 import adams.event.RatStateListener;
 import adams.flow.container.ErrorContainer;
+import adams.flow.control.AtomicExecution;
 import adams.flow.control.LocalScopeTransformer;
 import adams.flow.control.ScopeHandler.ScopeHandling;
 import adams.flow.control.StorageName;
@@ -199,15 +200,24 @@ import java.util.Set;
  * &nbsp;&nbsp;&nbsp;default: RUNNING
  * </pre>
  * 
+ * <pre>-mode &lt;CONTINUOUS|MANUAL&gt; (property: mode)
+ * &nbsp;&nbsp;&nbsp;The mode the Rat actor is run in.
+ * &nbsp;&nbsp;&nbsp;default: CONTINUOUS
+ * </pre>
+ *
+ * <pre>-finish-before-stopping &lt;boolean&gt; (property: finishBeforeStopping)
+ * &nbsp;&nbsp;&nbsp;If enabled, actor first finishes processing all data before stopping.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class Rat
   extends AbstractStandaloneGroupItem<Rats>
   implements MutableActorHandler, CallableActorUser, Pausable,
-             FlowPauseStateListener, DebugScopeRestrictionHandler {
+             FlowPauseStateListener, DebugScopeRestrictionHandler, AtomicExecution {
 
   /** for serialization. */
   private static final long serialVersionUID = -154461277343021604L;
@@ -346,6 +356,10 @@ public class Rat
     m_OptionManager.add(
       "mode", "mode",
       RatMode.CONTINUOUS);
+
+    m_OptionManager.add(
+      "finish-before-stopping", "finishBeforeStopping",
+      false);
   }
 
   /**
@@ -868,6 +882,35 @@ public class Rat
    */
   public String modeTipText() {
     return "The mode the Rat actor is run in.";
+  }
+
+  /**
+   * Sets whether to finish processing before stopping execution.
+   *
+   * @param value	if true then actor finishes processing first
+   */
+  public void setFinishBeforeStopping(boolean value) {
+    m_Actors.setFinishBeforeStopping(value);
+    reset();
+  }
+
+  /**
+   * Returns whether to finish processing before stopping execution.
+   *
+   * @return		true if actor finishes processing first
+   */
+  public boolean getFinishBeforeStopping() {
+    return m_Actors.getFinishBeforeStopping();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String finishBeforeStoppingTipText() {
+    return m_Actors.finishBeforeStoppingTipText();
   }
 
   /**
