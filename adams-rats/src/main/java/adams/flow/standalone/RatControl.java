@@ -13,7 +13,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * RatControl.java
  * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
  */
@@ -124,7 +124,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class RatControl
   extends AbstractDisplay
@@ -137,7 +136,6 @@ public class RatControl
    * Ancestor for control panels.
    *
    * @author  fracpete (fracpete at waikato dot ac dot nz)
-   * @version $Revision: 107 $
    */
   public static abstract class AbstractControlPanel<T extends Actor & Pausable>
     extends BasePanel {
@@ -158,7 +156,7 @@ public class RatControl
     protected void initGUI() {
       super.initGUI();
       
-      setLayout(new FlowLayout(FlowLayout.LEFT));
+      setLayout(new FlowLayout(FlowLayout.LEFT, 5, 1));
       
       m_ButtonPauseResume = new JButton(GUIHelper.getIcon("pause.gif"));
       m_ButtonPauseResume.addActionListener((ActionEvent e) -> pauseOrResume());
