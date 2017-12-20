@@ -29,7 +29,7 @@
   </scm>
 
   <properties>
-    <adams.version>17.12.0-SNAPSHOT</adams.version>
+    <adams.version>17.12.0</adams.version>
     <timestamp>${maven.build.timestamp}</timestamp>
     <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
   </properties>
