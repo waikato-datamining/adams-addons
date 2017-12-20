@@ -9,5 +9,5 @@ adams.flow.control.Flow -annotation "Performs a parameter optimization of a clas
  adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader
  adams.flow.transformer.WekaClassSelector
  adams.flow.transformer.WekaWSOptimizeClassifierMultiSearch -parameter "weka.core.setupgenerator.MathParameter -property confidenceFactor -min 0.1 -max 0.5 -step 0.1 -base 10.0 -expression I" -parameter "weka.core.setupgenerator.MathParameter -property minNumObj -min 1.0 -max 10.0 -step 1.0 -base 10.0 -expression I"
- adams.flow.transformer.WSTransformer -client "adams.flow.webservice.weka.OptimizeClassifierMultiSearch -out-interceptor adams.flow.webservice.weka.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.weka.interceptor.incoming.NullGenerator"
+ adams.flow.transformer.WSTransformer -client "adams.flow.webservice.weka.OptimizeClassifierMultiSearch -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator"
  adams.flow.sink.Display -writer adams.data.io.output.NullWriter

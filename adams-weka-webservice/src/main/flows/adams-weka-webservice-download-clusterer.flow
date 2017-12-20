@@ -4,5 +4,5 @@
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Downloads a previously trained SimpleKMeans cluster model.\\nSee flow defined in \\\"adams-weka-webservice-weka-webservice.flow\\\" for running the webservice\\nand \\\"adams-weka-webservice-train-clusterer.flow\\\" for training the SimpleKMeans model." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.source.WekaWSDownloadClusterer -model-name simplekmeans
- adams.flow.transformer.WSTransformer -logging-level INFO -client "adams.flow.webservice.weka.DownloadClusterer -out-interceptor adams.flow.webservice.weka.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.weka.interceptor.incoming.NullGenerator"
+ adams.flow.transformer.WSTransformer -logging-level INFO -client "adams.flow.webservice.weka.DownloadClusterer -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator"
  adams.flow.sink.Display -writer adams.data.io.output.NullWriter

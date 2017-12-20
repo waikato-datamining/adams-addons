@@ -3,6 +3,6 @@
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Lists all currently available clusterer models on the webservice server.\\nSee \\\"adams-weka-webservice-train-clusterer.flow\\\" flow for training the clusterer model on the server-side." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.source.WSSource -client "adams.flow.webservice.weka.ListClusterers -in-interceptor adams.flow.webservice.weka.interceptor.incoming.NullGenerator"
+ adams.flow.source.WSSource -client "adams.flow.webservice.weka.ListClusterers -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator"
  adams.flow.transformer.CollectionToSequence
  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
