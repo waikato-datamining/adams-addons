@@ -1,8 +1,10 @@
 # Project: adams
-# Date: 2016-02-15 14:55:09
+# Date: 2017-12-20 15:04:35
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Places uploaded files in ${FLOWS}/output" -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
  adams.flow.standalone.SetVariable -var-name output_dir -var-value ${FLOWS}/output
  adams.flow.standalone.Rats
   adams.flow.standalone.Rat -receiver "adams.flow.standalone.rats.input.WSBlobReception -web-service \"adams.flow.webservice.blob.RatsBlobServiceWS -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -implementation adams.flow.webservice.blob.SimpleRatsBlobService\"" -transmitter "adams.flow.standalone.rats.output.BinaryFileWriter -output @{file}" -scope-handling-variables SHARE
@@ -11,6 +13,7 @@ adams.flow.control.Flow -annotation "Places uploaded files in ${FLOWS}/output" -
     adams.flow.transformer.BaseName
     adams.flow.transformer.PrependDir -prefix @{output_dir}
     adams.flow.transformer.SetVariable -var-name file
+    adams.flow.sink.CallableSink -callable Display
  adams.flow.source.Start
  adams.flow.control.WhileLoop -condition adams.flow.condition.bool.True
   adams.flow.source.Start
