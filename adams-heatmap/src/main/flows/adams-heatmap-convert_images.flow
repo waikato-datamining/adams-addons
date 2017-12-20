@@ -1,13 +1,13 @@
 # Project: adams
-# Date: 2016-02-15 14:23:33
+# Date: 2017-12-20 14:34:20
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Converts JPG images into heatmaps and displays them." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.source.DirectoryLister -dir ${FLOWS}/data -list-files true -regexp .*.jpg -sorting SORT_BY_NAME
+ adams.flow.source.FileSystemSearch -search "adams.flow.source.filesystemsearch.LocalFileSearch -directory ${FLOWS}/data -regexp .*.jpg -sorting SORT_BY_NAME"
  adams.flow.control.Tee -name "get filename"
   adams.flow.transformer.BaseName -remove-extensions true
   adams.flow.transformer.SetVariable -var-name entry
- adams.flow.transformer.ImageReader -reader adams.data.io.input.JAIImageReader
+ adams.flow.transformer.ImageReader -reader adams.data.io.input.JAIImageReader -meta-data-reader adams.data.io.input.DefaultSimpleReportReader
  adams.flow.transformer.BufferedImageTransformer -transformer "adams.data.jai.transformer.Resize -width 0.1 -height 0.1"
  adams.flow.transformer.Convert -conversion adams.data.conversion.BufferedImageToHeatmap
  adams.flow.control.Tee
