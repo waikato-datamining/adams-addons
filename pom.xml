@@ -22,9 +22,9 @@
   </organization>
 
   <scm>
-    <connection>scm:git:https://github.com/waikato/adams-addons</connection>
-    <developerConnection>scm:git:https://github.com/waikato/adams-addons</developerConnection>
-    <url>https://github.com/waikato/adams-addons</url>
+    <connection>scm:git:https://github.com/waikato-datamining/adams-addons</connection>
+    <developerConnection>scm:git:https://github.com/waikato-datamining/adams-addons</developerConnection>
+    <url>https://github.com/waikato-datamining/adams-addons</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -37,6 +37,7 @@
   <modules>
     <module>adams-cntk</module>
     <module>adams-cntk-weka</module>
+    <module>adams-cntk-weka-stable</module>
     <module>adams-cqengine</module>
     <module>adams-dl4j</module>
     <module>adams-dl4j-insight</module>

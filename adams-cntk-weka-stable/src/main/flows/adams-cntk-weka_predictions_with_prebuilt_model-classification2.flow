@@ -1,0 +1,36 @@
+# Project: adams
+# Date: 2017-10-17 09:28:06
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Re-evaluates the CIFAR10 model." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.source.WekaClassifierSetup -classifier "weka.classifiers.functions.CNTKPrebuiltModel -model ${FLOWS}/data/ResNet20_CIFAR10_Python.model -device-type DEFAULT -inputs 1-3072 -input-names Input3 -class-name \"\\\"\\\"\" -output-name \"\\\"\\\"\""
+  adams.flow.sink.Display -name Predictions -writer adams.data.io.output.NullWriter
+  adams.flow.sink.SpreadSheetDisplay -name "Confusion matrix" -short-title true -x -3 -writer adams.data.io.output.NullWriter
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/cifar10.arff
+ adams.flow.transformer.WekaFileReader -loader weka.core.converters.SimpleArffLoader
+ adams.flow.transformer.WekaClassSelector
+ adams.flow.control.Trigger -name "new sheet"
+  adams.flow.source.NewSpreadSheet -columns Actual,Predicted -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.DefaultSpreadSheet
+  adams.flow.transformer.SetStorageValue -storage-name preds
+ adams.flow.control.Tee -name classify
+  adams.flow.transformer.WekaInstanceBuffer -operation INSTANCES_TO_INSTANCE
+  adams.flow.control.Tee -name "get class"
+   adams.flow.transformer.WekaGetInstanceValue -index last
+   adams.flow.transformer.SetVariable -var-name actual
+  adams.flow.transformer.WekaClassifying -model-actor WekaClassifierSetup
+  adams.flow.control.ContainerValuePicker -value "Classification label"
+   adams.flow.transformer.SetVariable -var-name predicted
+  adams.flow.control.Trigger -name "append sheet"
+   adams.flow.source.StorageValue -storage-name preds -conversion adams.data.conversion.UnknownToUnknown
+   adams.flow.transformer.SpreadSheetInsertRow -no-copy true -after true
+   adams.flow.transformer.SpreadSheetSetCell -name actual -no-copy true -row last -value @{actual} -force-string true
+   adams.flow.transformer.SpreadSheetSetCell -name predicted -no-copy true -row last -col 2 -value @{predicted} -force-string true
+   adams.flow.transformer.SetStorageValue -storage-name preds
+  adams.flow.control.Trigger -name output
+   adams.flow.source.CombineVariables -expression "@{actual} - @{predicted}" -conversion adams.data.conversion.StringToString
+   adams.flow.sink.CallableSink -callable Predictions
+ adams.flow.control.Trigger -name "confusion matrix"
+  adams.flow.source.StorageValue -storage-name preds -conversion adams.data.conversion.UnknownToUnknown
+  adams.flow.transformer.ConfusionMatrix
+  adams.flow.sink.CallableSink -callable "Confusion matrix"
