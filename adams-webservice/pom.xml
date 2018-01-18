@@ -13,7 +13,7 @@
   <packaging>jar</packaging>
 
   <name>adams-webservice</name>
-  <description>Adds generic webservice support, server and client.</description>
+  <description>Adds generic SOAP webservice support, server and client.</description>
   <url>https://adams.cms.waikato.ac.nz/</url>
   <organization>
     <name>University of Waikato, Hamilton, NZ</name>
