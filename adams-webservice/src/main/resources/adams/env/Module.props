@@ -13,7 +13,7 @@ Version=${project.version}
 BuildTimestamp=${timestamp}
 
 # A short description of the module
-Description=Adds generic webservice support, client and server.
+Description=Adds generic SOAP webservice support, client and server.
 
 # The author of the module
 Author=Peter Reutemann
