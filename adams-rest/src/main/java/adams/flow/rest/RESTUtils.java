@@ -29,7 +29,7 @@ import adams.flow.rest.interceptor.InterceptorWithActor;
 import adams.flow.rest.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.rest.interceptor.outgoing.AbstractOutInterceptorGenerator;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
-import org.apache.cxf.endpoint.EndpointImpl;
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -138,11 +138,11 @@ public class RESTUtils {
    * Configures the interceptors/logging for the service endpoint (incoming and outgoing).
    * 
    * @param owner		the owning actor
-   * @param endpoint		the endpoint to configure
+   * @param factory		the server factory to update
    * @param inInterceptor	the interceptor for incoming messages
    * @param outInterceptor	the interceptor for outcoing messages
    */
-  public static void configureServiceInterceptors(Actor owner, EndpointImpl endpoint, AbstractInInterceptorGenerator inInterceptor, AbstractOutInterceptorGenerator outInterceptor) {
+  public static void configureFactoryInterceptors(Actor owner, JAXRSServerFactoryBean factory, AbstractInInterceptorGenerator inInterceptor, AbstractOutInterceptorGenerator outInterceptor) {
     AbstractPhaseInterceptor<Message> 	in;
     AbstractPhaseInterceptor<Message> 	out;
     
@@ -165,9 +165,9 @@ public class RESTUtils {
       
     // add interceptors
     if (in != null)
-      endpoint.getInInterceptors().add(in);
+      factory.getInInterceptors().add(in);
     if (out != null)
-      endpoint.getOutInterceptors().add(out);
+      factory.getOutInterceptors().add(out);
   }
   
   /**

@@ -72,6 +72,7 @@ public class EchoServer
 
     factory = new JAXRSServerFactoryBean();
     factory.setResourceClasses(Echo.class);
+    configureInterceptors(factory);
 
     providers = new ArrayList<>();
     factory.setProviders(providers);

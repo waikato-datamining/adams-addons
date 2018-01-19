@@ -25,8 +25,8 @@ import adams.flow.core.Actor;
 import adams.flow.rest.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.rest.interceptor.outgoing.AbstractOutInterceptorGenerator;
 import adams.flow.standalone.RESTServer;
-import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 
 import java.net.URL;
 import java.util.logging.Level;
@@ -239,14 +239,14 @@ public abstract class AbstractRESTProvider
   }
 
   /**
-   * Configures the interceptors/logging for the endpoint (incoming and outgoing).
+   * Configures the interceptors/logging for the factory (incoming and outgoing).
    *
-   * @param endpoint	the endpoint to configure
+   * @param factory	the factory to configure
    * @see		#m_InInterceptor
    * @see		#m_OutInterceptor
    */
-  protected void configureInterceptors(EndpointImpl endpoint) {
-    RESTUtils.configureServiceInterceptors(m_Owner, endpoint, m_InInterceptor, m_OutInterceptor);
+  protected void configureInterceptors(JAXRSServerFactoryBean factory) {
+    RESTUtils.configureFactoryInterceptors(m_Owner, factory, m_InInterceptor, m_OutInterceptor);
   }
 
   /**
