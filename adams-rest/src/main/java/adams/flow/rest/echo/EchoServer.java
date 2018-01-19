@@ -76,7 +76,7 @@ public class EchoServer
     providers = new ArrayList<>();
     factory.setProviders(providers);
     factory.setResourceProvider(Echo.class, new SingletonResourceProvider(new Echo(), true));
-    factory.setAddress(getDefaultURL());
+    factory.setAddress(getURL());
 
     return factory.create();
   }
