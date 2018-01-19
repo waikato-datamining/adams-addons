@@ -20,6 +20,7 @@
 
 package adams.flow.rest.echo;
 
+import adams.core.logging.LoggingLevel;
 import adams.core.logging.LoggingObject;
 import adams.flow.rest.RESTPlugin;
 
@@ -42,12 +43,20 @@ public class Echo
 
   private static final long serialVersionUID = -5218893638471880150L;
 
+  /**
+   * Pre-configures the logging.
+   */
+  @Override
+  protected void initializeLogging() {
+    super.initializeLogging();
+    m_LoggingLevel = LoggingLevel.INFO;
+  }
+
   @GET
   @Path("/echo/{input}")
   @Produces("text/plain")
   public String ping(@PathParam("input") String input) {
-    if (isLoggingEnabled())
-      getLogger().info("input: " + input);
+    getLogger().info("input: " + input);
     return input;
   }
 }
