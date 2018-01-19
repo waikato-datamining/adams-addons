@@ -1,0 +1,30 @@
+# Configuration file listing the superclasses and the packages in which to
+# look for derived classes.
+#
+# Format:
+# class.name=package1,package2,...
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+
+# the REST servers
+adams.flow.rest.RESTProvider=\
+  adams.flow.rest,\
+  adams.flow.rest.echo
+
+# classes providing REST functionality
+adams.flow.rest.RESTPlugin=\
+  adams.flow.rest,\
+  adams.flow.rest.echo
+
+# REST clients
+adams.flow.rest.RESTClient=\
+  adams.flow.rest,\
+  adams.flow.rest.echo
+
+# the interceptor generators for incoming messages
+adams.flow.rest.interceptor.incoming.AbstractInInterceptorGenerator=\
+  adams.flow.rest.interceptor.incoming
+
+# the interceptor generators for outgoing messages
+adams.flow.rest.interceptor.outgoing.AbstractOutInterceptorGenerator=\
+  adams.flow.rest.interceptor.outgoing

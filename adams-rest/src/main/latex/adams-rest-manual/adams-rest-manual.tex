@@ -1,0 +1,102 @@
+% This work is made available under the terms of the
+% Creative Commons Attribution-ShareAlike 4.0 license,
+% http://creativecommons.org/licenses/by-sa/4.0/.
+
+\documentclass[a4paper]{book}
+
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{scalefnt}
+\usepackage{tikz}
+
+% watermark -- for draft stage
+\usepackage[firstpage]{draftwatermark}
+\SetWatermarkLightness{0.9}
+\SetWatermarkScale{5}
+
+\input{latex_extensions}
+
+\title{
+  \textbf{ADAMS} \\
+  {\Large \textbf{A}dvanced \textbf{D}ata mining \textbf{A}nd \textbf{M}achine
+  learning \textbf{S}ystem} \\
+  {\Large Module: adams-rest} \\
+  \vspace{1cm}
+  \includegraphics[width=2cm]{images/rest-module.png} \\
+}
+\author{
+  Peter Reutemann
+}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+
+\thispagestyle{empty}
+\center
+\begin{table}[b]
+	\begin{tabular}{c l l}
+		\parbox[c][2cm]{2cm}{\copyright -2017} &
+		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
+	\end{tabular}
+	\includegraphics[width=12cm]{images/cc.png} \\
+\end{table}
+
+\end{titlepage}
+
+\tableofcontents
+\listoffigures
+%\listoftables
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introduction}
+REST webservices (\cite(rest)) are a popular variant of webservices, that
+are quite often easier to implement than full-blown SOAP-based ones (\cite(soap)).
+
+ADAMS provides a general framework for accessing and implementing REST webservices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Accessing a web-service}
+TODO
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Creating a web-service}
+TODO
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Flow}
+This module contains generic actors in which you can simply plug your 
+web-services that you have implemented. In the following a short overview.
+
+The following standalones are available:
+\begin{tight_itemize}
+	\item \textit{RESTServer} -- runs a web-service. waiting for
+	requests\footnote{adams-rest-server.flow}.
+\end{tight_itemize}
+The following sources are available:
+\begin{tight_itemize}
+	\item \textit{RESTSource} -- queries a web-service and forwards the received
+	data\footnote{adams-rest-echo\_source.flow}.
+\end{tight_itemize}
+The following transformers are available:
+\begin{tight_itemize}
+	\item \textit{RESTTransformer} -- sends the data it receives to a web-service
+	and forwards the data from the response in
+	turn\footnote{adams-rest-echo\_transformer.flow}.
+\end{tight_itemize}
+The following sinks are available:
+\begin{tight_itemize}
+	\item \textit{RESTSink} -- simply sends data to a web-service\footnote{adams-rest-echo\_sink.flow}.
+\end{tight_itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{bibliography}
+
+\end{document}

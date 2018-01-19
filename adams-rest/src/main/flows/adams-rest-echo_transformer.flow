@@ -1,0 +1,8 @@
+# Project: adams
+# Date: 2018-01-19 14:46:08
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Sends a string entered by the user to the \\\"echo\\\" server.\\n\\nNotes:\\nYou need to start the \\\"adams-rest-server.flow\\\" for this to work." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.EnterValue -message "Please enter a string to echo" -initial-value "hello world"
+ adams.flow.transformer.RESTTransformer -client "adams.flow.rest.echo.EchoClientTransformer -out-interceptor adams.flow.rest.interceptor.outgoing.NullGenerator -in-interceptor adams.flow.rest.interceptor.incoming.NullGenerator"
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter
