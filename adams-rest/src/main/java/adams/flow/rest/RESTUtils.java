@@ -22,8 +22,6 @@ package adams.flow.rest;
 import adams.core.Utils;
 import adams.core.logging.LoggingLevelHandler;
 import adams.core.net.ProxyHelper;
-import adams.core.option.OptionHandler;
-import adams.core.option.OptionUtils;
 import adams.flow.core.Actor;
 import adams.flow.rest.interceptor.InterceptorWithActor;
 import adams.flow.rest.interceptor.incoming.AbstractInInterceptorGenerator;
@@ -38,13 +36,22 @@ import org.apache.cxf.transports.http.configuration.ConnectionType;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.transports.http.configuration.ProxyServerType;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.xml.ws.BindingProvider;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.net.Proxy;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility class around REST webservices.
@@ -214,16 +221,107 @@ public class RESTUtils {
   }
 
   /**
-   * Creates a copy of the WS implementation, either using a shallow copy
-   * (if implementing {@link OptionHandler}) or {@link Utils#deepCopy(Object)}.
+   * Returns the additional for the class, if any.
    *
-   * @param implementation	the webservice implemntation to copy
-   * @return			the copy, null if failed to copy
+   * @param cls		the class to inspect
+   * @return		the generated information, null if none available
    */
-  public static Object copyImplementation(Object implementation) {
-    if (implementation instanceof OptionHandler)
-      return OptionUtils.shallowCopy((OptionHandler) implementation, false);
+  protected static String getAdditionalInformation(Class cls) {
+    StringBuilder	result;
+    Annotation 		annotation;
+
+    result = new StringBuilder();
+
+    if (cls.isAnnotationPresent(Path.class)) {
+      annotation = cls.getAnnotation(Path.class);
+      result.append("- Path: " + annotation + "\n");
+    }
+    if (cls.isAnnotationPresent(Consumes.class)) {
+      annotation = cls.getAnnotation(Consumes.class);
+      result.append("- Consumes: " + annotation + "\n");
+    }
+    if (cls.isAnnotationPresent(Produces.class)) {
+      annotation = cls.getAnnotation(Produces.class);
+      result.append("- Produces: " + annotation + "\n");
+    }
+
+    if (result.length() == 0)
+      return null;
     else
-      return Utils.deepCopy(implementation);
+      return result.toString();
+  }
+
+  /**
+   * Returns the additional for the method, if any.
+   *
+   * @param method	the method to inspect
+   * @return		the generated information, null if none available
+   */
+  protected static String getAdditionalInformation(Method method) {
+    StringBuilder	result;
+    Annotation 		annotation;
+    List<String>	methods;
+
+    result = new StringBuilder();
+
+    if (method.isAnnotationPresent(Path.class)) {
+      annotation = method.getAnnotation(Path.class);
+      result.append("- Path: " + annotation + "\n");
+    }
+    if (method.isAnnotationPresent(Consumes.class)) {
+      annotation = method.getAnnotation(Consumes.class);
+      result.append("- Consumes: " + annotation + "\n");
+    }
+    if (method.isAnnotationPresent(Produces.class)) {
+      annotation = method.getAnnotation(Produces.class);
+      result.append("- Produces: " + annotation + "\n");
+    }
+    methods = new ArrayList<>();
+    if (method.isAnnotationPresent(GET.class))
+      methods.add("GET");
+    if (method.isAnnotationPresent(POST.class))
+      methods.add("POST");
+    if (methods.size() > 0)
+      result.append("- Method(s): " + Utils.flatten(methods, ", ") + "\n");
+
+    if (result.length() == 0)
+      return null;
+    else
+      return result.toString();
+  }
+
+  /**
+   * Generates information about the plugin, to be used for the information
+   * return by {@link adams.core.AdditionalInformationHandler}.
+   *
+   * @param plugin	the plugin to generate the information for
+   * @return		the information, null if none available
+   */
+  public static String getAdditionalInformation(RESTPlugin plugin) {
+    StringBuilder	result;
+    String		info;
+
+    result = new StringBuilder();
+
+    // class
+    info = getAdditionalInformation(plugin.getClass());
+    if (info != null)
+      result.append("REST Class\n").append(info);
+
+    // methods
+    for (Method method: plugin.getClass().getDeclaredMethods()) {
+      info = getAdditionalInformation(method);
+      if (info != null) {
+        if (result.length() > 0)
+          result.append("\n");
+        result.append("REST Method '" + method.getName() + "'\n");
+        result.append(info);
+      }
+    }
+
+    if (result.length() == 0)
+      return null;
+    else
+      return result.toString();
   }
 }

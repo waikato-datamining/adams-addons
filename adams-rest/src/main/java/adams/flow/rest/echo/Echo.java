@@ -20,9 +20,7 @@
 
 package adams.flow.rest.echo;
 
-import adams.core.logging.CustomLoggingLevelObject;
-import adams.core.logging.LoggingLevel;
-import adams.flow.rest.RESTPlugin;
+import adams.flow.rest.AbstractRESTPlugin;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -30,26 +28,32 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 /**
- * Simple echo of the input.
+ <!-- globalinfo-start -->
+ * Simple echo of the input.<br>
  * <br>
- * Based on code from <a href="https://github.com/zalacer/projects-tn/blob/master/JAX-RSdemo1/src/main/java/tn/HelloWorld.java">here</a>.
+ * Based on code from here:<br>
+ * https:&#47;&#47;github.com&#47;zalacer&#47;projects-tn&#47;blob&#47;master&#47;JAX-RSdemo1&#47;src&#47;main&#47;java&#47;tn&#47;HelloWorld.java
+ * <br><br>
+ <!-- globalinfo-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-@Path("/")
 public class Echo
-  extends CustomLoggingLevelObject
-  implements RESTPlugin {
+  extends AbstractRESTPlugin {
 
   private static final long serialVersionUID = -5218893638471880150L;
 
   /**
-   * Pre-configures the logging.
+   * Returns a string describing the object.
+   *
+   * @return 			a description suitable for displaying in the gui
    */
-  @Override
-  protected void initializeLogging() {
-    super.initializeLogging();
-    m_LoggingLevel = LoggingLevel.INFO;
+  public String globalInfo() {
+    return
+      "Simple echo of the input.\n"
+	+ "\n"
+	+ "Based on code from here:\n"
+	+ "https://github.com/zalacer/projects-tn/blob/master/JAX-RSdemo1/src/main/java/tn/HelloWorld.java";
   }
 
   @GET

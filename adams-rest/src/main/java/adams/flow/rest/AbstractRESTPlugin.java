@@ -14,22 +14,31 @@
  */
 
 /*
- * RESTPlugin.java
+ * AbstractRESTPlugin.java
  * Copyright (C) 2018 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.rest;
 
-import adams.core.AdditionalInformationHandler;
-import adams.core.GlobalInfoSupporter;
-import adams.core.logging.LoggingSupporter;
+import adams.core.option.AbstractOptionHandler;
 
 /**
- * Interface for classes that provide REST functionality.
+ * Ancestor for REST plugins.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public interface RESTPlugin
-  extends LoggingSupporter, AdditionalInformationHandler, GlobalInfoSupporter {
+public abstract class AbstractRESTPlugin
+  extends AbstractOptionHandler
+  implements RESTPlugin {
 
+  private static final long serialVersionUID = -5506525109386700642L;
+
+  /**
+   * Returns the additional information.
+   *
+   * @return		the additional information, null or 0-length string for no information
+   */
+  public String getAdditionalInformation() {
+    return RESTUtils.getAdditionalInformation(this);
+  }
 }
