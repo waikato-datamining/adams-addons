@@ -1,0 +1,10 @@
+# Project: adams
+# Date: 2018-01-22 12:34:57
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Simple \\\"echo\\\" REST server, using the GenericServer service provider." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.RESTServer -web-service "adams.flow.rest.GenericServer -in-interceptor adams.flow.rest.interceptor.incoming.NullGenerator -out-interceptor adams.flow.rest.interceptor.outgoing.NullGenerator -plugin adams.flow.rest.echo.Echo"
+ adams.flow.source.Start
+ adams.flow.control.WhileLoop -condition adams.flow.condition.bool.True
+  adams.flow.source.Start
+  adams.flow.control.Sleep
