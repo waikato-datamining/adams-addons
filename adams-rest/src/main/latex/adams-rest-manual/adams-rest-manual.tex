@@ -69,6 +69,21 @@ TODO
 \chapter{Creating a web-service}
 TODO
 
+\section{Context}
+If your REST service components require a context, e.g., flow context, then
+you have to use the following approach for setting up the service
+factory\footnote{\url{http://cxf.apache.org/docs/jaxrs-services-configuration.html}{}}:
+\begin{verbatim}
+JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+CustomerService cs = new CustomerService();
+sf.setServiceBeans(cs);
+sf.setAddress("http://localhost:9080/");
+sf.create();
+\end{verbatim}
+By instantiating the \textit{beans} yourself rather than through the factory,
+you can provide them with context. You then use the \textit{setServiceBean(s)}
+methods to set one or more beans.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
 This module contains generic actors in which you can simply plug your 
