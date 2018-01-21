@@ -1,0 +1,16 @@
+# Project: adams
+# Date: 2018-01-22 11:42:30
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Shows how to connect to a REST webservice, constructing URL \\nand connecting to service to obtain and display result.\\n\\nNB: Requires \\\"adams-rest-server.flow\\\" to be running." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.SetVariable -name "webservice URL" -var-name service_url -var-value http://localhost:8080/echo/
+ adams.flow.source.EnterValue -stop-if-canceled true -message "Please value to send to webservice" -initial-value "The brown fox jumps over the lazy dog."
+ adams.flow.control.Tee -name encode
+  adams.flow.transformer.Convert -conversion adams.data.conversion.URLEncode
+  adams.flow.transformer.StringInsert -position first -value @{service_url}
+  adams.flow.transformer.SetVariable -var-name url
+ adams.flow.control.Trigger -name send
+  adams.flow.source.HttpRequest -url @{url} -method GET
+  adams.flow.control.ContainerValuePicker -value Body -switch-outputs true
+  adams.flow.transformer.Convert -conversion adams.data.conversion.URLDecode
+  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
