@@ -26,7 +26,38 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 
 /**
- * Simple REST-based echo server.
+ <!-- globalinfo-start -->
+ * Only offers: adams.flow.rest.echo.Echo<br>
+ * <br>
+ * REST Method 'ping'<br>
+ * - Path: &#64;javax.ws.rs.Path(value=&#47;echo&#47;{input})<br>
+ * - Produces: &#64;javax.ws.rs.Produces(value=[text&#47;plain])<br>
+ * - Method(s): GET<br>
+ * <br><br>
+ <!-- globalinfo-end -->
+ *
+ <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ *
+ * <pre>-url &lt;java.lang.String&gt; (property: URL)
+ * &nbsp;&nbsp;&nbsp;The URL of the service.
+ * &nbsp;&nbsp;&nbsp;default: http:&#47;&#47;localhost:8080&#47;
+ * </pre>
+ *
+ * <pre>-in-interceptor &lt;adams.flow.rest.interceptor.incoming.AbstractInInterceptorGenerator&gt; (property: inInterceptor)
+ * &nbsp;&nbsp;&nbsp;The interceptor to use for incoming messages.
+ * &nbsp;&nbsp;&nbsp;default: adams.flow.rest.interceptor.incoming.NullGenerator
+ * </pre>
+ *
+ * <pre>-out-interceptor &lt;adams.flow.rest.interceptor.outgoing.AbstractOutInterceptorGenerator&gt; (property: outInterceptor)
+ * &nbsp;&nbsp;&nbsp;The interceptor to use for outgoing messages.
+ * &nbsp;&nbsp;&nbsp;default: adams.flow.rest.interceptor.outgoing.NullGenerator
+ * </pre>
+ *
+ <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
@@ -42,7 +73,8 @@ public class EchoServer
    */
   @Override
   public String globalInfo() {
-    return "Only offers: " + Utils.classToString(Echo.class);
+    return "Only offers: " + Utils.classToString(Echo.class) + "\n\n"
+      + new Echo().getAdditionalInformation();
   }
 
   /**
