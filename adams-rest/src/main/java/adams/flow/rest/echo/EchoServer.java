@@ -24,10 +24,6 @@ import adams.core.Utils;
 import adams.flow.rest.AbstractRESTProvider;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Simple REST-based echo server.
@@ -68,15 +64,14 @@ public class EchoServer
   @Override
   protected Server doStart() throws Exception {
     JAXRSServerFactoryBean	factory;
-    List<Object> 		providers;
+    Echo			echo;
 
     factory = new JAXRSServerFactoryBean();
-    factory.setResourceClasses(Echo.class);
     configureInterceptors(factory);
 
-    providers = new ArrayList<>();
-    factory.setProviders(providers);
-    factory.setResourceProvider(Echo.class, new SingletonResourceProvider(new Echo(), true));
+    echo = new Echo();
+    echo.setLoggingLevel(getLoggingLevel());
+    factory.setServiceBean(echo);
     factory.setAddress(getURL());
 
     return factory.create();

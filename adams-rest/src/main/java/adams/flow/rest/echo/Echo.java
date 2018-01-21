@@ -20,8 +20,8 @@
 
 package adams.flow.rest.echo;
 
+import adams.core.logging.CustomLoggingLevelObject;
 import adams.core.logging.LoggingLevel;
-import adams.core.logging.LoggingObject;
 import adams.flow.rest.RESTPlugin;
 
 import javax.ws.rs.GET;
@@ -38,7 +38,7 @@ import javax.ws.rs.Produces;
  */
 @Path("/")
 public class Echo
-  extends LoggingObject
+  extends CustomLoggingLevelObject
   implements RESTPlugin {
 
   private static final long serialVersionUID = -5218893638471880150L;
