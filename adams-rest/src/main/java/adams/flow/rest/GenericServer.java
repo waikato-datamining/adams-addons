@@ -139,6 +139,20 @@ public class GenericServer
   }
 
   /**
+   * For configuring the plugins, e.g., setting the flow context.
+   *
+   * @param plugins	the plugins to configure
+   */
+  protected void configurePlugins(RESTPlugin[] plugins) {
+    int		i;
+
+    for (i = 0; i < plugins.length; i++) {
+      if (plugins[i] instanceof FlowContextHandler)
+	((FlowContextHandler) plugins[i]).setFlowContext(getFlowContext());
+    }
+  }
+
+  /**
    * Performs the actual start of the service.
    *
    * @return 		the server instance
@@ -148,16 +162,12 @@ public class GenericServer
   protected Server doStart() throws Exception {
     JAXRSServerFactoryBean 	factory;
     RESTPlugin[] 		plugins;
-    int				i;
 
     factory = new JAXRSServerFactoryBean();
     configureInterceptors(factory);
 
     plugins = (RESTPlugin[]) ObjectCopyHelper.copyObject(m_Plugins);
-    for (i = 0; i < plugins.length; i++) {
-      if (plugins[i] instanceof FlowContextHandler)
-	((FlowContextHandler) plugins[i]).setFlowContext(getFlowContext());
-    }
+    configurePlugins(plugins);
     factory.setServiceBeans(Arrays.asList(plugins));
     factory.setAddress(getURL());
 
