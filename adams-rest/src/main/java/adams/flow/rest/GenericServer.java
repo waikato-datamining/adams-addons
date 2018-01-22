@@ -73,6 +73,11 @@ public class GenericServer
   /** the plugins that make up the server. */
   protected RESTPlugin[] m_Plugins;
 
+  /**
+   * Returns a string describing the object.
+   *
+   * @return 			a description suitable for displaying in the gui
+   */
   @Override
   public String globalInfo() {
     return
