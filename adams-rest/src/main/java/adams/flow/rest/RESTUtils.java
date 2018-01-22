@@ -261,6 +261,7 @@ public class RESTUtils {
     StringBuilder	result;
     Annotation 		annotation;
     List<String>	methods;
+    int			index;
 
     result = new StringBuilder();
 
@@ -275,6 +276,12 @@ public class RESTUtils {
     if (method.isAnnotationPresent(Produces.class)) {
       annotation = method.getAnnotation(Produces.class);
       result.append("- Produces: " + annotation + "\n");
+    }
+    index = 0;
+    for (Annotation[] annotations: method.getParameterAnnotations()) {
+      index++;
+      if (annotations.length > 0)
+        result.append("- Parameter #" + index + ": " + Utils.flatten(annotations, ", ") + "\n");
     }
     methods = new ArrayList<>();
     if (method.isAnnotationPresent(GET.class))
