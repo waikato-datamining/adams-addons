@@ -96,7 +96,16 @@ public class GenericServer
 
     m_OptionManager.add(
       "plugin", "plugins",
-      new RESTPlugin[0]);
+      getDefaultPlugins());
+  }
+
+  /**
+   * Returns the default plugins to use.
+   *
+   * @return		the default
+   */
+  protected RESTPlugin[] getDefaultPlugins() {
+    return new RESTPlugin[0];
   }
 
   /**
