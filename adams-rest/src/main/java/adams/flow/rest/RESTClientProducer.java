@@ -20,7 +20,6 @@
 package adams.flow.rest;
 
 import adams.event.RESTClientProducerResponseDataListener;
-import adams.flow.rest.interceptor.incoming.AbstractInInterceptorGenerator;
 
 /**
  * Interface for classes that use webRESTservices.
@@ -73,20 +72,4 @@ public interface RESTClientProducer<T>
    * @return		the response data
    */
   public T getResponseData();
-  
-  /**
-   * Sets the interceptor for incoming messages 
-   * (actually generator, since interceptors aren't serializable).
-   * 
-   * @param value	the interceptor
-   */
-  public void setInInterceptor(AbstractInInterceptorGenerator value);
-  
-  /**
-   * Returns the interceptor for incoming messages
-   * (actually generator, since interceptors aren't serializable).
-   * 
-   * @return		the interceptor
-   */
-  public AbstractInInterceptorGenerator getInInterceptor();
 }

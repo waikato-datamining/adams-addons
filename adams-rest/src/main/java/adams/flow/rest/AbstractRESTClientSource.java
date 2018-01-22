@@ -25,7 +25,6 @@ import adams.core.option.AbstractOptionHandler;
 import adams.event.RESTClientProducerResponseDataEvent;
 import adams.event.RESTClientProducerResponseDataListener;
 import adams.flow.core.Actor;
-import adams.flow.rest.interceptor.incoming.AbstractInInterceptorGenerator;
 
 import java.net.URL;
 import java.util.HashSet;
@@ -59,9 +58,6 @@ public abstract class AbstractRESTClientSource<O>
   /** the URL of the webservice. */
   protected String m_AlternativeURL;
 
-  /** the interceptor generator for incoming messages. */
-  protected AbstractInInterceptorGenerator m_InInterceptor;
-
   /** the response data. */
   protected transient O m_ResponseData;
 
@@ -93,10 +89,6 @@ public abstract class AbstractRESTClientSource<O>
     m_OptionManager.add(
       "alternative-url", "alternativeURL",
       getDefaultAlternativeURL());
-
-    m_OptionManager.add(
-      "in-interceptor", "inInterceptor",
-      getDefaultInInterceptor());
   }
 
   /**
@@ -240,44 +232,6 @@ public abstract class AbstractRESTClientSource<O>
    */
   public String alternativeURLTipText() {
     return "The URL of the service.";
-  }
-
-  /**
-   * Returns the default interceptor for incoming messages.
-   *
-   * @return		the interceptor
-   */
-  protected AbstractInInterceptorGenerator getDefaultInInterceptor() {
-    return new adams.flow.rest.interceptor.incoming.NullGenerator();
-  }
-
-  /**
-   * Sets the interceptor for incoming messages.
-   *
-   * @param value	the interceptor
-   */
-  public void setInInterceptor(AbstractInInterceptorGenerator value) {
-    m_InInterceptor = value;
-    reset();
-  }
-
-  /**
-   * Returns the interceptor for incoming messages.
-   *
-   * @return		the interceptor
-   */
-  public AbstractInInterceptorGenerator getInInterceptor() {
-    return m_InInterceptor;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String inInterceptorTipText() {
-    return "The interceptor to use for incoming messages.";
   }
 
   /**
@@ -441,10 +395,11 @@ public abstract class AbstractRESTClientSource<O>
   }
 
   /**
-   * Cleans up the client.
+   * Cleans up data structures, frees up memory.
+   * <br>
+   * Default implementation does nothing.
    */
   @Override
   public void cleanUp() {
-    m_InInterceptor.cleanUp();
   }
 }

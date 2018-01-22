@@ -19,8 +19,6 @@
  */
 package adams.flow.rest;
 
-import adams.flow.rest.interceptor.outgoing.AbstractOutInterceptorGenerator;
-
 /**
  * Interface for classes that use REST, sending data to them.
  * 
@@ -43,20 +41,4 @@ public interface RESTClientConsumer<T>
    * @param value	the request data
    */
   public void setRequestData(T value);
-  
-  /**
-   * Sets the interceptor for outgoing messages
-   * (actually generator, since interceptors aren't serializable).
-   * 
-   * @param value	the interceptor
-   */
-  public void setOutInterceptor(AbstractOutInterceptorGenerator value);
-  
-  /**
-   * Returns the interceptor for outgoing messages
-   * (actually generator, since interceptors aren't serializable).
-   * 
-   * @return		the interceptor
-   */
-  public AbstractOutInterceptorGenerator getOutInterceptor();
 }
