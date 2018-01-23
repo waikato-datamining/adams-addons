@@ -3,7 +3,7 @@
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Uploads text to a REST service.\\n\\nNB: Requires \\\"adams-rats-text_rest_server.flow\\\" to be running." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.standalone.SetVariable -name "webservice URL" -var-name service_url -var-value http://localhost:8080/upload/
+ adams.flow.standalone.SetVariable -name "webservice URL" -var-name service_url -var-value http://localhost:8080/rats/text/upload/
  adams.flow.source.EnterValue -stop-if-canceled true -message "Please enter text to send to webservice" -initial-value "The brown fox jumps over the lazy dog."
  adams.flow.control.Tee -name "create parameter"
   adams.flow.transformer.StringInsert -position first -value content=

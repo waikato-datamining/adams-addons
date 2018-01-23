@@ -77,7 +77,7 @@ public class RatsTextUpload
   }
 
   @POST
-  @Path("/upload")
+  @Path("/rats/text/upload")
   public void upload(@FormParam("content") String content) {
     if (m_RatInput == null) {
       getLogger().warning("No RAT input set!");
