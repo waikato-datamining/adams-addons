@@ -76,6 +76,11 @@ public class RatsTextUpload
     return m_RatInput;
   }
 
+  /**
+   * For uploading text to be processed in a Rat actor.
+   *
+   * @param content	the text
+   */
   @POST
   @Path("/rats/text/upload")
   public void upload(@FormParam("content") String content) {
