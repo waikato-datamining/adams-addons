@@ -20,6 +20,7 @@
 
 package adams.flow.rest;
 
+import adams.core.AdditionalInformationHandler;
 import adams.core.ObjectCopyHelper;
 import adams.core.Utils;
 import adams.flow.core.FlowContextHandler;
@@ -66,7 +67,8 @@ import java.util.Arrays;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class GenericServer
-  extends AbstractRESTProvider {
+  extends AbstractRESTProvider
+  implements AdditionalInformationHandler {
 
   private static final long serialVersionUID = 6759800194384027943L;
 
@@ -85,6 +87,27 @@ public class GenericServer
 	+ "plugins that should make up the service.\n"
 	+ "Automatically sets the flow context of plugins, if they should implement "
 	+ "the " + Utils.classToString(FlowContextHandler.class) + " interface.";
+  }
+
+  /**
+   * Returns the additional information.
+   *
+   * @return		the additional information, null or 0-length string for no information
+   */
+  public String getAdditionalInformation() {
+    StringBuilder 	result;
+
+    if (m_Plugins.length == 0)
+      return null;
+
+    result = new StringBuilder();
+    for (RESTPlugin plugin: m_Plugins) {
+      if (result.length() > 0)
+        result.append("\n");
+      result.append(RESTUtils.getAdditionalInformation(plugin));
+    }
+
+    return result.toString();
   }
 
   /**
