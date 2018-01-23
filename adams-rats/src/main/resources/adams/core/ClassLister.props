@@ -27,6 +27,11 @@ adams.flow.standalone.rats.output.webservice.AbstractWebserviceResponseDataPostP
 adams.flow.standalone.rats.generator.AbstractRatGenerator=\
   adams.flow.standalone.rats.generator
 
+# classes providing REST functionality
+adams.flow.rest.RESTPlugin=\
+  adams.flow.rest.control,\
+  adams.flow.rest.text
+
 # the servers
 adams.flow.webservice.WebServiceProvider=\
   adams.flow.webservice.blob,\

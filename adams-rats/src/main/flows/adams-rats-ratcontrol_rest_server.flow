@@ -1,0 +1,17 @@
+# Project: adams
+# Date: 2018-01-23 15:52:27
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.RESTServer -web-service "adams.flow.rest.GenericServer -url http://localhost:8081/ -in-interceptor adams.flow.rest.interceptor.incoming.NullGenerator -out-interceptor adams.flow.rest.interceptor.outgoing.NullGenerator -plugin adams.flow.rest.control.RatControl"
+ adams.flow.standalone.RegisterFlow
+ adams.flow.standalone.RatControl
+ adams.flow.standalone.Rats
+  adams.flow.standalone.Rat -name process -receiver "adams.flow.standalone.rats.input.RESTTextReception -web-service \"adams.flow.rest.RatsServer -in-interceptor adams.flow.rest.interceptor.incoming.NullGenerator -out-interceptor adams.flow.rest.interceptor.outgoing.NullGenerator -plugin adams.flow.rest.text.RatsTextUpload\"" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display" -show-in-control true
+  adams.flow.standalone.Rat -name manual -receiver "adams.flow.standalone.rats.input.RESTTextReception -web-service \"adams.flow.rest.RatsServer -in-interceptor adams.flow.rest.interceptor.incoming.NullGenerator -out-interceptor adams.flow.rest.interceptor.outgoing.NullGenerator -plugin adams.flow.rest.text.RatsTextUpload\"" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display" -show-in-control true -mode MANUAL
+ adams.flow.source.Start
+ adams.flow.control.WhileLoop -condition adams.flow.condition.bool.True
+  adams.flow.source.Start
+  adams.flow.control.Sleep
