@@ -20,6 +20,7 @@
 package adams.flow.standalone;
 
 
+import adams.core.AdditionalInformationHandler;
 import adams.core.Properties;
 import adams.core.QuickInfoHelper;
 import adams.core.option.OptionHandler;
@@ -122,6 +123,25 @@ public class RESTServer
   @Override
   public String globalInfo() {
     return "Runs a REST webservice.";
+  }
+
+  /**
+   * Returns the additional information.
+   *
+   * @return		the additional information, null or 0-length string for no information
+   */
+  public String getAdditionalInformation() {
+    StringBuilder  	result;
+
+    result = new StringBuilder(super.getAdditionalInformation());
+
+    if (m_WebService instanceof AdditionalInformationHandler) {
+      result.append("\n\n");
+      result.append("REST Service details:\n\n");
+      result.append(((AdditionalInformationHandler) m_WebService).getAdditionalInformation());
+    }
+
+    return result.toString();
   }
 
   /**
