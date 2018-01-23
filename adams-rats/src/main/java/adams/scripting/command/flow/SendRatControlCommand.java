@@ -120,7 +120,7 @@ public class SendRatControlCommand
    * 			displaying in the gui
    */
   public String IDTipText() {
-    return "The ID of the flow to oeprate on; -1 if to use the only one.";
+    return "The ID of the flow to operate on; -1 if to use the only one.";
   }
 
   /**
