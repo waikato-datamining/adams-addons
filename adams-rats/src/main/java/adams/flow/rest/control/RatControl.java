@@ -33,6 +33,7 @@ import adams.flow.standalone.RatControl.AbstractControlPanel;
 import adams.flow.standalone.RatControl.AbstractControlState;
 import adams.flow.standalone.RatControl.RatControlPanel;
 import adams.flow.standalone.RatControl.RatControlState;
+import adams.flow.standalone.Rats;
 import adams.scripting.command.flow.SendRatControlCommand;
 import adams.scripting.command.flow.SendRatControlCommand.Command;
 import com.google.gson.JsonArray;
@@ -135,12 +136,15 @@ public class RatControl
   @Path("/rats/control/status/{id}")
   public String status(@PathParam("id") int id) {
     JsonObject				result;
-    JsonArray				rats;
+    JsonArray 				groups;
+    JsonArray 				rats;
     JsonObject				rat;
+    JsonObject				group;
     MessageCollection			errors;
     Actor				flow;
     adams.flow.standalone.RatControl 	rc;
     Actor				actor;
+    String				ratspath;
 
     errors = new MessageCollection();
     flow   = getFlow(id, errors);
@@ -148,15 +152,27 @@ public class RatControl
       return errors.toString();
 
     result = new JsonObject();
-    rats   = new JsonArray();
-    result.add("rats", rats);
+    groups = new JsonArray();
+    result.add("groups", groups);
     result.addProperty("id", id);
+    ratspath = "";
+    group = new JsonObject();
+    rats = new JsonArray();
     for (Actor a : ActorUtils.enumerate(flow, new Class[]{adams.flow.standalone.RatControl.class})) {
       rc = (adams.flow.standalone.RatControl) a;
       for (AbstractControlState state: rc.getControlStates()) {
 	actor = state.getActor();
+	if (actor instanceof Rats) {
+	  ratspath = actor.getFullName();
+	  group = new JsonObject();
+	  group.addProperty("name", actor.getName());
+	  rats = new JsonArray();
+	  group.add("rats", rats);
+	  groups.add(group);
+	  continue;
+	}
 	rat = new JsonObject();
-	rat.addProperty("rat", state.getActor().getFullName());
+	rat.addProperty("name", state.getActor().getFullName().substring(ratspath.length() + 1));
 	rat.addProperty("pausable", state.isPausable());
 	rat.addProperty("paused", ((Pausable) actor).isPaused());
 	if ((state instanceof RatControlState)) {
