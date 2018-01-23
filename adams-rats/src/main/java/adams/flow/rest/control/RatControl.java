@@ -173,6 +173,7 @@ public class RatControl
 	}
 	rat = new JsonObject();
 	rat.addProperty("name", state.getActor().getFullName().substring(ratspath.length() + 1));
+	rat.addProperty("full", state.getActor().getFullName());
 	rat.addProperty("pausable", state.isPausable());
 	rat.addProperty("paused", ((Pausable) actor).isPaused());
 	if ((state instanceof RatControlState)) {
