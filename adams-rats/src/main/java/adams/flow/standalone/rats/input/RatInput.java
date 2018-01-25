@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * RatInput.java
- * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
@@ -25,10 +25,9 @@ import adams.core.option.OptionHandler;
 import adams.flow.standalone.Rat;
 
 /**
- * Interface for input receivers for the the RATS framework.
+ * Interface for input receivers for the RATS framework.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public interface RatInput
   extends StoppableWithFeedback, OptionHandler, AdditionalInformationHandler {
