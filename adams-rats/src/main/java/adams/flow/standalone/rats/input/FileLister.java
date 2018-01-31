@@ -15,7 +15,7 @@
 
 /*
  * FileLister.java
- * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
@@ -778,7 +778,7 @@ public class FileLister
 	    if (!FileUtils.move(file, m_Target, m_AtomicMove))
 	      errors.add("Failed to move '" + file + "' to '" + m_Target + "'!");
 	    else
-	      m_Files.add(i, m_Target.getAbsolutePath() + File.separator + file.getName());
+	      m_Files.add(m_Target.getAbsolutePath() + File.separator + file.getName());
 	  }
 	  catch (Exception e) {
 	    errors.add("Failed to move '" + file + "' to '" + m_Target + "': ", e);
