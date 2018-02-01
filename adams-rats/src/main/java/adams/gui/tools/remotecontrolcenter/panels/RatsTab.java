@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * RatsTab.java
- * Copyright (C) 2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2017-2018 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.tools.remotecontrolcenter.panels;
@@ -49,7 +49,6 @@ import java.util.List;
  * Tab for managing rats.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class RatsTab
   extends AbstractRemoteFlowTab {
@@ -61,7 +60,6 @@ public class RatsTab
    * remote command.
    *
    * @author FracPete (fracpete at waikato dot ac dot nz)
-   * @version $Revision$
    */
   public static class RatStatusResponseHandler
     extends AbstractResponseHandler {
@@ -153,6 +151,9 @@ public class RatsTab
     /** whether it is stopped. */
     protected boolean m_Stopped;
 
+    /** whether it is interactive. */
+    protected boolean m_Interactive;
+
     /** the label. */
     protected JLabel m_LabelName;
 
@@ -161,6 +162,9 @@ public class RatsTab
 
     /** the button for stop/start. */
     protected JButton m_ButtonStopStart;
+
+    /** the label for interactive actors. */
+    protected JLabel m_LabelInteractive;
 
     /**
      * Initializes the panel.
@@ -172,17 +176,19 @@ public class RatsTab
      * @param paused	whether currently paused
      * @param stoppable	whether stoppable at all
      * @param stopped	whether currently stopped
+     * @param interactive	whether interactive actors contained
      */
-    public RatStatusPanel(RatsTab owner, int id, String name, boolean pausable, boolean paused, boolean stoppable, boolean stopped) {
+    public RatStatusPanel(RatsTab owner, int id, String name, boolean pausable, boolean paused, boolean stoppable, boolean stopped, boolean interactive) {
       super();
 
-      m_Owner     = owner;
-      m_ID        = id;
-      m_Name      = name;
-      m_Pausable  = pausable;
-      m_Paused    = paused;
-      m_Stoppable = stoppable;
-      m_Stopped   = stopped;
+      m_Owner       = owner;
+      m_ID          = id;
+      m_Name        = name;
+      m_Pausable    = pausable;
+      m_Paused      = paused;
+      m_Stoppable   = stoppable;
+      m_Stopped     = stopped;
+      m_Interactive = interactive;
 
       initGUI();
       finishInit();
@@ -213,6 +219,11 @@ public class RatsTab
 	m_ButtonStopStart = new JButton(m_Stopped ? GUIHelper.getIcon("run.gif") : GUIHelper.getIcon("stop_blue.gif"));
 	m_ButtonStopStart.addActionListener((ActionEvent e) -> stopStart());
 	add(m_ButtonStopStart);
+      }
+
+      if (m_Interactive) {
+        m_LabelInteractive = new JLabel("I");
+        add(m_LabelInteractive);
       }
     }
 
@@ -394,7 +405,8 @@ public class RatsTab
 	row.getCell(GetRatControlStatus.COL_PAUSABLE).toBoolean(),
 	row.getCell(GetRatControlStatus.COL_PAUSED).toBoolean(),
 	row.getCell(GetRatControlStatus.COL_STOPPABLE).toBoolean(),
-	row.getCell(GetRatControlStatus.COL_STOPPED).toBoolean()
+	row.getCell(GetRatControlStatus.COL_STOPPED).toBoolean(),
+	row.getCell(GetRatControlStatus.COL_INTERACTIVE).toBoolean()
       );
       m_PanelRats.add(panel);
       panels.add(panel);
