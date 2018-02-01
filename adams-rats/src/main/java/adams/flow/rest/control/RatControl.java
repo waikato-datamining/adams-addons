@@ -184,6 +184,7 @@ public class RatControl
 	  rat.addProperty("stoppable", false);
 	  rat.addProperty("stopped", false);
 	}
+	rat.addProperty("interactive", ActorUtils.isInteractive(actor));
 	rats.add(rat);
       }
     }

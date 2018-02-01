@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * GetRatControlStatus.java
- * Copyright (C) 2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2017-2018 University of Waikato, Hamilton, NZ
  */
 
 package adams.scripting.command.flow;
@@ -67,6 +67,9 @@ public class GetRatControlStatus
   /** the column of the stopped flag. */
   public final static int COL_STOPPED = 5;
 
+  /** the column of the interactive flag. */
+  public final static int COL_INTERACTIVE = 6;
+
   /** the status. */
   protected SpreadSheet m_Status;
 
@@ -86,7 +89,8 @@ public class GetRatControlStatus
 	+ "- pausable -- whether the Rat can be paused\n"
 	+ "- ispaused -- whether the Rat is currently paused\n"
 	+ "- stoppable -- whether the Rat can be stopped\n"
-	+ "- isstopped -- whether the Rat is currently stopped";
+	+ "- isstopped -- whether the Rat is currently stopped\n"
+	+ "- isinteractive -- whether the Rat contains at least one interactive actor";
   }
 
   /**
@@ -205,6 +209,7 @@ public class GetRatControlStatus
       row.addCell("" + COL_PAUSED).setContent("ispaused");
       row.addCell("" + COL_STOPPABLE).setContent("stoppable");
       row.addCell("" + COL_STOPPED).setContent("isstopped");
+      row.addCell("" + COL_INTERACTIVE).setContent("isinteractive");
       for (Actor a : ActorUtils.enumerate(flow, new Class[]{RatControl.class})) {
 	rc = (RatControl) a;
 	for (AbstractControlState state: rc.getControlStates()) {
@@ -222,6 +227,7 @@ public class GetRatControlStatus
 	    row.addCell(COL_STOPPABLE).setContent(false);
 	    row.addCell(COL_STOPPED).setContent(false);
 	  }
+	  row.addCell(COL_INTERACTIVE).setContent(ActorUtils.isInteractive(actor));
 	}
       }
       m_Status = sheet;
