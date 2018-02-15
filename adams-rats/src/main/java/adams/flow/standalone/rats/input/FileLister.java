@@ -733,10 +733,17 @@ public class FileLister
    */
   @Override
   public Object output() {
-    if (m_OutputArray)
-      return m_Files.toArray(new String[m_Files.size()]);
-    else
-      return m_Files.remove(0);
+    Object  result;
+
+    if (m_OutputArray) {
+      result = m_Files.toArray(new String[m_Files.size()]);
+      m_Files.clear();
+    }
+    else {
+      result = m_Files.remove(0);
+    }
+
+    return result;
   }
 
   /**
