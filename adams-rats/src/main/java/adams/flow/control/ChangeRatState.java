@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * ChangeRatState.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2018 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.control;
@@ -93,7 +93,6 @@ import adams.flow.transformer.AbstractTransformer;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class ChangeRatState
   extends AbstractTransformer
@@ -253,19 +252,21 @@ public class ChangeRatState
     result = super.setUp();
 
     if (result == null) {
-      if (m_Rats.length == 0) {
-	result = "No Rat actor references defined!";
-      }
-      else {
-	for (i = 0; i < m_Rats.length; i++) {
-	  rat = m_RatHelper.findRatRecursive(this, m_Rats[i]);
-	  if (rat == null) {
-	    result = "Failed to locate Rat #" + (i+1) + ": " + m_Rats[i];
-	    break;
-	  }
-	  else if (!(rat instanceof Rat)) {
-	    result = "Rat #" + (i+1) + " '" + m_Rats[i] + "' is not of type " + Rat.class.getName();
-	    break;
+      if (!getOptionManager().hasVariableForProperty("rats")) {
+	if (m_Rats.length == 0) {
+	  result = "No Rat actor references defined!";
+	}
+	else {
+	  for (i = 0; i < m_Rats.length; i++) {
+	    rat = m_RatHelper.findRatRecursive(this, m_Rats[i]);
+	    if (rat == null) {
+	      result = "Failed to locate Rat #" + (i + 1) + ": " + m_Rats[i];
+	      break;
+	    }
+	    else if (!(rat instanceof Rat)) {
+	      result = "Rat #" + (i + 1) + " '" + m_Rats[i] + "' is not of type " + Rat.class.getName();
+	      break;
+	    }
 	  }
 	}
       }
