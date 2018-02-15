@@ -578,6 +578,7 @@ public class RatControl
     boolean			inControl;
     
     param = new ParameterPanel();
+    param.setUseMnemonicIndicators(false);
     list  = ActorUtils.findClosestTypes(this, Rats.class, true);
     for (Actor item: list) {
       rats = (Rats) item;
