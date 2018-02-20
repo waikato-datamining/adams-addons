@@ -1,0 +1,8 @@
+# Project: adams
+# Date: 2018-02-15 09:41:32
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Lists the available databases for the connection.\\nNB: You need to update the connections parameters to suit your needs." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.MongoDbConnection -url mongodb://localhost:27017/mydb
+ adams.flow.source.MongoDbListDatabases
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter

@@ -1,0 +1,21 @@
+# Properties file for MongoDB access
+#
+# author: FracPete (fracpete at waikato dot ac dot nz)
+
+# the database URL
+URL=mongodb://somehost:27017/somedatabase
+
+# the database user
+User=
+
+# the database password
+Password=
+
+# Whether to connect on start-up of the application
+ConnectOnStartUp=false
+
+# the maximum number of connection attempts for a URL/User/PW combination
+MaxConnectAttempts=1
+
+# the number of seconds to wait before trying to reconnect
+ReconnectWait=10

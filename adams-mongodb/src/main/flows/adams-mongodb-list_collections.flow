@@ -1,0 +1,8 @@
+# Project: adams
+# Date: 2018-02-15 09:28:22
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Lists the collections in the specified database.\\nNB: You need to update the connections parameters to suit your needs." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.MongoDbConnection -url mongodb://localhost:27017/mydb
+ adams.flow.source.MongoDbListCollections
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter

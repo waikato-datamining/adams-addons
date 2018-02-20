@@ -1,0 +1,39 @@
+# Project: adams
+# Date: 2018-02-21 09:30:36
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "You will need to update database and collection to work in your environment." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.MongoDbConnection -url mongodb://localhost:27017/mydb
+ adams.flow.standalone.SetVariable -name collection -var-name collection -var-value yo
+ adams.flow.standalone.SetVariable -name id -var-name id -var-value 12345
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "init storage"
+  adams.flow.source.StringConstants -string 1 -conversion adams.data.conversion.StringToInt
+  adams.flow.transformer.SetStorageValue -storage-name integer
+ adams.flow.control.Trigger -name "update collection"
+  adams.flow.source.MongoDbGetCollection -collection yo
+  adams.flow.control.ConditionalTee -name "document already present?" -condition "adams.flow.condition.bool.MongoDbDocumentExists -collection @{collection} -ID @{id}"
+   adams.flow.transformer.MongoDbCollectionUpdate -operation "adams.flow.transformer.mongodbcollectionupdate.RemoveDocument -id @{id}"
+  adams.flow.transformer.MongoDbCollectionUpdate -operation "adams.flow.transformer.mongodbcollectionupdate.AddDocument -id @{id} -update \"adams.flow.transformer.mongodbdocumentupdate.Append -key-value hello=world -value-conversion adams.data.conversion.StringToString\" -update \"adams.flow.transformer.mongodbdocumentupdate.AppendStorage -key-value intvalue=integer -value-conversion adams.data.conversion.ObjectToObject\""
+  adams.flow.transformer.MongoDbFindDocuments -operation "adams.flow.transformer.mongodbfinddocuments.Filtered -filter \"adams.flow.transformer.mongodbfinddocuments.filter.Equal -key _id -value @{id} -value-conversion adams.data.conversion.StringToString\""
+  adams.flow.transformer.MongoDbDocumentUpdate -operation "adams.flow.transformer.mongodbdocumentupdate.Append -key-value another=value -value-conversion adams.data.conversion.StringToString"
+  adams.flow.control.Trigger -name separator
+   adams.flow.source.StringConstants -string "--> document" -conversion adams.data.conversion.StringToString
+   adams.flow.sink.CallableSink -callable Display
+  adams.flow.control.ContainerValuePicker -name "display doc" -value Document
+   adams.flow.transformer.Convert -conversion adams.data.conversion.AnyToString
+   adams.flow.sink.CallableSink -callable Display
+  adams.flow.control.Trigger -name "separator (2)"
+   adams.flow.source.StringConstants -string "--> keys" -conversion adams.data.conversion.StringToString
+   adams.flow.sink.CallableSink -callable Display
+  adams.flow.control.Tee -name "output keys"
+   adams.flow.transformer.MongoDbGetDocumentKeys
+   adams.flow.sink.CallableSink -callable Display
+  adams.flow.control.Trigger -name "separator (3)"
+   adams.flow.source.StringConstants -string "--> value" -conversion adams.data.conversion.StringToString
+   adams.flow.sink.CallableSink -callable Display
+  adams.flow.control.Tee -name "get value"
+   adams.flow.transformer.MongoDbGetDocumentValue -key intvalue
+   adams.flow.sink.CallableSink -callable Display

@@ -1,0 +1,113 @@
+% This work is made available under the terms of the 
+% Creative Commons Attribution-ShareAlike 4.0 license,
+% http://creativecommons.org/licenses/by-sa/4.0/.
+%
+% Version: $Revision$
+
+\documentclass[a4paper]{book}
+
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{scalefnt}
+\usepackage{tikz}
+
+% watermark -- for draft stage
+\usepackage[firstpage]{draftwatermark}
+\SetWatermarkLightness{0.9}
+\SetWatermarkScale{5}
+
+\input{latex_extensions}
+
+\title{
+  \textbf{ADAMS} \\
+  {\Large \textbf{A}dvanced \textbf{D}ata mining \textbf{A}nd \textbf{M}achine
+  learning \textbf{S}ystem} \\
+  {\Large Module: adams-mongodb} \\
+  \vspace{1cm}
+  \includegraphics[width=2cm]{images/mongodb-module.png} \\
+}
+\author{
+  Peter Reutemann
+}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+
+\thispagestyle{empty}
+\center
+\begin{table}[b]
+	\begin{tabular}{c l l}
+		\parbox[c][2cm]{2cm}{\copyright 2018} &
+		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
+	\end{tabular}
+	\includegraphics[width=12cm]{images/cc.png} \\
+\end{table}
+
+\end{titlepage}
+
+\tableofcontents
+%\listoffigures
+%\listoftables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introduction}
+MongoDB (from humongous[citation needed]) is a free and open-source cross-platform
+document-oriented database program. Classified as a NoSQL\cite{nosql} database program,
+MongoDB uses JSON-like\cite{json} documents with schemas.
+
+\begin{tight_itemize}
+  \item Documentation on setting up a MongoDB instance on Linux: \\
+    \url{https://www.howtoforge.com/tutorial/install-mongodb-on-ubuntu-16.04/}{}
+  \item SQL to MongoDB Mapping Chart¶: \\
+    \url{https://docs.mongodb.com/manual/reference/sql-comparison/}{}
+\end{tight_itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Flow}
+The following boolean conditions are available:
+\begin{tight_itemize}
+  \item \textit{MongoDbCollectionExists} -- checks whether the specified collection exists.
+  \item \textit{MongoDbDocumentExists} -- checks whether the specified collection/document exists.
+\end{tight_itemize}
+
+The following standalones are available:
+\begin{tight_itemize}
+  \item \textit{MongoDbConnection} -- defines a connection to a MongoDB instance.
+\end{tight_itemize}
+
+The following sources are available:
+\begin{tight_itemize}
+  \item \textit{MongoDbGetCollection} -- forwards the specified collection.
+  \item \textit{MongoDbListCollections} -- lists all collections in the current
+  database context.
+  \item \textit{MongoDbListDatabases} -- lists all databases in the current
+  connection context.
+  \item \textit{MongoDbNewCollection} -- creates a new collection and forwards it.
+\end{tight_itemize}
+
+The following transformers are available:
+\begin{tight_itemize}
+  \item \textit{MongoDbCollectionUpdate} -- for updating a collection, e.g. adding a document.
+  \item \textit{MongoDbDocumentUpdate} -- for updating a document, adding/removing values
+  \item \textit{MongoDbFindDocuments} -- for locating documents in a collection
+  \item \textit{MongoDGetDocumentKeys} -- returns all the keys in the document
+  \item \textit{MongoDGetDocumentValue} -- returns the value associated with the specified key
+\end{tight_itemize}
+
+The following sinks are available:
+\begin{tight_itemize}
+  \item \textit{} --
+\end{tight_itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{bibliography}
+
+\end{document}
