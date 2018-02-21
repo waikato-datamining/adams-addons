@@ -25,6 +25,7 @@ import adams.core.Utils;
 import adams.db.MongoDbConnection;
 import adams.db.MongoDbUrl;
 import adams.flow.core.MongoDbActorUtils;
+import adams.opt.genetic.AbstractGeneticAlgorithm;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -42,6 +43,8 @@ public class MongoDB
 
   private static final long serialVersionUID = 1825847990988418348L;
 
+  public static final String KEY_SUCCESSFUL = "successful";
+
   /** the database connection. */
   protected MongoDbConnection m_DatabaseConnection;
 
@@ -58,7 +61,10 @@ public class MongoDB
     return
       "Stores the setup information in the MongoDB collection (aka experiment).\n"
 	+ "Uses the database available through the current flow context.\n"
-	+ "If the collection is not present, it gets automatically created.";
+	+ "If the collection is not present, it gets automatically created.\n"
+	+ "On completion of the algorithm run, a document with the key '" + KEY_SUCCESSFUL + "' "
+	+ "gets inserted with an associated value of 'true' or 'false' depending on "
+	+ "whether the algorithm run was successful. The fitness value is not present in this case.";
   }
 
   /**
@@ -135,6 +141,14 @@ public class MongoDB
   }
 
   /**
+   * Before Starting the uploads, ie the genetic algorithm run.
+   *
+   * @param algorithm	the algorithm initiating the run
+   */
+  protected void doStart(AbstractGeneticAlgorithm algorithm) {
+  }
+
+  /**
    * Uploads the setup.
    *
    * @param setup	the setup data to upload
@@ -181,5 +195,18 @@ public class MongoDB
     }
 
     return result;
+  }
+
+  /**
+   * Finishing up the genetic algorithm run.
+   *
+   * @param algorithm		the algorithm that initiated the run
+   * @param successfulRun 	whether the run was successful
+   * @param params              the parameters to store
+   */
+  @Override
+  protected void doFinish(AbstractGeneticAlgorithm algorithm, boolean successfulRun, Map<String,Object> params) {
+    params.put(KEY_SUCCESSFUL, successfulRun);
+    upload(params);
   }
 }
