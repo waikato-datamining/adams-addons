@@ -138,7 +138,7 @@ public class MongoDbConnection
   /**
    * Constructor, uses the default settings.
    */
-  protected MongoDbConnection() {
+  public MongoDbConnection() {
     initialize();
     defineOptions();
     getOptionManager().setDefaults();
@@ -155,7 +155,7 @@ public class MongoDbConnection
    * @param password    the password for the user
    * @param authDb	the authentication database
    */
-  protected MongoDbConnection(String url, String user, BasePassword password, String authDb) {
+  public MongoDbConnection(String url, String user, BasePassword password, String authDb) {
     this();
 
     setURL(url);
