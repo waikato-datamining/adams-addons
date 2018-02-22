@@ -1,0 +1,7 @@
+# Project: adams
+# Date: 2018-02-22 14:48:17
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Requires \\\"adams-rest_stoppable.flow\\\" to run.\\nSimply stops the other flow." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.HttpRequest -url http://localhost:8080//flow/control/stop/-1 -method GET
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter

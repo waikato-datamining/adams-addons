@@ -1,0 +1,10 @@
+# Project: adams
+# Date: 2018-02-22 14:57:24
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "A stoppable flow, simply outputs timestamps to the log." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.RegisterFlow
+ adams.flow.standalone.RESTServer -web-service "adams.flow.rest.GenericServer -in-interceptor adams.flow.rest.interceptor.incoming.NullGenerator -out-interceptor adams.flow.rest.interceptor.outgoing.NullGenerator -plugin adams.flow.rest.control.StopFlow"
+ adams.flow.source.ForLoop -upper 1000
+ adams.flow.control.Sleep
+ adams.flow.sink.JavaLogging
