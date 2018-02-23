@@ -29,7 +29,6 @@ adams.flow.standalone.rats.generator.AbstractRatGenerator=\
 
 # classes providing REST functionality
 adams.flow.rest.RESTPlugin=\
-  adams.flow.rest.control,\
   adams.flow.rest.text
 
 # the servers
