@@ -13,12 +13,12 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * MOAObjectHelpGenerator.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2018 University of Waikato, Hamilton, NZ
  */
 
-package adams.gui.tools.classhelp;
+package adams.gui.help;
 
 import adams.gui.core.ConsolePanel;
 import moa.MOAObject;
@@ -30,7 +30,6 @@ import java.util.logging.Level;
  * Help generator for MOA objects.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class MOAObjectHelpGenerator
   extends AbstractHelpGenerator {
@@ -64,7 +63,7 @@ public class MOAObjectHelpGenerator
    * @return		the help, null if failed to produce
    */
   @Override
-  public String generateHelp(Class cls) {
+  public String generate(Class cls) {
     StringBuilder		result;
     MOAObject			obj;
     moa.options.OptionHandler	handler;

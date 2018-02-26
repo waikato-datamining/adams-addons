@@ -28,8 +28,8 @@ import adams.core.option.AbstractOption;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseTextArea;
 import adams.gui.core.GUIHelper;
-import adams.gui.core.HelpFrame;
 import adams.gui.dialog.ApprovalDialog;
+import adams.gui.help.HelpFrame;
 import adams.parser.TwitterFilter;
 
 import javax.swing.BorderFactory;
