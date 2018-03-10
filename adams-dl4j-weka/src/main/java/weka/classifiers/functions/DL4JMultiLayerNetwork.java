@@ -48,7 +48,7 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.classifiers.DL4JFilteredMultiLayerNetworkProvider;
 import weka.classifiers.DL4JMultiLayerNetworkProvider;
-import weka.classifiers.RandomSplitGenerator;
+import weka.classifiers.DefaultRandomSplitGenerator;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.rules.ZeroR;
 import weka.core.Capabilities;
@@ -1071,7 +1071,7 @@ public class DL4JMultiLayerNetwork
     boolean				nominal;
     Evaluation 				evalCls;
     RegressionEvaluation		evalReg;
-    RandomSplitGenerator		split;
+    DefaultRandomSplitGenerator split;
     WekaTrainTestSetContainer		trainTest;
     DL4JModelContainer			modelCont;
     MessageCollection			triggers;
@@ -1123,7 +1123,7 @@ public class DL4JMultiLayerNetwork
 
     // build
     if (m_TestPercentage > 0) {
-      split     = new RandomSplitGenerator(data, m_Seed, 1.0 - m_TestPercentage);
+      split     = new DefaultRandomSplitGenerator(data, m_Seed, 1.0 - m_TestPercentage);
       trainTest = split.next();
       train     = (Instances) trainTest.getValue(WekaTrainTestSetContainer.VALUE_TRAIN);
       test      = (Instances) trainTest.getValue(WekaTrainTestSetContainer.VALUE_TEST);
