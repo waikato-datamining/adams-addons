@@ -1,5 +1,6 @@
 # Project: adams
-# Date: 2017-08-30 15:22:14
+# Modules: adams-cntk,adams-core,adams-imaging,adams-ml,adams-spreadsheet,adams-visualstats
+# Date: 2018-03-21 12:45:56
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Converts object annotations to TSV files for CNTK." -flow-execution-listener adams.flow.execution.NullListener
@@ -7,7 +8,7 @@ adams.flow.control.Flow -annotation "Converts object annotations to TSV files fo
   adams.flow.sink.ProgressBar -writer adams.gui.print.NullWriter -max @{max}
  adams.flow.source.Start
  adams.flow.control.Trigger -name "prompt user"
-  adams.flow.source.EnterManyValues -stop-if-canceled true -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name in_dir -display \"Input directory\" -help \"directory with annotated images\" -default-value @{flow_dir}" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name out_dir -display \"Output directory\" -help \"directory for storing the generated TSV files\" -default-value @{flow_dir}" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name prefix -display \"Object prefix\" -help \"The prefix for the objects in the report\" -default-value Object." -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name has_labels -display Labels? -help \"Are labels stored in the annotations\" -type BOOLEAN -default-value false" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name label_suffix -display \"Label suffix\" -help \"The suffix for the report fields containing the labels\" -default-value .type" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name default_label -display \"Default label\" -help \"The default label to use if there are no labels stored with the objects themselves.\" -default-value Object" -output-type MAP
+  adams.flow.source.EnterManyValues -stop-if-canceled true -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name in_dir -display \"Input directory\" -help \"directory with annotated images\" -type DIRECTORY_ABSOLUTE -default-value @{flow_dir}" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name out_dir -display \"Output directory\" -help \"directory for storing the generated TSV files\" -type DIRECTORY_ABSOLUTE -default-value @{flow_dir}" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name prefix -display \"Object prefix\" -help \"The prefix for the objects in the report\" -default-value Object." -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name has_labels -display Labels? -help \"Are labels stored in the annotations\" -type BOOLEAN -default-value false" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name label_suffix -display \"Label suffix\" -help \"The suffix for the report fields containing the labels\" -default-value .type" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name default_label -display \"Default label\" -help \"The default label to use if there are no labels stored with the objects themselves.\" -default-value Object" -output-type MAP
   adams.flow.transformer.MapToVariables
  adams.flow.control.Trigger -name processinput
   adams.flow.standalone.SetVariable -name "reset image count" -var-name img_count -var-value 0
