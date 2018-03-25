@@ -213,6 +213,10 @@
         </executions>
       </plugin>
 
+      <!--
+      for Java 9/10 see here:
+      https://issues.apache.org/jira/browse/CXF-7516?page=com.atlassian.jira.plugin.system.issuetabpanels%3Aall-tabpanel
+       -->
       <plugin>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-codegen-plugin</artifactId>
