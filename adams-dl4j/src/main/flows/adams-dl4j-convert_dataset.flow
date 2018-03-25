@@ -1,9 +1,0 @@
-# Project: adams
-# Date: 2017-06-15 10:09:37
-# User: fracpete
-# Charset: UTF-8
-adams.flow.control.Flow -annotation "Converts the bolts UCI dataset from a CSV spreadsheet into a DL4J DataSet." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.source.FileSupplier -file ${FLOWS}/data/bolts.csv
- adams.flow.transformer.SpreadSheetFileReader -reader "adams.data.io.input.CsvSpreadSheetReader -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.DefaultSpreadSheet"
- adams.flow.transformer.Convert -conversion adams.data.conversion.SpreadSheetToDL4JDataSet
- adams.flow.sink.Display -writer adams.data.io.output.NullWriter
