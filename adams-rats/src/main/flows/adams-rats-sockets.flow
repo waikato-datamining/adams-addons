@@ -1,0 +1,23 @@
+# Project: adams
+# Modules: adams-core,adams-event,adams-meta,adams-net,adams-rats,adams-rest,adams-webservice
+# Date: 2018-03-27 11:21:21
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Sends data via sockets: one Rat sending, one receiving." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.QueueInit
+ adams.flow.standalone.Rats
+  adams.flow.standalone.Rat -name send -receiver adams.flow.standalone.rats.input.DeQueue -transmitter adams.flow.standalone.rats.output.Socket -scope-handling-storage SHARE
+   adams.flow.control.Tee -name log
+    adams.flow.sink.Console -prefix "send: "
+  adams.flow.standalone.Rat -name receive -receiver "adams.flow.standalone.rats.input.Socket -output-string true" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display" -scope-handling-storage SHARE -suppress-errors false
+   adams.flow.control.Tee -name log
+    adams.flow.sink.Console -prefix "receive: "
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "place data in queue"
+  adams.flow.source.ForLoop -upper 100
+  adams.flow.control.Sleep -interval 200
+  adams.flow.transformer.Convert -conversion adams.data.conversion.AnyToString
+  adams.flow.sink.EnQueue
+ adams.flow.control.Sleep -annotation "wait for flow to finish up" -interval 3000
