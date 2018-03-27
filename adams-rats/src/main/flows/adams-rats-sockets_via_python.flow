@@ -1,0 +1,16 @@
+# Project: adams
+# Modules: adams-core,adams-event,adams-meta,adams-net,adams-rats,adams-rest,adams-webservice
+# Date: 2018-03-27 14:48:57
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Simple flow that sends data to a Python process via a socket\\non port 8000 and listens on port 8001 for the Python process\\nto return the result.\\n\\nYou need to execute the \\\"adams-rats-sockets_via_python.py\\\"\\nPython script before running this flow." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.Rats
+  adams.flow.standalone.Rat -name "receive from python" -receiver "adams.flow.standalone.rats.input.Socket -port 8001 -output-string true" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display"
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "send to python"
+  adams.flow.source.ForLoop
+  adams.flow.control.Sleep -interval 200
+  adams.flow.sink.Socket
+ adams.flow.control.Sleep -interval 3000
