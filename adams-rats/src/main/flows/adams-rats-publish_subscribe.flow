@@ -1,0 +1,22 @@
+# Project: adams
+# Modules: adams-core,adams-event,adams-meta,adams-net,adams-rats,adams-rest,adams-webservice
+# Date: 2018-03-27 13:31:35
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Shows how to publish data using the Publish/Subscribe functionality,\\nas well as how to react to data being published (\\\"subscribe\\\")." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -name Subscription1 -short-title true -writer adams.data.io.output.NullWriter
+  adams.flow.sink.Display -name Subscription2 -short-title true -x -3 -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.InitPublishSubscribe -storage-name pubsub1 -storage-name pubsub2
+ adams.flow.standalone.Rats
+  adams.flow.standalone.Rat -name subscription1 -receiver "adams.flow.standalone.rats.input.Subscribe -storage-name pubsub1" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Subscription1" -scope-handling-storage SHARE
+  adams.flow.standalone.Rat -name "subscription1, publication2" -receiver "adams.flow.standalone.rats.input.Subscribe -storage-name pubsub1" -transmitter "adams.flow.standalone.rats.output.Publish -storage-name pubsub2" -scope-handling-storage SHARE
+   adams.flow.transformer.Convert -conversion "adams.data.conversion.MathExpression -expression \"X / 10\""
+  adams.flow.standalone.Rat -name subscription2 -receiver "adams.flow.standalone.rats.input.Subscribe -storage-name pubsub2" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Subscription2" -scope-handling-storage SHARE
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "publish data"
+  adams.flow.source.ForLoop
+  adams.flow.transformer.Convert -conversion adams.data.conversion.IntToDouble
+  adams.flow.control.Sleep -interval 200
+  adams.flow.sink.Publish -storage-name pubsub1
+ adams.flow.control.Sleep -annotation "let flow finish processing data"
