@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractRatInput.java
- * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
@@ -36,7 +36,6 @@ import adams.flow.standalone.Rat;
  * Ancestor for input receivers.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public abstract class AbstractRatInput
   extends AbstractOptionHandler
@@ -55,8 +54,11 @@ public abstract class AbstractRatInput
   /** the logging prefix. */
   protected String m_LoggingPrefix;
 
+  /** whether reception is currently underway. */
+  protected boolean m_ReceptionRunning;
+
   /** whether reception was interrupted. */
-  protected boolean m_ReceptionInterruped;
+  protected boolean m_ReceptionInterrupted;
 
   /**
    * Initializes the members.
@@ -250,8 +252,9 @@ public abstract class AbstractRatInput
    * Initializes the reception.
    */
   public void initReception() {
-    m_Stopped             = false;
-    m_ReceptionInterruped = false;
+    m_Stopped              = false;
+    m_ReceptionInterrupted = false;
+    m_ReceptionRunning     = false;
     getOptionManager().updateVariableValues(true);
   }
 
@@ -266,7 +269,7 @@ public abstract class AbstractRatInput
    * Interrupts the reception (eg when pausing).
    */
   public void interruptReception() {
-    m_ReceptionInterruped = true;
+    m_ReceptionInterrupted = true;
   }
 
   /**
@@ -275,7 +278,16 @@ public abstract class AbstractRatInput
    * @return		true if interrupted
    */
   public boolean getReceptionInterrupted() {
-    return m_ReceptionInterruped;
+    return m_ReceptionInterrupted;
+  }
+
+  /**
+   * Returns whether the reception is currently running.
+   *
+   * @return		true if running
+   */
+  public boolean isReceptionRunning() {
+    return m_ReceptionRunning;
   }
 
   /**
@@ -283,10 +295,11 @@ public abstract class AbstractRatInput
    *
    * @return		true if possible
    * @see		#m_Stopped
-   * @see		#m_ReceptionInterruped
+   * @see		#m_ReceptionInterrupted
+   * @see		#m_ReceptionRunning
    */
   protected boolean canReceive() {
-    return !m_Stopped && !m_ReceptionInterruped;
+    return !isStopped() && !getReceptionInterrupted() && !isReceptionRunning();
   }
 
   /**
@@ -297,14 +310,19 @@ public abstract class AbstractRatInput
   public String receive() {
     String	result;
     
-    m_Stopped             = false;
-    m_ReceptionInterruped = false;
+    m_Stopped              = false;
+    m_ReceptionInterrupted = false;
+    m_ReceptionRunning     = true;
 
-    result = check();
-    if (result == null)
-      result = doReceive();
-
-    return result;
+    try {
+      result = check();
+      if (result == null)
+        result = doReceive();
+      return result;
+    }
+    finally {
+      m_ReceptionRunning = false;
+    }
   }
   
   /**

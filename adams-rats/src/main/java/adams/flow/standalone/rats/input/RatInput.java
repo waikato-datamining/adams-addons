@@ -106,6 +106,13 @@ public interface RatInput
   public boolean getReceptionInterrupted();
 
   /**
+   * Returns whether the reception is currently running.
+   *
+   * @return		true if running
+   */
+  public boolean isReceptionRunning();
+
+  /**
    * Stops the execution.
    */
   public void stopExecution();
