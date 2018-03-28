@@ -765,8 +765,10 @@ public class FileLister
 
     if (files.size() > 0) {
       i = 0;
-      while (i < files.size()) {
+      while (i < files.size() && !isStopped()) {
         file = new PlaceholderFile(files.get(i));
+        if (m_SkipInUse && isLoggingEnabled())
+          getLogger().fine("In use? " + file);
         if (m_SkipInUse && m_Check.isInUse(file)) {
           if (isLoggingEnabled())
             getLogger().fine("File in use: " + files.get(i));
@@ -777,7 +779,7 @@ public class FileLister
         }
       }
 
-      if (m_MoveFiles) {
+      if (m_MoveFiles && !isStopped()) {
 	errors = new MessageCollection();
 	for (i = 0; i < files.size(); i++) {
 	  file = new PlaceholderFile(files.get(i));
@@ -799,7 +801,8 @@ public class FileLister
 	}
       }
       else {
-	m_Files.addAll(files);
+        if (!isStopped())
+	  m_Files.addAll(files);
       }
     }
 
