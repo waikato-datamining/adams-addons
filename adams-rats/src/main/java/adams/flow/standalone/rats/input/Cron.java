@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Cron.java
- * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
@@ -59,7 +59,6 @@ import java.util.Date;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class Cron
   extends AbstractMetaRatInput {
@@ -90,7 +89,12 @@ public class Cron
       Cron	owner;
 
       owner = (Cron) context.getJobDetail().getJobDataMap().get(KEY_OWNER);
-      
+
+      if (owner.isReceptionRunning()) {
+        owner.getLogger().warning("Busy, skipping cron execution!");
+        return;
+      }
+
       // skip if paused
       if (owner.getOwner().isPaused() || !owner.canReceive())
 	return;
@@ -186,7 +190,17 @@ public class Cron
   public Class generates() {
     return m_Input.generates();
   }
-  
+
+  /**
+   * Returns whether the reception is currently running.
+   *
+   * @return		true if running
+   */
+  @Override
+  public boolean isReceptionRunning() {
+    return m_Input.isReceptionRunning();
+  }
+
   /**
    * Retrieves data using the base input.
    * 
