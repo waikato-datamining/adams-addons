@@ -1,0 +1,137 @@
+body {
+  padding-top: 60px;
+}
+
+.table_params th, td {
+    padding: 5px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.navbar-inverse {
+  background-color: #be0403;
+  border-color: #be0403;
+}
+
+/* TODO */
+/* #ffffff -> ??? */
+/* #960000 -> ??? */
+/* #444 -> ??? */
+/* #333-> ??? */
+/* 101010 -> ??? */
+.navbar-inverse .navbar-brand {
+  color: #ffffff;
+}
+.navbar-inverse .navbar-brand:hover,
+.navbar-inverse .navbar-brand:focus {
+  color: #fff;
+  background-color: transparent;
+}
+.navbar-inverse .navbar-text {
+  color: #ffffff;
+}
+.navbar-inverse .navbar-nav > li > a {
+  color: #ffffff;
+}
+.navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-nav > li > a:focus {
+  color: #dddddd;
+  background-color: transparent;
+}
+.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus {
+  color: #dddddd;
+  background-color: #960000;
+}
+.navbar-inverse .navbar-nav > .disabled > a,
+.navbar-inverse .navbar-nav > .disabled > a:hover,
+.navbar-inverse .navbar-nav > .disabled > a:focus {
+  color: #444;
+  background-color: transparent;
+}
+.navbar-inverse .navbar-toggle {
+  border-color: #333;
+}
+.navbar-inverse .navbar-toggle:hover,
+.navbar-inverse .navbar-toggle:focus {
+  background-color: #333;
+}
+.navbar-inverse .navbar-toggle .icon-bar {
+  background-color: #dddddd;
+}
+.navbar-inverse .navbar-collapse,
+.navbar-inverse .navbar-form {
+  border-color: #101010;
+}
+.navbar-inverse .navbar-nav > .open > a,
+.navbar-inverse .navbar-nav > .open > a:hover,
+.navbar-inverse .navbar-nav > .open > a:focus {
+  color: #fff;
+  background-color: #960000;
+}
+
+/* export button, used in conjunction with 'btn btn-default' */
+.btn-export {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 6px;
+  padding-right: 6px;
+  font-size: 10px;
+}
+
+.applist-button {
+  text-align: left;
+}
+
+.btn-group-vertical-separated {
+  border-radius: 4px;
+}
+.btn-group-vertical-separated > .btn:not(:first-child):not(:last-child) {
+  border-radius: 4px;
+}
+.btn-group-vertical-separated > .btn:first-child:not(:last-child) {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+.btn-group-vertical-separated > .btn:last-child:not(:first-child) {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+.btn-group-vertical-separated > .btn-group:not(:first-child):not(:last-child) > .btn {
+  border-radius: 4px;
+}
+.btn-group-vertical-separated > .btn-group:first-child:not(:last-child) > .btn:last-child,
+.btn-group-vertical-separated > .btn-group:first-child:not(:last-child) > .dropdown-toggle {
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+.btn-group-vertical-separated > .btn-group:last-child:not(:first-child) > .btn:first-child {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+.btn-group-vertical-separated > .btn + .btn,
+.btn-group-vertical-separated > .btn + .btn-group,
+.btn-group-vertical-separated > .btn-group + .btn,
+.btn-group-vertical-separated > .btn-group + .btn-group {
+  margin-top: 4px;
+  margin-left: 0;
+}
+
+.table-nonfluid {
+   width: auto !important;
+}
+
+.table-with-border {
+  border: 1px solid transparent;
+  border-radius: 4px;
+  border-color: #ccc;
+}
+
+.no-left-padding {
+  padding-left: 0px;
+}

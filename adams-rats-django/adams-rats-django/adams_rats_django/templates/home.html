@@ -1,0 +1,16 @@
+{% extends "base_navbar.html" %}
+
+{% block main %}
+
+{% for t in apps_type_name %}
+<h3>{{ apps_type_name|get_item:t }}</h3>
+<div class="btn-group-vertical btn-group-vertical-separated" role="group" aria-label="...">
+    {% for a in apps %}
+      {% if apps_type|get_item:a == t %}
+    <a type="button" class="btn btn-default applist-button" href="/{{ a }}">{{ apps_long|get_item:a }}</a>
+      {% endif %}
+    {% endfor %}
+</div>
+{% endfor %}
+
+{% endblock %}

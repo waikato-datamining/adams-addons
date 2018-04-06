@@ -1,0 +1,27 @@
+{% extends "base_navbar.html" %}
+
+{% block main %}
+
+<h3>{{ title }}</h3>
+
+
+{% if can_restart %}
+<div class="panel panel-danger">
+  <div class="panel-heading">Do you really want to restart the ADAMS backend?</div>
+  <div class="panel-body">
+    <form action="{% url 'restart_backend:output' %}" method="POST">
+      {% csrf_token %}
+      <input class="btn btn-default applist-button" type="submit" value="Restart"/>
+    </form>
+  </div>
+</div>
+{% else %}
+<div class="panel panel-danger">
+  <div class="panel-heading">No restart command defined, action not available!</div>
+  <div class="panel-body">
+    <a type="button" class="btn btn-default applist-button" href="{% url 'index' %}">Back</a>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base_navbar.html" %}
+
+{% block main %}
+
+<h3>{{ title }}</h3>
+
+{% if success %}
+<div class="panel panel-success">
+  <div class="panel-heading">Successfully restarted backend</div>
+  <div class="panel-body">
+    {{ output|safe }}
+  </div>
+</div>
+{% else %}
+<div class="panel panel-danger">
+  <div class="panel-heading">Failed to restart backend</div>
+  <div class="panel-body">
+    {{ output|safe }}
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
