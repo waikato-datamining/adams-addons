@@ -3,6 +3,14 @@
 Simple Django framework for managing Rat actors accessible via a RatControl
 using a REST webservice.
 
+In order to be able to remote control Rat actors, you need to:
+
+* have a *RatControl* standalone in your flow
+* all the *Rat* actors that should be remote controllable, need to have their
+  *showInControl* flag set
+* have a *RESTServer* standalone with the *GenericServer* configured; the
+  *GenericServer* must list at least the *RatControl* rest plugin.
+
 
 ## Installation
 
