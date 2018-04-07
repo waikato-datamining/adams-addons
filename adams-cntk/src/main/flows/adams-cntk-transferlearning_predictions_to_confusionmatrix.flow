@@ -12,7 +12,7 @@ adams.flow.control.Flow -annotation "Turns the predictions generated from transf
   adams.flow.source.NewSpreadSheet -columns Actual,Predicted,Probability -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.DefaultSpreadSheet
   adams.flow.transformer.SetStorageValue -storage-name sheet
  adams.flow.control.Trigger -name process
-  adams.flow.source.SelectFile -initial-file ${HOME}/temp/zespri.extract/predictions.txt
+  adams.flow.source.SelectFile
   adams.flow.transformer.TextFileReader -reader adams.data.io.input.LineArrayTextReader
   adams.flow.transformer.ArrayToSequence
   adams.flow.transformer.Convert -conversion adams.data.conversion.StringToJson
