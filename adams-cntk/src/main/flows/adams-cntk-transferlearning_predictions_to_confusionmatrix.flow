@@ -1,0 +1,52 @@
+# Project: adams
+# Modules: adams-cntk,adams-core,adams-imaging,adams-ml,adams-spreadsheet,adams-visualstats
+# Date: 2018-04-07 18:45:19
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Turns the predictions generated from transfer learning (JSON)\\ninto a confusion matrix." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.GridView -width 1000 -height 400 -num-cols 2 -add-headers true -writer adams.gui.print.NullWriter
+  adams.flow.sink.SpreadSheetDisplay -name Counts -cell-rendering-customizer "adams.gui.core.spreadsheettable.ConfusionMatrixCellRenderingCustomizer -value-based-background true -background-color-generator \"adams.gui.visualization.core.BiColorGenerator -first-color #ffffff -second-color #ff0000 -alpha 128\"" -writer adams.data.io.output.NullWriter
+  adams.flow.sink.SpreadSheetDisplay -name "Row percentages" -cell-rendering-customizer "adams.gui.core.spreadsheettable.ConfusionMatrixCellRenderingCustomizer -value-based-background true -background-color-generator \"adams.gui.visualization.core.BiColorGenerator -first-color #ffffff -second-color #ff0000 -alpha 128\"" -writer adams.data.io.output.NullWriter
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "init sheet"
+  adams.flow.source.NewSpreadSheet -columns Actual,Predicted,Probability -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.DefaultSpreadSheet
+  adams.flow.transformer.SetStorageValue -storage-name sheet
+ adams.flow.control.Trigger -name process
+  adams.flow.source.SelectFile -initial-file ${HOME}/temp/zespri.extract/predictions.txt
+  adams.flow.transformer.TextFileReader -reader adams.data.io.input.LineArrayTextReader
+  adams.flow.transformer.ArrayToSequence
+  adams.flow.transformer.Convert -conversion adams.data.conversion.StringToJson
+  adams.flow.control.Cast
+  adams.flow.transformer.Convert -name "Convert (2)" -conversion adams.data.conversion.JsonArrayToArray
+  adams.flow.transformer.GetArrayElement
+  adams.flow.control.Tee -name class
+   adams.flow.transformer.GetJsonValue -path "$[\\\'class\\\']" -data-type STRING
+   adams.flow.transformer.SetVariable -var-name actual
+  adams.flow.control.Tee -name predictions
+   adams.flow.transformer.GetJsonValue -path "$[\\\'predictions\\\']"
+   adams.flow.transformer.Convert -conversion adams.data.conversion.JsonObjectToMap
+   adams.flow.transformer.SetStorageValue -storage-name preds
+   adams.flow.transformer.SetVariable -name "reset probability" -var-name probability -var-value -1
+   adams.flow.transformer.GetMapKeys
+   adams.flow.transformer.SetVariable -var-name key
+   adams.flow.control.Trigger -name "check prob"
+    adams.flow.source.StorageValue -storage-name preds -conversion adams.data.conversion.UnknownToUnknown
+    adams.flow.transformer.GetMapValue -key @{key}
+    adams.flow.control.ConditionalTee -name higher? -condition "adams.flow.condition.bool.Expression -expression \"X > @{probability}\""
+     adams.flow.transformer.SetVariable -name prob -var-name predicted_prob
+     adams.flow.transformer.SetVariable -var-name predicted_label -var-value @{key}
+  adams.flow.control.Trigger -name "append prediction"
+   adams.flow.source.StorageValue -storage-name sheet -conversion adams.data.conversion.UnknownToUnknown
+   adams.flow.transformer.SpreadSheetInsertRow -no-copy true -after true
+   adams.flow.transformer.SpreadSheetSetCell -name actual -no-copy true -row last -col Actual -value @{actual} -force-string true
+   adams.flow.transformer.SpreadSheetSetCell -name predicted -no-copy true -row last -col Predicted -value @{predicted_label} -force-string true
+   adams.flow.transformer.SpreadSheetSetCell -name probability -no-copy true -row last -col Probability -value @{predicted_prob}
+   adams.flow.transformer.SetStorageValue -storage-name sheet
+ adams.flow.control.Trigger -name "confusion matrix"
+  adams.flow.source.StorageValue -storage-name sheet -conversion adams.data.conversion.UnknownToUnknown
+  adams.flow.control.Tee -name counts
+   adams.flow.transformer.ConfusionMatrix -actual-column Actual -predicted-column Predicted
+   adams.flow.sink.CallableSink -callable Counts
+  adams.flow.control.Tee -name "row percentages"
+   adams.flow.transformer.ConfusionMatrix -actual-column Actual -predicted-column Predicted -matrix-values PERCENTAGES_PER_ROW
+   adams.flow.sink.CallableSink -callable "Row percentages"
