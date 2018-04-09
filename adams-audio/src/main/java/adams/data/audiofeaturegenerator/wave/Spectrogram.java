@@ -14,7 +14,7 @@
  */
 
 /*
- * Fingerprint.java
+ * Spectrogram.java
  * Copyright (C) 2018 University of Waikato, Hamilton, NZ
  */
 
