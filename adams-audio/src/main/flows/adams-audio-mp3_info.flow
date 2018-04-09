@@ -1,0 +1,9 @@
+# Project: adams
+# Modules: adams-audio,adams-core
+# Date: 2018-04-08 16:01:07
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Outputs information about a MP3 file." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.FileSupplier -file "${FLOWS}/data/h02880so - Northern jacana Jacana spinosa.mp3"
+ adams.flow.transformer.AudioInfo -reader adams.flow.transformer.audioinfo.MP3
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter

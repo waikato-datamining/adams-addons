@@ -1,0 +1,12 @@
+# Project: adams
+# Modules: adams-audio,adams-core,adams-spreadsheet
+# Date: 2018-04-09 12:51:50
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Generates a spectrogram from a trimmed WAV file." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/cock_a_1.wav
+ adams.flow.transformer.AudioData -reader adams.flow.transformer.audiodata.Wave
+ adams.flow.transformer.WaveTrim -name "WaveTrim - left" -type SECONDS -left 0.5
+ adams.flow.transformer.WaveTrim -name "WaveTrim - right" -type SECONDS -right 0.5
+ adams.flow.transformer.WaveFeatureGenerator -algorithm "adams.data.audiofeaturegenerator.wave.Spectrogram -converter adams.data.featureconverter.Text"
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter

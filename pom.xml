@@ -35,6 +35,7 @@
   </properties>
 
   <modules>
+    <module>adams-audio</module>
     <module>adams-cntk</module>
     <module>adams-cntk-weka</module>
     <module>adams-cqengine</module>

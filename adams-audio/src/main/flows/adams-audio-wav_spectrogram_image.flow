@@ -1,0 +1,11 @@
+# Project: adams
+# Modules: adams-audio,adams-core,adams-spreadsheet
+# Date: 2018-04-09 15:27:16
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Generates a spectrogram image from a WAV file." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/cock_a_1.wav
+ adams.flow.transformer.AudioData -reader adams.flow.transformer.audiodata.Wave
+ adams.flow.transformer.Convert -name "create spectrogram" -conversion adams.data.conversion.WaveToSpectrogram
+ adams.flow.transformer.Convert -name "create image" -conversion "adams.data.conversion.SpectrogramToBufferedImage -generator adams.gui.visualization.core.MultiColorGenerator"
+ adams.flow.sink.ImageViewer -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.NullProcessor -left-click-processor adams.gui.visualization.image.leftclick.NullProcessor -image-overlay adams.gui.visualization.image.NullOverlay

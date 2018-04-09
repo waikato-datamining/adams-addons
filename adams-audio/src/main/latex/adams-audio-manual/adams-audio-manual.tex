@@ -1,0 +1,89 @@
+% This work is made available under the terms of the
+% Creative Commons Attribution-ShareAlike 4.0 license,
+% http://creativecommons.org/licenses/by-sa/4.0/.
+
+\documentclass[a4paper]{book}
+
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{scalefnt}
+\usepackage{tikz}
+
+% watermark -- for draft stage
+\usepackage[firstpage]{draftwatermark}
+\SetWatermarkLightness{0.9}
+\SetWatermarkScale{5}
+
+\input{latex_extensions}
+
+\title{
+  \textbf{ADAMS} \\
+  {\Large \textbf{A}dvanced \textbf{D}ata mining \textbf{A}nd \textbf{M}achine
+  learning \textbf{S}ystem} \\
+  {\Large Module: adams-audio} \\
+  \vspace{1cm}
+  \includegraphics[width=2cm]{images/audio-module.png} \\
+}
+\author{
+  Peter Reutemann
+}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+
+\thispagestyle{empty}
+\center
+\begin{table}[b]
+	\begin{tabular}{c l l}
+		\parbox[c][2cm]{2cm}{\copyright 2018} &
+		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
+	\end{tabular}
+	\includegraphics[width=12cm]{images/cc.png} \\
+\end{table}
+
+\end{titlepage}
+
+\tableofcontents
+%\listoffigures
+%\listoftables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introduction}
+The \textit{adams-audio} module offers some basic audio processing functionality,
+like extracting information from audio files and reading their data.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Flow}
+The following transformers are available:
+\begin{tight_itemize}
+  \item \textit{AudioData} -- reads the data from an audio source, eg a file
+  \item \textit{AudioInfo} -- generates information about an audio source
+  \item \textit{WaveFeatureGenerator} -- generates features from a Wave object
+  using the specified generator
+  \item \textit{WaveTrim} -- cuts down a Wave object to the specified left/right
+  samples/seconds
+\end{tight_itemize}
+
+\noindent The following conversions are available:
+\begin{tight_itemize}
+  \item \textit{SpectrogramToBufferedImage}
+  \item \textit{WaveToSpectrogram}
+\end{tight_itemize}
+
+\noindent The following Wave feature generators are available:
+\begin{tight_itemize}
+  \item \textit{Fingerprint}
+  \item \textit{Spectrogram}
+\end{tight_itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{bibliography}
+
+\end{document}

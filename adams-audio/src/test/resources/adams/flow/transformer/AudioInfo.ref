@@ -1,0 +1,3 @@
+--> dumpfile.txt
+{subChunk1Size=16, subChunk1Id=fmt , chunkSize=284614, byteRate=22050, format=WAVE, audioFormat=1, chunkId=RIFF, sampleRate=11025, bitsPerSample=16, subChunk2Size=26, channels=1, blockAlign=2, subChunk2Id=LIST}
+

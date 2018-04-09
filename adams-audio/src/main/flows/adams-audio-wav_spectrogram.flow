@@ -1,0 +1,10 @@
+# Project: adams
+# Modules: adams-audio,adams-core,adams-spreadsheet
+# Date: 2018-04-09 10:50:57
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Generates a spectrogram for a WAV file." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.FileSupplier -file "${FLOWS}/data/h02880so - Northern jacana Jacana spinosa.wav"
+ adams.flow.transformer.AudioData -reader adams.flow.transformer.audiodata.Wave
+ adams.flow.transformer.WaveFeatureGenerator -algorithm "adams.data.audiofeaturegenerator.wave.Spectrogram -converter adams.data.featureconverter.Text"
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter

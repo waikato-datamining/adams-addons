@@ -1,0 +1,19 @@
+# Configuration file listing the superclasses and the packages in which to
+# look for derived classes.
+#
+# Format:
+# class.name=package1,package2,...
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+
+# the audio readers
+adams.flow.transformer.audiodata.AbstractAudioDataReader=\
+  adams.flow.transformer.audiodata
+
+# the audio info schemes
+adams.flow.transformer.audioinfo.AbstractAudioInfoReader=\
+  adams.flow.transformer.audioinfo
+
+# the feature generators for Wave objects
+adams.data.audiofeaturegenerator.wave.AbstractWaveFeatureGenerator=\
+  adams.data.audiofeaturegenerator.wave
