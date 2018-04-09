@@ -39,6 +39,7 @@
     <module>adams-cntk</module>
     <module>adams-cntk-weka</module>
     <module>adams-cqengine</module>
+    <module>adams-ffmpeg</module>
     <module>adams-gnuplot</module>
     <module>adams-heatmap</module>
     <module>adams-groovy-webservice</module>

@@ -9,11 +9,11 @@
     <version>18.4.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>adams-video</artifactId>
+  <artifactId>adams-ffmpeg</artifactId>
   <packaging>jar</packaging>
 
-  <name>adams-video</name>
-  <description>Module containing functionality related to handling videos.</description>
+  <name>adams-ffmpeg</name>
+  <description>Module for ffmpeg support.</description>
   <url>https://adams.cms.waikato.ac.nz/</url>
   <organization>
     <name>University of Waikato, Hamilton, NZ</name>
@@ -62,96 +62,6 @@
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>
-
-    <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-imaging</artifactId>
-      <version>${adams.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-imaging</artifactId>
-      <version>${adams.version}</version>
-      <scope>test</scope>
-      <type>test-jar</type>
-    </dependency>
-
-    <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-imaging-boofcv</artifactId>
-      <version>${adams.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-imaging-boofcv</artifactId>
-      <version>${adams.version}</version>
-      <scope>test</scope>
-      <type>test-jar</type>
-    </dependency>
-
-    <dependency>
-      <groupId>org.boofcv</groupId>
-      <artifactId>WebcamCapture</artifactId>
-      <version>${boofcv.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-imaging-openimaj</artifactId>
-      <version>${adams.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-imaging-openimaj</artifactId>
-      <version>${adams.version}</version>
-      <scope>test</scope>
-      <type>test-jar</type>
-    </dependency>
-
-    <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-ffmpeg</artifactId>
-      <version>${adams.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-ffmpeg</artifactId>
-      <version>${adams.version}</version>
-      <scope>test</scope>
-      <type>test-jar</type>
-    </dependency>
-
-    <dependency>
-      <groupId>org.openimaj</groupId>
-      <artifactId>video-processing</artifactId>
-      <version>${openimaj.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>jama</groupId>
-          <artifactId>jama</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javassist</groupId>
-          <artifactId>javassist</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>uk.co.caprica</groupId>
-      <artifactId>vlcj</artifactId>
-      <version>3.10.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.github.fracpete</groupId>
-      <artifactId>screencast4j</artifactId>
-      <version>0.1.4</version>
-    </dependency>
   </dependencies>
 
   <build>
@@ -164,6 +74,21 @@
       <plugin>
         <groupId>com.github.fracpete</groupId>
         <artifactId>latex-maven-plugin</artifactId>
+      </plugin>
+
+      <!-- updates/uses 'src/license/THIRD-PARTY.properties' for missing libraries -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <configuration>
+          <useMissingFile>true</useMissingFile>
+        </configuration>
+      </plugin>
+            
+      <!-- for generating the license information -->
+      <plugin>
+        <groupId>org.bsc.maven</groupId>
+        <artifactId>maven-processor-plugin</artifactId>
       </plugin>
 
       <plugin>
@@ -193,7 +118,7 @@
                 <descriptor>src/main/assembly/doc.xml</descriptor>
                 <descriptor>src/main/assembly/flows.xml</descriptor>
                 <descriptor>src/main/assembly/sources.xml</descriptor>
-                <descriptor>src/main/assembly/test-sources.xml</descriptor>
+                <!--descriptor>src/main/assembly/test-sources.xml</descriptor-->
               </descriptors>
             </configuration>
           </execution>

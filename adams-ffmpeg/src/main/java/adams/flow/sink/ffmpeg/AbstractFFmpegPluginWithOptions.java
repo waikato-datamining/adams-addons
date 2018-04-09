@@ -20,12 +20,12 @@
 
 package adams.flow.sink.ffmpeg;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import adams.core.QuickInfoHelper;
 import adams.core.option.OptionUtils;
 import adams.flow.sink.FFmpeg;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Ancestor for {@link FFmpeg} plugins that offers the user to specify
