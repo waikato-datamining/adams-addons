@@ -1,0 +1,11 @@
+# Project: adams
+# Modules: adams-audio,adams-core,adams-spreadsheet
+# Date: 2018-04-10 09:52:54
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Generates a histogram from a WAV file." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.FileSupplier -file "${FLOWS}/data/h02880so - Northern jacana Jacana spinosa.wav"
+ adams.flow.transformer.AudioData -reader adams.flow.transformer.audiodata.Wave
+ adams.flow.transformer.WaveFeatureGenerator -algorithm "adams.data.audiofeaturegenerator.wave.Histogram -converter \"adams.data.featureconverter.SpreadSheet -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.DefaultSpreadSheet\" -display-ranges true"
+ adams.flow.transformer.SpreadSheetRowBuffer
+ adams.flow.sink.SpreadSheetDisplay -cell-rendering-customizer adams.gui.core.spreadsheettable.DefaultCellRenderingCustomizer -writer adams.data.io.output.NullWriter
