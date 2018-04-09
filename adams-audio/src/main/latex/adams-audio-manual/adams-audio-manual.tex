@@ -83,6 +83,43 @@ The following transformers are available:
   \item \textit{Spectrogram}
 \end{tight_itemize}
 
+\section{Spectrograms}
+There are currently two ways of generating spectrogram data:
+\begin{tight_itemize}
+  \item image
+  \item spreadsheet
+\end{tight_itemize}
+
+\noindent In order to generate an \textit{image} of a spectrogram, you need to:
+\begin{tight_itemize}
+  \item turn the \textit{Wave} container into a spectrogram data structure,
+  using the \textit{WaveToSpectrogram} conversion
+  \item turn the \textit{Spectrogram} data structure into an image using
+  the \textit{SpectrogramToBufferedImage} conversion
+\end{tight_itemize}
+Example flow \textit{adams-audio-wav\_spectrogram\_image.flow} incorporates
+these steps and Figure \ref{spectrogram} shows the generated example image.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=4.0cm]{images/spectrogram.png}
+  \caption{Spectrogram with gradient using multiple colors.}
+  \label{spectrogram}
+\end{figure}
+
+\clearpage
+\noindent If you want to generated \textit{spreadsheet} data from a spectrogram,
+you need to:
+\begin{tight_itemize}
+  \item generate features from the \textit{Wave} container using the
+  \textit{WaveFeatureGenerator} transformer with the \textit{Spectrogram}
+  feature generator
+  \item what kind of output is being generated, is determined by the
+  \textit{converter} that is part of the feature generator
+\end{tight_itemize}
+Example flow \textit{adams-audio-wav\_spectrogram.flow} shows how to do this.
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
 
