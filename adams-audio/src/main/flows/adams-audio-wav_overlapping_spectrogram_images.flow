@@ -1,0 +1,37 @@
+# Project: adams
+# Modules: adams-audio,adams-core,adams-ffmpeg,adams-spreadsheet
+# Date: 2018-04-10 14:44:27
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Generates images from overlapping spectrograms using a WAV file as source." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.GridView -width 1100 -num-cols 2 -add-headers true -writer adams.gui.print.NullWriter
+  adams.flow.sink.DisplayPanelManager -name Spectrograms -width 740 -provider "adams.flow.sink.ImageViewer -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.NullProcessor -left-click-processor adams.gui.visualization.image.leftclick.NullProcessor -image-overlay adams.gui.visualization.image.NullOverlay" -entry-name-variable left
+  adams.flow.sink.SpreadSheetDisplay -name info -cell-rendering-customizer adams.gui.core.spreadsheettable.DefaultCellRenderingCustomizer -writer adams.data.io.output.NullWriter
+ adams.flow.source.FileSupplier -file "${FLOWS}/data/Humpback Whale-SoundBible.com-93645231.wav"
+ adams.flow.transformer.AudioData -reader adams.flow.transformer.audiodata.Wave
+ adams.flow.transformer.SetStorageValue -storage-name wave
+ adams.flow.control.Tee -name "get length"
+  adams.flow.transformer.AudioInfo -reader adams.flow.transformer.audioinfo.Wave
+  adams.flow.control.Tee -name info
+   adams.flow.transformer.Convert -conversion adams.data.conversion.MapToSpreadSheet
+   adams.flow.transformer.SpreadSheetSort
+   adams.flow.sink.CallableSink -callable info
+  adams.flow.transformer.GetMapValue -key subChunk2Size
+  adams.flow.transformer.SetVariable -var-name length
+ adams.flow.control.Trigger -name process
+  adams.flow.standalone.SetVariable -name duration -var-name duration -var-value 400000
+  adams.flow.standalone.SetVariable -name "reset left" -var-name left -var-value 0
+  adams.flow.standalone.SetVariable -name "reset right" -var-name right -var-value @{length}-@{duration} -value-type MATH_EXPRESSION_ROUND -expand-value true
+  adams.flow.standalone.SetVariable -name increment -var-name increment -var-value 100000
+  adams.flow.source.Start
+  adams.flow.control.WhileLoop -condition "adams.flow.condition.bool.Expression -expression \"@{right} > 0\""
+   adams.flow.source.StorageValue -storage-name wave -conversion adams.data.conversion.UnknownToUnknown
+   adams.flow.transformer.WaveTrim -left @{left} -right @{right}
+   adams.flow.transformer.Convert -name "create spectrogram" -conversion adams.data.conversion.WaveToSpectrogram
+   adams.flow.transformer.Convert -name "create image" -conversion "adams.data.conversion.SpectrogramToBufferedImage -generator adams.gui.visualization.core.MultiColorGenerator"
+   adams.flow.control.Tee -name display
+    adams.flow.sink.CallableSink -callable Spectrograms
+   adams.flow.control.Tee -name increment
+    adams.flow.transformer.SetVariable -name left -var-name left -var-value @{left}+@{increment} -value-type MATH_EXPRESSION_ROUND -expand-value true
+    adams.flow.transformer.SetVariable -name right -var-name right -var-value @{right}-@{increment} -value-type MATH_EXPRESSION_ROUND -expand-value true
+    adams.flow.transformer.SetVariable -name width -var-name width -var-value @{left}+@{right} -value-type MATH_EXPRESSION_ROUND -expand-value true
