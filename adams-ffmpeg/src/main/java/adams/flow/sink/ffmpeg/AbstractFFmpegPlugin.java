@@ -15,7 +15,7 @@
 
 /*
  * AbstractFFmpegPlugin.java
- * Copyright (C) 2012-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink.ffmpeg;
@@ -36,7 +36,6 @@ import java.util.Arrays;
  * Ancestor for {@link FFmpeg} plugins.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public abstract class AbstractFFmpegPlugin
   extends AbstractOptionHandler {
@@ -55,12 +54,6 @@ public abstract class AbstractFFmpegPlugin
   
   /** the frames per second to use. */
   protected int m_FramesPerSecond;
-  
-  /** additional input options to use for ffmpeg. */
-  protected String m_AdditionalInputOptions;
-  
-  /** additional output options to use for ffmpeg. */
-  protected String m_AdditionalOutputOptions;
 
   /**
    * Adds options to the internal list of options.
@@ -230,10 +223,10 @@ public abstract class AbstractFFmpegPlugin
    * @return		the executable, null if not available or no owner set
    */
   protected PlaceholderFile getExecutable() {
-    if (m_Owner == null)
+    if ((m_Owner == null) || (m_Owner.getConfig() == null))
       return null;
     else
-      return m_Owner.getExecutable();
+      return m_Owner.getConfig().getExecutable();
   }
   
   /**

@@ -15,16 +15,17 @@
 
 /*
  * FFmpeg.java
- * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
 
 import adams.core.QuickInfoHelper;
 import adams.core.io.PlaceholderFile;
-import adams.core.management.OS;
+import adams.flow.core.ActorUtils;
 import adams.flow.sink.ffmpeg.AbstractFFmpegPlugin;
 import adams.flow.sink.ffmpeg.GenericPlugin;
+import adams.flow.standalone.FFmpegConfig;
 
 import java.io.File;
 
@@ -90,7 +91,6 @@ import java.io.File;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class FFmpeg
   extends AbstractFileWriter {
@@ -98,15 +98,12 @@ public class FFmpeg
   /** for serialization. */
   private static final long serialVersionUID = -7106585852803101639L;
 
-  /** the ffmpeg executable. */
-  protected PlaceholderFile m_Executable;
-  
   /** the plugin to execute. */
   protected AbstractFFmpegPlugin m_Plugin;
 
-  /** the output file. */
-  protected PlaceholderFile m_OutputFile;
-  
+  /** the ffmpeg configuration. */
+  protected transient FFmpegConfig m_Config;
+
   /**
    * Returns a string describing the object.
    *
@@ -118,15 +115,21 @@ public class FFmpeg
   }
 
   /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_Config = null;
+  }
+
+  /**
    * Adds options to the internal list of options.
    */
   @Override
   public void defineOptions() {
     super.defineOptions();
-
-    m_OptionManager.add(
-	    "executable", "executable",
-	    getDefaultExecutable());
 
     m_OptionManager.add(
 	    "plugin", "plugin",
@@ -143,52 +146,9 @@ public class FFmpeg
     String	result;
 
     result = super.getQuickInfo();
-    result += QuickInfoHelper.toString(this, "executable", m_Executable, ", executable: ");
     result += QuickInfoHelper.toString(this, "plugin", m_Plugin, ", plugin: ");
 
     return result;
-  }
-  
-  /**
-   * Returns the default executable.
-   * 
-   * @return		the default
-   */
-  protected PlaceholderFile getDefaultExecutable() {
-    // TODO search PATH?
-    if (OS.isWindows())
-      return new PlaceholderFile("avconv.exe");
-    else
-      return new PlaceholderFile("/usr/bin/avconv");
-  }
-
-  /**
-   * Sets the ffmpeg executable.
-   *
-   * @param value	the executable
-   */
-  public void setExecutable(PlaceholderFile value) {
-    m_Executable = value;
-    reset();
-  }
-
-  /**
-   * Returns the ffmpeg executable.
-   *
-   * @return		the executable
-   */
-  public PlaceholderFile getExecutable() {
-    return m_Executable;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String executableTipText() {
-    return "The avconv/ffmpeg executable.";
   }
 
   /**
@@ -252,18 +212,26 @@ public class FFmpeg
     String	result;
     
     result = super.setUp();
-    
+
     if (result == null) {
-      if (m_Executable.isDirectory())
-	result = "Executable points to a directory: " + m_Executable;
-      else if (!m_Executable.exists())
-	result = "Executable does not exist: " + m_Executable;
+      m_Config = (FFmpegConfig) ActorUtils.findClosestType(this, FFmpegConfig.class);
+      if (m_Config == null)
+	result = "No " + FFmpegConfig.class.getName() + " actor found!";
     }
-    
+
     if (result == null)
       result = m_Plugin.setUp();
     
     return result;
+  }
+
+  /**
+   * Returns the configuration.
+   *
+   * @return		the configuration, null if not available
+   */
+  public FFmpegConfig getConfig() {
+    return m_Config;
   }
 
   /**
