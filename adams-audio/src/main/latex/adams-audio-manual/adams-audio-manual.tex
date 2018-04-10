@@ -122,7 +122,23 @@ Example flow \textit{adams-audio-wav\_spectrogram.flow} shows how to do this.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Conversion}
-Since the \textit{adams-audio} module is limited to using
+Since the \textit{adams-audio} module is limited to using WAV (aka PCM) files,
+you need to convert other audio formats first. You can do this, either on
+the command-line outside ADAMS (e.g., using ffmpeg or avconv natively), or
+using the \textit{FFmpeg} sink actor. The latter provides a wrapper around
+ffmpeg/avconv\cite{ffmpeg}.
+
+Here is an example command-line conversion of an MP3 file into a WAV one, using
+ffmpeg:
+\begin{verbatim}
+ffmpeg -i sample.mp3 -acodec pcm_s16le -ar 44100 sample.wav
+\end{verbatim}
+
+Use the following command-line to list all the available \textit{encoders}
+that are available on your system:
+\begin{verbatim}
+ffmpeg -encoders
+\end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
