@@ -23,6 +23,7 @@ package adams.flow.transformer.audioinfo;
 import adams.core.Utils;
 import adams.core.base.BaseURL;
 import adams.core.io.FileUtils;
+import adams.data.audio.WaveContainer;
 import com.musicg.wave.WaveHeader;
 
 import java.io.BufferedInputStream;
@@ -59,7 +60,7 @@ public class Wave
    */
   @Override
   public Class[] accepts() {
-    return new Class[]{String.class, URL.class, BaseURL.class, com.musicg.wave.Wave.class};
+    return new Class[]{String.class, URL.class, BaseURL.class, com.musicg.wave.Wave.class, WaveContainer.class};
   }
 
   /**
@@ -86,6 +87,8 @@ public class Wave
       is = new BufferedInputStream(((BaseURL) input).urlValue().openStream());
     else if (input instanceof com.musicg.wave.Wave)
       wave = (com.musicg.wave.Wave) input;
+    else if (input instanceof WaveContainer)
+      wave = ((WaveContainer) input).getAudio();
     if (is != null)
       wave = new com.musicg.wave.Wave(is);
 
