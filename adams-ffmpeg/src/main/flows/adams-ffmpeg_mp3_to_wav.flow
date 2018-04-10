@@ -1,0 +1,16 @@
+# Project: adams
+# Modules: adams-core,adams-ffmpeg
+# Date: 2018-04-10 12:55:29
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Converts an MP3 file into a WAV one." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.FFmpegConfig
+ adams.flow.standalone.SetVariable -var-name output_file -var-value ${FLOWS}/output/converted.wav
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name convert
+  adams.flow.source.FileSupplier -file "${FLOWS}/data/h02880so - Northern jacana Jacana spinosa.mp3"
+  adams.flow.sink.FFmpeg -output @{output_file} -plugin adams.flow.sink.ffmpeg.ConvertAudio
+ adams.flow.control.Trigger -name "show output filename"
+  adams.flow.source.Variable -var-name output_file -conversion adams.data.conversion.StringToString
+  adams.flow.transformer.Convert -conversion "adams.data.conversion.MultiConversion -conversion \"adams.data.conversion.StringToFile -placeholderfile true\" -conversion \"adams.data.conversion.FileToString -absolute true\""
+  adams.flow.sink.Display -writer adams.data.io.output.NullWriter

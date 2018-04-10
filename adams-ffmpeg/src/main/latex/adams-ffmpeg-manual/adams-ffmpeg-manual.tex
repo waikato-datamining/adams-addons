@@ -61,16 +61,28 @@ ffmpeg\cite{ffmpeg} command-line tool for converting audio and video.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
+
 \noindent Available standalones:
 \begin{tight_itemize}
   \item \textit{FFmpegConfig} -- for specifying the avconv/ffmpeg executable
   to be used for all operations in the scope.
 \end{tight_itemize}
+
 \noindent Available sinks:
 \begin{tight_itemize}
   \item \textit{FFmpeg} -- actor for processing audio and video files using
-  ffmpeg\cite{ffmpeg}\footnote{adams-ffmpeg-video.flow}.
+  ffmpeg.
 \end{tight_itemize}
+
+\noindent The following plugins are available for the FFmpeg sink:
+\begin{tight_itemize}
+  \item \textit{ConvertAudio} -- for converting audio files.
+  \item \textit{GenericPlugin} -- for executing any ffmpeg operation, simply
+  by providing input and output options.\footnote{adams-ffmpeg_mp3\_to\_wav.flow}
+  \item \textit{MovieFromImages} -- turns images in a directory that match a
+  pattern into a movie.\footnote{adams-ffmpeg-video.flow}
+\end{tight_itemize}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}

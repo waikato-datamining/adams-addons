@@ -75,12 +75,7 @@ public class FFmpegConfig
    */
   @Override
   public String getQuickInfo() {
-    String	result;
-
-    result = super.getQuickInfo();
-    result += QuickInfoHelper.toString(this, "executable", m_Executable, ", executable: ");
-
-    return result;
+    return QuickInfoHelper.toString(this, "executable", m_Executable, "executable: ");
   }
   
   /**

@@ -20,7 +20,7 @@
 
 package adams.flow.sink.ffmpeg;
 
-import adams.core.QuickInfoHelper;
+import adams.core.QuickInfoSupporter;
 import adams.core.Utils;
 import adams.core.io.PlaceholderFile;
 import adams.core.management.ProcessUtils;
@@ -38,7 +38,8 @@ import java.util.Arrays;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public abstract class AbstractFFmpegPlugin
-  extends AbstractOptionHandler {
+  extends AbstractOptionHandler
+  implements QuickInfoSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = -2555683041357914117L;
@@ -48,29 +49,7 @@ public abstract class AbstractFFmpegPlugin
   
   /** the input file. */
   protected PlaceholderFile m_Input;
-  
-  /** the bitrate in kbits to use. */
-  protected int m_BitRate;
-  
-  /** the frames per second to use. */
-  protected int m_FramesPerSecond;
 
-  /**
-   * Adds options to the internal list of options.
-   */
-  @Override
-  public void defineOptions() {
-    super.defineOptions();
-
-    m_OptionManager.add(
-	    "bit-rate", "bitRate",
-	    getDefaultBitRate(), 0, null);
-
-    m_OptionManager.add(
-	    "fps", "framesPerSecond",
-	    getDefaultFramesPerSecond(), 1, null);
-  }
-  
   /**
    * Initializes the members.
    */
@@ -103,100 +82,10 @@ public abstract class AbstractFFmpegPlugin
   /**
    * Sets the owner.
    * 
-   * @reutrn		the owner
+   * @return		the owner
    */
   public FFmpeg getOwner() {
     return m_Owner;
-  }
-
-  /**
-   * Returns a quick info about the plugin, which will be displayed in the GUI.
-   *
-   * @return		null if no info available, otherwise short string
-   */
-  public String getQuickInfo() {
-    String	result;
-
-    result  = QuickInfoHelper.toString(this, "framesPerSecond", m_FramesPerSecond, "-r ");
-    result += QuickInfoHelper.toString(this, "bitRate", m_BitRate, "-b ");
-    
-    return result;
-  }
-
-  /**
-   * The default setting for fps.
-   * 
-   * @return		the default
-   */
-  protected int getDefaultFramesPerSecond() {
-    return 25;
-  }
-  
-  /**
-   * Sets the frames per second to use.
-   *
-   * @param value	the fps
-   */
-  public void setFramesPerSecond(int value) {
-    m_FramesPerSecond = value;
-    reset();
-  }
-
-  /**
-   * Returns the frames per second to use.
-   *
-   * @return		the options
-   */
-  public int getFramesPerSecond() {
-    return m_FramesPerSecond;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String framesPerSecondTipText() {
-    return "The frames per second (in Hz).";
-  }
-
-  /**
-   * The default setting for fps.
-   * 
-   * @return		the default
-   */
-  protected int getDefaultBitRate() {
-    return 64000;
-  }
-
-  /**
-   * Sets the bit rate in kbits to use.
-   *
-   * @param value	the bit rate, 0 to ignore parameter
-   */
-  public void setBitRate(int value) {
-    m_BitRate = value;
-    reset();
-  }
-
-  /**
-   * Returns the bit rate in kbits to use.
-   *
-   * @return		the bit rate
-   */
-  public int getBitRate() {
-    return m_BitRate;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String bitRateTipText() {
-    return "The bit rate (in kbits) to use; if <1 then bitrate gets ignored.";
   }
 
   /**
@@ -228,7 +117,18 @@ public abstract class AbstractFFmpegPlugin
     else
       return m_Owner.getConfig().getExecutable();
   }
-  
+
+  /**
+   * Returns a quick info about the plugin, which will be displayed in the GUI.
+   * <br>
+   * Default implementation returns null.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  public String getQuickInfo() {
+    return null;
+  }
+
   /**
    * Checks the configuration.
    * <br><br>
@@ -296,14 +196,6 @@ public abstract class AbstractFFmpegPlugin
       try {
 	// executable
 	options.add(getExecutable().getAbsolutePath());
-	// fps
-	options.add("-r");
-	options.add("" + m_FramesPerSecond);
-	// bitrate
-        if (m_BitRate > 0) {
-          options.add("-b");
-          options.add("" + m_BitRate);
-        }
 	// always overwrite output files
 	options.add("-y");
 	// input options

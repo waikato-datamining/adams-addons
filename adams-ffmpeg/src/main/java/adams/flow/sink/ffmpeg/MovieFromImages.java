@@ -24,7 +24,6 @@ package adams.flow.sink.ffmpeg;
  * Creates a movie out of a range of images.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class MovieFromImages
   extends AbstractFFmpegPluginWithOptions {
