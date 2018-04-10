@@ -94,7 +94,9 @@ public class FFmpegConfig
       return new PlaceholderFile("ffmpeg.exe");
     }
     else {
-      if (FileUtils.fileExists("/usr/bin/avconv"))
+      if (FileUtils.fileExists("/usr/bin/ffmpeg"))
+        return new PlaceholderFile("/usr/bin/ffmpeg");
+      else if (FileUtils.fileExists("/usr/bin/avconv"))
         return new PlaceholderFile("/usr/bin/avconv");
       else
         return new PlaceholderFile("/usr/bin/ffmpeg");
