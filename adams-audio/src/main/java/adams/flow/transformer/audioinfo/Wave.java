@@ -107,6 +107,7 @@ public class Wave
     result.put("bitsPerSample", header.getBitsPerSample());
     result.put("subChunk2Id", header.getSubChunk2Id());
     result.put("subChunk2Size", header.getSubChunk2Size());
+    result.put("lengthInSeconds", (float) header.getSubChunk2Size() / header.getByteRate());
 
     if (is != null)
       FileUtils.closeQuietly(is);
