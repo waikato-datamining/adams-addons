@@ -40,7 +40,7 @@ public class WaveContainer
    */
   @Override
   protected Wave cloneContent() {
-    return new Wave(getContent().getWaveHeader(), getContent().getBytes());
+    return getContent().clone();
   }
 
   /**
