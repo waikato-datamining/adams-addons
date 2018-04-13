@@ -14,7 +14,7 @@
  */
 
 /*
- * WaveTrimTest.java
+ * WaveFilterTest.java
  * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
  */
 
@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Test for WaveTrim actor.
+ * Test for WaveFilter actor.
  *
  * @author fracpete
  * @author adams.core.option.FlowJUnitTestProducer (code generator)
@@ -131,18 +131,18 @@ public class WaveFilterTest
 
       actors.add(audiodata);
 
-      // Flow.WaveTrim - left
+      // Flow.WaveFilter - left
       WaveFilter wavefilter = new WaveFilter();
-      wavefilter.setName("WaveTrim - left");
+      wavefilter.setName("WaveFilter - left");
       Trim trim = new Trim();
       trim.setType(TrimType.SECONDS);
       trim.setLeft(0.5);
       wavefilter.setFilter(trim);
       actors.add(wavefilter);
 
-      // Flow.WaveTrim - right
+      // Flow.WaveFilter - right
       WaveFilter wavefilter2 = new WaveFilter();
-      wavefilter2.setName("WaveTrim - right");
+      wavefilter2.setName("WaveFilter - right");
       Trim trim2 = new Trim();
       trim2.setType(TrimType.SECONDS);
       trim2.setRight(0.5);
