@@ -95,8 +95,8 @@ public class Cron
         return;
       }
 
-      // skip if paused
-      if (owner.getOwner().isPaused() || !owner.canReceive() || !owner.isReceptionRunning())
+      // skip if paused or currently running
+      if (owner.getOwner().isPaused() || !owner.canReceive() || owner.isReceptionRunning())
 	return;
       
       result = owner.receiveData();
