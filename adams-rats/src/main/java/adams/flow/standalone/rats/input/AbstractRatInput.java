@@ -296,10 +296,9 @@ public abstract class AbstractRatInput
    * @return		true if possible
    * @see		#m_Stopped
    * @see		#m_ReceptionInterrupted
-   * @see		#m_ReceptionRunning
    */
   protected boolean canReceive() {
-    return !isStopped() && !getReceptionInterrupted() && !isReceptionRunning();
+    return !isStopped() && !getReceptionInterrupted();
   }
 
   /**
