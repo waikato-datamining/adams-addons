@@ -23,6 +23,8 @@ package adams.flow.transformer;
 import adams.core.io.PlaceholderFile;
 import adams.core.option.AbstractArgumentOption;
 import adams.data.conversion.ExtractSimpleContainerContent;
+import adams.data.wavefilter.Trim;
+import adams.data.wavefilter.Trim.TrimType;
 import adams.env.Environment;
 import adams.flow.AbstractFlowTest;
 import adams.flow.control.Flow;
@@ -31,7 +33,6 @@ import adams.flow.core.Actor;
 import adams.flow.execution.NullListener;
 import adams.flow.sink.DumpFile;
 import adams.flow.source.FileSupplier;
-import adams.flow.transformer.WaveTrim.TrimType;
 import adams.flow.transformer.audiodata.Wave;
 import adams.test.TmpFile;
 import junit.framework.Test;
@@ -46,7 +47,7 @@ import java.util.List;
  * @author fracpete
  * @author adams.core.option.FlowJUnitTestProducer (code generator)
  */
-public class WaveTrimTest
+public class WaveFilterTest
   extends AbstractFlowTest {
 
   /**
@@ -54,7 +55,7 @@ public class WaveTrimTest
    *
    * @param name	the name of the test
    */
-  public WaveTrimTest(String name) {
+  public WaveFilterTest(String name) {
     super(name);
   }
 
@@ -99,7 +100,7 @@ public class WaveTrimTest
    * @return		the test suite
    */
   public static Test suite() {
-    return new TestSuite(WaveTrimTest.class);
+    return new TestSuite(WaveFilterTest.class);
   }
 
   /**
@@ -131,24 +132,22 @@ public class WaveTrimTest
       actors.add(audiodata);
 
       // Flow.WaveTrim - left
-      WaveTrim wavetrim = new WaveTrim();
-      argOption = (AbstractArgumentOption) wavetrim.getOptionManager().findByProperty("name");
-      wavetrim.setName((String) argOption.valueOf("WaveTrim - left"));
-      argOption = (AbstractArgumentOption) wavetrim.getOptionManager().findByProperty("type");
-      wavetrim.setType((TrimType) argOption.valueOf("SECONDS"));
-      argOption = (AbstractArgumentOption) wavetrim.getOptionManager().findByProperty("left");
-      wavetrim.setLeft((Double) argOption.valueOf("0.5"));
-      actors.add(wavetrim);
+      WaveFilter wavefilter = new WaveFilter();
+      wavefilter.setName("WaveTrim - left");
+      Trim trim = new Trim();
+      trim.setType(TrimType.SECONDS);
+      trim.setLeft(0.5);
+      wavefilter.setFilter(trim);
+      actors.add(wavefilter);
 
       // Flow.WaveTrim - right
-      WaveTrim wavetrim2 = new WaveTrim();
-      argOption = (AbstractArgumentOption) wavetrim2.getOptionManager().findByProperty("name");
-      wavetrim2.setName((String) argOption.valueOf("WaveTrim - right"));
-      argOption = (AbstractArgumentOption) wavetrim2.getOptionManager().findByProperty("type");
-      wavetrim2.setType((TrimType) argOption.valueOf("SECONDS"));
-      argOption = (AbstractArgumentOption) wavetrim2.getOptionManager().findByProperty("right");
-      wavetrim2.setRight((Double) argOption.valueOf("0.5"));
-      actors.add(wavetrim2);
+      WaveFilter wavefilter2 = new WaveFilter();
+      wavefilter2.setName("WaveTrim - right");
+      Trim trim2 = new Trim();
+      trim2.setType(TrimType.SECONDS);
+      trim2.setRight(0.5);
+      wavefilter2.setFilter(trim2);
+      actors.add(wavefilter2);
 
       Convert conv = new Convert();
       conv.setConversion(new ExtractSimpleContainerContent());
