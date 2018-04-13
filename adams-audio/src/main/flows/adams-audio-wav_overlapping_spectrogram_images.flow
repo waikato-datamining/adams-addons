@@ -26,7 +26,7 @@ adams.flow.control.Flow -annotation "Generates images from overlapping spectrogr
   adams.flow.source.Start
   adams.flow.control.WhileLoop -condition "adams.flow.condition.bool.Expression -expression \"@{right} > 0\""
    adams.flow.source.StorageValue -storage-name wave -conversion adams.data.conversion.UnknownToUnknown
-   adams.flow.transformer.WaveTrim -left @{left} -right @{right}
+   adams.flow.transformer.WaveFilter -filter "adams.data.wavefilter.Trim -left @{left} -right @{right}"
    adams.flow.transformer.Convert -name "create spectrogram" -conversion adams.data.conversion.WaveToSpectrogram
    adams.flow.transformer.Convert -name "create image" -conversion "adams.data.conversion.SpectrogramToBufferedImage -generator adams.gui.visualization.core.MultiColorGenerator"
    adams.flow.control.Tee -name display
