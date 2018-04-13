@@ -14,105 +14,31 @@
  */
 
 /*
- * WaveTrim.java
+ * Trim.java
  * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
  */
 
-package adams.flow.transformer;
+package adams.data.wavefilter;
 
 import adams.core.QuickInfoHelper;
 import adams.data.InPlaceProcessing;
 import adams.data.audio.WaveContainer;
-import adams.flow.core.Token;
-import adams.flow.provenance.ActorType;
-import adams.flow.provenance.Provenance;
-import adams.flow.provenance.ProvenanceContainer;
-import adams.flow.provenance.ProvenanceInformation;
-import adams.flow.provenance.ProvenanceSupporter;
 
 /**
  <!-- globalinfo-start -->
- * Trims the Wave object left and&#47;or right, using either sample number of time in seconds.<br>
- * Only works if 'subChunk2Id' is 'data' not 'LIST'.
- * <br><br>
  <!-- globalinfo-end -->
  *
- <!-- flow-summary-start -->
- * Input&#47;output:<br>
- * - accepts:<br>
- * &nbsp;&nbsp;&nbsp;adams.data.audio.WaveContainer<br>
- * - generates:<br>
- * &nbsp;&nbsp;&nbsp;adams.data.audio.WaveContainer<br>
- * <br><br>
- <!-- flow-summary-end -->
- *
  <!-- options-start -->
- * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
- * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
- * &nbsp;&nbsp;&nbsp;default: WARNING
- * </pre>
- *
- * <pre>-name &lt;java.lang.String&gt; (property: name)
- * &nbsp;&nbsp;&nbsp;The name of the actor.
- * &nbsp;&nbsp;&nbsp;default: WaveTrim
- * </pre>
- *
- * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
- * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
- * &nbsp;&nbsp;&nbsp;default:
- * </pre>
- *
- * <pre>-skip &lt;boolean&gt; (property: skip)
- * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded
- * &nbsp;&nbsp;&nbsp;as it is.
- * &nbsp;&nbsp;&nbsp;default: false
- * </pre>
- *
- * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
- * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
- * &nbsp;&nbsp;&nbsp;actors.
- * &nbsp;&nbsp;&nbsp;default: false
- * </pre>
- *
- * <pre>-silent &lt;boolean&gt; (property: silent)
- * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
- * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
- * &nbsp;&nbsp;&nbsp;default: false
- * </pre>
- *
- * <pre>-type &lt;SAMPLES|SECONDS&gt; (property: type)
- * &nbsp;&nbsp;&nbsp;How to interpret the left&#47;right values.
- * &nbsp;&nbsp;&nbsp;default: SAMPLES
- * </pre>
- *
- * <pre>-left &lt;double&gt; (property: left)
- * &nbsp;&nbsp;&nbsp;The starting point of the trimming.
- * &nbsp;&nbsp;&nbsp;default: 0.0
- * &nbsp;&nbsp;&nbsp;minimum: 0.0
- * </pre>
- *
- * <pre>-right &lt;double&gt; (property: right)
- * &nbsp;&nbsp;&nbsp;The end point of the trimming; ignored if 0.
- * &nbsp;&nbsp;&nbsp;default: 0.0
- * &nbsp;&nbsp;&nbsp;minimum: 0.0
- * </pre>
- *
- * <pre>-no-copy &lt;boolean&gt; (property: noCopy)
- * &nbsp;&nbsp;&nbsp;If enabled, no copy of the Wave is created before trimming it.
- * &nbsp;&nbsp;&nbsp;default: false
- * </pre>
- *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
-public class WaveTrim
-  extends AbstractTransformer
-  implements ProvenanceSupporter, InPlaceProcessing {
+public class Trim
+  extends AbstractWaveFilter
+  implements InPlaceProcessing {
 
   /** for serialization. */
-  private static final long serialVersionUID = -1998955116780561587L;
+  private static final long serialVersionUID = 2319957467336388607L;
 
   public enum TrimType {
     SAMPLES,
@@ -128,7 +54,7 @@ public class WaveTrim
   /** the right trim. */
   protected double m_Right;
 
-  /** whether to skip creating a copy of the image. */
+  /** whether to skip creating a copy of the container. */
   protected boolean m_NoCopy;
 
   /**
@@ -301,71 +227,31 @@ public class WaveTrim
   }
 
   /**
-   * Returns the class that the consumer accepts.
+   * Performs the actual filtering.
    *
-   * @return		the Class of objects that can be processed
-   */
-  public Class[] accepts() {
-    return new Class[]{WaveContainer.class};
-  }
-
-  /**
-   * Returns the class of objects that it generates.
-   *
-   * @return		the Class of objects that get generated
-   */
-  public Class[] generates() {
-    return new Class[]{WaveContainer.class};
-  }
-
-  /**
-   * Executes the flow item.
-   *
-   * @return		null if everything is fine, otherwise error message
+   * @param data	the data to filter
+   * @return		the filtered data
    */
   @Override
-  protected String doExecute() {
-    String		result;
-    WaveContainer	cont;
-    WaveContainer	contNew;
+  protected WaveContainer processData(WaveContainer data) {
+    WaveContainer 	result;
 
-    result = null;
-
-    cont = m_InputToken.getPayload(WaveContainer.class);
     if (!m_NoCopy)
-      contNew = (WaveContainer) cont.getClone();
+      result = (WaveContainer) data.getClone();
     else
-      contNew = cont;
+      result = data;
 
     switch (m_Type) {
       case SAMPLES:
-        contNew.getAudio().trim((int) m_Left, (int) m_Right);
+        result.getAudio().trim((int) m_Left, (int) m_Right);
         break;
       case SECONDS:
-        contNew.getAudio().trim(m_Left, m_Right);
+        result.getAudio().trim(m_Left, m_Right);
         break;
       default:
-        result = "Unhandled trim type: " + m_Type;
-    }
-
-    if (result == null) {
-      m_OutputToken = new Token(contNew);
-      updateProvenance(m_OutputToken);
+        throw new IllegalStateException("Unhandled trim type: " + m_Type);
     }
 
     return result;
-  }
-
-  /**
-   * Updates the provenance information in the provided container.
-   *
-   * @param cont	the provenance container to update
-   */
-  public void updateProvenance(ProvenanceContainer cont) {
-    if (Provenance.getSingleton().isEnabled()) {
-      if (m_InputToken.hasProvenance())
-	cont.setProvenance(m_InputToken.getProvenance().getClone());
-      cont.addProvenance(new ProvenanceInformation(ActorType.PREPROCESSOR, m_InputToken.getPayload().getClass(), this, ((Token) cont).getPayload().getClass()));
-    }
   }
 }

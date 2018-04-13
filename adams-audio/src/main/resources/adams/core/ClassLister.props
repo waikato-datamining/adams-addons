@@ -17,3 +17,7 @@ adams.flow.transformer.audioinfo.AbstractAudioInfoReader=\
 # the feature generators for Wave objects
 adams.data.audiofeaturegenerator.wave.AbstractWaveFeatureGenerator=\
   adams.data.audiofeaturegenerator.wave
+
+# the filters for wave containers
+adams.data.wavefilter.AbstractWaveFilter=\
+  adams.data.wavefilter
