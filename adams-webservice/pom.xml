@@ -92,6 +92,12 @@
     </dependency>
 
     <dependency>
+      <groupId>javax.jws</groupId>
+      <artifactId>jsr181-api</artifactId>
+      <version>1.0-MR1</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-frontend-jaxws</artifactId>
       <version>${cxf.version}</version>
