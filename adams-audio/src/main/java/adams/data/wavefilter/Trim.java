@@ -26,9 +26,39 @@ import adams.data.audio.WaveContainer;
 
 /**
  <!-- globalinfo-start -->
+ * Trims the Wave object left and&#47;or right, using either sample number of time in seconds.<br>
+ * Only works if 'subChunk2Id' is 'data' not 'LIST'.
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ *
+ * <pre>-type &lt;SAMPLES|SECONDS&gt; (property: type)
+ * &nbsp;&nbsp;&nbsp;How to interpret the left&#47;right values.
+ * &nbsp;&nbsp;&nbsp;default: SAMPLES
+ * </pre>
+ *
+ * <pre>-left &lt;double&gt; (property: left)
+ * &nbsp;&nbsp;&nbsp;The starting point of the trimming.
+ * &nbsp;&nbsp;&nbsp;default: 0.0
+ * &nbsp;&nbsp;&nbsp;minimum: 0.0
+ * </pre>
+ *
+ * <pre>-right &lt;double&gt; (property: right)
+ * &nbsp;&nbsp;&nbsp;The end point of the trimming; ignored if 0.
+ * &nbsp;&nbsp;&nbsp;default: 0.0
+ * &nbsp;&nbsp;&nbsp;minimum: 0.0
+ * </pre>
+ *
+ * <pre>-no-copy &lt;boolean&gt; (property: noCopy)
+ * &nbsp;&nbsp;&nbsp;If enabled, no copy of the Wave is created before trimming it.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
