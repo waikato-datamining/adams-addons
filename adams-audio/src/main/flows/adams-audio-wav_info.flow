@@ -1,9 +1,9 @@
 # Project: adams
-# Modules: adams-audio,adams-core
-# Date: 2018-04-08 16:00:38
+# Modules: adams-audio,adams-core,adams-ffmpeg,adams-spreadsheet
+# Date: 2018-05-08 11:33:43
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Outputs information about a WAV file." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.source.FileSupplier -file "${FLOWS}/data/h02880so - Northern jacana Jacana spinosa.wav"
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/cock_a_1.wav
  adams.flow.transformer.AudioInfo -reader adams.flow.transformer.audioinfo.Wave
  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
