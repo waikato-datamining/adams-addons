@@ -7,6 +7,7 @@ package adams.data.audio;
 
 import adams.core.License;
 import adams.core.annotation.ThirdPartyCopyright;
+import gnu.trove.list.TFloatList;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFormat.Encoding;
@@ -73,7 +74,7 @@ public class SimpleAudioConversion {
    *  or {@code (samples.length < blen / bytesPerSample(fmt.getBitsPerSample()))}.
    */
   public static int unpack(byte[]      bytes,
-			   float[]     samples,
+			   TFloatList  samples,
 			   int         blen,
 			   AudioFormat fmt) {
     int   bitsPerSample = fmt.getSampleSizeInBits();
@@ -109,7 +110,7 @@ public class SimpleAudioConversion {
 	sample = bitsToALaw(temp);
       }
 
-      samples[s] = sample;
+      samples.add(sample);
 
       i += bytesPerSample;
       s++;
