@@ -70,13 +70,8 @@ public class Trim
   /** for serialization. */
   private static final long serialVersionUID = 2319957467336388607L;
 
-  public enum TrimType {
-    SAMPLES,
-    SECONDS,
-  }
-
   /** how to trim. */
-  protected TrimType m_Type;
+  protected WaveIndexingType m_Type;
 
   /** the left trim. */
   protected double m_Left;
@@ -108,7 +103,7 @@ public class Trim
 
     m_OptionManager.add(
       "type", "type",
-      TrimType.SAMPLES);
+      WaveIndexingType.SAMPLES);
 
     m_OptionManager.add(
       "left", "left",
@@ -128,7 +123,7 @@ public class Trim
    *
    * @param value	the type
    */
-  public void setType(TrimType value) {
+  public void setType(WaveIndexingType value) {
     m_Type = value;
     reset();
   }
@@ -138,7 +133,7 @@ public class Trim
    *
    * @return		the type
    */
-  public TrimType getType() {
+  public WaveIndexingType getType() {
     return m_Type;
   }
 
