@@ -1,0 +1,18 @@
+# Project: adams
+# Modules: adams-audio,adams-core,adams-ffmpeg,adams-spreadsheet
+# Date: 2018-05-08 10:30:35
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Records a 10s WAV file using the local microphone." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
+  adams.flow.sink.ImageViewer -x -3 -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.NullProcessor -left-click-processor adams.gui.visualization.image.leftclick.NullProcessor -image-overlay adams.gui.visualization.image.NullOverlay
+ adams.flow.source.AudioRecorder -recorder "adams.flow.source.audiorecorder.FixedDuration -sample-rate 16000.0 -output-file ${FLOWS}/output/out.wav -duration 10"
+ adams.flow.control.Tee -name info
+  adams.flow.sink.CallableSink -callable Display
+ adams.flow.transformer.AudioData -reader adams.flow.transformer.audiodata.Wave
+ adams.flow.control.Tee -name "container info"
+  adams.flow.sink.CallableSink -callable Display
+ adams.flow.transformer.Convert -conversion "adams.data.conversion.WaveToSpectrogram -fft-sample-size 256"
+ adams.flow.transformer.Convert -name "Convert (2)" -conversion "adams.data.conversion.SpectrogramToBufferedImage -generator adams.gui.visualization.core.BiColorGenerator"
+ adams.flow.sink.CallableSink -callable ImageViewer

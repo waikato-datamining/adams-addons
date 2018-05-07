@@ -6,6 +6,10 @@
 #
 # Author:  FracPete (fracpete at waikato dot ac dot nz)
 
+# the audio recorders
+adams.flow.source.audiorecorder.AbstractAudioRecorder=\
+  adams.flow.source.audiorecorder
+
 # the audio readers
 adams.flow.transformer.audiodata.AbstractAudioDataReader=\
   adams.flow.transformer.audiodata
