@@ -24,7 +24,7 @@ import adams.core.io.PlaceholderFile;
 import adams.core.option.AbstractArgumentOption;
 import adams.data.conversion.ExtractSimpleContainerContent;
 import adams.data.wavefilter.Trim;
-import adams.data.wavefilter.Trim.TrimType;
+import adams.data.wavefilter.WaveIndexingType;
 import adams.env.Environment;
 import adams.flow.AbstractFlowTest;
 import adams.flow.control.Flow;
@@ -135,7 +135,7 @@ public class WaveFilterTest
       WaveFilter wavefilter = new WaveFilter();
       wavefilter.setName("WaveFilter - left");
       Trim trim = new Trim();
-      trim.setType(TrimType.SECONDS);
+      trim.setType(WaveIndexingType.SECONDS);
       trim.setLeft(0.5);
       wavefilter.setFilter(trim);
       actors.add(wavefilter);
@@ -144,7 +144,7 @@ public class WaveFilterTest
       WaveFilter wavefilter2 = new WaveFilter();
       wavefilter2.setName("WaveFilter - right");
       Trim trim2 = new Trim();
-      trim2.setType(TrimType.SECONDS);
+      trim2.setType(WaveIndexingType.SECONDS);
       trim2.setRight(0.5);
       wavefilter2.setFilter(trim2);
       actors.add(wavefilter2);
