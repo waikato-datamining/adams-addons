@@ -27,11 +27,7 @@ import adams.flow.core.RunnableWithLogging;
 
 import javax.sound.sampled.AudioFileFormat.Type;
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
-import javax.sound.sampled.TargetDataLine;
-import java.util.logging.Level;
 
 /**
  * Records a WAV file of fixed duration.
@@ -144,36 +140,7 @@ public class FixedDuration
    * @return		the runnable
    */
   protected RunnableWithLogging getRecordingWorker(final DataLine.Info info, final AudioFormat format) {
-    RunnableWithLogging	result;
-
-    result = new RunnableWithLogging() {
-      protected TargetDataLine microphone;
-      @Override
-      protected void doRun() {
-	try {
-	  microphone = (TargetDataLine) AudioSystem.getLine(info);
-	  microphone.open(format);
-	  microphone.start();
-	  AudioInputStream ais = new AudioInputStream(microphone);
-	  if (isLoggingEnabled())
-	    getLogger().info("Recording to: " + m_OutputFile);
-	  if (!isStopped() && microphone.isOpen())
-	    AudioSystem.write(ais, Type.WAVE, m_OutputFile.getAbsoluteFile());
-	}
-	catch (Exception e) {
-	  getLogger().log(Level.SEVERE, "Failed to record!", e);
-	}
-      }
-      @Override
-      public void stopExecution() {
-        microphone.stop();
-        microphone.close();
-	super.stopExecution();
-      }
-    };
-    result.setLoggingLevel(getLoggingLevel());
-
-    return result;
+    return getRecordingWorker(info, format, Type.WAVE);
   }
 
   /**
