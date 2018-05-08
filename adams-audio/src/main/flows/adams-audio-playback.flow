@@ -1,0 +1,8 @@
+# Project: adams
+# Modules: adams-audio,adams-core,adams-ffmpeg,adams-spreadsheet
+# Date: 2018-05-08 15:55:01
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Plays an audio file." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.FileSupplier -file "${FLOWS}/data/Humpback Whale-SoundBible.com-93645231.wav"
+ adams.flow.sink.AudioPlayback -start 0.5
