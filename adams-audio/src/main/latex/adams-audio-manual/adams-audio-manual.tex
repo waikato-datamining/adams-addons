@@ -59,6 +59,15 @@
 The \textit{adams-audio} module offers some basic audio processing functionality,
 like extracting information from audio files and reading their data.
 
+There are some very good, open-source tools for processing audio:
+\begin{tight_itemize}
+  \item \textit{ffmpeg}\cite{ffmpeg} -- command-line tool, swiss army knife
+  for audio and video processing (extraction and conversion).
+  \item \textit{Audacity}\cite{audacity} -- user interface for recording and
+  editing multi-track audio files.
+\end{tight_itemize}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
 The following sources are available:
@@ -139,7 +148,7 @@ Since the \textit{adams-audio} module is limited to using WAV (aka PCM) files,
 you need to convert other audio formats first. You can do this, either on
 the command-line outside ADAMS (e.g., using ffmpeg or avconv natively), or
 using the \textit{FFmpeg} sink actor. The latter provides a wrapper around
-ffmpeg/avconv\cite{ffmpeg}.
+ffmpeg/avconv.
 
 Here is an example command-line conversion of an MP3 file into a WAV one, using
 ffmpeg:
