@@ -157,9 +157,8 @@ public class FixedDuration
 	  AudioInputStream ais = new AudioInputStream(microphone);
 	  if (isLoggingEnabled())
 	    getLogger().info("Recording to: " + m_OutputFile);
-	  while (!isStopped() && microphone.isOpen()) {
+	  if (!isStopped() && microphone.isOpen())
 	    AudioSystem.write(ais, Type.WAVE, m_OutputFile.getAbsoluteFile());
-	  }
 	}
 	catch (Exception e) {
 	  getLogger().log(Level.SEVERE, "Failed to record!", e);
