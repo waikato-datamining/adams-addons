@@ -826,7 +826,7 @@ public class HeatmapViewerPanel
       HeatmapPanel panel = newPanel(map);
       panel.log(comment);
       m_MultiPagePane.addPage(panel.getTitle(), panel);
-      m_MultiPagePane.setSelectedIndex(panel);
+      m_MultiPagePane.setSelectedPage(panel);
       showStatus("");
     });
   }
@@ -853,7 +853,7 @@ public class HeatmapViewerPanel
 	  panel.log("Load: " + file);
           panel.setReader(reader);
           m_MultiPagePane.addPage(panel.getTitle(), panel);
-	  m_MultiPagePane.setSelectedIndex(panel);
+	  m_MultiPagePane.setSelectedPage(panel);
           showStatus("");
           if (m_RecentFilesHandler != null)
             m_RecentFilesHandler.addRecentItem(new Setup(file, reader));
