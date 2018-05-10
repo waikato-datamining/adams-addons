@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * HeatmapViewerPanel.java
- * Copyright (C) 2011-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.heatmap;
 
@@ -32,10 +32,10 @@ import adams.gui.chooser.BaseColorChooser;
 import adams.gui.chooser.HeatmapFileChooser;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseStatusBar;
-import adams.gui.core.BaseTabbedPane;
 import adams.gui.core.CustomColorImageIcon;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.MenuBarProvider;
+import adams.gui.core.MultiPagePane;
 import adams.gui.core.RecentFilesHandlerWithCommandline;
 import adams.gui.core.RecentFilesHandlerWithCommandline.Setup;
 import adams.gui.core.SearchPanel;
@@ -82,7 +82,6 @@ import java.util.List;
  * Panel for viewing/processing heatmaps.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class HeatmapViewerPanel
   extends BasePanel
@@ -100,7 +99,7 @@ public class HeatmapViewerPanel
   protected static Properties m_Properties;
 
   /** the tabbed pane for the heatmaps. */
-  protected BaseTabbedPane m_TabbedPane;
+  protected MultiPagePane m_MultiPagePane;
 
   /** the status bar. */
   protected BaseStatusBar m_StatusBar;
@@ -234,18 +233,15 @@ public class HeatmapViewerPanel
     panel = new JPanel(new BorderLayout());
     add(panel, BorderLayout.CENTER);
 
-    m_TabbedPane = new BaseTabbedPane();
-    m_TabbedPane.setTabLayoutPolicy(BaseTabbedPane.SCROLL_TAB_LAYOUT);
-    m_TabbedPane.setCloseTabsWithMiddleMouseButton(true);
-    m_TabbedPane.setShowCloseTabButton(true);
-    m_TabbedPane.addChangeListener(new ChangeListener() {
+    m_MultiPagePane = new MultiPagePane();
+    m_MultiPagePane.addChangeListener(new ChangeListener() {
       @Override
       public void stateChanged(ChangeEvent e) {
 	if ((m_MenuItemViewMissingValueColor != null) && (getCurrentPanel() != null))
 	  m_MenuItemViewMissingValueColor.setIcon(new CustomColorImageIcon(16, 16, getCurrentPanel().getMissingValueColor()));
       }
     });
-    panel.add(m_TabbedPane, BorderLayout.CENTER);
+    panel.add(m_MultiPagePane, BorderLayout.CENTER);
 
     m_SearchPanel = new SearchPanel(LayoutType.HORIZONTAL, true, "_Search", true, null);
     m_SearchPanel.setMinimumChars(2);
@@ -277,7 +273,6 @@ public class HeatmapViewerPanel
     int			i;
     int[]		zooms;
     String[]		shortcuts;
-    String[]		plugins;
 
     if (m_MenuBar == null) {
       result = new JMenuBar();
@@ -366,8 +361,8 @@ public class HeatmapViewerPanel
       });
       m_MenuItemFileReloadAll = menuitem;
 
-      // File/Close tab
-      menuitem = new JMenuItem("Close tab");
+      // File/Close page
+      menuitem = new JMenuItem("Close page");
       menu.addSeparator();
       menu.add(menuitem);
       menuitem.setMnemonic('t');
@@ -381,8 +376,8 @@ public class HeatmapViewerPanel
       });
       m_MenuItemFileCloseCurrent = menuitem;
 
-      // File/Close all tabs
-      menuitem = new JMenuItem("Close all tabs");
+      // File/Close all pages
+      menuitem = new JMenuItem("Close all pages");
       menu.add(menuitem);
       menuitem.setMnemonic('a');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed N"));
@@ -678,7 +673,7 @@ public class HeatmapViewerPanel
    * @return            the number of panels
    */
   public int getPanelCount() {
-    return m_TabbedPane.getTabCount();
+    return m_MultiPagePane.getPageCount();
   }
 
   /**
@@ -693,7 +688,7 @@ public class HeatmapViewerPanel
     result = null;
 
     if (index != -1)
-      result = (HeatmapPanel) m_TabbedPane.getComponentAt(index);
+      result = (HeatmapPanel) m_MultiPagePane.getPageAt(index);
 
     return result;
   }
@@ -704,7 +699,7 @@ public class HeatmapViewerPanel
    * @return		the panel, null if none selected
    */
   public HeatmapPanel getCurrentPanel() {
-    return getPanelAt(m_TabbedPane.getSelectedIndex());
+    return getPanelAt(m_MultiPagePane.getSelectedIndex());
   }
 
   /**
@@ -717,7 +712,7 @@ public class HeatmapViewerPanel
     int			i;
 
     result = new ArrayList<HeatmapPanel>();
-    for (i = 0; i < m_TabbedPane.getTabCount(); i++)
+    for (i = 0; i < m_MultiPagePane.getPageCount(); i++)
       result.add(getPanelAt(i));
 
     return result.toArray(new HeatmapPanel[result.size()]);
@@ -732,7 +727,7 @@ public class HeatmapViewerPanel
     if (m_MenuBar == null)
       return;
 
-    dataLoaded = (m_TabbedPane.getTabCount() > 0);
+    dataLoaded = (m_MultiPagePane.getPageCount() > 0);
 
     // File
     m_MenuItemFileSaveAs.setEnabled(getCurrentPanel() != null);
@@ -772,7 +767,7 @@ public class HeatmapViewerPanel
       return;
 
     panel.reload();
-    m_TabbedPane.setTitleAt(m_TabbedPane.getSelectedIndex(), panel.getTitle());
+    m_MultiPagePane.setTitleAt(m_MultiPagePane.getSelectedIndex(), panel.getTitle());
   }
 
   /**
@@ -782,10 +777,10 @@ public class HeatmapViewerPanel
     int			i;
     HeatmapPanel	panel;
 
-    for (i = 0; i < m_TabbedPane.getTabCount(); i++) {
+    for (i = 0; i < m_MultiPagePane.getPageCount(); i++) {
       panel = getPanelAt(i);
       panel.reload();
-      m_TabbedPane.setTitleAt(i, panel.getTitle());
+      m_MultiPagePane.setTitleAt(i, panel.getTitle());
     }
   }
 
@@ -793,15 +788,15 @@ public class HeatmapViewerPanel
    * Removes the current tab.
    */
   public void closeCurrent() {
-    if (m_TabbedPane.getSelectedIndex() != -1)
-      m_TabbedPane.removeTabAt(m_TabbedPane.getSelectedIndex());
+    if (m_MultiPagePane.getSelectedIndex() != -1)
+      m_MultiPagePane.removePageAt(m_MultiPagePane.getSelectedIndex());
   }
 
   /**
    * Removes all the data.
    */
   public void closeAll() {
-    m_TabbedPane.removeAll();
+    m_MultiPagePane.removeAllPages();
   }
 
   /**
@@ -830,8 +825,8 @@ public class HeatmapViewerPanel
     SwingUtilities.invokeLater(() -> {
       HeatmapPanel panel = newPanel(map);
       panel.log(comment);
-      m_TabbedPane.addTab(panel.getTitle(), panel);
-      m_TabbedPane.setSelectedComponent(panel);
+      m_MultiPagePane.addPage(panel.getTitle(), panel);
+      m_MultiPagePane.setSelectedIndex(panel);
       showStatus("");
     });
   }
@@ -857,8 +852,8 @@ public class HeatmapViewerPanel
           HeatmapPanel panel = newPanel(maps.get(0));
 	  panel.log("Load: " + file);
           panel.setReader(reader);
-          m_TabbedPane.addTab(panel.getTitle(), panel);
-	  m_TabbedPane.setSelectedComponent(panel);
+          m_MultiPagePane.addPage(panel.getTitle(), panel);
+	  m_MultiPagePane.setSelectedIndex(panel);
           showStatus("");
           if (m_RecentFilesHandler != null)
             m_RecentFilesHandler.addRecentItem(new Setup(file, reader));
@@ -969,14 +964,14 @@ public class HeatmapViewerPanel
     m_CurrentFilter             = e.getFilter();
     m_FilterOverlayOriginalData = e.getOverlayOriginalData();
 
-    count = m_TabbedPane.getTabCount();
+    count = m_MultiPagePane.getPageCount();
     if (m_FilterAll) {
       indices = new int[count];
       for (i = 0; i < count; i++)
 	indices[i] = i;
     }
     else {
-      indices = new int[]{m_TabbedPane.getSelectedIndex()};
+      indices = new int[]{m_MultiPagePane.getSelectedIndex()};
     }
 
     for (i = 0; i < indices.length; i++) {
@@ -991,11 +986,11 @@ public class HeatmapViewerPanel
 	  panel.log("Filter: " + filter.toCommandLine());
 	  if (e.getOverlayOriginalData()) {
 	    panel = newPanel(filtered);
-	    m_TabbedPane.addTab(panel.getTitle(), panel);
+	    m_MultiPagePane.addPage(panel.getTitle(), panel);
 	  }
 	  else {
 	    panel.setHeatmap(filtered);
-	    m_TabbedPane.setTitleAt(index, panel.getTitle());
+	    m_MultiPagePane.setTitleAt(index, panel.getTitle());
 	  }
 	}
       };
@@ -1012,7 +1007,7 @@ public class HeatmapViewerPanel
   public void search(String text, boolean isRegExp) {
     int		i;
 
-    for (i = 0; i < m_TabbedPane.getTabCount(); i++)
+    for (i = 0; i < m_MultiPagePane.getPageCount(); i++)
       getPanelAt(i).search(text, isRegExp);
   }
 

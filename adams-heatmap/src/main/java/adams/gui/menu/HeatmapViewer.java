@@ -15,7 +15,7 @@
 
 /*
  * HeatmapViewer.java
- * Copyright (C) 2011-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -30,7 +30,6 @@ import adams.gui.core.GUIHelper;
  * For displaying heatmaps.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class HeatmapViewer
   extends AbstractBasicMenuItemDefinition {
@@ -68,7 +67,7 @@ public class HeatmapViewer
    */
   public void launch() {
     adams.gui.visualization.heatmap.HeatmapViewerPanel panel = new adams.gui.visualization.heatmap.HeatmapViewerPanel();
-    createChildFrame(panel, GUIHelper.getDefaultLargeDialogDimension());
+    createChildFrame(panel, GUIHelper.makeWider(GUIHelper.getDefaultLargeDialogDimension()));
   }
 
   /**
