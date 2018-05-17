@@ -25,6 +25,7 @@ import adams.core.QuickInfoHelper;
 import adams.core.base.BasePassword;
 import adams.core.io.ConsoleHelper;
 import adams.db.MongoDbUrl;
+import adams.flow.control.Flow;
 import adams.flow.core.OptionalPasswordPrompt;
 import adams.flow.core.StopHelper;
 import adams.flow.core.StopMode;
@@ -413,7 +414,9 @@ public class MongoDbConnection
 
     dlg = new PasswordDialog((Dialog) null, ModalityType.DOCUMENT_MODAL);
     dlg.setLocationRelativeTo(getParentComponent());
+    ((Flow) getRoot()).registerWindow(dlg, dlg.getTitle());
     dlg.setVisible(true);
+    ((Flow) getRoot()).deregisterWindow(dlg);
     result = (dlg.getOption() == PasswordDialog.APPROVE_OPTION);
 
     if (result)
