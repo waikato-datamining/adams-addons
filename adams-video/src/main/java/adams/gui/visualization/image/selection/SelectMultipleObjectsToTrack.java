@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SelectMultipleObjectsToTrack.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.image.selection;
 
@@ -55,7 +55,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SelectMultipleObjectsToTrack
   extends AbstractSelectionProcessor {
@@ -128,10 +127,11 @@ public class SelectMultipleObjectsToTrack
    * @param panel	the origin
    * @param topLeft	the top-left position of the selection
    * @param bottomRight	the bottom-right position of the selection
+   * @param trace	the trace from the selection
    * @param modifiersEx	the associated modifiers
    */
   @Override
-  protected void doProcessSelection(ImagePanel panel, Point topLeft, Point bottomRight, int modifiersEx) {
+  protected void doProcessSelection(ImagePanel panel, Point topLeft, Point bottomRight, List<Point> trace, int modifiersEx) {
     Report 			report;
     int				x1;
     int				y1;

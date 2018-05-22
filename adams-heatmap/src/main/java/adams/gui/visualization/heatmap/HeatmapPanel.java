@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * HeatmapPanel.java
- * Copyright (C) 2011-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.heatmap;
 
@@ -51,6 +51,7 @@ import adams.gui.visualization.core.BiColorGenerator;
 import adams.gui.visualization.heatmap.overlay.AbstractHeatmapOverlay;
 import adams.gui.visualization.image.ImagePanel;
 import adams.gui.visualization.image.ImagePanel.PaintPanel;
+import adams.gui.visualization.image.selectionshape.RectanglePainter;
 import adams.gui.visualization.report.ReportFactory;
 
 import javax.swing.JPanel;
@@ -153,8 +154,9 @@ public class HeatmapPanel
    */
   @Override
   protected void initGUI() {
-    Properties	props;
-    JPanel	panel;
+    Properties		props;
+    JPanel		panel;
+    RectanglePainter	painter;
 
     super.initGUI();
 
@@ -170,9 +172,11 @@ public class HeatmapPanel
     m_SplitPane.setDividerLocation(props.getInteger("Panel.DividerLocation", 600));
     m_LogTabbedPane.addTab("Data", m_SplitPane);
 
+    painter = new RectanglePainter();
+    painter.setColor(Color.RED);
     m_HeatmapImage = new ImagePanel();
     m_HeatmapImage.setSelectionEnabled(true);
-    m_HeatmapImage.setSelectionBoxColor(Color.RED);
+    m_HeatmapImage.setSelectionShapePainter(painter);
     m_HeatmapImage.addSelectionListener(this);
     m_HeatmapTable = null;
 
