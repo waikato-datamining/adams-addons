@@ -66,6 +66,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
@@ -86,8 +87,8 @@ import java.util.List;
 public class HeatmapViewerPanel
   extends BasePanel
   implements MenuBarProvider, StatusMessageHandler,
-             FilterListener<Heatmap>, SendToActionSupporter, CleanUpHandler,
-             ToolPluginSupporter<HeatmapPanel> {
+  FilterListener<Heatmap>, SendToActionSupporter, CleanUpHandler,
+  ToolPluginSupporter<HeatmapPanel> {
 
   /** for serialization. */
   private static final long serialVersionUID = -2642034258827736757L;
@@ -187,7 +188,7 @@ public class HeatmapViewerPanel
 
   /** the search panel for the heatmap report. */
   protected SearchPanel m_SearchPanel;
-  
+
   /** the dialog for selecting the color provider. */
   protected GenericObjectEditorDialog m_DialogColorGenerator;
 
@@ -305,7 +306,7 @@ public class HeatmapViewerPanel
       submenu = new JMenu("Open recent");
       menu.add(submenu);
       m_RecentFilesHandler = new RecentFilesHandlerWithCommandline<JMenu>(
-	  SESSION_FILE, getProperties().getInteger("MaxRecentFiles", 5), submenu);
+	SESSION_FILE, getProperties().getInteger("MaxRecentFiles", 5), submenu);
       m_RecentFilesHandler.addRecentItemListener(new RecentItemListener<JMenu,Setup>() {
 	@Override
 	public void recentItemAdded(RecentItemEvent<JMenu,Setup> e) {
@@ -497,30 +498,30 @@ public class HeatmapViewerPanel
 
       // zoom levels
       zooms = new int[]{
-	  -100,
-	  25,
-	  50,
-	  66,
-	  75,
-	  100,
-	  150,
-	  200,
-	  400,
-	  800,
-	  1600,
+	-100,
+	25,
+	50,
+	66,
+	75,
+	100,
+	150,
+	200,
+	400,
+	800,
+	1600,
       };
       shortcuts = new String[]{
-	  "F",
-	  "",
-	  "",
-	  "",
-	  "",
-	  "1",
-	  "",
-	  "2",
-	  "4",
-	  "",
-	  "",
+	"F",
+	"",
+	"",
+	"",
+	"",
+	"1",
+	"",
+	"2",
+	"4",
+	"",
+	"",
       };
       submenu.addSeparator();
       for (i = 0; i < zooms.length; i++) {
@@ -555,16 +556,16 @@ public class HeatmapViewerPanel
       menuitem.setMnemonic('R');
       menuitem.setIcon(GUIHelper.getEmptyIcon());
       menuitem.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          if (m_MenuItemViewApplyAll.isSelected()) {
-            for (int i = 0; i < getPanelCount(); i++)
-              getPanelAt(i).removeOverlays();
-          }
-          else {
-            getCurrentPanel().removeOverlays();
-          }
-        }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+	  if (m_MenuItemViewApplyAll.isSelected()) {
+	    for (int i = 0; i < getPanelCount(); i++)
+	      getPanelAt(i).removeOverlays();
+	  }
+	  else {
+	    getCurrentPanel().removeOverlays();
+	  }
+	}
       });
       m_MenuItemViewRemoveOverlays = menuitem;
 
@@ -575,19 +576,19 @@ public class HeatmapViewerPanel
       menuitem.setMnemonic('d');
       menuitem.setIcon(GUIHelper.getEmptyIcon());
       menuitem.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          AbstractHeatmapOverlay overlay = selectOverlay();
-          if (overlay == null)
-            return;
-          if (m_MenuItemViewApplyAll.isSelected()) {
-            for (int i = 0; i < getPanelCount(); i++)
-              getPanelAt(i).addOverlay(overlay);
-          }
-          else {
-            getCurrentPanel().addOverlay(overlay);
-          }
-        }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+	  AbstractHeatmapOverlay overlay = selectOverlay();
+	  if (overlay == null)
+	    return;
+	  if (m_MenuItemViewApplyAll.isSelected()) {
+	    for (int i = 0; i < getPanelCount(); i++)
+	      getPanelAt(i).addOverlay(overlay);
+	  }
+	  else {
+	    getCurrentPanel().addOverlay(overlay);
+	  }
+	}
       });
       m_MenuItemViewAddOverlay = menuitem;
 
@@ -598,16 +599,16 @@ public class HeatmapViewerPanel
       menuitem.setMnemonic('R');
       menuitem.setIcon(GUIHelper.getEmptyIcon());
       menuitem.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          if (m_MenuItemViewApplyAll.isSelected()) {
-            for (int i = 0; i < getPanelCount(); i++)
-              getPanelAt(i).removeSelectionListeners();
-          }
-          else {
-            getCurrentPanel().removeSelectionListeners();
-          }
-        }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+	  if (m_MenuItemViewApplyAll.isSelected()) {
+	    for (int i = 0; i < getPanelCount(); i++)
+	      getPanelAt(i).removeSelectionListeners();
+	  }
+	  else {
+	    getCurrentPanel().removeSelectionListeners();
+	  }
+	}
       });
       m_MenuItemViewRemoveSelectionProcessors = menuitem;
 
@@ -618,19 +619,19 @@ public class HeatmapViewerPanel
       menuitem.setMnemonic('d');
       menuitem.setIcon(GUIHelper.getEmptyIcon());
       menuitem.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          HeatmapPanelSelectionListener processor = selectSelectionProcessor();
-          if (processor == null)
-            return;
-          if (m_MenuItemViewApplyAll.isSelected()) {
-            for (int i = 0; i < getPanelCount(); i++)
-              getPanelAt(i).addSelectionListener(processor);
-          }
-          else {
-            getCurrentPanel().addSelectionListener(processor);
-          }
-        }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+	  HeatmapPanelSelectionListener processor = selectSelectionProcessor();
+	  if (processor == null)
+	    return;
+	  if (m_MenuItemViewApplyAll.isSelected()) {
+	    for (int i = 0; i < getPanelCount(); i++)
+	      getPanelAt(i).addSelectionListener(processor);
+	  }
+	  else {
+	    getCurrentPanel().addSelectionListener(processor);
+	  }
+	}
       });
       m_MenuItemViewAddSelectionProcessor = menuitem;
 
@@ -835,33 +836,38 @@ public class HeatmapViewerPanel
    * Loads heatmaps from disk, popping up a file chooser dialog.
    */
   public void load(final File[] files, final AbstractHeatmapReader reader) {
-    Runnable	run;
-    
-    for (final File file: files) {
-      run = new Runnable() {
-        @Override
-	public void run() {
-          showStatus("Loading file: " + file);
-          reader.setInput(new PlaceholderFile(file));
-          List<Heatmap> maps = reader.read();
-          if (maps.size() == 0) {
-            GUIHelper.showErrorMessage(HeatmapViewerPanel.this, "Failed to read heatmap from:\n" + reader.getInput());
+    SwingWorker 	worker;
+
+    worker = new SwingWorker() {
+      @Override
+      protected Object doInBackground() throws Exception {
+	for (final File file: files) {
+	  showStatus("Loading file: " + file);
+	  reader.setInput(new PlaceholderFile(file));
+	  List<Heatmap> maps = reader.read();
+	  if (maps.size() == 0) {
+	    GUIHelper.showErrorMessage(HeatmapViewerPanel.this, "Failed to read heatmap from:\n" + reader.getInput());
 	    showStatus("");
-            return;
-          }
-          HeatmapPanel panel = newPanel(maps.get(0));
+	    return null;
+	  }
+	  HeatmapPanel panel = newPanel(maps.get(0));
 	  panel.log("Load: " + file);
-          panel.setReader(reader);
-          m_MultiPagePane.addPage(panel.getTitle(), panel);
+	  panel.setReader(reader);
+	  m_MultiPagePane.addPage(panel.getTitle(), panel);
 	  m_MultiPagePane.setSelectedPage(panel);
-          showStatus("");
-          if (m_RecentFilesHandler != null)
-            m_RecentFilesHandler.addRecentItem(new Setup(file, reader));
-        }
-      };
-      SwingUtilities.invokeLater(run);
-    }
-    showStatus("");
+	  if (m_RecentFilesHandler != null)
+	    m_RecentFilesHandler.addRecentItem(new Setup(file, reader));
+	}
+	return null;
+      }
+
+      @Override
+      protected void done() {
+	showStatus("");
+	super.done();
+      }
+    };
+    worker.execute();
   }
 
   /**
@@ -870,7 +876,7 @@ public class HeatmapViewerPanel
    */
   public void load(File file) {
     AbstractHeatmapReader 	reader;
-    
+
     reader = (AbstractHeatmapReader) m_FileChooser.getReaderForFile(file);
     if (reader == null) {
       m_FileChooser.setSelectedFile(file);
@@ -878,7 +884,7 @@ public class HeatmapViewerPanel
       load();
       return;
     }
-    
+
     load(new File[]{file}, reader);
   }
 
@@ -904,11 +910,11 @@ public class HeatmapViewerPanel
     Heatmap			map;
     PlaceholderFile		file;
     AbstractDataContainerWriter	writer;
-    
+
     retVal = m_FileChooser.showSaveDialog(this);
     if (retVal != HeatmapFileChooser.APPROVE_OPTION)
       return;
-      
+
     map    = getCurrentPanel().getHeatmap();
     file   = m_FileChooser.getSelectedPlaceholderFile();
     writer = m_FileChooser.getWriter();
@@ -916,7 +922,7 @@ public class HeatmapViewerPanel
     if (!writer.write(map))
       GUIHelper.showErrorMessage(this, "Failed to write heatmap to '" + file + "'!\nCheck console for error message.");
   }
-  
+
   /**
    * closes the dialog/frame.
    */
@@ -1086,7 +1092,7 @@ public class HeatmapViewerPanel
       m_DialogColorGenerator.getGOEEditor().setCanChangeClassInDialog(true);
       m_DialogColorGenerator.setLocationRelativeTo(this);
     }
-    
+
     m_DialogColorGenerator.setCurrent(getCurrentPanel().getColorGenerator().shallowCopy());
     m_DialogColorGenerator.setVisible(true);
     if (m_DialogColorGenerator.getResult() != GenericObjectEditorDialog.APPROVE_OPTION)
