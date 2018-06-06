@@ -46,6 +46,7 @@ import adams.flow.core.CallableActorUser;
 import adams.flow.core.Compatibility;
 import adams.flow.core.ErrorHandler;
 import adams.flow.core.InputConsumer;
+import adams.flow.core.LazySetupSupporter;
 import adams.flow.core.MutableActorHandler;
 import adams.flow.core.PauseStateHandler;
 import adams.flow.core.PauseStateManager;
@@ -217,7 +218,8 @@ import java.util.Set;
 public class Rat
   extends AbstractStandaloneGroupItem<Rats>
   implements MutableActorHandler, CallableActorUser, Pausable,
-             FlowPauseStateListener, DebugScopeRestrictionHandler, AtomicExecution {
+             FlowPauseStateListener, DebugScopeRestrictionHandler,
+             AtomicExecution, LazySetupSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = -154461277343021604L;
@@ -230,6 +232,9 @@ public class Rat
 
   /** the default send errors queue name. */
   public final static String DEFAULT_SENDERRORS = "senderrors";
+
+  /** whether to perform lazy initialization of sub-actors. */
+  protected boolean m_PerformLazySetup;
 
   /** the receiver to use. */
   protected RatInput m_Receiver;
@@ -276,6 +281,9 @@ public class Rat
   /** the state listeners. */
   protected Set<RatStateListener> m_StateListeners;
 
+  /** whether layz initialization has been performed. */
+  protected boolean m_LazySetupPeformed;
+
   /**
    * Returns a string describing the object.
    *
@@ -296,6 +304,10 @@ public class Rat
     m_OptionManager.add(
       "receiver", "receiver",
       new DummyInput());
+
+    m_OptionManager.add(
+      "perform-lazy-setup", "performLazySetup",
+      false);
 
     m_OptionManager.add(
       "actor", "actors",
@@ -372,6 +384,8 @@ public class Rat
     m_Actors = new LocalScopeTransformer();
     m_Actors.setParent(this);
 
+    m_LazySetupPeformed = false;
+
     m_Helper         = new CallableActorHelper();
     m_StateListeners = new HashSet<>();
   }
@@ -415,6 +429,35 @@ public class Rat
    */
   public String receiverTipText() {
     return "The receiver to use.";
+  }
+
+  /**
+   * Sets whether to perform a lazy setup, ie when first executed.
+   *
+   * @param value	true if to perform lazy setup
+   */
+  public void setPerformLazySetup(boolean value) {
+    m_PerformLazySetup = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to perform a lazy setup, ie when first executed.
+   *
+   * @return		true if to perform lazy setup
+   */
+  public boolean getPerformLazySetup() {
+    return m_PerformLazySetup;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String performLazySetupTipText() {
+    return "If enabled, initializing the sub-actors will only occurring the first time the rat gets executed (ie the input triggers).";
   }
 
   /**
@@ -1302,8 +1345,10 @@ public class Rat
 
     result = super.setUp();
 
-    if (result == null)
-      result = m_Actors.setUp();
+    if (result == null) {
+      if (!m_PerformLazySetup)
+	result = m_Actors.setUp();
+    }
     
     if (result == null) {
       comp = new Compatibility();
@@ -1368,6 +1413,25 @@ public class Rat
     }
 
     return result;
+  }
+
+  /**
+   * Returns whether lazy setup has been performed.
+   *
+   * @return		true if performed
+   */
+  public boolean hasLazySetupPerformed() {
+    return m_LazySetupPeformed;
+  }
+
+  /**
+   * Performs the lazy setup.
+   *
+   * @return		null if successful, otherwise error message
+   */
+  public String lazySetup() {
+    m_LazySetupPeformed = true;
+    return m_Actors.setUp();
   }
 
   /**
@@ -1547,7 +1611,9 @@ public class Rat
 	m_LogActor.wrapUp();
       }
     }
-    
+
+    m_LazySetupPeformed = false;
+
     super.wrapUp();
   }
 

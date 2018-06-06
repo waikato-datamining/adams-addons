@@ -158,8 +158,13 @@ public class RatRunnable
 	    // actors?
 	    if (m_HasActors) {
 	      if (data != null) {
-		m_Owner.getActorHandler().input(new Token(data));
-		result = m_Owner.getActorHandler().execute();
+	        // delayed setup?
+	        if (m_Owner.getPerformLazySetup() && !m_Owner.hasLazySetupPerformed())
+	          result = m_Owner.lazySetup();
+	        if (result == null) {
+		  m_Owner.getActorHandler().input(new Token(data));
+		  result = m_Owner.getActorHandler().execute();
+		}
 		if (result == null) {
 		  while (m_Owner.getActorHandler().hasPendingOutput() && !m_Stopped) {
 		    token  = m_Owner.getActorHandler().output();
