@@ -73,12 +73,17 @@ There are some very good, open-source tools for processing audio:
 The following sources are available:
 \begin{tight_itemize}
   \item \textit{AudioRecorder} -- records audio using the specified recorder.
+  \item \textit{NewAudioTrail} -- creates an empty audio trail data structure.
 \end{tight_itemize}
 
 \noindent The following transformers are available:
 \begin{tight_itemize}
+  \item \textit{AddAudioTrailStep} -- adds a step to an audio trail data structure.
   \item \textit{AudioData} -- reads the data from an audio source, eg a file
   \item \textit{AudioInfo} -- generates information about an audio source
+  \item \textit{AudioTrailFileReader} -- reads an audio trail from disk.
+  \item \textit{AudioTrailFileWriter} -- writes an audio trail to disk.
+  \item \textit{AudioTrailFilter} -- applies a filter to an audio trail.
   \item \textit{WaveFeatureGenerator} -- generates features from a Wave object
   using the specified generator
   \item \textit{WaveFilter} -- applies the specified filter to the Wave object.
