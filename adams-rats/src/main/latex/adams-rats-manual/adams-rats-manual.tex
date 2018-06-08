@@ -1,8 +1,6 @@
 % This work is made available under the terms of the
 % Creative Commons Attribution-ShareAlike 4.0 license,
 % http://creativecommons.org/licenses/by-sa/4.0/.
-%
-% Version: $Revision: 6651 $
 
 \documentclass[a4paper]{book}
 
@@ -46,7 +44,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2014-2016} &
+		\parbox[c][2cm]{2cm}{\copyright 2014-2018} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}}
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -91,6 +89,8 @@ The following control actors are available:
 	\item \textit{ChangeRatState} -- changes the state (eg RUNNING, PAUSED)
 	of a \textit{Rat} actor. This allows the startup of Rat actors in a
 	paused state before activating them later on.
+	\item \textit{ExecuteRats} -- allows the execution of Rat actor(s) in
+	\textit{MANUAL} mode whenever a token passes through.
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%
