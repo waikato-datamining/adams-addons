@@ -13,16 +13,16 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * TrailWindow.java
- * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
+/*
+ * AudioAnnotationsWindow.java
+ * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.filter;
 
 import adams.core.DateUtils;
 import adams.core.base.BaseTimeMsec;
-import adams.data.audiotrail.AudioStep;
-import adams.data.audiotrail.AudioTrail;
+import adams.data.audioannotations.AudioAnnotation;
+import adams.data.audioannotations.AudioAnnotations;
 
 import java.util.Date;
 
@@ -34,10 +34,9 @@ import java.util.Date;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
-public class AudioTrailWindow
-  extends AbstractFilter<AudioTrail> {
+public class AudioAnnotationsWindow
+  extends AbstractFilter<AudioAnnotations> {
 
   /** for serialization. */
   private static final long serialVersionUID = 2616498525816421178L;
@@ -59,7 +58,7 @@ public class AudioTrailWindow
   @Override
   public String globalInfo() {
     return 
-	"Leaves only the specified window in the trail (borders included).\n"
+	"Leaves only the specified window in the annotations (borders included).\n"
 	+ "The matching can be inverted, i.e., everything but the window is returned.";
   }
 
@@ -84,7 +83,7 @@ public class AudioTrailWindow
   }
 
   /**
-   * Sets the start timestamp for trail.
+   * Sets the start timestamp for annotations.
    *
    * @param value	the timestamp
    */
@@ -94,7 +93,7 @@ public class AudioTrailWindow
   }
 
   /**
-   * The start timestamp of trail.
+   * The start timestamp of annotations.
    *
    * @return		the timestamp
    */
@@ -109,11 +108,11 @@ public class AudioTrailWindow
    * 			displaying in the GUI or for listing the options.
    */
   public String startTipText() {
-    return "The timestamp for the first data point in the trail to keep.";
+    return "The timestamp for the first data point in the annotations to keep.";
   }
 
   /**
-   * Sets the end timestamp for trail.
+   * Sets the end timestamp for annotations.
    *
    * @param value	the timestamp
    */
@@ -123,7 +122,7 @@ public class AudioTrailWindow
   }
 
   /**
-   * The end timestamp of trail.
+   * The end timestamp of annotations.
    *
    * @return		the timestamp
    */
@@ -138,7 +137,7 @@ public class AudioTrailWindow
    * 			displaying in the GUI or for listing the options.
    */
   public String endTipText() {
-    return "The timestamp for the last data point in the trail to keep.";
+    return "The timestamp for the last data point in the annotations to keep.";
   }
 
   /**
@@ -177,14 +176,14 @@ public class AudioTrailWindow
    * @return		the filtered data
    */
   @Override
-  protected AudioTrail processData(AudioTrail data) {
-    AudioTrail	result;
-    AudioStep   step;
+  protected AudioAnnotations processData(AudioAnnotations data) {
+    AudioAnnotations result;
+    AudioAnnotation step;
     int		i;
     Date	start;
     Date	end;
 
-    result = (AudioTrail) data.getHeader();
+    result = (AudioAnnotations) data.getHeader();
     start  = m_Start.dateValue();
     end    = m_End.dateValue();
     for (i = 0; i < data.size(); i++) {
@@ -197,7 +196,7 @@ public class AudioTrailWindow
 	if (DateUtils.isBefore(start, step.getTimestamp()) || DateUtils.isAfter(end, step.getTimestamp()))
 	  continue;
       }
-      result.add(new AudioStep(step.getTimestamp(), step.getMetaData()));
+      result.add(new AudioAnnotation(step.getTimestamp(), step.getMetaData()));
     }
     
     return result;

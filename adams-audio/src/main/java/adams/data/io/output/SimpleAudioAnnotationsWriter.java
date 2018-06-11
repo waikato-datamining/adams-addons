@@ -14,7 +14,7 @@
  */
 
 /*
- * SimpleAudioTrailWriter.java
+ * SimpleAudioAnnotationsWriter.java
  * Copyright (C) 2018 University of Waikato, Hamilton, NZ
  */
 
@@ -24,7 +24,7 @@ import adams.core.Constants;
 import adams.core.Properties;
 import adams.core.io.FileUtils;
 import adams.data.DateFormatString;
-import adams.data.audiotrail.AudioTrail;
+import adams.data.audioannotations.AudioAnnotations;
 import adams.data.spreadsheet.SpreadSheet;
 
 import java.io.StringWriter;
@@ -52,8 +52,8 @@ import java.util.List;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class SimpleAudioTrailWriter
-  extends AbstractAudioTrailWriter {
+public class SimpleAudioAnnotationsWriter
+  extends AbstractAudioAnnotationsWriter {
 
   private static final long serialVersionUID = -7138302129366743189L;
 
@@ -68,7 +68,7 @@ public class SimpleAudioTrailWriter
   @Override
   public String globalInfo() {
     return
-      "Writes audio trails in the simple CSV-like format.\n"
+      "Writes audio annotations in the simple CSV-like format.\n"
 	+ "The report comes before the actual trail data.\n"
 	+ "The report data is prefixed with '" + COMMENT + "'.";
   }
@@ -110,9 +110,9 @@ public class SimpleAudioTrailWriter
    * @return		true if successfully written
    */
   @Override
-  protected boolean writeData(List<AudioTrail> data) {
+  protected boolean writeData(List<AudioAnnotations> data) {
     boolean			result;
-    AudioTrail			trail;
+    AudioAnnotations trail;
     SpreadSheet 		sheet;
     StringWriter		swriter;
     Properties			props;

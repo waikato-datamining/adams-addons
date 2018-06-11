@@ -14,11 +14,11 @@
  */
 
 /*
- * AudioTrail.java
+ * AudioAnnotations.java
  * Copyright (C) 2015-2016 University of Waikato, Hamilton, NZ
  */
 
-package adams.data.audiotrail;
+package adams.data.audioannotations;
 
 import adams.core.TimeMsec;
 import adams.data.Notes;
@@ -42,14 +42,14 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * Encapsulates a series of audio steps, i.e., a audio trail.
+ * Encapsulates a series of audio annotations.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class AudioTrail
-  extends AbstractDataContainer<AudioStep>
+public class AudioAnnotations
+  extends AbstractDataContainer<AudioAnnotation>
   implements MutableReportHandler<Report>,
-  NotesHandler, SpreadSheetSupporter, InformativeStatisticSupporter<AudioTrailStatistic>  {
+  NotesHandler, SpreadSheetSupporter, InformativeStatisticSupporter<AudioAnnotationsStatistic>  {
 
   private static final long serialVersionUID = 8721248965909493612L;
 
@@ -62,12 +62,12 @@ public class AudioTrail
   protected Notes m_Notes;
 
   /** the comparator to use. */
-  protected static AudioStepComparator m_Comparator;
+  protected static AudioAnnotationComparator m_Comparator;
 
   /**
    * Initializes the trail.
    */
-  public AudioTrail() {
+  public AudioAnnotations() {
     super();
 
     m_ID     = "" + new Date();
@@ -83,8 +83,8 @@ public class AudioTrail
    * @return		the comparator instance
    */
   @Override
-  public AudioStepComparator newComparator() {
-    return new AudioStepComparator();
+  public AudioAnnotationComparator newComparator() {
+    return new AudioAnnotationComparator();
   }
 
   /**
@@ -93,7 +93,7 @@ public class AudioTrail
    * @return		the comparator in use
    */
   @Override
-  public DataPointComparator<AudioStep> getComparator() {
+  public DataPointComparator<AudioAnnotation> getComparator() {
     return m_Comparator;
   }
 
@@ -103,8 +103,8 @@ public class AudioTrail
    * @return		the new DataContainer point
    */
   @Override
-  public AudioStep newPoint() {
-    return new AudioStep();
+  public AudioAnnotation newPoint() {
+    return new AudioAnnotation();
   }
 
   /**
@@ -114,12 +114,12 @@ public class AudioTrail
    * @param other	the data point to get the values from
    */
   @Override
-  public void assign(DataContainer<AudioStep> other) {
-    AudioTrail trail;
+  public void assign(DataContainer<AudioAnnotation> other) {
+    AudioAnnotations trail;
 
     super.assign(other);
 
-    trail = (AudioTrail) other;
+    trail = (AudioAnnotations) other;
 
     if (trail.hasReport())
       setReport(trail.getReport().getClone());
@@ -176,12 +176,12 @@ public class AudioTrail
    * @param timestamp 	the timestamp to get the step for
    * @return		the associated step or null if none available for the timestamp
    */
-  public AudioStep getStep(Date timestamp) {
-    AudioStep result;
+  public AudioAnnotation getStep(Date timestamp) {
+    AudioAnnotation result;
     int		pos;
 
     result = null;
-    pos    = Collections.binarySearch(m_Points, new AudioStep(timestamp), m_Comparator);
+    pos    = Collections.binarySearch(m_Points, new AudioAnnotation(timestamp), m_Comparator);
     if (pos >= 0)
       result = m_Points.get(pos);
 
@@ -202,7 +202,7 @@ public class AudioTrail
 
     // collect meta-data keys
     keys = new HashSet<>();
-    for (AudioStep step: m_Points) {
+    for (AudioAnnotation step: m_Points) {
       if (step.hasMetaData())
 	keys.addAll(step.getMetaData().keySet());
     }
@@ -220,7 +220,7 @@ public class AudioTrail
       row.addCell("M-" + key).setContent(PREFIX_META + key);
 
     // data
-    for (AudioStep step: this) {
+    for (AudioAnnotation step: this) {
       row = result.addRow();
       row.addCell("T").setContent(new TimeMsec(step.getTimestamp()));
       if (step.hasMetaData()) {
@@ -238,8 +238,8 @@ public class AudioTrail
    * @return		statistics for this object
    */
   @Override
-  public AudioTrailStatistic toStatistic() {
-    return new AudioTrailStatistic(this);
+  public AudioAnnotationsStatistic toStatistic() {
+    return new AudioAnnotationsStatistic(this);
   }
 
   /**

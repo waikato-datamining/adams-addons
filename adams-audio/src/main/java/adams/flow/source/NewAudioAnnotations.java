@@ -14,26 +14,23 @@
  */
 
 /*
- * AudioTrailFileReader.java
+ * NewAudioAnnotations.java
  * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
  */
+package adams.flow.source;
 
-package adams.flow.transformer;
-
-import adams.data.audiotrail.AudioTrail;
-import adams.data.io.input.AbstractDataContainerReader;
-import adams.data.io.input.SimpleAudioTrailReader;
+import adams.core.QuickInfoHelper;
+import adams.data.audioannotations.AudioAnnotations;
+import adams.flow.core.Token;
 
 /**
  <!-- globalinfo-start -->
- * Loads a file containing an audio trail from disk with the specified reader and passes it on.
+ * Generates empty annotations with the specified dimensions.
  * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
  * Input&#47;output:<br>
- * - accepts:<br>
- * &nbsp;&nbsp;&nbsp;java.lang.String<br>
  * - generates:<br>
  * &nbsp;&nbsp;&nbsp;adams.data.trail.Trail<br>
  * <br><br>
@@ -47,7 +44,7 @@ import adams.data.io.input.SimpleAudioTrailReader;
  * 
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
- * &nbsp;&nbsp;&nbsp;default: TrailFileReader
+ * &nbsp;&nbsp;&nbsp;default: NewTrail
  * </pre>
  * 
  * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
@@ -72,20 +69,23 @@ import adams.data.io.input.SimpleAudioTrailReader;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
- * <pre>-reader &lt;adams.data.io.input.AbstractDataContainerReader&gt; (property: reader)
- * &nbsp;&nbsp;&nbsp;The reader to use for importing the data.
- * &nbsp;&nbsp;&nbsp;default: adams.data.io.input.SimpleTrailReader
+ * <pre>-id &lt;java.lang.String&gt; (property: ID)
+ * &nbsp;&nbsp;&nbsp;The ID of the trail; ignored if empty.
+ * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
- * 
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
-public class AudioTrailFileReader
-  extends AbstractDataContainerFileReader<AudioTrail> {
+public class NewAudioAnnotations
+  extends AbstractSimpleSource {
 
   /** for serialization. */
-  private static final long serialVersionUID = 1429977151568224156L;
+  private static final long serialVersionUID = -5718059337341470131L;
+
+  /** the ID of the trail. */
+  protected String m_ID;
 
   /**
    * Returns a string describing the object.
@@ -94,26 +94,84 @@ public class AudioTrailFileReader
    */
   @Override
   public String globalInfo() {
-    return "Loads a file containing an audio trail from disk with the specified reader and passes it on.";
+    return "Generates empty audio annotations.";
   }
 
   /**
-   * Returns the default reader to use.
-   *
-   * @return		the default reader
+   * Adds options to the internal list of options.
    */
   @Override
-  protected AbstractDataContainerReader getDefaultReader() {
-    return new SimpleAudioTrailReader();
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "id", "ID",
+      "");
   }
 
   /**
-   * Returns the class of objects that it generates.
+   * Returns a quick info about the actor, which will be displayed in the GUI.
    *
-   * @return		the data type
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    return QuickInfoHelper.toString(this, "ID", (m_ID.isEmpty() ? "-none-" : m_ID), "ID: ");
+  }
+
+  /**
+   * Sets the ID of the trail.
+   *
+   * @param value	the ID
+   */
+  public void setID(String value) {
+    m_ID = value;
+    reset();
+  }
+
+  /**
+   * Returns the ID of the trail.
+   *
+   * @return		the ID
+   */
+  public String getID() {
+    return m_ID;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String IDTipText() {
+    return "The ID of the audio annotations; ignored if empty.";
+  }
+
+  /**
+   * Returns a string describing the object.
+   *
+   * @return 			a description suitable for displaying in the gui
    */
   @Override
   public Class[] generates() {
-    return new Class[]{AudioTrail.class};
+    return new Class[]{AudioAnnotations.class};
+  }
+
+  /**
+   * Executes the flow item.
+   *
+   * @return		null if everything is fine, otherwise error message
+   */
+  @Override
+  protected String doExecute() {
+    AudioAnnotations trail;
+
+    trail = new AudioAnnotations();
+    if (!m_ID.isEmpty())
+      trail.setID(m_ID);
+    m_OutputToken = new Token(trail);
+
+    return null;
   }
 }

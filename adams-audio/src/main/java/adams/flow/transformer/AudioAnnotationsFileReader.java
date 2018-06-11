@@ -14,30 +14,28 @@
  */
 
 /*
- * AudioTrailFileWriter.java
+ * AudioAnnotationsFileReader.java
  * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
-import adams.data.audiotrail.AudioTrail;
-import adams.data.io.output.AbstractDataContainerWriter;
-import adams.data.io.output.SimpleAudioTrailWriter;
+import adams.data.audioannotations.AudioAnnotations;
+import adams.data.io.input.AbstractDataContainerReader;
+import adams.data.io.input.SimpleAudioAnnotationsReader;
 
 /**
  <!-- globalinfo-start -->
- * Saves an audio trail to disk with the specified writer and passes the absolute filename on.<br>
- * As filename&#47;directory name (depending on the writer) the ID of the trail is used (below the specified output directory).
+ * Loads a file containing audio annotations from disk with the specified reader and passes it on.
  * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
  * Input&#47;output:<br>
  * - accepts:<br>
- * &nbsp;&nbsp;&nbsp;adams.data.trail.Trail<br>
- * &nbsp;&nbsp;&nbsp;adams.data.trail.Trail[]<br>
- * - generates:<br>
  * &nbsp;&nbsp;&nbsp;java.lang.String<br>
+ * - generates:<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.audioannotations.AudioAnnotations<br>
  * <br><br>
  <!-- flow-summary-end -->
  *
@@ -49,7 +47,7 @@ import adams.data.io.output.SimpleAudioTrailWriter;
  * 
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
- * &nbsp;&nbsp;&nbsp;default: TrailFileWriter
+ * &nbsp;&nbsp;&nbsp;default: TrailFileReader
  * </pre>
  * 
  * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
@@ -74,36 +72,20 @@ import adams.data.io.output.SimpleAudioTrailWriter;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
- * <pre>-writer &lt;adams.data.io.output.AbstractDataContainerWriter&gt; (property: writer)
- * &nbsp;&nbsp;&nbsp;The writer to use for saving the data.
- * &nbsp;&nbsp;&nbsp;default: adams.data.io.output.SimpleTrailWriter
- * </pre>
- * 
- * <pre>-dir &lt;adams.core.io.PlaceholderDirectory&gt; (property: outputDir)
- * &nbsp;&nbsp;&nbsp;The output directory for the data.
- * &nbsp;&nbsp;&nbsp;default: ${CWD}
- * </pre>
- * 
- * <pre>-file-name-generation &lt;AUTOMATIC|DATABASE_ID|ID|SUPPLIED&gt; (property: fileNameGeneration)
- * &nbsp;&nbsp;&nbsp;Defines how to generate the file name.
- * &nbsp;&nbsp;&nbsp;default: AUTOMATIC
- * </pre>
- * 
- * <pre>-supplied-file-name &lt;java.lang.String&gt; (property: suppliedFileName)
- * &nbsp;&nbsp;&nbsp;The file name (without path) to use when using SUPPLIED (including extension
- * &nbsp;&nbsp;&nbsp;).
- * &nbsp;&nbsp;&nbsp;default: out.trail
+ * <pre>-reader &lt;adams.data.io.input.AbstractDataContainerReader&gt; (property: reader)
+ * &nbsp;&nbsp;&nbsp;The reader to use for importing the data.
+ * &nbsp;&nbsp;&nbsp;default: adams.data.io.input.SimpleTrailReader
  * </pre>
  * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
-public class AudioTrailFileWriter
-  extends AbstractDataContainerFileWriter<AudioTrail> {
+public class AudioAnnotationsFileReader
+  extends AbstractDataContainerFileReader<AudioAnnotations> {
 
   /** for serialization. */
-  private static final long serialVersionUID = -7990944411836957831L;
+  private static final long serialVersionUID = 1429977151568224156L;
 
   /**
    * Returns a string describing the object.
@@ -112,30 +94,26 @@ public class AudioTrailFileWriter
    */
   @Override
   public String globalInfo() {
-    return
-        "Saves an audio trail to disk with the "
-      + "specified writer and passes the absolute filename on.\n"
-      + "As filename/directory name (depending on the writer) the "
-      + "ID of the trail is used (below the specified output directory).";
+    return "Loads a file containing audio annotations from disk with the specified reader and passes it on.";
   }
 
   /**
-   * Returns the default writer to use.
+   * Returns the default reader to use.
    *
-   * @return		the default writer
+   * @return		the default reader
    */
   @Override
-  protected AbstractDataContainerWriter<AudioTrail> getDefaultWriter() {
-    return new SimpleAudioTrailWriter();
+  protected AbstractDataContainerReader getDefaultReader() {
+    return new SimpleAudioAnnotationsReader();
   }
 
   /**
-   * Returns the data container class in use.
+   * Returns the class of objects that it generates.
    *
-   * @return		the container class
+   * @return		the data type
    */
   @Override
-  protected Class getDataContainerClass() {
-    return AudioTrail.class;
+  public Class[] generates() {
+    return new Class[]{AudioAnnotations.class};
   }
 }

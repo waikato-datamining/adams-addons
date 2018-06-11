@@ -14,7 +14,7 @@
  */
 
 /*
- * SimpleAudioTrailReader.java
+ * SimpleAudioAnnotationsReader.java
  * Copyright (C) 2018 University of Waikato, Hamilton, NZ
  */
 
@@ -27,9 +27,9 @@ import adams.core.Utils;
 import adams.core.base.BaseRegExp;
 import adams.core.io.FileUtils;
 import adams.data.DateFormatString;
-import adams.data.audiotrail.AudioStep;
-import adams.data.audiotrail.AudioTrail;
-import adams.data.io.output.SimpleAudioTrailWriter;
+import adams.data.audioannotations.AudioAnnotation;
+import adams.data.audioannotations.AudioAnnotations;
+import adams.data.io.output.SimpleAudioAnnotationsWriter;
 import adams.data.report.Report;
 import adams.data.spreadsheet.DenseFloatDataRow;
 import adams.data.spreadsheet.Row;
@@ -42,7 +42,7 @@ import java.util.List;
 
 /**
  <!-- globalinfo-start -->
- * Reads audio trails in simple CSV-like format.<br>
+ * Reads audio annotations in simple CSV-like format.<br>
  * See adams.data.io.output.SimpleAudioTrailWriter for more details on format.
  * <br><br>
  <!-- globalinfo-end -->
@@ -67,8 +67,8 @@ import java.util.List;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class SimpleAudioTrailReader
-  extends AbstractAudioTrailReader {
+public class SimpleAudioAnnotationsReader
+  extends AbstractAudioAnnotationsReader {
 
   private static final long serialVersionUID = 1681189490537858223L;
 
@@ -80,8 +80,8 @@ public class SimpleAudioTrailReader
   @Override
   public String globalInfo() {
     return
-      "Reads audio trails in simple CSV-like format.\n"
-	+ "See " + SimpleAudioTrailWriter.class.getName() + " for more details on format.";
+      "Reads audio annotations in simple CSV-like format.\n"
+	+ "See " + SimpleAudioAnnotationsWriter.class.getName() + " for more details on format.";
   }
 
   /**
@@ -92,7 +92,7 @@ public class SimpleAudioTrailReader
    */
   @Override
   public String getFormatDescription() {
-    return new SimpleAudioTrailWriter().getFormatDescription();
+    return new SimpleAudioAnnotationsWriter().getFormatDescription();
   }
 
   /**
@@ -102,7 +102,7 @@ public class SimpleAudioTrailReader
    */
   @Override
   public String[] getFormatExtensions() {
-    return new SimpleAudioTrailWriter().getFormatExtensions();
+    return new SimpleAudioAnnotationsWriter().getFormatExtensions();
   }
 
   /**
@@ -115,9 +115,9 @@ public class SimpleAudioTrailReader
     List<String>		comments;
     List<String>		data;
     SpreadSheet 		sheet;
-    AudioTrail 			trail;
+    AudioAnnotations trail;
     Report			report;
-    AudioStep 			step;
+    AudioAnnotation step;
     boolean			header;
     StringReader		sreader;
     int				i;
@@ -130,7 +130,7 @@ public class SimpleAudioTrailReader
     header     = true;
     for (String line: lines) {
       if (header) {
-	if (line.startsWith(SimpleAudioTrailWriter.COMMENT)) {
+	if (line.startsWith(SimpleAudioAnnotationsWriter.COMMENT)) {
 	  comments.add(line);
 	}
 	else {
@@ -160,13 +160,13 @@ public class SimpleAudioTrailReader
     metaCols = new HashMap<>();
     for (i = 0; i < sheet.getColumnNames().size(); i++) {
       col = sheet.getColumnNames().get(i);
-      if (col.startsWith(AudioTrail.PREFIX_META))
-	metaCols.put(i, col.substring(AudioTrail.PREFIX_META.length()));
+      if (col.startsWith(AudioAnnotations.PREFIX_META))
+	metaCols.put(i, col.substring(AudioAnnotations.PREFIX_META.length()));
     }
     report = Report.parseProperties(Properties.fromComment(Utils.flatten(comments, "\n")));
-    trail  = new AudioTrail();
+    trail  = new AudioAnnotations();
     for (Row row: sheet.rows()) {
-      step = new AudioStep(
+      step = new AudioAnnotation(
 	row.getCell(0).toAnyDateType());
       // meta-data?
       for (int n: metaCols.keySet()) {

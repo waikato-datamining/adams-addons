@@ -14,19 +14,19 @@
  */
 
 /*
- * AudioTrailFilter.java
+ * AudioAnnotationsFilter.java
  * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.transformer;
 
-import adams.data.audiotrail.AudioTrail;
+import adams.data.audioannotations.AudioAnnotations;
 import adams.db.AbstractDatabaseConnection;
 import adams.flow.container.AudioTrailFilterContainer;
 import adams.flow.core.ActorUtils;
 
 /**
  <!-- globalinfo-start -->
- * Filters data using the specified filter.
+ * Filters audio annotations using the specified filter.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -78,7 +78,7 @@ import adams.flow.core.ActorUtils;
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
-public class AudioTrailFilter
+public class AudioAnnotationsFilter
   extends AbstractFilter {
 
   /** for serialization. */
@@ -91,7 +91,7 @@ public class AudioTrailFilter
    */
   @Override
   protected Class getDataContainerClass() {
-    return AudioTrail.class;
+    return AudioAnnotations.class;
   }
 
   /**

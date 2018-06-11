@@ -14,11 +14,11 @@
  */
 
 /*
- * AudioStep.java
+ * AudioAnnotation.java
  * Copyright (C) 2018 University of Waikato, Hamilton, NZ
  */
 
-package adams.data.audiotrail;
+package adams.data.audioannotations;
 
 import adams.core.DateFormat;
 import adams.core.DateUtils;
@@ -29,11 +29,11 @@ import java.util.Date;
 import java.util.HashMap;
 
 /**
- * Represents a single step in an audio trail.
+ * Represents a single annotation in an audio trail.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class AudioStep
+public class AudioAnnotation
   extends AbstractDataPoint {
 
   private static final long serialVersionUID = 7649750314026526010L;
@@ -53,7 +53,7 @@ public class AudioStep
   /**
    * Initializes the step with default values.
    */
-  public AudioStep() {
+  public AudioAnnotation() {
     this(new Date(), null);
   }
 
@@ -62,7 +62,7 @@ public class AudioStep
    *
    * @param timestamp	the timestamp
    */
-  public AudioStep(Date timestamp) {
+  public AudioAnnotation(Date timestamp) {
     this(new Date(), null);
   }
 
@@ -72,7 +72,7 @@ public class AudioStep
    * @param timestamp	the timestamp
    * @param metaData	the meta-data, can be null
    */
-  public AudioStep(Date timestamp, HashMap<String,Object> metaData) {
+  public AudioAnnotation(Date timestamp, HashMap<String,Object> metaData) {
     super();
     m_Timestamp = new Date(timestamp.getTime());
     m_MetaData  = null;
@@ -86,11 +86,11 @@ public class AudioStep
    * @param other	the data point to get the values from
    */
   public void assign(DataPoint other) {
-    AudioStep step;
+    AudioAnnotation step;
 
     super.assign(other);
 
-    step = (AudioStep) other;
+    step = (AudioAnnotation) other;
 
     setTimestamp(step.getTimestamp());
     setMetaData(step.getMetaData());
@@ -165,9 +165,9 @@ public class AudioStep
   @Override
   public int compareTo(Object o) {
     int		result;
-    AudioStep other;
+    AudioAnnotation other;
 
-    other  = (AudioStep) o;
+    other  = (AudioAnnotation) o;
 
     result = getTimestamp().compareTo(other.getTimestamp());
 
@@ -183,7 +183,7 @@ public class AudioStep
    */
   @Override
   public boolean equals(Object obj) {
-    return (obj instanceof AudioStep) && (compareTo(obj) == 0);
+    return (obj instanceof AudioAnnotation) && (compareTo(obj) == 0);
   }
 
   /**

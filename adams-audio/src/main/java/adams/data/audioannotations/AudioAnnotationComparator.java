@@ -14,21 +14,21 @@
  */
 
 /*
- * AudioStepComparator.java
+ * AudioAnnotationComparator.java
  * Copyright (C) 2018 University of Waikato, Hamilton, NZ
  */
 
-package adams.data.audiotrail;
+package adams.data.audioannotations;
 
 import adams.data.container.DataPointComparator;
 
 /**
- * Comparator for Step objects.
+ * Comparator for annotation objects.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class AudioStepComparator
-  extends DataPointComparator<AudioStep> {
+public class AudioAnnotationComparator
+  extends DataPointComparator<AudioAnnotation> {
 
   private static final long serialVersionUID = -8169185817314762674L;
 
@@ -44,7 +44,7 @@ public class AudioStepComparator
    * 			than the second.
    */
   @Override
-  public int compare(AudioStep o1, AudioStep o2) {
+  public int compare(AudioAnnotation o1, AudioAnnotation o2) {
     int		result;
 
     result = o1.getTimestamp().compareTo(o2.getTimestamp());

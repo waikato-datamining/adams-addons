@@ -20,7 +20,7 @@
 
 package adams.flow.container;
 
-import adams.data.audiotrail.AudioTrail;
+import adams.data.audioannotations.AudioAnnotations;
 import adams.data.filter.Filter;
 
 /**
@@ -29,7 +29,7 @@ import adams.data.filter.Filter;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class AudioTrailFilterContainer
-  extends AbstractFilterContainer<Filter, AudioTrail> {
+  extends AbstractFilterContainer<Filter, AudioAnnotations> {
 
   private static final long serialVersionUID = -7791501313124716613L;
 
@@ -48,7 +48,7 @@ public class AudioTrailFilterContainer
    * @param filter	the filter
    * @param data	the dataset, can be null
    */
-  public AudioTrailFilterContainer(Object input, Filter filter, AudioTrail data) {
+  public AudioTrailFilterContainer(Object input, Filter filter, AudioAnnotations data) {
     super(input, filter, data);
   }
 
@@ -56,8 +56,8 @@ public class AudioTrailFilterContainer
    * Initializes help strings specific to the filter.
    */
   protected void initFilterHelp() {
-    addHelp(VALUE_INPUT, "input object", new Class[]{AudioTrail.class, AudioTrail[].class});
+    addHelp(VALUE_INPUT, "input object", new Class[]{AudioAnnotations.class, AudioAnnotations[].class});
     addHelp(VALUE_FILTER, "filter object", Filter.class);
-    addHelp(VALUE_DATA, "data object", new Class[]{AudioTrail.class, AudioTrail[].class});
+    addHelp(VALUE_DATA, "data object", new Class[]{AudioAnnotations.class, AudioAnnotations[].class});
   }
 }

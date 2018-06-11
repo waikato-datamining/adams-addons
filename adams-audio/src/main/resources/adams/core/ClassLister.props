@@ -27,9 +27,9 @@ adams.data.wavefilter.AbstractWaveFilter=\
   adams.data.wavefilter
 
 # the audio trail readers
-adams.data.io.input.AbstractAudioTrailReader=\
+adams.data.io.input.AbstractAudioAnnotationsReader=\
   adams.data.io.input
 
 # the audio trail writers
-adams.data.io.output.AbstractAudioTrailWriter=\
+adams.data.io.output.AbstractAudioAnnotationsWriter=\
   adams.data.io.output

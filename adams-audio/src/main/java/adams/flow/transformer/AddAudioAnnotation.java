@@ -14,7 +14,7 @@
  */
 
 /*
- * AddAudioTrailStep.java
+ * AddAudioAnnotation.java
  * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
  */
 
@@ -23,22 +23,22 @@ package adams.flow.transformer;
 import adams.core.QuickInfoHelper;
 import adams.core.base.BaseDateTimeMsec;
 import adams.core.base.BaseKeyValuePair;
-import adams.data.audiotrail.AudioStep;
-import adams.data.audiotrail.AudioTrail;
+import adams.data.audioannotations.AudioAnnotation;
+import adams.data.audioannotations.AudioAnnotations;
 import adams.flow.core.Token;
 
 /**
  <!-- globalinfo-start -->
- * Adds a step to the audio trail passing through.
+ * Adds an annotation the audio annotations passing through.
  * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
  * Input&#47;output:<br>
  * - accepts:<br>
- * &nbsp;&nbsp;&nbsp;adams.data.audiotrail.AudioTrail<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.audioannotations.AudioAnnotations<br>
  * - generates:<br>
- * &nbsp;&nbsp;&nbsp;adams.data.audiotrail.AudioTrail<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.audioannotations.AudioAnnotations<br>
  * <br><br>
  <!-- flow-summary-end -->
  *
@@ -89,7 +89,7 @@ import adams.flow.core.Token;
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
-public class AddAudioTrailStep
+public class AddAudioAnnotation
   extends AbstractTransformer {
 
   /** for serialization. */
@@ -108,7 +108,7 @@ public class AddAudioTrailStep
    */
   @Override
   public String globalInfo() {
-    return "Adds a step to the audio trail passing through.";
+    return "Adds an annotation to the audio annotations passing through.";
   }
 
   /**
@@ -201,7 +201,7 @@ public class AddAudioTrailStep
    * @return		the Class of objects that can be processed
    */
   public Class[] accepts() {
-    return new Class[]{AudioTrail.class};
+    return new Class[]{AudioAnnotations.class};
   }
 
   /**
@@ -211,7 +211,7 @@ public class AddAudioTrailStep
    */
   @Override
   public Class[] generates() {
-    return new Class[]{AudioTrail.class};
+    return new Class[]{AudioAnnotations.class};
   }
 
   /**
@@ -221,11 +221,11 @@ public class AddAudioTrailStep
    */
   @Override
   protected String doExecute() {
-    AudioTrail 	trail;
-    AudioStep   step;
+    AudioAnnotations trail;
+    AudioAnnotation step;
 
-    trail = (AudioTrail) m_InputToken.getPayload();
-    step = new AudioStep(m_Timestamp.dateValue());
+    trail = (AudioAnnotations) m_InputToken.getPayload();
+    step = new AudioAnnotation(m_Timestamp.dateValue());
     for (BaseKeyValuePair pair: m_MetaData)
       step.addMetaData(pair.getPairKey(), pair.getPairValue());
     trail.add(step);

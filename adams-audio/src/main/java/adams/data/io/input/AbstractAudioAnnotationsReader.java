@@ -14,40 +14,31 @@
  */
 
 /*
- * AbstractAudioTrailWriter.java
+ * AbstractAudioAnnotationsReader.java
  * Copyright (C) 2018 University of Waikato, Hamilton, NZ
  */
 
-package adams.data.io.output;
+package adams.data.io.input;
 
 import adams.core.ClassLister;
-import adams.data.audiotrail.AudioTrail;
+import adams.data.audioannotations.AudioAnnotations;
 
 /**
- * Ancestor for trail writers.
+ * Ancestor of annotations readers.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public abstract class AbstractAudioTrailWriter
-  extends AbstractDataContainerWriter<AudioTrail> {
+public abstract class AbstractAudioAnnotationsReader
+  extends AbstractDataContainerReader<AudioAnnotations> {
 
-  private static final long serialVersionUID = -6258698538028259568L;
-
-  /**
-   * Initializes the members.
-   */
-  @Override
-  protected void initialize() {
-    super.initialize();
-    m_OutputIsFile = true;
-  }
+  private static final long serialVersionUID = 6359759819108867894L;
 
   /**
-   * Returns a list with classnames of writers.
+   * Returns a list with classnames of readers.
    *
-   * @return the writer classnames
+   * @return		the reader classnames
    */
-  public static String[] getWriters() {
-    return ClassLister.getSingleton().getClassnames(AbstractAudioTrailWriter.class);
+  public static String[] getReaders() {
+    return ClassLister.getSingleton().getClassnames(AbstractAudioAnnotationsReader.class);
   }
 }

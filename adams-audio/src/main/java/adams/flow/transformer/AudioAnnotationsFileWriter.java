@@ -14,25 +14,30 @@
  */
 
 /*
- * NewAudioTrail.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * AudioAnnotationsFileWriter.java
+ * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
  */
-package adams.flow.source;
 
-import adams.core.QuickInfoHelper;
-import adams.data.audiotrail.AudioTrail;
-import adams.flow.core.Token;
+package adams.flow.transformer;
+
+import adams.data.audioannotations.AudioAnnotations;
+import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.output.SimpleAudioAnnotationsWriter;
 
 /**
  <!-- globalinfo-start -->
- * Generates an empty trail with the specified dimensions.
+ * Saves audio annotations to disk with the specified writer and passes the absolute filename on.<br>
+ * As filename&#47;directory name (depending on the writer) the ID of the trail is used (below the specified output directory).
  * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
  * Input&#47;output:<br>
- * - generates:<br>
+ * - accepts:<br>
  * &nbsp;&nbsp;&nbsp;adams.data.trail.Trail<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.trail.Trail[]<br>
+ * - generates:<br>
+ * &nbsp;&nbsp;&nbsp;java.lang.String<br>
  * <br><br>
  <!-- flow-summary-end -->
  *
@@ -44,7 +49,7 @@ import adams.flow.core.Token;
  * 
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
- * &nbsp;&nbsp;&nbsp;default: NewTrail
+ * &nbsp;&nbsp;&nbsp;default: TrailFileWriter
  * </pre>
  * 
  * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
@@ -69,23 +74,36 @@ import adams.flow.core.Token;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
- * <pre>-id &lt;java.lang.String&gt; (property: ID)
- * &nbsp;&nbsp;&nbsp;The ID of the trail; ignored if empty.
- * &nbsp;&nbsp;&nbsp;default: 
+ * <pre>-writer &lt;adams.data.io.output.AbstractDataContainerWriter&gt; (property: writer)
+ * &nbsp;&nbsp;&nbsp;The writer to use for saving the data.
+ * &nbsp;&nbsp;&nbsp;default: adams.data.io.output.SimpleTrailWriter
  * </pre>
- *
+ * 
+ * <pre>-dir &lt;adams.core.io.PlaceholderDirectory&gt; (property: outputDir)
+ * &nbsp;&nbsp;&nbsp;The output directory for the data.
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
+ * </pre>
+ * 
+ * <pre>-file-name-generation &lt;AUTOMATIC|DATABASE_ID|ID|SUPPLIED&gt; (property: fileNameGeneration)
+ * &nbsp;&nbsp;&nbsp;Defines how to generate the file name.
+ * &nbsp;&nbsp;&nbsp;default: AUTOMATIC
+ * </pre>
+ * 
+ * <pre>-supplied-file-name &lt;java.lang.String&gt; (property: suppliedFileName)
+ * &nbsp;&nbsp;&nbsp;The file name (without path) to use when using SUPPLIED (including extension
+ * &nbsp;&nbsp;&nbsp;).
+ * &nbsp;&nbsp;&nbsp;default: out.trail
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
-public class NewAudioTrail
-  extends AbstractSimpleSource {
+public class AudioAnnotationsFileWriter
+  extends AbstractDataContainerFileWriter<AudioAnnotations> {
 
   /** for serialization. */
-  private static final long serialVersionUID = -5718059337341470131L;
-
-  /** the ID of the trail. */
-  protected String m_ID;
+  private static final long serialVersionUID = -7990944411836957831L;
 
   /**
    * Returns a string describing the object.
@@ -94,84 +112,30 @@ public class NewAudioTrail
    */
   @Override
   public String globalInfo() {
-    return "Generates an empty audio trail.";
+    return
+        "Saves audio annotations to disk with the "
+      + "specified writer and passes the absolute filename on.\n"
+      + "As filename/directory name (depending on the writer) the "
+      + "ID of the annotations is used (below the specified output directory).";
   }
 
   /**
-   * Adds options to the internal list of options.
+   * Returns the default writer to use.
+   *
+   * @return		the default writer
    */
   @Override
-  public void defineOptions() {
-    super.defineOptions();
-
-    m_OptionManager.add(
-      "id", "ID",
-      "");
+  protected AbstractDataContainerWriter<AudioAnnotations> getDefaultWriter() {
+    return new SimpleAudioAnnotationsWriter();
   }
 
   /**
-   * Returns a quick info about the actor, which will be displayed in the GUI.
+   * Returns the data container class in use.
    *
-   * @return		null if no info available, otherwise short string
+   * @return		the container class
    */
   @Override
-  public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "ID", (m_ID.isEmpty() ? "-none-" : m_ID), "ID: ");
-  }
-
-  /**
-   * Sets the ID of the trail.
-   *
-   * @param value	the ID
-   */
-  public void setID(String value) {
-    m_ID = value;
-    reset();
-  }
-
-  /**
-   * Returns the ID of the trail.
-   *
-   * @return		the ID
-   */
-  public String getID() {
-    return m_ID;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String IDTipText() {
-    return "The ID of the audio trail; ignored if empty.";
-  }
-
-  /**
-   * Returns a string describing the object.
-   *
-   * @return 			a description suitable for displaying in the gui
-   */
-  @Override
-  public Class[] generates() {
-    return new Class[]{AudioTrail.class};
-  }
-
-  /**
-   * Executes the flow item.
-   *
-   * @return		null if everything is fine, otherwise error message
-   */
-  @Override
-  protected String doExecute() {
-    AudioTrail	trail;
-
-    trail = new AudioTrail();
-    if (!m_ID.isEmpty())
-      trail.setID(m_ID);
-    m_OutputToken = new Token(trail);
-
-    return null;
+  protected Class getDataContainerClass() {
+    return AudioAnnotations.class;
   }
 }

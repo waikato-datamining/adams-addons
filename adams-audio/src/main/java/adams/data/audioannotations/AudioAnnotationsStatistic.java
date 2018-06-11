@@ -14,11 +14,11 @@
  */
 
 /*
- * AudioTrailStatistic.java
+ * AudioAnnotationsStatistic.java
  * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
  */
 
-package adams.data.audiotrail;
+package adams.data.audioannotations;
 
 import adams.data.statistics.AbstractDataStatistic;
 import adams.data.statistics.StatUtils;
@@ -27,12 +27,12 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Statistical information specific to an audio trail.
+ * Statistical information specific to a audio annotations.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
-public class AudioTrailStatistic
-  extends AbstractDataStatistic<AudioTrail> {
+public class AudioAnnotationsStatistic
+  extends AbstractDataStatistic<AudioAnnotations> {
 
   /** for serialization. */
   private static final long serialVersionUID = -2482267274581297567L;
@@ -49,7 +49,7 @@ public class AudioTrailStatistic
   /**
    * Initializes the statistic.
    */
-  public AudioTrailStatistic() {
+  public AudioAnnotationsStatistic() {
     super();
   }
 
@@ -58,7 +58,7 @@ public class AudioTrailStatistic
    *
    * @param data	the trail to generate the statistics for
    */
-  public AudioTrailStatistic(AudioTrail data) {
+  public AudioAnnotationsStatistic(AudioAnnotations data) {
     super(data);
   }
 
@@ -87,7 +87,7 @@ public class AudioTrailStatistic
    * @param value	the trail to use, can be null
    */
   @Override
-  public void setData(AudioTrail value) {
+  public void setData(AudioAnnotations value) {
     m_Calculated = false;
     m_Data       = value;
   }
@@ -98,7 +98,7 @@ public class AudioTrailStatistic
    * @return		the trail, can be null
    */
   @Override
-  public AudioTrail getData() {
+  public AudioAnnotations getData() {
     return m_Data;
   }
 
@@ -116,7 +116,7 @@ public class AudioTrailStatistic
    */
   @Override
   protected void calculate() {
-    List<AudioStep> 		points;
+    List<AudioAnnotation> 		points;
     int			i;
     Long[] 		deltaTimestamp;
     Date 		firstTimestamp;
