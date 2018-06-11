@@ -32,7 +32,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineEvent;
-import javax.sound.sampled.LineEvent.Type;
 import javax.sound.sampled.LineListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -129,9 +128,7 @@ public class AudioPlaybackPanel
 
     m_ButtonPauseResume = new JButton(GUIHelper.getIcon("pause.gif"));
     m_ButtonPauseResume.addActionListener((ActionEvent e) -> pauseOrResume());
-    /* doesn't work yet
     panel.add(m_ButtonPauseResume);
-    */
 
     m_ButtonStop = new JButton(GUIHelper.getIcon("stop_blue.gif"));
     m_ButtonStop.addActionListener((ActionEvent e) -> stop());
@@ -346,8 +343,6 @@ public class AudioPlaybackPanel
    * @param  event a line event that describes the change
    */
   public void update(LineEvent event) {
-    if (event.getType() == Type.STOP)
-      stop();
   }
 
   /**
