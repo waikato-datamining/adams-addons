@@ -127,9 +127,9 @@ public class AudioPlaybackPanel
     m_ButtonStart.addActionListener((ActionEvent e) -> start());
     panel.add(m_ButtonStart);
 
-    /* doesn't work yet
     m_ButtonPauseResume = new JButton(GUIHelper.getIcon("pause.gif"));
     m_ButtonPauseResume.addActionListener((ActionEvent e) -> pauseOrResume());
+    /* doesn't work yet
     panel.add(m_ButtonPauseResume);
     */
 
