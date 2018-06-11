@@ -32,8 +32,7 @@ import java.util.List;
 
 /**
  <!-- globalinfo-start -->
- * Writes audio trails in the simple CSV-like format.<br>
- * The report data is prefixed with '# ' and the background is prefixed with '% '.
+ * Writes audio annotations in simple CSV-like format.<br>
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -68,8 +67,8 @@ public class SimpleAudioAnnotationsWriter
   @Override
   public String globalInfo() {
     return
-      "Writes audio annotations in the simple CSV-like format.\n"
-	+ "The report comes before the actual trail data.\n"
+      "Writes audio annotations in simple CSV-like format.\n"
+	+ "The report comes before the actual annotation data.\n"
 	+ "The report data is prefixed with '" + COMMENT + "'.";
   }
 
@@ -90,7 +89,7 @@ public class SimpleAudioAnnotationsWriter
    */
   @Override
   public String[] getFormatExtensions() {
-    return new String[]{"audiotrail"};
+    return new String[]{"aua"};
   }
 
   /**
