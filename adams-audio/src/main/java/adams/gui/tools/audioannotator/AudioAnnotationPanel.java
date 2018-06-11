@@ -22,8 +22,8 @@ package adams.gui.tools.audioannotator;
 
 import adams.data.audioannotations.AudioAnnotation;
 import adams.gui.action.AbstractBaseAction;
+import adams.gui.audio.AudioPlaybackPanel;
 import adams.gui.core.BasePanel;
-import adams.gui.visualization.audio.AudioPlaybackPanel;
 
 import javax.swing.JButton;
 import javax.swing.KeyStroke;

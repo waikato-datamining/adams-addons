@@ -30,6 +30,7 @@ import adams.data.io.output.AbstractDataContainerWriter;
 import adams.data.io.output.SpreadSheetWriter;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.gui.action.AbstractBaseAction;
+import adams.gui.audio.AudioPlaybackPanel;
 import adams.gui.chooser.AudioAnnotationsFileChooser;
 import adams.gui.chooser.BaseFileChooser;
 import adams.gui.chooser.SpreadSheetFileChooser;
@@ -42,7 +43,6 @@ import adams.gui.core.TitleGenerator;
 import adams.gui.dialog.ApprovalDialog;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
-import adams.gui.visualization.audio.AudioPlaybackPanel;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;

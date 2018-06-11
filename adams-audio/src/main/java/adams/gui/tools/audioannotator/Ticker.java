@@ -20,7 +20,7 @@
 
 package adams.gui.tools.audioannotator;
 
-import adams.gui.visualization.audio.AudioPlaybackPanel;
+import adams.gui.audio.AudioPlaybackPanel;
 
 import java.util.ArrayList;
 import java.util.Date;

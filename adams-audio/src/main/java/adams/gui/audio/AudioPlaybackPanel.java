@@ -18,7 +18,7 @@
  * Copyright (C) 2018 University of Waikato, Hamilton, NZ
  */
 
-package adams.gui.visualization.audio;
+package adams.gui.audio;
 
 import adams.core.CleanUpHandler;
 import adams.core.Utils;
@@ -32,16 +32,16 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineEvent.Type;
 import javax.sound.sampled.LineListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Simple audio playback panel.
@@ -200,16 +200,10 @@ public class AudioPlaybackPanel
       m_Clip = (Clip) AudioSystem.getLine(info);
       m_Clip.addLineListener(this);
       m_Clip.open(ais);
-      m_Clip.start();
-      m_RefreshTimer = new Timer();
-      m_RefreshTimer.schedule(new TimerTask() {
-	@Override
-	public void run() {
-	  update();
-	}
-      }, 0, 500);
+      m_RefreshTimer = new Timer(200, (ActionEvent e) -> updateTime());
       m_Playing = true;
       m_Paused  = false;
+      m_Clip.start();
     }
     catch (Exception e) {
       GUIHelper.showErrorMessage(this, "Failed to playback file: " + getCurrentFile(), e);
@@ -252,7 +246,7 @@ public class AudioPlaybackPanel
       m_Clip = null;
     }
     if (m_RefreshTimer != null) {
-      m_RefreshTimer.cancel();
+      m_RefreshTimer.stop();
       m_RefreshTimer = null;
     }
     m_ButtonPauseResume.setIcon(GUIHelper.getIcon("pause.gif"));
@@ -343,6 +337,14 @@ public class AudioPlaybackPanel
    * @param  event a line event that describes the change
    */
   public void update(LineEvent event) {
+    if (event.getType() == Type.START) {
+      if (m_RefreshTimer != null)
+	m_RefreshTimer.start();
+    }
+    else if (event.getType() == Type.STOP) {
+      if (m_RefreshTimer != null)
+	m_RefreshTimer.stop();
+    }
   }
 
   /**
