@@ -94,9 +94,6 @@ public class AudioPlaybackPanel
   /** timer for refreshing the playback time. */
   protected Timer m_RefreshTimer;
 
-  /** whether to ignore change events to the slider. */
-  protected boolean m_IgnoreSliderChange;
-
   /**
    * Initializes the members.
    */
@@ -104,13 +101,12 @@ public class AudioPlaybackPanel
   protected void initialize() {
     super.initialize();
 
-    m_Playing            = false;
-    m_Paused             = false;
-    m_CurrentFile        = null;
-    m_Clip               = null;
-    m_FileChooser        = new AudioFileChooser();
-    m_RefreshTimer       = null;
-    m_IgnoreSliderChange = false;
+    m_Playing      = false;
+    m_Paused       = false;
+    m_CurrentFile  = null;
+    m_Clip         = null;
+    m_FileChooser  = new AudioFileChooser();
+    m_RefreshTimer = null;
   }
 
   /**
@@ -129,8 +125,19 @@ public class AudioPlaybackPanel
     m_Slider.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     m_Slider.setMinimum(0);
     m_Slider.addChangeListener((ChangeEvent e) -> {
-      if (!m_IgnoreSliderChange)
-	updateTime();
+      if (m_Slider.getValueIsAdjusting()) {
+        if (m_Clip.isRunning())
+          m_Clip.stop();
+	m_Clip.setMicrosecondPosition(m_Slider.getValue() * 1000);
+      }
+      else {
+        if ((m_Clip != null) && !m_Clip.isRunning()) {
+	  m_Clip.setMicrosecondPosition(m_Slider.getValue() * 1000);
+	  if (!isPaused())
+	    m_Clip.start();
+	}
+      }
+      updateTime(false);
     });
     add(m_Slider, BorderLayout.NORTH);
 
@@ -222,7 +229,7 @@ public class AudioPlaybackPanel
       m_Clip = (Clip) AudioSystem.getLine(info);
       m_Clip.addLineListener(this);
       m_Clip.open(ais);
-      m_RefreshTimer = new Timer(200, (ActionEvent e) -> updateTime());
+      m_RefreshTimer = new Timer(200, (ActionEvent e) -> updateTime(true));
       m_Playing = true;
       m_Paused  = false;
       m_Slider.setMinimum(0);
@@ -265,9 +272,6 @@ public class AudioPlaybackPanel
   public void stop() {
     m_Playing = false;
     m_Paused  = false;
-    m_IgnoreSliderChange = true;
-    SwingUtilities.invokeLater(() -> m_Slider.setValue(0));
-    SwingUtilities.invokeLater(() -> m_IgnoreSliderChange = false);
     if (m_Clip != null) {
       m_Clip.removeLineListener(this);
       m_Clip.close();
@@ -278,7 +282,8 @@ public class AudioPlaybackPanel
       m_RefreshTimer = null;
     }
     m_ButtonPauseResume.setIcon(GUIHelper.getIcon("pause.gif"));
-    update();
+    resetTime();
+    updateButtons();
   }
 
   /**
@@ -311,9 +316,21 @@ public class AudioPlaybackPanel
   }
 
   /**
-   * Updates the displayed time.
+   * Resets the time/slider.
+   *
+   * @see #NO_TIME
    */
-  protected void updateTime() {
+  protected void resetTime() {
+    m_Slider.setValue(0);
+    m_LabelTime.setText(NO_TIME);
+  }
+
+  /**
+   * Updates the displayed time.
+   *
+   * @param updateSlider 	whether to update the slider
+   */
+  protected void updateTime(boolean updateSlider) {
     int		current;
     int		hours;
     int		mins;
@@ -321,13 +338,7 @@ public class AudioPlaybackPanel
     int 	msecs;
     int		time;
 
-    if (!isPlaying()) {
-      m_IgnoreSliderChange = true;
-      SwingUtilities.invokeLater(() -> m_Slider.setValue(0));
-      SwingUtilities.invokeLater(() -> m_IgnoreSliderChange = false);
-      m_LabelTime.setText(NO_TIME);
-    }
-    else {
+    if (m_Clip != null) {
       current = (int) m_Clip.getMicrosecondPosition() / 1000;
       time    = current / 1000;
       hours   = time / 3600;
@@ -335,9 +346,8 @@ public class AudioPlaybackPanel
       mins    = time / 60;
       secs    = time % 60;
       msecs   = current % 1000;
-      m_IgnoreSliderChange = true;
-      SwingUtilities.invokeLater(() -> m_Slider.setValue(current));
-      SwingUtilities.invokeLater(() -> m_IgnoreSliderChange = false);
+      if (updateSlider)
+	SwingUtilities.invokeLater(() -> m_Slider.setValue(current));
       SwingUtilities.invokeLater(() -> {
 	m_LabelTime.setText(
 	  Utils.padLeft("" + hours, '0', 2)
@@ -367,7 +377,7 @@ public class AudioPlaybackPanel
    * Updates buttons and time.
    */
   protected void update() {
-    updateTime();
+    updateTime(true);
     updateButtons();
   }
 
@@ -386,6 +396,10 @@ public class AudioPlaybackPanel
     else if (event.getType() == Type.STOP) {
       if (m_RefreshTimer != null)
 	m_RefreshTimer.stop();
+      if (m_Clip.getMicrosecondLength() == m_Clip.getMicrosecondPosition())
+        stop();
+      else
+	update();
     }
   }
 
