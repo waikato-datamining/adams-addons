@@ -69,7 +69,7 @@ public class AudioAnnotator
   public void launch() {
     AudioAnnotatorPanel panel = new AudioAnnotatorPanel();
     panel.setTitle(getTitle());
-    createChildFrame(panel, new Dimension(400, 150));
+    createChildFrame(panel, new Dimension(400, 180));
   }
 
   /**

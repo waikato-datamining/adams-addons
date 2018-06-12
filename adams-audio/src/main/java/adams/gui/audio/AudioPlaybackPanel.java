@@ -34,10 +34,14 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineEvent.Type;
 import javax.sound.sampled.LineListener;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -69,6 +73,9 @@ public class AudioPlaybackPanel
   /** the text displaying the time. */
   protected JLabel m_LabelTime;
 
+  /** the slider for the current position. */
+  protected JSlider m_Slider;
+
   /** whether audio is being played back. */
   protected boolean m_Playing;
 
@@ -87,6 +94,9 @@ public class AudioPlaybackPanel
   /** timer for refreshing the playback time. */
   protected Timer m_RefreshTimer;
 
+  /** whether to ignore change events to the slider. */
+  protected boolean m_IgnoreSliderChange;
+
   /**
    * Initializes the members.
    */
@@ -94,12 +104,13 @@ public class AudioPlaybackPanel
   protected void initialize() {
     super.initialize();
 
-    m_Playing      = false;
-    m_Paused       = false;
-    m_CurrentFile  = null;
-    m_Clip         = null;
-    m_FileChooser  = new AudioFileChooser();
-    m_RefreshTimer = null;
+    m_Playing            = false;
+    m_Paused             = false;
+    m_CurrentFile        = null;
+    m_Clip               = null;
+    m_FileChooser        = new AudioFileChooser();
+    m_RefreshTimer       = null;
+    m_IgnoreSliderChange = false;
   }
 
   /**
@@ -113,8 +124,19 @@ public class AudioPlaybackPanel
 
     setLayout(new BorderLayout());
 
+    // slider
+    m_Slider = new JSlider();
+    m_Slider.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    m_Slider.setMinimum(0);
+    m_Slider.addChangeListener((ChangeEvent e) -> {
+      if (!m_IgnoreSliderChange)
+	updateTime();
+    });
+    add(m_Slider, BorderLayout.NORTH);
+
     // time
     m_LabelTime = new JLabel(NO_TIME);
+    m_LabelTime.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     m_LabelTime.setFont(m_LabelTime.getFont().deriveFont(m_LabelTime.getFont().getSize() * 2.0f));
     add(m_LabelTime, BorderLayout.CENTER);
 
@@ -203,7 +225,10 @@ public class AudioPlaybackPanel
       m_RefreshTimer = new Timer(200, (ActionEvent e) -> updateTime());
       m_Playing = true;
       m_Paused  = false;
+      m_Slider.setMinimum(0);
+      m_Slider.setMaximum((int) (m_Clip.getMicrosecondLength() / 1000));
       m_Clip.start();
+      m_Slider.setValue(0);
     }
     catch (Exception e) {
       GUIHelper.showErrorMessage(this, "Failed to playback file: " + getCurrentFile(), e);
@@ -240,6 +265,9 @@ public class AudioPlaybackPanel
   public void stop() {
     m_Playing = false;
     m_Paused  = false;
+    m_IgnoreSliderChange = true;
+    SwingUtilities.invokeLater(() -> m_Slider.setValue(0));
+    SwingUtilities.invokeLater(() -> m_IgnoreSliderChange = false);
     if (m_Clip != null) {
       m_Clip.removeLineListener(this);
       m_Clip.close();
@@ -286,26 +314,40 @@ public class AudioPlaybackPanel
    * Updates the displayed time.
    */
   protected void updateTime() {
+    int		current;
     int		hours;
     int		mins;
-    int		secs;
+    int  	secs;
+    int 	msecs;
     int		time;
 
-    if (!isPlaying() || isPaused()) {
+    if (!isPlaying()) {
+      m_IgnoreSliderChange = true;
+      SwingUtilities.invokeLater(() -> m_Slider.setValue(0));
+      SwingUtilities.invokeLater(() -> m_IgnoreSliderChange = false);
       m_LabelTime.setText(NO_TIME);
     }
     else {
-      time  = (int) m_Clip.getMicrosecondPosition() / 1000000;
-      hours = time / 3600;
-      time  = time % 3600;
-      mins  = time / 60;
-      secs  = time % 60;
-      m_LabelTime.setText(
-	Utils.padLeft("" + hours, '0', 2)
-	  + ":"
-	  + Utils.padLeft("" + mins, '0', 2)
-	  + ":"
-	  + Utils.padLeft("" + secs, '0', 2));
+      current = (int) m_Clip.getMicrosecondPosition() / 1000;
+      time    = current / 1000;
+      hours   = time / 3600;
+      time    = time % 3600;
+      mins    = time / 60;
+      secs    = time % 60;
+      msecs   = current % 1000;
+      m_IgnoreSliderChange = true;
+      SwingUtilities.invokeLater(() -> m_Slider.setValue(current));
+      SwingUtilities.invokeLater(() -> m_IgnoreSliderChange = false);
+      SwingUtilities.invokeLater(() -> {
+	m_LabelTime.setText(
+	  Utils.padLeft("" + hours, '0', 2)
+	    + ":"
+	    + Utils.padLeft("" + mins, '0', 2)
+	    + ":"
+	    + Utils.padLeft("" + secs, '0', 2)
+	    + "."
+	    + Utils.padLeft("" + msecs, '0', 3));
+      });
     }
   }
 
