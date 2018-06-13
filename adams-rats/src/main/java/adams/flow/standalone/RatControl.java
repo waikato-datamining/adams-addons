@@ -15,7 +15,7 @@
 
 /*
  * RatControl.java
- * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
@@ -40,6 +40,7 @@ import adams.gui.core.ParameterPanel;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -195,13 +196,23 @@ public class RatControl
      * Pauses/resumes the processor applier.
      */
     public void pauseOrResume() {
+      SwingWorker	worker;
+
       if (m_Actor == null)
 	return;
-      if (m_Actor.isPaused())
-	m_Actor.resumeExecution();
-      else
-	m_Actor.pauseExecution();
-      updateButtons();
+
+      worker = new SwingWorker() {
+	@Override
+	protected Object doInBackground() throws Exception {
+	  if (m_Actor.isPaused())
+	    m_Actor.resumeExecution();
+	  else
+	    m_Actor.pauseExecution();
+	  updateButtons();
+	  return null;
+	}
+      };
+      worker.execute();
     }
     
     /**
@@ -210,6 +221,7 @@ public class RatControl
     public void updateButtons() {
       if (m_Actor == null)
 	return;
+      m_ButtonPauseResume.setEnabled(true);
       if (m_Actor.isPaused())
 	m_ButtonPauseResume.setIcon(GUIHelper.getIcon("resume.gif"));
       else
@@ -277,28 +289,30 @@ public class RatControl
     
     /**
      * Stops/starts the rat.
-     *
-     * @return		null if successful, otherwise error message
      */
-    public String stopOrStart() {
-      String	result;
+    public void stopOrStart() {
+      SwingWorker	worker;
 
       if (m_Actor == null)
-	return null;
+	return;
 
-      result = null;
-      if (m_Actor.isRunnableActive()) {
-        m_Actor.stopRunnable();
-      }
-      else {
-        if (m_Actor.getInitialState() == RatState.PAUSED)
-          m_Actor.setInitialState(RatState.RUNNING);
-        result = m_Actor.startRunnable();
-      }
-
-      updateButtons();
-
-      return result;
+      worker = new SwingWorker() {
+	@Override
+	protected Object doInBackground() throws Exception {
+	  m_ButtonStopStart.setEnabled(false);
+	  if (m_Actor.isRunnableActive()) {
+	    m_Actor.stopRunnable();
+	  }
+	  else {
+	    if (m_Actor.getInitialState() == RatState.PAUSED)
+	      m_Actor.setInitialState(RatState.RUNNING);
+	    m_Actor.startRunnable();
+	  }
+	  updateButtons();
+	  return null;
+	}
+      };
+      worker.execute();
     }
     
     /**
@@ -314,6 +328,7 @@ public class RatControl
       else
 	m_ButtonPauseResume.setIcon(GUIHelper.getIcon("pause.gif"));
 
+      m_ButtonStopStart.setEnabled(true);
       if (m_Actor.isRunnableActive())
 	m_ButtonStopStart.setIcon(GUIHelper.getIcon("stop_blue.gif"));
       else
