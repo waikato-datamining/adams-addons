@@ -26,6 +26,8 @@ import adams.flow.core.Token;
 import adams.flow.standalone.Rat;
 import adams.flow.standalone.rats.input.PollingRatInput;
 
+import java.util.logging.Level;
+
 /**
  * Runnable class for Rat used in a thread.
  *
@@ -162,7 +164,7 @@ public class RatRunnable
 	        if (m_Owner.getPerformLazySetup() && !m_Owner.hasLazySetupPerformed()) {
 		  result = m_Owner.lazySetup();
 		  if (result != null)
-		    getOwner().log(result, "lazy setup");
+		    getOwner().getLogger().log(Level.SEVERE, result);
 		}
 	        if (result == null) {
 		  m_Owner.getActorHandler().input(new Token(data));
