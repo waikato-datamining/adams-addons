@@ -159,8 +159,11 @@ public class RatRunnable
 	    if (m_HasActors) {
 	      if (data != null) {
 	        // delayed setup?
-	        if (m_Owner.getPerformLazySetup() && !m_Owner.hasLazySetupPerformed())
-	          result = m_Owner.lazySetup();
+	        if (m_Owner.getPerformLazySetup() && !m_Owner.hasLazySetupPerformed()) {
+		  result = m_Owner.lazySetup();
+		  if (result != null)
+		    getOwner().log(result, "lazy setup");
+		}
 	        if (result == null) {
 		  m_Owner.getActorHandler().input(new Token(data));
 		  result = m_Owner.getActorHandler().execute();
