@@ -38,7 +38,7 @@ public class BindingParameterPanel extends ParameterPanel {
 
   private static final long serialVersionUID = -3909613160168503521L;
 
-  private static final int DEFAULT_TIMEOUT = 1000;
+  private static final int DEFAULT_TIMEOUT = 250;
 
   /** a text field for the name */
   protected JTextField m_NameField;
