@@ -15,12 +15,12 @@
 
 /*
  * TickEvent.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.tools.audioannotator;
 
-import java.util.Date;
+import adams.core.TimeMsec;
 
 /**
  * A Tick event to alert listeners and pass the timestamp through to them.
@@ -30,13 +30,13 @@ import java.util.Date;
 public class TickEvent {
 
   /** the timestamp */
-  protected Date m_TimeStamp;
+  protected TimeMsec m_TimeStamp;
 
   /**
    * Constructor for the basic tick event
    * @param time the timestamp to be passed to the listener
    */
-  public TickEvent(Date time) {
+  public TickEvent(TimeMsec time) {
     m_TimeStamp = time;
   }
 
@@ -44,7 +44,7 @@ public class TickEvent {
    * A getter for the timestamp
    * @return the timestamp
    */
-  public Date getTimeStamp() {
+  public TimeMsec getTimeStamp() {
     return m_TimeStamp;
   }
 

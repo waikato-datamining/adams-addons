@@ -20,10 +20,10 @@
 
 package adams.gui.tools.audioannotator;
 
+import adams.core.TimeMsec;
 import adams.gui.audio.AudioPlaybackPanel;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -112,7 +112,7 @@ public class Ticker {
       long msec = m_AudioPlayer.getTimestamp();
       if (msec == -1 || !m_AudioPlayer.isPlaying())
 	return;
-      Date timeStamp = new Date(msec);
+      TimeMsec timeStamp = new TimeMsec(msec);
       TickEvent tickEvent = new TickEvent(timeStamp);
       for (TickListener listener : m_Listeners) {
 	listener.tickHappened(tickEvent);

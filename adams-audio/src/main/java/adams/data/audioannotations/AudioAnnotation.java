@@ -22,10 +22,10 @@ package adams.data.audioannotations;
 
 import adams.core.DateFormat;
 import adams.core.DateUtils;
+import adams.core.TimeMsec;
 import adams.data.container.AbstractDataPoint;
 import adams.data.container.DataPoint;
 
-import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -39,7 +39,7 @@ public class AudioAnnotation
   private static final long serialVersionUID = 7649750314026526010L;
 
   /** the timestamp of the step. */
-  protected Date m_Timestamp;
+  protected TimeMsec m_Timestamp;
 
   /** the optional meta-data. */
   protected HashMap<String,Object> m_MetaData;
@@ -54,7 +54,7 @@ public class AudioAnnotation
    * Initializes the step with default values.
    */
   public AudioAnnotation() {
-    this(new Date(), null);
+    this(new TimeMsec(), null);
   }
 
   /**
@@ -62,8 +62,8 @@ public class AudioAnnotation
    *
    * @param timestamp	the timestamp
    */
-  public AudioAnnotation(Date timestamp) {
-    this(new Date(), null);
+  public AudioAnnotation(TimeMsec timestamp) {
+    this(new TimeMsec(), null);
   }
 
   /**
@@ -72,9 +72,9 @@ public class AudioAnnotation
    * @param timestamp	the timestamp
    * @param metaData	the meta-data, can be null
    */
-  public AudioAnnotation(Date timestamp, HashMap<String,Object> metaData) {
+  public AudioAnnotation(TimeMsec timestamp, HashMap<String,Object> metaData) {
     super();
-    m_Timestamp = new Date(timestamp.getTime());
+    m_Timestamp = new TimeMsec(timestamp.getTime());
     m_MetaData  = null;
     if (metaData != null)
       m_MetaData = new HashMap<>(metaData);
@@ -101,8 +101,8 @@ public class AudioAnnotation
    *
    * @param value	the timestamp
    */
-  public void setTimestamp(Date value) {
-    m_Timestamp = new Date(value.getTime());
+  public void setTimestamp(TimeMsec value) {
+    m_Timestamp = new TimeMsec(value.getTime());
   }
 
   /**
@@ -110,7 +110,7 @@ public class AudioAnnotation
    *
    * @return		the timestamp
    */
-  public Date getTimestamp() {
+  public TimeMsec getTimestamp() {
     return m_Timestamp;
   }
 

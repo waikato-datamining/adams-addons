@@ -133,7 +133,6 @@ public class SimpleAudioAnnotationsWriter
     sheet = trail.toSpreadSheet();
     writer = new CsvSpreadSheetWriter();
     writer.setTimeMsecFormat(new DateFormatString(Constants.TIME_FORMAT_MSECS));
-    //writer.setTimeZone(TimeZone.getTimeZone("GMT"));
     writer.setMissingValue("");
     result = writer.write(sheet, swriter);
 

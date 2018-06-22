@@ -21,6 +21,7 @@
 package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
+import adams.core.TimeMsec;
 import adams.core.base.BaseDateTimeMsec;
 import adams.core.base.BaseKeyValuePair;
 import adams.data.audioannotations.AudioAnnotation;
@@ -225,7 +226,7 @@ public class AddAudioAnnotation
     AudioAnnotation step;
 
     trail = (AudioAnnotations) m_InputToken.getPayload();
-    step = new AudioAnnotation(m_Timestamp.dateValue());
+    step = new AudioAnnotation(new TimeMsec(m_Timestamp.dateValue()));
     for (BaseKeyValuePair pair: m_MetaData)
       step.addMetaData(pair.getPairKey(), pair.getPairValue());
     trail.add(step);

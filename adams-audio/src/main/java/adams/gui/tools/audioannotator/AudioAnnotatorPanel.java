@@ -700,7 +700,7 @@ public class AudioAnnotatorPanel extends BasePanel
    */
   protected void openAnnotations(PlaceholderFile file) {
     List<AudioAnnotations> readTrail;
-    AbstractAudioAnnotationsReader reader = (AbstractAudioAnnotationsReader) m_AnnotationsFileChooser.getReader();
+    AbstractAudioAnnotationsReader reader = (AbstractAudioAnnotationsReader) m_AnnotationsFileChooser.getReaderForFile(file);
 
     reader.setInput(file);
 

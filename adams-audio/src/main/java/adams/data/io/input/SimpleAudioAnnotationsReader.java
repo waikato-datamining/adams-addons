@@ -151,7 +151,6 @@ public class SimpleAudioAnnotationsReader
     reader.setTimeMsecColumns(new Range(Range.FIRST));
     reader.setTimeMsecLenient(true);
     reader.setTimeMsecFormat(new DateFormatString(Constants.TIME_FORMAT_MSECS));
-    //reader.setTimeZone(TimeZone.getTimeZone("GMT"));
     sheet = reader.read(sreader);
     if (sheet == null) {
       getLogger().severe("Failed to read file from: " + m_Input);
@@ -167,7 +166,7 @@ public class SimpleAudioAnnotationsReader
     trail  = new AudioAnnotations();
     for (Row row: sheet.rows()) {
       step = new AudioAnnotation(
-	row.getCell(0).toAnyDateType());
+	row.getCell(0).toTimeMsec());
       // meta-data?
       for (int n: metaCols.keySet()) {
 	if (row.hasCell(n) && !row.getCell(n).isMissing())

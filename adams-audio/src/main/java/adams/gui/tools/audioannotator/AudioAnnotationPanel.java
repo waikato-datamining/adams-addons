@@ -20,6 +20,7 @@
 
 package adams.gui.tools.audioannotator;
 
+import adams.core.TimeMsec;
 import adams.data.audioannotations.AudioAnnotation;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.audio.AudioPlaybackPanel;
@@ -33,7 +34,6 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -96,7 +96,7 @@ public class AudioAnnotationPanel extends BasePanel implements TickListener {
    * Creates a step for a given timestamp and alerts the listeners
    * @param timestamp the timestamp for the step
    */
-  protected void makeStep(Date timestamp) {
+  protected void makeStep(TimeMsec timestamp) {
     HashMap<String,Object> meta = new HashMap<>();
     if (m_IsToggleable)
       meta.put(m_Binding.getName(), (m_Binding.isInverted() ^ m_IsToggled));
@@ -171,7 +171,7 @@ public class AudioAnnotationPanel extends BasePanel implements TickListener {
       m_Action = new AbstractBaseAction(binding.getName()  +  " (" + binding.getBinding() + ")") {
 	@Override
 	protected void doActionPerformed(ActionEvent e) {
-	  Date timestamp = new Date(m_Player.getTimestamp());
+	  TimeMsec timestamp = new TimeMsec(m_Player.getTimestamp());
 	  makeStep(timestamp);
 	}
       };

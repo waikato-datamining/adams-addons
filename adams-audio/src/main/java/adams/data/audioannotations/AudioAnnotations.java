@@ -176,7 +176,7 @@ public class AudioAnnotations
    * @param timestamp 	the timestamp to get the step for
    * @return		the associated step or null if none available for the timestamp
    */
-  public AudioAnnotation getStep(Date timestamp) {
+  public AudioAnnotation getStep(TimeMsec timestamp) {
     AudioAnnotation result;
     int		pos;
 
@@ -222,7 +222,7 @@ public class AudioAnnotations
     // data
     for (AudioAnnotation step: this) {
       row = result.addRow();
-      row.addCell("T").setContent(new TimeMsec(step.getTimestamp()));
+      row.addCell("T").setContent(step.getTimestamp());
       if (step.hasMetaData()) {
 	for (String key: step.getMetaData().keySet())
 	  row.addCell("M-" + key).setNative(step.getMetaData().get(key));
