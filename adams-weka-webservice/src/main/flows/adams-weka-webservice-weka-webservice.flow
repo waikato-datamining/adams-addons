@@ -1,5 +1,6 @@
 # Project: adams
-# Date: 2017-10-30 10:18:28
+# Modules: adams-core,adams-event,adams-ml,adams-net,adams-spreadsheet,adams-visualstats,adams-webservice,adams-weka,adams-weka-webservice
+# Date: 2018-06-25 11:39:09
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "The webservice that allows clients to:\\n- cross-validate classifier setups\\n- train (and cache) classifiers with data\\n- use trained classifiers to make predictions on \\n- evaluate trained classifiers on test data\\n- optimize classifier setup on a dataset (MultiSearch)\\n- train (and cache) clusterers with data\\n- use trained clusterers to cluster data\\n- transform data with a callable transformer" -flow-execution-listener adams.flow.execution.NullListener
@@ -9,7 +10,4 @@ adams.flow.control.Flow -annotation "The webservice that allows clients to:\\n- 
    adams.flow.transformer.WekaFilter -name WekaFilter-1 -filter "weka.filters.unsupervised.attribute.RemoveType -T nominal"
  adams.flow.standalone.LookUpInit -storage-name models
  adams.flow.standalone.WSServer -logging-level INFO -web-service "adams.flow.webservice.weka.WekaServiceWS -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator -out-interceptor adams.flow.webservice.interceptor.outgoing.NullGenerator -implementation \"adams.flow.webservice.weka.SimpleWekaService -storage-name models\""
- adams.flow.source.Start
- adams.flow.control.WhileLoop -name "keep going" -condition adams.flow.condition.bool.True
-  adams.flow.source.Start
-  adams.flow.control.Sleep
+ adams.flow.source.Idle
