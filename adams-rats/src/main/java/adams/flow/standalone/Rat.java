@@ -392,6 +392,10 @@ public class Rat
       false);
 
     m_OptionManager.add(
+      "stopping-timeout", "stoppingTimeout",
+      -1, -1, null);
+
+    m_OptionManager.add(
       "wrapup-after-execution", "wrapUpAfterExecution",
       false);
   }
@@ -979,6 +983,35 @@ public class Rat
    */
   public String finishBeforeStoppingTipText() {
     return m_Actors.finishBeforeStoppingTipText();
+  }
+
+  /**
+   * Sets the timeout for waiting for the sub-flow to stop.
+   *
+   * @param value	timeout in milliseconds (<= 0 for infinity)
+   */
+  public void setStoppingTimeout(int value) {
+    m_Actors.setStoppingTimeout(value);
+    reset();
+  }
+
+  /**
+   * Returns the timeout for waiting for the sub-flow to stop.
+   *
+   * @return		timeout in milliseconds (<= 0 for infinity)
+   */
+  public int getStoppingTimeout() {
+    return m_Actors.getStoppingTimeout();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String stoppingTimeoutTipText() {
+    return m_Actors.stoppingTimeoutTipText();
   }
 
   /**
