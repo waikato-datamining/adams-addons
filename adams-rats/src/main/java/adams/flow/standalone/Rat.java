@@ -33,6 +33,7 @@ import adams.event.RatStateEvent;
 import adams.event.RatStateListener;
 import adams.flow.container.ErrorContainer;
 import adams.flow.control.AtomicExecution;
+import adams.flow.control.Breakpoint;
 import adams.flow.control.LocalScopeTransformer;
 import adams.flow.control.ScopeHandler.ScopeHandling;
 import adams.flow.control.StorageName;
@@ -299,8 +300,11 @@ public class Rat
   /** the state listeners. */
   protected Set<RatStateListener> m_StateListeners;
 
-  /** whether layz initialization has been performed. */
+  /** whether lazy initialization has been performed. */
   protected boolean m_LazySetupPeformed;
+
+  /** whether a Breakpoint actor is part of the sub-flow. */
+  protected boolean m_BreakpointPresent;
 
   /**
    * Returns a string describing the object.
@@ -411,6 +415,7 @@ public class Rat
     m_Actors.setParent(this);
 
     m_LazySetupPeformed = false;
+    m_BreakpointPresent = false;
 
     m_Helper         = new CallableActorHelper();
     m_StateListeners = new HashSet<>();
@@ -486,7 +491,8 @@ public class Rat
     return
       "If enabled, initializing the sub-actors will only occurring the first "
 	+ "time the rat gets executed (ie the input triggers); use with "
-	+ "'wrapUpAfterExecution' to save memory.";
+	+ "'wrapUpAfterExecution' to save memory; gets disabled if actors "
+	+ "contain a Breakpoint.";
   }
 
   /**
@@ -1335,7 +1341,16 @@ public class Rat
   public Actor getCallableActor() {
     return m_LogActor;
   }
-  
+
+  /**
+   * Returns whether a breakpoint is present.
+   *
+   * @return		true if present
+   */
+  public boolean isBreakpointPresent() {
+    return m_BreakpointPresent;
+  }
+
   /**
    * Logs an error message if a valid callable log actor has been set up.
    * 
@@ -1435,7 +1450,8 @@ public class Rat
     result = super.setUp();
 
     if (result == null) {
-      if (!m_PerformLazySetup)
+      m_BreakpointPresent = (ActorUtils.enumerate(m_Actors, new Class[]{Breakpoint.class}).size() > 0);
+      if (!m_PerformLazySetup || isBreakpointPresent())
 	result = m_Actors.setUp();
     }
     
@@ -1507,10 +1523,11 @@ public class Rat
   /**
    * Returns whether lazy setup has been performed.
    *
-   * @return		true if performed
+   * @return		true if performed or breakpoint present (which disables lazy setup)
+   * @see		#isBreakpointPresent()
    */
   public boolean hasLazySetupPerformed() {
-    return m_LazySetupPeformed;
+    return m_LazySetupPeformed || isBreakpointPresent();
   }
 
   /**

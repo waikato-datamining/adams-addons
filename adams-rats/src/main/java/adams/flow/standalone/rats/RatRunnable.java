@@ -189,7 +189,7 @@ public class RatRunnable
 		  getOwner().queueFlowError(data, result);
 		}
 		// free up memory?
-		if (m_Owner.getPerformLazySetup() && m_Owner.getWrapUpAfterExecution())
+		if (m_Owner.getPerformLazySetup() && m_Owner.getWrapUpAfterExecution() && !m_Owner.isBreakpointPresent())
 		  m_Owner.getActorHandler().wrapUp();
 	      }
 	    }
