@@ -37,7 +37,11 @@ import adams.gui.core.BaseScrollPane;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.ParameterPanel;
 
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -45,7 +49,9 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  <!-- globalinfo-start -->
@@ -143,10 +149,19 @@ public class RatControl
     
     /** for serialization. */
     private static final long serialVersionUID = -5965060223206287867L;
-    
+
+    /** the owner. */
+    protected RatControl m_Owner;
+
+    /** the rats group this belongs to. */
+    protected Rats m_Group;
+
     /** the actor to manage. */
     protected T m_Actor;
-    
+
+    /** the checkbox for bulk actions. */
+    protected JCheckBox m_CheckBoxBulkAction;
+
     /** the button for pausing/resuming. */
     protected JButton m_ButtonPauseResume;
     
@@ -158,7 +173,13 @@ public class RatControl
       super.initGUI();
       
       setLayout(new FlowLayout(FlowLayout.LEFT, 5, 1));
-      
+
+      m_CheckBoxBulkAction = new JCheckBox();
+      m_CheckBoxBulkAction.setVisible(false);
+      m_CheckBoxBulkAction.addActionListener((ActionEvent e) -> checkBoxBulkActionTrigger());
+      m_CheckBoxBulkAction.setToolTipText(getCheckBoxBulkActionToolTipText());
+      add(m_CheckBoxBulkAction);
+
       m_ButtonPauseResume = new JButton(GUIHelper.getIcon("pause.gif"));
       m_ButtonPauseResume.addActionListener((ActionEvent e) -> pauseOrResume());
       add(m_ButtonPauseResume);
@@ -171,6 +192,42 @@ public class RatControl
     protected void finishInit() {
       super.finishInit();
       updateButtons();
+    }
+
+    /**
+     * Sets the RatControl actor this control belongs to.
+     *
+     * @param value	the owner
+     */
+    public void setOwner(RatControl value) {
+      m_Owner = value;
+    }
+
+    /**
+     * Returns the RatControl actor this control belongs to.
+     *
+     * @return		the owner
+     */
+    public RatControl getOwner() {
+      return m_Owner;
+    }
+
+    /**
+     * Sets the Rats groups this control belongs to.
+     *
+     * @param value	the group
+     */
+    public void setGroup(Rats value) {
+      m_Group = value;
+    }
+
+    /**
+     * Returns the Rats group this control belongs to.
+     *
+     * @return		the group
+     */
+    public Rats getGroup() {
+      return m_Group;
     }
 
     /**
@@ -191,11 +248,71 @@ public class RatControl
     public T getActor() {
       return m_Actor;
     }
-    
+
     /**
-     * Pauses/resumes the processor applier.
+     * Returns the tool tip for the bulk action checkbox.
+     * <br>
+     * Default implementation is null.
+     *
+     * @return		the tip text
      */
-    public void pauseOrResume() {
+    protected String getCheckBoxBulkActionToolTipText() {
+      return null;
+    }
+
+    /**
+     * For custom actions when the bulk action checkbox is selected/unselected.
+     * <br>
+     * Default implementation does nothing.
+     */
+    protected void checkBoxBulkActionTrigger() {
+    }
+
+    /**
+     * Checks whether bulk action is enabled.
+     *
+     * @return		true if enabled
+     */
+    public boolean isBulkActionEnabled() {
+      return m_CheckBoxBulkAction.isVisible();
+    }
+
+    /**
+     * Sets whether bulk action is enabled.
+     *
+     * @param value	true if enabled
+     */
+    public void setBulkActionEnabled(boolean value) {
+      m_CheckBoxBulkAction.setVisible(value);
+    }
+
+    /**
+     * Checks whether bulk action checkbox is selected.
+     * Only works if {@link #isBulkActionEnabled()}.
+     *
+     * @return		true if checked
+     * @see		#isBulkActionEnabled()
+     */
+    public boolean isChecked() {
+      return isBulkActionEnabled() && m_CheckBoxBulkAction.isSelected();
+    }
+
+    /**
+     * Sets the selected state of the bulk action checkbox.
+     * Only works if {@link #isBulkActionEnabled()}.
+     *
+     * @param value 	true if to check
+     * @see		#isBulkActionEnabled()
+     */
+    public void setChecked(boolean value) {
+      if (isBulkActionEnabled())
+        m_CheckBoxBulkAction.setSelected(value);
+    }
+
+    /**
+     * Pauses the rat.
+     */
+    public void pause() {
       SwingWorker	worker;
 
       if (m_Actor == null)
@@ -204,15 +321,45 @@ public class RatControl
       worker = new SwingWorker() {
 	@Override
 	protected Object doInBackground() throws Exception {
-	  if (m_Actor.isPaused())
-	    m_Actor.resumeExecution();
-	  else
-	    m_Actor.pauseExecution();
+	  m_Actor.pauseExecution();
 	  updateButtons();
 	  return null;
 	}
       };
       worker.execute();
+    }
+
+    /**
+     * Resumes the rat.
+     */
+    public void resume() {
+      SwingWorker	worker;
+
+      if (m_Actor == null)
+	return;
+
+      worker = new SwingWorker() {
+	@Override
+	protected Object doInBackground() throws Exception {
+	  m_Actor.resumeExecution();
+	  updateButtons();
+	  return null;
+	}
+      };
+      worker.execute();
+    }
+
+    /**
+     * Pauses/resumes the rat.
+     */
+    public void pauseOrResume() {
+      if (m_Actor == null)
+	return;
+
+      if (m_Actor.isPaused())
+	resume();
+      else
+	pause();
     }
     
     /**
@@ -251,20 +398,45 @@ public class RatControl
    * Control panel for {@link Rats} actor.
    *
    * @author  fracpete (fracpete at waikato dot ac dot nz)
-   * @version $Revision: 107 $
    */
   public static class RatsControlPanel
     extends AbstractControlPanel<Rats> {
     
     /** for serialization. */
     private static final long serialVersionUID = 4516229240505598425L;
+
+    /**
+     * Returns the tool tip for the bulk action checkbox.
+     *
+     * @return		the tip text
+     */
+    protected String getCheckBoxBulkActionToolTipText() {
+      return "Checks/unchecks all rat actors in this group";
+    }
+
+    /**
+     * For custom actions when the bulk action checkbox is selected/unselected.
+     */
+    protected void checkBoxBulkActionTrigger() {
+      List<AbstractControlPanel>	panels;
+
+      if (getOwner() == null)
+        return;
+      if (getGroup() == null)
+        return;
+
+      panels = getOwner().getControlPanelsPerRats().get(getGroup());
+      for (AbstractControlPanel panel: panels) {
+        if (panel instanceof RatControlPanel)
+	  panel.setChecked(m_CheckBoxBulkAction.isSelected());
+      }
+    }
   }
   
   /**
    * Control panel for {@link Rat} actor.
    *
    * @author  fracpete (fracpete at waikato dot ac dot nz)
-   * @version $Revision: 107 $
    */
   public static class RatControlPanel
     extends AbstractControlPanel<Rat> {
@@ -286,11 +458,11 @@ public class RatControl
       m_ButtonStopStart.addActionListener((ActionEvent e) -> stopOrStart());
       add(m_ButtonStopStart);
     }
-    
+
     /**
-     * Stops/starts the rat.
+     * Stops the rat.
      */
-    public void stopOrStart() {
+    public void stop() {
       SwingWorker	worker;
 
       if (m_Actor == null)
@@ -300,10 +472,29 @@ public class RatControl
 	@Override
 	protected Object doInBackground() throws Exception {
 	  m_ButtonStopStart.setEnabled(false);
-	  if (m_Actor.isRunnableActive()) {
+	  if (m_Actor.isRunnableActive())
 	    m_Actor.stopRunnable();
-	  }
-	  else {
+	  updateButtons();
+	  return null;
+	}
+      };
+      worker.execute();
+    }
+
+    /**
+     * Starts the rat.
+     */
+    public void start() {
+      SwingWorker	worker;
+
+      if (m_Actor == null)
+	return;
+
+      worker = new SwingWorker() {
+	@Override
+	protected Object doInBackground() throws Exception {
+	  m_ButtonStopStart.setEnabled(false);
+	  if (!m_Actor.isRunnableActive()) {
 	    if (m_Actor.getInitialState() == RatState.PAUSED)
 	      m_Actor.setInitialState(RatState.RUNNING);
 	    m_Actor.startRunnable();
@@ -313,6 +504,21 @@ public class RatControl
 	}
       };
       worker.execute();
+    }
+
+    /**
+     * Stops/starts the rat.
+     */
+    public void stopOrStart() {
+      SwingWorker	worker;
+
+      if (m_Actor == null)
+	return;
+
+      if (m_Actor.isRunnableActive())
+	stop();
+      else
+	start();
     }
     
     /**
@@ -358,7 +564,6 @@ public class RatControl
    * Ancestor for control states.
    *
    * @author  fracpete (fracpete at waikato dot ac dot nz)
-   * @version $Revision: 107 $
    */
   public static abstract class AbstractControlState<T extends Actor & Pausable>
     extends LoggingObject {
@@ -366,11 +571,53 @@ public class RatControl
     /** for serialization. */
     private static final long serialVersionUID = -5965060223206287867L;
 
+    /** the owner. */
+    protected RatControl m_Owner;
+
+    /** the rats group this belongs to. */
+    protected Rats m_Group;
+
     /** the actor to manage. */
     protected T m_Actor;
 
     /** the button for pausing/resuming. */
     protected boolean m_PauseResume;
+
+    /**
+     * Sets the RatControl actor this control belongs to.
+     *
+     * @param value	the owner
+     */
+    public void setOwner(RatControl value) {
+      m_Owner = value;
+    }
+
+    /**
+     * Returns the RatControl actor this control belongs to.
+     *
+     * @return		the owner
+     */
+    public RatControl getOwner() {
+      return m_Owner;
+    }
+
+    /**
+     * Sets the Rats groups this control belongs to.
+     *
+     * @param value	the group
+     */
+    public void setGroup(Rats value) {
+      m_Group = value;
+    }
+
+    /**
+     * Returns the Rats group this control belongs to.
+     *
+     * @return		the group
+     */
+    public Rats getGroup() {
+      return m_Group;
+    }
 
     /**
      * Sets the actor to manage.
@@ -391,15 +638,33 @@ public class RatControl
     }
 
     /**
-     * Pauses/resumes the processor applier.
+     * Pauses the rat.
+     */
+    public void pause() {
+      if (m_Actor == null)
+	return;
+      m_Actor.pauseExecution();
+    }
+
+    /**
+     * Resumes the rat.
+     */
+    public void resume() {
+      if (m_Actor == null)
+	return;
+      m_Actor.resumeExecution();
+    }
+
+    /**
+     * Pauses/resumes the rat.
      */
     public void pauseOrResume() {
       if (m_Actor == null)
 	return;
       if (m_Actor.isPaused())
-	m_Actor.resumeExecution();
+	resume();
       else
-	m_Actor.pauseExecution();
+	pause();
     }
 
     /**
@@ -425,7 +690,6 @@ public class RatControl
    * Control state for {@link Rats} actor.
    *
    * @author  fracpete (fracpete at waikato dot ac dot nz)
-   * @version $Revision: 107 $
    */
   public static class RatsControlState
     extends AbstractControlState<Rats> {
@@ -438,7 +702,6 @@ public class RatControl
    * Control state for {@link Rat} actor.
    *
    * @author  fracpete (fracpete at waikato dot ac dot nz)
-   * @version $Revision: 107 $
    */
   public static class RatControlState
     extends AbstractControlState<Rat> {
@@ -450,23 +713,50 @@ public class RatControl
     protected boolean m_StopStart;
 
     /**
-     * Stops/starts the rat.
+     * Stops the rat.
      *
      * @return		null if successful, otherwise error message
      */
-    public String stopOrStart() {
+    public String stop() {
+      if (m_Actor == null)
+	return null;
+
+      if (m_Actor.isRunnableActive())
+	m_Actor.stopRunnable();
+      return null;
+    }
+
+    /**
+     * Starts the rat.
+     *
+     * @return		null if successful, otherwise error message
+     */
+    public String start() {
       String	result;
 
       if (m_Actor == null)
 	return null;
 
       result = null;
-      if (m_Actor.isRunnableActive())
-	m_Actor.stopRunnable();
-      else
+      if (!m_Actor.isRunnableActive())
 	result = m_Actor.startRunnable();
 
       return result;
+    }
+
+    /**
+     * Stops/starts the rat.
+     *
+     * @return		null if successful, otherwise error message
+     */
+    public String stopOrStart() {
+      if (m_Actor == null)
+	return null;
+
+      if (m_Actor.isRunnableActive())
+	return stop();
+      else
+	return start();
     }
 
     /**
@@ -498,8 +788,29 @@ public class RatControl
     }
   }
 
+  /** Caption for no bulk action. */
+  public final static String BULKACTION_NONE = "---";
+
+  /** Caption for "pause" bulk action. */
+  public final static String BULKACTION_PAUSE = "Pause";
+
+  /** Caption for "resume" bulk action. */
+  public final static String BULKACTION_RESUME = "Resume";
+
+  /** Caption for "stop" bulk action. */
+  public final static String BULKACTION_STOP = "Stop";
+
+  /** Caption for "start" bulk action. */
+  public final static String BULKACTION_START = "Start";
+
+  /** whether to allow bulk actions. */
+  protected boolean m_BulkActions;
+
   /** the control panels. */
   protected List<AbstractControlPanel> m_ControlPanels;
+
+  /** the control panels per Rats actor. */
+  protected Map<Rats, List<AbstractControlPanel>> m_ControlPanelsPerRats;
 
   /** the control states. */
   protected List<AbstractControlState> m_ControlStates;
@@ -521,10 +832,52 @@ public class RatControl
   protected void initialize() {
     super.initialize();
     
-    m_ControlPanels = new ArrayList<>();
-    m_ControlStates = new ArrayList<>();
+    m_ControlPanels        = new ArrayList<>();
+    m_ControlPanelsPerRats = new HashMap<>();
+    m_ControlStates        = new ArrayList<>();
   }
-  
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "bulk-actions", "bulkActions",
+      false);
+  }
+
+  /**
+   * Sets whether to enable bulk actions.
+   *
+   * @param value	true if to enable bulk actions
+   */
+  public void setBulkActions(boolean value) {
+    m_BulkActions = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to enable bulk actions.
+   *
+   * @return		true if bulk actions enabled
+   */
+  public boolean getBulkActions() {
+    return m_BulkActions;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String bulkActionsTipText() {
+    return "If enabled, bulk actions can be performed on the checked rats.";
+  }
+
   /**
    * Returns the default value for displaying the panel in the editor
    * rather than in a separate frame.
@@ -557,6 +910,15 @@ public class RatControl
   }
 
   /**
+   * Returns the current control panels, grouped by RatControl actor.
+   *
+   * @return		the panels
+   */
+  public Map<Rats,List<AbstractControlPanel>> getControlPanelsPerRats() {
+    return m_ControlPanelsPerRats;
+  }
+
+  /**
    * Returns the current control states.
    *
    * @return		the states
@@ -577,6 +939,8 @@ public class RatControl
    *
    * @return		the panel
    * @see		#m_ControlPanels
+   * @see		#m_ControlPanelsPerRats
+   * @see		#setUpControlStates()
    */
   @Override
   protected BasePanel newPanel() {
@@ -588,7 +952,10 @@ public class RatControl
     AbstractControlPanel	subcpanel;
     ParameterPanel		param;
     JPanel			panel;
+    JPanel			panelBottom;
     JButton			buttonStop;
+    final JComboBox<String> 	comboBulkActions;
+    JButton			buttonApply;
     int				i;
     boolean			inControl;
     
@@ -598,9 +965,14 @@ public class RatControl
     for (Actor item: list) {
       rats = (Rats) item;
       cpanel = new RatsControlPanel();
+      cpanel.setOwner(this);
+      cpanel.setGroup(rats);
+      cpanel.setBulkActionEnabled(m_BulkActions);
       cpanel.setActor(rats);
       param.addParameter(rats.getName(), cpanel);
       m_ControlPanels.add(cpanel);
+      m_ControlPanelsPerRats.put(rats, new ArrayList<>());
+      m_ControlPanelsPerRats.get(rats).add(cpanel);
       // the individual Rat actors
       inControl = false;
       for (i = 0; i < rats.size(); i++) {
@@ -610,23 +982,63 @@ public class RatControl
 	rat.addRatStateListener(this);
 	inControl = true;
         subcpanel = new RatControlPanel();
+        subcpanel.setOwner(this);
+        subcpanel.setGroup(rats);
+        subcpanel.setBulkActionEnabled(m_BulkActions);
         subcpanel.setPausable(rat.getMode() == RatMode.CONTINUOUS);
 	subcpanel.setActor(rat);
 	param.addParameter(" - " + rat.getName(), subcpanel);
 	m_ControlPanels.add(subcpanel);
+	m_ControlPanelsPerRats.get(rats).add(subcpanel);
       }
       cpanel.setPausable(!inControl);
     }
-    
+
+    panelBottom = new JPanel(new BorderLayout(0, 0));
+    panelBottom.setBorder(BorderFactory.createEmptyBorder());
+
+    // bulk actions
+    if (m_BulkActions) {
+      panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+      panelBottom.add(panel, BorderLayout.WEST);
+      comboBulkActions = new JComboBox<>(new DefaultComboBoxModel<>(new String[]{
+        BULKACTION_NONE,
+	BULKACTION_PAUSE,
+	BULKACTION_RESUME,
+	BULKACTION_START,
+	BULKACTION_STOP,
+      }));
+      panel.add(comboBulkActions);
+      buttonApply = new JButton("Apply");
+      buttonApply.addActionListener((ActionEvent e) -> {
+        SwingWorker worker = new SwingWorker() {
+	  @Override
+	  protected Object doInBackground() throws Exception {
+	    buttonApply.setEnabled(false);
+	    applyBulkAction((String) comboBulkActions.getSelectedItem());
+	    return null;
+	  }
+	  @Override
+	  protected void done() {
+	    super.done();
+	    buttonApply.setEnabled(true);
+	  }
+	};
+        worker.execute();
+      });
+      panel.add(buttonApply);
+    }
+
     // general buttons
     panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     buttonStop = new JButton("Stop");
     buttonStop.addActionListener((ActionEvent e) -> getRoot().stopExecution());
     panel.add(buttonStop);
+    panelBottom.add(panel, BorderLayout.EAST);
     
     result = new BasePanel(new BorderLayout());
     result.add(new BaseScrollPane(param), BorderLayout.CENTER);
-    result.add(panel, BorderLayout.SOUTH);
+    result.add(panelBottom, BorderLayout.SOUTH);
 
     setUpControlStates();
 
@@ -651,6 +1063,8 @@ public class RatControl
     for (Actor item: list) {
       rats = (Rats) item;
       cstate = new RatsControlState();
+      cstate.setOwner(this);
+      cstate.setGroup(rats);
       cstate.setActor(rats);
       m_ControlStates.add(cstate);
       // the individual Rat actors
@@ -662,11 +1076,60 @@ public class RatControl
 	rat.addRatStateListener(this);
 	inControl = true;
         subcstate = new RatControlState();
+        subcstate.setOwner(this);
+        subcstate.setGroup(rats);
         subcstate.setPausable(rat.getMode() == RatMode.CONTINUOUS);
 	subcstate.setActor(rat);
 	m_ControlStates.add(subcstate);
       }
       cstate.setPausable(!inControl);
+    }
+  }
+
+  /**
+   * Applies the bulk action.
+   *
+   * @param action 	the action to execute
+   */
+  protected void applyBulkAction(String action) {
+    RatControlPanel	rcpanel;
+
+    if (!m_BulkActions)
+      return;
+    if (action.equals(BULKACTION_NONE))
+      return;
+
+    for (AbstractControlPanel panel: getControlPanels()) {
+      switch (action) {
+	case BULKACTION_PAUSE:
+	  if (panel.isPausable())
+	    panel.pause();
+	  break;
+
+	case BULKACTION_RESUME:
+	  if (panel.isPausable())
+	    panel.resume();
+	  break;
+
+	case BULKACTION_STOP:
+	  if (panel instanceof RatControlPanel) {
+	    rcpanel = (RatControlPanel) panel;
+	    if (rcpanel.isStoppable())
+	      rcpanel.stop();
+	  }
+	  break;
+
+	case BULKACTION_START:
+	  if (panel instanceof RatControlPanel) {
+	    rcpanel = (RatControlPanel) panel;
+	    if (rcpanel.isStoppable())
+	      rcpanel.start();
+	  }
+	  break;
+
+	default:
+	  throw new IllegalStateException("Unhandled bulk action: " + action);
+      }
     }
   }
 
@@ -777,6 +1240,7 @@ public class RatControl
     PauseStateManager	manager;
 
     m_ControlPanels.clear();
+    m_ControlPanelsPerRats.clear();
     m_ControlStates.clear();
 
     if (getRoot() instanceof PauseStateHandler) {
