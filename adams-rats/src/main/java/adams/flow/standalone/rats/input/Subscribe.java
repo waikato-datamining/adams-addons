@@ -156,7 +156,7 @@ public class Subscribe
    * @param e		the data event
    */
   public void dataPublished(PublicationEvent e) {
-    if (!isStopped()) {
+    if (!isStopped() && !m_Owner.isPaused()) {
       if (isLoggingEnabled())
         getLogger().info("Data published by " + e.getDataSource() + ": " + e.getPublishedData());
       bufferData(e.getPublishedData());
