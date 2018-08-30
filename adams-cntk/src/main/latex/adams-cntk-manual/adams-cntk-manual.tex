@@ -1,8 +1,6 @@
 % This work is made available under the terms of the
 % Creative Commons Attribution-ShareAlike 4.0 license,
 % http://creativecommons.org/licenses/by-sa/4.0/.
-%
-% Version: $Revision: 15503 $
 
 \documentclass[a4paper]{book}
 
@@ -45,7 +43,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2017} &
+		\parbox[c][2cm]{2cm}{\copyright 2017-2018} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -62,27 +60,7 @@
 CNTK, the Microsoft Cognitive Toolkit\cite{cntk}, is a deeplearning C++
 library which can be configured via the BrainScript Network
 Builder\footnote{\url{https://docs.microsoft.com/en-us/cognitive-toolkit/BrainScript-Network-Builder}{}}
-or Python. It comes with binaries for 64-bit Windows and Linux. It has
-experimetnal bindings for Java as well, but only for prediction time.
-
-\section{Installation}
-Follow the installation instructions for CNTK: \\
-\url{https://docs.microsoft.com/en-us/cognitive-toolkit/Setup-CNTK-on-your-machine}{} \\
-
-\noindent For the Java bindings to work, you need to do the following:
-\begin{itemize}
-  \item Download binaries for your platform.
-  \item Create a new directory to contain all the libraries
-  \item Copy the libraries from the \textit{lib} and \textit{dependencies/lib}
-  directories into the newly created directory. For older Linux versions that
-  required a custom build of the openmpi libraries, copy these libraries as well.
-  \item Either supply the new library directory to the JVM using
-  \textit{-Djava.library.path=...}, or, when using the \textit{Launcher} class,
-  (package \textit{adams.core.management}), you can use the
-  \textit{ADAMS\_LIBRARY\_PATH} environment variable to supply the directory.
-  The launcher will automatically add the content of the variable to the
-  command-line.
-\end{itemize}
+or Python. It comes with binaries for 64-bit Windows and Linux.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -93,15 +71,9 @@ The following standalines are available:
 \end{itemize}
 The following sources are available:
 \begin{itemize}
+  \item \textit{CNTKBrainScriptExec} -- executes a brainscript and forwards the output (stdout/stderr)
   \item \textit{CNTKModelGenerator} -- uses the specified model generator
   to output model specification strings.
-\end{itemize}
-The following transformers are available:
-\begin{itemize}
-  \item \textit{CNTKModelApplier} -- uses the specified model applier to the
-  incoming data.
-  \item \textit{CNTKModelInfo} -- outputs information about the incoming model.
-  \item \textit{CNTKModelReader} -- reads a CNTK model from disk.
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
