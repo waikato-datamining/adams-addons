@@ -5,11 +5,6 @@
 # class.name=package1,package2,...
 #
 # Author:  FracPete (fracpete at waikato dot ac dot nz)
-# Version: $Revision$
-
-# model appliers
-adams.ml.cntk.modelapplier.AbstractModelApplier=\
-  adams.ml.cntk.modelapplier
 
 # model generators
 adams.ml.cntk.modelgenerator.ModelGenerator=\
