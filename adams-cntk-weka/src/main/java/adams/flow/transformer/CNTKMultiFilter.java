@@ -462,15 +462,21 @@ public class CNTKMultiFilter
    * @return		the setup
    */
   protected CNTKSaver generateSaver(Instances filtered) {
-    CNTKSaver	result;
-    List<Range>	ranges;
-    Range	range;
-    TIntList	atts;
-    int		i;
-    int		n;
-    String	prefix;
+    CNTKSaver		result;
+    List<Range> 	inputs;
+    Range 		input;
+    TIntList		atts;
+    int			i;
+    int			n;
+    String		prefix;
+    List<BaseString> 	inputNames;
 
-    ranges = new ArrayList<>();
+    inputNames = new ArrayList<>();
+    for (BaseString name: m_Prefixes)
+      inputNames.add(new BaseString(name.getValue()));
+
+    // filters
+    inputs = new ArrayList<>();
     for (i = 0; i < m_Filters.length; i++) {
       atts = new TIntArrayList();
       prefix = m_Prefixes[i].getValue();
@@ -481,16 +487,27 @@ public class CNTKMultiFilter
         if (filtered.attribute(n).name().startsWith(prefix))
           atts.add(n);
       }
-      range = new Range();
-      range.setMax(filtered.numAttributes());
-      range.setIndices(atts.toArray());
-      ranges.add(range);
+      input = new Range();
+      input.setMax(filtered.numAttributes());
+      input.setIndices(atts.toArray());
+      inputs.add(input);
+    }
+
+    // targets
+    for (n = 0; n < filtered.numAttributes(); n++) {
+      if (filtered.attribute(n).name().startsWith(PREFIX_TARGETS)) {
+        input = new Range();
+        input.setMax(filtered.numAttributes());
+        input.setIndices(new int[]{n});
+	inputs.add(input);
+	inputNames.add(new BaseString(extractTarget(filtered.attribute(n).name())));
+      }
     }
 
     result = new CNTKSaver();
     result.setRowID(new Index("1"));
-    result.setInputs(ranges.toArray(new Range[0]));
-    result.setInputNames(m_Prefixes.clone());
+    result.setInputs(inputs.toArray(new Range[0]));
+    result.setInputNames(inputNames.toArray(new BaseString[0]));
 
     return result;
   }
