@@ -15,17 +15,23 @@
 
 /*
  * Exec.java
- * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2018 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone.rats.output;
 
 import adams.core.Placeholders;
 import adams.core.QuickInfoHelper;
+import adams.core.base.BaseKeyValuePair;
+import adams.core.io.PlaceholderDirectory;
+import adams.core.management.EnvironmentVariablesHandler;
 import adams.core.management.ProcessUtils;
+import adams.core.management.WorkingDirectoryHandler;
 import adams.core.option.OptionUtils;
 import adams.flow.core.Unknown;
 import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
+
+import java.util.HashMap;
 
 /**
  <!-- globalinfo-start -->
@@ -45,6 +51,16 @@ import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
  * &nbsp;&nbsp;&nbsp;default: ls -l .
  * </pre>
  * 
+ * <pre>-working-directory &lt;java.lang.String&gt; (property: workingDirectory)
+ * &nbsp;&nbsp;&nbsp;The current working directory for the command.
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
+ * <pre>-env-var &lt;adams.core.base.BaseKeyValuePair&gt; [-env-var ...] (property: envVars)
+ * &nbsp;&nbsp;&nbsp;The environment variables to overlay on top of the current ones.
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
  * <pre>-placeholder &lt;boolean&gt; (property: commandContainsPlaceholder)
  * &nbsp;&nbsp;&nbsp;Set this to true to enable automatic placeholder expansion for the command 
  * &nbsp;&nbsp;&nbsp;string.
@@ -60,21 +76,27 @@ import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class Exec
-  extends AbstractRatOutput {
+  extends AbstractRatOutput
+  implements EnvironmentVariablesHandler, WorkingDirectoryHandler {
 
   private static final long serialVersionUID = 2950260223110007595L;
 
   /** the command to run. */
   protected String m_Command;
 
-  /** whether the replace string contains a placeholder, which needs to be
+  /** the current working directory. */
+  protected String m_WorkingDirectory;
+
+  /** environment variables. */
+  protected BaseKeyValuePair[] m_EnvVars;
+
+  /** whether the command string contains a placeholder, which needs to be
    * expanded first. */
   protected boolean m_CommandContainsPlaceholder;
 
-  /** whether the replace string contains a variable, which needs to be
+  /** whether the command string contains a variable, which needs to be
    * expanded first. */
   protected boolean m_CommandContainsVariable;
 
@@ -103,6 +125,14 @@ public class Exec
     m_OptionManager.add(
       "cmd", "command",
       "ls -l .");
+
+    m_OptionManager.add(
+      "working-directory", "workingDirectory",
+      "");
+
+    m_OptionManager.add(
+      "env-var", "envVars",
+      new BaseKeyValuePair[0]);
 
     m_OptionManager.add(
       "placeholder", "commandContainsPlaceholder",
@@ -150,6 +180,70 @@ public class Exec
    */
   public String commandTipText() {
     return "The external command to run.";
+  }
+
+  /**
+   * Sets the current working directory for the command.
+   *
+   * @param value	the directory, ignored if empty
+   */
+  @Override
+  public void setWorkingDirectory(String value) {
+    m_WorkingDirectory = value;
+    reset();
+  }
+
+  /**
+   * Returns the current working directory for the command.
+   *
+   * @return 		the directory, ignored if empty
+   */
+  @Override
+  public String getWorkingDirectory() {
+    return m_WorkingDirectory;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  @Override
+  public String workingDirectoryTipText() {
+    return "The current working directory for the command.";
+  }
+
+  /**
+   * Sets the environment variables to overlay on top of the current ones.
+   *
+   * @param value	the environment variables
+   */
+  @Override
+  public void setEnvVars(BaseKeyValuePair[] value) {
+    m_EnvVars = value;
+    reset();
+  }
+
+  /**
+   * Returns the environment variables to overlay on top of the current ones.
+   *
+   * @return 		the environment variables
+   */
+  @Override
+  public BaseKeyValuePair[] getEnvVars() {
+    return m_EnvVars;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  @Override
+  public String envVarsTipText() {
+    return "The environment variables to overlay on top of the current ones.";
   }
 
   /**
@@ -231,8 +325,10 @@ public class Exec
    */
   @Override
   protected String doTransmit() {
-    String		result;
-    String		cmd;
+    String			result;
+    String			cmd;
+    PlaceholderDirectory 	cwd;
+    HashMap<String, String> 	env;
 
     result = null;
 
@@ -241,9 +337,11 @@ public class Exec
       cmd = getOwner().getVariables().expand(cmd);
     if (m_CommandContainsPlaceholder)
       cmd = Placeholders.getSingleton().expand(cmd).replace("\\", "/");
+    cwd = m_WorkingDirectory.isEmpty() ? null : new PlaceholderDirectory(m_WorkingDirectory);
+    env = ProcessUtils.getEnvironment(m_EnvVars, true);
 
     try {
-      m_ProcessOutput = ProcessUtils.execute(OptionUtils.splitOptions(cmd));
+      m_ProcessOutput = ProcessUtils.execute(OptionUtils.splitOptions(cmd), env, cwd);
       if (!m_ProcessOutput.hasSucceeded())
 	result = ProcessUtils.toErrorOutput(m_ProcessOutput);
     }
