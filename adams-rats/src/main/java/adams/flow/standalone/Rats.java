@@ -124,7 +124,7 @@ public class Rats
    */
   @Override
   protected List<Rat> getDefaultActors() {
-    return new ArrayList<Rat>();
+    return new ArrayList<>();
   }
 
   /**
@@ -233,6 +233,25 @@ public class Rats
 	+ ", provided: " + actor.getClass().getName();
     else
       return null;
+  }
+
+  /**
+   * Checks whether the actor is valid.
+   *
+   * @param actor	the actor to check
+   * @return		null if OK, otherwise error message
+   */
+  protected String checkActor(Actor actor) {
+    String	result;
+
+    result = super.checkActor(actor);
+    if (result != null)
+      return result;
+
+    if (getScopeHandler() != null)
+      return getScopeHandler().addCallableName(this, actor);
+
+    return null;
   }
 
   /**
