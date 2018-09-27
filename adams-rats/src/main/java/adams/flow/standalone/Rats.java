@@ -15,7 +15,7 @@
 
 /*
  * Rats.java
- * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
@@ -178,7 +178,12 @@ public class Rats
    */
   @Override
   public ActorHandlerInfo getActorHandlerInfo() {
-    return new ActorHandlerInfo(true, false, ActorExecution.UNDEFINED, false, new Class[]{Rat.class, LabRat.class});
+    return new ActorHandlerInfo()
+      .allowStandalones(true)
+      .allowSource(false)
+      .actorExecution(ActorExecution.UNDEFINED)
+      .forwardsInput(false)
+      .restrictions(new Class[]{Rat.class, LabRat.class});
   }
 
   /**
