@@ -15,7 +15,7 @@
 
 /*
  * RatReferenceEditor.java
- * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2018 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -59,7 +59,6 @@ import java.util.List;
  * A PropertyEditor for RatReference objects.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class RatReferenceEditor
   extends AbstractPropertyEditorSupport
@@ -348,17 +347,21 @@ public class RatReferenceEditor
    */
   protected List<String> findRats() {
     List<String>	result;
-    List<Node>		callables;
+    List<Node> 		nodes;
     int			i;
     Node		child;
 
     result = new ArrayList<>();
 
-    callables = FlowHelper.findNodes(m_CustomEditor, Rats.class);
-    for (Node callable: callables) {
-      result.add(callable.getFullName());
-      for (i = 0; i < callable.getChildCount(); i++) {
-	child = (Node) callable.getChildAt(i);
+    nodes = FlowHelper.findNodes(m_CustomEditor, Rats.class);
+    for (Node node : nodes) {
+      if (node.getActor().getSkip())
+        continue;
+      result.add(node.getFullName());
+      for (i = 0; i < node.getChildCount(); i++) {
+	child = (Node) node.getChildAt(i);
+	if (child.getActor().getSkip())
+	  continue;
 	result.add(child.getFullName());
       }
     }
