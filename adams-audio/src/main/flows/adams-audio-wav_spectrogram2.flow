@@ -1,0 +1,17 @@
+# Project: adams
+# Date: 2018-10-12 19:39:18
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-audio,adams-core,adams-ffmpeg,adams-spreadsheet
+#
+adams.flow.control.Flow -annotation "Generates a spectrogram for a WAV file and displays the spreadsheet." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name generate
+  adams.flow.source.FileSupplier -file "${FLOWS}/data/h02880so - Northern jacana Jacana spinosa.wav"
+  adams.flow.transformer.AudioData -reader adams.flow.transformer.audiodata.Wave
+  adams.flow.transformer.WaveFeatureGenerator -algorithm "adams.data.audiofeaturegenerator.wave.Spectrogram -converter \"adams.data.featureconverter.SpreadSheet -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.DefaultSpreadSheet\""
+  adams.flow.transformer.SpreadSheetRowBuffer
+  adams.flow.transformer.SetStorageValue -storage-name features
+ adams.flow.control.Trigger -name display
+  adams.flow.source.StorageValue -storage-name features -conversion adams.data.conversion.UnknownToUnknown
+  adams.flow.sink.SpreadSheetDisplay -cell-rendering-customizer adams.gui.core.spreadsheettable.DefaultCellRenderingCustomizer -writer adams.data.io.output.NullWriter
