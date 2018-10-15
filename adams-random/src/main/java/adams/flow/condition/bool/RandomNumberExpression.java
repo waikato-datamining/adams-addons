@@ -13,13 +13,11 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * RandomNumberExpression.java
- * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.condition.bool;
-
-import java.util.HashMap;
 
 import adams.core.QuickInfoHelper;
 import adams.data.random.JavaRandomInt;
@@ -27,6 +25,8 @@ import adams.data.random.RandomNumberGenerator;
 import adams.flow.core.Actor;
 import adams.flow.core.Token;
 import adams.parser.BooleanExpressionText;
+
+import java.util.HashMap;
 
 /**
  <!-- globalinfo-start -->
@@ -275,7 +275,10 @@ public class RandomNumberExpression
     String	exp;
     HashMap	symbols;
 
-    exp     = owner.getVariables().expand(getExpression().getValue());
+    if (owner != null)
+      exp = owner.getVariables().expand(getExpression().getValue());
+    else
+      exp = getExpression().getValue();
     symbols = new HashMap();
     symbols.put("X", m_Generator.next().doubleValue());
 
