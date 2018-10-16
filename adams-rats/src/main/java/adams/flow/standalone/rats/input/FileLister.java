@@ -767,16 +767,17 @@ public class FileLister
       i = 0;
       while (i < files.size() && !isStopped()) {
         file = new PlaceholderFile(files.get(i));
-        if (m_SkipInUse && isLoggingEnabled())
-          getLogger().fine("In use? " + file);
-        if (m_SkipInUse && m_Check.isInUse(file)) {
+        if (m_SkipInUse) {
           if (isLoggingEnabled())
-            getLogger().fine("File in use: " + files.get(i));
-          files.remove(i);
+            getLogger().fine("In use? " + file);
+          if (m_Check.isInUse(file)) {
+            if (isLoggingEnabled())
+              getLogger().fine("File is in use: " + files.get(i));
+            files.remove(i);
+            continue;
+          }
         }
-        else {
-          i++;
-        }
+	i++;
       }
 
       if (m_MoveFiles && !isStopped()) {
