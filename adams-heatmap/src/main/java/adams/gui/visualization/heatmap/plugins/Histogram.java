@@ -13,16 +13,16 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Histogram.java
- * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.heatmap.plugins;
 
 import adams.core.option.OptionUtils;
 import adams.data.heatmap.Heatmap;
 import adams.data.statistics.ArrayHistogram;
-import adams.gui.core.BaseMultiPagePane;
+import adams.gui.core.MultiPagePane;
 import adams.gui.dialog.ApprovalDialog;
 import adams.gui.visualization.heatmap.HeatmapPanel;
 import adams.gui.visualization.heatmap.HistogramPanel;
@@ -35,7 +35,6 @@ import java.util.List;
  * Displays the histogram for heatmap(s).
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class Histogram
   extends AbstractSelectedHeatmapsViewerPluginWithGOE {
@@ -168,16 +167,19 @@ public class Histogram
   @Override
   protected String processFinish() {
     String		result;
-    BaseMultiPagePane	multipane;
+    MultiPagePane 	multipane;
     ApprovalDialog	dialog;
     int			i;
 
     result = super.processFinish();
 
     if (result == null) {
-      multipane = new BaseMultiPagePane();
+      multipane = new MultiPagePane();
+      multipane.setReadOnly(true);
       for (i = 0; i < m_HistogramList.size(); i++)
 	multipane.addPage(m_TitleList.get(i), m_HistogramList.get(i));
+      if (multipane.getPageCount() > 0)
+        multipane.setSelectedIndex(0);
 
       if (m_CurrentPanel.getParentDialog() != null)
 	dialog = new ApprovalDialog(m_CurrentPanel.getParentDialog());
