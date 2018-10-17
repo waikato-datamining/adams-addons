@@ -13,17 +13,17 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SpreadSheetView.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.heatmap.plugins;
 
 import adams.core.Properties;
 import adams.data.conversion.HeatmapToSpreadSheet;
 import adams.data.spreadsheet.SpreadSheet;
-import adams.gui.core.BaseMultiPagePane;
 import adams.gui.core.BaseScrollPane;
+import adams.gui.core.MultiPagePane;
 import adams.gui.core.SpreadSheetTable;
 import adams.gui.core.SpreadSheetTableModel;
 import adams.gui.dialog.ApprovalDialog;
@@ -38,7 +38,6 @@ import java.util.List;
  * Displays the heatmap as spreadsheet.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SpreadSheetView
   extends AbstractSelectedHeatmapsViewerPlugin {
@@ -164,16 +163,19 @@ public class SpreadSheetView
   @Override
   protected String processFinish() {
     String		result;
-    BaseMultiPagePane 	multipane;
+    MultiPagePane 	multipane;
     ApprovalDialog	dialog;
     int			i;
 
     result = super.processFinish();
 
     if (result == null) {
-      multipane = new BaseMultiPagePane();
+      multipane = new MultiPagePane();
+      multipane.setReadOnly(true);
       for (i = 0; i < m_TableList.size(); i++)
 	multipane.addPage(m_TitleList.get(i), new BaseScrollPane(m_TableList.get(i)));
+      if (multipane.getPageCount() > 0)
+        multipane.setSelectedIndex(0);
 
       if (m_CurrentPanel.getParentDialog() != null)
 	dialog = new ApprovalDialog(m_CurrentPanel.getParentDialog());
