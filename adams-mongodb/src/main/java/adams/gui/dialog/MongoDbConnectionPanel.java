@@ -28,12 +28,12 @@ import adams.db.MongoDbConnection;
 import adams.db.MongoDbConnectionParameters;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseCheckBox;
+import adams.gui.core.BaseComboBox;
 import adams.gui.core.BasePanel;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.ParameterPanel;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -65,7 +65,7 @@ public class MongoDbConnectionPanel
   protected MongoDbConnectionPanel m_Self;
 
   /** the combobox with the available connections. */
-  protected JComboBox m_ComboBoxConnections;
+  protected BaseComboBox m_ComboBoxConnections;
 
   /** the edit field for the database URL. */
   protected JTextField m_TextURL;
@@ -83,7 +83,7 @@ public class MongoDbConnectionPanel
   protected JTextField m_TextAuthDB;
 
   /** the combobox for the logging level. */
-  protected JComboBox m_ComboBoxLoggingLevel;
+  protected BaseComboBox m_ComboBoxLoggingLevel;
 
   /** the checkbox for connecting on startup. */
   protected BaseCheckBox m_CheckBoxConnectOnStartUp;
@@ -138,7 +138,7 @@ public class MongoDbConnectionPanel
     m_PanelParameters = new ParameterPanel();
     add(m_PanelParameters, BorderLayout.NORTH);
 
-    m_ComboBoxConnections = new JComboBox(getDatabaseConnection().getConnections().toArray());
+    m_ComboBoxConnections = new BaseComboBox(getDatabaseConnection().getConnections().toArray());
     m_ComboBoxConnections.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
 	if (m_ComboBoxConnections.getSelectedIndex() == -1)
@@ -173,7 +173,7 @@ public class MongoDbConnectionPanel
     m_TextAuthDB = new JTextField(20);
     m_PanelParameters.addParameter("Auth DB", m_TextAuthDB);
 
-    m_ComboBoxLoggingLevel = new JComboBox(LoggingLevel.values());
+    m_ComboBoxLoggingLevel = new BaseComboBox(LoggingLevel.values());
     m_PanelParameters.addParameter("_Logging level", m_ComboBoxLoggingLevel);
 
     m_CheckBoxConnectOnStartUp = new BaseCheckBox();

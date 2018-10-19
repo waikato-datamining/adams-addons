@@ -31,6 +31,7 @@ import adams.flow.core.CallableActorReference;
 import adams.flow.core.Token;
 import adams.flow.source.MOAClustererSetup;
 import adams.gui.core.BaseButton;
+import adams.gui.core.BaseComboBox;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseSplitPane;
@@ -51,7 +52,6 @@ import weka.core.Instances;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
@@ -294,10 +294,10 @@ public class MOAClusterVisualization
   protected int m_SpeedCounter;
 
   /** the combobox for the X dimension. */
-  protected JComboBox m_ComboBoxDimX;
+  protected BaseComboBox m_ComboBoxDimX;
 
   /** the combobox for the Y dimension. */
-  protected JComboBox m_ComboBoxDimY;
+  protected BaseComboBox m_ComboBoxDimY;
 
   /**
    * Returns a string describing the object.
@@ -872,7 +872,7 @@ public class MOAClusterVisualization
     JPanel 			panel;
     JPanel 			panel2;
     JLabel 			label;
-    final JComboBox<String>	comboBox;
+    final BaseComboBox<String>	comboBox;
     BaseButton 			button;
     List<String>		measures;
     int				i;
@@ -893,7 +893,7 @@ public class MOAClusterVisualization
     m_StreamPanel.setPointVisibility(m_DrawPoints);
     panelClusters.add(new BaseScrollPane(m_StreamPanel), BorderLayout.CENTER);
 
-    m_ComboBoxDimX = new JComboBox(new String[0]);
+    m_ComboBoxDimX = new BaseComboBox(new String[0]);
     m_ComboBoxDimX.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -901,7 +901,7 @@ public class MOAClusterVisualization
 	m_StreamPanel.repaint();
       }
     });
-    m_ComboBoxDimY = new JComboBox(new String[0]);
+    m_ComboBoxDimY = new BaseComboBox(new String[0]);
     m_ComboBoxDimY.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -961,7 +961,7 @@ public class MOAClusterVisualization
       for (i = 0; i < measure.getNumMeasures(); i++)
 	measures.add(measure.getName(i));
     }
-    comboBox = new JComboBox<String>(measures.toArray(new String[measures.size()]));
+    comboBox = new BaseComboBox<String>(measures.toArray(new String[measures.size()]));
     comboBox.setSelectedIndex(0);
     comboBox.addActionListener(new ActionListener() {
       @Override

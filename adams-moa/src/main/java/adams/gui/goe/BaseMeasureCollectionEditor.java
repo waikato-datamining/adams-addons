@@ -25,11 +25,11 @@ import adams.core.Utils;
 import adams.core.base.BaseMeasureCollection;
 import adams.core.option.AbstractOption;
 import adams.gui.core.BaseButton;
+import adams.gui.core.BaseComboBox;
 import adams.gui.dialog.ApprovalDialog;
 import moa.evaluation.MeasureCollection;
 import nz.ac.waikato.cms.locator.ClassLocator;
 
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -59,7 +59,7 @@ public class BaseMeasureCollectionEditor
   implements CustomStringRepresentationHandler, MultiSelectionEditor {
 
   /** The combobox with the values. */
-  protected JComboBox<String> m_ComboBoxValue;
+  protected BaseComboBox<String> m_ComboBoxValue;
 
   /**
    * Returns the {@link BaseMeasureCollection} as string.
@@ -193,7 +193,7 @@ public class BaseMeasureCollectionEditor
     classes = ClassLocator.getSingleton().findNames(MeasureCollection.class, new String[]{BaseMeasureCollection.DEFAULT_PACKAGE});
     for (i = 0; i < classes.size(); i++)
       classes.set(i, classes.get(i).replaceAll(".*\\.", ""));
-    m_ComboBoxValue = new JComboBox<String>(classes.toArray(new String[classes.size()]));
+    m_ComboBoxValue = new BaseComboBox<String>(classes.toArray(new String[classes.size()]));
     m_ComboBoxValue.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {

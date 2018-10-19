@@ -34,6 +34,7 @@ import adams.flow.core.RatMode;
 import adams.flow.core.RatState;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseCheckBox;
+import adams.gui.core.BaseComboBox;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.GUIHelper;
@@ -41,7 +42,6 @@ import adams.gui.core.ParameterPanel;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -954,7 +954,7 @@ public class RatControl
     JPanel			panel;
     JPanel			panelBottom;
     BaseButton			buttonStop;
-    final JComboBox<String> 	comboBulkActions;
+    final BaseComboBox<String> 	comboBulkActions;
     BaseButton			buttonApply;
     int				i;
     boolean			inControl;
@@ -1001,7 +1001,7 @@ public class RatControl
     if (m_BulkActions) {
       panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
       panelBottom.add(panel, BorderLayout.WEST);
-      comboBulkActions = new JComboBox<>(new DefaultComboBoxModel<>(new String[]{
+      comboBulkActions = new BaseComboBox<>(new DefaultComboBoxModel<>(new String[]{
         BULKACTION_NONE,
 	BULKACTION_PAUSE,
 	BULKACTION_RESUME,
