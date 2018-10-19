@@ -25,9 +25,9 @@ import adams.core.io.FileUtils;
 import adams.core.net.TwitterHelper;
 import adams.env.Environment;
 import adams.env.TwitterDefinition;
+import adams.gui.core.BaseCheckBox;
 import adams.gui.core.ParameterPanel;
 
-import javax.swing.JCheckBox;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
@@ -55,7 +55,7 @@ public class TwitterSetupPanel
   protected JPasswordField m_TextConsumerSecret;
 
   /** Whether to show the consumer secret. */
-  protected JCheckBox m_CheckBoxShowConsumerSecret;
+  protected BaseCheckBox m_CheckBoxShowConsumerSecret;
 
   /** the access token. */
   protected JTextField m_TextAccessToken;
@@ -64,7 +64,7 @@ public class TwitterSetupPanel
   protected JPasswordField m_TextAccessTokenSecret;
 
   /** Whether to show the access token secret. */
-  protected JCheckBox m_CheckBoxShowAccessTokenSecret;
+  protected BaseCheckBox m_CheckBoxShowAccessTokenSecret;
 
   /**
    * Initializes the members.
@@ -87,7 +87,7 @@ public class TwitterSetupPanel
     m_TextConsumerSecret.setEchoChar(Constants.PASSWORD_CHAR);
     m_PanelParameters.addParameter("Consumer _secret", m_TextConsumerSecret);
 
-    m_CheckBoxShowConsumerSecret = new JCheckBox();
+    m_CheckBoxShowConsumerSecret = new BaseCheckBox();
     m_CheckBoxShowConsumerSecret.setSelected(false);
     m_CheckBoxShowConsumerSecret.addActionListener((ActionEvent e) -> {
       if (m_CheckBoxShowConsumerSecret.isSelected())
@@ -106,7 +106,7 @@ public class TwitterSetupPanel
     m_TextAccessTokenSecret.setEchoChar(Constants.PASSWORD_CHAR);
     m_PanelParameters.addParameter("Access _token secret", m_TextAccessTokenSecret);
 
-    m_CheckBoxShowAccessTokenSecret = new JCheckBox();
+    m_CheckBoxShowAccessTokenSecret = new BaseCheckBox();
     m_CheckBoxShowAccessTokenSecret.setSelected(false);
     m_CheckBoxShowAccessTokenSecret.addActionListener((ActionEvent e) -> {
       if (m_CheckBoxShowAccessTokenSecret.isSelected())

@@ -27,12 +27,12 @@ import adams.core.logging.LoggingLevel;
 import adams.db.MongoDbConnection;
 import adams.db.MongoDbConnectionParameters;
 import adams.gui.core.BaseButton;
+import adams.gui.core.BaseCheckBox;
 import adams.gui.core.BasePanel;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.ParameterPanel;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -77,7 +77,7 @@ public class MongoDbConnectionPanel
   protected JPasswordField m_TextPassword;
 
   /** the checkbox for showing the password. */
-  protected JCheckBox m_CheckBoxShowPassword;
+  protected BaseCheckBox m_CheckBoxShowPassword;
 
   /** the edit field for the authentication DB. */
   protected JTextField m_TextAuthDB;
@@ -86,7 +86,7 @@ public class MongoDbConnectionPanel
   protected JComboBox m_ComboBoxLoggingLevel;
 
   /** the checkbox for connecting on startup. */
-  protected JCheckBox m_CheckBoxConnectOnStartUp;
+  protected BaseCheckBox m_CheckBoxConnectOnStartUp;
 
   /** the button for making a connection the default one. */
   protected BaseButton m_ButtonMakeDefault;
@@ -158,7 +158,7 @@ public class MongoDbConnectionPanel
     m_TextPassword.setEchoChar(Constants.PASSWORD_CHAR);
     m_PanelParameters.addParameter("_Password", m_TextPassword);
 
-    m_CheckBoxShowPassword = new JCheckBox();
+    m_CheckBoxShowPassword = new BaseCheckBox();
     m_CheckBoxShowPassword.setSelected(false);
     m_CheckBoxShowPassword.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -176,7 +176,7 @@ public class MongoDbConnectionPanel
     m_ComboBoxLoggingLevel = new JComboBox(LoggingLevel.values());
     m_PanelParameters.addParameter("_Logging level", m_ComboBoxLoggingLevel);
 
-    m_CheckBoxConnectOnStartUp = new JCheckBox();
+    m_CheckBoxConnectOnStartUp = new BaseCheckBox();
     m_CheckBoxConnectOnStartUp.setSelected(false);
     m_PanelParameters.addParameter("Co_nnect on startup", m_CheckBoxConnectOnStartUp);
 

@@ -33,6 +33,7 @@ import adams.flow.core.PauseStateManager;
 import adams.flow.core.RatMode;
 import adams.flow.core.RatState;
 import adams.gui.core.BaseButton;
+import adams.gui.core.BaseCheckBox;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.GUIHelper;
@@ -40,7 +41,6 @@ import adams.gui.core.ParameterPanel;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -160,7 +160,7 @@ public class RatControl
     protected T m_Actor;
 
     /** the checkbox for bulk actions. */
-    protected JCheckBox m_CheckBoxBulkAction;
+    protected BaseCheckBox m_CheckBoxBulkAction;
 
     /** the button for pausing/resuming. */
     protected BaseButton m_ButtonPauseResume;
@@ -174,7 +174,7 @@ public class RatControl
       
       setLayout(new FlowLayout(FlowLayout.LEFT, 5, 1));
 
-      m_CheckBoxBulkAction = new JCheckBox();
+      m_CheckBoxBulkAction = new BaseCheckBox();
       m_CheckBoxBulkAction.setVisible(false);
       m_CheckBoxBulkAction.addActionListener((ActionEvent e) -> checkBoxBulkActionTrigger());
       m_CheckBoxBulkAction.setToolTipText(getCheckBoxBulkActionToolTipText());

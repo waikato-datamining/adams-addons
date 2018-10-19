@@ -20,9 +20,9 @@
 
 package adams.gui.visualization.annotator;
 
+import adams.gui.core.BaseCheckBox;
 import adams.gui.core.ParameterPanel;
 
-import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JTextField;
 import javax.swing.text.MaskFormatter;
@@ -48,10 +48,10 @@ public class BindingParameterPanel extends ParameterPanel {
   protected KeyPressTextField m_BindingField;
 
   /** a checkbox to indicate if the binding is toggleable or not */
-  protected JCheckBox m_Toggleable;
+  protected BaseCheckBox m_Toggleable;
 
   /** a checkbox to indicate if the binding is inverted */
-  protected JCheckBox m_Inverted;
+  protected BaseCheckBox m_Inverted;
 
   /** an input field for the interval for this binding */
   protected JFormattedTextField m_Interval;
@@ -71,8 +71,8 @@ public class BindingParameterPanel extends ParameterPanel {
 
     m_NameField = new JTextField();
     m_BindingField = new KeyPressTextField();
-    m_Toggleable = new JCheckBox();
-    m_Inverted = new JCheckBox();
+    m_Toggleable = new BaseCheckBox();
+    m_Inverted = new BaseCheckBox();
     m_Interval = new JFormattedTextField(NumberFormat.getNumberInstance());
     m_Interval.setValue(DEFAULT_TIMEOUT);
 
