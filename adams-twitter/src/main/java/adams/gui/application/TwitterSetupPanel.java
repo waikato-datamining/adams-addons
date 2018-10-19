@@ -26,10 +26,10 @@ import adams.core.net.TwitterHelper;
 import adams.env.Environment;
 import adams.env.TwitterDefinition;
 import adams.gui.core.BaseCheckBox;
+import adams.gui.core.BaseTextField;
 import adams.gui.core.ParameterPanel;
 
 import javax.swing.JPasswordField;
-import javax.swing.JTextField;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 
@@ -49,7 +49,7 @@ public class TwitterSetupPanel
   protected ParameterPanel m_PanelParameters;
 
   /** the consumer key. */
-  protected JTextField m_TextConsumerKey;
+  protected BaseTextField m_TextConsumerKey;
 
   /** the consumer secret. */
   protected JPasswordField m_TextConsumerSecret;
@@ -58,7 +58,7 @@ public class TwitterSetupPanel
   protected BaseCheckBox m_CheckBoxShowConsumerSecret;
 
   /** the access token. */
-  protected JTextField m_TextAccessToken;
+  protected BaseTextField m_TextAccessToken;
 
   /** the access token secret. */
   protected JPasswordField m_TextAccessTokenSecret;
@@ -78,7 +78,7 @@ public class TwitterSetupPanel
     m_PanelParameters = new ParameterPanel();
     add(m_PanelParameters, BorderLayout.CENTER);
 
-    m_TextConsumerKey = new JTextField(20);
+    m_TextConsumerKey = new BaseTextField(20);
     m_TextConsumerKey.setText(TwitterHelper.getConsumerKey());
     m_PanelParameters.addParameter("Consumer _key", m_TextConsumerKey);
 
@@ -97,7 +97,7 @@ public class TwitterSetupPanel
     });
     m_PanelParameters.addParameter("Show consumer secret", m_CheckBoxShowConsumerSecret);
 
-    m_TextAccessToken = new JTextField(20);
+    m_TextAccessToken = new BaseTextField(20);
     m_TextAccessToken.setText(TwitterHelper.getAccessToken());
     m_PanelParameters.addParameter("_Access token", m_TextAccessToken);
 

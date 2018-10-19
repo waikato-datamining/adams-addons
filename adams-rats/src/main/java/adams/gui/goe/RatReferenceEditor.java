@@ -27,6 +27,7 @@ import adams.flow.core.RatReference;
 import adams.flow.standalone.Rats;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseScrollPane;
+import adams.gui.core.BaseTextField;
 import adams.gui.core.BaseTreeNode;
 import adams.gui.core.MouseUtils;
 import adams.gui.flow.tree.Node;
@@ -37,7 +38,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
@@ -65,7 +65,7 @@ public class RatReferenceEditor
   implements CustomStringRepresentationHandler {
 
   /** The text field with the value. */
-  protected JTextField m_TextValue;
+  protected BaseTextField m_TextValue;
 
   /** The tree displaying all the callable actors. */
   protected RatsTree m_Tree;
@@ -254,7 +254,7 @@ public class RatReferenceEditor
     panel    = new JPanel(new FlowLayout(FlowLayout.LEFT));
     panelAll.add(panel, BorderLayout.CENTER);
 
-    m_TextValue = new JTextField(20);
+    m_TextValue = new BaseTextField(20);
     m_TextValue.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {

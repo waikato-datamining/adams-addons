@@ -30,6 +30,7 @@ import adams.gui.core.BaseButton;
 import adams.gui.core.BaseCheckBox;
 import adams.gui.core.BaseComboBox;
 import adams.gui.core.BasePanel;
+import adams.gui.core.BaseTextField;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.ParameterPanel;
 
@@ -37,7 +38,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -68,10 +68,10 @@ public class MongoDbConnectionPanel
   protected BaseComboBox m_ComboBoxConnections;
 
   /** the edit field for the database URL. */
-  protected JTextField m_TextURL;
+  protected BaseTextField m_TextURL;
 
   /** the edit field for the database user. */
-  protected JTextField m_TextUser;
+  protected BaseTextField m_TextUser;
 
   /** the edit field for the database password. */
   protected JPasswordField m_TextPassword;
@@ -80,7 +80,7 @@ public class MongoDbConnectionPanel
   protected BaseCheckBox m_CheckBoxShowPassword;
 
   /** the edit field for the authentication DB. */
-  protected JTextField m_TextAuthDB;
+  protected BaseTextField m_TextAuthDB;
 
   /** the combobox for the logging level. */
   protected BaseComboBox m_ComboBoxLoggingLevel;
@@ -148,10 +148,10 @@ public class MongoDbConnectionPanel
     });
     m_PanelParameters.addParameter("_Connections", m_ComboBoxConnections);
 
-    m_TextURL = new JTextField(20);
+    m_TextURL = new BaseTextField(20);
     m_PanelParameters.addParameter("_URL", m_TextURL);
 
-    m_TextUser = new JTextField(20);
+    m_TextUser = new BaseTextField(20);
     m_PanelParameters.addParameter("U_ser", m_TextUser);
 
     m_TextPassword = new JPasswordField(20);
@@ -170,7 +170,7 @@ public class MongoDbConnectionPanel
     });
     m_PanelParameters.addParameter("Sho_w password", m_CheckBoxShowPassword);
 
-    m_TextAuthDB = new JTextField(20);
+    m_TextAuthDB = new BaseTextField(20);
     m_PanelParameters.addParameter("Auth DB", m_TextAuthDB);
 
     m_ComboBoxLoggingLevel = new BaseComboBox(LoggingLevel.values());

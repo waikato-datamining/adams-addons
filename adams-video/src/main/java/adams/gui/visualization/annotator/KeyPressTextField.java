@@ -20,7 +20,8 @@
 
 package adams.gui.visualization.annotator;
 
-import javax.swing.JTextField;
+import adams.gui.core.BaseTextField;
+
 import javax.swing.KeyStroke;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -31,7 +32,7 @@ import java.awt.event.KeyListener;
  * @author sjb90
  * @version $Revision$
  */
-public class KeyPressTextField extends JTextField {
+public class KeyPressTextField extends BaseTextField {
 
   private static final long serialVersionUID = -1292173919485929114L;
 

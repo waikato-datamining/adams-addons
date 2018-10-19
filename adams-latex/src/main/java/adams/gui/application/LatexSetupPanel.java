@@ -25,9 +25,9 @@ import adams.doc.latex.LatexHelper;
 import adams.env.Environment;
 import adams.env.LatexDefinition;
 import adams.gui.chooser.DirectoryChooserPanel;
+import adams.gui.core.BaseTextField;
 import adams.gui.core.ParameterPanel;
 
-import javax.swing.JTextField;
 import java.awt.BorderLayout;
 
 /**
@@ -49,13 +49,13 @@ public class LatexSetupPanel
   protected DirectoryChooserPanel m_ChooserLatexBinaries;
 
   /** the executable. */
-  protected JTextField m_TextExecutable;
+  protected BaseTextField m_TextExecutable;
 
   /** the executable options. */
-  protected JTextField m_TextExecutableOptions;
+  protected BaseTextField m_TextExecutableOptions;
 
   /** the bibtex executable. */
-  protected JTextField m_TextBibtex;
+  protected BaseTextField m_TextBibtex;
 
   /**
    * Initializes the members.
@@ -73,15 +73,15 @@ public class LatexSetupPanel
     m_ChooserLatexBinaries.setCurrent(LatexHelper.getBinariesDir());
     m_PanelParameters.addParameter("_Binaries dir", m_ChooserLatexBinaries);
 
-    m_TextExecutable = new JTextField(10);
+    m_TextExecutable = new BaseTextField(10);
     m_TextExecutable.setText(LatexHelper.getExecutable());
     m_PanelParameters.addParameter("_Executable", m_TextExecutable);
 
-    m_TextExecutableOptions = new JTextField(10);
+    m_TextExecutableOptions = new BaseTextField(10);
     m_TextExecutableOptions.setText(LatexHelper.getExecutableOptions());
     m_PanelParameters.addParameter("Executable _options", m_TextExecutableOptions);
 
-    m_TextBibtex = new JTextField(10);
+    m_TextBibtex = new BaseTextField(10);
     m_TextBibtex.setText(LatexHelper.getBibtex());
     m_PanelParameters.addParameter("B_ibtex", m_TextBibtex);
   }

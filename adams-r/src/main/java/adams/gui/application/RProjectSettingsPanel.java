@@ -19,16 +19,14 @@
  */
 package adams.gui.application;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-
 import adams.core.RProjectHelper;
 import adams.core.io.PlaceholderFile;
-import adams.gui.application.AbstractPreferencesPanel;
 import adams.gui.chooser.FileChooserPanel;
+import adams.gui.core.BaseTextField;
 import adams.gui.core.ParameterPanel;
+
+import javax.swing.JSpinner;
+import java.awt.BorderLayout;
 
 /**
  * Panel for configuring the R-Project settings.
@@ -49,7 +47,7 @@ public class RProjectSettingsPanel
   protected FileChooserPanel m_FileRExecutable;
 
   /** the Rserve host. */
-  protected JTextField m_TextRserveHost;
+  protected BaseTextField m_TextRserveHost;
 
   /** the Rserve port. */
   protected JSpinner m_SpinnerRservePort;
@@ -72,7 +70,7 @@ public class RProjectSettingsPanel
     m_PanelParameters.addParameter(m_FileRExecutable);
     
     // Rserve
-    m_TextRserveHost = new JTextField(15);
+    m_TextRserveHost = new BaseTextField(15);
     m_PanelParameters.addParameter("Rserve _Host", m_TextRserveHost);
 
     m_SpinnerRservePort = new JSpinner();

@@ -21,10 +21,10 @@
 package adams.gui.tools.audioannotator;
 
 import adams.gui.core.BaseCheckBox;
+import adams.gui.core.BaseTextField;
 import adams.gui.core.ParameterPanel;
 
 import javax.swing.JFormattedTextField;
-import javax.swing.JTextField;
 import javax.swing.text.MaskFormatter;
 import java.security.InvalidKeyException;
 import java.text.NumberFormat;
@@ -41,7 +41,7 @@ public class BindingParameterPanel extends ParameterPanel {
   private static final int DEFAULT_TIMEOUT = 250;
 
   /** a text field for the name */
-  protected JTextField m_NameField;
+  protected BaseTextField m_NameField;
 
   /** a text field for the key press */
   protected KeyPressTextField m_BindingField;
@@ -68,7 +68,7 @@ public class BindingParameterPanel extends ParameterPanel {
       System.err.println("formatter is bad: " + e.getMessage());
     }
 
-    m_NameField = new JTextField();
+    m_NameField = new BaseTextField();
     m_BindingField = new KeyPressTextField();
     m_Toggleable = new BaseCheckBox();
     m_Inverted = new BaseCheckBox();
