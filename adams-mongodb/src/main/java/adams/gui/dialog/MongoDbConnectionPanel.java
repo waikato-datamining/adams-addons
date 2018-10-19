@@ -26,12 +26,12 @@ import adams.core.StatusMessageHandler;
 import adams.core.logging.LoggingLevel;
 import adams.db.MongoDbConnection;
 import adams.db.MongoDbConnectionParameters;
+import adams.gui.core.BaseButton;
 import adams.gui.core.BasePanel;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.ParameterPanel;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -89,10 +89,10 @@ public class MongoDbConnectionPanel
   protected JCheckBox m_CheckBoxConnectOnStartUp;
 
   /** the button for making a connection the default one. */
-  protected JButton m_ButtonMakeDefault;
+  protected BaseButton m_ButtonMakeDefault;
 
   /** the button connecting/disconnecting the database. */
-  protected JButton m_ButtonConnect;
+  protected BaseButton m_ButtonConnect;
 
   /** the label for status messages. */
   protected JLabel m_LabelStatus;
@@ -192,7 +192,7 @@ public class MongoDbConnectionPanel
     // buttons
     panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-    m_ButtonMakeDefault = new JButton("Make default");
+    m_ButtonMakeDefault = new BaseButton("Make default");
     panel.add(m_ButtonMakeDefault);
     m_ButtonMakeDefault.setMnemonic('m');
     m_ButtonMakeDefault.addActionListener(new ActionListener() {
@@ -204,7 +204,7 @@ public class MongoDbConnectionPanel
       }
     });
 
-    m_ButtonConnect = new JButton("Connect");
+    m_ButtonConnect = new BaseButton("Connect");
     panel.add(m_ButtonConnect);
     m_ButtonConnect.setMnemonic('C');
     m_ButtonConnect.addActionListener(new ActionListener() {

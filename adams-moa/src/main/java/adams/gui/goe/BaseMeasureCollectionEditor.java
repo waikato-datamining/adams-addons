@@ -24,11 +24,11 @@ package adams.gui.goe;
 import adams.core.Utils;
 import adams.core.base.BaseMeasureCollection;
 import adams.core.option.AbstractOption;
+import adams.gui.core.BaseButton;
 import adams.gui.dialog.ApprovalDialog;
 import moa.evaluation.MeasureCollection;
 import nz.ac.waikato.cms.locator.ClassLocator;
 
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -182,8 +182,8 @@ public class BaseMeasureCollectionEditor
     JPanel		panel;
     JLabel		label;
     JPanel 		panelButtons;
-    JButton 		buttonOK;
-    JButton 		buttonClose;
+    BaseButton 		buttonOK;
+    BaseButton 		buttonClose;
     List<String> 	classes;
     int			i;
 
@@ -219,7 +219,7 @@ public class BaseMeasureCollectionEditor
     panelButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     panelAll.add(panelButtons, BorderLayout.SOUTH);
 
-    buttonOK = new JButton("OK");
+    buttonOK = new BaseButton("OK");
     buttonOK.setMnemonic('O');
     buttonOK.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -228,7 +228,7 @@ public class BaseMeasureCollectionEditor
     });
     panelButtons.add(buttonOK);
 
-    buttonClose = new JButton("Cancel");
+    buttonClose = new BaseButton("Cancel");
     buttonClose.setMnemonic('C');
     buttonClose.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {

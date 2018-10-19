@@ -21,13 +21,15 @@
 package adams.gui.visualization.annotator;
 
 import adams.gui.action.AbstractBaseAction;
+import adams.gui.core.BaseButton;
 import adams.gui.core.BaseListWithButtons;
 import adams.gui.core.BasePanel;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.DefaultListModel;
+import java.awt.Dialog;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,17 +50,17 @@ public class BindingsEditorPanel extends BasePanel{
   /**
    * the button for adding a binding
    */
-  protected JButton m_AddButton;
+  protected BaseButton m_AddButton;
 
   /**
    * the button for deleting a binding
    */
-  protected JButton m_DeleteButton;
+  protected BaseButton m_DeleteButton;
 
   /**
    * the save button
    */
-  protected JButton m_EditButton;
+  protected BaseButton m_EditButton;
 
   /**
    * dialog for editing or adding a binding
@@ -165,13 +167,13 @@ public class BindingsEditorPanel extends BasePanel{
 
     // Buttons for the list
 
-    m_AddButton = new JButton(m_AddAction);
+    m_AddButton = new BaseButton(m_AddAction);
     m_BindingsList.addToButtonsPanel(m_AddButton);
 
-    m_DeleteButton = new JButton(m_DeleteAction);
+    m_DeleteButton = new BaseButton(m_DeleteAction);
     m_BindingsList.addToButtonsPanel(m_DeleteButton);
 
-    m_EditButton = new JButton(m_EditAction);
+    m_EditButton = new BaseButton(m_EditAction);
     m_EditButton.setEnabled(false);
     m_BindingsList.addToButtonsPanel(m_EditButton);
     add(m_BindingsList);

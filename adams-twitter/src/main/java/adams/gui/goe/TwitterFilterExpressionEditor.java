@@ -25,6 +25,7 @@ import adams.core.Utils;
 import adams.core.base.BaseObject;
 import adams.core.base.TwitterFilterExpression;
 import adams.core.option.AbstractOption;
+import adams.gui.core.BaseButton;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseTextArea;
 import adams.gui.core.GUIHelper;
@@ -33,7 +34,6 @@ import adams.gui.help.HelpFrame;
 import adams.parser.TwitterFilter;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -66,7 +66,7 @@ public class TwitterFilterExpressionEditor
   protected JTextComponent m_TextValue;
 
   /** the help button for bringing up a browser with the Java Pattern class. */
-  protected JButton m_ButtonHelp;
+  protected BaseButton m_ButtonHelp;
 
   /**
    * Returns the Compound as string.
@@ -158,8 +158,8 @@ public class TwitterFilterExpressionEditor
     JPanel		panel;
     JLabel		label;
     JPanel 		panelButtons;
-    JButton 		buttonOK;
-    JButton 		buttonClose;
+    BaseButton 		buttonOK;
+    BaseButton 		buttonClose;
 
     m_TextValue = new BaseTextArea(1, 20);
     ((BaseTextArea) m_TextValue).setLineWrap(true);
@@ -197,7 +197,7 @@ public class TwitterFilterExpressionEditor
     panelButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     panelAll.add(panelButtons, BorderLayout.SOUTH);
 
-    m_ButtonHelp = new JButton(GUIHelper.getIcon("help2.png"));
+    m_ButtonHelp = new BaseButton(GUIHelper.getIcon("help2.png"));
     m_ButtonHelp.setToolTipText("Display grammar");
     m_ButtonHelp.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -208,7 +208,7 @@ public class TwitterFilterExpressionEditor
     panelAll.add(panel, BorderLayout.EAST);
     panel.add(m_ButtonHelp);
 
-    buttonOK = new JButton("OK");
+    buttonOK = new BaseButton("OK");
     buttonOK.setMnemonic('O');
     buttonOK.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -217,7 +217,7 @@ public class TwitterFilterExpressionEditor
     });
     panelButtons.add(buttonOK);
 
-    buttonClose = new JButton("Cancel");
+    buttonClose = new BaseButton("Cancel");
     buttonClose.setMnemonic('C');
     buttonClose.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {

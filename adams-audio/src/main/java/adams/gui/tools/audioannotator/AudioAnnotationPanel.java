@@ -24,9 +24,9 @@ import adams.core.TimeMsec;
 import adams.data.audioannotations.AudioAnnotation;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.audio.AudioPlaybackPanel;
+import adams.gui.core.BaseButton;
 import adams.gui.core.BasePanel;
 
-import javax.swing.JButton;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
@@ -78,7 +78,7 @@ public class AudioAnnotationPanel extends BasePanel implements TickListener {
   protected boolean m_IsToggled;
 
   /** a button to indicate when a binding is pressed or toggled on */
-  protected JButton m_Button;
+  protected BaseButton m_Button;
 
   /**
    * Constructs a AnnotationPanel
@@ -117,7 +117,7 @@ public class AudioAnnotationPanel extends BasePanel implements TickListener {
   protected void initGUI() {
     super.initGUI();
     setLayout(new FlowLayout(FlowLayout.CENTER));
-    m_Button = new JButton();
+    m_Button = new BaseButton();
     add(m_Button);
   }
 

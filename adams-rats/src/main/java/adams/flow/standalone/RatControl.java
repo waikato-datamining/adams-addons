@@ -32,6 +32,7 @@ import adams.flow.core.PauseStateHandler;
 import adams.flow.core.PauseStateManager;
 import adams.flow.core.RatMode;
 import adams.flow.core.RatState;
+import adams.gui.core.BaseButton;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.GUIHelper;
@@ -39,7 +40,6 @@ import adams.gui.core.ParameterPanel;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -163,7 +163,7 @@ public class RatControl
     protected JCheckBox m_CheckBoxBulkAction;
 
     /** the button for pausing/resuming. */
-    protected JButton m_ButtonPauseResume;
+    protected BaseButton m_ButtonPauseResume;
     
     /**
      * Initializes the widgets.
@@ -180,7 +180,7 @@ public class RatControl
       m_CheckBoxBulkAction.setToolTipText(getCheckBoxBulkActionToolTipText());
       add(m_CheckBoxBulkAction);
 
-      m_ButtonPauseResume = new JButton(GUIHelper.getIcon("pause.gif"));
+      m_ButtonPauseResume = new BaseButton(GUIHelper.getIcon("pause.gif"));
       m_ButtonPauseResume.addActionListener((ActionEvent e) -> pauseOrResume());
       add(m_ButtonPauseResume);
     }
@@ -445,7 +445,7 @@ public class RatControl
     private static final long serialVersionUID = 4516229240505598425L;
 
     /** the button for stopping/starting. */
-    protected JButton m_ButtonStopStart;
+    protected BaseButton m_ButtonStopStart;
 
     /**
      * Initializes the widgets.
@@ -454,7 +454,7 @@ public class RatControl
     protected void initGUI() {
       super.initGUI();
 
-      m_ButtonStopStart = new JButton(GUIHelper.getIcon("run.gif"));
+      m_ButtonStopStart = new BaseButton(GUIHelper.getIcon("run.gif"));
       m_ButtonStopStart.addActionListener((ActionEvent e) -> stopOrStart());
       add(m_ButtonStopStart);
     }
@@ -953,9 +953,9 @@ public class RatControl
     ParameterPanel		param;
     JPanel			panel;
     JPanel			panelBottom;
-    JButton			buttonStop;
+    BaseButton			buttonStop;
     final JComboBox<String> 	comboBulkActions;
-    JButton			buttonApply;
+    BaseButton			buttonApply;
     int				i;
     boolean			inControl;
     
@@ -1009,7 +1009,7 @@ public class RatControl
 	BULKACTION_STOP,
       }));
       panel.add(comboBulkActions);
-      buttonApply = new JButton("Apply");
+      buttonApply = new BaseButton("Apply");
       buttonApply.addActionListener((ActionEvent e) -> {
         SwingWorker worker = new SwingWorker() {
 	  @Override
@@ -1031,7 +1031,7 @@ public class RatControl
 
     // general buttons
     panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    buttonStop = new JButton("Stop");
+    buttonStop = new BaseButton("Stop");
     buttonStop.addActionListener((ActionEvent e) -> getRoot().stopExecution());
     panel.add(buttonStop);
     panelBottom.add(panel, BorderLayout.EAST);

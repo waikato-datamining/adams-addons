@@ -22,12 +22,15 @@ package adams.gui.visualization.annotator;
 
 import adams.data.trail.Step;
 import adams.gui.action.AbstractBaseAction;
+import adams.gui.core.BaseButton;
 import adams.gui.core.BasePanel;
 import adams.gui.visualization.video.vlcjplayer.VLCjDirectRenderPanel;
 
-import javax.swing.*;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Date;
@@ -76,7 +79,7 @@ public class AnnotationPanel extends BasePanel implements TickListener {
   protected boolean m_IsToggled;
 
   /** a button to indicate when a binding is pressed or toggled on */
-  protected JButton m_Button;
+  protected BaseButton m_Button;
 
   /**
    * Constructs a AnnotationPanel
@@ -115,7 +118,7 @@ public class AnnotationPanel extends BasePanel implements TickListener {
   protected void initGUI() {
     super.initGUI();
     setLayout(new FlowLayout(FlowLayout.CENTER));
-    m_Button = new JButton();
+    m_Button = new BaseButton();
     add(m_Button);
   }
 

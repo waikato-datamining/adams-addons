@@ -23,6 +23,7 @@ package adams.gui.audio;
 import adams.core.CleanUpHandler;
 import adams.core.Utils;
 import adams.gui.chooser.AudioFileChooser;
+import adams.gui.core.BaseButton;
 import adams.gui.core.BasePanel;
 import adams.gui.core.GUIHelper;
 
@@ -35,7 +36,6 @@ import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineEvent.Type;
 import javax.sound.sampled.LineListener;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -62,13 +62,13 @@ public class AudioPlaybackPanel
   public final static String NO_TIME = "--:--:--";
 
   /** the button starting playback. */
-  protected JButton m_ButtonStart;
+  protected BaseButton m_ButtonStart;
 
   /** the button pausing/resuming playback. */
-  protected JButton m_ButtonPauseResume;
+  protected BaseButton m_ButtonPauseResume;
 
   /** the button stopping playback. */
-  protected JButton m_ButtonStop;
+  protected BaseButton m_ButtonStop;
 
   /** the text displaying the time. */
   protected JLabel m_LabelTime;
@@ -151,15 +151,15 @@ public class AudioPlaybackPanel
     panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     add(panel, BorderLayout.SOUTH);
 
-    m_ButtonStart = new JButton(GUIHelper.getIcon("run.gif"));
+    m_ButtonStart = new BaseButton(GUIHelper.getIcon("run.gif"));
     m_ButtonStart.addActionListener((ActionEvent e) -> start());
     panel.add(m_ButtonStart);
 
-    m_ButtonPauseResume = new JButton(GUIHelper.getIcon("pause.gif"));
+    m_ButtonPauseResume = new BaseButton(GUIHelper.getIcon("pause.gif"));
     m_ButtonPauseResume.addActionListener((ActionEvent e) -> pauseOrResume());
     panel.add(m_ButtonPauseResume);
 
-    m_ButtonStop = new JButton(GUIHelper.getIcon("stop_blue.gif"));
+    m_ButtonStop = new BaseButton(GUIHelper.getIcon("stop_blue.gif"));
     m_ButtonStop.addActionListener((ActionEvent e) -> stop());
     panel.add(m_ButtonStop);
   }

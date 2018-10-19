@@ -27,15 +27,19 @@ import adams.data.image.multiimageoperation.Median;
 import adams.flow.transformer.movieimagesampler.AbstractBufferedImageMovieImageSampler;
 import adams.flow.transformer.movieimagesampler.AbstractMovieImageSampler;
 import adams.flow.transformer.movieimagesampler.FixedIntervalBufferedImageSampler;
+import adams.gui.core.BaseButton;
 import adams.gui.core.MouseUtils;
 import adams.gui.core.ParameterPanel;
 import adams.gui.dialog.ApprovalDialog;
 import adams.gui.goe.GenericObjectEditorPanel;
-import adams.gui.tools.SpreadSheetViewerPanel;
 import adams.gui.visualization.image.ImagePanel;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import java.awt.BorderLayout;
+import java.awt.Dialog;
+import java.awt.Frame;
 import java.awt.image.BufferedImage;
 
 /**
@@ -55,7 +59,7 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
   protected AbstractBufferedImageMultiImageOperation m_ImageOperation;
 
   /** preview button */
-  protected JButton m_ButtonPreview;
+  protected BaseButton m_ButtonPreview;
 
   /** Image Panel for displaying the preview */
   protected ImagePanel m_ImagePanel;
@@ -189,7 +193,7 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
     m_ImagePanel = new ImagePanel();
     add(m_ImagePanel, BorderLayout.CENTER);
 
-    m_ButtonPreview = new JButton("Preview");
+    m_ButtonPreview = new BaseButton("Preview");
     getButtonsPanel(false).add(m_ButtonPreview);
     getButtonsPanel(false).setComponentZOrder(m_ButtonPreview,0);
     m_ButtonPreview.addActionListener( e -> {

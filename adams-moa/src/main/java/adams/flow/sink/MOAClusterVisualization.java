@@ -30,6 +30,7 @@ import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.Token;
 import adams.flow.source.MOAClustererSetup;
+import adams.gui.core.BaseButton;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseSplitPane;
@@ -50,7 +51,6 @@ import weka.core.Instances;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -873,7 +873,7 @@ public class MOAClusterVisualization
     JPanel 			panel2;
     JLabel 			label;
     final JComboBox<String>	comboBox;
-    JButton 			button;
+    BaseButton 			button;
     List<String>		measures;
     int				i;
 
@@ -999,7 +999,7 @@ public class MOAClusterVisualization
     panel2 = new JPanel(new GridLayout(4, 1));
     panel.add(panel2, BorderLayout.NORTH);
 
-    button = new JButton("X", GUIHelper.getIcon("zoom_in.png"));
+    button = new BaseButton("X", GUIHelper.getIcon("zoom_in.png"));
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -1008,7 +1008,7 @@ public class MOAClusterVisualization
     });
     panel2.add(button);
 
-    button = new JButton("X", GUIHelper.getIcon("zoom_out.png"));
+    button = new BaseButton("X", GUIHelper.getIcon("zoom_out.png"));
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -1017,7 +1017,7 @@ public class MOAClusterVisualization
     });
     panel2.add(button);
 
-    button = new JButton("Y", GUIHelper.getIcon("zoom_in.png"));
+    button = new BaseButton("Y", GUIHelper.getIcon("zoom_in.png"));
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -1026,7 +1026,7 @@ public class MOAClusterVisualization
     });
     panel2.add(button);
 
-    button = new JButton("Y", GUIHelper.getIcon("zoom_out.png"));
+    button = new BaseButton("Y", GUIHelper.getIcon("zoom_out.png"));
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {

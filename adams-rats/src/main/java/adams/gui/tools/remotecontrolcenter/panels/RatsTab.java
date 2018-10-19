@@ -22,6 +22,7 @@ package adams.gui.tools.remotecontrolcenter.panels;
 
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
+import adams.gui.core.BaseButton;
 import adams.gui.core.BasePanel;
 import adams.gui.core.GUIHelper;
 import adams.scripting.command.RemoteCommand;
@@ -32,7 +33,6 @@ import adams.scripting.command.flow.SendRatControlCommand.Command;
 import adams.scripting.responsehandler.AbstractResponseHandler;
 import com.googlecode.jfilechooserbookmarks.gui.BaseScrollPane;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -158,10 +158,10 @@ public class RatsTab
     protected JLabel m_LabelName;
 
     /** the button for pause/resume. */
-    protected JButton m_ButtonPauseResume;
+    protected BaseButton m_ButtonPauseResume;
 
     /** the button for stop/start. */
-    protected JButton m_ButtonStopStart;
+    protected BaseButton m_ButtonStopStart;
 
     /** the label for interactive actors. */
     protected JLabel m_LabelInteractive;
@@ -210,13 +210,13 @@ public class RatsTab
       add(m_LabelName);
 
       if (m_Pausable) {
-	m_ButtonPauseResume = new JButton(m_Paused ? GUIHelper.getIcon("resume.gif") : GUIHelper.getIcon("pause.gif"));
+	m_ButtonPauseResume = new BaseButton(m_Paused ? GUIHelper.getIcon("resume.gif") : GUIHelper.getIcon("pause.gif"));
 	m_ButtonPauseResume.addActionListener((ActionEvent e) -> pauseResume());
 	add(m_ButtonPauseResume);
       }
 
       if (m_Stoppable) {
-	m_ButtonStopStart = new JButton(m_Stopped ? GUIHelper.getIcon("run.gif") : GUIHelper.getIcon("stop_blue.gif"));
+	m_ButtonStopStart = new BaseButton(m_Stopped ? GUIHelper.getIcon("run.gif") : GUIHelper.getIcon("stop_blue.gif"));
 	m_ButtonStopStart.addActionListener((ActionEvent e) -> stopStart());
 	add(m_ButtonStopStart);
       }
@@ -280,7 +280,7 @@ public class RatsTab
   protected JPanel m_PanelRats;
 
   /** the button for updating the rats states. */
-  protected JButton m_ButtonRefreshRats;
+  protected BaseButton m_ButtonRefreshRats;
 
   /**
    * Initializes the widgets.
@@ -299,7 +299,7 @@ public class RatsTab
 
     panelRefresh = new JPanel(new FlowLayout(FlowLayout.LEFT));
     panelAll.add(panelRefresh, BorderLayout.NORTH);
-    m_ButtonRefreshRats = new JButton(GUIHelper.getIcon("refresh.gif"));
+    m_ButtonRefreshRats = new BaseButton(GUIHelper.getIcon("refresh.gif"));
     m_ButtonRefreshRats.addActionListener((ActionEvent e) -> refreshRats());
     label = new JLabel("Refresh Rats status");
     label.setDisplayedMnemonic('R');

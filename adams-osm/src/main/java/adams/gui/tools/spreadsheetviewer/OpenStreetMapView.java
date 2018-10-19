@@ -44,6 +44,7 @@ import adams.flow.sink.openstreetmapviewer.OpenStreetMapSource;
 import adams.flow.sink.openstreetmapviewer.TableMapObjectHitListener;
 import adams.flow.source.StorageValue;
 import adams.flow.transformer.Convert;
+import adams.gui.core.BaseButton;
 import adams.gui.core.BasePanel;
 import adams.gui.core.ConsolePanel;
 import adams.gui.core.DescriptionPanel;
@@ -52,7 +53,6 @@ import adams.gui.core.PropertiesParameterPanel;
 import adams.gui.core.PropertiesParameterPanel.PropertyType;
 import adams.gui.goe.GenericObjectEditorPanel;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import java.awt.BorderLayout;
@@ -148,8 +148,8 @@ public class OpenStreetMapView
     String[]				cols;
     Properties				props;
     String				key;
-    JButton				buttonOK;
-    JButton				buttonCancel;
+    BaseButton				buttonOK;
+    BaseButton				buttonCancel;
     List<String>			order;
     
     result = new DescriptionPanel(new BorderLayout());
@@ -202,7 +202,7 @@ public class OpenStreetMapView
     panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     result.add(panel, BorderLayout.SOUTH);
     
-    buttonOK = new JButton("OK");
+    buttonOK = new BaseButton("OK");
     buttonOK.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -211,7 +211,7 @@ public class OpenStreetMapView
     });
     panel.add(buttonOK);
     
-    buttonCancel = new JButton("Cancel");
+    buttonCancel = new BaseButton("Cancel");
     buttonCancel.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {

@@ -20,10 +20,10 @@
 
 package adams.gui.dialog;
 
+import adams.gui.core.BaseButton;
 import adams.gui.core.BaseDialog;
 import adams.gui.core.GUIHelper;
 
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
@@ -53,7 +53,7 @@ public class MongoDbConnectionDialog
   protected MongoDbConnectionPanel m_Panel;
 
   /** the Close button. */
-  protected JButton m_ButtonClose;
+  protected BaseButton m_ButtonClose;
 
   /**
    * Creates a modal dialog.
@@ -130,7 +130,7 @@ public class MongoDbConnectionDialog
     panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     add(panel, BorderLayout.SOUTH);
 
-    m_ButtonClose = new JButton("Close", GUIHelper.getIcon("exit.png"));
+    m_ButtonClose = new BaseButton("Close", GUIHelper.getIcon("exit.png"));
     m_ButtonClose.setMnemonic('l');
     m_ButtonClose.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {

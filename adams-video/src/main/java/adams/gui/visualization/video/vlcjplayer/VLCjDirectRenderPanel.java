@@ -29,6 +29,7 @@ import adams.core.logging.Logger;
 import adams.core.logging.LoggingHelper;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.chooser.BaseFileChooser;
+import adams.gui.core.BaseButton;
 import adams.gui.core.BasePanel;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.MenuBarProvider;
@@ -40,7 +41,6 @@ import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -185,17 +185,17 @@ public class VLCjDirectRenderPanel
   /**
    * the "play" button
    */
-  protected JButton m_PlayButton;
+  protected BaseButton m_PlayButton;
 
   /**
    * the "pause" button
    */
-  protected JButton m_StopButton;
+  protected BaseButton m_StopButton;
 
   /**
    * Mute button
    */
-  protected JButton m_MuteButton;
+  protected BaseButton m_MuteButton;
   /**
    * for generating the title.
    */
@@ -502,13 +502,13 @@ public class VLCjDirectRenderPanel
     m_ControlsPanel.add(m_MediaLengthLabel);
 
     // Buttons
-    m_PlayButton = new JButton(m_PlayAction);
+    m_PlayButton = new BaseButton(m_PlayAction);
     m_ControlsPanel.add(m_PlayButton);
 
-    m_StopButton = new JButton(m_StopAction);
+    m_StopButton = new BaseButton(m_StopAction);
     m_ControlsPanel.add(m_StopButton);
 
-    m_MuteButton = new JButton(m_MuteAction);
+    m_MuteButton = new BaseButton(m_MuteAction);
     m_ControlsPanel.add(m_MuteButton);
 
   }
