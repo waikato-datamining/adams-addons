@@ -39,23 +39,14 @@ public class CNTKMultiFilterResultContainer
   /** the key for the dataset. */
   public final static String VALUE_DATASET = "Dataset";
 
-  /** the key for the IDs dataset. */
+  /** the key for the IDs JSON map. */
   public final static String VALUE_IDS = "IDs";
 
   /** the key for the saver commandline. */
   public final static String VALUE_SAVER = "Saver";
 
-  /** the key for the CNTK dimensions. */
-  public final static String VALUE_DIMS = "Dimensions";
-
-  /** the key for the CNTK reader. */
-  public final static String VALUE_READER = "Reader";
-
-  /** the key for the CNTK input vars. */
-  public final static String VALUE_INPUTVARS = "Input vars";
-
-  /** the key for the CNTK input map. */
-  public final static String VALUE_INPUTMAP = "Input map";
+  /** the key for the CNTK JSON definition. */
+  public final static String VALUE_DEFINITION = "Definition";
 
   /**
    * Default constructor.
@@ -70,21 +61,15 @@ public class CNTKMultiFilterResultContainer
    * @param data	the converted data
    * @param ids		the dataset with the IDs (row id, sample ID)
    * @param saver 	the commandline for the saver
-   * @param dims	the CNTK dimensions
-   * @param reader 	the CNTK reader
-   * @param inputVars 	the CNTK input variables
-   * @param inputMap	the CNTK input map
+   * @param definition	the CNTK dimensions
    */
-  public CNTKMultiFilterResultContainer(Instances data, Instances ids, String saver, String dims, String reader, String inputVars, String inputMap) {
+  public CNTKMultiFilterResultContainer(Instances data, String ids, String saver, String definition) {
     this();
 
-    store(VALUE_DATASET,   data);
-    store(VALUE_IDS,       ids);
-    store(VALUE_SAVER,     saver);
-    store(VALUE_DIMS,      dims);
-    store(VALUE_READER,    reader);
-    store(VALUE_INPUTVARS, inputVars);
-    store(VALUE_INPUTMAP,  inputMap);
+    store(VALUE_DATASET,    data);
+    store(VALUE_IDS,        ids);
+    store(VALUE_SAVER,      saver);
+    store(VALUE_DEFINITION, definition);
   }
 
   /**
@@ -93,13 +78,10 @@ public class CNTKMultiFilterResultContainer
   protected void initHelp() {
     super.initHelp();
 
-    addHelp(VALUE_DATASET,   "transformed dataset", Instances.class);
-    addHelp(VALUE_DATASET,   "dataset with IDs (row id <-> sample ID)", Instances.class);
-    addHelp(VALUE_SAVER,     "Instances saver command-line", String.class);
-    addHelp(VALUE_DIMS,      "CNTK dimensions (Python code)", String.class);
-    addHelp(VALUE_READER,    "CNTK reader (Python code)", String.class);
-    addHelp(VALUE_INPUTVARS, "CNTK input variables (Python code)", String.class);
-    addHelp(VALUE_INPUTMAP,  "CNTK input map (Python code)", String.class);
+    addHelp(VALUE_DATASET,    "transformed dataset", Instances.class);
+    addHelp(VALUE_DATASET,    "dataset with IDs (JSON Map; id <-> sample ID)", String.class);
+    addHelp(VALUE_SAVER,      "Instances saver command-line", String.class);
+    addHelp(VALUE_DEFINITION, "CNTK setup (JSON config file)", String.class);
   }
 
   /**
@@ -116,10 +98,7 @@ public class CNTKMultiFilterResultContainer
     result.add(VALUE_DATASET);
     result.add(VALUE_IDS);
     result.add(VALUE_SAVER);
-    result.add(VALUE_DIMS);
-    result.add(VALUE_READER);
-    result.add(VALUE_INPUTVARS);
-    result.add(VALUE_INPUTMAP);
+    result.add(VALUE_DEFINITION);
 
     return result.iterator();
   }
@@ -131,6 +110,9 @@ public class CNTKMultiFilterResultContainer
    */
   @Override
   public boolean isValid() {
-    return hasValue(VALUE_DATASET) && hasValue(VALUE_SAVER);
+    return hasValue(VALUE_DATASET)
+      && hasValue(VALUE_SAVER)
+      && hasValue(VALUE_IDS)
+      && hasValue(VALUE_DEFINITION);
   }
 }

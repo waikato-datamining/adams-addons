@@ -20,20 +20,24 @@
 
 package adams.flow.transformer;
 
-import adams.core.Index;
 import adams.core.ObjectCopyHelper;
 import adams.core.QuickInfoHelper;
 import adams.core.Range;
 import adams.core.Utils;
 import adams.core.base.BaseString;
 import adams.core.option.OptionUtils;
+import adams.data.weka.WekaAttributeIndex;
 import adams.data.weka.WekaAttributeRange;
 import adams.flow.container.CNTKMultiFilterResultContainer;
 import adams.flow.core.Token;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.CNTKSaver;
 import weka.filters.AllFilter;
@@ -48,7 +52,7 @@ import java.util.List;
 
 /**
  <!-- globalinfo-start -->
- * Applies the filters to the incoming data (also adds a numeric ID column) and output this new dataset along side Python code for CNTK.
+ * Applies the filters to the incoming data (also adds a numeric ID column) and outputs this new dataset alongside Python code for CNTK.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -60,7 +64,7 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;adams.flow.container.CNTKMultiFilterResultContainer<br>
  * <br><br>
  * Container information:<br>
- * - adams.flow.container.CNTKMultiFilterResultContainer: Dataset, IDs, Saver, Dimensions, Reader, Input vars, Input map
+ * - adams.flow.container.CNTKMultiFilterResultContainer: Dataset, IDs, Saver, Definition
  * <br><br>
  <!-- flow-summary-end -->
  *
@@ -99,6 +103,16 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
+ * <pre>-domain-name &lt;java.lang.String&gt; (property: domainName)
+ * &nbsp;&nbsp;&nbsp;The name for the domain.
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
+ * <pre>-domain-type &lt;java.lang.String&gt; (property: domainType)
+ * &nbsp;&nbsp;&nbsp;The type for the domain.
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
  * <pre>-filter &lt;weka.filters.Filter&gt; [-filter ...] (property: filters)
  * &nbsp;&nbsp;&nbsp;The filters to apply individually to the data (excluding targets and sample
  * &nbsp;&nbsp;&nbsp;ID).
@@ -116,9 +130,17 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;example: A range is a comma-separated list of single 1-based indices or sub-ranges of indices ('start-end'); 'inv(...)' inverts the range '...'; apart from attribute names (case-sensitive), the following placeholders can be used as well: first, second, third, last_2, last_1, last; numeric indices can be enforced by preceding them with '#' (eg '#12'); attribute names can be surrounded by double quotes.
  * </pre>
  *
- * <pre>-reader-name &lt;java.lang.String&gt; (property: readerName)
- * &nbsp;&nbsp;&nbsp;The name of the reader in the Python code.
- * &nbsp;&nbsp;&nbsp;default: test_reader
+ * <pre>-input-id-att &lt;adams.data.weka.WekaAttributeIndex&gt; (property: inputIDAttribute)
+ * &nbsp;&nbsp;&nbsp;The attribute index in the input dataset that contains the unique ID for
+ * &nbsp;&nbsp;&nbsp;which to generate the ID mapping.
+ * &nbsp;&nbsp;&nbsp;default: first
+ * &nbsp;&nbsp;&nbsp;example: An index is a number starting with 1; apart from attribute names (case-sensitive), the following placeholders can be used as well: first, second, third, last_2, last_1, last; numeric indices can be enforced by preceding them with '#' (eg '#12'); attribute names can be surrounded by double quotes.
+ * </pre>
+ *
+ * <pre>-output-id-att &lt;java.lang.String&gt; (property: outputIDAttribute)
+ * &nbsp;&nbsp;&nbsp;The attribute name in the output dataset that contains the numeric unique
+ * &nbsp;&nbsp;&nbsp;ID for which the ID mapping was generated.
+ * &nbsp;&nbsp;&nbsp;default: ID
  * </pre>
  *
  <!-- options-end -->
@@ -134,6 +156,12 @@ public class CNTKMultiFilter
 
   public static final String PREFIX_FILTERED = "filtered";
 
+  /** the domain name. */
+  protected String m_DomainName;
+  
+  /** the domain type. */
+  protected String m_DomainType;
+
   /** the filters to apply. */
   protected Filter[] m_Filters;
 
@@ -143,8 +171,11 @@ public class CNTKMultiFilter
   /** the range of attributes to use as targets. */
   protected WekaAttributeRange m_Targets;
 
-  /** the name of the reader. */
-  protected String m_ReaderName;
+  /** the name of the attribute in the input with the unique ID. */
+  protected WekaAttributeIndex m_InputIDAttribute;
+
+  /** the name of the attribute in the output with the unique ID. */
+  protected String m_OutputIDAttribute;
 
   /**
    * Returns a string describing the object.
@@ -154,7 +185,7 @@ public class CNTKMultiFilter
   @Override
   public String globalInfo() {
     return "Applies the filters to the incoming data (also adds a numeric ID "
-      + "column) and output this new dataset along side Python code for CNTK.";
+      + "column) and outputs this new dataset alongside Python code for CNTK.";
   }
 
   /**
@@ -163,6 +194,14 @@ public class CNTKMultiFilter
   @Override
   public void defineOptions() {
     super.defineOptions();
+
+    m_OptionManager.add(
+      "domain-name", "domainName",
+      "");
+
+    m_OptionManager.add(
+      "domain-type", "domainType",
+      "");
 
     m_OptionManager.add(
       "filter", "filters",
@@ -177,8 +216,70 @@ public class CNTKMultiFilter
       new WekaAttributeRange(WekaAttributeRange.LAST));
 
     m_OptionManager.add(
-      "reader-name", "readerName",
-      "test_reader");
+      "input-id-att", "inputIDAttribute",
+      new WekaAttributeIndex(WekaAttributeIndex.FIRST));
+
+    m_OptionManager.add(
+      "output-id-att", "outputIDAttribute",
+      "ID");
+  }
+
+  /**
+   * Sets the domain name.
+   *
+   * @param value	the name
+   */
+  public void setDomainName(String value) {
+    m_DomainName  = value;
+    reset();
+  }
+
+  /**
+   * Returns the domain name.
+   *
+   * @return 		the name
+   */
+  public String getDomainName() {
+    return m_DomainName;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return         tip text for this property suitable for
+   *             displaying in the GUI or for listing the options.
+   */
+  public String domainNameTipText() {
+    return "The name for the domain.";
+  }
+
+  /**
+   * Sets the domain type.
+   *
+   * @param value	the type
+   */
+  public void setDomainType(String value) {
+    m_DomainType  = value;
+    reset();
+  }
+
+  /**
+   * Returns the domain type.
+   *
+   * @return 		the type
+   */
+  public String getDomainType() {
+    return m_DomainType;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return         tip text for this property suitable for
+   *             displaying in the GUI or for listing the options.
+   */
+  public String domainTypeTipText() {
+    return "The type for the domain.";
   }
 
   /**
@@ -271,22 +372,24 @@ public class CNTKMultiFilter
   }
 
   /**
-   * Sets the name of the Python reader.
+   * Sets the attribute index in the input dataset that contains the unique ID
+   * for which to generate the ID mapping.
    *
-   * @param value	the name
+   * @param value	the attribute index
    */
-  public void setReaderName(String value) {
-    m_ReaderName = value;
+  public void setInputIDAttribute(WekaAttributeIndex value) {
+    m_InputIDAttribute = value;
     reset();
   }
 
   /**
-   * Returns the name of the Python reader.
+   * Returns the attribute index in the input dataset that contains the unique
+   * ID for which to generate the ID mapping.
    *
-   * @return 		the name
+   * @return 		the attribute index
    */
-  public String getReaderName() {
-    return m_ReaderName;
+  public WekaAttributeIndex getInputIDAttribute() {
+    return m_InputIDAttribute;
   }
 
   /**
@@ -295,8 +398,39 @@ public class CNTKMultiFilter
    * @return         tip text for this property suitable for
    *             displaying in the GUI or for listing the options.
    */
-  public String readerNameTipText() {
-    return "The name of the reader in the Python code.";
+  public String inputIDAttributeTipText() {
+    return "The attribute index in the input dataset that contains the unique ID for which to generate the ID mapping.";
+  }
+
+  /**
+   * Sets the attribute name in the output dataset that contains the numeric
+   * unique ID for which the ID mapping was generated.
+   *
+   * @param value	the attribute name
+   */
+  public void setOutputIDAttribute(String value) {
+    m_OutputIDAttribute = value;
+    reset();
+  }
+
+  /**
+   * Returns the attribute name in the output dataset that contains the numeric
+   * unique ID for which the ID mapping was generated.
+   *
+   * @return 		the attribute name
+   */
+  public String getOutputIDAttribute() {
+    return m_OutputIDAttribute;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return         tip text for this property suitable for
+   *             displaying in the GUI or for listing the options.
+   */
+  public String outputIDAttributeTipText() {
+    return "The attribute name in the output dataset that contains the numeric unique ID for which the ID mapping was generated.";
   }
 
   /**
@@ -308,9 +442,12 @@ public class CNTKMultiFilter
   public String getQuickInfo() {
     String	result;
 
-    result  = QuickInfoHelper.toString(this, "filters", m_Filters.length + " filters", "");
+    result  = QuickInfoHelper.toString(this, "domainName", (m_DomainName.isEmpty() ? "-none-" : m_DomainName), "name: ");
+    result += QuickInfoHelper.toString(this, "domainType", (m_DomainType.isEmpty() ? "-none-" : m_DomainType), ", type: ");
+    result += QuickInfoHelper.toString(this, "filters", m_Filters.length + " filters", "");
     result += QuickInfoHelper.toString(this, "targets", m_Targets, ", targets: ");
-    result += QuickInfoHelper.toString(this, "readerName", m_ReaderName, ", reader: ");
+    result += QuickInfoHelper.toString(this, "inputIDAttribute", m_InputIDAttribute, ", input ID: ");
+    result += QuickInfoHelper.toString(this, "outputIDAttribute", m_OutputIDAttribute, ", output ID: ");
 
     return result;
   }
@@ -364,6 +501,7 @@ public class CNTKMultiFilter
     List<Filter> 		filters;
     List<weka.core.Range>	ranges;
     List<BaseString>		prefixes;
+    AddID			addID;
     MultiFilter			multi;
 
     // determine data attributes
@@ -405,9 +543,13 @@ public class CNTKMultiFilter
     part.setPrefixes(prefixes.toArray(new BaseString[0]));
     part.setRemoveUnused(true);
 
+    // AddID
+    addID = new AddID();
+    addID.setAttributeName(m_OutputIDAttribute);
+
     // multifilter
     multi = new MultiFilter();
-    multi.setFilters(new Filter[]{part, new AddID()});
+    multi.setFilters(new Filter[]{part, addID});
 
     if (isLoggingEnabled())
       getLogger().info("MultiFilter: " + OptionUtils.getCommandLine(multi));
@@ -420,30 +562,43 @@ public class CNTKMultiFilter
   }
 
   /**
+   * Generates pretty-printed string from the JSON object.
+   *
+   * @param json	the object to turn into string
+   * @return		the generated string
+   */
+  protected String toString(JsonObject json) {
+    Gson 	gson;
+
+    gson = new GsonBuilder().setPrettyPrinting().create();
+
+    return gson.toJson(json);
+  }
+
+  /**
    * Generates the dataset with the IDs (row id, sample id).
    *
    * @param data	the input data
    * @return		the IDs data
    * @throws Exception	if generation fails
    */
-  protected Instances generateIDs(Instances data) throws Exception {
+  protected String generateIDs(Instances data) throws Exception {
+    JsonObject 	result;
     Instances 	filtered;
-    TIntList 	nonNumeric;
-    int 	i;
+    int		id;
     Remove 	remove;
     MultiFilter	multi;
 
     data = new Instances(data);
     data.setClassIndex(-1);
 
-    nonNumeric = new TIntArrayList();
-    for (i = 0; i < data.numAttributes(); i++) {
-      if (!data.attribute(i).isNumeric())
-	nonNumeric.add(i);
-    }
+    m_InputIDAttribute.setData(data);
+    id = m_InputIDAttribute.getIntIndex();
+    if (id == -1)
+      throw new IllegalStateException("Failed to locate unique ID attribute in input data: " + m_InputIDAttribute);
 
     remove = new Remove();
-    remove.setAttributeIndicesArray(nonNumeric.toArray());
+    remove.setAttributeIndicesArray(new int[]{id});
     remove.setInvertSelection(true);
 
     multi = new MultiFilter();
@@ -452,7 +607,11 @@ public class CNTKMultiFilter
     multi.setInputFormat(data);
     filtered = Filter.useFilter(data, multi);
 
-    return filtered;
+    result = new JsonObject();
+    for (Instance inst: filtered)
+      result.addProperty("" + ((int) inst.value(0)), inst.stringValue(1));
+
+    return toString(result);
   }
 
   /**
@@ -471,12 +630,17 @@ public class CNTKMultiFilter
     String		prefix;
     List<BaseString> 	inputNames;
 
+    inputs     = new ArrayList<>();
     inputNames = new ArrayList<>();
-    for (BaseString name: m_Prefixes)
-      inputNames.add(new BaseString(name.getValue()));
+
+    // ID attribute
+    m_InputIDAttribute.setData(filtered);
+    inputs.add(new Range("" + (filtered.attribute(m_OutputIDAttribute).index() + 1)));
+    inputNames.add(new BaseString(m_OutputIDAttribute));
 
     // filters
-    inputs = new ArrayList<>();
+    for (BaseString name: m_Prefixes)
+      inputNames.add(new BaseString(name.getValue()));
     for (i = 0; i < m_Filters.length; i++) {
       atts = new TIntArrayList();
       prefix = m_Prefixes[i].getValue();
@@ -505,7 +669,6 @@ public class CNTKMultiFilter
     }
 
     result = new CNTKSaver();
-    result.setRowID(new Index("1"));
     result.setInputs(inputs.toArray(new Range[0]));
     result.setInputNames(inputNames.toArray(new BaseString[0]));
 
@@ -513,120 +676,40 @@ public class CNTKMultiFilter
   }
 
   /**
-   * Generates a python snippet for the dimensions.
+   * Generates a JSON definition for the dataset.
    *
-   * @param filtered	the filtered data to inspect
-   * @return		the python snippet
+   * @param saver	the configured saver to use
+   * @param filtered	the filtered dataset
+   * @return		the JSON definition
    */
-  protected String generateDims(Instances filtered) {
-    StringBuilder	result;
+  protected String generateDefinition(CNTKSaver saver, Instances filtered) {
+    JsonObject		result;
+    JsonObject		map;
     int			i;
-    int			count;
+    Range		range;
 
-    result = new StringBuilder();
-    result.append("labelDim = 1\n");
+    result = new JsonObject();
 
-    for (BaseString prefix: m_Prefixes) {
-      count = 0;
-      for (i = 0; i < filtered.numAttributes(); i++) {
-        if (filtered.attribute(i).name().startsWith(prefix.getValue()))
-          count++;
-      }
-      result.append(prefix.getValue()).append("Dim = " + count + "\n");
+    // domain
+    map = new JsonObject();
+    map.addProperty("Name", m_DomainName);
+    map.addProperty("Type", m_DomainType);
+    result.add("Domain", map);
+
+    // unique ID
+    result.addProperty("UniqueID", m_OutputIDAttribute);
+
+    // inputs
+    map = new JsonObject();
+    for (i = 0; i < saver.getInputNames().length; i++) {
+      range = saver.getInputs()[i].getClone();
+      range.setMax(filtered.numAttributes());
+      map.addProperty(saver.getInputNames()[i].getValue(), range.getIntIndices().length);
     }
+    result.add("Inputs", map);
 
-    return result.toString();
-  }
 
-  /**
-   * Generates a python snippet for the reader.
-   *
-   * @param filtered	the filtered data to inspect
-   * @return		the python snippet
-   */
-  protected String generateReader(Instances filtered) {
-    StringBuilder	result;
-    int			i;
-    String		target;
-
-    result = new StringBuilder();
-    result.append("def create_reader(path, is_training):\n");
-    result.append("    return C.io.MinibatchSource(C.io.CTFDeserializer(path, C.io.StreamDefs(\n");
-
-    // features
-    for (BaseString prefix: m_Prefixes)
-      result.append("        " + prefix + "_features=C.io.StreamDef(field='" + prefix + "', shape=" + prefix + "Dim),\n");
-
-    // targets
-    for (i = 0; i < filtered.numAttributes(); i++) {
-      if (filtered.attribute(i).name().startsWith(PREFIX_TARGETS)) {
-        target = extractTarget(filtered.attribute(i).name());
-        result.append("        " + target + "=C.io.StreamDef(field='" + target + "', shape=labelDim),\n");
-      }
-    }
-
-    result.append("    )), randomize=is_training, max_sweeps=C.io.INFINITELY_REPEAT if is_training else 1)\n");
-
-    return result.toString();
-  }
-
-  /**
-   * Generates a python snippet for the input vars.
-   *
-   * @param filtered	the filtered data to inspect
-   * @return		the python snippet
-   */
-  protected String generateInputVars(Instances filtered) {
-    StringBuilder	result;
-    String		target;
-    int			i;
-
-    result = new StringBuilder();
-
-    // features
-    for (BaseString prefix: m_Prefixes)
-      result.append(prefix + " = C.input_variable(" + prefix + "Dim, name='" + prefix + "')\n");
-
-    // targets
-    for (i = 0; i < filtered.numAttributes(); i++) {
-      if (filtered.attribute(i).name().startsWith(PREFIX_TARGETS)) {
-        target = extractTarget(filtered.attribute(i).name());
-        result.append(target + " = C.input_variable(labelDim, name='" + target + "')\n");
-      }
-    }
-
-    return result.toString();
-  }
-
-  /**
-   * Generates a python snippet for the input map.
-   *
-   * @param filtered	the filtered data to inspect
-   * @return		the python snippet
-   */
-  protected String generateInputMap(Instances filtered) {
-    StringBuilder	result;
-    String		target;
-    int			i;
-
-    result = new StringBuilder();
-    result.append(m_ReaderName + "_map = {\n");
-
-    // features
-    for (BaseString prefix: m_Prefixes)
-      result.append("    " + prefix + ": " + m_ReaderName + "." + prefix + "_features,\n");
-
-    // targets
-    for (i = 0; i < filtered.numAttributes(); i++) {
-      if (filtered.attribute(i).name().startsWith(PREFIX_TARGETS)) {
-        target = extractTarget(filtered.attribute(i).name());
-	result.append("    " + target + ": " + m_ReaderName + "." + target + ",\n");
-      }
-    }
-
-    result.append("}\n");
-
-    return result.toString();
+    return toString(result);
   }
 
   /**
@@ -639,32 +722,23 @@ public class CNTKMultiFilter
     String				result;
     Instances				data;
     Instances				filtered;
-    Instances				ids;
+    String				ids;
     CNTKMultiFilterResultContainer	cont;
     CNTKSaver				saver;
-    String				dims;
-    String				reader;
-    String				inputVars;
-    String				inputMap;
+    String 				def;
 
     result = null;
     data   = m_InputToken.getPayload(Instances.class);
 
     try {
-      // data
       filtered = filter(data);
       ids      = generateIDs(data);
       saver    = generateSaver(filtered);
-
-      // python snippets
-      dims      = generateDims(filtered);
-      reader    = generateReader(filtered);
-      inputVars = generateInputVars(filtered);
-      inputMap  = generateInputMap(filtered);
+      def      = generateDefinition(saver, filtered);
 
       // container
       cont = new CNTKMultiFilterResultContainer(
-        filtered, ids, OptionUtils.getCommandLine(saver), dims, reader, inputVars, inputMap);
+        filtered, ids, OptionUtils.getCommandLine(saver), def);
       m_OutputToken = new Token(cont);
     }
     catch (Exception e) {
