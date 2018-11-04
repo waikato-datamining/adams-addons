@@ -88,6 +88,9 @@ public class CNTKFasterRCNN
   /** the label translations. */
   protected BaseKeyValuePair[] m_LabelTranslations;
 
+  /** whether to output object location spreadsheet. */
+  protected boolean m_OutputObjectLocations;
+
   /** whether to make use of annotations for the negative images. */
   protected boolean m_UseNegativeAnnotations;
 
@@ -130,6 +133,10 @@ public class CNTKFasterRCNN
     m_OptionManager.add(
       "label-translation", "labelTranslations",
       new BaseKeyValuePair[0]);
+
+    m_OptionManager.add(
+      "output-object-locations", "outputObjectLocations",
+      false);
 
     m_OptionManager.add(
       "use-negative-annotations", "useNegativeAnnotations",
@@ -258,6 +265,38 @@ public class CNTKFasterRCNN
    */
   public String labelTranslationsTipText() {
     return "For translation labels: key=to find, value=replacement.";
+  }
+
+  /**
+   * Sets whether to output the objects loactions and their associated
+   * label and file in a spreadsheet.
+   *
+   * @param value	true if to use annotations
+   */
+  public void setOutputObjectLocations(boolean value) {
+    m_OutputObjectLocations = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to output the objects loactions and their associated
+   * label and file in a spreadsheet.
+   *
+   * @return		true if to output
+   */
+  public boolean getOutputObjectLocations() {
+    return m_OutputObjectLocations;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String outputObjectLocationsTipText() {
+    return "If enabled, the object locations and their associated label and "
+      + "file are output in a spreadsheet for training/test set.";
   }
 
   /**
@@ -513,7 +552,7 @@ public class CNTKFasterRCNN
    * @param labels 	for recording labels
    * @return		null if successful, otherwise error message
    */
-  protected String outputAnnotations(FileBasedDatasetContainer cont, boolean train, SharedStringsTable labels) {
+  protected String processAnnotations(FileBasedDatasetContainer cont, boolean train, SharedStringsTable labels) {
     String			result;
     String[]			files;
     PlaceholderDirectory	outDir;
@@ -523,6 +562,7 @@ public class CNTKFasterRCNN
     LocatedObjects		objects;
     List<String> 		imgList;
     List<String> 		roiList;
+    List<String>		objList;
     StringBuilder		rois;
     AbstractImageContainer	imgCont;
 
@@ -531,6 +571,8 @@ public class CNTKFasterRCNN
     outDir  = new PlaceholderDirectory(m_OutputDir.getAbsolutePath() + File.separator + (train ? SUB_DIR_TRAIN : SUB_DIR_TEST));
     imgList = new ArrayList<>();
     roiList = new ArrayList<>();
+    objList = new ArrayList<>();
+    objList.add("file,x0,y0,x1,y1,label");
 
     for (i = 0; i < files.length; i++) {
       file = new PlaceholderFile(files[i]);
@@ -554,11 +596,22 @@ public class CNTKFasterRCNN
 	if (objects.size() > 0) {
 	  for (LocatedObject object: objects) {
 	    object.makeFit(imgCont.getWidth(), imgCont.getHeight());
+	    // roi
 	    rois.append(" " + object.getX());
 	    rois.append(" " + object.getY());
 	    rois.append(" " + (object.getX() + object.getWidth() - 1));
 	    rois.append(" " + (object.getY() + object.getHeight() - 1));
 	    rois.append(" " + labels.getIndex(translateLabel("" + object.getMetaData().get("type"))));
+	    // location
+	    if (m_OutputObjectLocations) {
+	      objList.add(
+		FileUtils.replaceExtension(file.getName(), "") + ","
+		  + object.getX() + ","
+		  + object.getY() + ","
+		  + (object.getX() + object.getWidth() - 1) + ","
+		  + (object.getY() + object.getHeight() - 1) + ","
+		  + translateLabel("" + object.getMetaData().get("type")));
+	    }
 	  }
 	}
 	imgList.add(i + "\t" + (train ? SUB_DIR_TRAIN : SUB_DIR_TEST) + "/" + file.getName());
@@ -573,6 +626,8 @@ public class CNTKFasterRCNN
       result = FileUtils.saveToFileMsg(imgList, new File(m_OutputDir.getAbsolutePath() + File.separator + (train ? "train" : "test") + "_img_file.txt"), null);
       if (result == null)
 	result = FileUtils.saveToFileMsg(roiList, new File(m_OutputDir.getAbsolutePath() + File.separator + (train ? "train" : "test") + "_roi_file.txt"), null);
+      if ((result == null) && m_OutputObjectLocations)
+	result = FileUtils.saveToFileMsg(objList, new File(m_OutputDir.getAbsolutePath() + File.separator + (train ? "train" : "test") + ".csv"), null);
     }
 
     return result;
@@ -584,7 +639,7 @@ public class CNTKFasterRCNN
    * @param cont	the file container
    * @return		null if successful, otherwise error message
    */
-  protected String outputNegative(FileBasedDatasetContainer cont) {
+  protected String processNegative(FileBasedDatasetContainer cont) {
     String			result;
     String[]			files;
     PlaceholderDirectory	outDir;
@@ -659,7 +714,7 @@ public class CNTKFasterRCNN
    * @param labels	the collected labels
    * @return		null if successful, otherwise error message
    */
-  protected String generateClassMap(SharedStringsTable labels) {
+  protected String processClassMap(SharedStringsTable labels) {
     String		result;
     List<String>	content;
     int			i;
@@ -698,13 +753,13 @@ public class CNTKFasterRCNN
     if (msg == null) {
       labels = new SharedStringsTable();
       labels.getIndex(BACKGROUND);
-      msg = outputAnnotations(cont, true, labels);
+      msg = processAnnotations(cont, true, labels);
       if (msg == null)
-	msg = outputAnnotations(cont, false, labels);
+	msg = processAnnotations(cont, false, labels);
       if (msg == null)
-	msg = outputNegative(cont);
+	msg = processNegative(cont);
       if (msg == null)
-	msg = generateClassMap(labels);
+	msg = processClassMap(labels);
     }
 
     if (msg != null)
