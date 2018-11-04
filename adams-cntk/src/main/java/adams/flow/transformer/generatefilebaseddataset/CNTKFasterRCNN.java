@@ -23,15 +23,20 @@ package adams.flow.transformer.generatefilebaseddataset;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.base.BaseKeyValuePair;
+import adams.core.base.BaseRegExp;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
+import adams.data.RoundingType;
 import adams.data.SharedStringsTable;
 import adams.data.image.AbstractImageContainer;
+import adams.data.image.BufferedImageContainer;
 import adams.data.image.BufferedImageHelper;
+import adams.data.image.transformer.subimages.Grid;
 import adams.data.io.input.AbstractImageReader;
 import adams.data.io.input.DefaultSimpleReportReader;
 import adams.data.io.input.JAIImageReader;
+import adams.data.objectfilter.Scale;
 import adams.data.objectfinder.AllFinder;
 import adams.data.objectfinder.ObjectFinder;
 import adams.data.report.Report;
@@ -39,15 +44,17 @@ import adams.flow.container.FileBasedDatasetContainer;
 import adams.flow.transformer.locateobjects.LocatedObject;
 import adams.flow.transformer.locateobjects.LocatedObjects;
 
+import javax.media.jai.InterpolationNearest;
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Generates a CNTK dataset for Faster-RCNN in the specified directory.
- *
- * TODO: 2x2 grid option (via regexp on filename)
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
@@ -82,6 +89,9 @@ public class CNTKFasterRCNN
   /** the image reader for the train/test images. */
   protected AbstractImageReader m_ImageReader;
 
+  /** the regular expression to identify images to enlarge. */
+  protected BaseRegExp m_RegExpEnlarge;
+
   /** the object finder to use. */
   protected ObjectFinder m_ObjectFinder;
 
@@ -108,7 +118,9 @@ public class CNTKFasterRCNN
   @Override
   public String globalInfo() {
     return "Generates a CNTK dataset for Faster-RCNN in the specified directory.\n"
-      + "Expects reports with annotations to be present with the same name (but with .report extension).";
+      + "Expects reports with annotations to be present with the same name (but with .report extension).\n"
+      + "Via the 'regExpEnlarge' expression, iamges can be identified that should be split into 2x2 grid "
+      + "and blown up to original size.";
   }
 
   /**
@@ -121,6 +133,10 @@ public class CNTKFasterRCNN
     m_OptionManager.add(
       "output-dir", "outputDir",
       new PlaceholderDirectory());
+
+    m_OptionManager.add(
+      "regexp-enlarge", "regExpEnlarge",
+      new BaseRegExp(".*-2x2.*"));
 
     m_OptionManager.add(
       "image-reader", "imageReader",
@@ -178,6 +194,37 @@ public class CNTKFasterRCNN
    */
   public String outputDirTipText() {
     return "The output directory for the generated dataset.";
+  }
+
+  /**
+   * Sets the regular expression for identifying train/test images that need
+   * to get enlarged (2x2 grid).
+   *
+   * @param value	the directory
+   */
+  public void setRegExpEnlarge(BaseRegExp value) {
+    m_RegExpEnlarge = value;
+    reset();
+  }
+
+  /**
+   * Returns the regular expression for identifying train/test images that need
+   * to get enlarged (2x2 grid).
+   *
+   * @return		the expression
+   */
+  public BaseRegExp getRegExpEnlarge() {
+    return m_RegExpEnlarge;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String regExpEnlargeTipText() {
+    return "The regular expression for identifying train/test images that need to get enlarged (2x2 grid).";
   }
 
   /**
@@ -545,6 +592,62 @@ public class CNTKFasterRCNN
   }
 
   /**
+   * Splits the image into a 2x2 grid and blows up the individual images
+   * to the original size. Object locations get adjusted accordingly.
+   *
+   * @param imgCont	the image to process
+   * @return		the generated
+   */
+  protected BufferedImageContainer[] enlarge(AbstractImageContainer imgCont) {
+    List<BufferedImageContainer>	result;
+    Grid				grid;
+    List<BufferedImageContainer>	subImages;
+    ParameterBlock 			params;
+    RenderedOp 				imNew;
+    BufferedImageContainer		contNew;
+    Scale				scale;
+    LocatedObjects			objects;
+
+    result = new ArrayList<>();
+
+    // split
+    grid = new Grid();
+    grid.setNumCols(2);
+    grid.setNumRows(2);
+    grid.setPartial(false);
+    grid.setFixInvalid(true);
+    grid.setPrefix(m_ObjectFinder.getPrefix());
+    subImages = grid.process(BufferedImageHelper.toBufferedImageContainer(imgCont));
+
+    for (BufferedImageContainer subImage: subImages) {
+      // scale image
+      params = new ParameterBlock();
+      params.addSource(subImage.toBufferedImage());
+      params.add(2.0F);
+      params.add(2.0F);
+      params.add(0.0F);  // x translate
+      params.add(0.0F);  // y translate
+      params.add(new InterpolationNearest());
+      imNew = JAI.create("scale", params);
+      contNew = new BufferedImageContainer();
+      contNew.setContent(imNew.getAsBufferedImage());
+
+      // scale annotations
+      objects = LocatedObjects.fromReport(subImage.getReport(), m_ObjectFinder.getPrefix());
+      scale = new Scale();
+      scale.setScaleX(2.0);
+      scale.setScaleY(2.0);
+      scale.setRoundingType(RoundingType.ROUND);
+      objects = scale.filter(objects);
+      contNew.setReport(objects.toReport(m_ObjectFinder.getPrefix()));
+
+      result.add(contNew);
+    }
+
+    return result.toArray(new BufferedImageContainer[0]);
+  }
+
+  /**
    * Outputs the annotations.
    *
    * @param cont	the file container
@@ -553,18 +656,23 @@ public class CNTKFasterRCNN
    * @return		null if successful, otherwise error message
    */
   protected String processAnnotations(FileBasedDatasetContainer cont, boolean train, SharedStringsTable labels) {
-    String			result;
-    String[]			files;
-    PlaceholderDirectory	outDir;
-    int				i;
-    PlaceholderFile		file;
-    Report			report;
-    LocatedObjects		objects;
-    List<String> 		imgList;
-    List<String> 		roiList;
-    List<String>		objList;
-    StringBuilder		rois;
-    AbstractImageContainer	imgCont;
+    String				result;
+    String[]				files;
+    PlaceholderDirectory		outDir;
+    int					i;
+    PlaceholderFile			file;
+    PlaceholderFile			subfile;
+    Report				report;
+    LocatedObjects			objects;
+    List<String> 			imgList;
+    List<String> 			roiList;
+    List<String>			objList;
+    StringBuilder			rois;
+    AbstractImageContainer		imgCont;
+    boolean				enlarge;
+    BufferedImageContainer[] 		imgLarge;
+    int					n;
+    int					imgIndex;
 
     result  = null;
     files   = cont.getValue(train ? FileBasedDatasetContainer.VALUE_TRAIN : FileBasedDatasetContainer.VALUE_TEST, String[].class);
@@ -574,48 +682,100 @@ public class CNTKFasterRCNN
     objList = new ArrayList<>();
     objList.add("file,x0,y0,x1,y1,label");
 
+    imgIndex = 0;
     for (i = 0; i < files.length; i++) {
-      file = new PlaceholderFile(files[i]);
-      rois = new StringBuilder();
+      file    = new PlaceholderFile(files[i]);
+      enlarge = m_RegExpEnlarge.isMatch(files[i]);
       try {
+        // load report
 	report = readAssociatedReport(file.getAbsolutePath());
 	if (report == null) {
 	  result = "Failed to read associated report for " + (train ? "training" : "test") + " image: " + file;
 	  break;
 	}
+
+	// load image
 	imgCont = m_ImageReader.read(file);
 	if (imgCont == null) {
 	  result = "Failed to read " + (train ? "training" : "test") + " image: " + file;
 	  break;
 	}
-	if (!FileUtils.copy(file, outDir)) {
-	  result = "Failed to copy image '" + file + "' to: " + outDir;
-	  break;
+	imgCont.getReport().mergeWith(report);
+
+	if (enlarge) {
+	  imgLarge = enlarge(imgCont);
+	  for (n = 0; n < imgLarge.length; n++) {
+	    subfile = new PlaceholderFile(outDir.getAbsolutePath() + File.separator + FileUtils.replaceExtension(file.getName(), "-" + (n+1) + ".png"));
+	    // store image
+	    result = BufferedImageHelper.write(imgLarge[n].toBufferedImage(), subfile);
+	    if (result != null)
+	      break;
+	    // generate annotations
+	    rois    = new StringBuilder();
+	    objects = m_ObjectFinder.findObjects(imgLarge[n].getReport());
+	    if (objects.size() > 0) {
+	      for (LocatedObject object : objects) {
+		object.makeFit(imgLarge[n].getWidth(), imgLarge[n].getHeight());
+		// roi
+		rois.append(" " + object.getX());
+		rois.append(" " + object.getY());
+		rois.append(" " + (object.getX() + object.getWidth() - 1));
+		rois.append(" " + (object.getY() + object.getHeight() - 1));
+		rois.append(" " + labels.getIndex(translateLabel("" + object.getMetaData().get("type"))));
+		// location
+		if (m_OutputObjectLocations) {
+		  objList.add(
+		    FileUtils.replaceExtension(subfile.getName(), "") + ","
+		      + object.getX() + ","
+		      + object.getY() + ","
+		      + (object.getX() + object.getWidth() - 1) + ","
+		      + (object.getY() + object.getHeight() - 1) + ","
+		      + translateLabel("" + object.getMetaData().get("type")));
+		}
+	      }
+	    }
+	    imgList.add(imgIndex + "\t" + (train ? SUB_DIR_TRAIN : SUB_DIR_TEST) + "/" + subfile.getName() + "\t" + "0");
+	    roiList.add(imgIndex + " |roiAndLabel " + rois);
+	    imgIndex++;
+	  }
+	  if (result != null)
+	    break;
 	}
-	objects = m_ObjectFinder.findObjects(report);
-	if (objects.size() > 0) {
-	  for (LocatedObject object: objects) {
-	    object.makeFit(imgCont.getWidth(), imgCont.getHeight());
-	    // roi
-	    rois.append(" " + object.getX());
-	    rois.append(" " + object.getY());
-	    rois.append(" " + (object.getX() + object.getWidth() - 1));
-	    rois.append(" " + (object.getY() + object.getHeight() - 1));
-	    rois.append(" " + labels.getIndex(translateLabel("" + object.getMetaData().get("type"))));
-	    // location
-	    if (m_OutputObjectLocations) {
-	      objList.add(
-		FileUtils.replaceExtension(file.getName(), "") + ","
-		  + object.getX() + ","
-		  + object.getY() + ","
-		  + (object.getX() + object.getWidth() - 1) + ","
-		  + (object.getY() + object.getHeight() - 1) + ","
-		  + translateLabel("" + object.getMetaData().get("type")));
+	else {
+	  // store image
+	  if (!FileUtils.copy(file, outDir)) {
+	    result = "Failed to copy image '" + file + "' to: " + outDir;
+	    break;
+	  }
+
+	  // generate annotations
+	  rois    = new StringBuilder();
+	  objects = m_ObjectFinder.findObjects(imgCont.getReport());
+	  if (objects.size() > 0) {
+	    for (LocatedObject object : objects) {
+	      object.makeFit(imgCont.getWidth(), imgCont.getHeight());
+	      // roi
+	      rois.append(" " + object.getX());
+	      rois.append(" " + object.getY());
+	      rois.append(" " + (object.getX() + object.getWidth() - 1));
+	      rois.append(" " + (object.getY() + object.getHeight() - 1));
+	      rois.append(" " + labels.getIndex(translateLabel("" + object.getMetaData().get("type"))));
+	      // location
+	      if (m_OutputObjectLocations) {
+		objList.add(
+		  FileUtils.replaceExtension(file.getName(), "") + ","
+		    + object.getX() + ","
+		    + object.getY() + ","
+		    + (object.getX() + object.getWidth() - 1) + ","
+		    + (object.getY() + object.getHeight() - 1) + ","
+		    + translateLabel("" + object.getMetaData().get("type")));
+	      }
 	    }
 	  }
+	  imgList.add(imgIndex + "\t" + (train ? SUB_DIR_TRAIN : SUB_DIR_TEST) + "/" + file.getName() + "\t" + "0");
+	  roiList.add(imgIndex + " |roiAndLabel " + rois);
+	  imgIndex++;
 	}
-	imgList.add(i + "\t" + (train ? SUB_DIR_TRAIN : SUB_DIR_TEST) + "/" + file.getName());
-	roiList.add(i + " |roiAndLabel " + rois);
       }
       catch (Exception e) {
 	result = Utils.handleException(this, "Failed to process " + (train ? "training" : "test") + " '" + file + "!", e);
