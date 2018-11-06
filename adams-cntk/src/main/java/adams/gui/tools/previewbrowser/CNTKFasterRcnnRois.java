@@ -27,14 +27,18 @@ import adams.core.logging.LoggingSupporter;
 import adams.data.report.Report;
 import adams.flow.transformer.locateobjects.LocatedObject;
 import adams.flow.transformer.locateobjects.LocatedObjects;
-import adams.gui.core.BaseList;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseSplitPane;
+import adams.gui.core.SearchPanel;
+import adams.gui.core.SearchPanel.LayoutType;
+import adams.gui.core.SearchableBaseList;
+import adams.gui.event.SearchEvent;
 import adams.gui.visualization.image.ImagePanel;
 import adams.gui.visualization.image.ObjectLocationsOverlayFromReport;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
 import java.awt.BorderLayout;
 import java.io.File;
@@ -85,10 +89,13 @@ public class CNTKFasterRcnnRois
     protected BaseSplitPane m_SplitPane;
 
     /** the list with the image indices. */
-    protected BaseList m_ListIndices;
+    protected SearchableBaseList m_ListIndices;
 
     /** the list model with the indices. */
     protected DefaultListModel<String> m_ModelIndices;
+
+    /** the search panel. */
+    protected SearchPanel m_PanelSearch;
 
     /** the panel with the overlayed image. */
     protected ImagePanel m_PanelImage;
@@ -126,6 +133,7 @@ public class CNTKFasterRcnnRois
     @Override
     protected void initGUI() {
       ObjectLocationsOverlayFromReport	overlay;
+      JPanel 				panelIndices;
 
       super.initGUI();
 
@@ -136,10 +144,17 @@ public class CNTKFasterRcnnRois
       m_SplitPane.setDividerLocation(100);
       add(m_SplitPane, BorderLayout.CENTER);
 
+      panelIndices = new JPanel(new BorderLayout());
+      m_SplitPane.setLeftComponent(panelIndices);
+
       m_ModelIndices = new DefaultListModel<>();
-      m_ListIndices  = new BaseList(m_ModelIndices);
+      m_ListIndices  = new SearchableBaseList(m_ModelIndices);
       m_ListIndices.addListSelectionListener((ListSelectionEvent e) -> updateImage());
-      m_SplitPane.setLeftComponent(new BaseScrollPane(m_ListIndices));
+      panelIndices.add(new BaseScrollPane(m_ListIndices), BorderLayout.CENTER);
+
+      m_PanelSearch = new SearchPanel(LayoutType.HORIZONTAL, false, "", true, "");
+      m_PanelSearch.addSearchListener((SearchEvent e) -> search(e.getParameters().getSearchString()));
+      panelIndices.add(m_PanelSearch, BorderLayout.SOUTH);
 
       overlay = new ObjectLocationsOverlayFromReport();
       overlay.setLabelFormat("#. $");
@@ -171,6 +186,15 @@ public class CNTKFasterRcnnRois
     }
 
     /**
+     * Performs a search with the given string.
+     *
+     * @param s		the string to use
+     */
+    protected void search(String s) {
+      m_ListIndices.search(s, false);
+    }
+
+    /**
      * Updates the selected image.
      */
     protected void updateImage() {
@@ -181,7 +205,7 @@ public class CNTKFasterRcnnRois
       if (m_ListIndices.getSelectedIndex() == -1)
         return;
 
-      key = "" + m_ListIndices.getSelectedValue();
+      key = m_ListIndices.getSelectedValue().toString().split(" - ")[0];
       if (!m_MapImages.containsKey(key) || !m_MapROIs.containsKey(key))
         return;
 
@@ -199,6 +223,7 @@ public class CNTKFasterRcnnRois
     public void display(File imgFile, File roiFile, File classMapFile) {
       List<String> 		lines;
       List<String>		keys;
+      List<String>		keysLong;
       String[]			parts;
       String[]			rois;
       int			i;
@@ -233,8 +258,9 @@ public class CNTKFasterRcnnRois
       // read images
       if (isLoggingEnabled())
         getLogger().info("Reading img file: " + imgFile);
-      keys = new ArrayList<>();
-      lines = FileUtils.loadFromFile(imgFile);
+      keys     = new ArrayList<>();
+      keysLong = new ArrayList<>();
+      lines    = FileUtils.loadFromFile(imgFile);
       if (lines == null) {
 	getLogger().severe("Failed to read: " + imgFile);
 	return;
@@ -243,6 +269,7 @@ public class CNTKFasterRcnnRois
         parts = line.split("\t");
         if (parts.length == 3) {
           keys.add(parts[0].trim());
+          keysLong.add(parts[0].trim() + " - " + parts[1].trim());
 	  m_MapImages.put(parts[0].trim(), new File(imgFile.getParentFile().getAbsolutePath() + File.separator + parts[1]));
 	}
       }
@@ -284,7 +311,7 @@ public class CNTKFasterRcnnRois
       // update
       m_PanelImage.clear();
       m_ModelIndices = new DefaultListModel<>();
-      for (String key: keys)
+      for (String key: keysLong)
         m_ModelIndices.addElement(key);
       m_ListIndices.setModel(m_ModelIndices);
       if (keys.size() > 0)
