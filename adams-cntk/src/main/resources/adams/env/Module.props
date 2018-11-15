@@ -13,7 +13,7 @@ Version=${project.version}
 BuildTimestamp=${timestamp}
 
 # A short description of the module
-Description=Support for Microsoft CNTK at prediction time.
+Description=Support for Microsoft CNTK.
 
 # The author of the module
 Author=Peter Reutemann, Dale Fletcher

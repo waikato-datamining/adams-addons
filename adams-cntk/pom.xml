@@ -13,7 +13,7 @@
   <packaging>jar</packaging>
 
   <name>adams-cntk</name>
-  <description>Module for Microsoft CNTK bindings for prediction time.</description>
+  <description>Module for Microsoft CNTK support.</description>
   <url>https://adams.cms.waikato.ac.nz/</url>
   <organization>
     <name>University of Waikato, Hamilton, NZ</name>
