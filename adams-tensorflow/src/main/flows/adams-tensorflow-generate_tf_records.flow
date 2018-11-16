@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2018-11-16 10:33:42
+# Date: 2018-11-16 15:53:17
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-imaging,adams-ml,adams-python,adams-spreadsheet,adams-tensorflow,adams-visualstats
@@ -23,6 +23,8 @@ adams.flow.control.Flow -annotation "Generates TFRecords for the object detectio
   adams.flow.transformer.SetVariable -name "test list" -var-name test_list -var-value @{output_dir}/test.list -expand-value true
   adams.flow.transformer.SetVariable -name "train tfrecords" -var-name train_tfrecords -var-value @{output_dir}/train.tfrecords -expand-value true
   adams.flow.transformer.SetVariable -name "test tfrecords" -var-name test_tfrecords -var-value @{output_dir}/test.tfrecords -expand-value true
+  adams.flow.transformer.SetVariable -name "train pb label map" -var-name train_pbtxt -var-value @{output_dir}/train.pbtxt -expand-value true
+  adams.flow.transformer.SetVariable -name "test pb label map" -var-name test_pbtxt -var-value @{output_dir}/test.pbtxt -expand-value true
   adams.flow.control.ConditionalTrigger -name "label mappings" -condition "adams.flow.condition.bool.Expression -expression \"\\\\\\\"@{label_mappings}\\\\\\\" != \\\\\\\"\\\\\\\"\""
    adams.flow.source.Variable -var-name label_mappings -conversion adams.data.conversion.StringToString
    adams.flow.transformer.StringSplit -expression " "
@@ -45,8 +47,8 @@ adams.flow.control.Flow -annotation "Generates TFRecords for the object detectio
     adams.flow.transformer.StringJoin -glue \n
     adams.flow.sink.DumpFile -output @{test_list}
   adams.flow.control.Trigger -name "generate train"
-   adams.flow.source.PythonExec -output-type BOTH -prefix-stdout "[train-out] " -prefix-stderr "[train-err] " -script @{convert_script} -script-options "--input @{train_list} --output @{train_tfrecords} --shards @{shards} @{mappings} --regexp @{label_regexp} @{labels} --verbose" -working-directory @{adams_tensorflow_dir} -variable true
+   adams.flow.source.PythonExec -output-type BOTH -prefix-stdout "[train-out] " -prefix-stderr "[train-err] " -script @{convert_script} -script-options "--input @{train_list} --output @{train_tfrecords} --shards @{shards} @{mappings} --regexp @{label_regexp} @{labels} --protobuf_label_map @{train_pbtxt}" -working-directory @{adams_tensorflow_dir} -variable true
    adams.flow.sink.CallableSink -callable "Script output"
   adams.flow.control.Trigger -name "generate test"
-   adams.flow.source.PythonExec -output-type BOTH -prefix-stdout "[test-out] " -prefix-stderr "[test-err] " -script @{convert_script} -script-options "--input @{test_list} --output @{test_tfrecords} --shards @{shards} @{mappings} --regexp @{label_regexp} @{labels} --verbose" -working-directory @{adams_tensorflow_dir} -variable true
+   adams.flow.source.PythonExec -output-type BOTH -prefix-stdout "[test-out] " -prefix-stderr "[test-err] " -script @{convert_script} -script-options "--input @{test_list} --output @{test_tfrecords} --shards @{shards} @{mappings} --regexp @{label_regexp} @{labels} --protobuf_label_map @{test_pbtxt}" -working-directory @{adams_tensorflow_dir} -variable true
    adams.flow.sink.CallableSink -callable "Script output"
