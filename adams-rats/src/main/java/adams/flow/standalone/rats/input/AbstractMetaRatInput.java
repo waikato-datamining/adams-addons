@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractMetaRatInput.java
- * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
@@ -28,7 +28,6 @@ import java.util.ArrayList;
  * Ancestor for {@link RatInput} schemes that wrap another {@link RatInput}.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public abstract class AbstractMetaRatInput
   extends AbstractRatInput {
@@ -131,7 +130,16 @@ public abstract class AbstractMetaRatInput
     
     return result;
   }
-  
+
+  /**
+   * Initializes the reception.
+   */
+  @Override
+  public void initReception() {
+    super.initReception();
+    m_Input.initReception();
+  }
+
   /**
    * Hook method before calling the base-input's receive() method.
    * <br><br>

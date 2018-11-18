@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractMetaRatOutput.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
 
@@ -26,7 +26,6 @@ import adams.flow.standalone.Rat;
  * Ancestor for {@link RatOutput} schemes that wrap another {@link RatOutput}.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public abstract class AbstractMetaRatOutput
   extends AbstractRatOutput {
@@ -115,6 +114,15 @@ public abstract class AbstractMetaRatOutput
       result = m_Output.setUp();
     
     return result;
+  }
+
+  /**
+   * Initializes the transmission.
+   */
+  @Override
+  public void initTransmission() {
+    super.initTransmission();
+    m_Output.initTransmission();
   }
 
   /**

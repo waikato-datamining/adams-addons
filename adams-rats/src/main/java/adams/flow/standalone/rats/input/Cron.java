@@ -222,21 +222,18 @@ public class Cron
     
     return result;
   }
-  
+
   /**
-   * Hook method that calls the base-input's receive() method using a cronjob.
-   * 
-   * @return		null if successful, otherwise error message
+   * Initializes the reception.
    */
   @Override
-  protected String callReceive() {
-    String	result;
+  public void initReception() {
     JobDetail	job;
     CronTrigger	trigger;
     Date	first;
-    
-    result = null;
-    
+
+    super.initReception();
+
     try {
       if (m_Scheduler == null) {
 	m_Scheduler = EventHelper.getDefaultScheduler();
@@ -254,15 +251,21 @@ public class Cron
 	  getLogger().info("First execution of actor: " + first);
 	m_Scheduler.start();
       }
-      else {
-	doWait(100);
-      }
     }
     catch (Exception e) {
-      result = handleException("Failed to set up cron job: ", e);
+      handleException("Failed to set up cron job: ", e);
     }
+  }
 
-    return result;
+  /**
+   * Hook method that calls the base-input's receive() method using a cronjob.
+   * 
+   * @return		null if successful, otherwise error message
+   */
+  @Override
+  protected String callReceive() {
+    doWait(100);
+    return null;
   }
 
   /**
