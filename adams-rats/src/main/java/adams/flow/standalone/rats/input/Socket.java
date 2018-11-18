@@ -288,28 +288,41 @@ public class Socket
   }
 
   /**
+   * Initializes the reception.
+   *
+   * @return		null if successfully initialized, otherwise error message
+   */
+  @Override
+  public String initReception() {
+    String	result;
+
+    result = super.initReception();
+
+    if (result == null) {
+      if (m_Server == null) {
+	try {
+	  m_Server = new ServerSocket(m_Port);
+	  m_Server.setSoTimeout(m_Timeout);
+	  PortManager.getSingleton().bind(this, m_Port);
+	}
+	catch (Exception e) {
+	  result   = handleException("Failed to listen on port: " + m_Port, e);
+	  m_Server = null;
+	}
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Performs the actual reception of data.
    *
    * @return		null if successful, otherwise error message
    */
   @Override
   protected String doReceive() {
-    String		result;
     RunnableWithLogging	run;
-
-    result = null;
-
-    if (m_Server == null) {
-      try {
-	m_Server = new ServerSocket(m_Port);
-	m_Server.setSoTimeout(m_Timeout);
-	PortManager.getSingleton().bind(this, m_Port);
-      }
-      catch (Exception e) {
-	result   = handleException("Failed to listen on port: " + m_Port, e);
-	m_Server = null;
-      }
-    }
 
     if (m_Server != null) {
       run = new RunnableWithLogging() {
@@ -349,7 +362,7 @@ public class Socket
       new Thread(run).start();
     }
 
-    return result;
+    return null;
   }
 
   /**

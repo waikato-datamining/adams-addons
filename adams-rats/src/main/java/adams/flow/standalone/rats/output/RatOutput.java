@@ -72,8 +72,10 @@ public interface RatOutput
 
   /**
    * Initializes the transmission.
+   *
+   * @return		null if successfully initialized, otherwise error message
    */
-  public void initTransmission();
+  public String initTransmission();
 
   /**
    * Whether input can be supplied at the moment.

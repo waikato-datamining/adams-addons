@@ -133,11 +133,19 @@ public abstract class AbstractMetaRatInput
 
   /**
    * Initializes the reception.
+   *
+   * @return		null if successfully initialized, otherwise error message
    */
   @Override
-  public void initReception() {
-    super.initReception();
-    m_Input.initReception();
+  public String initReception() {
+    String	result;
+
+    result = super.initReception();
+
+    if (result == null)
+      result = m_Input.initReception();
+
+    return result;
   }
 
   /**

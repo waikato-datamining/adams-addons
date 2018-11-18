@@ -225,36 +225,43 @@ public class Cron
 
   /**
    * Initializes the reception.
+   *
+   * @return		null if successfully initialized, otherwise error message
    */
   @Override
-  public void initReception() {
+  public String initReception() {
+    String	result;
     JobDetail	job;
     CronTrigger	trigger;
     Date	first;
 
-    super.initReception();
+    result = super.initReception();
 
-    try {
-      if (m_Scheduler == null) {
-	m_Scheduler = EventHelper.getDefaultScheduler();
-	job         = new JobDetail(getFullName() + ".job", getFullName() + ".group", CronJob.class);
-	job.getJobDataMap().put(KEY_OWNER, this);
-	trigger     = new CronTrigger(
+    if (result == null) {
+      try {
+	if (m_Scheduler == null) {
+	  m_Scheduler = EventHelper.getDefaultScheduler();
+	  job = new JobDetail(getFullName() + ".job", getFullName() + ".group", CronJob.class);
+	  job.getJobDataMap().put(KEY_OWNER, this);
+	  trigger = new CronTrigger(
 	    getFullName() + ".trigger",
 	    getFullName() + ".group",
 	    getFullName() + ".job",
 	    getFullName() + ".group",
 	    m_Schedule.getValue());
-	m_Scheduler.addJob(job, true);
-	first = m_Scheduler.scheduleJob(trigger);
-	if (isLoggingEnabled())
-	  getLogger().info("First execution of actor: " + first);
-	m_Scheduler.start();
+	  m_Scheduler.addJob(job, true);
+	  first = m_Scheduler.scheduleJob(trigger);
+	  if (isLoggingEnabled())
+	    getLogger().info("First execution of actor: " + first);
+	  m_Scheduler.start();
+	}
+      }
+      catch (Exception e) {
+	result = handleException("Failed to set up cron job: ", e);
       }
     }
-    catch (Exception e) {
-      handleException("Failed to set up cron job: ", e);
-    }
+
+    return result;
   }
 
   /**

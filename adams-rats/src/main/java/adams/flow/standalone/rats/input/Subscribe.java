@@ -164,27 +164,40 @@ public class Subscribe
   }
 
   /**
+   * Initializes the reception.
+   *
+   * @return		null if successfully initialized, otherwise error message
+   */
+  @Override
+  public String initReception() {
+    String	result;
+
+    result = super.initReception();
+
+    if (result == null) {
+      if (!getOwner().getStorageHandler().getStorage().has(m_StorageName)) {
+	result = "Storage item not found: " + m_StorageName;
+      }
+      else if (!(getOwner().getStorageHandler().getStorage().get(m_StorageName) instanceof PublishSubscribeHandler)) {
+	result = "Storage item '" + m_StorageName + "' is not a " + Utils.classToString(PublishSubscribeHandler.class) + "!";
+      }
+      else {
+	m_Handler = (PublishSubscribeHandler) getOwner().getStorageHandler().getStorage().get(m_StorageName);
+	m_Handler.addSubscriber(this);
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Performs the actual reception of data.
    * 
    * @return		null if successful, otherwise error message
    */
   @Override
   protected String doReceive() {
-    String		result;
-
-    result = null;
-    if (!getOwner().getStorageHandler().getStorage().has(m_StorageName)) {
-      result = "Storage item not found: " + m_StorageName;
-    }
-    else if (!(getOwner().getStorageHandler().getStorage().get(m_StorageName) instanceof PublishSubscribeHandler)) {
-      result = "Storage item '" + m_StorageName + "' is not a " + Utils.classToString(PublishSubscribeHandler.class) + "!";
-    }
-    else {
-      m_Handler = (PublishSubscribeHandler) getOwner().getStorageHandler().getStorage().get(m_StorageName);
-      m_Handler.addSubscriber(this);
-    }
-
-    return result;
+    return null;
   }
 
   /**

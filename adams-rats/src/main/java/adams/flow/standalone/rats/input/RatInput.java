@@ -83,8 +83,10 @@ public interface RatInput
 
   /**
    * Initializes the reception.
+   *
+   * @return		null if successfully initialized, otherwise error message
    */
-  public void initReception();
+  public String initReception();
 
   /**
    * Initiates the reception of data.

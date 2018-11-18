@@ -250,12 +250,15 @@ public abstract class AbstractRatInput
 
   /**
    * Initializes the reception.
+   *
+   * @return		null if successfully initialized, otherwise error message
    */
-  public void initReception() {
+  public String initReception() {
     m_Stopped              = false;
     m_ReceptionInterrupted = false;
     m_ReceptionRunning     = false;
     getOptionManager().updateVariableValues(true);
+    return null;
   }
 
   /**

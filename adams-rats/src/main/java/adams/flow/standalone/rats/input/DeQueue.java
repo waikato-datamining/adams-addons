@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * DeQueue.java
- * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
@@ -48,7 +48,6 @@ import java.util.logging.Level;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class DeQueue
   extends AbstractRatInput
@@ -163,6 +162,26 @@ public class DeQueue
   }
 
   /**
+   * Initializes the reception.
+   *
+   * @return		null if successfully initialized, otherwise error message
+   */
+  @Override
+  public String initReception() {
+    String	result;
+
+    result = super.initReception();
+
+    if (result == null) {
+      m_Queue  = getQueue(m_StorageName);
+      if (m_Queue == null)
+	result = "Queue not available: " + m_StorageName;
+    }
+
+    return result;
+  }
+
+  /**
    * Waits for the next data object, polling the queue.
    *
    * @return		the data, null if none available (eg when stopped)
@@ -192,18 +211,8 @@ public class DeQueue
    */
   @Override
   protected String doReceive() {
-    String		result;
-
-    result   = null;
-    m_Output = null;
-    m_Queue  = getQueue(m_StorageName);
-    if (m_Queue == null)
-      result = "Queue not available: " + m_StorageName;
-
-    if (result == null)
-      m_Output = poll(m_Queue);
-
-    return result;
+    m_Output = poll(m_Queue);
+    return null;
   }
 
   /**

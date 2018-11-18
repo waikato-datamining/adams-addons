@@ -118,11 +118,19 @@ public abstract class AbstractMetaRatOutput
 
   /**
    * Initializes the transmission.
+   *
+   * @return		null if successfully initialized, otherwise error message
    */
   @Override
-  public void initTransmission() {
-    super.initTransmission();
-    m_Output.initTransmission();
+  public String initTransmission() {
+    String	result;
+
+    result = super.initTransmission();
+
+    if (result == null)
+      m_Output.initTransmission();
+
+    return result;
   }
 
   /**

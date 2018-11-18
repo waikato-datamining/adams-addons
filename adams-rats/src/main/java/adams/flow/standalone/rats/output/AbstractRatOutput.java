@@ -451,10 +451,13 @@ public abstract class AbstractRatOutput
 
   /**
    * Initializes the transmission.
+   *
+   * @return		null if successfully initialized, otherwise error message
    */
-  public void initTransmission() {
+  public String initTransmission() {
     m_Stopped = false;
     getOptionManager().updateVariableValues(true);
+    return null;
   }
 
   /**
