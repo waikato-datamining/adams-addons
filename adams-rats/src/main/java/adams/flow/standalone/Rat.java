@@ -1562,7 +1562,7 @@ public class Rat
       m_Transmitter.initTransmission();
 
       // start runnable
-      m_Runnable = new RatRunnable(this);
+      m_Runnable = new RatRunnable(this, (m_InitialState == RatState.PAUSED));
       m_Runnable.setLoggingLevel(getLoggingLevel());
       switch (m_InitialState) {
 	case RUNNING:
@@ -1570,8 +1570,7 @@ public class Rat
 	  break;
 	case PAUSED:
 	  if (isLoggingEnabled())
-	    getLogger().info("Starting rat in paused mode");
-	  m_Runnable.pauseExecution();
+	    getLogger().info("Started rat in paused mode");
 	  break;
 	default:
 	  result = "Unhandled initial rat state: " + m_InitialState;

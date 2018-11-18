@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * RatRunnable.java
- * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats;
 
@@ -32,7 +32,6 @@ import java.util.logging.Level;
  * Runnable class for Rat used in a thread.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class RatRunnable
   extends RunnableWithLogging {
@@ -53,13 +52,14 @@ public class RatRunnable
    * Initializes the runnable.
    *
    * @param owner	the owning actor
+   * @param paused 	whether to start in paused mode
    */
-  public RatRunnable(Rat owner) {
+  public RatRunnable(Rat owner, boolean paused) {
     super();
 
     m_Owner     = owner;
     m_HasActors = (owner.getActorHandler().active() > 0);
-    m_Paused    = false;
+    m_Paused    = paused;
   }
 
   /**
