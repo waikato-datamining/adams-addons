@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * TwitterListener.java
- * Copyright (C) 2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2017-2018 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone.rats.input;
@@ -141,15 +141,23 @@ public class TwitterListener
 
   /**
    * Initializes the reception.
+   *
+   * @return		null if successfully initialized, otherwise error message
    */
   @Override
-  public void initReception() {
-    super.initReception();
+  public String initReception() {
+    String	result;
 
-    if (m_ActualListener != null)
-      m_ActualListener.stopExecution();
-    m_ActualListener = (AbstractListener) OptionUtils.shallowCopy(m_Listener);
-    m_ActualListener.setFlowContext(getOwner());
+    result = super.initReception();
+
+    if (result == null) {
+      if (m_ActualListener != null)
+	m_ActualListener.stopExecution();
+      m_ActualListener = (AbstractListener) OptionUtils.shallowCopy(m_Listener);
+      m_ActualListener.setFlowContext(getOwner());
+    }
+
+    return result;
   }
 
   /**
