@@ -147,7 +147,7 @@ public class AddTrailBackgroundTest
       actors3.add(filesupplier);
 
       // Flow.CallableActors.bg.ImageReader
-      ImageReader imagereader = new ImageReader();
+      ImageFileReader imagereader = new ImageFileReader();
       JAIImageReader jaiimagereader = new JAIImageReader();
       imagereader.setReader(jaiimagereader);
 

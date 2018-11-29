@@ -6,7 +6,7 @@ adams.flow.control.Flow -annotation "Generates features from images using a form
  adams.flow.source.Start
  adams.flow.control.Trigger -name "generate features"
   adams.flow.source.FileSystemSearch -search "adams.flow.source.filesystemsearch.LocalFileSearch -directory ${FLOWS}/data -regexp 0.*\\\\.png -sorting SORT_BY_NAME"
-  adams.flow.transformer.ImageReader -reader adams.data.io.input.JAIImageReader
+  adams.flow.transformer.ImageFileReader -reader adams.data.io.input.JAIImageReader
   adams.flow.transformer.BufferedImageFeatureGenerator -algorithm "adams.data.image.features.DefaultCNTK -converter \"adams.data.featureconverter.SpreadSheet -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.DefaultSpreadSheet\" -channels BGR"
   adams.flow.transformer.SpreadSheetRowBuffer
   adams.flow.transformer.SetStorageValue -storage-name data

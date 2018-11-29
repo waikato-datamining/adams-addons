@@ -7,7 +7,7 @@ adams.flow.control.Flow -annotation "Converts JPG images into heatmaps and displ
  adams.flow.control.Tee -name "get filename"
   adams.flow.transformer.BaseName -remove-extensions true
   adams.flow.transformer.SetVariable -var-name entry
- adams.flow.transformer.ImageReader -reader adams.data.io.input.JAIImageReader -meta-data-reader adams.data.io.input.DefaultSimpleReportReader
+ adams.flow.transformer.ImageFileReader -reader adams.data.io.input.JAIImageReader -meta-data-reader adams.data.io.input.DefaultSimpleReportReader
  adams.flow.transformer.BufferedImageTransformer -transformer "adams.data.jai.transformer.Resize -width 0.1 -height 0.1"
  adams.flow.transformer.Convert -conversion adams.data.conversion.BufferedImageToHeatmap
  adams.flow.control.Tee
