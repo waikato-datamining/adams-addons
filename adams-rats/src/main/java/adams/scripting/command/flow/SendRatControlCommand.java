@@ -25,8 +25,8 @@ import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
 import adams.flow.standalone.Rat;
 import adams.flow.standalone.RatControl;
-import adams.flow.standalone.RatControl.AbstractControlPanel;
-import adams.flow.standalone.RatControl.RatControlPanel;
+import adams.flow.standalone.ratcontrol.AbstractControlPanel;
+import adams.flow.standalone.ratcontrol.RatControlPanel;
 import adams.scripting.command.AbstractRemoteCommandOnFlowWithResponse;
 
 /**

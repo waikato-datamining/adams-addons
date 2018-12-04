@@ -30,8 +30,8 @@ import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
 import adams.flow.standalone.Rat;
 import adams.flow.standalone.RatControl;
-import adams.flow.standalone.RatControl.AbstractControlState;
-import adams.flow.standalone.RatControl.RatControlState;
+import adams.flow.standalone.ratcontrol.AbstractControlState;
+import adams.flow.standalone.ratcontrol.RatControlState;
 import adams.scripting.command.AbstractRemoteCommandOnFlowWithResponse;
 
 import java.io.StringReader;
