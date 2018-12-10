@@ -235,6 +235,7 @@ public class HeatmapViewerPanel
     add(panel, BorderLayout.CENTER);
 
     m_MultiPagePane = new MultiPagePane();
+    m_MultiPagePane.setMaxPageCloseUndo(10);
     m_MultiPagePane.addChangeListener(new ChangeListener() {
       @Override
       public void stateChanged(ChangeEvent e) {
