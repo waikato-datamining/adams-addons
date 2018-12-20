@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>adams-addons-pom</artifactId>
-  <version>18.12.0</version>
+  <version>18.12.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>adams-addons-pom</name>
@@ -25,7 +25,7 @@
     <connection>scm:git:https://github.com/waikato-datamining/adams-addons</connection>
     <developerConnection>scm:git:https://github.com/waikato-datamining/adams-addons</developerConnection>
     <url>https://github.com/waikato-datamining/adams-addons</url>
-    <tag>adams-addons-pom-18.12.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
