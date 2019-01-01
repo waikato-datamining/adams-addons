@@ -108,6 +108,12 @@
       <artifactId>postgis-jdbc</artifactId>
       <version>${postgis.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.github.grumlimited</groupId>
+      <artifactId>geocalc</artifactId>
+      <version>0.5.7</version>
+    </dependency>
   </dependencies>
 
   <build>
