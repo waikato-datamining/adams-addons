@@ -15,7 +15,7 @@
 
 /*
  * RatControl.java
- * Copyright (C) 2014-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
@@ -29,6 +29,8 @@ import adams.flow.core.ActorUtils;
 import adams.flow.core.PauseStateHandler;
 import adams.flow.core.PauseStateManager;
 import adams.flow.core.RatMode;
+import adams.flow.core.displaytype.AbstractDisplayType;
+import adams.flow.core.displaytype.DisplayInEditor;
 import adams.flow.standalone.ratcontrol.AbstractControlPanel;
 import adams.flow.standalone.ratcontrol.AbstractControlState;
 import adams.flow.standalone.ratcontrol.RatControlPanel;
@@ -237,8 +239,8 @@ public class RatControl
    * @return		the default
    */
   @Override
-  protected boolean getDefaultDisplayInEditor() {
-    return true;
+  protected AbstractDisplayType getDefaultDisplayType() {
+    return new DisplayInEditor();
   }
 
   /**
@@ -248,7 +250,7 @@ public class RatControl
    * @return		true if to deregister already in {@link #wrapUp()}
    */
   @Override
-  protected boolean deregisterInWrapUp() {
+  public boolean deregisterInWrapUp() {
     return true;
   }
 
@@ -501,8 +503,7 @@ public class RatControl
 
     result = new Runnable() {
       public void run() {
-	if (getCreateFrame() && !m_Frame.isVisible())
-	  m_Frame.setVisible(true);
+        m_DisplayType.show(RatControl.this);
 	for (AbstractControlPanel panel: m_ControlPanels)
 	  panel.updateButtons();
 	synchronized(m_Self) {
