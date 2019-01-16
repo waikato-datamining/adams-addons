@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * VlcjDirectRenderPanelClean.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.video.vlcjplayer;
@@ -23,17 +23,24 @@ package adams.gui.visualization.video.vlcjplayer;
 import adams.gui.core.BasePanel;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
-import uk.co.caprica.vlcj.player.direct.*;
+import uk.co.caprica.vlcj.player.direct.BufferFormatCallback;
+import uk.co.caprica.vlcj.player.direct.DirectMediaPlayer;
+import uk.co.caprica.vlcj.player.direct.RenderCallback;
+import uk.co.caprica.vlcj.player.direct.RenderCallbackAdapter;
 import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
 /**
  * A panel that is a self contained Direct rendering video player.
  *
  * @author sjb90
- * @version $Revision$
  */
 public class DirectRenderMediaPlayerPanel extends BasePanel {
 
@@ -96,7 +103,6 @@ public class DirectRenderMediaPlayerPanel extends BasePanel {
       y = (int) (heightDiff / 2);
     }
 
-
     g2.scale(result, result);
     g2.drawImage(m_Image,null,x,y);
   }
@@ -129,8 +135,6 @@ public class DirectRenderMediaPlayerPanel extends BasePanel {
     revalidate();
     repaint();
   }
-
-
 
   /**
    * Sets the playback rate
@@ -241,12 +245,18 @@ public class DirectRenderMediaPlayerPanel extends BasePanel {
 
   /**
    * mutes the player
-   * @return true if the player is muted, otherwise false.
    */
-  public boolean mute() {
-    if(m_MediaComponent == null)
-      return false;
-    return m_MediaComponent.getMediaPlayer().mute();
+  public void mute() {
+    if(m_MediaComponent != null)
+      m_MediaComponent.getMediaPlayer().mute(true);
+  }
+
+  /**
+   * unmutes the player
+   */
+  public void unmute() {
+    if(m_MediaComponent != null)
+      m_MediaComponent.getMediaPlayer().mute(false);
   }
 
   /**

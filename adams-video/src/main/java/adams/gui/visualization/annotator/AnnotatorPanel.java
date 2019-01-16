@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AnnotatorPanel.java
- * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.annotator;
@@ -54,9 +54,10 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dialog;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.security.InvalidKeyException;
@@ -67,7 +68,6 @@ import java.util.List;
  * Panel for viewing and annotating videos
  *
  * @author sjb90
- * @version $Revision$
  */
 public class AnnotatorPanel extends BasePanel
   implements MenuBarProvider, CleanUpHandler {
@@ -125,26 +125,6 @@ public class AnnotatorPanel extends BasePanel
    * for closing the program
    */
   protected JMenuItem m_MenuItemVideoClose;
-
-  /**
-   * Mute action
-   */
-  protected AbstractBaseAction m_ActionMute;
-
-  /**
-   * Play action
-   */
-  protected AbstractBaseAction m_ActionPlay;
-
-  /**
-   * Pause action
-   */
-  protected AbstractBaseAction m_ActionPause;
-
-  /**
-   * Stop action
-   */
-  protected AbstractBaseAction m_ActionStop;
 
   /** New Bindings action. */
   protected AbstractBaseAction m_ActionNewBindings;
@@ -271,51 +251,6 @@ public class AnnotatorPanel extends BasePanel
   @SuppressWarnings("serial")
   protected void initActions(){
     AbstractBaseAction action;
-
-    // Mute action
-    action = new AbstractBaseAction("Mute", "mute.gif") {
-      @Override
-      protected void doActionPerformed(ActionEvent e) {
-	m_VideoPlayer.mute();
-      }
-    };
-
-    action.setMnemonic(KeyEvent.VK_M);
-    action.setAccelerator("ctrl pressed M");
-    m_ActionMute = action;
-
-    // Play action
-    action = new AbstractBaseAction("Play", "run.gif") {
-      @Override
-      protected void doActionPerformed(ActionEvent e) {
-	m_VideoPlayer.play();
-      }
-    };
-    action.setMnemonic(KeyEvent.VK_P);
-    action.setAccelerator("ctrl pressed P");
-    m_ActionPlay = action;
-
-    // Pause action
-    action = new AbstractBaseAction("Pause", "pause.gif") {
-      @Override
-      protected void doActionPerformed(ActionEvent e) {
-	m_VideoPlayer.pause();
-      }
-    };
-    action.setMnemonic(KeyEvent.VK_U);
-    action.setAccelerator("ctrl pressed U");
-    m_ActionPause = action;
-
-    // Stop action
-    action = new AbstractBaseAction("Stop", "stop_blue.gif" ) {
-      @Override
-      protected void doActionPerformed(ActionEvent e) {
-	m_VideoPlayer.stop();
-      }
-    };
-    action.setMnemonic(KeyEvent.VK_S);
-    action.setAccelerator("ctrl pressed S");
-    m_ActionStop = action;
 
     // New Bindings
     action = new AbstractBaseAction("New", "new.gif") {
@@ -542,14 +477,6 @@ public class AnnotatorPanel extends BasePanel
   }
 
   /**
-   * Finishes up the initialization.
-   */
-  @Override
-  protected void finishInit() {
-    super.finishInit();
-  }
-
-  /**
    * Creates a menu bar (singleton per panel object). Can be used in frames.
    *
    * @return the menu bar
@@ -601,7 +528,8 @@ public class AnnotatorPanel extends BasePanel
       });
       m_MenuFileLoadRecentVideos = submenu;
 
-      menuitem = new JMenuItem(m_VideoPlayer.getSetSpeedAction());
+      menuitem = new JMenuItem("Playback speed...");
+      menuitem.addActionListener((ActionEvent e) -> m_VideoPlayer.enterPlaybackSpeed());
       menu.add(menuitem);
 
       menuitem = new JMenuItem("Quit", GUIHelper.getIcon("exit.png"));
