@@ -15,7 +15,7 @@
 
 /*
  * ConnectToMongoDB.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2019 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -93,7 +93,7 @@ public class ConnectToMongoDB
    * @return 		the title
    */
   public String getTitle() {
-    return "Connect to MongoDB";
+    return "Connect MongoDB";
   }
 
   /**
