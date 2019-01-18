@@ -24,6 +24,7 @@ import adams.core.ObjectCopyHelper;
 import adams.core.QuickInfoHelper;
 import adams.core.Range;
 import adams.core.Utils;
+import adams.core.base.BaseRegExp;
 import adams.core.base.BaseString;
 import adams.core.option.OptionUtils;
 import adams.data.weka.WekaAttributeIndex;
@@ -119,6 +120,14 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default:
  * </pre>
  *
+ * <pre>-regexp &lt;adams.core.base.BaseRegExp&gt; [-regexp ...] (property: regExps)
+ * &nbsp;&nbsp;&nbsp;The regular expression to apply to the attribute names to identify numeric
+ * &nbsp;&nbsp;&nbsp;attributes to use for a filter.
+ * &nbsp;&nbsp;&nbsp;default:
+ * &nbsp;&nbsp;&nbsp;more: https:&#47;&#47;docs.oracle.com&#47;javase&#47;tutorial&#47;essential&#47;regex&#47;
+ * &nbsp;&nbsp;&nbsp;https:&#47;&#47;docs.oracle.com&#47;javase&#47;8&#47;docs&#47;api&#47;java&#47;util&#47;regex&#47;Pattern.html
+ * </pre>
+ *
  * <pre>-prefix &lt;adams.core.base.BaseString&gt; [-prefix ...] (property: prefixes)
  * &nbsp;&nbsp;&nbsp;The prefixes for the attributes to use (- gets added automatically).
  * &nbsp;&nbsp;&nbsp;default:
@@ -165,6 +174,9 @@ public class CNTKMultiFilter
   /** the filters to apply. */
   protected Filter[] m_Filters;
 
+  /** the regular expressions to identify the attributes to use for the filters. */
+  protected BaseRegExp[] m_RegExps;
+
   /** the prefixes to use. */
   protected BaseString[] m_Prefixes;
 
@@ -206,6 +218,10 @@ public class CNTKMultiFilter
     m_OptionManager.add(
       "filter", "filters",
       new Filter[0]);
+
+    m_OptionManager.add(
+      "regexp", "regExps",
+      new BaseRegExp[0]);
 
     m_OptionManager.add(
       "prefix", "prefixes",
@@ -290,6 +306,7 @@ public class CNTKMultiFilter
   public void setFilters(Filter[] value) {
     m_Filters  = value;
     m_Prefixes = (BaseString[]) Utils.adjustArray(m_Prefixes, m_Filters.length, new BaseString());
+    m_RegExps  = (BaseRegExp[]) Utils.adjustArray(m_RegExps, m_Filters.length, new BaseRegExp());
     reset();
   }
 
@@ -313,6 +330,39 @@ public class CNTKMultiFilter
   }
 
   /**
+   * Sets the regular expression to apply to the attribute names to identify
+   * numeric attributes to use for a filter.
+   *
+   * @param value	the expressions
+   */
+  public void setRegExps(BaseRegExp[] value) {
+    m_RegExps  = value;
+    m_Filters  = (Filter[]) Utils.adjustArray(m_Filters, m_RegExps.length, new AllFilter());
+    m_Prefixes = (BaseString[]) Utils.adjustArray(m_Prefixes, m_RegExps.length, new BaseString());
+    reset();
+  }
+
+  /**
+   * Returns the regular expression to apply to the attribute names to identify
+   * numeric attributes to use for a filter.
+   *
+   * @return 		the expressions
+   */
+  public BaseRegExp[] getRegExps() {
+    return m_RegExps;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return         tip text for this property suitable for
+   *             displaying in the GUI or for listing the options.
+   */
+  public String regExpsTipText() {
+    return "The regular expression to apply to the attribute names to identify numeric attributes to use for a filter.";
+  }
+
+  /**
    * Sets the prefixes to use for the filters (- gets added automatically).
    *
    * @param value	the prefixes
@@ -320,6 +370,7 @@ public class CNTKMultiFilter
   public void setPrefixes(BaseString[] value) {
     m_Prefixes = value;
     m_Filters  = (Filter[]) Utils.adjustArray(m_Filters, m_Prefixes.length, new AllFilter());
+    m_RegExps  = (BaseRegExp[]) Utils.adjustArray(m_RegExps, m_Prefixes.length, new BaseRegExp());
     reset();
   }
 
@@ -483,46 +534,74 @@ public class CNTKMultiFilter
   }
 
   /**
-   * Generates the filtered data.
+   * Generates the set of blacklisted attributes (non-numeric and targets),
+   * to be used for the filters.
    *
    * @param data	the input data
-   * @return		the filtered data
-   * @throws Exception	if filtering fails
+   * @return		the blacklisted 0-based attribute indices
    */
-  protected Instances filter(Instances data) throws Exception {
-    Instances			filtered;
+  protected TIntSet generateAttributeBlacklist(Instances data) {
+    TIntSet 	result;
+    TIntList	nonNumeric;
+    int		i;
+
+    m_Targets.setData(data);
+    result     = new TIntHashSet(m_Targets.getIntIndices());
+    nonNumeric = new TIntArrayList();
+    for (i = 0; i < data.numAttributes(); i++) {
+      if (!data.attribute(i).isNumeric())
+	nonNumeric.add(i);
+    }
+    result.addAll(nonNumeric);
+
+    return result;
+  }
+
+  /**
+   * Determines the attribute indices for each filter, using the regular expressions.
+   *
+   * @param data	the input data
+   * @param blacklist 	the blacklisted attributes indices
+   * @return		the attributes indices corresponding with the filters
+   * @throws Exception	if generation fails
+   */
+  protected TIntList[] generateAttributeIndices(Instances data, TIntSet blacklist) throws Exception {
+    TIntList[]	result;
+    int		i;
+    int		n;
+
+    result = new TIntList[m_Filters.length];
+    for (n = 0; n < result.length; n++) {
+      result[n] = new TIntArrayList();
+      for (i = 0; i < data.numAttributes(); i++) {
+        if (blacklist.contains(i))
+          continue;
+        if (m_RegExps[n].isMatch(data.attribute(i).name()))
+          result[n].add(i);
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Generates the filter to use.
+   *
+   * @param data	the input data
+   * @param attIndices 	the attribute indices for each filter
+   * @return		the filter
+   * @throws Exception	if generation fails
+   */
+  protected Filter generateFilter(Instances data, TIntList[] attIndices) throws Exception {
+    MultiFilter 		result;
     PartitionedMultiFilter2	part;
     Range			dataAtts;
-    TIntList			attList;
-    TIntList			nonNumeric;
-    TIntSet			blacklist;
     int				i;
     String			dataRange;
     List<Filter> 		filters;
     List<weka.core.Range>	ranges;
     List<BaseString>		prefixes;
     AddID			addID;
-    MultiFilter			multi;
-
-    // determine data attributes
-    m_Targets.setData(data);
-    blacklist  = new TIntHashSet(m_Targets.getIntIndices());
-    nonNumeric = new TIntArrayList();
-    for (i = 0; i < data.numAttributes(); i++) {
-      if (!data.attribute(i).isNumeric())
-	nonNumeric.add(i);
-    }
-    blacklist.addAll(nonNumeric);
-
-    attList = new TIntArrayList();
-    for (i = 0; i < data.numAttributes(); i++) {
-      if (!blacklist.contains(i))
-        attList.add(i);
-    }
-    dataAtts = new Range();
-    dataAtts.setMax(data.numAttributes());
-    dataAtts.setIndices(attList.toArray());
-    dataRange = dataAtts.toExplicitRange();
 
     // partitionedmultifilter
     filters = new ArrayList<>();
@@ -530,8 +609,13 @@ public class CNTKMultiFilter
       filters.add(ObjectCopyHelper.copyObject(m_Filters[i]));
     filters.add(new AllFilter());  // targets
     ranges = new ArrayList<>();
-    for (i = 0; i < m_Filters.length; i++)
+    for (i = 0; i < m_Filters.length; i++) {
+      dataAtts = new Range();
+      dataAtts.setMax(data.numAttributes());
+      dataAtts.setIndices(attIndices[i].toArray());
+      dataRange = dataAtts.toExplicitRange();
       ranges.add(new weka.core.Range(dataRange));
+    }
     ranges.add(new weka.core.Range(m_Targets.toExplicitRange())); // targets
     prefixes = new ArrayList<>();
     for (i = 0; i < m_Prefixes.length; i++)
@@ -548,17 +632,30 @@ public class CNTKMultiFilter
     addID.setAttributeName(m_OutputIDAttribute);
 
     // multifilter
-    multi = new MultiFilter();
-    multi.setFilters(new Filter[]{part, addID});
+    result = new MultiFilter();
+    result.setFilters(new Filter[]{part, addID});
 
     if (isLoggingEnabled())
-      getLogger().info("MultiFilter: " + OptionUtils.getCommandLine(multi));
+      getLogger().info("MultiFilter: " + OptionUtils.getCommandLine(result));
 
-    // filter
-    multi.setInputFormat(data);
-    filtered = Filter.useFilter(data, multi);
+    return result;
+  }
 
-    return filtered;
+  /**
+   * Generates the filtered data.
+   *
+   * @param filter	the filter to use
+   * @param data	the input data
+   * @return		the filtered data
+   * @throws Exception	if filtering fails
+   */
+  protected Instances filter(Filter filter, Instances data) throws Exception {
+    Instances 	result;
+
+    filter.setInputFormat(data);
+    result = Filter.useFilter(data, filter);
+
+    return result;
   }
 
   /**
@@ -679,10 +776,12 @@ public class CNTKMultiFilter
    * Generates a JSON definition for the dataset.
    *
    * @param saver	the configured saver to use
+   * @param filter	the filter
    * @param filtered	the filtered dataset
+   * @param attIndices	the attribute indices used by the filters
    * @return		the JSON definition
    */
-  protected String generateDefinition(CNTKSaver saver, Instances filtered) {
+  protected String generateDefinition(CNTKSaver saver, Filter filter, Instances filtered, TIntList[] attIndices) {
     JsonObject		result;
     JsonObject		map;
     int			i;
@@ -708,6 +807,18 @@ public class CNTKMultiFilter
     }
     result.add("Inputs", map);
 
+    // filter
+    result.addProperty("Filter", OptionUtils.getCommandLine(filter));
+
+    // ranges
+    map = new JsonObject();
+    for (i = 0; i < m_Filters.length; i++) {
+      range = new Range();
+      range.setMax(filtered.numAttributes());
+      range.setIndices(attIndices[i].toArray());
+      map.addProperty(m_Prefixes[i].getValue(), range.toExplicitRange());
+    }
+    result.add("AttributeRanges", map);
 
     return toString(result);
   }
@@ -721,6 +832,9 @@ public class CNTKMultiFilter
   protected String doExecute() {
     String				result;
     Instances				data;
+    TIntSet				blacklist;
+    TIntList[] 				attIndices;
+    Filter				filter;
     Instances				filtered;
     String				ids;
     CNTKMultiFilterResultContainer	cont;
@@ -731,10 +845,13 @@ public class CNTKMultiFilter
     data   = m_InputToken.getPayload(Instances.class);
 
     try {
-      filtered = filter(data);
-      ids      = generateIDs(data);
-      saver    = generateSaver(filtered);
-      def      = generateDefinition(saver, filtered);
+      blacklist  = generateAttributeBlacklist(data);
+      attIndices = generateAttributeIndices(data, blacklist);
+      filter     = generateFilter(data, attIndices);
+      filtered   = filter(filter, data);
+      ids        = generateIDs(data);
+      saver      = generateSaver(filtered);
+      def        = generateDefinition(saver, filter, filtered, attIndices);
 
       // container
       cont = new CNTKMultiFilterResultContainer(
