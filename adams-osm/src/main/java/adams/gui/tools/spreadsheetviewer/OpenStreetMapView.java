@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * OpenStreetMapView.java
- * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.tools.spreadsheetviewer;
 
@@ -36,6 +36,7 @@ import adams.data.spreadsheet.GPSObjectHandler;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.SpreadSheetColumnIndex;
 import adams.data.spreadsheet.SpreadSheetColumnRange;
+import adams.data.spreadsheet.SpreadSheetUnorderedColumnRange;
 import adams.flow.control.Flow;
 import adams.flow.control.StorageName;
 import adams.flow.sink.OpenStreetMapViewer;
@@ -67,7 +68,6 @@ import java.util.logging.Level;
  * Displays the GIS data in OpenStreetMap (OSM).
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class OpenStreetMapView
   extends AbstractViewPlugin {
@@ -281,7 +281,7 @@ public class OpenStreetMapView
       
       Convert conv = new Convert();
       SpreadSheetJoinColumns join = new SpreadSheetJoinColumns();
-      join.setColumns(new SpreadSheetColumnRange((latIndex+1) + "," + (lonIndex+1))); 
+      join.setColumns(new SpreadSheetUnorderedColumnRange((latIndex+1) + "," + (lonIndex+1)));
       join.setGlue(" ");
       join.setColumnName("gps");
       conv.setConversion(join);
