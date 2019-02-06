@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractBufferedRatInput.java
- * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone.rats.input;
@@ -29,7 +29,6 @@ import java.util.logging.Level;
  * Ancestor for buffering rat inputs.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public abstract class AbstractBufferedRatInput
   extends AbstractRatInput
@@ -58,7 +57,7 @@ public abstract class AbstractBufferedRatInput
 
     m_OptionManager.add(
       "max-buffer", "maxBuffer",
-      65535, 1, null);
+      getDefaultMaxBuffer(), 1, null);
   }
 
   /**
@@ -89,6 +88,15 @@ public abstract class AbstractBufferedRatInput
     }
 
     return result;
+  }
+
+  /**
+   * Returns the default maximum for the buffer.
+   *
+   * @return		the default
+   */
+  protected int getDefaultMaxBuffer() {
+    return 65535;
   }
 
   /**
