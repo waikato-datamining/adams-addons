@@ -19,6 +19,8 @@
  */
 package adams.flow.standalone;
 
+import adams.core.Utils;
+import adams.core.io.FileUtils;
 import adams.event.FlowPauseStateEvent;
 import adams.event.FlowPauseStateListener;
 import adams.event.RatStateEvent;
@@ -37,14 +39,25 @@ import adams.flow.standalone.ratcontrol.RatControlPanel;
 import adams.flow.standalone.ratcontrol.RatControlState;
 import adams.flow.standalone.ratcontrol.RatsControlPanel;
 import adams.flow.standalone.ratcontrol.RatsControlState;
+import adams.gui.chooser.TextFileChooser;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseComboBox;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
+import adams.gui.core.BaseTextArea;
+import adams.gui.core.ConsolePanel;
+import adams.gui.core.Fonts;
+import adams.gui.core.GUIHelper;
 import adams.gui.core.ParameterPanel;
+import adams.gui.dialog.ApprovalDialog;
+import adams.gui.event.ConsolePanelEvent;
+import adams.gui.event.ConsolePanelListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -88,47 +101,65 @@ import java.util.Map;
  * </pre>
  * 
  * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
- * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
+ * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  * <pre>-short-title &lt;boolean&gt; (property: shortTitle)
- * &nbsp;&nbsp;&nbsp;If enabled uses just the name for the title instead of the actor's full 
+ * &nbsp;&nbsp;&nbsp;If enabled uses just the name for the title instead of the actor's full
  * &nbsp;&nbsp;&nbsp;name.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
- * <pre>-display-in-editor &lt;boolean&gt; (property: displayInEditor)
- * &nbsp;&nbsp;&nbsp;If enabled displays the panel in a tab in the flow editor rather than in 
- * &nbsp;&nbsp;&nbsp;a separate frame.
- * &nbsp;&nbsp;&nbsp;default: true
+ *
+ * <pre>-display-type &lt;adams.flow.core.displaytype.AbstractDisplayType&gt; (property: displayType)
+ * &nbsp;&nbsp;&nbsp;Determines how to show the display, eg as standalone frame (default) or
+ * &nbsp;&nbsp;&nbsp;in the Flow editor window.
+ * &nbsp;&nbsp;&nbsp;default: adams.flow.core.displaytype.DisplayInEditor
  * </pre>
- * 
+ *
  * <pre>-width &lt;int&gt; (property: width)
  * &nbsp;&nbsp;&nbsp;The width of the dialog.
  * &nbsp;&nbsp;&nbsp;default: 800
  * &nbsp;&nbsp;&nbsp;minimum: -1
  * </pre>
- * 
+ *
  * <pre>-height &lt;int&gt; (property: height)
  * &nbsp;&nbsp;&nbsp;The height of the dialog.
  * &nbsp;&nbsp;&nbsp;default: 600
  * &nbsp;&nbsp;&nbsp;minimum: -1
  * </pre>
- * 
+ *
  * <pre>-x &lt;int&gt; (property: x)
  * &nbsp;&nbsp;&nbsp;The X position of the dialog (&gt;=0: absolute, -1: left, -2: center, -3: right
  * &nbsp;&nbsp;&nbsp;).
  * &nbsp;&nbsp;&nbsp;default: -1
  * &nbsp;&nbsp;&nbsp;minimum: -3
  * </pre>
- * 
+ *
  * <pre>-y &lt;int&gt; (property: y)
  * &nbsp;&nbsp;&nbsp;The Y position of the dialog (&gt;=0: absolute, -1: top, -2: center, -3: bottom
  * &nbsp;&nbsp;&nbsp;).
  * &nbsp;&nbsp;&nbsp;default: -1
  * &nbsp;&nbsp;&nbsp;minimum: -3
+ * </pre>
+ *
+ * <pre>-bulk-actions &lt;boolean&gt; (property: bulkActions)
+ * &nbsp;&nbsp;&nbsp;If enabled, bulk actions can be performed on the checked rats.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-console-line-limit &lt;int&gt; (property: consoleLineLimit)
+ * &nbsp;&nbsp;&nbsp;The line limit for the console output, &lt;=0 for no limit.
+ * &nbsp;&nbsp;&nbsp;default: 10000
+ * &nbsp;&nbsp;&nbsp;minimum: -1
  * </pre>
  * 
  <!-- options-end -->
@@ -137,7 +168,7 @@ import java.util.Map;
  */
 public class RatControl
   extends AbstractDisplay
-  implements FlowPauseStateListener, RatStateListener {
+  implements FlowPauseStateListener, RatStateListener, ConsolePanelListener {
 
   /** for serialization. */
   private static final long serialVersionUID = 2777897240842864503L;
@@ -168,6 +199,12 @@ public class RatControl
 
   /** the control states. */
   protected List<AbstractControlState> m_ControlStates;
+
+  /** the textarea with console output. */
+  protected BaseTextArea m_TextAreaConsole;
+
+  /** the line limit for the console output. */
+  protected int m_ConsoleLineLimit;
 
   /**
    * Returns a string describing the object.
@@ -201,6 +238,10 @@ public class RatControl
     m_OptionManager.add(
       "bulk-actions", "bulkActions",
       false);
+
+    m_OptionManager.add(
+      "console-line-limit", "consoleLineLimit",
+      10000, -1, null);
   }
 
   /**
@@ -230,6 +271,35 @@ public class RatControl
    */
   public String bulkActionsTipText() {
     return "If enabled, bulk actions can be performed on the checked rats.";
+  }
+
+  /**
+   * Sets the line limit for the console output.
+   *
+   * @param value	the limit, <= 0 for unlimited
+   */
+  public void setConsoleLineLimit(int value) {
+    m_ConsoleLineLimit = value;
+    reset();
+  }
+
+  /**
+   * Returns the line limit for the console output.
+   *
+   * @return		the limit, <= 0 for unlimited
+   */
+  public int getConsoleLineLimit() {
+    return m_ConsoleLineLimit;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String consoleLineLimitTipText() {
+    return "The line limit for the console output, <=0 for no limit.";
   }
 
   /**
@@ -308,6 +378,7 @@ public class RatControl
     JPanel			panel;
     JPanel			panelBottom;
     BaseButton			buttonStop;
+    BaseButton			buttonConsole;
     final BaseComboBox<String> 	comboBulkActions;
     BaseButton			buttonApply;
     int				i;
@@ -385,11 +456,20 @@ public class RatControl
 
     // general buttons
     panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    panelBottom.add(panel, BorderLayout.EAST);
+
     buttonStop = new BaseButton("Stop");
     buttonStop.addActionListener((ActionEvent e) -> getRoot().stopExecution());
     panel.add(buttonStop);
-    panelBottom.add(panel, BorderLayout.EAST);
-    
+
+    buttonConsole = new BaseButton("Console");
+    buttonConsole.addActionListener((ActionEvent e) -> showConsole());
+    panel.add(buttonConsole);
+
+    m_TextAreaConsole = new BaseTextArea();
+    m_TextAreaConsole.setFont(Fonts.getMonospacedFont());
+    m_TextAreaConsole.setLineWrap(false);
+
     result = new BasePanel(new BorderLayout());
     result.add(new BaseScrollPane(param), BorderLayout.CENTER);
     result.add(panelBottom, BorderLayout.SOUTH);
@@ -536,6 +616,11 @@ public class RatControl
       }
     }
 
+    if (result == null) {
+      ConsolePanel.getSingleton().removeListener(this);
+      ConsolePanel.getSingleton().addListener(this);
+    }
+
     return result;
   }
 
@@ -588,6 +673,65 @@ public class RatControl
   }
 
   /**
+   * Gets called when the {@link ConsolePanel} receives a message.
+   *
+   * @param e		the generated event
+   */
+  public void consolePanelMessageReceived(ConsolePanelEvent e) {
+    String	line;
+
+    if (m_TextAreaConsole != null) {
+      line = Utils.indent(e.getMessage(), "[" + e.getLevel() + "] ");
+      m_TextAreaConsole.append(line, m_ConsoleLineLimit);
+    }
+  }
+
+  /**
+   * Shows the text area with the console output.
+   */
+  protected void showConsole() {
+    ApprovalDialog	dialog;
+    JMenuBar		menubar;
+    JMenu 		menu;
+    JMenuItem		menuitem;
+
+    menubar = new JMenuBar();
+    menu = new JMenu("File");
+    menu.setMnemonic('F');
+    menubar.add(menu);
+
+    menuitem = new JMenuItem("Save as...", GUIHelper.getIcon("save.gif"));
+    menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed S"));
+    menuitem.addActionListener((ActionEvent e) -> {
+      TextFileChooser fileChooser = new TextFileChooser();
+      int retVal = fileChooser.showSaveDialog(getParentComponent());
+      if (retVal != TextFileChooser.APPROVE_OPTION)
+        return;
+      String outputFile = fileChooser.getSelectedFile().getAbsolutePath();
+      String msg = FileUtils.writeToFileMsg(outputFile, m_TextAreaConsole.getText(), false, null);
+      if (msg != null)
+        GUIHelper.showErrorMessage(getParentComponent(), "Failed to write to:\n" + outputFile + "\n" + msg);
+    });
+    menu.add(menuitem);
+
+    menu.addSeparator();
+
+    menuitem = new JMenuItem("Close", GUIHelper.getIcon("exit.png"));
+    menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed Q"));
+    menuitem.addActionListener((ActionEvent e) -> GUIHelper.closeParent(m_TextAreaConsole));
+    menu.add(menuitem);
+
+    dialog = ApprovalDialog.getInformationDialog(null, false);
+    dialog.setJMenuBar(menubar);
+    dialog.setTitle("Console: " + getName());
+    dialog.getContentPane().add(new BaseScrollPane(m_TextAreaConsole), BorderLayout.CENTER);
+    dialog.setDefaultCloseOperation(ApprovalDialog.DISPOSE_ON_CLOSE);
+    dialog.setSize(GUIHelper.getDefaultDialogDimension());
+    dialog.setLocationRelativeTo(getParentComponent());
+    dialog.setVisible(true);
+  }
+
+  /**
    * Cleans up after the execution has finished. Also removes graphical
    * components.
    */
@@ -603,6 +747,11 @@ public class RatControl
       manager = ((PauseStateHandler) getRoot()).getPauseStateManager();
       if (manager != null)
 	manager.removeListener(this);
+    }
+
+    if (m_TextAreaConsole != null) {
+      ConsolePanel.getSingleton().removeListener(this);
+      m_TextAreaConsole = null;
     }
 
     super.cleanUp();
