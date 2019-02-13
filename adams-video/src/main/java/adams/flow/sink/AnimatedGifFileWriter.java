@@ -15,7 +15,7 @@
 
 /*
  * AnimatedGifFileWriter.java
- * Copyright (C) 2015 FracPete (fracpete at gmail dot com)
+ * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
  *
  */
 
