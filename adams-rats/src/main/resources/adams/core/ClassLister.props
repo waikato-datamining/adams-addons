@@ -10,10 +10,14 @@
 # input handlers
 adams.flow.standalone.rats.input.RatInput=\
   adams.flow.standalone.rats.input
-  
+
 # output handlers
 adams.flow.standalone.rats.output.RatOutput=\
   adams.flow.standalone.rats.output
+
+# the log object generators
+adams.flow.standalone.rats.log.AbstractLogObjectGenerator=\
+  adams.flow.standalone.rats.log
 
 # the guards for enqueuing data
 adams.flow.standalone.rats.output.enqueue.AbstractEnqueueGuard=\

@@ -15,7 +15,7 @@
 
 /*
  * Rat.java
- * Copyright (C) 2014-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
@@ -61,11 +61,12 @@ import adams.flow.execution.debug.SubFlowRestriction;
 import adams.flow.standalone.rats.RatRunnable;
 import adams.flow.standalone.rats.input.DummyInput;
 import adams.flow.standalone.rats.input.RatInput;
+import adams.flow.standalone.rats.log.AbstractLogObjectGenerator;
+import adams.flow.standalone.rats.log.LogEntryGenerator;
 import adams.flow.standalone.rats.output.DummyOutput;
 import adams.flow.standalone.rats.output.RatOutput;
 import adams.gui.flow.tree.Node;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -121,7 +122,7 @@ import java.util.Set;
  * <pre>-perform-lazy-setup &lt;boolean&gt; (property: performLazySetup)
  * &nbsp;&nbsp;&nbsp;If enabled, initializing the sub-actors will only occurring the first time
  * &nbsp;&nbsp;&nbsp;the rat gets executed (ie the input triggers); use with 'wrapUpAfterExecution'
- * &nbsp;&nbsp;&nbsp; to save memory.
+ * &nbsp;&nbsp;&nbsp; to save memory; gets disabled if actors contain a Breakpoint.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
@@ -142,6 +143,11 @@ import java.util.Set;
  * &nbsp;&nbsp;&nbsp;default: unknown
  * </pre>
  *
+ * <pre>-log-generator &lt;adams.flow.standalone.rats.log.AbstractLogObjectGenerator&gt; (property: logGenerator)
+ * &nbsp;&nbsp;&nbsp;The generator for turning the error message into the required log object.
+ * &nbsp;&nbsp;&nbsp;default: adams.flow.standalone.rats.log.LogEntryGenerator
+ * </pre>
+ *
  * <pre>-scope-handling-variables &lt;EMPTY|COPY|SHARE&gt; (property: scopeHandlingVariables)
  * &nbsp;&nbsp;&nbsp;Defines how variables are handled in the local scope; whether to start with
  * &nbsp;&nbsp;&nbsp;empty set, a copy of the outer scope variables or share variables with the
@@ -158,7 +164,8 @@ import java.util.Set;
  * <pre>-variables-regexp &lt;adams.core.base.BaseRegExp&gt; (property: variablesRegExp)
  * &nbsp;&nbsp;&nbsp;The regular expression that variable names must match in order to get propagated.
  * &nbsp;&nbsp;&nbsp;default: .*
- * &nbsp;&nbsp;&nbsp;more: https:&#47;&#47;docs.oracle.com&#47;javase&#47;8&#47;docs&#47;api&#47;java&#47;util&#47;regex&#47;Pattern.html
+ * &nbsp;&nbsp;&nbsp;more: https:&#47;&#47;docs.oracle.com&#47;javase&#47;tutorial&#47;essential&#47;regex&#47;
+ * &nbsp;&nbsp;&nbsp;https:&#47;&#47;docs.oracle.com&#47;javase&#47;8&#47;docs&#47;api&#47;java&#47;util&#47;regex&#47;Pattern.html
  * </pre>
  *
  * <pre>-scope-handling-storage &lt;EMPTY|COPY|SHARE&gt; (property: scopeHandlingStorage)
@@ -178,7 +185,8 @@ import java.util.Set;
  * &nbsp;&nbsp;&nbsp;The regular expression that the names of storage items must match in order
  * &nbsp;&nbsp;&nbsp;to get propagated.
  * &nbsp;&nbsp;&nbsp;default: .*
- * &nbsp;&nbsp;&nbsp;more: https:&#47;&#47;docs.oracle.com&#47;javase&#47;8&#47;docs&#47;api&#47;java&#47;util&#47;regex&#47;Pattern.html
+ * &nbsp;&nbsp;&nbsp;more: https:&#47;&#47;docs.oracle.com&#47;javase&#47;tutorial&#47;essential&#47;regex&#47;
+ * &nbsp;&nbsp;&nbsp;https:&#47;&#47;docs.oracle.com&#47;javase&#47;8&#47;docs&#47;api&#47;java&#47;util&#47;regex&#47;Pattern.html
  * </pre>
  *
  * <pre>-flow-error-queue &lt;adams.flow.control.StorageName&gt; (property: flowErrorQueue)
@@ -219,6 +227,13 @@ import java.util.Set;
  * <pre>-finish-before-stopping &lt;boolean&gt; (property: finishBeforeStopping)
  * &nbsp;&nbsp;&nbsp;If enabled, actor first finishes processing all data before stopping.
  * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-stopping-timeout &lt;int&gt; (property: stoppingTimeout)
+ * &nbsp;&nbsp;&nbsp;The timeout in milliseconds when waiting for actors to finish (&lt;= 0 for
+ * &nbsp;&nbsp;&nbsp;infinity; see 'finishBeforeStopping').
+ * &nbsp;&nbsp;&nbsp;default: -1
+ * &nbsp;&nbsp;&nbsp;minimum: -1
  * </pre>
  *
  * <pre>-wrapup-after-execution &lt;boolean&gt; (property: wrapUpAfterExecution)
@@ -266,6 +281,9 @@ public class Rat
 
   /** the callable log actor. */
   protected Actor m_LogActor;
+
+  /** the generator for the log objects. */
+  protected AbstractLogObjectGenerator m_LogGenerator;
 
   /** the helper class. */
   protected CallableActorHelper m_Helper;
@@ -342,6 +360,10 @@ public class Rat
     m_OptionManager.add(
       "log", "log",
       new CallableActorReference(DEFAULT_LOG));
+
+    m_OptionManager.add(
+      "log-generator", "logGenerator",
+      new LogEntryGenerator());
 
     m_OptionManager.add(
       "scope-handling-variables", "scopeHandlingVariables",
@@ -592,6 +614,35 @@ public class Rat
    */
   public String logTipText() {
     return "The name of the callable log actor to use (logging disabled if actor not found).";
+  }
+
+  /**
+   * Sets the generator for turning error messages into log objects.
+   *
+   * @param value 	the generator
+   */
+  public void setLogGenerator(AbstractLogObjectGenerator value) {
+    m_LogGenerator = value;
+    reset();
+  }
+
+  /**
+   * Returns the generator for turning error messages into log objects.
+   *
+   * @return 		the generator
+   */
+  public AbstractLogObjectGenerator getLogGenerator() {
+    return m_LogGenerator;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String logGeneratorTipText() {
+    return "The generator for turning the error message into the required log object.";
   }
 
   /**
@@ -1148,23 +1199,15 @@ public class Rat
    * @param source	the source of the error
    * @param type	the type of error
    * @param msg		the error message to log
-   * @return		always null
+   * @return		null if {@link #m_SuppressErrors}, otherwise the error message
    */
   @Override
   public String handleError(Actor source, String type, String msg) {
-    LogEntry		entry;
-    Properties		props;
-    
+    Object		logObj;
+
     if (m_LogActor != null) {
-      props   = new Properties();
-      props.setProperty("Message", msg);
-      entry = new LogEntry();
-      entry.setGeneration(new Date());
-      entry.setSource(getFullName());
-      entry.setType(type);
-      entry.setStatus(LogEntry.STATUS_NEW);
-      entry.setMessage(props);
-      ((InputConsumer) m_LogActor).input(new Token(entry));
+      logObj = m_LogGenerator.generate(this, source, type, msg);
+      ((InputConsumer) m_LogActor).input(new Token(logObj));
       m_LogActor.execute();
     }
 
