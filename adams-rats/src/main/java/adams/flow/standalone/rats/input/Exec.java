@@ -15,7 +15,7 @@
 
 /*
  * Exec.java
- * Copyright (C) 2016-2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone.rats.input;
@@ -366,7 +366,7 @@ public class Exec
     if (m_CommandContainsVariable)
       cmd = getOwner().getVariables().expand(cmd);
     if (m_CommandContainsPlaceholder)
-      cmd = Placeholders.getSingleton().expand(cmd).replace("\\", "/");
+      cmd = Placeholders.getSingleton().expand(cmd);
     cwd = m_WorkingDirectory.isEmpty() ? null : new PlaceholderDirectory(m_WorkingDirectory);
     env = ProcessUtils.getEnvironment(m_EnvVars, true);
 
