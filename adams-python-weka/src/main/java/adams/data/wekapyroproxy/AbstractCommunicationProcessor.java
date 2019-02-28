@@ -18,10 +18,10 @@
  * Copyright (C) 2019 University of Waikato, Hamilton, NZ
  */
 
-package adams.data.cntkpyroproxy;
+package adams.data.wekapyroproxy;
 
 import adams.core.option.AbstractOptionHandler;
-import weka.classifiers.functions.CNTKPyroProxy;
+import weka.classifiers.functions.PyroProxy;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -54,7 +54,7 @@ public abstract class AbstractCommunicationProcessor
    * @param data	the training data
    * @throws Exception	if initialization fails
    */
-  protected abstract void doInitialize(CNTKPyroProxy owner, Instances data) throws Exception;
+  protected abstract void doInitialize(PyroProxy owner, Instances data) throws Exception;
 
   /**
    * Converts the instance into a different format.
@@ -63,7 +63,7 @@ public abstract class AbstractCommunicationProcessor
    * @param data	the training data
    * @throws Exception	if check or initialization fails
    */
-  public void initialize(CNTKPyroProxy owner, Instances data) throws Exception {
+  public void initialize(PyroProxy owner, Instances data) throws Exception {
     String	msg;
 
     msg = checkInitialize(data);
@@ -92,7 +92,7 @@ public abstract class AbstractCommunicationProcessor
    * @return		the generated data structure
    * @throws Exception	if conversion fails
    */
-  protected abstract Object doConvertInstance(CNTKPyroProxy owner, Instance inst) throws Exception;
+  protected abstract Object doConvertInstance(PyroProxy owner, Instance inst) throws Exception;
 
   /**
    * Converts the instance into a different format.
@@ -102,7 +102,7 @@ public abstract class AbstractCommunicationProcessor
    * @return		the generated data structure
    * @throws Exception	if check or conversion fails
    */
-  public Object convertInstance(CNTKPyroProxy owner, Instance inst) throws Exception {
+  public Object convertInstance(PyroProxy owner, Instance inst) throws Exception {
     String	msg;
 
     msg = checkInstance(inst);
@@ -131,7 +131,7 @@ public abstract class AbstractCommunicationProcessor
    * @return		the class distribution
    * @throws Exception	if conversion fails
    */
-  protected abstract double[] doParsePrediction(CNTKPyroProxy owner, Object prediction) throws Exception;
+  protected abstract double[] doParsePrediction(PyroProxy owner, Object prediction) throws Exception;
 
   /**
    * Parses the prediction.
@@ -141,7 +141,7 @@ public abstract class AbstractCommunicationProcessor
    * @return		the class distribution
    * @throws Exception	if check or conversion fails
    */
-  public double[] parsePrediction(CNTKPyroProxy owner, Object prediction) throws Exception {
+  public double[] parsePrediction(PyroProxy owner, Object prediction) throws Exception {
     String	msg;
 
     msg = checkPrediction(prediction);

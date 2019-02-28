@@ -7,5 +7,5 @@
 # Author:  FracPete (fracpete at waikato dot ac dot nz)
 
 # communocation processors for Pyro Proxy
-adams.data.cntkpyroproxy.AbstractCommunicationProcessor=\
-  adams.data.cntkpyroproxy
+adams.data.wekapyroproxy.AbstractCommunicationProcessor=\
+  adams.data.wekapyroproxy

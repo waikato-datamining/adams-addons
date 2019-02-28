@@ -18,7 +18,7 @@
  * Copyright (C) 2019 University of Waikato, Hamilton, NZ
  */
 
-package adams.data.cntkpyroproxy;
+package adams.data.wekapyroproxy;
 
 import adams.core.Utils;
 import adams.core.io.FileUtils;
@@ -29,7 +29,7 @@ import gnu.trove.list.array.TIntArrayList;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
-import weka.classifiers.functions.CNTKPyroProxy;
+import weka.classifiers.functions.PyroProxy;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.filters.Filter;
@@ -202,7 +202,7 @@ public class JsonAttributeBlocksCommunicationProcessor
    * @param data	the training data
    * @throws Exception	if initialization fails
    */
-  protected void doInitialize(CNTKPyroProxy owner, Instances data) throws Exception {
+  protected void doInitialize(PyroProxy owner, Instances data) throws Exception {
     m_Filter.setInputFormat(data);
     Filter.useFilter(data, m_Filter);
   }
@@ -239,7 +239,7 @@ public class JsonAttributeBlocksCommunicationProcessor
    * @return		the generated data structure
    */
   @Override
-  protected Object doConvertInstance(CNTKPyroProxy owner, Instance inst) throws Exception {
+  protected Object doConvertInstance(PyroProxy owner, Instance inst) throws Exception {
     String		result;
     JSONObject		data;
     JSONObject		blocks;
@@ -302,7 +302,7 @@ public class JsonAttributeBlocksCommunicationProcessor
    * @return		the generated data structure
    * @throws Exception	if conversion fails
    */
-  protected double[] doParsePrediction(CNTKPyroProxy owner, Object prediction) throws Exception {
+  protected double[] doParsePrediction(PyroProxy owner, Object prediction) throws Exception {
     double[]		result;
     StringReader	sreader;
     JSONParser		parser;

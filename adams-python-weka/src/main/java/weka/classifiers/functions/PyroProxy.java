@@ -14,19 +14,18 @@
  */
 
 /*
- * CNTKPyroProxy.java
+ * PyroProxy.java
  * Copyright (C) 2019 University of Waikato, Hamilton, NZ
  */
 
 package weka.classifiers.functions;
 
 import adams.core.base.BaseHostname;
-import adams.data.cntkpyroproxy.AbstractCommunicationProcessor;
-import adams.data.cntkpyroproxy.JsonAttributeBlocksCommunicationProcessor;
+import adams.data.wekapyroproxy.AbstractCommunicationProcessor;
+import adams.data.wekapyroproxy.JsonAttributeBlocksCommunicationProcessor;
 import adams.env.Environment;
 import net.razorvine.pyro.Config;
 import net.razorvine.pyro.NameServerProxy;
-import net.razorvine.pyro.PyroProxy;
 import weka.classifiers.simple.AbstractSimpleClassifier;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
@@ -34,11 +33,11 @@ import weka.core.Instance;
 import weka.core.Instances;
 
 /**
- * Proxy for a CNTK model using Pyro4 for communication.
+ * Proxy for a python model using Pyro4 for communication.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class CNTKPyroProxy
+public class PyroProxy
   extends AbstractSimpleClassifier {
 
   private static final long serialVersionUID = -4578812400878994526L;
@@ -62,7 +61,7 @@ public class CNTKPyroProxy
   protected transient NameServerProxy m_NameServerProxy;
 
   /** the remote object. */
-  protected transient PyroProxy m_RemoteObject;
+  protected transient net.razorvine.pyro.PyroProxy m_RemoteObject;
 
   /**
    * Returns a string describing classifier.
@@ -72,7 +71,7 @@ public class CNTKPyroProxy
    */
   public String globalInfo() {
     return
-      "Proxy for a CNTK model using Pyro4 for communication.\n\n"
+      "Proxy for a Python model using Pyro4 for communication.\n\n"
       + "For more information see:\n"
       + "https://github.com/irmen/Pyro4";
   }
@@ -316,7 +315,7 @@ public class CNTKPyroProxy
       if (isLoggingEnabled())
 	getLogger().info("Obtaining remote object: " + m_RemoteObjectName);
       start = System.currentTimeMillis();
-      m_RemoteObject = new PyroProxy(m_NameServerProxy.lookup(m_RemoteObjectName));
+      m_RemoteObject = new net.razorvine.pyro.PyroProxy(m_NameServerProxy.lookup(m_RemoteObjectName));
       end = System.currentTimeMillis();
       if (isLoggingEnabled())
 	getLogger().info("duration/remoteobject: " + ((double) (end - start) / 1000.0));
@@ -376,6 +375,6 @@ public class CNTKPyroProxy
    */
   public static void main(String[] args) throws Exception {
     Environment.setEnvironmentClass(Environment.class);
-    runClassifier(new CNTKPyroProxy(), args);
+    runClassifier(new PyroProxy(), args);
   }
 }
