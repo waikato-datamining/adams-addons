@@ -57,6 +57,9 @@ public class PyroProxy
   /** the instance converter to use. */
   protected AbstractCommunicationProcessor m_ModelProxy;
 
+  /** whether to perform training. */
+  protected boolean m_PerformTraining;
+
   /** the nameserver. */
   protected transient NameServerProxy m_NameServerProxy;
 
@@ -102,6 +105,10 @@ public class PyroProxy
     m_OptionManager.add(
       "model-proxy", "modelProxy",
       new JsonAttributeBlocksCommunicationProcessor());
+
+    m_OptionManager.add(
+      "perform-training", "performTraining",
+      false);
   }
 
   /**
@@ -250,6 +257,35 @@ public class PyroProxy
   }
 
   /**
+   * Sets whether to train the model as well.
+   *
+   * @param value 	true if also train
+   */
+  public void setPerformTraining(boolean value) {
+    m_PerformTraining = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to train the model as well.
+   *
+   * @return 		true if also train
+   */
+  public boolean getPerformTraining() {
+    return m_PerformTraining;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String performTrainingTipText() {
+    return "If enabled, then training is performed.";
+  }
+
+  /**
    * Returns the Capabilities of this classifier.
    *
    * @return the capabilities of this object
@@ -323,6 +359,9 @@ public class PyroProxy
     catch (Exception e) {
       throw new Exception("Failed to obtain remote object: " + m_RemoteObjectName, e);
     }
+
+    if (m_PerformTraining)
+      m_ModelProxy.build(this, data);
   }
 
   /**

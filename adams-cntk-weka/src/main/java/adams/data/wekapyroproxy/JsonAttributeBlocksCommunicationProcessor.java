@@ -208,6 +208,40 @@ public class JsonAttributeBlocksCommunicationProcessor
   }
 
   /**
+   * Hook method for performing checks before building.
+   *
+   * @param data	the Instances to check
+   * @return		null if successful, otherwise the error message
+   */
+  protected String checkBuild(Instances data) {
+    String	result;
+
+    result = super.checkBuild(data);
+
+    if (result == null) {
+      if (!m_DataDescriptionFile.exists())
+        result = "Data description JSON file does not exist: " + m_DataDescriptionFile;
+      else if (m_DataDescriptionFile.isDirectory())
+        result = "Data description JSON file points to a directory: " + m_DataDescriptionFile;
+      else
+        result = loadDataDescription();
+    }
+
+    return result;
+  }
+
+  /**
+   * Performs the build.
+   *
+   * @param owner 	the owning classifier
+   * @param data	the training data
+   * @throws Exception	if build fails
+   */
+  protected void doBuild(PyroProxy owner, Instances data) throws Exception {
+    getLogger().warning("Build not supported!");
+  }
+
+  /**
    * Hook method for performing checks before converting the Instance.
    *
    * @param inst	the Instance to check

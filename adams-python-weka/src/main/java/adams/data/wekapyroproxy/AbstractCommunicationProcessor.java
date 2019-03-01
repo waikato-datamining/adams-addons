@@ -73,6 +73,43 @@ public abstract class AbstractCommunicationProcessor
   }
 
   /**
+   * Hook method for performing checks before building.
+   *
+   * @param data	the Instances to check
+   * @return		null if successful, otherwise the error message
+   */
+  protected String checkBuild(Instances data) {
+    if (data == null)
+      return "No Instances provided!";
+    return null;
+  }
+
+  /**
+   * Performs the build.
+   *
+   * @param owner 	the owning classifier
+   * @param data	the training data
+   * @throws Exception	if build fails
+   */
+  protected abstract void doBuild(PyroProxy owner, Instances data) throws Exception;
+
+  /**
+   * Performs the build.
+   *
+   * @param owner 	the owning classifier
+   * @param data	the training data
+   * @throws Exception	if check or build fails
+   */
+  public void build(PyroProxy owner, Instances data) throws Exception {
+    String	msg;
+
+    msg = checkBuild(data);
+    if (msg != null)
+      throw new Exception(msg);
+    doInitialize(owner, data);
+  }
+
+  /**
    * Hook method for performing checks before converting the Instance.
    *
    * @param inst	the Instance to check
