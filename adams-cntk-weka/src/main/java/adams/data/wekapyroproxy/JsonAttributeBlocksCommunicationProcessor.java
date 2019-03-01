@@ -21,6 +21,7 @@
 package adams.data.wekapyroproxy;
 
 import adams.core.Utils;
+import adams.core.exception.NotImplementedException;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 import adams.core.option.OptionUtils;
@@ -238,7 +239,7 @@ public class JsonAttributeBlocksCommunicationProcessor
    * @throws Exception	if build fails
    */
   protected void doBuild(PyroProxy owner, Instances data) throws Exception {
-    getLogger().warning("Build not supported!");
+    throw new NotImplementedException();
   }
 
   /**
