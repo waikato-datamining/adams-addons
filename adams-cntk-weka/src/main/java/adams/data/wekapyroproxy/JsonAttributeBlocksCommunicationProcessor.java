@@ -214,10 +214,10 @@ public class JsonAttributeBlocksCommunicationProcessor
    * @param data	the Instances to check
    * @return		null if successful, otherwise the error message
    */
-  protected String checkBuild(Instances data) {
+  protected String checkDataset(Instances data) {
     String	result;
 
-    result = super.checkBuild(data);
+    result = super.checkDataset(data);
 
     if (result == null) {
       if (!m_DataDescriptionFile.exists())
@@ -232,13 +232,14 @@ public class JsonAttributeBlocksCommunicationProcessor
   }
 
   /**
-   * Performs the build.
+   * Performs the dataset conversion.
    *
    * @param owner 	the owning classifier
-   * @param data	the training data
+   * @param data	the dataset to convert
+   * @return		the converted dataset
    * @throws Exception	if build fails
    */
-  protected void doBuild(PyroProxy owner, Instances data) throws Exception {
+  protected Object doConvertDataset(PyroProxy owner, Instances data) throws Exception {
     throw new NotImplementedException();
   }
 

@@ -3,15 +3,19 @@
 import Pyro4
 
 @Pyro4.expose
-class CntkProxy(object):
+class DummyProxy(object):
+    def train(self, data):
+        print("train", data)
+
     def predict(self, data):
-        result = "[0.314]"
+        print("predict", data)
+        result = "{\"Prediction\": [0.314]}"
         return result
 
 daemon = Pyro4.Daemon()
 ns = Pyro4.locateNS()
-uri = daemon.register(CntkProxy)
-ns.register("cntk", uri)
+uri = daemon.register(DummyProxy)
+ns.register("dummy", uri)
 
 print("Ready.")
 daemon.requestLoop()

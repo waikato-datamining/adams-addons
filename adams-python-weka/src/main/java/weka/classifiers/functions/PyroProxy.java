@@ -48,8 +48,11 @@ public class PyroProxy
   /** the Pyro remote object. */
   protected String m_RemoteObjectName;
 
-  /** the Pyro remote method. */
-  protected String m_MethodName;
+  /** the Pyro remote method for training. */
+  protected String m_MethodNameTrain;
+
+  /** the Pyro remote method for prediction. */
+  protected String m_MethodNamePrediction;
 
   /** the model name. */
   protected String m_ModelName;
@@ -95,7 +98,15 @@ public class PyroProxy
       "");
 
     m_OptionManager.add(
-      "method-name", "methodName",
+      "perform-training", "performTraining",
+      false);
+
+    m_OptionManager.add(
+      "method-name-train", "methodNameTrain",
+      "");
+
+    m_OptionManager.add(
+      "method-name-prediction", "methodNamePrediction",
       "");
 
     m_OptionManager.add(
@@ -105,10 +116,6 @@ public class PyroProxy
     m_OptionManager.add(
       "model-proxy", "modelProxy",
       new NullCommunicationProcessor());
-
-    m_OptionManager.add(
-      "perform-training", "performTraining",
-      false);
   }
 
   /**
@@ -170,22 +177,22 @@ public class PyroProxy
   }
 
   /**
-   * Sets the name of the method to call.
+   * Sets whether to train the model as well.
    *
-   * @param value 	the name
+   * @param value 	true if also train
    */
-  public void setMethodName(String value) {
-    m_MethodName = value;
+  public void setPerformTraining(boolean value) {
+    m_PerformTraining = value;
     reset();
   }
 
   /**
-   * Returns the name of the method to call.
+   * Returns whether to train the model as well.
    *
-   * @return 		the name
+   * @return 		true if also train
    */
-  public String getMethodName() {
-    return m_MethodName;
+  public boolean getPerformTraining() {
+    return m_PerformTraining;
   }
 
   /**
@@ -194,8 +201,66 @@ public class PyroProxy
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String methodNameTipText() {
-    return "The name of the method to call.";
+  public String performTrainingTipText() {
+    return "If enabled, then training is performed.";
+  }
+
+  /**
+   * Sets the name of the method to call for training.
+   *
+   * @param value 	the name
+   */
+  public void setMethodNameTrain(String value) {
+    m_MethodNameTrain = value;
+    reset();
+  }
+
+  /**
+   * Returns the name of the method to call for training.
+   *
+   * @return 		the name
+   */
+  public String getMethodNameTrain() {
+    return m_MethodNameTrain;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String methodNameTrainTipText() {
+    return "The name of the method to call for training.";
+  }
+
+  /**
+   * Sets the name of the method to call for predictions.
+   *
+   * @param value 	the name
+   */
+  public void setMethodNamePrediction(String value) {
+    m_MethodNamePrediction = value;
+    reset();
+  }
+
+  /**
+   * Returns the name of the method to call for predictions.
+   *
+   * @return 		the name
+   */
+  public String getMethodNamePrediction() {
+    return m_MethodNamePrediction;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String methodNamePredictionTipText() {
+    return "The name of the method to call for predictions.";
   }
 
   /**
@@ -257,35 +322,6 @@ public class PyroProxy
   }
 
   /**
-   * Sets whether to train the model as well.
-   *
-   * @param value 	true if also train
-   */
-  public void setPerformTraining(boolean value) {
-    m_PerformTraining = value;
-    reset();
-  }
-
-  /**
-   * Returns whether to train the model as well.
-   *
-   * @return 		true if also train
-   */
-  public boolean getPerformTraining() {
-    return m_PerformTraining;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String performTrainingTipText() {
-    return "If enabled, then training is performed.";
-  }
-
-  /**
    * Returns the Capabilities of this classifier.
    *
    * @return the capabilities of this object
@@ -319,13 +355,16 @@ public class PyroProxy
   public void buildClassifier(Instances data) throws Exception {
     long	start;
     long	end;
+    Object	train;
 
     getCapabilities().testWithFail(data);
 
     if (m_RemoteObjectName.trim().isEmpty())
       throw new IllegalStateException("Remote object name is empty!");
-    if (m_MethodName.trim().isEmpty())
-      throw new IllegalStateException("Method name is empty!");
+    if (m_PerformTraining && m_MethodNameTrain.trim().isEmpty())
+      throw new IllegalStateException("Method name (train) is empty!");
+    if (m_MethodNamePrediction.trim().isEmpty())
+      throw new IllegalStateException("Method name (prediction) is empty!");
     if (m_ModelName.trim().isEmpty())
       throw new IllegalStateException("Model name is empty!");
 
@@ -360,8 +399,14 @@ public class PyroProxy
       throw new Exception("Failed to obtain remote object: " + m_RemoteObjectName, e);
     }
 
-    if (m_PerformTraining)
-      m_ModelProxy.build(this, data);
+    if (m_PerformTraining) {
+      train      = m_ModelProxy.convertDataset(this, data);
+      start      = System.currentTimeMillis();
+      m_RemoteObject.call_oneway(m_MethodNameTrain, train);
+      end        = System.currentTimeMillis();
+      if (isLoggingEnabled())
+	getLogger().info("duration/buildClassifier: " + ((double) (end - start) / 1000.0));
+    }
   }
 
   /**
@@ -385,7 +430,7 @@ public class PyroProxy
 
     data       = m_ModelProxy.convertInstance(this, instance);
     start      = System.currentTimeMillis();
-    prediction = m_RemoteObject.call(m_MethodName, data);
+    prediction = m_RemoteObject.call(m_MethodNamePrediction, data);
     end        = System.currentTimeMillis();
     if (isLoggingEnabled())
       getLogger().info("duration/distributionForInstance: " + ((double) (end - start) / 1000.0));
@@ -402,7 +447,9 @@ public class PyroProxy
   public String toString() {
     return "Nameserver: " + m_NameServer + "\n"
       + "Remote object name: " + m_RemoteObjectName + "\n"
-      + "Method name: " + m_MethodName + "\n"
+      + "Perform training: " + m_PerformTraining + "\n"
+      + "Method name (train): " + m_MethodNameTrain + "\n"
+      + "Method name (prediction): " + m_MethodNamePrediction + "\n"
       + "Model name: " + m_ModelName + "\n"
       + "Connected: " + (m_RemoteObject != null);
   }

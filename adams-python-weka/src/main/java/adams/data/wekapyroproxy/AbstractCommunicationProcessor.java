@@ -73,40 +73,42 @@ public abstract class AbstractCommunicationProcessor
   }
 
   /**
-   * Hook method for performing checks before building.
+   * Hook method for performing checks before converting a dataset.
    *
-   * @param data	the Instances to check
+   * @param data	the dataset to check
    * @return		null if successful, otherwise the error message
    */
-  protected String checkBuild(Instances data) {
+  protected String checkDataset(Instances data) {
     if (data == null)
       return "No Instances provided!";
     return null;
   }
 
   /**
-   * Performs the build.
+   * Performs the dataset conversion.
    *
    * @param owner 	the owning classifier
-   * @param data	the training data
+   * @param data	the dataset to convert
+   * @return		the converted dataset
    * @throws Exception	if build fails
    */
-  protected abstract void doBuild(PyroProxy owner, Instances data) throws Exception;
+  protected abstract Object doConvertDataset(PyroProxy owner, Instances data) throws Exception;
 
   /**
-   * Performs the build.
+   * Performs the dataset conversion.
    *
    * @param owner 	the owning classifier
-   * @param data	the training data
+   * @param data	the dataset to convert
+   * @return		the converted dataset
    * @throws Exception	if check or build fails
    */
-  public void build(PyroProxy owner, Instances data) throws Exception {
+  public Object convertDataset(PyroProxy owner, Instances data) throws Exception {
     String	msg;
 
-    msg = checkBuild(data);
+    msg = checkDataset(data);
     if (msg != null)
       throw new Exception(msg);
-    doInitialize(owner, data);
+    return doConvertDataset(owner, data);
   }
 
   /**

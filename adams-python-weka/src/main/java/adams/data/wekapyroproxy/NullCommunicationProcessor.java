@@ -65,7 +65,7 @@ public class NullCommunicationProcessor
    * @throws Exception	if initialization fails
    */
   @Override
-  protected void doBuild(PyroProxy owner, Instances data) throws Exception {
+  protected Object doConvertDataset(PyroProxy owner, Instances data) throws Exception {
     throw new NotImplementedException();
   }
 
