@@ -140,7 +140,7 @@ public class SimpleJsonCommunicationProcessor
     x = new JSONArray();
     train.put("X", x);
     y = new JSONArray();
-    train.put("Y", y);
+    train.put("y", y);
     for (i = 0; i < data.numInstances(); i++) {
       x.add(instanceToRow(data.instance(i)));
       y.add(data.instance(i).classValue());
@@ -163,7 +163,7 @@ public class SimpleJsonCommunicationProcessor
 
     result = new JSONObject();
     result.put("Model", owner.getModelName());
-    result.put("X", instanceToRow(inst));
+    result.put("x", instanceToRow(inst));
 
     return result;
   }
