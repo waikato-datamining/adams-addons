@@ -22,7 +22,7 @@ package weka.classifiers.functions;
 
 import adams.core.base.BaseHostname;
 import adams.data.wekapyroproxy.AbstractCommunicationProcessor;
-import adams.data.wekapyroproxy.JsonAttributeBlocksCommunicationProcessor;
+import adams.data.wekapyroproxy.NullCommunicationProcessor;
 import adams.env.Environment;
 import net.razorvine.pyro.Config;
 import net.razorvine.pyro.NameServerProxy;
@@ -104,7 +104,7 @@ public class PyroProxy
 
     m_OptionManager.add(
       "model-proxy", "modelProxy",
-      new JsonAttributeBlocksCommunicationProcessor());
+      new NullCommunicationProcessor());
 
     m_OptionManager.add(
       "perform-training", "performTraining",
