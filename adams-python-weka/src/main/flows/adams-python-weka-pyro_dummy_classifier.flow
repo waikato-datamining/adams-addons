@@ -1,0 +1,35 @@
+# Project: adams
+# Date: 2019-03-01 16:45:42
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-ml,adams-python,adams-python-weka,adams-spreadsheet,adams-visualstats,adams-weka
+#
+adams.flow.control.Flow -annotation "Builds a Pyro4 model and uses it to make predictions.\\n\\nNotes:\\nRequires \\\"adams-python-weka-pyro_namserver_and_dummy_proxyserver.flow\\\" running." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.CallableActors
+  adams.flow.source.WekaClassifierSetup -classifier "weka.classifiers.functions.PyroProxy -name-server @{hostport} -remote-object-name dummy -perform-training true -method-name-train train -method-name-prediction predict -model-name notused -model-proxy adams.data.wekapyroproxy.SimpleJsonCommunicationProcessor"
+  adams.flow.sink.Display -name Predictions -short-title true -display-type adams.flow.core.displaytype.Default -x -3 -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.SetVariable -name host -var-name host -var-value localhost
+ adams.flow.standalone.SetVariable -name port -var-name port -var-value 9090
+ adams.flow.standalone.SetVariable -name "host/port combined" -var-name hostport -var-value @{host}:@{port} -expand-value true
+ adams.flow.standalone.PythonEnvironment -python ${CWD}/venv/bin/python3
+ adams.flow.standalone.PyroNameServer -server @{hostport} -mode LAUNCH_AND_CONNECT
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "generate train/test"
+  adams.flow.source.FileSupplier -file ${FLOWS}/data/bodyfat.arff
+  adams.flow.transformer.WekaFileReader -loader weka.core.converters.SimpleArffLoader
+  adams.flow.transformer.WekaClassSelector
+  adams.flow.transformer.WekaRandomSplit -generator weka.classifiers.DefaultRandomSplitGenerator
+  adams.flow.control.ContainerValuePicker -value Train
+   adams.flow.transformer.SetStorageValue -storage-name train
+  adams.flow.control.ContainerValuePicker -name "ContainerValuePicker (2)" -value Test
+   adams.flow.transformer.SetStorageValue -storage-name test
+ adams.flow.control.Trigger -name train
+  adams.flow.source.StorageValue -storage-name train -conversion adams.data.conversion.UnknownToUnknown
+  adams.flow.transformer.WekaTrainClassifier
+  adams.flow.transformer.SetStorageValue -storage-name model
+ adams.flow.control.Trigger -name predict
+  adams.flow.source.StorageValue -storage-name test -conversion adams.data.conversion.UnknownToUnknown
+  adams.flow.transformer.WekaInstanceBuffer -operation INSTANCES_TO_INSTANCE
+  adams.flow.transformer.WekaClassifying -model-loading-type STORAGE -model-storage model -on-the-fly true
+  adams.flow.control.ContainerValuePicker
+   adams.flow.sink.CallableSink -callable Predictions

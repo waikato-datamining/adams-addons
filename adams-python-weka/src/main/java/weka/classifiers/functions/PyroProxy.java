@@ -402,7 +402,7 @@ public class PyroProxy
     if (m_PerformTraining) {
       train      = m_ModelProxy.convertDataset(this, data);
       start      = System.currentTimeMillis();
-      m_RemoteObject.call_oneway(m_MethodNameTrain, train);
+      m_RemoteObject.call(m_MethodNameTrain, train);
       end        = System.currentTimeMillis();
       if (isLoggingEnabled())
 	getLogger().info("duration/buildClassifier: " + ((double) (end - start) / 1000.0));

@@ -146,7 +146,7 @@ public class SimpleJsonCommunicationProcessor
       y.add(data.instance(i).classValue());
     }
 
-    return result;
+    return result.toJSONString();
   }
 
   /**
@@ -165,7 +165,7 @@ public class SimpleJsonCommunicationProcessor
     result.put("Model", owner.getModelName());
     result.put("x", instanceToRow(inst));
 
-    return result;
+    return result.toJSONString();
   }
 
   /**
