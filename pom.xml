@@ -53,7 +53,6 @@
     <module>adams-mongodb</module>
     <module>adams-nlp</module>
     <module>adams-osm</module>
-    <module>adams-phmm4weka</module>
     <module>adams-python-weka</module>
     <module>adams-r</module>
     <module>adams-random</module>
