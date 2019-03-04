@@ -6,27 +6,31 @@ import numpy as np
 import traceback
 from sklearn.linear_model import LinearRegression
 
-models = {}
+MODELS = {}
+DEBUG = False
 
 @Pyro4.expose
 class ScikitLearnProxy(object):
 
     def train(self, data):
-        global models
+        global MODELS
 
         try:
             input = json.loads(data)
             name = input["Model"]
-            print("[train] Model", name)
+            if DEBUG:
+                print("[train] Model", name)
 
             X = np.array(input["Train"]["X"])
             y = np.array(input["Train"]["y"])
-            print("[train] X", X)
-            print("[train] y", y)
+            if DEBUG:
+                print("[train] X", X)
+                print("[train] y", y)
 
             reg = LinearRegression().fit(X, y)
-            models[name] = reg
-            print("[train] models", models)
+            MODELS[name] = reg
+            if DEBUG:
+                print("[train] models", models)
 
             return "OK"
         except:
@@ -35,18 +39,21 @@ class ScikitLearnProxy(object):
             return "Error: " + error
 
     def predict(self, data):
-        global models
+        global MODELS
 
         try:
             input = json.loads(data)
             name = input["Model"]
-            print("[predict] Model", name)
+            if DEBUG:
+                print("[predict] Model", name)
 
             x = np.array([input["x"]])
-            print("[predict] x", x)
+            if DEBUG:
+                print("[predict] x", x)
 
-            pred = models[name].predict(x).tolist()
-            print("[predict] pred", pred)
+            pred = MODELS[name].predict(x).tolist()
+            if DEBUG:
+                print("[predict] pred", pred)
             result = {"Prediction": pred}
         except:
             error = traceback.format_exc()

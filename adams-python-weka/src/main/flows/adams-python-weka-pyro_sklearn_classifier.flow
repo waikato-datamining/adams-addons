@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2019-03-01 16:50:45
+# Date: 2019-03-05 11:25:07
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-ml,adams-python,adams-python-weka,adams-spreadsheet,adams-visualstats,adams-weka
@@ -8,6 +8,7 @@ adams.flow.control.Flow -annotation "Builds a Pyro4 model and uses it to make pr
  adams.flow.standalone.CallableActors
   adams.flow.source.WekaClassifierSetup -classifier "weka.classifiers.functions.PyroProxy -name-server @{hostport} -remote-object-name sklearn -perform-training true -method-name-train train -method-name-prediction predict -model-name lr -model-proxy adams.data.wekapyroproxy.SimpleJsonCommunicationProcessor"
   adams.flow.sink.Display -name Predictions -short-title true -display-type adams.flow.core.displaytype.Default -x -3 -writer adams.data.io.output.NullWriter
+  adams.flow.sink.ActualVsPredictedPlot -display-type adams.flow.core.displaytype.Default -x -3 -y -3 -writer adams.gui.print.NullWriter -meta-data-color adams.gui.visualization.sequence.metadatacolor.Dummy
  adams.flow.standalone.SetVariable -name host -var-name host -var-value localhost
  adams.flow.standalone.SetVariable -name port -var-name port -var-value 9090
  adams.flow.standalone.SetVariable -name "host/port combined" -var-name hostport -var-value @{host}:@{port} -expand-value true
@@ -33,3 +34,10 @@ adams.flow.control.Flow -annotation "Builds a Pyro4 model and uses it to make pr
   adams.flow.transformer.WekaClassifying -model-loading-type STORAGE -model-storage model -on-the-fly true
   adams.flow.control.ContainerValuePicker
    adams.flow.sink.CallableSink -callable Predictions
+ adams.flow.control.Trigger -name evaluate
+  adams.flow.standalone.CallableActors
+   adams.flow.source.StorageValue -name Testset -storage-name test -conversion adams.data.conversion.UnknownToUnknown
+  adams.flow.source.StorageValue -storage-name model -conversion adams.data.conversion.UnknownToUnknown
+  adams.flow.transformer.WekaTestSetEvaluator -output weka.classifiers.evaluation.output.prediction.Null
+  adams.flow.transformer.WekaPredictionsToSpreadSheet
+  adams.flow.sink.CallableSink -callable ActualVsPredictedPlot
