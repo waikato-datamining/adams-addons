@@ -31,6 +31,7 @@ import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.PyroProxyObject;
 
 /**
  * Proxy for a python model using Pyro4 for communication.
@@ -38,7 +39,8 @@ import weka.core.Instances;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class PyroProxy
-  extends AbstractSimpleClassifier {
+  extends AbstractSimpleClassifier
+  implements PyroProxyObject {
 
   private static final long serialVersionUID = -4578812400878994526L;
 
@@ -58,7 +60,7 @@ public class PyroProxy
   protected String m_ModelName;
 
   /** the instance converter to use. */
-  protected AbstractCommunicationProcessor m_ModelProxy;
+  protected AbstractCommunicationProcessor m_Communication;
 
   /** whether to perform training. */
   protected boolean m_PerformTraining;
@@ -114,7 +116,7 @@ public class PyroProxy
       "");
 
     m_OptionManager.add(
-      "model-proxy", "modelProxy",
+      "communication", "communication",
       new NullCommunicationProcessor());
   }
 
@@ -297,8 +299,8 @@ public class PyroProxy
    *
    * @param value 	the proxy
    */
-  public void setModelProxy(AbstractCommunicationProcessor value) {
-    m_ModelProxy = value;
+  public void setCommunication(AbstractCommunicationProcessor value) {
+    m_Communication = value;
     reset();
   }
 
@@ -307,8 +309,8 @@ public class PyroProxy
    *
    * @return 		the proxy
    */
-  public AbstractCommunicationProcessor getModelProxy() {
-    return m_ModelProxy;
+  public AbstractCommunicationProcessor getCommunication() {
+    return m_Communication;
   }
 
   /**
@@ -317,8 +319,8 @@ public class PyroProxy
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String modelProxyTipText() {
-    return "The model proxy to use for communication with the remote model.";
+  public String communicationTipText() {
+    return "Handles the communication with the remote model.";
   }
 
   /**
@@ -368,7 +370,7 @@ public class PyroProxy
     if (m_ModelName.trim().isEmpty())
       throw new IllegalStateException("Model name is empty!");
 
-    m_ModelProxy.initialize(this, data);
+    m_Communication.initialize(this, data);
 
     // nameserver
     try {
@@ -400,7 +402,7 @@ public class PyroProxy
     }
 
     if (m_PerformTraining) {
-      train      = m_ModelProxy.convertDataset(this, data);
+      train      = m_Communication.convertDataset(this, data);
       start      = System.currentTimeMillis();
       m_RemoteObject.call(m_MethodNameTrain, train);
       end        = System.currentTimeMillis();
@@ -428,14 +430,14 @@ public class PyroProxy
     if (m_RemoteObject == null)
       throw new IllegalStateException("No remote object available for remote calls!");
 
-    data       = m_ModelProxy.convertInstance(this, instance);
+    data       = m_Communication.convertInstance(this, instance);
     start      = System.currentTimeMillis();
     prediction = m_RemoteObject.call(m_MethodNamePrediction, data);
     end        = System.currentTimeMillis();
     if (isLoggingEnabled())
       getLogger().info("duration/distributionForInstance: " + ((double) (end - start) / 1000.0));
 
-    return m_ModelProxy.parsePrediction(this, prediction);
+    return m_Communication.parsePrediction(this, prediction);
   }
 
   /**
