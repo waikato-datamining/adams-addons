@@ -15,7 +15,7 @@
 
 /*
  * BaseMeasureCollectionEditor.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2019 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -26,7 +26,7 @@ import adams.core.base.BaseMeasureCollection;
 import adams.core.option.AbstractOption;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseComboBox;
-import adams.gui.dialog.ApprovalDialog;
+import adams.gui.core.GUIHelper;
 import moa.evaluation.MeasureCollection;
 import nz.ac.waikato.cms.locator.ClassLocator;
 
@@ -44,15 +44,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * A PropertyEditor for {@link BaseMeasureCollection} objects.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class BaseMeasureCollectionEditor
   extends AbstractPropertyEditorSupport
@@ -301,24 +298,21 @@ public class BaseMeasureCollectionEditor
   public Object[] getSelectedObjects(Container parent) {
     Object[]			result;
     MultiLineValueDialog	dialog;
-    Vector<String>		lines;
+    List<String>		lines;
     int				i;
 
-    dialog = new MultiLineValueDialog();
+    if (GUIHelper.getParentDialog(parent) != null)
+      dialog = new MultiLineValueDialog(GUIHelper.getParentDialog(parent));
+    else
+      dialog = new MultiLineValueDialog(GUIHelper.getParentFrame(parent));
     dialog.setInfoText("Enter the measure collection names, one per line:");
     dialog.setLocationRelativeTo(parent);
     dialog.setVisible(true);
 
-    if (dialog.getOption() == ApprovalDialog.APPROVE_OPTION) {
-      lines = new Vector<String>(Arrays.asList(dialog.getContent().split("\n")));
-      Utils.removeEmptyLines(lines);
-      result = (Object[]) Array.newInstance(BaseMeasureCollection.class, lines.size());
-      for (i = 0; i < lines.size(); i++)
-	Array.set(result, i, parse(lines.get(i)));
-    }
-    else {
-      result = (Object[]) Array.newInstance(BaseMeasureCollection.class, 0);
-    }
+    lines  = dialog.getValues();
+    result = (Object[]) Array.newInstance(BaseMeasureCollection.class, lines.size());
+    for (i = 0; i < lines.size(); i++)
+      Array.set(result, i, parse(lines.get(i)));
 
     return result;
   }

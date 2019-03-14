@@ -15,20 +15,19 @@
 
 /*
  *    GPSEditor.java
- *    Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ *    Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  *
  */
 
 package adams.gui.goe;
 
-import adams.core.Utils;
 import adams.core.option.AbstractArgumentOption;
 import adams.core.option.AbstractOption;
 import adams.data.gps.AbstractGPS;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseTextArea;
-import adams.gui.dialog.ApprovalDialog;
+import adams.gui.core.GUIHelper;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -45,14 +44,12 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * A PropertyEditor for GPS coordinates.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class GPSEditor
   extends AbstractPropertyEditorSupport
@@ -292,26 +289,23 @@ public class GPSEditor
   public Object[] getSelectedObjects(Container parent) {
     Object[]			result;
     MultiLineValueDialog	dialog;
-    Vector<String>		lines;
+    List<String> 		lines;
     Class			cls;
     int				i;
 
-    dialog = new MultiLineValueDialog();
+    if (GUIHelper.getParentDialog(parent) != null)
+      dialog = new MultiLineValueDialog(GUIHelper.getParentDialog(parent));
+    else
+      dialog = new MultiLineValueDialog(GUIHelper.getParentFrame(parent));
     dialog.setInfoText("Enter the coordinates, one pair per line:");
     dialog.setLocationRelativeTo(parent);
     dialog.setVisible(true);
 
-    cls = getValue().getClass();
-    if (dialog.getOption() == ApprovalDialog.APPROVE_OPTION) {
-      lines = new Vector<String>(Arrays.asList(dialog.getContent().split("\n")));
-      Utils.removeEmptyLines(lines);
-      result = (Object[]) Array.newInstance(cls, lines.size());
-      for (i = 0; i < lines.size(); i++)
-	Array.set(result, i, valueOf(cls, lines.get(i)));
-    }
-    else {
-      result = (Object[]) Array.newInstance(cls, 0);
-    }
+    cls    = getValue().getClass();
+    lines  = dialog.getValues();
+    result = (Object[]) Array.newInstance(cls, lines.size());
+    for (i = 0; i < lines.size(); i++)
+      Array.set(result, i, valueOf(cls, lines.get(i)));
 
     return result;
   }

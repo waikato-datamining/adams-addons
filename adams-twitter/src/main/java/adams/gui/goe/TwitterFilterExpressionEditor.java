@@ -15,13 +15,12 @@
 
 /*
  * TwitterFilterExpressionEditor.java
- * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2019 University of Waikato, Hamilton, New Zealand
  *
  */
 
 package adams.gui.goe;
 
-import adams.core.Utils;
 import adams.core.base.BaseObject;
 import adams.core.base.TwitterFilterExpression;
 import adams.core.option.AbstractOption;
@@ -29,7 +28,6 @@ import adams.gui.core.BaseButton;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseTextArea;
 import adams.gui.core.GUIHelper;
-import adams.gui.dialog.ApprovalDialog;
 import adams.gui.help.HelpFrame;
 import adams.parser.TwitterFilter;
 
@@ -48,14 +46,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * A PropertyEditor for TwitterFilterExpression objects.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  * @see adams.core.base.TwitterFilterExpression
  */
 public class TwitterFilterExpressionEditor
@@ -313,24 +309,21 @@ public class TwitterFilterExpressionEditor
   public Object[] getSelectedObjects(Container parent) {
     TwitterFilterExpression[]	result;
     MultiLineValueDialog	dialog;
-    Vector<String>		lines;
+    List<String> 		lines;
     int				i;
 
-    dialog = new MultiLineValueDialog();
+    if (GUIHelper.getParentDialog(parent) != null)
+      dialog = new MultiLineValueDialog(GUIHelper.getParentDialog(parent));
+    else
+      dialog = new MultiLineValueDialog(GUIHelper.getParentFrame(parent));
     dialog.setInfoText("Enter the filter expressions, one per line:");
     dialog.setLocationRelativeTo(parent);
     dialog.setVisible(true);
 
-    if (dialog.getOption() == ApprovalDialog.APPROVE_OPTION) {
-      lines = new Vector<String>(Arrays.asList(dialog.getContent().split("\n")));
-      Utils.removeEmptyLines(lines);
-      result = new TwitterFilterExpression[lines.size()];
-      for (i = 0; i < lines.size(); i++)
-	result[i] = new TwitterFilterExpression(lines.get(i));
-    }
-    else {
-      result = new TwitterFilterExpression[0];
-    }
+    lines  = dialog.getValues();
+    result = new TwitterFilterExpression[lines.size()];
+    for (i = 0; i < lines.size(); i++)
+      result[i] = new TwitterFilterExpression(lines.get(i));
 
     return result;
   }
