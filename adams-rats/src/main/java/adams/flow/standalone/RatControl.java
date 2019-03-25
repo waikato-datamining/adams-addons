@@ -434,7 +434,8 @@ public class RatControl
 	BULKACTION_STOP,
       }));
       panel.add(comboBulkActions);
-      buttonApply = new BaseButton("Apply");
+      buttonApply = new BaseButton(GUIHelper.getIcon("validate.png"));
+      buttonApply.setToolTipText("Apply bulk action");
       buttonApply.addActionListener((ActionEvent e) -> {
         SwingWorker worker = new SwingWorker() {
 	  @Override
@@ -458,11 +459,13 @@ public class RatControl
     panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     panelBottom.add(panel, BorderLayout.EAST);
 
-    buttonStop = new BaseButton("Stop");
+    buttonStop = new BaseButton(GUIHelper.getIcon("stop_blue.gif"));
+    buttonStop.setToolTipText("Stop flow");
     buttonStop.addActionListener((ActionEvent e) -> getRoot().stopExecution());
     panel.add(buttonStop);
 
-    buttonConsole = new BaseButton("Console");
+    buttonConsole = new BaseButton(GUIHelper.getIcon("log.gif"));
+    buttonConsole.setToolTipText("Show console output");
     buttonConsole.addActionListener((ActionEvent e) -> showConsole());
     panel.add(buttonConsole);
 
