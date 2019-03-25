@@ -44,6 +44,7 @@ public class MultiwayFilterTest
    */
   public MultiwayFilterTest(String name) {
     super(name);
+    setRegressionDecimalPlaces(4);
   }
 
   /**
