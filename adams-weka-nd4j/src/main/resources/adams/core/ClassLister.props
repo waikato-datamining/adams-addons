@@ -1,0 +1,13 @@
+# Configuration file listing the superclasses and the packages in which to
+# look for derived classes.
+#
+# Format:
+# class.name=package1,package2,...
+#
+# Author:  Corey Sterling (csterlin at waikato dot ac dot nz)
+# Version: $Revision$
+
+# the multi-way algorithms
+nz.ac.waikato.cms.adams.multiway.algorithm.api.AbstractAlgorithm=\
+  nz.ac.waikato.cms.adams.multiway.algorithm,\
+  nz.ac.waikato.cms.adams.multiway.algorithm.twoway

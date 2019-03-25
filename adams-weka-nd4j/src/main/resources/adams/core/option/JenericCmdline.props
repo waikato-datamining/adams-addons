@@ -1,0 +1,11 @@
+# Configuration file listing the superclasses/interfaces to be handled by
+# the jeneric-cmdline library to add command-line functionality..
+#
+# Format:
+# class.name=true|false
+#
+# Author:  Corey Sterling (csterlin at waikato dot ac dot nz)
+
+# multiway filters (to support WEKA MultiwayFilter)
+nz.ac.waikato.cms.adams.multiway.algorithm.api.AbstractAlgorithm=true
+nz.ac.waikato.cms.adams.multiway.algorithm.stopping.Criterion=true
