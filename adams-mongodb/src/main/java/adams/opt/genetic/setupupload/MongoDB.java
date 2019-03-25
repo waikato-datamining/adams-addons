@@ -15,7 +15,7 @@
 
 /*
  * MongoDB.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.opt.genetic.setupupload;
@@ -201,12 +201,12 @@ public class MongoDB
    * Finishing up the genetic algorithm run.
    *
    * @param algorithm		the algorithm that initiated the run
-   * @param successfulRun 	whether the run was successful
+   * @param error  		null if successful, otherwise error message
    * @param params              the parameters to store
    */
   @Override
-  protected void doFinish(AbstractGeneticAlgorithm algorithm, boolean successfulRun, Map<String,Object> params) {
-    params.put(KEY_SUCCESSFUL, successfulRun);
+  protected void doFinish(AbstractGeneticAlgorithm algorithm, String error, Map<String,Object> params) {
+    params.put(KEY_SUCCESSFUL, error);
     upload(params);
   }
 }
