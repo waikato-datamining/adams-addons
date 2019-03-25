@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * JOOQResultToSpreadSheet.java
- * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.conversion;
 
@@ -27,6 +27,7 @@ import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.sql.AbstractTypeMapper;
 import adams.data.spreadsheet.sql.DefaultTypeMapper;
 import adams.data.spreadsheet.sql.Reader;
+import adams.db.SQLUtils;
 import org.jooq.Result;
 
 import java.sql.ResultSet;
@@ -205,6 +206,7 @@ public class JOOQResultToSpreadSheet
     m_Reader = new Reader(m_TypeMapper, m_DataRowType.getClass());
     result   = m_Reader.read(rs);
     m_Reader = null;
+    SQLUtils.closeAll(rs);
     
     return result;
   }
