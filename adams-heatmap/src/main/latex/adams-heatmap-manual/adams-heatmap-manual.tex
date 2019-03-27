@@ -1,8 +1,6 @@
 % This work is made available under the terms of the
 % Creative Commons Attribution-ShareAlike 4.0 license,
 % http://creativecommons.org/licenses/by-sa/4.0/.
-%
-% Version: $Revision$
 
 \documentclass[a4paper]{book}
 
@@ -44,7 +42,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2011-2016} &
+		\parbox[c][2cm]{2cm}{\copyright 2011-2019} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -68,6 +66,11 @@ The following conversions are available:
 \begin{tight_itemize}
   	\item \textit{BufferedImageToHeatmap} -- turns a BufferedImage into a heat
   	map, using the RGB values (but not alpha).
+  	\item \textit{ColumnCorrelationToHeatmap} -- calculates the correlation
+  	coefficient between selected columns and generates a heatmap from the
+  	calculated values.
+  	\item \textit{ColumnCovarianceToHeatmap} -- calculates the covariance
+  	between selected columns and generates a heatmap from the calculated values.
   	\item \textit{HeatmapToArray} -- generates a double array from a heat map.
   	\item \textit{HeatmapToBufferedImage} -- generates an image from heat map.
   	\item \textit{HeatmapToBufferedImageExpression} -- generates an image

@@ -1,0 +1,14 @@
+# Project: adams
+# Date: 2019-03-27 15:50:15
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-heatmap,adams-imaging,adams-imaging-boofcv,adams-spreadsheet
+#
+adams.flow.control.Flow -annotation "Computes a covariance heatmap between the columns of the bodyfat UCI dataset." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/bodyfat.csv
+ adams.flow.transformer.SpreadSheetFileReader -reader "adams.data.io.input.CsvSpreadSheetReader -data-row-type adams.data.spreadsheet.DenseDataRow -spreadsheet-type adams.data.spreadsheet.DefaultSpreadSheet"
+ adams.flow.transformer.Convert -conversion adams.data.conversion.ColumnCovarianceToHeatmap
+ adams.flow.control.Tee -name heatmap
+  adams.flow.sink.HeatmapDisplay -display-type adams.flow.core.displaytype.Default -writer adams.gui.print.NullWriter -color-generator adams.gui.visualization.core.BiColorGenerator
+ adams.flow.control.Tee -name table
+  adams.flow.sink.SpreadSheetDisplay -display-type adams.flow.core.displaytype.Default -x -3 -cell-rendering-customizer adams.gui.core.spreadsheettable.DefaultCellRenderingCustomizer -allow-search true -writer adams.data.io.output.NullWriter
