@@ -15,7 +15,7 @@
 
 /*
  * Heatmap.java
- * Copyright (C) 2011-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.heatmap;
 
@@ -27,10 +27,15 @@ import adams.data.NotesHandler;
 import adams.data.container.DataContainer;
 import adams.data.container.DataPointComparator;
 import adams.data.id.MutableIDHandler;
+import adams.data.report.AbstractField;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.report.MutableReportHandler;
 import adams.data.report.Report;
+import adams.data.spreadsheet.DefaultSpreadSheet;
+import adams.data.spreadsheet.Row;
+import adams.data.spreadsheet.SpreadSheet;
+import adams.data.spreadsheet.SpreadSheetSupporter;
 import adams.data.statistics.InformativeStatisticSupporter;
 
 import java.io.Serializable;
@@ -45,12 +50,12 @@ import java.util.TreeSet;
  * Simple wrapper around a 2-D array representing a heatmap.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class Heatmap
   implements Serializable, MutableIDHandler, MutableReportHandler<Report>,
              NotesHandler, DataContainer<HeatmapValue>,
-             InformativeStatisticSupporter<HeatmapStatistic>{
+             InformativeStatisticSupporter<HeatmapStatistic>,
+             SpreadSheetSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = 2380816899974969042L;
@@ -1154,6 +1159,46 @@ public class Heatmap
   @Override
   public HeatmapStatistic toStatistic() {
     return new HeatmapStatistic(this);
+  }
+
+  /**
+   * Returns the content as spreadsheet.
+   *
+   * @return		the content
+   */
+  @Override
+  public SpreadSheet toSpreadSheet() {
+    SpreadSheet		result;
+    int			x;
+    int			y;
+    Row row;
+    List<AbstractField>	fields;
+
+    result = new DefaultSpreadSheet();
+
+    // comments
+    fields = getReport().getFields();
+    Collections.sort(fields);
+    for (AbstractField field: fields)
+      result.addComment(field.getName() + ": " + getReport().getValue(field));
+
+    // header
+    row = result.getHeaderRow();
+    for (x = 0; x < getWidth(); x++)
+      row.addCell("x" + x).setContent("x" + x);
+
+    // data
+    for (y = 0; y < getHeight(); y++) {
+      row = result.addRow("y" + y);
+      for (x = 0; x < getWidth(); x++) {
+	if (isMissing(y, x))
+	  row.addCell("x" + x).setMissing();
+	else
+	  row.addCell("x" + x).setContent(get(y, x));
+      }
+    }
+
+    return result;
   }
 
   /**

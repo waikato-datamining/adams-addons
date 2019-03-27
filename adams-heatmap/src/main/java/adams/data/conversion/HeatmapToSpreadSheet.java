@@ -13,20 +13,14 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * HeatmapToSpreadSheet.java
- * Copyright (C) 2011-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.conversion;
 
 import adams.data.heatmap.Heatmap;
-import adams.data.report.AbstractField;
-import adams.data.spreadsheet.DefaultSpreadSheet;
-import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -47,7 +41,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class HeatmapToSpreadSheet
   extends AbstractConversion {
@@ -95,38 +88,6 @@ public class HeatmapToSpreadSheet
    */
   @Override
   protected Object doConvert() throws Exception {
-    SpreadSheet		result;
-    Heatmap		map;
-    int			x;
-    int			y;
-    Row			row;
-    List<AbstractField>	fields;
-
-    result = new DefaultSpreadSheet();
-    map    = (Heatmap) m_Input;
-
-    // comments
-    fields = map.getReport().getFields();
-    Collections.sort(fields);
-    for (AbstractField field: fields)
-      result.addComment(field.getName() + ": " + map.getReport().getValue(field));
-
-    // header
-    row = result.getHeaderRow();
-    for (x = 0; x < map.getWidth(); x++)
-      row.addCell("x" + x).setContent("x" + x);
-
-    // data
-    for (y = 0; y < map.getHeight(); y++) {
-      row = result.addRow("y" + y);
-      for (x = 0; x < map.getWidth(); x++) {
-	if (map.isMissing(y, x))
-	  row.addCell("x" + x).setMissing();
-	else
-	  row.addCell("x" + x).setContent(map.get(y, x));
-      }
-    }
-
-    return result;
+    return ((Heatmap) m_Input).toSpreadSheet();
   }
 }
