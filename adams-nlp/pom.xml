@@ -106,7 +106,7 @@
     <dependency>
       <groupId>com.github.fracpete</groupId>
       <artifactId>nlp-weka-package</artifactId>
-      <version>2015.3.25</version>
+      <version>2019.3.29</version>
       <exclusions>
         <exclusion>
           <groupId>nz.ac.waikato.cms.weka</groupId>
