@@ -19,6 +19,7 @@
  */
 package adams.data.heatmap;
 
+import adams.core.CompareUtils;
 import adams.core.Constants;
 import adams.core.UniqueIDs;
 import adams.core.Utils;
@@ -609,10 +610,10 @@ public class Heatmap
     c = (Heatmap) o;
 
     if (result == 0)
-      result = Utils.compare(getID(), c.getID());
+      result = CompareUtils.compare(getID(), c.getID());
 
     if (result == 0)
-      result = Utils.compare(getReport(), c.getReport());
+      result = CompareUtils.compare(getReport(), c.getReport());
 
     return result;
   }
