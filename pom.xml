@@ -55,7 +55,7 @@
     <module>adams-osm</module>
     <module>adams-python-weka</module>
     <module>adams-r</module>
-    <module>adams-rabbitmq</module>
+    <!--module>adams-rabbitmq</module-->
     <module>adams-random</module>
     <module>adams-rats</module>
     <module>adams-rest</module>
