@@ -21,8 +21,7 @@
 
 package adams.gui.goe;
 
-import adams.core.option.AbstractArgumentOption;
-import adams.core.option.AbstractOption;
+import adams.core.option.parsing.GPSParsing;
 import adams.data.gps.AbstractGPS;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseScrollPane;
@@ -43,7 +42,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
 import java.util.List;
 
 /**
@@ -58,57 +56,6 @@ public class GPSEditor
 
   /** The text field with the coordinates. */
   protected JTextComponent m_TextCoordinates;
-
-  /**
-   * Turns the string into an instance of the specified GPS class.
-   * 
-   * @param cls		the GPS class to instantiate
-   * @param str		the string to parse
-   * @return		the instantiated GPS object
-   */
-  protected static AbstractGPS valueOf(Class cls, String str) {
-    AbstractGPS	result;
-    Constructor	constr;
-    
-    try {
-      constr = cls.getConstructor(new Class[]{String.class});
-      result = (AbstractGPS) constr.newInstance(new Object[]{str});
-    }
-    catch (Exception e) {
-      try {
-	result = (AbstractGPS) cls.newInstance();
-      }
-      catch (Exception ex) {
-	System.err.println("Failed to instantiate " + cls.getName() + " as " + AbstractGPS.class.getName() + "!");
-	ex.printStackTrace();
-	result = null;
-      }
-    }
-    
-    return result;
-  }
-  
-  /**
-   * Returns the GPS coordinates as string.
-   *
-   * @param option	the current option
-   * @param object	the GPS coordinates object to convert
-   * @return		the generated string
-   */
-  public static String toString(AbstractOption option, Object object) {
-    return object.toString();
-  }
-
-  /**
-   * Returns GPS coordinates generated from the string.
-   *
-   * @param option	the current option
-   * @param str		the string to convert to GPS coordinates
-   * @return		the generated GPS coordinates
-   */
-  public static Object valueOf(AbstractOption option, String str) {
-    return valueOf(((AbstractArgumentOption) option).getBaseClass(), str);
-  }
 
   /**
    * Returns a custom string representation of the object.
@@ -127,7 +74,7 @@ public class GPSEditor
    * @return		the object
    */
   public Object fromCustomStringRepresentation(String str) {
-    return valueOf(getValue().getClass(), str);
+    return GPSParsing.valueOf(getValue().getClass(), str);
   }
 
   /**
@@ -148,7 +95,7 @@ public class GPSEditor
 
     s = m_TextCoordinates.getText();
     if (isValid(s) && !isUnchanged(s))
-      setValue(valueOf(getValue().getClass(), s));
+      setValue(GPSParsing.valueOf(getValue().getClass(), s));
     closeDialog(APPROVE_OPTION);
   }
 
@@ -305,7 +252,7 @@ public class GPSEditor
     lines  = dialog.getValues();
     result = (Object[]) Array.newInstance(cls, lines.size());
     for (i = 0; i < lines.size(); i++)
-      Array.set(result, i, valueOf(cls, lines.get(i)));
+      Array.set(result, i, GPSParsing.valueOf(cls, lines.get(i)));
 
     return result;
   }
@@ -325,7 +272,7 @@ public class GPSEditor
    * @param value	the value to use
    */
   public void setInlineValue(String value) {
-    setValue(valueOf(getValue().getClass(), value));
+    setValue(GPSParsing.valueOf(getValue().getClass(), value));
   }
 
   /**

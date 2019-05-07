@@ -22,7 +22,7 @@
 package adams.gui.goe;
 
 import adams.core.Utils;
-import adams.core.option.AbstractOption;
+import adams.core.option.parsing.RatReferenceParsing;
 import adams.flow.core.RatReference;
 import adams.flow.standalone.Rats;
 import adams.gui.core.BaseButton;
@@ -71,35 +71,13 @@ public class RatReferenceEditor
   protected RatsTree m_Tree;
 
   /**
-   * Returns the reference as string.
-   *
-   * @param option	the current option
-   * @param object	the reference object to convert
-   * @return		the generated string
-   */
-  public static String toString(AbstractOption option, Object object) {
-    return ((RatReference) object).getValue();
-  }
-
-  /**
-   * Returns a reference generated from the string.
-   *
-   * @param option	the current option
-   * @param str		the string to convert to a reference
-   * @return		the generated reference
-   */
-  public static Object valueOf(AbstractOption option, String str) {
-    return new RatReference(str);
-  }
-
-  /**
    * Returns a custom string representation of the object.
    *
    * @param obj		the object to turn into a string
    * @return		the string representation
    */
   public String toCustomStringRepresentation(Object obj) {
-    return toString(null, obj);
+    return RatReferenceParsing.toString(null, obj);
   }
 
   /**

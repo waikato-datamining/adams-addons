@@ -4,10 +4,10 @@
 
 # MOA objects
 moa.options.ClassOption=true
-moa.options.ClassOption#toString=adams.gui.goe.MOAClassOptionEditor#toString
-moa.options.ClassOption#valueOf=adams.gui.goe.MOAClassOptionEditor#valueOf
+moa.options.ClassOption#toString=adams.core.option.parsing.MOAClassOptionParsing#toString
+moa.options.ClassOption#valueOf=adams.core.option.parsing.MOAClassOptionParsing#valueOf
 
 # BaseMeasureCollection
 adams.core.base.BaseMeasureCollection=true
-adams.core.base.BaseMeasureCollection#toString=adams.gui.goe.BaseObjectEditor#toString
-adams.core.base.BaseMeasureCollection#valueOf=adams.gui.goe.BaseObjectEditor#valueOf
+adams.core.base.BaseMeasureCollection#toString=adams.core.option.parsing.BaseObjectParsing#toString
+adams.core.base.BaseMeasureCollection#valueOf=adams.core.option.parsing.BaseObjectParsing#valueOf

@@ -15,30 +15,25 @@
 
 /*
  * MOAClassOptionEditor.java
- * Copyright (C) 2009-2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.goe;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
+import moa.gui.ClassOptionEditComponent;
+import moa.options.ClassOption;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import moa.MOAObject;
-import moa.gui.ClassOptionEditComponent;
-import moa.options.ClassOption;
-import weka.core.MOAUtils;
-import adams.core.option.AbstractOption;
+import java.awt.BorderLayout;
+import java.awt.Component;
 
 /**
  * An editor for MOA ClassOption objects.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  * @see ClassOption
  */
 public class MOAClassOptionEditor
@@ -80,38 +75,4 @@ public class MOAClassOptionEditor
     return panel;
   }
 
-  /**
-   * Returns the color as string.
-   *
-   * @param option	the current option
-   * @param object	the color object to convert
-   * @return		the generated string
-   */
-  public static String toString(AbstractOption option, Object object) {
-    String	result;
-    ClassOption	classoption;
-    MOAObject	arg;
-
-    classoption = (ClassOption) object;
-    arg         = MOAUtils.fromOption(classoption);
-    result      = MOAUtils.toCommandLine(arg);
-
-    return result;
-  }
-
-  /**
-   * Returns a color generated from the string.
-   *
-   * @param option	the current option
-   * @param str		the string to convert to a color
-   * @return		the generated color
-   */
-  public static Object valueOf(AbstractOption option, String str) {
-    ClassOption	result;
-
-    result = (ClassOption) ((MOAObject) option.getDefaultValue()).copy();
-    result.setCurrentObject(MOAUtils.fromCommandLine(result, str));
-
-    return result;
-  }
 }
