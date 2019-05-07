@@ -23,7 +23,7 @@ package adams.gui.goe;
 
 import adams.core.base.BaseObject;
 import adams.core.base.TwitterFilterExpression;
-import adams.core.option.AbstractOption;
+import adams.core.option.parsing.TwitterFilterExpressionParsing;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseTextArea;
@@ -65,35 +65,13 @@ public class TwitterFilterExpressionEditor
   protected BaseButton m_ButtonHelp;
 
   /**
-   * Returns the Compound as string.
-   *
-   * @param option	the current option
-   * @param object	the Compound object to convert
-   * @return		the generated string
-   */
-  public static String toString(AbstractOption option, Object object) {
-    return ((TwitterFilterExpression) object).getValue();
-  }
-
-  /**
-   * Returns a Compound generated from the string.
-   *
-   * @param option	the current option
-   * @param str		the string to convert to a Compound
-   * @return		the generated Compound
-   */
-  public static Object valueOf(AbstractOption option, String str) {
-    return new TwitterFilterExpression(str);
-  }
-
-  /**
    * Returns a custom string representation of the object.
    *
    * @param obj		the object to turn into a string
    * @return		the string representation
    */
   public String toCustomStringRepresentation(Object obj) {
-    return toString(null, obj);
+    return TwitterFilterExpressionParsing.toString(null, obj);
   }
 
   /**
@@ -103,7 +81,7 @@ public class TwitterFilterExpressionEditor
    * @return		the object
    */
   public Object fromCustomStringRepresentation(String str) {
-    return valueOf(null, str);
+    return TwitterFilterExpressionParsing.valueOf(null, str);
   }
 
   /**
@@ -115,7 +93,7 @@ public class TwitterFilterExpressionEditor
   public String getJavaInitializationString() {
     String	result;
 
-    result = "new " + getValue().getClass().getName() + "(\"" + toString(null, getValue()) + "\")";
+    result = "new " + getValue().getClass().getName() + "(\"" + TwitterFilterExpressionParsing.toString(null, getValue()) + "\")";
 
     return result;
   }
@@ -137,7 +115,7 @@ public class TwitterFilterExpressionEditor
     if (getValue() == null)
       val = AbstractPropertyEditorSupport.NULL;
     else
-      val = toString(null, getValue());
+      val = TwitterFilterExpressionParsing.toString(null, getValue());
     if (val.isEmpty())
       val = AbstractPropertyEditorSupport.EMPTY;
     gfx.drawString(val, 2, fm.getHeight() + vpad);

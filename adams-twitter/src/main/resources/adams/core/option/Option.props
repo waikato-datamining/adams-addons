@@ -15,7 +15,6 @@
 #
 #
 # Author: FracPete (fracpete at waikato dot ac dot nz)
-# Version: $Revision$
 
 #########
 # hooks #
@@ -23,5 +22,5 @@
 
 # TwitterFilterExpression objects
 adams.core.base.TwitterFilterExpression=true
-adams.core.base.TwitterFilterExpression#toString=adams.gui.goe.TwitterFilterExpressionEditor#toString
-adams.core.base.TwitterFilterExpression#valueOf=adams.gui.goe.TwitterFilterExpressionEditor#valueOf
+adams.core.base.TwitterFilterExpression#toString=adams.core.option.parsing.TwitterFilterExpressionParsing#toString
+adams.core.base.TwitterFilterExpression#valueOf=adams.core.option.parsing.TwitterFilterExpressionParsing#valueOf
