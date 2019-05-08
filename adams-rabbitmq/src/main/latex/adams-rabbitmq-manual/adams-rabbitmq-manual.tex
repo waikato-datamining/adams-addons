@@ -1,0 +1,124 @@
+% This work is made available under the terms of the
+% Creative Commons Attribution-ShareAlike 4.0 license,
+% http://creativecommons.org/licenses/by-sa/4.0/.
+
+\documentclass[a4paper]{book}
+
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{scalefnt}
+\usepackage{tikz}
+
+% watermark -- for draft stage
+%\usepackage[firstpage]{draftwatermark}
+%\SetWatermarkLightness{0.9}
+%\SetWatermarkScale{5}
+
+\input{latex_extensions}
+
+\title{
+  \textbf{ADAMS} \\
+  {\Large \textbf{A}dvanced \textbf{D}ata mining \textbf{A}nd \textbf{M}achine
+  learning \textbf{S}ystem} \\
+  {\Large Module: adams-rabbitmq} \\
+  \vspace{1cm}
+  \includegraphics[width=2cm]{images/rabbitmq-module.png} \\
+}
+\author{
+  Peter Reutemann
+}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+
+\thispagestyle{empty}
+\center
+\begin{table}[b]
+	\begin{tabular}{c l l}
+		\parbox[c][2cm]{2cm}{\copyright 2019} &
+		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
+	\end{tabular}
+	\includegraphics[width=12cm]{images/cc.png} \\
+\end{table}
+
+\end{titlepage}
+
+\tableofcontents
+%\listoffigures
+%\listoftables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introduction}
+RabbitMQ\cite{rabbitmq} is an open source message broker. It supports:
+\begin{tight_itemize}
+  \item multiple messaging protocols
+  \item message queuing
+  \item delivery acknowledgement
+  \item flexible routing to queues
+  \item multiple exchange type
+\end{tight_itemize}
+ADAMS makes use of it for publishing and consuming messages, as well as for
+remote procedure calls (RPC).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Installation}
+Installation instructions for all available platforms can be found here: \\
+\url{https://www.rabbitmq.com/download.html}{}
+
+\section{Linux}
+You can install the RabbitMQ server on Debian systems like this:
+\begin{verbatim}
+sudo apt-get install rabbitmq-server
+\end{verbatim}
+
+\noindent For RPM-based distributions, please follow the instructions here: \\
+\url{https://www.rabbitmq.com/install-rpm.html}{}
+
+\section{Windows}
+For installing the server on Windows, please follow the instructions here: \\
+\url{https://www.rabbitmq.com/install-windows.html}{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Flow}
+The following standalones are available:
+\begin{verbatim}
+  \item \textit{RabbitMQConnection} -- defines a RabbitMQ broker connection.
+  \item \textit{RabbitMQChannelAction} -- peforms the specified channel action.
+\end{verbatim}
+
+The following sources are available:
+\begin{verbatim}
+  \item \textit{RabbitMQConsume} -- outputs the data it consumes from either
+  a queue or an exchange.
+\end{verbatim}
+
+The following transformers are available:
+\begin{verbatim}
+  \item \textit{RabbitMQRemoteProcedureCall} -- for performing remote procedure
+  calls via a RabbitMQ broker.
+\end{verbatim}
+
+The following sinks are available:
+\begin{verbatim}
+  \item \textit{RabbitMQPublish} -- publishes the incoming data to a queue
+  or an exchange.
+\end{verbatim}
+
+The following conversions are available:
+\begin{verbatim}
+  \item \textit{RabbitMQPropertiesToMap} -- converts RabbitMQ basic properties
+  into a Java Map.
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{bibliography}
+
+\end{document}

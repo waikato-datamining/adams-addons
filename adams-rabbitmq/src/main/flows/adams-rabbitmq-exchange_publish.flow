@@ -1,0 +1,14 @@
+# Project: adams
+# Date: 2019-05-08 13:06:02
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-rabbitmq
+#
+adams.flow.control.Flow -annotation "Publishes the contents of a log file, entry by entry, via an exchange.\\n\\nRequires the following flow to run:\\n  adams-rabbitmq-exchange_consume.flow" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.RabbitMQConnection -host localhost
+ adams.flow.standalone.RabbitMQChannelAction -action "adams.core.net.rabbitmq.channelaction.DeclareExchange -exchange logs"
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/apache.log
+ adams.flow.transformer.TextFileReader -reader adams.data.io.input.LineArrayTextReader
+ adams.flow.transformer.StringArraySplit -regexp ^192.* -split-handling AT_START
+ adams.flow.transformer.StringJoin -glue \n
+ adams.flow.sink.RabbitMQPublish -exchange logs -converter adams.core.net.rabbitmq.send.StringConverter

@@ -1,0 +1,19 @@
+# Configuration file listing the superclasses and the packages in which to
+# look for derived classes.
+#
+# Format:
+# class.name=package1,package2,...
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+
+# the channel actions
+adams.core.net.rabbitmq.channelaction.AbstractChannelAction=\
+  adams.core.net.rabbitmq.channelaction
+
+# the send converters
+adams.core.net.rabbitmq.send.AbstractConverter=\
+  adams.core.net.rabbitmq.send
+
+# the receive converters
+adams.core.net.rabbitmq.receive.AbstractConverter=\
+  adams.core.net.rabbitmq.receive
