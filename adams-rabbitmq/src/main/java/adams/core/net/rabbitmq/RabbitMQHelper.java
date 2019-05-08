@@ -80,6 +80,15 @@ public class RabbitMQHelper {
   }
 
   /**
+   * Closes the connection.
+   *
+   * @param connection	the connection to close
+   */
+  public static void closeQuietly(Connection connection) {
+    closeQuietly(connection, null);
+  }
+
+  /**
    * Closes the connection and deletes any auto-created queues.
    *
    * @param connection	the connection to close
@@ -91,7 +100,7 @@ public class RabbitMQHelper {
     if (connection != null) {
       if (connection.isOpen()) {
         // delete auto-created queues
-        if (queues.size() > 0) {
+        if ((queues != null) && (queues.size() > 0)) {
           channel = createChannel(null, connection);
           if (channel != null) {
 	    for (String queue : queues) {
