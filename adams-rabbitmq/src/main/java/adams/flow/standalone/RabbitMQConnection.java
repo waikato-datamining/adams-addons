@@ -237,7 +237,7 @@ public class RabbitMQConnection
   public String getQuickInfo() {
     String	result;
 
-    result = QuickInfoHelper.toString(this, "user", (m_User.isEmpty() ? "anonymous" : m_User));
+    result = QuickInfoHelper.toString(this, "user", (m_User.isEmpty() ? "guest" : m_User));
     result += QuickInfoHelper.toString(this, "host", (m_Host.length() == 0 ? "??" : m_Host), "@");
     result += QuickInfoHelper.toString(this, "port", m_Port, ":");
 
