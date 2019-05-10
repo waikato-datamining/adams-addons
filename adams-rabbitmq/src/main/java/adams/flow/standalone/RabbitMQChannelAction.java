@@ -169,14 +169,8 @@ public class RabbitMQChannelAction
 
     if (result == null) {
       m_Connection = (RabbitMQConnection) ActorUtils.findClosestType(this, RabbitMQConnection.class);
-      if (m_Connection == null) {
+      if (m_Connection == null)
 	result = "No " + RabbitMQConnection.class.getName() + " actor found!";
-      }
-      else {
-	m_Channel = m_Connection.createChannel();
-	if (m_Channel == null)
-	  result = "Failed to create a channel!";
-      }
     }
 
     return result;
@@ -191,11 +185,21 @@ public class RabbitMQChannelAction
   protected String doExecute() {
     String		result;
 
-    try {
-      result = m_Action.performAction(m_Channel);
+    result = null;
+
+    if (m_Channel == null) {
+      m_Channel = m_Connection.createChannel();
+      if (m_Channel == null)
+	result = "Failed to create a channel!";
     }
-    catch (Exception e) {
-      result = handleException("Failed to execute remote command: " + m_Action, e);
+
+    if (result == null) {
+      try {
+	result = m_Action.performAction(m_Channel);
+      }
+      catch (Exception e) {
+	result = handleException("Failed to execute remote command: " + m_Action, e);
+      }
     }
 
     return result;

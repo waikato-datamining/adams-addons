@@ -85,6 +85,12 @@ sudo apt-get install rabbitmq-server
 For installing the server on Windows, please follow the instructions here: \\
 \url{https://www.rabbitmq.com/install-windows.html}{}
 
+\section{TLS Support}
+\label{tls_support}
+You can find information on how to set up RabbitMQ using TLS on the
+following URL: \\
+\url{https://www.rabbitmq.com/ssl.html}{}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
 The following standalones are available:
@@ -122,6 +128,17 @@ The following JobRunners are available:
   \item \textit{RabbitMQJobRunner} -- distributes the jobs using the specified
   broker.
 \end{verbatim}
+
+\section{TLS Support}
+If you want to take advantage of TLS, i.e., encrypting your connections to
+the RabbitMQ server, then you need to configure your server for that (see
+\ref{tls_support}) and also add (and configure) the following standalones
+in your flow:
+\begin{tight_itemize}
+  \item KeyManager
+  \item TrustManager
+  \item SSLContext
+\begin{tight_itemize}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

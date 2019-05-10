@@ -111,6 +111,9 @@ public class RabbitMQPublish
   /** the converter. */
   protected AbstractConverter m_Converter;
 
+  /** the connection in use. */
+  protected transient RabbitMQConnection m_Connection;
+
   /** the channel action to use. */
   protected transient Channel m_Channel;
 
@@ -266,20 +269,13 @@ public class RabbitMQPublish
   @Override
   public String setUp() {
     String		result;
-    RabbitMQConnection connection;
 
     result = super.setUp();
 
     if (result == null) {
-      connection = (RabbitMQConnection) ActorUtils.findClosestType(this, RabbitMQConnection.class);
-      if (connection == null) {
+      m_Connection = (RabbitMQConnection) ActorUtils.findClosestType(this, RabbitMQConnection.class);
+      if (m_Connection == null)
 	result = "No " + RabbitMQConnection.class.getName() + " actor found!";
-      }
-      else {
-	m_Channel = connection.createChannel();
-	if (m_Channel == null)
-	  result = "Failed to create a channel!";
-      }
     }
 
     return result;
@@ -298,11 +294,20 @@ public class RabbitMQPublish
 
     result = null;
 
+    if (m_Channel == null) {
+      m_Channel = m_Connection.createChannel();
+      if (m_Channel == null)
+	result = "Failed to create a channel!";
+    }
+
     // convert data
-    errors = new MessageCollection();
-    data = m_Converter.convert(m_InputToken.getPayload(), errors);
-    if (!errors.isEmpty())
-      result = errors.toString();
+    data = null;
+    if (result == null) {
+      errors = new MessageCollection();
+      data = m_Converter.convert(m_InputToken.getPayload(), errors);
+      if (!errors.isEmpty())
+	result = errors.toString();
+    }
 
     // send data
     if (result == null) {
@@ -313,6 +318,7 @@ public class RabbitMQPublish
         result = handleException("Failed to publish data (exchange=" + m_Exchange + ", queue=" + m_Queue + ")!", e);
       }
     }
+
 
     return result;
   }

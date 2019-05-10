@@ -20,11 +20,14 @@
 
 package adams.flow.standalone;
 
+import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
+import adams.core.Utils;
 import adams.core.base.BasePassword;
 import adams.core.io.ConsoleHelper;
 import adams.core.net.rabbitmq.RabbitMQHelper;
 import adams.flow.control.Flow;
+import adams.flow.core.ActorUtils;
 import adams.flow.core.OptionalPasswordPrompt;
 import adams.flow.core.StopHelper;
 import adams.flow.core.StopMode;
@@ -141,6 +144,9 @@ public class RabbitMQConnection
   /** the SSH port. */
   protected int m_Port;
 
+  /** whether to use SSL. */
+  protected boolean m_UseSSL;
+
   /** database username. */
   protected String m_User;
 
@@ -168,6 +174,9 @@ public class RabbitMQConnection
   /** the auto-created queues that need to get deleted again. */
   protected List<String> m_AutoCreatedQueues;
 
+  /** the SSL context. */
+  protected transient SSLContext m_SSLContext;
+
   /**
    * Returns a string describing the object.
    *
@@ -192,6 +201,10 @@ public class RabbitMQConnection
     m_OptionManager.add(
       "port", "port",
       AMQP.PROTOCOL.PORT, 1, 65535);
+
+    m_OptionManager.add(
+      "uss-ssl", "useSSL",
+      false);
 
     m_OptionManager.add(
       "user", "user",
@@ -240,6 +253,7 @@ public class RabbitMQConnection
     result = QuickInfoHelper.toString(this, "user", (m_User.isEmpty() ? "guest" : m_User));
     result += QuickInfoHelper.toString(this, "host", (m_Host.length() == 0 ? "??" : m_Host), "@");
     result += QuickInfoHelper.toString(this, "port", m_Port, ":");
+    result += QuickInfoHelper.toString(this, "useSSL", m_UseSSL, "SSL", ", ");
 
     if (QuickInfoHelper.hasVariable(this, "promptForPassword") || m_PromptForPassword) {
       result += ", prompt for password";
@@ -307,6 +321,37 @@ public class RabbitMQConnection
    */
   public String portTipText() {
     return "The port to connect to.";
+  }
+
+  /**
+   * Sets whether to use SSL.
+   *
+   * @param value	true if to use SSL
+   */
+  public void setUseSSL(boolean value) {
+    m_UseSSL = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to use SSL.
+   *
+   * @return		true if to use SSL
+   */
+  public boolean getUseSSL() {
+    return m_UseSSL;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String useSSLTipText() {
+    return
+      "If enabled uses SSL for the connection; requires "
+	+ Utils.classToString(SSLContext.class) + " to be present for custom SSL context.";
   }
 
   /**
@@ -541,6 +586,28 @@ public class RabbitMQConnection
   }
 
   /**
+   * Initializes the item for flow execution.
+   *
+   * @return		null if everything is fine, otherwise error message
+   */
+  @Override
+  public String setUp() {
+    String	result;
+
+    result = super.setUp();
+
+    if (result == null) {
+      if (m_UseSSL) {
+        m_SSLContext = (SSLContext) ActorUtils.findClosestType(this, SSLContext.class, true);
+        if (m_SSLContext == null)
+          getLogger().warning("No instance of " + Utils.classToString(SSLContext.class) + " found, using default context!");
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Executes the actor.
    *
    * @return		null if everything is fine, otherwise error message
@@ -549,6 +616,7 @@ public class RabbitMQConnection
   protected String doExecute() {
     String				result;
     com.rabbitmq.client.Connection	conn;
+    MessageCollection			errors;
 
     result = null;
 
@@ -580,9 +648,14 @@ public class RabbitMQConnection
     }
 
     if (result == null) {
-      conn = getConnection();
-      if (!conn.isOpen())
-        result = "Failed to connect to broker (" + getHost() + ":" + getPort() + ")";
+      errors = new MessageCollection();
+      conn   = retrieveConnection(errors);
+      if (!conn.isOpen()) {
+	if (!errors.isEmpty())
+	  result = errors.toString();
+	else
+	  result = "Failed to connect to broker (" + getHost() + ":" + getPort() + ")";
+      }
     }
 
     return result;
@@ -592,9 +665,10 @@ public class RabbitMQConnection
    * Returns the database connection in use. Reconnects the database, to make
    * sure that the database connection is the correct one.
    *
+   * @param errors 	for collecting errors, can be null
    * @return		the connection object
    */
-  protected com.rabbitmq.client.Connection retrieveConnection() {
+  protected com.rabbitmq.client.Connection retrieveConnection(MessageCollection errors) {
     ConnectionFactory 	factory;
 
     factory = new ConnectionFactory();
@@ -604,10 +678,44 @@ public class RabbitMQConnection
       factory.setUsername(m_User);
       factory.setPassword(m_ActualPassword.getValue());
     }
+    if (m_UseSSL) {
+      if (m_SSLContext != null) {
+        if (m_SSLContext.getSSLContext() != null) {
+	  try {
+	    factory.useSslProtocol(m_SSLContext.getSSLContext());
+	  }
+	  catch (Exception e) {
+	    if (errors != null)
+	      errors.add("Failed to use custom SSL context (" + m_SSLContext.getFullName() + ")!", e);
+	    handleException("Failed to use custom SSL context (" + m_SSLContext.getFullName() + ")!", e);
+	    return null;
+	  }
+	}
+	else {
+          if (errors != null)
+            errors.add("No SSL context instance available from: " + m_SSLContext.getFullName());
+          getLogger().severe("No SSL context instance available from: " + m_SSLContext.getFullName());
+          return null;
+	}
+      }
+      else {
+        try {
+	  factory.useSslProtocol();
+	}
+	catch (Exception e) {
+	  if (errors != null)
+	    errors.add("Failed to use default SSL context!", e);
+          handleException("Failed to use default SSL context!", e);
+          return null;
+	}
+      }
+    }
     try {
       return factory.newConnection();
     }
     catch (Exception e) {
+      if (errors != null)
+	errors.add("Failed to connect to broker " + m_Host + ":" + m_Port, e);
       handleException("Failed to connect to broker " + m_Host + ":" + m_Port, e);
       return null;
     }
@@ -621,7 +729,7 @@ public class RabbitMQConnection
    */
   public com.rabbitmq.client.Connection getConnection() {
     if (m_Connection == null)
-      m_Connection = retrieveConnection();
+      m_Connection = retrieveConnection(null);
     return m_Connection;
   }
 

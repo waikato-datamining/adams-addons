@@ -301,14 +301,8 @@ public class RabbitMQRemoteProcedureCall
 
     if (result == null) {
       m_Connection = (RabbitMQConnection) ActorUtils.findClosestType(this, RabbitMQConnection.class);
-      if (m_Connection == null) {
+      if (m_Connection == null)
 	result = "No " + RabbitMQConnection.class.getName() + " actor found!";
-      }
-      else {
-	m_Channel = m_Connection.createChannel();
-	if (m_Channel == null)
-	  result = "Failed to create a channel!";
-      }
     }
 
     return result;
@@ -321,22 +315,30 @@ public class RabbitMQRemoteProcedureCall
    */
   @Override
   protected String doExecute() {
-    String		result;
-    String 		callbackQueue;
-    BasicProperties 	props;
-    MessageCollection 	errorsSnd;
-    byte[] 		dataSnd;
-    DeliverCallback 	deliverCallback;
+    String result;
+    String callbackQueue;
+    BasicProperties props;
+    MessageCollection errorsSnd;
+    byte[] dataSnd;
+    DeliverCallback deliverCallback;
 
     result = null;
-
     m_Data.clear();
 
+    if (m_Channel == null) {
+      m_Channel = m_Connection.createChannel();
+      if (m_Channel == null)
+        result = "Failed to create a channel!";
+    }
+
     // convert input data
-    errorsSnd = new MessageCollection();
-    dataSnd = m_SendConverter.convert(m_InputToken.getPayload(), errorsSnd);
-    if (!errorsSnd.isEmpty())
-      result = errorsSnd.toString();
+    dataSnd = null;
+    if (result == null) {
+      errorsSnd = new MessageCollection();
+      dataSnd = m_SendConverter.convert(m_InputToken.getPayload(), errorsSnd);
+      if (!errorsSnd.isEmpty())
+        result = errorsSnd.toString();
+    }
 
     // send
     callbackQueue = null;

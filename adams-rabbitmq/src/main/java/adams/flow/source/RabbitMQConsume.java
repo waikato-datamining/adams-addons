@@ -450,14 +450,8 @@ public class RabbitMQConsume
 
     if (result == null) {
       m_Connection = (RabbitMQConnection) ActorUtils.findClosestType(this, RabbitMQConnection.class);
-      if (m_Connection == null) {
+      if (m_Connection == null)
 	result = "No " + RabbitMQConnection.class.getName() + " actor found!";
-      }
-      else {
-	m_Channel = m_Connection.createChannel();
-	if (m_Channel == null)
-	  result = "Failed to create a channel!";
-      }
     }
 
     return result;
@@ -476,35 +470,44 @@ public class RabbitMQConsume
 
     result = null;
 
-    // ensure queue is cleared
-    if (m_Data == null)
-      m_Data = new ArrayBlockingQueue<>((m_Limit < 1 ? 65536 : m_Limit));
-    m_Data.clear();
-
-    // callback
-    deliverCallback = (consumerTag, delivery) -> {
-      byte[] data = delivery.getBody();
-      MessageCollection errors = new MessageCollection();
-      Object output = m_Converter.convert(data, errors);
-      if (m_OutputContainer)
-        m_Data.add(new RabbitMQConsumptionContainer(output, delivery.getProperties()));
-      else
-	m_Data.add(output);
-    };
-
-    // determine queue name
-    queue = "";
-    if (m_Exchange.isEmpty()) {
-      queue = m_Queue;
+    if (m_Channel == null) {
+      m_Channel = m_Connection.createChannel();
+      if (m_Channel == null)
+	result = "Failed to create a channel!";
     }
-    else {
-      try {
-	queue = m_Channel.queueDeclare().getQueue();
-	m_Connection.addAutoCreatedQueue(queue);
-	m_Channel.queueBind(queue, m_Exchange, "");
+
+    queue           = "";
+    deliverCallback = null;
+    if (result == null) {
+      // ensure queue is cleared
+      if (m_Data == null)
+	m_Data = new ArrayBlockingQueue<>((m_Limit < 1 ? 65536 : m_Limit));
+      m_Data.clear();
+
+      // callback
+      deliverCallback = (consumerTag, delivery) -> {
+	byte[] data = delivery.getBody();
+	MessageCollection errors = new MessageCollection();
+	Object output = m_Converter.convert(data, errors);
+	if (m_OutputContainer)
+	  m_Data.add(new RabbitMQConsumptionContainer(output, delivery.getProperties()));
+	else
+	  m_Data.add(output);
+      };
+
+      // determine queue name
+      if (m_Exchange.isEmpty()) {
+	queue = m_Queue;
       }
-      catch (Exception e) {
-	result = handleException("Failed to bind queue to exchange!", e);
+      else {
+	try {
+	  queue = m_Channel.queueDeclare().getQueue();
+	  m_Connection.addAutoCreatedQueue(queue);
+	  m_Channel.queueBind(queue, m_Exchange, "");
+	}
+	catch (Exception e) {
+	  result = handleException("Failed to bind queue to exchange!", e);
+	}
       }
     }
 
