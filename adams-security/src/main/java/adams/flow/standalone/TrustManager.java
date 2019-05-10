@@ -14,7 +14,7 @@
  */
 
 /*
- * KeyManager.java
+ * TrustManager.java
  * Copyright (C) 2019 University of Waikato, Hamilton, NZ
  */
 
@@ -41,12 +41,89 @@ import java.util.List;
 
 /**
  <!-- globalinfo-start -->
+ * Initializes a TrustManagerFactory instance using the specified keystore file and algorithm.
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
  <!-- flow-summary-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ *
+ * <pre>-name &lt;java.lang.String&gt; (property: name)
+ * &nbsp;&nbsp;&nbsp;The name of the actor.
+ * &nbsp;&nbsp;&nbsp;default: TrustManager
+ * </pre>
+ *
+ * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
+ * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
+ * <pre>-skip &lt;boolean&gt; (property: skip)
+ * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded
+ * &nbsp;&nbsp;&nbsp;as it is.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
+ * &nbsp;&nbsp;&nbsp;actors.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-keystore-type &lt;java.lang.String&gt; (property: keystoreType)
+ * &nbsp;&nbsp;&nbsp;The type of the keystore, eg PKCS12 or JKS.
+ * &nbsp;&nbsp;&nbsp;default: JKS
+ * </pre>
+ *
+ * <pre>-keystore-file &lt;adams.core.io.PlaceholderFile&gt; (property: keystoreFile)
+ * &nbsp;&nbsp;&nbsp;The location of the keystore.
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
+ * </pre>
+ *
+ * <pre>-keystore-passphrase &lt;adams.core.base.BasePassword&gt; (property: keystorePassphrase)
+ * &nbsp;&nbsp;&nbsp;The passphrase for the keystore file, ignored if empty.
+ * </pre>
+ *
+ * <pre>-prompt-for-password &lt;boolean&gt; (property: promptForPassword)
+ * &nbsp;&nbsp;&nbsp;If enabled, the user gets prompted for enter a password if none has been
+ * &nbsp;&nbsp;&nbsp;provided in the setup.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-stop-if-canceled &lt;boolean&gt; (property: stopFlowIfCanceled)
+ * &nbsp;&nbsp;&nbsp;If enabled, the flow gets stopped in case the user cancels the dialog.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-custom-stop-message &lt;java.lang.String&gt; (property: customStopMessage)
+ * &nbsp;&nbsp;&nbsp;The custom stop message to use in case a user cancelation stops the flow
+ * &nbsp;&nbsp;&nbsp;(default is the full name of the actor)
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
+ * <pre>-stop-mode &lt;GLOBAL|STOP_RESTRICTOR&gt; (property: stopMode)
+ * &nbsp;&nbsp;&nbsp;The stop mode to use.
+ * &nbsp;&nbsp;&nbsp;default: GLOBAL
+ * </pre>
+ *
+ * <pre>-algorithm &lt;java.lang.String&gt; (property: algorithm)
+ * &nbsp;&nbsp;&nbsp;The algorithm to use.
+ * &nbsp;&nbsp;&nbsp;default: SunX509
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
