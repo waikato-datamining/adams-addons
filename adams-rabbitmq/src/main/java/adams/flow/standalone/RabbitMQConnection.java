@@ -97,6 +97,17 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;maximum: 65535
  * </pre>
  *
+ * <pre>-uss-ssl &lt;boolean&gt; (property: useSSL)
+ * &nbsp;&nbsp;&nbsp;If enabled uses SSL for the connection; requires adams.flow.standalone.SSLContext
+ * &nbsp;&nbsp;&nbsp;to be present for custom SSL context.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-hostname-verification &lt;boolean&gt; (property: hostnameVerification)
+ * &nbsp;&nbsp;&nbsp;If enabled (and SSL is used), hostnames et verified.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  * <pre>-user &lt;java.lang.String&gt; (property: user)
  * &nbsp;&nbsp;&nbsp;The database user to connect with.
  * </pre>
@@ -146,6 +157,9 @@ public class RabbitMQConnection
 
   /** whether to use SSL. */
   protected boolean m_UseSSL;
+
+  /** whether to use hostname verification (if SSL on). */
+  protected boolean m_HostnameVerification;
 
   /** database username. */
   protected String m_User;
@@ -207,6 +221,10 @@ public class RabbitMQConnection
       false);
 
     m_OptionManager.add(
+      "hostname-verification", "hostnameVerification",
+      false);
+
+    m_OptionManager.add(
       "user", "user",
       "", false);
 
@@ -254,6 +272,8 @@ public class RabbitMQConnection
     result += QuickInfoHelper.toString(this, "host", (m_Host.length() == 0 ? "??" : m_Host), "@");
     result += QuickInfoHelper.toString(this, "port", m_Port, ":");
     result += QuickInfoHelper.toString(this, "useSSL", m_UseSSL, "SSL", ", ");
+    if (m_UseSSL)
+      result += QuickInfoHelper.toString(this, "hostnameVerification", m_HostnameVerification, "hostname verification", ", ");
 
     if (QuickInfoHelper.hasVariable(this, "promptForPassword") || m_PromptForPassword) {
       result += ", prompt for password";
@@ -352,6 +372,35 @@ public class RabbitMQConnection
     return
       "If enabled uses SSL for the connection; requires "
 	+ Utils.classToString(SSLContext.class) + " to be present for custom SSL context.";
+  }
+
+  /**
+   * Sets whether to perform hostname verification.
+   *
+   * @param value	true if to verify
+   */
+  public void setHostnameVerification(boolean value) {
+    m_HostnameVerification = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to perform hostname verification.
+   *
+   * @return		true if to verify
+   */
+  public boolean getHostnameVerification() {
+    return m_HostnameVerification;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String hostnameVerificationTipText() {
+    return "If enabled (and SSL is used), hostnames et verified.";
   }
 
   /**
@@ -683,6 +732,8 @@ public class RabbitMQConnection
         if (m_SSLContext.getSSLContext() != null) {
 	  try {
 	    factory.useSslProtocol(m_SSLContext.getSSLContext());
+	    if (m_HostnameVerification)
+	      factory.enableHostnameVerification();
 	  }
 	  catch (Exception e) {
 	    if (errors != null)
@@ -701,6 +752,8 @@ public class RabbitMQConnection
       else {
         try {
 	  factory.useSslProtocol();
+	  if (m_HostnameVerification)
+	    factory.enableHostnameVerification();
 	}
 	catch (Exception e) {
 	  if (errors != null)
