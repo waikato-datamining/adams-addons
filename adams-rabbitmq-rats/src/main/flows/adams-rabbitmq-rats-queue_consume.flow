@@ -1,0 +1,17 @@
+# Project: adams
+# Date: 2019-05-13 16:42:59
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-event,adams-meta,adams-net,adams-rabbitmq,adams-rabbitmq-rats,adams-rats,adams-rest,adams-webservice
+#
+adams.flow.control.Flow -annotation "Consumes data from the specified queue and displays." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.RabbitMQConnection -connection-factory adams.core.net.rabbitmq.connection.GuestConnectionFactory
+ adams.flow.standalone.RabbitMQChannelAction -action "adams.core.net.rabbitmq.channelaction.DeclareQueue -queue hello"
+ adams.flow.standalone.Rats
+  adams.flow.standalone.Rat -receiver "adams.flow.standalone.rats.input.RabbitMQConsume -queue hello -converter adams.core.net.rabbitmq.receive.StringConverter" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display" -log-generator adams.flow.standalone.rats.log.LogEntryGenerator
+ adams.flow.source.Start
+ adams.flow.control.WhileLoop -condition adams.flow.condition.bool.True
+  adams.flow.source.Start
+  adams.flow.control.Sleep
