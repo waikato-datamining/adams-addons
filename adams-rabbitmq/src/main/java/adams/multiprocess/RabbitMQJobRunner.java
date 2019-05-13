@@ -66,6 +66,9 @@ public class RabbitMQJobRunner<T extends Job>
   /** the queue in use. */
   protected String m_Queue;
 
+  /** whether to distribute the jobs or run them on the same machine. */
+  protected boolean m_DistributeJobs;
+
   /** the connection. */
   protected transient com.rabbitmq.client.Connection m_Connection;
 
@@ -120,6 +123,10 @@ public class RabbitMQJobRunner<T extends Job>
     m_OptionManager.add(
       "queue", "queue",
       "");
+
+    m_OptionManager.add(
+      "distribute-jobs", "distributeJobs",
+      false);
   }
 
   /**
@@ -280,6 +287,35 @@ public class RabbitMQJobRunner<T extends Job>
   }
 
   /**
+   * Sets whether to distribute the jobs via separate messages.
+   *
+   * @param value	true if to distribute
+   */
+  public void setDistributeJobs(boolean value) {
+    m_DistributeJobs = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to distribute the jobs via separate messages.
+   *
+   * @return		true if to distribute
+   */
+  public boolean getDistributeJobs() {
+    return m_DistributeJobs;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String distributeJobsTipText() {
+    return "If enabled, the jobs get distributed via separate messages.";
+  }
+
+  /**
    * Returns the database connection in use. Reconnects the database, to make
    * sure that the database connection is the correct one.
    *
@@ -369,13 +405,25 @@ public class RabbitMQJobRunner<T extends Job>
     if (result == null) {
       convSnd = new adams.core.net.rabbitmq.send.BinaryConverter();
       errors  = new MessageCollection();
-      for (Enumerated<T> enm : enumerate(getJobs())) {
+      if (m_DistributeJobs) {
+	for (Enumerated<T> enm : enumerate(getJobs())) {
+	  runner = new LocalJobRunner();
+	  runner.getMetaData().put("index", enm.index);
+	  runner.add(enm.value);
+	  m_Processing.add(enm.index);
+	  ser = convSnd.convert(runner, errors);
+	  if (ser != null)
+	    runners.add(ser);
+	}
+      }
+      else {
         runner = new LocalJobRunner();
-        runner.getMetaData().put("index", enm.index);
-        runner.add(enm.value);
-        m_Processing.add(enm.index);
-        ser = convSnd.convert(runner, errors);
-        if (ser != null)
+        for (Job job: getJobs())
+	  runner.add(job);
+	runner.getMetaData().put("index", 0);
+        m_Processing.add(0);
+	ser = convSnd.convert(runner, errors);
+	if (ser != null)
 	  runners.add(ser);
       }
       if (!errors.isEmpty())
@@ -480,7 +528,13 @@ public class RabbitMQJobRunner<T extends Job>
 	  if (index != null) {
 	    if (isLoggingEnabled())
 	      getLogger().info("Job #" + index + " received");
-	    m_Jobs.set(index, (T) jobrunner.getJobs().get(0));
+	    if (m_DistributeJobs) {
+	      m_Jobs.set(index, (T) jobrunner.getJobs().get(0));
+	    }
+	    else {
+	      for (int i = 0; i < jobrunner.getJobs().size(); i++)
+		m_Jobs.set(i, (T) jobrunner.getJobs().get(i));
+	    }
 	    m_Processing.remove(index);
 	  }
 	  else {
