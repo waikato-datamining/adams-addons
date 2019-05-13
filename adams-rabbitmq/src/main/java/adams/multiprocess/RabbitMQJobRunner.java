@@ -26,7 +26,6 @@ import adams.core.base.BasePassword;
 import adams.core.net.rabbitmq.RabbitMQHelper;
 import adams.event.JobCompleteEvent;
 import adams.event.JobCompleteListener;
-import adams.multiprocess.rabbitmq.RabbitMQLocalJobRunner;
 import com.github.fracpete.javautils.enumerate.Enumerated;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.AMQP.BasicProperties;
@@ -350,7 +349,7 @@ public class RabbitMQJobRunner<T extends Job>
     byte[]						ser;
     MessageCollection					errors;
     List<byte[]>					runners;
-    RabbitMQLocalJobRunner runner;
+    LocalJobRunner 					runner;
     BasicProperties 					props;
 
     result = null;
@@ -371,7 +370,8 @@ public class RabbitMQJobRunner<T extends Job>
       convSnd = new adams.core.net.rabbitmq.send.BinaryConverter();
       errors  = new MessageCollection();
       for (Enumerated<T> enm : enumerate(getJobs())) {
-        runner = new RabbitMQLocalJobRunner(enm.index);
+        runner = new LocalJobRunner();
+        runner.getMetaData().put("index", enm.index);
         runner.add(enm.value);
         m_Processing.add(enm.index);
         ser = convSnd.convert(runner, errors);
@@ -474,12 +474,18 @@ public class RabbitMQJobRunner<T extends Job>
       deliverCallback = (consumerTag, delivery) -> {
 	byte[] dataRec = delivery.getBody();
 	MessageCollection errorsRec = new MessageCollection();
-	RabbitMQLocalJobRunner jobrunner = (RabbitMQLocalJobRunner) convRec.convert(dataRec, errorsRec);
+	LocalJobRunner jobrunner = (LocalJobRunner) convRec.convert(dataRec, errorsRec);
 	if (jobrunner != null) {
-	  if (isLoggingEnabled())
-	    getLogger().info("Job #" + jobrunner.getIndex() + " received");
-	  m_Jobs.set(jobrunner.getIndex(), (T) jobrunner.getJobs().get(0));
-	  m_Processing.remove(jobrunner.getIndex());
+	  Integer index = (Integer) jobrunner.getMetaData().get("index");
+	  if (index != null) {
+	    if (isLoggingEnabled())
+	      getLogger().info("Job #" + index + " received");
+	    m_Jobs.set(index, (T) jobrunner.getJobs().get(0));
+	    m_Processing.remove(index);
+	  }
+	  else {
+	    getLogger().warning("No job index stored in meta-data of jobrunner?");
+	  }
 	}
       };
 
