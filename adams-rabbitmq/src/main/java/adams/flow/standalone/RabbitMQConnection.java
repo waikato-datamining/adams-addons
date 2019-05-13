@@ -22,22 +22,12 @@ package adams.flow.standalone;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
-import adams.core.base.BasePassword;
-import adams.core.io.ConsoleHelper;
 import adams.core.net.rabbitmq.RabbitMQHelper;
-import adams.flow.control.Flow;
-import adams.flow.core.ActorUtils;
-import adams.flow.core.OptionalPasswordPrompt;
-import adams.flow.core.StopHelper;
-import adams.flow.core.StopMode;
-import adams.gui.dialog.PasswordDialog;
-import com.rabbitmq.client.AMQP;
+import adams.core.net.rabbitmq.connection.AbstractConnectionFactory;
+import adams.core.net.rabbitmq.connection.GuestConnectionFactory;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConnectionFactory;
 
-import java.awt.Dialog;
-import java.awt.Dialog.ModalityType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,57 +75,9 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
- * <pre>-host &lt;java.lang.String&gt; (property: host)
- * &nbsp;&nbsp;&nbsp;The host (name&#47;IP address) to connect to.
- * &nbsp;&nbsp;&nbsp;default:
- * </pre>
- *
- * <pre>-port &lt;int&gt; (property: port)
- * &nbsp;&nbsp;&nbsp;The port to connect to.
- * &nbsp;&nbsp;&nbsp;default: 5672
- * &nbsp;&nbsp;&nbsp;minimum: 1
- * &nbsp;&nbsp;&nbsp;maximum: 65535
- * </pre>
- *
- * <pre>-uss-ssl &lt;boolean&gt; (property: useSSL)
- * &nbsp;&nbsp;&nbsp;If enabled uses SSL for the connection; requires adams.flow.standalone.SSLContext
- * &nbsp;&nbsp;&nbsp;to be present for custom SSL context.
- * &nbsp;&nbsp;&nbsp;default: false
- * </pre>
- *
- * <pre>-hostname-verification &lt;boolean&gt; (property: hostnameVerification)
- * &nbsp;&nbsp;&nbsp;If enabled (and SSL is used), hostnames et verified.
- * &nbsp;&nbsp;&nbsp;default: false
- * </pre>
- *
- * <pre>-user &lt;java.lang.String&gt; (property: user)
- * &nbsp;&nbsp;&nbsp;The database user to connect with.
- * </pre>
- *
- * <pre>-password &lt;adams.core.base.BasePassword&gt; (property: password)
- * &nbsp;&nbsp;&nbsp;The password of the database user.
- * </pre>
- *
- * <pre>-prompt-for-password &lt;boolean&gt; (property: promptForPassword)
- * &nbsp;&nbsp;&nbsp;If enabled and authentication is required, the user gets prompted for enter
- * &nbsp;&nbsp;&nbsp;a password if none has been provided in the setup.
- * &nbsp;&nbsp;&nbsp;default: false
- * </pre>
- *
- * <pre>-stop-if-canceled &lt;boolean&gt; (property: stopFlowIfCanceled)
- * &nbsp;&nbsp;&nbsp;If enabled, the flow gets stopped in case the user cancels the dialog.
- * &nbsp;&nbsp;&nbsp;default: false
- * </pre>
- *
- * <pre>-custom-stop-message &lt;java.lang.String&gt; (property: customStopMessage)
- * &nbsp;&nbsp;&nbsp;The custom stop message to use in case a user cancelation stops the flow
- * &nbsp;&nbsp;&nbsp;(default is the full name of the actor)
- * &nbsp;&nbsp;&nbsp;default:
- * </pre>
- *
- * <pre>-stop-mode &lt;GLOBAL|STOP_RESTRICTOR&gt; (property: stopMode)
- * &nbsp;&nbsp;&nbsp;The stop mode to use.
- * &nbsp;&nbsp;&nbsp;default: GLOBAL
+ * <pre>-connection-factory &lt;adams.core.net.rabbitmq.connection.AbstractConnectionFactory&gt; (property: connectionFactory)
+ * &nbsp;&nbsp;&nbsp;The connection factory to use.
+ * &nbsp;&nbsp;&nbsp;default: adams.core.net.rabbitmq.connection.GuestConnectionFactory
  * </pre>
  *
  <!-- options-end -->
@@ -143,53 +85,19 @@ import java.util.List;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class RabbitMQConnection
-  extends AbstractStandalone
-  implements OptionalPasswordPrompt {
+  extends AbstractStandalone {
 
   /** for serialization. */
   private static final long serialVersionUID = -1726172998200420556L;
 
-  /** the SSH host. */
-  protected String m_Host;
-
-  /** the SSH port. */
-  protected int m_Port;
-
-  /** whether to use SSL. */
-  protected boolean m_UseSSL;
-
-  /** whether to use hostname verification (if SSL on). */
-  protected boolean m_HostnameVerification;
-
-  /** database username. */
-  protected String m_User;
-
-  /** database password. */
-  protected BasePassword m_Password;
-
-  /** the actual SMTP password to use. */
-  protected BasePassword m_ActualPassword;
-
-  /** whether to prompt the user for a password if none provided. */
-  protected boolean m_PromptForPassword;
-
-  /** whether to stop the flow if canceled. */
-  protected boolean m_StopFlowIfCanceled;
-
-  /** the custom stop message to use if flow gets stopped due to cancelation. */
-  protected String m_CustomStopMessage;
-
-  /** how to perform the stop. */
-  protected StopMode m_StopMode;
+  /** the connection to use. */
+  protected AbstractConnectionFactory m_ConnectionFactory;
 
   /** the connection. */
   protected transient com.rabbitmq.client.Connection m_Connection;
 
   /** the auto-created queues that need to get deleted again. */
   protected List<String> m_AutoCreatedQueues;
-
-  /** the SSL context. */
-  protected transient SSLContext m_SSLContext;
 
   /**
    * Returns a string describing the object.
@@ -209,44 +117,8 @@ public class RabbitMQConnection
     super.defineOptions();
 
     m_OptionManager.add(
-      "host", "host",
-      "");
-
-    m_OptionManager.add(
-      "port", "port",
-      AMQP.PROTOCOL.PORT, 1, 65535);
-
-    m_OptionManager.add(
-      "uss-ssl", "useSSL",
-      false);
-
-    m_OptionManager.add(
-      "hostname-verification", "hostnameVerification",
-      false);
-
-    m_OptionManager.add(
-      "user", "user",
-      "", false);
-
-    m_OptionManager.add(
-      "password", "password",
-      new BasePassword(), false);
-
-    m_OptionManager.add(
-      "prompt-for-password", "promptForPassword",
-      false);
-
-    m_OptionManager.add(
-      "stop-if-canceled", "stopFlowIfCanceled",
-      false);
-
-    m_OptionManager.add(
-      "custom-stop-message", "customStopMessage",
-      "");
-
-    m_OptionManager.add(
-      "stop-mode", "stopMode",
-      StopMode.GLOBAL);
+      "connection-factory", "connectionFactory",
+      new GuestConnectionFactory());
   }
 
   /**
@@ -266,40 +138,26 @@ public class RabbitMQConnection
    */
   @Override
   public String getQuickInfo() {
-    String	result;
-
-    result = QuickInfoHelper.toString(this, "user", (m_User.isEmpty() ? "guest" : m_User));
-    result += QuickInfoHelper.toString(this, "host", (m_Host.length() == 0 ? "??" : m_Host), "@");
-    result += QuickInfoHelper.toString(this, "port", m_Port, ":");
-    result += QuickInfoHelper.toString(this, "useSSL", m_UseSSL, "SSL", ", ");
-    if (m_UseSSL)
-      result += QuickInfoHelper.toString(this, "hostnameVerification", m_HostnameVerification, "hostname verification", ", ");
-
-    if (QuickInfoHelper.hasVariable(this, "promptForPassword") || m_PromptForPassword) {
-      result += ", prompt for password";
-      result += QuickInfoHelper.toString(this, "stopFlowIfCanceled", m_StopFlowIfCanceled, "stop flow", ", ");
-    }
-
-    return result;
+    return QuickInfoHelper.toString(this, "connectionFactory", m_ConnectionFactory);
   }
 
   /**
-   * Sets the host to connect to.
+   * Sets the connection factory to use.
    *
-   * @param value	the host name/ip
+   * @param value	the factory
    */
-  public void setHost(String value) {
-    m_Host = value;
+  public void setConnectionFactory(AbstractConnectionFactory value) {
+    m_ConnectionFactory = value;
     reset();
   }
 
   /**
-   * Returns the host to connect to.
+   * Returns the connection factory to use.
    *
-   * @return		the host name/ip
+   * @return		the factory
    */
-  public String getHost() {
-    return m_Host;
+  public AbstractConnectionFactory getConnectionFactory() {
+    return m_ConnectionFactory;
   }
 
   /**
@@ -308,352 +166,8 @@ public class RabbitMQConnection
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String hostTipText() {
-    return "The host (name/IP address) to connect to.";
-  }
-
-  /**
-   * Sets the port to connect to.
-   *
-   * @param value	the port
-   */
-  public void setPort(int value) {
-    if (getOptionManager().isValid("port", value)) {
-      m_Port = value;
-      reset();
-    }
-  }
-
-  /**
-   * Returns the port to connect to.
-   *
-   * @return 		the port
-   */
-  public int getPort() {
-    return m_Port;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return		tip text for this property suitable for
-   *             	displaying in the GUI or for listing the options.
-   */
-  public String portTipText() {
-    return "The port to connect to.";
-  }
-
-  /**
-   * Sets whether to use SSL.
-   *
-   * @param value	true if to use SSL
-   */
-  public void setUseSSL(boolean value) {
-    m_UseSSL = value;
-    reset();
-  }
-
-  /**
-   * Returns whether to use SSL.
-   *
-   * @return		true if to use SSL
-   */
-  public boolean getUseSSL() {
-    return m_UseSSL;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String useSSLTipText() {
-    return
-      "If enabled uses SSL for the connection; requires "
-	+ Utils.classToString(SSLContext.class) + " to be present for custom SSL context.";
-  }
-
-  /**
-   * Sets whether to perform hostname verification.
-   *
-   * @param value	true if to verify
-   */
-  public void setHostnameVerification(boolean value) {
-    m_HostnameVerification = value;
-    reset();
-  }
-
-  /**
-   * Returns whether to perform hostname verification.
-   *
-   * @return		true if to verify
-   */
-  public boolean getHostnameVerification() {
-    return m_HostnameVerification;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String hostnameVerificationTipText() {
-    return "If enabled (and SSL is used), hostnames et verified.";
-  }
-
-  /**
-   * Sets the database user.
-   *
-   * @param value	the user
-   */
-  public void setUser(String value) {
-    m_User = value;
-    reset();
-  }
-
-  /**
-   * Returns the database user.
-   *
-   * @return 		the user
-   */
-  public String getUser() {
-    return m_User;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return         tip text for this property suitable for
-   *             displaying in the GUI or for listing the options.
-   */
-  public String userTipText() {
-    return "The database user to connect with.";
-  }
-
-  /**
-   * Sets the database password.
-   *
-   * @param value	the password
-   */
-  public void setPassword(BasePassword value) {
-    m_Password = value;
-    reset();
-  }
-
-  /**
-   * Returns the database password.
-   *
-   * @return 		the password
-   */
-  public BasePassword getPassword() {
-    return m_Password;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return         tip text for this property suitable for
-   *             displaying in the GUI or for listing the options.
-   */
-  public String passwordTipText() {
-    return "The password of the database user.";
-  }
-
-  /**
-   * Sets whether to prompt for a password if none currently provided.
-   *
-   * @param value	true if to prompt for a password
-   */
-  public void setPromptForPassword(boolean value) {
-    m_PromptForPassword = value;
-    reset();
-  }
-
-  /**
-   * Returns whether to prompt for a password if none currently provided.
-   *
-   * @return		true if to prompt for a password
-   */
-  public boolean getPromptForPassword() {
-    return m_PromptForPassword;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String promptForPasswordTipText() {
-    return
-      "If enabled and authentication is required, the user gets prompted "
-        + "for enter a password if none has been provided in the setup.";
-  }
-
-  /**
-   * Sets whether to stop the flow if dialog canceled.
-   *
-   * @param value	if true flow gets stopped if dialog canceled
-   */
-  public void setStopFlowIfCanceled(boolean value) {
-    m_StopFlowIfCanceled = value;
-    reset();
-  }
-
-  /**
-   * Returns whether to stop the flow if dialog canceled.
-   *
-   * @return 		true if the flow gets stopped if dialog canceled
-   */
-  public boolean getStopFlowIfCanceled() {
-    return m_StopFlowIfCanceled;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return		tip text for this property suitable for
-   *             	displaying in the GUI or for listing the options.
-   */
-  public String stopFlowIfCanceledTipText() {
-    return "If enabled, the flow gets stopped in case the user cancels the dialog.";
-  }
-
-  /**
-   * Sets the custom message to use when stopping the flow.
-   *
-   * @param value	the stop message
-   */
-  public void setCustomStopMessage(String value) {
-    m_CustomStopMessage = value;
-    reset();
-  }
-
-  /**
-   * Returns the custom message to use when stopping the flow.
-   *
-   * @return		the stop message
-   */
-  public String getCustomStopMessage() {
-    return m_CustomStopMessage;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return		tip text for this property suitable for
-   *             	displaying in the GUI or for listing the options.
-   */
-  public String customStopMessageTipText() {
-    return
-      "The custom stop message to use in case a user cancelation stops the "
-        + "flow (default is the full name of the actor)";
-  }
-
-  /**
-   * Sets the stop mode.
-   *
-   * @param value	the mode
-   */
-  @Override
-  public void setStopMode(StopMode value) {
-    m_StopMode = value;
-    reset();
-  }
-
-  /**
-   * Returns the stop mode.
-   *
-   * @return		the mode
-   */
-  @Override
-  public StopMode getStopMode() {
-    return m_StopMode;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  @Override
-  public String stopModeTipText() {
-    return "The stop mode to use.";
-  }
-
-  /**
-   * Performs the interaction with the user.
-   *
-   * @return		true if successfully interacted
-   */
-  public boolean doInteract() {
-    boolean		result;
-    PasswordDialog	dlg;
-
-    dlg = new PasswordDialog((Dialog) null, ModalityType.DOCUMENT_MODAL);
-    dlg.setLocationRelativeTo(getParentComponent());
-    ((Flow) getRoot()).registerWindow(dlg, dlg.getTitle());
-    dlg.setVisible(true);
-    ((Flow) getRoot()).deregisterWindow(dlg);
-    result = (dlg.getOption() == PasswordDialog.APPROVE_OPTION);
-
-    if (result)
-      m_ActualPassword = dlg.getPassword();
-
-    return result;
-  }
-
-  /**
-   * Returns whether headless interaction is supported.
-   *
-   * @return		true if interaction in headless environment is possible
-   */
-  public boolean supportsHeadlessInteraction() {
-    return true;
-  }
-
-  /**
-   * Performs the interaction with the user in a headless environment.
-   *
-   * @return		true if successfully interacted
-   */
-  public boolean doInteractHeadless() {
-    boolean		result;
-    BasePassword	password;
-
-    result   = false;
-    password = ConsoleHelper.enterPassword("Please enter password (" + getName() + "):");
-    if (password != null) {
-      result           = true;
-      m_ActualPassword = password;
-    }
-
-    return result;
-  }
-
-  /**
-   * Initializes the item for flow execution.
-   *
-   * @return		null if everything is fine, otherwise error message
-   */
-  @Override
-  public String setUp() {
-    String	result;
-
-    result = super.setUp();
-
-    if (result == null) {
-      if (m_UseSSL) {
-        m_SSLContext = (SSLContext) ActorUtils.findClosestType(this, SSLContext.class, true);
-        if (m_SSLContext == null)
-          getLogger().warning("No instance of " + Utils.classToString(SSLContext.class) + " found, using default context!");
-      }
-    }
-
-    return result;
+  public String connectionFactoryTipText() {
+    return "The connection factory to use.";
   }
 
   /**
@@ -668,43 +182,13 @@ public class RabbitMQConnection
     MessageCollection			errors;
 
     result = null;
-
-    m_ActualPassword = m_Password;
-
-    if (m_PromptForPassword && (m_Password.getValue().length() == 0)) {
-      if (!isHeadless()) {
-        if (!doInteract()) {
-          if (m_StopFlowIfCanceled) {
-            if ((m_CustomStopMessage == null) || (m_CustomStopMessage.trim().length() == 0))
-              StopHelper.stop(this, m_StopMode, "Flow canceled: " + getFullName());
-            else
-              StopHelper.stop(this, m_StopMode, m_CustomStopMessage);
-            result = getStopMessage();
-          }
-        }
-      }
-      else if (supportsHeadlessInteraction()) {
-        if (!doInteractHeadless()) {
-          if (m_StopFlowIfCanceled) {
-            if ((m_CustomStopMessage == null) || (m_CustomStopMessage.trim().length() == 0))
-              StopHelper.stop(this, m_StopMode, "Flow canceled: " + getFullName());
-            else
-              StopHelper.stop(this, m_StopMode, m_CustomStopMessage);
-            result = getStopMessage();
-          }
-        }
-      }
-    }
-
-    if (result == null) {
-      errors = new MessageCollection();
-      conn   = retrieveConnection(errors);
-      if (!conn.isOpen()) {
-	if (!errors.isEmpty())
-	  result = errors.toString();
-	else
-	  result = "Failed to connect to broker (" + getHost() + ":" + getPort() + ")";
-      }
+    errors = new MessageCollection();
+    conn   = retrieveConnection(errors);
+    if ((conn == null) || !conn.isOpen()) {
+      if (!errors.isEmpty())
+	result = errors.toString();
+      else
+	result = "Failed to connect to broker (" + m_ConnectionFactory + ")!";
     }
 
     return result;
@@ -720,56 +204,18 @@ public class RabbitMQConnection
   protected com.rabbitmq.client.Connection retrieveConnection(MessageCollection errors) {
     ConnectionFactory 	factory;
 
-    factory = new ConnectionFactory();
-    factory.setHost(m_Host);
-    factory.setPort(m_Port);
-    if (!m_User.isEmpty()) {
-      factory.setUsername(m_User);
-      factory.setPassword(m_ActualPassword.getValue());
-    }
-    if (m_UseSSL) {
-      if (m_SSLContext != null) {
-        if (m_SSLContext.getSSLContext() != null) {
-	  try {
-	    factory.useSslProtocol(m_SSLContext.getSSLContext());
-	    if (m_HostnameVerification)
-	      factory.enableHostnameVerification();
-	  }
-	  catch (Exception e) {
-	    if (errors != null)
-	      errors.add("Failed to use custom SSL context (" + m_SSLContext.getFullName() + ")!", e);
-	    handleException("Failed to use custom SSL context (" + m_SSLContext.getFullName() + ")!", e);
-	    return null;
-	  }
-	}
-	else {
-          if (errors != null)
-            errors.add("No SSL context instance available from: " + m_SSLContext.getFullName());
-          getLogger().severe("No SSL context instance available from: " + m_SSLContext.getFullName());
-          return null;
-	}
-      }
-      else {
-        try {
-	  factory.useSslProtocol();
-	  if (m_HostnameVerification)
-	    factory.enableHostnameVerification();
-	}
-	catch (Exception e) {
-	  if (errors != null)
-	    errors.add("Failed to use default SSL context!", e);
-          handleException("Failed to use default SSL context!", e);
-          return null;
-	}
-      }
-    }
+    if (errors == null)
+      errors = new MessageCollection();
+    factory = m_ConnectionFactory.generate(errors);
+    if (!errors.isEmpty())
+      return null;
+
     try {
       return factory.newConnection();
     }
     catch (Exception e) {
-      if (errors != null)
-	errors.add("Failed to connect to broker " + m_Host + ":" + m_Port, e);
-      handleException("Failed to connect to broker " + m_Host + ":" + m_Port, e);
+      errors.add("Failed to connect to broker (" + m_ConnectionFactory + ")!", e);
+      handleException("Failed to connect to broker (" + m_ConnectionFactory + ")!", e);
       return null;
     }
   }

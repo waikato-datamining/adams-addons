@@ -22,12 +22,12 @@ package adams.multiprocess;
 
 import adams.core.MessageCollection;
 import adams.core.Utils;
-import adams.core.base.BasePassword;
 import adams.core.net.rabbitmq.RabbitMQHelper;
+import adams.core.net.rabbitmq.connection.AbstractConnectionFactory;
+import adams.core.net.rabbitmq.connection.GuestConnectionFactory;
 import adams.event.JobCompleteEvent;
 import adams.event.JobCompleteListener;
 import com.github.fracpete.javautils.enumerate.Enumerated;
-import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConnectionFactory;
@@ -51,17 +51,8 @@ public class RabbitMQJobRunner<T extends Job>
 
   private static final long serialVersionUID = 8430171807757802783L;
 
-  /** the SSH host. */
-  protected String m_Host;
-
-  /** the SSH port. */
-  protected int m_Port;
-
-  /** database username. */
-  protected String m_User;
-
-  /** database password. */
-  protected BasePassword m_Password;
+  /** the connection to use. */
+  protected AbstractConnectionFactory m_ConnectionFactory;
 
   /** the queue in use. */
   protected String m_Queue;
@@ -105,20 +96,8 @@ public class RabbitMQJobRunner<T extends Job>
     super.defineOptions();
 
     m_OptionManager.add(
-      "host", "host",
-      "");
-
-    m_OptionManager.add(
-      "port", "port",
-      AMQP.PROTOCOL.PORT, 1, 65535);
-
-    m_OptionManager.add(
-      "user", "user",
-      "", false);
-
-    m_OptionManager.add(
-      "password", "password",
-      new BasePassword(), false);
+      "connection-factory", "connectionFactory",
+      new GuestConnectionFactory());
 
     m_OptionManager.add(
       "queue", "queue",
@@ -140,22 +119,22 @@ public class RabbitMQJobRunner<T extends Job>
   }
 
   /**
-   * Sets the host to connect to.
+   * Sets the base connection factory to encrypt.
    *
-   * @param value	the host name/ip
+   * @param value	the factory
    */
-  public void setHost(String value) {
-    m_Host = value;
+  public void setConnectionFactory(AbstractConnectionFactory value) {
+    m_ConnectionFactory = value;
     reset();
   }
 
   /**
-   * Returns the host to connect to.
+   * Returns the base connection factory to encrypt.
    *
-   * @return		the host name/ip
+   * @return		the factory
    */
-  public String getHost() {
-    return m_Host;
+  public AbstractConnectionFactory getConnectionFactory() {
+    return m_ConnectionFactory;
   }
 
   /**
@@ -164,97 +143,8 @@ public class RabbitMQJobRunner<T extends Job>
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String hostTipText() {
-    return "The host (name/IP address) to connect to.";
-  }
-
-  /**
-   * Sets the port to connect to.
-   *
-   * @param value	the port
-   */
-  public void setPort(int value) {
-    if (getOptionManager().isValid("port", value)) {
-      m_Port = value;
-      reset();
-    }
-  }
-
-  /**
-   * Returns the port to connect to.
-   *
-   * @return 		the port
-   */
-  public int getPort() {
-    return m_Port;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return		tip text for this property suitable for
-   *             	displaying in the GUI or for listing the options.
-   */
-  public String portTipText() {
-    return "The port to connect to.";
-  }
-
-  /**
-   * Sets the database user.
-   *
-   * @param value	the user
-   */
-  public void setUser(String value) {
-    m_User = value;
-    reset();
-  }
-
-  /**
-   * Returns the database user.
-   *
-   * @return 		the user
-   */
-  public String getUser() {
-    return m_User;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return         tip text for this property suitable for
-   *             displaying in the GUI or for listing the options.
-   */
-  public String userTipText() {
-    return "The database user to connect with.";
-  }
-
-  /**
-   * Sets the database password.
-   *
-   * @param value	the password
-   */
-  public void setPassword(BasePassword value) {
-    m_Password = value;
-    reset();
-  }
-
-  /**
-   * Returns the database password.
-   *
-   * @return 		the password
-   */
-  public BasePassword getPassword() {
-    return m_Password;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return         tip text for this property suitable for
-   *             displaying in the GUI or for listing the options.
-   */
-  public String passwordTipText() {
-    return "The password of the database user.";
+  public String connectionFactoryTipText() {
+    return "The base connection factory to encrypt.";
   }
 
   /**
@@ -322,20 +212,20 @@ public class RabbitMQJobRunner<T extends Job>
    * @return		the connection object
    */
   protected com.rabbitmq.client.Connection retrieveConnection() {
-    ConnectionFactory factory;
+    ConnectionFactory 	factory;
+    MessageCollection	errors;
 
-    factory = new ConnectionFactory();
-    factory.setHost(m_Host);
-    factory.setPort(m_Port);
-    if (!m_User.isEmpty()) {
-      factory.setUsername(m_User);
-      factory.setPassword(m_Password.getValue());
-    }
+    errors = new MessageCollection();
+    factory = m_ConnectionFactory.generate(errors);
+    if (!errors.isEmpty())
+      return null;
+
     try {
       return factory.newConnection();
     }
     catch (Exception e) {
-      Utils.handleException(this, "Failed to connect to broker " + m_Host + ":" + m_Port, e);
+      errors.add("Failed to connect to broker (" + m_ConnectionFactory + ")!", e);
+      Utils.handleException(this, "Failed to connect to broker (" + m_ConnectionFactory + ")!", e);
       return null;
     }
   }
@@ -353,7 +243,7 @@ public class RabbitMQJobRunner<T extends Job>
     if (result == null) {
       m_Connection = retrieveConnection();
       if (m_Connection == null)
-        result = "Failed to connect to broker " + m_Host + ":" + m_Port;
+        result = "Failed to connect to broker (" + m_ConnectionFactory + ")!";
     }
 
     if (result == null) {

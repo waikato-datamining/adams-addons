@@ -6,6 +6,10 @@
 #
 # Author:  FracPete (fracpete at waikato dot ac dot nz)
 
+# the connection factories
+adams.core.net.rabbitmq.connection.AbstractConnectionFactory=\
+  adams.core.net.rabbitmq.connection
+
 # the channel actions
 adams.core.net.rabbitmq.channelaction.AbstractChannelAction=\
   adams.core.net.rabbitmq.channelaction

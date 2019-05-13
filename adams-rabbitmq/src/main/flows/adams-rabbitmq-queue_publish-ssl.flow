@@ -1,0 +1,10 @@
+# Project: adams
+# Date: 2019-05-13 15:25:03
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-rabbitmq
+#
+adams.flow.control.Flow -annotation "Publishes a simple \\\'Hello World!\\\' string using a queue.\\n\\nRequires RabbitMQ listening on SSL port and the following flow to run:\\n  adams-rabbitmq-queue_consume-ssl.flow" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.RabbitMQConnection -connection-factory "adams.core.net.rabbitmq.connection.NonValidatingSSLConnectionFactory -connection-factory \"adams.core.net.rabbitmq.connection.GuestConnectionFactory -port 5671\""
+ adams.flow.source.StringConstants -string "Hello World!" -conversion adams.data.conversion.StringToString
+ adams.flow.sink.RabbitMQPublish -queue hello -converter adams.core.net.rabbitmq.send.StringConverter

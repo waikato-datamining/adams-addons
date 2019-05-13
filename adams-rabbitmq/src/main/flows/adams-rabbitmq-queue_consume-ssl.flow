@@ -1,0 +1,11 @@
+# Project: adams
+# Date: 2019-05-13 15:24:12
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-rabbitmq
+#
+adams.flow.control.Flow -annotation "Consumes data from the specified queue and displays.\\nRequires RabbitMQ server to be listening on SSL port." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.RabbitMQConnection -connection-factory "adams.core.net.rabbitmq.connection.NonValidatingSSLConnectionFactory -connection-factory \"adams.core.net.rabbitmq.connection.GuestConnectionFactory -port 5671\""
+ adams.flow.standalone.RabbitMQChannelAction -action "adams.core.net.rabbitmq.channelaction.DeclareQueue -queue hello"
+ adams.flow.source.RabbitMQConsume -queue hello -converter adams.core.net.rabbitmq.receive.StringConverter
+ adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
