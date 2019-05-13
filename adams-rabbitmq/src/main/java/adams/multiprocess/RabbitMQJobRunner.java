@@ -21,6 +21,7 @@
 package adams.multiprocess;
 
 import adams.core.MessageCollection;
+import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.net.rabbitmq.RabbitMQHelper;
 import adams.core.net.rabbitmq.connection.AbstractConnectionFactory;
@@ -203,6 +204,21 @@ public class RabbitMQJobRunner<T extends Job>
    */
   public String distributeJobsTipText() {
     return "If enabled, the jobs get distributed via separate messages.";
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  public String getQuickInfo() {
+    String	result;
+
+    result  = QuickInfoHelper.toString(this, "connectionFactory", m_ConnectionFactory, "connection: ");
+    result += QuickInfoHelper.toString(this, "queue", m_Queue, ", queue: ");
+    result += QuickInfoHelper.toString(this, "distributeJobs", m_DistributeJobs, "distribute jobs", ", ");
+
+    return result;
   }
 
   /**
