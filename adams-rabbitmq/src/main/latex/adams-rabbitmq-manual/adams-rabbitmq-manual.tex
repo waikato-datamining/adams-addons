@@ -132,12 +132,11 @@ The following JobRunners are available:
 \section{TLS Support}
 If you want to take advantage of TLS, i.e., encrypting your connections to
 the RabbitMQ server, then you need to configure your server for that (see
-\ref{tls_support}) and also add (and configure) the following standalones
-in your flow:
+\ref{tls_support}) and encapsulate your actual connection factory used by
+\textit{RabbitMQConnection} in one of the following meta-factories:
 \begin{tight_itemize}
-  \item KeyManager
-  \item TrustManager
-  \item SSLContext
+  \item \textit{NonValidatingSSLConnectionFactory} -- only to be used for testing/development
+  \item \textit{SSLConnectionFactory}
 \end{tight_itemize}
 
 
