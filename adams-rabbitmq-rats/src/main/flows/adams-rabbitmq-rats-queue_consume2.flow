@@ -1,0 +1,11 @@
+# Project: adams
+# Date: 2019-05-13 17:01:14
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-event,adams-meta,adams-net,adams-rabbitmq,adams-rabbitmq-rats,adams-rats,adams-rest,adams-webservice
+#
+adams.flow.control.Flow -annotation "Consumes data from the specified queue and displays." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.RabbitMQConnection -connection-factory adams.core.net.rabbitmq.connection.GuestConnectionFactory
+ adams.flow.standalone.RabbitMQChannelAction -action "adams.core.net.rabbitmq.channelaction.DeclareQueue -queue hello"
+ adams.flow.source.RabbitMQConsume -queue hello -converter adams.core.net.rabbitmq.receive.StringConverter
+ adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
