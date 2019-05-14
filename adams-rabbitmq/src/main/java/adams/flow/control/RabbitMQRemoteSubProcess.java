@@ -754,7 +754,7 @@ public class RabbitMQRemoteSubProcess
 	  m_Processing = UniqueIDs.nextLong();
 	  m_Channel.basicConsume(callbackQueue, true, deliverCallback, consumerTag -> {});
 	  while (m_Processing != null) {
-	    Utils.wait(this, 1000, 100);
+	    Utils.wait(this, 1000, 50);
 	  }
 	}
 	catch (Exception e) {
