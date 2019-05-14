@@ -319,7 +319,6 @@ public class RabbitMQPublish
       }
     }
 
-
     return result;
   }
 
