@@ -22,6 +22,8 @@ package adams.flow.transformer;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
+import adams.core.UniqueIDs;
+import adams.core.Utils;
 import adams.core.net.rabbitmq.RabbitMQHelper;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.Token;
@@ -124,6 +126,9 @@ public class RabbitMQRemoteProcedureCall
 
   /** the collected data. */
   protected List<Object> m_Data;
+
+  /** for checking whether still processing received data. */
+  protected transient Long m_Processing;
 
   /**
    * Returns a string describing the object.
@@ -315,12 +320,12 @@ public class RabbitMQRemoteProcedureCall
    */
   @Override
   protected String doExecute() {
-    String result;
-    String callbackQueue;
-    BasicProperties props;
-    MessageCollection errorsSnd;
-    byte[] dataSnd;
-    DeliverCallback deliverCallback;
+    String 		result;
+    String 		callbackQueue;
+    BasicProperties 	props;
+    MessageCollection 	errorsSnd;
+    byte[] 		dataSnd;
+    DeliverCallback 	deliverCallback;
 
     result = null;
     m_Data.clear();
@@ -362,14 +367,26 @@ public class RabbitMQRemoteProcedureCall
     if (result == null) {
       try {
 	deliverCallback = (consumerTag, delivery) -> {
-	  byte[] dataRec = delivery.getBody();
-	  MessageCollection errorsRec = new MessageCollection();
-	  Object output = m_ReceiveConverter.convert(dataRec, errorsRec);
-	  if (output != null)
-	    m_Data.add(output);
+	  try {
+	    byte[] dataRec = delivery.getBody();
+	    MessageCollection errorsRec = new MessageCollection();
+	    Object output = m_ReceiveConverter.convert(dataRec, errorsRec);
+	    if (output != null)
+	      m_Data.add(output);
+	  }
+	  catch (Exception e) {
+	    handleException("Failed to process received data!", e);
+	  }
+	  finally {
+	    m_Processing = null;
+	  }
 	};
 
+	m_Processing = UniqueIDs.nextLong();
 	m_Channel.basicConsume(callbackQueue, true, deliverCallback, consumerTag -> {});
+	while (m_Processing != null) {
+	  Utils.wait(this, 1000, 50);
+	}
       }
       catch (Exception e) {
 	result = handleException("Failed to receive data!", e);
