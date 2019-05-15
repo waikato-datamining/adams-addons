@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * WebserviceUtils.java
- * Copyright (C) 2013-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
@@ -25,9 +25,14 @@ import adams.core.net.ProxyHelper;
 import adams.core.option.OptionHandler;
 import adams.core.option.OptionUtils;
 import adams.flow.core.Actor;
+import adams.flow.core.ActorUtils;
+import adams.flow.standalone.KeyManager;
+import adams.flow.standalone.SSLContext;
+import adams.flow.standalone.TrustManager;
 import adams.flow.webservice.interceptor.InterceptorWithActor;
 import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -76,10 +81,50 @@ public class WebserviceUtils {
   public static void disableSchemaValidation(BindingProvider provider) {
     provider.getRequestContext().put("schema-validation-enabled", "false");
   }
-  
+
+  /**
+   * Sets TrustManager and KeyManager if within the context of the actor.
+   *
+   * @param owner	the owning actor
+   * @param http	the HTTP conduit to configure
+   * @return		whether successfully enabled TLS
+   */
+  public static boolean configureTLS(Actor owner, HTTPConduit http) {
+    KeyManager 		keyManager;
+    TrustManager 	trustManager;
+    SSLContext		sslContext;
+    String		protocol;
+    TLSClientParameters tlsParams;
+
+    keyManager = (KeyManager) ActorUtils.findClosestType(owner, KeyManager.class, true);
+    if (keyManager == null)
+      return false;
+    if (keyManager.getKeyManagerFactory() == null)
+      return false;
+
+    trustManager = (TrustManager) ActorUtils.findClosestType(owner, TrustManager.class, true);
+    if (trustManager == null)
+      return false;
+    if (trustManager.getTrustManagerFactory() == null)
+      return false;
+
+    protocol = "TLS";
+    sslContext = (SSLContext) ActorUtils.findClosestType(owner, SSLContext.class, true);
+    if (sslContext != null)
+      protocol = sslContext.getProtocol();
+
+    tlsParams = new TLSClientParameters();
+    tlsParams.setKeyManagers(keyManager.getKeyManagerFactory().getKeyManagers());
+    tlsParams.setTrustManagers(trustManager.getTrustManagerFactory().getTrustManagers());
+    tlsParams.setSecureSocketProtocol(protocol);
+    http.setTlsClientParameters(tlsParams);
+    return true;
+  }
+
   /**
    * Sets the timeouts for connection and receiving. Also configures the
    * proxy settings in case there is a system-wide proxy configured.
+   * Automatically configures TLS if present in actor's context.
    * 
    * @param owner		the owning actor
    * @param servicePort		the service port to set the timeouts for
@@ -171,6 +216,9 @@ public class WebserviceUtils {
       ((InterceptorWithActor) out).setActor(owner);
     if (out != null)
       client.getOutInterceptors().add(out);
+
+    // configure TLS (if present in flow)
+    configureTLS(owner, http);
   }
 
   /**

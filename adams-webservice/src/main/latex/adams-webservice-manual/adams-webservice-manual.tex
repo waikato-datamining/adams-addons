@@ -44,7 +44,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2012-2017} &
+		\parbox[c][2cm]{2cm}{\copyright 2012-2019} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -371,6 +371,16 @@ public class CustomersByName extends AbstractWebServiceClientTransformer<String,
 }
 \end{verbatim}
 }
+
+\subsubsection{TLS support}
+TLS support is automatically configured when using the \verb|WebserviceUtils.configureClient|
+method, as long as the following standalones are present:
+\begin{tight_itemize}
+  \item \textit{KeyManager}
+  \item \textit{TrustManager}
+  \item \textit{SSLContext} -- optional, only used to determine the version of the
+  TLS protocol (fallback is \textit{TSL}).
+\begin{tight_itemize}
 
 \subsection{Callable transformer support}
 \label{webservice_callable_transformer}
