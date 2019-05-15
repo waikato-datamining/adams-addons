@@ -15,7 +15,7 @@
 
 /*
  * HeatmapPanel.java
- * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.heatmap;
 
@@ -36,6 +36,7 @@ import adams.gui.core.BaseSplitPane;
 import adams.gui.core.BaseTabbedPane;
 import adams.gui.core.BaseTabbedPaneWithTabHiding;
 import adams.gui.core.ColorHelper;
+import adams.gui.core.KnownParentSupporter;
 import adams.gui.core.SearchPanel;
 import adams.gui.core.SearchPanel.LayoutType;
 import adams.gui.core.SpreadSheetTable;
@@ -57,6 +58,7 @@ import adams.gui.visualization.report.ReportFactory;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.HashSet;
@@ -70,7 +72,7 @@ import java.util.List;
  */
 public class HeatmapPanel
   extends BasePanel
-  implements ImagePanelSelectionListener {
+  implements ImagePanelSelectionListener, KnownParentSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = 1897625268125110563L;
@@ -223,6 +225,16 @@ public class HeatmapPanel
    */
   public HeatmapViewerPanel getOwner() {
     return m_Owner;
+  }
+
+  /**
+   * Returns the component that acts as this component's parent.
+   *
+   * @return		the parent, null if not available
+   */
+  @Override
+  public Container getKnownParent() {
+    return getOwner();
   }
 
   /**
