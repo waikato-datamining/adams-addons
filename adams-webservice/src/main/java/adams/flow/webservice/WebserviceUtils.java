@@ -89,7 +89,7 @@ public class WebserviceUtils {
    * @param http	the HTTP conduit to configure
    * @return		whether successfully enabled TLS
    */
-  public static boolean configureTLS(Actor owner, HTTPConduit http) {
+  public static boolean configureClientTLS(Actor owner, HTTPConduit http) {
     KeyManager 		keyManager;
     TrustManager 	trustManager;
     SSLContext		sslContext;
@@ -218,7 +218,7 @@ public class WebserviceUtils {
       client.getOutInterceptors().add(out);
 
     // configure TLS (if present in flow)
-    configureTLS(owner, http);
+    configureClientTLS(owner, http);
   }
 
   /**
