@@ -119,8 +119,12 @@ The following sinks are available:
 
 The following control actors are available:
 \begin{verbatim}
-  \item \textit{RabbitMQRemoteSubProcess} -- encapsulates the sub-actors and
-  sends them for executing via a RabbitMQ queue.
+  \item \textit{RabbitMQRemoteSubProcess} -- executes the sub-actors remotely
+  for processing the input, forwards the generated output.
+  \item \textit{RabbitMQRemoteTee} -- executes the sub-actors remotely
+  for processing the input, forwards the input.
+  \item \textit{RabbitMQRemoteTrigger} -- executes the sub-actors remotely,
+  forwards the input.
 \end{verbatim}
 
 The following conversions are available:

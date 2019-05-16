@@ -14,14 +14,12 @@
  */
 
 /*
- * RabbitMQRemoteSubProcess.java
+ * RabbitMQRemoteTee.java
  * Copyright (C) 2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.control;
 
-import adams.core.MessageCollection;
-import adams.core.Utils;
 import adams.flow.container.EncapsulatedActorsContainer;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorExecution;
@@ -30,85 +28,22 @@ import adams.flow.core.ActorUtils;
 import adams.flow.core.EncapsulateActors;
 import adams.flow.core.InputConsumer;
 import adams.flow.core.OutputProducer;
-import adams.flow.core.Token;
 import adams.flow.core.Unknown;
 import com.rabbitmq.client.DeliverCallback;
 
 /**
  <!-- globalinfo-start -->
- * Encapsulates a sequence of actors to be executed remotely. The first actor must accept input and the last one must produce output.
- * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
- * Input&#47;output:<br>
- * - accepts:<br>
- * &nbsp;&nbsp;&nbsp;adams.flow.core.Unknown<br>
- * - generates:<br>
- * &nbsp;&nbsp;&nbsp;adams.flow.core.Unknown<br>
- * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->
- * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
- * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
- * &nbsp;&nbsp;&nbsp;default: WARNING
- * </pre>
- *
- * <pre>-name &lt;java.lang.String&gt; (property: name)
- * &nbsp;&nbsp;&nbsp;The name of the actor.
- * &nbsp;&nbsp;&nbsp;default: RabbitMQRemoteSubProcess
- * </pre>
- *
- * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
- * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
- * &nbsp;&nbsp;&nbsp;default:
- * </pre>
- *
- * <pre>-skip &lt;boolean&gt; (property: skip)
- * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded
- * &nbsp;&nbsp;&nbsp;as it is.
- * &nbsp;&nbsp;&nbsp;default: false
- * </pre>
- *
- * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
- * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
- * &nbsp;&nbsp;&nbsp;actors.
- * &nbsp;&nbsp;&nbsp;default: false
- * </pre>
- *
- * <pre>-silent &lt;boolean&gt; (property: silent)
- * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
- * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
- * &nbsp;&nbsp;&nbsp;default: false
- * </pre>
- *
- * <pre>-actor &lt;adams.flow.core.Actor&gt; [-actor ...] (property: actors)
- * &nbsp;&nbsp;&nbsp;The actors to execute remotely.
- * &nbsp;&nbsp;&nbsp;default:
- * </pre>
- *
- * <pre>-storage-name &lt;adams.flow.control.StorageName&gt; [-storage-name ...] (property: storageNames)
- * &nbsp;&nbsp;&nbsp;The (optional) storage items to transfer.
- * &nbsp;&nbsp;&nbsp;default:
- * </pre>
- *
- * <pre>-variable-name &lt;adams.core.VariableName&gt; [-variable-name ...] (property: variableNames)
- * &nbsp;&nbsp;&nbsp;The (optional) variables to transfer.
- * &nbsp;&nbsp;&nbsp;default:
- * </pre>
- *
- * <pre>-queue &lt;java.lang.String&gt; (property: queue)
- * &nbsp;&nbsp;&nbsp;The name of the queue.
- * &nbsp;&nbsp;&nbsp;default:
- * </pre>
- *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class RabbitMQRemoteSubProcess
+public class RabbitMQRemoteTee
   extends AbstractRabbitMQControlActor
   implements InputConsumer, OutputProducer {
 
@@ -122,8 +57,8 @@ public class RabbitMQRemoteSubProcess
   @Override
   public String globalInfo() {
     return
-      "Encapsulates a sequence of actors to be executed remotely. The first actor must accept "
-	+ "input and the last one must produce output.";
+      "Encapsulates a sequence of actors to be executed remotely as a Tee. "
+	+ "The first actor must accept input.";
   }
 
   /**
@@ -197,10 +132,7 @@ public class RabbitMQRemoteSubProcess
    * @return		the Class of the generated tokens
    */
   public Class[] generates() {
-    if (active() > 0)
-      return ((OutputProducer) lastActive()).generates();
-    else
-      return new Class[]{Unknown.class};
+    return new Class[]{Unknown.class};
   }
 
   /**
@@ -217,8 +149,6 @@ public class RabbitMQRemoteSubProcess
     if (result == null) {
       if (!(firstActive() instanceof InputConsumer))
 	result = "First actor ('" + firstActive().getName() + "') does not accept input!";
-      else if (!(lastActive() instanceof OutputProducer))
-	result = "Last actor ('" + lastActive().getName() + "') does not generate output!";
     }
 
     return result;
@@ -230,11 +160,11 @@ public class RabbitMQRemoteSubProcess
    * @return		the generated container
    */
   protected EncapsulatedActorsContainer encapsulate() {
-    SubProcess	sub;
+    Tee		sub;
     int		i;
 
     // generate subflow
-    sub = new SubProcess();
+    sub = new Tee();
     sub.setName("source: " + getFullName());
     for (i = 0; i < size(); i++)
       sub.add(get(i).shallowCopy(false));
@@ -254,35 +184,8 @@ public class RabbitMQRemoteSubProcess
     DeliverCallback 	result;
 
     result = (consumerTag, delivery) -> {
-      try {
-	adams.core.net.rabbitmq.receive.BinaryConverter recv = new adams.core.net.rabbitmq.receive.BinaryConverter();
-	byte[] dataRec = delivery.getBody();
-	MessageCollection errorsRec = new MessageCollection();
-	Object objRec = recv.convert(dataRec, errorsRec);
-	if (objRec != null) {
-	  if (objRec instanceof EncapsulatedActorsContainer) {
-	    EncapsulatedActorsContainer contRec = (EncapsulatedActorsContainer) objRec;
-	    if (contRec.hasValue(EncapsulatedActorsContainer.VALUE_OUTPUT)) {
-	      Object generated = contRec.getValue(EncapsulatedActorsContainer.VALUE_OUTPUT);
-	      if (isLoggingEnabled())
-		getLogger().info("Received: " + generated);
-	      m_OutputToken = new Token(generated);
-	    }
-	    else {
-	      getLogger().warning("Did not receive any generated output!");
-	    }
-	  }
-	  else {
-	    getLogger().severe("Expected " + Utils.classToString(EncapsulatedActorsContainer.class) + " but received " + Utils.classToString(objRec) + " back!");
-	  }
-	}
-      }
-      catch (Exception e) {
-	handleException("Failed to process received data!", e);
-      }
-      finally {
-	m_Processing = null;
-      }
+      m_OutputToken = m_InputToken;
+      m_Processing = null;
     };
 
     return result;
