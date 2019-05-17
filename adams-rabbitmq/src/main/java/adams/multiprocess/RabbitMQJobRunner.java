@@ -58,6 +58,12 @@ public class RabbitMQJobRunner<T extends Job>
   /** the queue in use. */
   protected String m_Queue;
 
+  /** the converter for sending. */
+  protected adams.core.net.rabbitmq.send.AbstractConverter m_SendConverter;
+
+  /** the converter for receiving. */
+  protected adams.core.net.rabbitmq.receive.AbstractConverter m_ReceiveConverter;
+
   /** whether to distribute the jobs or run them on the same machine. */
   protected boolean m_DistributeJobs;
 
@@ -103,6 +109,14 @@ public class RabbitMQJobRunner<T extends Job>
     m_OptionManager.add(
       "queue", "queue",
       "");
+
+    m_OptionManager.add(
+      "send-converter", "sendConverter",
+      new adams.core.net.rabbitmq.send.BinaryConverter());
+
+    m_OptionManager.add(
+      "receive-converter", "receiveConverter",
+      new adams.core.net.rabbitmq.receive.BinaryConverter());
 
     m_OptionManager.add(
       "distribute-jobs", "distributeJobs",
@@ -178,6 +192,64 @@ public class RabbitMQJobRunner<T extends Job>
   }
 
   /**
+   * Sets the converter to use for sending.
+   *
+   * @param value	the converter
+   */
+  public void setSendConverter(adams.core.net.rabbitmq.send.AbstractConverter value) {
+    m_SendConverter = value;
+    reset();
+  }
+
+  /**
+   * Returns the converter to use for sending.
+   *
+   * @return 		the converter
+   */
+  public adams.core.net.rabbitmq.send.AbstractConverter getSendConverter() {
+    return m_SendConverter;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String sendConverterTipText() {
+    return "The converter to use for sending.";
+  }
+
+  /**
+   * Sets the converter to use for receiving.
+   *
+   * @param value	the converter
+   */
+  public void setReceiveConverter(adams.core.net.rabbitmq.receive.AbstractConverter value) {
+    m_ReceiveConverter = value;
+    reset();
+  }
+
+  /**
+   * Returns the converter to use for receiving.
+   *
+   * @return 		the converter
+   */
+  public adams.core.net.rabbitmq.receive.AbstractConverter getReceiveConverter() {
+    return m_ReceiveConverter;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String receiveConverterTipText() {
+    return "The converter to use for receiving data.";
+  }
+
+  /**
    * Sets whether to distribute the jobs via separate messages.
    *
    * @param value	true if to distribute
@@ -216,6 +288,8 @@ public class RabbitMQJobRunner<T extends Job>
 
     result  = QuickInfoHelper.toString(this, "connectionFactory", m_ConnectionFactory, "connection: ");
     result += QuickInfoHelper.toString(this, "queue", m_Queue, ", queue: ");
+    result += QuickInfoHelper.toString(this, "sendConverter", m_SendConverter, ", send: ");
+    result += QuickInfoHelper.toString(this, "receiveConverter", m_ReceiveConverter, ", receive: ");
     result += QuickInfoHelper.toString(this, "distributeJobs", m_DistributeJobs, "distribute jobs", ", ");
 
     return result;
@@ -286,13 +360,12 @@ public class RabbitMQJobRunner<T extends Job>
    */
   @Override
   protected String doStart() {
-    String						result;
-    adams.core.net.rabbitmq.send.BinaryConverter 	convSnd;
-    byte[]						ser;
-    MessageCollection					errors;
-    List<byte[]>					runners;
-    LocalJobRunner 					runner;
-    BasicProperties 					props;
+    String		result;
+    byte[]		ser;
+    MessageCollection	errors;
+    List<byte[]>	runners;
+    LocalJobRunner 	runner;
+    BasicProperties 	props;
 
     result = null;
 
@@ -309,7 +382,6 @@ public class RabbitMQJobRunner<T extends Job>
     m_Processing = new HashSet<>();
     runners      = new ArrayList<>();
     if (result == null) {
-      convSnd = new adams.core.net.rabbitmq.send.BinaryConverter();
       errors  = new MessageCollection();
       if (m_DistributeJobs) {
 	for (Enumerated<T> enm : enumerate(getJobs())) {
@@ -317,7 +389,7 @@ public class RabbitMQJobRunner<T extends Job>
 	  runner.getMetaData().put("index", enm.index);
 	  runner.add(enm.value);
 	  m_Processing.add(enm.index);
-	  ser = convSnd.convert(runner, errors);
+	  ser = m_SendConverter.convert(runner, errors);
 	  if (ser != null)
 	    runners.add(ser);
 	}
@@ -328,7 +400,7 @@ public class RabbitMQJobRunner<T extends Job>
 	  runner.add(job);
 	runner.getMetaData().put("index", 0);
         m_Processing.add(0);
-	ser = convSnd.convert(runner, errors);
+	ser = m_SendConverter.convert(runner, errors);
 	if (ser != null)
 	  runners.add(ser);
       }
@@ -415,20 +487,18 @@ public class RabbitMQJobRunner<T extends Job>
    */
   @Override
   protected String doStop() {
-    String						result;
-    adams.core.net.rabbitmq.receive.BinaryConverter	convRec;
-    DeliverCallback 					deliverCallback;
-    String						msg;
+    String		result;
+    DeliverCallback 	deliverCallback;
+    String		msg;
 
     result = null;
 
     // receive
-    convRec = new adams.core.net.rabbitmq.receive.BinaryConverter();
     try {
       deliverCallback = (consumerTag, delivery) -> {
 	byte[] dataRec = delivery.getBody();
 	MessageCollection errorsRec = new MessageCollection();
-	LocalJobRunner jobrunner = (LocalJobRunner) convRec.convert(dataRec, errorsRec);
+	LocalJobRunner jobrunner = (LocalJobRunner) m_ReceiveConverter.convert(dataRec, errorsRec);
 	if (jobrunner != null) {
 	  Integer index = (Integer) jobrunner.getMetaData().get("index");
 	  if (index != null) {
