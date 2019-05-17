@@ -21,6 +21,7 @@
 package adams.flow.control;
 
 import adams.core.MessageCollection;
+import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.flow.container.EncapsulatedActorsContainer;
 import adams.flow.core.Actor;
@@ -104,6 +105,16 @@ import com.rabbitmq.client.DeliverCallback;
  * &nbsp;&nbsp;&nbsp;default:
  * </pre>
  *
+ * <pre>-send-converter &lt;adams.core.net.rabbitmq.send.AbstractConverter&gt; (property: sendConverter)
+ * &nbsp;&nbsp;&nbsp;The converter to use for sending.
+ * &nbsp;&nbsp;&nbsp;default: adams.core.net.rabbitmq.send.BinaryConverter
+ * </pre>
+ *
+ * <pre>-receive-converter &lt;adams.core.net.rabbitmq.receive.AbstractConverter&gt; (property: receiveConverter)
+ * &nbsp;&nbsp;&nbsp;The converter to use for receiving data.
+ * &nbsp;&nbsp;&nbsp;default: adams.core.net.rabbitmq.receive.BinaryConverter
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -113,6 +124,9 @@ public class RabbitMQRemoteSubProcess
   implements InputConsumer, OutputProducer {
 
   private static final long serialVersionUID = 5816569944356142679L;
+
+  /** the converter for receiving. */
+  protected adams.core.net.rabbitmq.receive.AbstractConverter m_ReceiveConverter;
 
   /**
    * Returns a string describing the object.
@@ -124,6 +138,62 @@ public class RabbitMQRemoteSubProcess
     return
       "Encapsulates a sequence of actors to be executed remotely. The first actor must accept "
 	+ "input and the last one must produce output.";
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "receive-converter", "receiveConverter",
+      new adams.core.net.rabbitmq.receive.BinaryConverter());
+  }
+
+  /**
+   * Sets the converter to use for receiving.
+   *
+   * @param value	the converter
+   */
+  public void setReceiveConverter(adams.core.net.rabbitmq.receive.AbstractConverter value) {
+    m_ReceiveConverter = value;
+    reset();
+  }
+
+  /**
+   * Returns the converter to use for receiving.
+   *
+   * @return 		the converter
+   */
+  public adams.core.net.rabbitmq.receive.AbstractConverter getReceiveConverter() {
+    return m_ReceiveConverter;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String receiveConverterTipText() {
+    return "The converter to use for receiving data.";
+  }
+
+  /**
+   * Returns a quick info about the actor, which will be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    String	result;
+
+    result  = super.getQuickInfo();
+    result += QuickInfoHelper.toString(this, "receiveConverter", m_ReceiveConverter, ", receive: ");
+
+    return result;
   }
 
   /**
@@ -255,10 +325,9 @@ public class RabbitMQRemoteSubProcess
 
     result = (consumerTag, delivery) -> {
       try {
-	adams.core.net.rabbitmq.receive.BinaryConverter recv = new adams.core.net.rabbitmq.receive.BinaryConverter();
 	byte[] dataRec = delivery.getBody();
 	MessageCollection errorsRec = new MessageCollection();
-	Object objRec = recv.convert(dataRec, errorsRec);
+	Object objRec = m_ReceiveConverter.convert(dataRec, errorsRec);
 	if (objRec != null) {
 	  if (objRec instanceof EncapsulatedActorsContainer) {
 	    EncapsulatedActorsContainer contRec = (EncapsulatedActorsContainer) objRec;

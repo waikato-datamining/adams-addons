@@ -75,6 +75,9 @@ public abstract class AbstractRabbitMQControlActor
   /** the name of the queue. */
   protected String m_Queue;
 
+  /** the converter for sending. */
+  protected adams.core.net.rabbitmq.send.AbstractConverter m_SendConverter;
+
   /** the connection in use. */
   protected transient RabbitMQConnection m_Connection;
 
@@ -106,6 +109,10 @@ public abstract class AbstractRabbitMQControlActor
     m_OptionManager.add(
       "queue", "queue",
       "");
+
+    m_OptionManager.add(
+      "send-converter", "sendConverter",
+      new adams.core.net.rabbitmq.send.BinaryConverter());
   }
 
   /**
@@ -245,6 +252,35 @@ public abstract class AbstractRabbitMQControlActor
   }
 
   /**
+   * Sets the converter to use for sending.
+   *
+   * @param value	the converter
+   */
+  public void setSendConverter(adams.core.net.rabbitmq.send.AbstractConverter value) {
+    m_SendConverter = value;
+    reset();
+  }
+
+  /**
+   * Returns the converter to use for sending.
+   *
+   * @return 		the converter
+   */
+  public adams.core.net.rabbitmq.send.AbstractConverter getSendConverter() {
+    return m_SendConverter;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String sendConverterTipText() {
+    return "The converter to use for sending.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -256,6 +292,7 @@ public abstract class AbstractRabbitMQControlActor
 
     value  = super.getQuickInfo();
     result = QuickInfoHelper.toString(this, "queue", (m_Queue.isEmpty() ? "-empty-" : m_Queue), "queue: ");
+    result += QuickInfoHelper.toString(this, "sendConverter", m_SendConverter, ", send: ");
     if (value != null)
       result += ", " + value;
 
@@ -532,14 +569,13 @@ public abstract class AbstractRabbitMQControlActor
    */
   @Override
   protected String doExecute() {
-    String						result;
-    EncapsulatedActorsContainer				cont;
-    adams.core.net.rabbitmq.send.BinaryConverter	send;
-    String 						callbackQueue;
-    BasicProperties props;
-    MessageCollection 					errorsSnd;
-    byte[] 						dataSnd;
-    DeliverCallback 					deliverCallback;
+    String			result;
+    EncapsulatedActorsContainer	cont;
+    String 			callbackQueue;
+    BasicProperties 		props;
+    MessageCollection 		errorsSnd;
+    byte[] 			dataSnd;
+    DeliverCallback 		deliverCallback;
 
     result = null;
 
@@ -553,9 +589,8 @@ public abstract class AbstractRabbitMQControlActor
       cont = encapsulate();
 
       // convert input data
-      send = new adams.core.net.rabbitmq.send.BinaryConverter();
       errorsSnd = new MessageCollection();
-      dataSnd = send.convert(cont, errorsSnd);
+      dataSnd = m_SendConverter.convert(cont, errorsSnd);
       if (!errorsSnd.isEmpty())
 	result = errorsSnd.toString();
 
