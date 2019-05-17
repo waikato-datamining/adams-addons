@@ -149,6 +149,21 @@ the RabbitMQ server, then you need to configure your server for that (see
   \item \textit{SSLConnectionFactory}
 \end{tight_itemize}
 
+\section{Large payloads}
+In theory, you can use RabbitMQ to send any amount of data. However, queues
+may be constrained in disk size and sending large amounts (e.g., processing
+large datasets) will also slow down the overall performance of the message broker.
+
+As long as the sending and receiving ends have access to the same shared directory,
+it is possible to exchange the actual payload via this directory and only send
+the filename via the message broker. For this scenario, you can use the following
+converters:
+\begin{tight_itemize}
+  \item adams.core.net.rabbitmq.send.FileBasedConverter
+  \item adams.core.net.rabbitmq.receive.FileBasedConverter
+\end{tight_itemize}
+The receiving converter automatically deletes the payload file ones read
+successfully.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
