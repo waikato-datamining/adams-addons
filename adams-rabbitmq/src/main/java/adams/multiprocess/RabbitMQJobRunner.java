@@ -347,7 +347,6 @@ public class RabbitMQJobRunner<T extends Job>
       }
     }
 
-
     return result;
   }
 
@@ -478,6 +477,8 @@ public class RabbitMQJobRunner<T extends Job>
   protected void close() {
     RabbitMQHelper.closeQuietly(m_Channel);
     RabbitMQHelper.closeQuietly(m_Connection);
+    m_Channel    = null;
+    m_Connection = null;
   }
 
   /**
