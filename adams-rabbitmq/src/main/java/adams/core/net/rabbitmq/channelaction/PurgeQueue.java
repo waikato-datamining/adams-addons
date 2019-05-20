@@ -14,7 +14,7 @@
  */
 
 /*
- * DeleteQueue.java
+ * PurgeQueue.java
  * Copyright (C) 2019 University of Waikato, Hamilton, NZ
  */
 
