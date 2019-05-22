@@ -80,6 +80,13 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: adams.core.net.rabbitmq.connection.GuestConnectionFactory
  * </pre>
  *
+ * <pre>-prefetch-count &lt;int&gt; (property: prefetchCount)
+ * &nbsp;&nbsp;&nbsp;The number of un-acked jobs a client can pull off a queue; 0 = unlimited,
+ * &nbsp;&nbsp;&nbsp; 1 = fair.
+ * &nbsp;&nbsp;&nbsp;default: 1
+ * &nbsp;&nbsp;&nbsp;minimum: 0
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -92,6 +99,9 @@ public class RabbitMQConnection
 
   /** the connection to use. */
   protected AbstractConnectionFactory m_ConnectionFactory;
+
+  /** the prefetch count. */
+  protected int m_PrefetchCount;
 
   /** the connection. */
   protected transient com.rabbitmq.client.Connection m_Connection;
@@ -119,6 +129,10 @@ public class RabbitMQConnection
     m_OptionManager.add(
       "connection-factory", "connectionFactory",
       new GuestConnectionFactory());
+
+    m_OptionManager.add(
+      "prefetch-count", "prefetchCount",
+      1, 0, null);
   }
 
   /**
@@ -138,7 +152,12 @@ public class RabbitMQConnection
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "connectionFactory", m_ConnectionFactory);
+    String  result;
+
+    result = QuickInfoHelper.toString(this, "connectionFactory", m_ConnectionFactory);
+    result += QuickInfoHelper.toString(this, "prefetchCount", (m_PrefetchCount == 0 ? "unlimited" : "" + m_PrefetchCount), ", prefetch: ");
+
+    return result;
   }
 
   /**
@@ -168,6 +187,35 @@ public class RabbitMQConnection
    */
   public String connectionFactoryTipText() {
     return "The connection factory to use.";
+  }
+
+  /**
+   * Sets the maximum number of unacked jobs a client can pull off a queue.
+   *
+   * @param value	the count, 0 = unlimited, 1 = fair
+   */
+  public void setPrefetchCount(int value) {
+    m_PrefetchCount = value;
+    reset();
+  }
+
+  /**
+   * Returns the maximum number of unacked jobs a client can pull off a queue.
+   *
+   * @return		the count, 0 = unlimited, 1 = fair
+   */
+  public int getPrefetchCount() {
+    return m_PrefetchCount;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String prefetchCountTipText() {
+    return "The number of un-acked jobs a client can pull off a queue; 0 = unlimited, 1 = fair.";
   }
 
   /**
@@ -238,7 +286,7 @@ public class RabbitMQConnection
    * @return		the channel, null if failed to create or no connection available
    */
   public Channel createChannel() {
-    return RabbitMQHelper.createChannel(this, getConnection());
+    return RabbitMQHelper.createChannel(this, getConnection(), m_PrefetchCount);
   }
 
   /**

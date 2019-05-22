@@ -47,6 +47,9 @@ public class RabbitMQConnection
   /** the connection to use. */
   protected AbstractConnectionFactory m_ConnectionFactory;
 
+  /** the prefetch count. */
+  protected int m_PrefetchCount;
+
   /** the name of the exchange. */
   protected String m_Exchange;
 
@@ -82,6 +85,10 @@ public class RabbitMQConnection
     m_OptionManager.add(
       "connection-factory", "connectionFactory",
       new GuestConnectionFactory());
+
+    m_OptionManager.add(
+      "prefetch-count", "prefetchCount",
+      1, 0, null);
 
     m_OptionManager.add(
       "exchange", "exchange",
@@ -123,6 +130,35 @@ public class RabbitMQConnection
    */
   public String connectionFactoryTipText() {
     return "The connection factory to use.";
+  }
+
+  /**
+   * Sets the maximum number of unacked jobs a client can pull off a queue.
+   *
+   * @param value	the count, 0 = unlimited, 1 = fair
+   */
+  public void setPrefetchCount(int value) {
+    m_PrefetchCount = value;
+    reset();
+  }
+
+  /**
+   * Returns the maximum number of unacked jobs a client can pull off a queue.
+   *
+   * @return		the count, 0 = unlimited, 1 = fair
+   */
+  public int getPrefetchCount() {
+    return m_PrefetchCount;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String prefetchCountTipText() {
+    return "The number of un-acked jobs a client can pull off a queue; 0 = unlimited, 1 = fair.";
   }
 
   /**
@@ -222,6 +258,7 @@ public class RabbitMQConnection
     String	result;
 
     result  = QuickInfoHelper.toString(this, "connectionFactory", m_ConnectionFactory, "connection: ");
+    result += QuickInfoHelper.toString(this, "prefetchCount", (m_PrefetchCount == 0 ? "unlimited" : "" + m_PrefetchCount), ", prefetch: ");
     result += QuickInfoHelper.toString(this, "exchange", (m_Exchange.isEmpty() ? "-empty-" : m_Exchange), ", exchange: ");
     result += QuickInfoHelper.toString(this, "queue", (m_Queue.isEmpty() ? "-empty-" : m_Queue), ", queue: ");
     result += QuickInfoHelper.toString(this, "sendConverter", m_SendConverter, ", send: ");
@@ -260,6 +297,8 @@ public class RabbitMQConnection
 	m_Channel = m_Connection.createChannel();
 	if (m_Channel == null)
 	  result = "Failed to create a channel!";
+	else
+	  m_Channel.basicQos(m_PrefetchCount);
       }
       catch (Exception e) {
 	result = Utils.handleException(this, "Failed to create channel!", e);

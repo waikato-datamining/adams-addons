@@ -53,6 +53,9 @@ public class RabbitMQScriptingEngine
   /** the connection to use. */
   protected AbstractConnectionFactory m_ConnectionFactory;
 
+  /** the prefetch count. */
+  protected int m_PrefetchCount;
+
   /** the action to execute. */
   protected AbstractChannelAction m_Action;
 
@@ -110,6 +113,10 @@ public class RabbitMQScriptingEngine
       new GuestConnectionFactory());
 
     m_OptionManager.add(
+      "prefetch-count", "prefetchCount",
+      1, 0, null);
+
+    m_OptionManager.add(
       "action", "action",
       new NoAction());
 
@@ -153,6 +160,35 @@ public class RabbitMQScriptingEngine
    */
   public String connectionFactoryTipText() {
     return "The connection factory to use.";
+  }
+
+  /**
+   * Sets the maximum number of unacked jobs a client can pull off a queue.
+   *
+   * @param value	the count, 0 = unlimited, 1 = fair
+   */
+  public void setPrefetchCount(int value) {
+    m_PrefetchCount = value;
+    reset();
+  }
+
+  /**
+   * Returns the maximum number of unacked jobs a client can pull off a queue.
+   *
+   * @return		the count, 0 = unlimited, 1 = fair
+   */
+  public int getPrefetchCount() {
+    return m_PrefetchCount;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String prefetchCountTipText() {
+    return "The number of un-acked jobs a client can pull off a queue; 0 = unlimited, 1 = fair.";
   }
 
   /**
@@ -312,6 +348,8 @@ public class RabbitMQScriptingEngine
 	m_Channel = m_Connection.createChannel();
 	if (m_Channel == null)
 	  result = "Failed to create a channel!";
+	else
+	  m_Channel.basicQos(m_PrefetchCount);
       }
       catch (Exception e) {
 	result = Utils.handleException(this, "Failed to create channel!", e);

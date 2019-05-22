@@ -38,10 +38,11 @@ public class RabbitMQHelper {
    * Creates a new channel and returns it.
    *
    * @param connection 	the connection to use
+   * @param prefetchCount 	how many jobs a client can pull off queue before having to ack them, 0 is unlimited
    * @return		the channel, null if failed to create or no connection available
    */
-  public static Channel createChannel(Connection connection) {
-    return createChannel(null, connection);
+  public static Channel createChannel(Connection connection, int prefetchCount) {
+    return createChannel(null, connection, prefetchCount);
   }
 
   /**
@@ -49,18 +50,28 @@ public class RabbitMQHelper {
    *
    * @param logging 	for logging errors
    * @param connection 	the connection to use
+   * @param prefetchCount 	how many jobs a client can pull off queue before having to ack them, 0 is unlimited
    * @return		the channel, null if failed to create or no connection available
    */
-  public static Channel createChannel(LoggingSupporter logging, Connection connection) {
+  public static Channel createChannel(LoggingSupporter logging, Connection connection, int prefetchCount) {
+    Channel	result;
+
+    result = null;
+    if (prefetchCount < 0)
+      prefetchCount = 0;
+
     try {
-      if (connection != null)
-	return connection.createChannel();
+      if (connection != null) {
+	result = connection.createChannel();
+	result.basicQos(prefetchCount);
+      }
     }
     catch (Exception e) {
       if (logging != null)
 	Utils.handleException(logging, "Failed to create channel!", e);
     }
-    return null;
+
+    return result;
   }
 
   /**
@@ -101,7 +112,7 @@ public class RabbitMQHelper {
       if (connection.isOpen()) {
         // delete auto-created queues
         if ((queues != null) && (queues.size() > 0)) {
-          channel = createChannel(null, connection);
+          channel = createChannel(null, connection, 0);
           if (channel != null) {
 	    for (String queue : queues) {
 	      try {
