@@ -15,7 +15,7 @@
 
 /*
  * EchoServer.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.rest.echo;
@@ -105,6 +105,8 @@ public class EchoServer
     echo.setLoggingLevel(getLoggingLevel());
     factory.setServiceBean(echo);
     factory.setAddress(getURL());
+
+    configureTLS(factory);
 
     return factory.create();
   }

@@ -15,18 +15,25 @@
 
 /*
  * AbstractRESTProvider.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.rest;
 
 import adams.core.Utils;
+import adams.core.base.BaseURL;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.Actor;
+import adams.flow.core.TLSUtils;
 import adams.flow.rest.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.rest.interceptor.outgoing.AbstractOutInterceptorGenerator;
+import adams.flow.standalone.KeyManager;
 import adams.flow.standalone.RESTServer;
+import adams.flow.standalone.SSLContext;
+import adams.flow.standalone.TrustManager;
+import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 
 import java.net.URL;
 import java.util.logging.Level;
@@ -247,6 +254,32 @@ public abstract class AbstractRESTProvider
    */
   protected void configureInterceptors(JAXRSServerFactoryBean factory) {
     RESTUtils.configureFactoryInterceptors(m_Owner, factory, m_InInterceptor, m_OutInterceptor);
+  }
+
+  /**
+   * Configures TLS support (if using https:// and actors present in flow).
+   *
+   * @param factory	the factory to configure
+   * @throws IllegalStateException	if https used but failed to configure TLS params
+   */
+  protected void configureTLS(JAXRSServerFactoryBean factory) throws Exception {
+    TLSServerParameters 		tlsparams;
+    JettyHTTPServerEngineFactory 	jettyFactory;
+    BaseURL 				baseURL;
+
+    if (factory.getAddress().startsWith("https://")) {
+      tlsparams = TLSUtils.configureServerTLS(m_Owner);
+      if (tlsparams != null) {
+	jettyFactory = factory.getBus().getExtension(JettyHTTPServerEngineFactory.class);
+	baseURL = new BaseURL(factory.getAddress());
+	jettyFactory.setTLSServerParametersForPort(baseURL.urlValue().getPort(), tlsparams);
+      }
+      else {
+	throw new IllegalStateException(
+	  "Failed to configure SSL context for '" + factory.getAddress() + "' - missing actors ("
+	    + Utils.classesToString(new Class[]{KeyManager.class, TrustManager.class, SSLContext.class}) + ")?");
+      }
+    }
   }
 
   /**

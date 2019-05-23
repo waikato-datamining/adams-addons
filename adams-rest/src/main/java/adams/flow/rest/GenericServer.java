@@ -15,7 +15,7 @@
 
 /*
  * GenericServer.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.rest;
@@ -198,10 +198,12 @@ public class GenericServer
     factory = new JAXRSServerFactoryBean();
     configureInterceptors(factory);
 
-    plugins = (RESTPlugin[]) ObjectCopyHelper.copyObject(m_Plugins);
+    plugins = ObjectCopyHelper.copyObject(m_Plugins);
     configurePlugins(plugins);
     factory.setServiceBeans(Arrays.asList(plugins));
     factory.setAddress(getURL());
+
+    configureTLS(factory);
 
     return factory.create();
   }
