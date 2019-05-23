@@ -20,6 +20,7 @@
 
 package adams.data.conversion;
 
+import adams.core.Utils;
 import com.rabbitmq.client.AMQP.BasicProperties;
 
 import java.util.HashMap;
@@ -27,7 +28,26 @@ import java.util.Map;
 
 /**
  <!-- globalinfo-start -->
- * Converts RabbitMQ properties into a Java Map.
+ * Converts RabbitMQ properties into a Java Map.<br>
+ * Can be used to obtain the replyto queue name for sending back results.<br>
+ * Available keys:<br>
+ * - AppId<br>
+ * - ClassId<br>
+ * - ClassName<br>
+ * - ClusterId<br>
+ * - ContentEncoding<br>
+ * - ContentType<br>
+ * - CorrelationId<br>
+ * - DeliveryMode<br>
+ * - Expiration<br>
+ * - Headers<br>
+ * - MessageId<br>
+ * - Priority<br>
+ * - ReplyTo<br>
+ * - Timestamp<br>
+ * - Type<br>
+ * - UserId<br>
+ * - BodySize<br>
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -46,6 +66,60 @@ public class RabbitMQPropertiesToMap
 
   private static final long serialVersionUID = 6432647148987897719L;
 
+  public static final String KEY_APP_ID = "AppId";
+
+  public static final String KEY_CLASS_ID = "ClassId";
+
+  public static final String KEY_CLASS_NAME = "ClassName";
+
+  public static final String KEY_CLUSTER_ID = "ClusterId";
+
+  public static final String KEY_CONTENT_ENCODING = "ContentEncoding";
+
+  public static final String KEY_CONTENT_TYPE = "ContentType";
+
+  public static final String KEY_CORRELATION_ID = "CorrelationId";
+
+  public static final String KEY_DELIVERY_MODE = "DeliveryMode";
+
+  public static final String KEY_EXPIRATION = "Expiration";
+
+  public static final String KEY_HEADERS = "Headers";
+
+  public static final String KEY_MESSAGE_ID = "MessageId";
+
+  public static final String KEY_PRIORITY = "Priority";
+
+  public static final String KEY_REPLY_TO = "ReplyTo";
+
+  public static final String KEY_TIMESTAMP = "Timestamp";
+
+  public static final String KEY_TYPE = "Type";
+
+  public static final String KEY_USER_ID = "UserId";
+
+  public static final String KEY_BODY_SIZE = "BodySize";
+
+  public final static String[] KEYS = {
+    KEY_APP_ID,
+    KEY_CLASS_ID,
+    KEY_CLASS_NAME,
+    KEY_CLUSTER_ID,
+    KEY_CONTENT_ENCODING,
+    KEY_CONTENT_TYPE,
+    KEY_CORRELATION_ID,
+    KEY_DELIVERY_MODE,
+    KEY_EXPIRATION,
+    KEY_HEADERS,
+    KEY_MESSAGE_ID,
+    KEY_PRIORITY,
+    KEY_REPLY_TO,
+    KEY_TIMESTAMP,
+    KEY_TYPE,
+    KEY_USER_ID,
+    KEY_BODY_SIZE,
+  };
+
   /**
    * Returns a string describing the object.
    *
@@ -53,7 +127,9 @@ public class RabbitMQPropertiesToMap
    */
   @Override
   public String globalInfo() {
-    return "Converts RabbitMQ properties into a Java Map.";
+    return "Converts RabbitMQ properties into a Java Map.\n"
+      + "Can be used to obtain the replyto queue name for sending back results.\n"
+      + "Available keys:\n" + Utils.commentOut(Utils.flatten(KEYS, "\n"), "- ");
   }
 
   /**
@@ -89,23 +165,23 @@ public class RabbitMQPropertiesToMap
 
     result = new HashMap<>();
     props  = (BasicProperties) m_Input;
-    result.put("AppId", props.getAppId());
-    result.put("ClassId", props.getClassId());
-    result.put("ClassName", props.getClassName());
-    result.put("ClusterId", props.getClusterId());
-    result.put("ContentEncoding", props.getContentEncoding());
-    result.put("ContentType", props.getContentType());
-    result.put("CorrelationId", props.getCorrelationId());
-    result.put("DeliveryMode", props.getDeliveryMode());
-    result.put("Expiration", props.getExpiration());
-    result.put("Headers", props.getHeaders());
-    result.put("MessageId", props.getMessageId());
-    result.put("Priority", props.getPriority());
-    result.put("ReplyTo", props.getReplyTo());
-    result.put("Timestamp", props.getTimestamp());
-    result.put("Type", props.getType());
-    result.put("UserId", props.getUserId());
-    result.put("BodySize", props.getBodySize());
+    result.put(KEY_APP_ID, props.getAppId());
+    result.put(KEY_CLASS_ID, props.getClassId());
+    result.put(KEY_CLASS_NAME, props.getClassName());
+    result.put(KEY_CLUSTER_ID, props.getClusterId());
+    result.put(KEY_CONTENT_ENCODING, props.getContentEncoding());
+    result.put(KEY_CONTENT_TYPE, props.getContentType());
+    result.put(KEY_CORRELATION_ID, props.getCorrelationId());
+    result.put(KEY_DELIVERY_MODE, props.getDeliveryMode());
+    result.put(KEY_EXPIRATION, props.getExpiration());
+    result.put(KEY_HEADERS, props.getHeaders());
+    result.put(KEY_MESSAGE_ID, props.getMessageId());
+    result.put(KEY_PRIORITY, props.getPriority());
+    result.put(KEY_REPLY_TO, props.getReplyTo());
+    result.put(KEY_TIMESTAMP, props.getTimestamp());
+    result.put(KEY_TYPE, props.getType());
+    result.put(KEY_USER_ID, props.getUserId());
+    result.put(KEY_BODY_SIZE, props.getBodySize());
 
     return result;
   }

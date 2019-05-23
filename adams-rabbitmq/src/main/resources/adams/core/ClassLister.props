@@ -14,6 +14,10 @@ adams.core.net.rabbitmq.connection.AbstractConnectionFactory=\
 adams.core.net.rabbitmq.channelaction.AbstractChannelAction=\
   adams.core.net.rabbitmq.channelaction
 
+# the message delivery actions
+adams.core.net.rabbitmq.deliveryaction.AbstractDeliveryAction=\
+  adams.core.net.rabbitmq.deliveryaction
+
 # the send converters
 adams.core.net.rabbitmq.send.AbstractConverter=\
   adams.core.net.rabbitmq.send

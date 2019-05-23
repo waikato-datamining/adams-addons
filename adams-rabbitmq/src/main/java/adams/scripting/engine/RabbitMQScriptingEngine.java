@@ -77,6 +77,9 @@ public class RabbitMQScriptingEngine
   /** the data that has been received. */
   protected ArrayBlockingQueue<Object> m_Data;
 
+  /** the ack tags that have been received. */
+  protected ArrayBlockingQueue<Long> m_Tags;
+
   /** the internal timeout interval for polling the queue in msec. */
   protected int m_PollTimeout;
 
@@ -98,6 +101,7 @@ public class RabbitMQScriptingEngine
     super.initialize();
 
     m_Data        = null;
+    m_Tags        = null;
     m_PollTimeout = 100;
   }
 
@@ -366,11 +370,15 @@ public class RabbitMQScriptingEngine
    * Handles the received object.
    *
    * @param data	the data received
+   * @param tag		the tag to use for the ack
    */
-  protected void handleMessage(Object data) {
+  protected void handleMessage(Object data, Long tag) {
+    boolean		ack;
     RemoteCommand 	cmd;
     MessageCollection	errors;
     String		msg;
+
+    ack = false;
 
     // instantiate command
     errors = new MessageCollection();
@@ -387,12 +395,23 @@ public class RabbitMQScriptingEngine
       msg = m_CommandHandler.handle(cmd, m_CommandProcessor);
       if (msg != null)
 	getLogger().severe("Failed to handle command:\n" + msg);
+      else
+        ack = true;
     }
     else {
       if (!errors.isEmpty())
 	getLogger().severe("Failed to parse command:\n" + errors.toString());
       else
 	getLogger().severe("Failed to parse command:\n" + data);
+    }
+
+    if (ack && (tag != null)) {
+      try {
+	m_Channel.basicAck(tag, false);
+      }
+      catch (Exception e) {
+        getLogger().log(Level.SEVERE, "Failed to send ack!", e);
+      }
     }
   }
 
@@ -408,6 +427,7 @@ public class RabbitMQScriptingEngine
     DeliverCallback 	deliverCallback;
     String 		queue;
     Object		data;
+    Long		tag;
 
     m_Paused  = false;
     m_Stopped = false;
@@ -417,15 +437,19 @@ public class RabbitMQScriptingEngine
     deliverCallback = null;
     if (result == null) {
       // ensure queue is cleared
-      if (m_Data == null)
+      if (m_Data == null) {
 	m_Data = new ArrayBlockingQueue<>(65536);
+	m_Tags = new ArrayBlockingQueue<>(65536);
+      }
       m_Data.clear();
+      m_Tags.clear();
 
       // callback
       deliverCallback = (consumerTag, delivery) -> {
 	byte[] recv = delivery.getBody();
 	MessageCollection errors = new MessageCollection();
 	Object output = m_Converter.convert(recv, errors);
+	m_Tags.add(delivery.getEnvelope().getDeliveryTag());
 	m_Data.add(output);
       };
 
@@ -455,7 +479,7 @@ public class RabbitMQScriptingEngine
 	}
 
 	try {
-	  m_Channel.basicConsume(queue, true, deliverCallback, consumerTag -> {});
+	  m_Channel.basicConsume(queue, false, deliverCallback, consumerTag -> {});
 	}
 	catch (Exception e) {
 	  result = Utils.handleException(this, "Failed to consume data!", e);
@@ -465,8 +489,12 @@ public class RabbitMQScriptingEngine
 	while (!isStopped() && (data == null)) {
 	  try {
 	    data = m_Data.poll(m_PollTimeout, TimeUnit.MILLISECONDS);
-	    if (data != null)
-	      handleMessage(data);
+	    if (data != null) {
+	      tag = m_Tags.poll();
+	      if (tag == null)
+	        getLogger().severe("No tag for ack received");
+	      handleMessage(data, tag);
+	    }
 	  }
 	  catch (Exception e) {
 	    if (isLoggingEnabled())

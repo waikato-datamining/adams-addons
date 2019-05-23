@@ -21,6 +21,8 @@
 package adams.flow.container;
 
 import com.rabbitmq.client.AMQP.BasicProperties;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Envelope;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,6 +43,12 @@ public class RabbitMQConsumptionContainer
 
   /** the key for the properties. */
   public final static String VALUE_PROPERTIES = "Properties";
+
+  /** the key for the envelope. */
+  public final static String VALUE_ENVELOPE = "Envelope";
+
+  /** the key for the channel. */
+  public final static String VALUE_CHANNEL = "Channel";
 
   /**
    * Default constructor.
@@ -65,9 +73,34 @@ public class RabbitMQConsumptionContainer
    * @param properties	the properties, can be null
    */
   public RabbitMQConsumptionContainer(Object data, BasicProperties properties) {
+    this(data, properties, null);
+  }
+
+  /**
+   * Initializes the container with data and properties.
+   *
+   * @param data	the data
+   * @param properties	the properties, can be null
+   * @param envelope 	the delivery envelope, can be null
+   */
+  public RabbitMQConsumptionContainer(Object data, BasicProperties properties, Envelope envelope) {
+    this(data, properties, envelope, null);
+  }
+
+  /**
+   * Initializes the container with data and properties.
+   *
+   * @param data	the data
+   * @param properties	the properties, can be null
+   * @param envelope 	the delivery envelope, can be null
+   * @param channel 	the channel, can be null
+   */
+  public RabbitMQConsumptionContainer(Object data, BasicProperties properties, Envelope envelope, Channel channel) {
     super();
     store(VALUE_DATA, data);
     store(VALUE_PROPERTIES, properties);
+    store(VALUE_ENVELOPE, envelope);
+    store(VALUE_CHANNEL, channel);
   }
 
   /**
@@ -78,6 +111,8 @@ public class RabbitMQConsumptionContainer
 
     addHelp(VALUE_DATA, "the payload data", Object.class);
     addHelp(VALUE_PROPERTIES, "optional properties that were received", BasicProperties.class);
+    addHelp(VALUE_ENVELOPE, "optional delivery envelope", Envelope.class);
+    addHelp(VALUE_CHANNEL, "optional channel object (eg for sending back ack's)", Channel.class);
   }
 
   /**
@@ -93,6 +128,8 @@ public class RabbitMQConsumptionContainer
 
     result.add(VALUE_DATA);
     result.add(VALUE_PROPERTIES);
+    result.add(VALUE_ENVELOPE);
+    result.add(VALUE_CHANNEL);
 
     return result.iterator();
   }

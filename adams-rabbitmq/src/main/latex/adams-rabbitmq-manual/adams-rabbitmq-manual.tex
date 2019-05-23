@@ -113,6 +113,8 @@ The following transformers are available:
 
 The following sinks are available:
 \begin{verbatim}
+  \item \textit{RabbitMQMessageDeliveryAction} -- for executing an action using
+  the incoming delivery tag, e.g., acknowledging it.
   \item \textit{RabbitMQPublish} -- publishes the incoming data to a queue
   or an exchange.
 \end{verbatim}
@@ -129,8 +131,10 @@ The following control actors are available:
 
 The following conversions are available:
 \begin{verbatim}
+  \item \textit{RabbitMQEnvelopeToMap} -- converts RabbitMQ envelope into a
+  Java Map, e.g., to obtain a delivery tag to acknowledge consumption of a message.
   \item \textit{RabbitMQPropertiesToMap} -- converts RabbitMQ basic properties
-  into a Java Map.
+  into a Java Map, e.g., to obtain the reply-to queue name.
 \end{verbatim}
 
 The following JobRunners are available:

@@ -424,6 +424,13 @@ public class RabbitMQRemoteProcedureCall
     return result;
   }
 
+  @Override
+  public void stopExecution() {
+    if (m_Processing != null)
+      m_Processing = null;
+    super.stopExecution();
+  }
+
   /**
    * Cleans up after the execution has finished.
    */

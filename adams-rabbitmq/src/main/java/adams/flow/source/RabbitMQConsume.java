@@ -20,15 +20,18 @@
 
 package adams.flow.source;
 
+import adams.core.ClassCrossReference;
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.net.rabbitmq.RabbitMQHelper;
 import adams.core.net.rabbitmq.receive.AbstractConverter;
 import adams.core.net.rabbitmq.receive.StringConverter;
+import adams.data.conversion.RabbitMQEnvelopeToMap;
 import adams.flow.container.RabbitMQConsumptionContainer;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.Token;
+import adams.flow.sink.RabbitMQMessageDeliveryAction;
 import adams.flow.standalone.RabbitMQChannelAction;
 import adams.flow.standalone.RabbitMQConnection;
 import com.rabbitmq.client.Channel;
@@ -43,7 +46,12 @@ import java.util.logging.Level;
  <!-- globalinfo-start -->
  * Consumes data it receives and forwards it.<br>
  * It either binds to the specified exchange (if non-empty and ignores the queue name), or it listens to the specified queue.<br>
- * When using an exchange, this one must be declared via the adams.flow.standalone.RabbitMQChannelAction standalone.
+ * When using an exchange, this one must be declared via the adams.flow.standalone.RabbitMQChannelAction standalone.<br>
+ * When not automatically acknowledging messages, the delivery tag must be retrieved from the delivery envelope (enabled to output container) and manually acknowledge using adams.flow.sink.RabbitMQAck.<br>
+ * <br>
+ * See also:<br>
+ * adams.data.conversion.RabbitMQEnvelopeToMap<br>
+ * adams.flow.sink.RabbitMQAck
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -99,6 +107,13 @@ import java.util.logging.Level;
  * &nbsp;&nbsp;&nbsp;default:
  * </pre>
  *
+ * <pre>-auto-ack &lt;boolean&gt; (property: autoAck)
+ * &nbsp;&nbsp;&nbsp;If enabled, jobs are automatically acknowledged (= flagged as successfully
+ * &nbsp;&nbsp;&nbsp;processed); otherwise the delivery tag has get extracted with adams.data.conversion.RabbitMQEnvelopeToMap
+ * &nbsp;&nbsp;&nbsp;and manually acknowledged using adams.flow.sink.RabbitMQAck.
+ * &nbsp;&nbsp;&nbsp;default: true
+ * </pre>
+ *
  * <pre>-converter &lt;adams.core.net.rabbitmq.receive.AbstractConverter&gt; (property: converter)
  * &nbsp;&nbsp;&nbsp;The converter to use.
  * &nbsp;&nbsp;&nbsp;default: adams.core.net.rabbitmq.receive.StringConverter
@@ -120,7 +135,8 @@ import java.util.logging.Level;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class RabbitMQConsume
-  extends AbstractSource {
+  extends AbstractSource
+  implements ClassCrossReference {
 
   private static final long serialVersionUID = -7073183797972945731L;
 
@@ -132,6 +148,9 @@ public class RabbitMQConsume
 
   /** the name of the queue. */
   protected String m_Queue;
+
+  /** whether to automatically acknowledge jobs. */
+  protected boolean m_AutoAck;
 
   /** the converter. */
   protected AbstractConverter m_Converter;
@@ -164,7 +183,23 @@ public class RabbitMQConsume
     return "Consumes data it receives and forwards it.\n"
       + "It either binds to the specified exchange (if non-empty and ignores the queue name), "
       + "or it listens to the specified queue.\n"
-      + "When using an exchange, this one must be declared via the " + Utils.classToString(RabbitMQChannelAction.class) + " standalone.";
+      + "When using an exchange, this one must be declared via the "
+      + Utils.classToString(RabbitMQChannelAction.class) + " standalone.\n"
+      + "When not automatically acknowledging messages, the delivery tag must be "
+      + "retrieved from the delivery envelope (enabled to output container) "
+      + "and manually acknowledge using " + Utils.classToString(RabbitMQMessageDeliveryAction.class) + ".";
+  }
+
+  /**
+   * Returns the cross-referenced classes.
+   *
+   * @return		the classes
+   */
+  public Class[] getClassCrossReferences() {
+    return new Class[]{
+      RabbitMQEnvelopeToMap.class,
+      RabbitMQMessageDeliveryAction.class,
+    };
   }
 
   /**
@@ -181,6 +216,10 @@ public class RabbitMQConsume
     m_OptionManager.add(
       "queue", "queue",
       "");
+
+    m_OptionManager.add(
+      "auto-ack", "autoAck",
+      true);
 
     m_OptionManager.add(
       "converter", "converter",
@@ -268,6 +307,7 @@ public class RabbitMQConsume
 
     result = QuickInfoHelper.toString(this, "exchange", (m_Exchange.isEmpty() ? "-empty-" : m_Exchange), "exchange: ");
     result += QuickInfoHelper.toString(this, "queue", (m_Queue.isEmpty() ? "-empty-" : m_Queue), ", queue: ");
+    result += QuickInfoHelper.toString(this, "autoAck", m_AutoAck, "auto-ack", ", ");
     result += QuickInfoHelper.toString(this, "converter", m_Converter, ", converter: ");
     result += QuickInfoHelper.toString(this, "limit", m_Limit, ", limit: ");
     result += QuickInfoHelper.toString(this, "outputContainer", m_OutputContainer, "container", ", ");
@@ -331,6 +371,42 @@ public class RabbitMQConsume
    */
   public String queueTipText() {
     return "The name of the queue.";
+  }
+
+  /**
+   * Sets whether to automatically acknowledge jobs (= successfully processed).
+   *
+   * @param value	true if automatically acknowledge
+   * @see		RabbitMQEnvelopeToMap
+   * @see                RabbitMQMessageDeliveryAction
+   */
+  public void setAutoAck(boolean value) {
+    m_AutoAck = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to automatically acknowledge jobs (= successfully processed).
+   *
+   * @return 		true if automatically acknowledge
+   * @see		RabbitMQEnvelopeToMap
+   * @see                RabbitMQMessageDeliveryAction
+   */
+  public boolean getAutoAck() {
+    return m_AutoAck;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String autoAckTipText() {
+    return "If enabled, jobs are automatically acknowledged (= flagged as "
+      + "successfully processed); otherwise the delivery tag has get "
+      + "extracted with " + Utils.classToString(RabbitMQEnvelopeToMap.class) + " "
+      + "and manually acknowledged using " + Utils.classToString(RabbitMQMessageDeliveryAction.class) + ".";
   }
 
   /**
@@ -490,7 +566,7 @@ public class RabbitMQConsume
 	MessageCollection errors = new MessageCollection();
 	Object output = m_Converter.convert(data, errors);
 	if (m_OutputContainer)
-	  m_Data.add(new RabbitMQConsumptionContainer(output, delivery.getProperties()));
+	  m_Data.add(new RabbitMQConsumptionContainer(output, delivery.getProperties(), delivery.getEnvelope(), m_Channel));
 	else
 	  m_Data.add(output);
       };
@@ -514,7 +590,7 @@ public class RabbitMQConsume
     // consume
     if (result == null) {
       try {
-	m_Channel.basicConsume(queue, true, deliverCallback, consumerTag -> {});
+	m_Channel.basicConsume(queue, m_AutoAck, deliverCallback, consumerTag -> {});
       }
       catch (Exception e) {
 	result = handleException("Failed to consume data!", e);
