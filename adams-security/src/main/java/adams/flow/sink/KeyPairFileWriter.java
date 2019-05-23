@@ -125,7 +125,12 @@ public class KeyPairFileWriter
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "type", m_Type);
+    String	result;
+
+    result = super.getQuickInfo();
+    result += QuickInfoHelper.toString(this, "type", m_Type, ", type: ");
+
+    return result;
   }
 
   /**
