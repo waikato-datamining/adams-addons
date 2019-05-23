@@ -19,18 +19,16 @@
  */
 package adams.flow.core;
 
-import gnu.trove.list.array.TByteArrayList;
-
-import java.io.InputStream;
-
-import javax.activation.DataHandler;
-import javax.mail.util.ByteArrayDataSource;
-
 import adams.core.Utils;
+import adams.core.net.MimeTypeHelper;
 import adams.data.blob.BlobContainer;
 import adams.data.report.AbstractField;
 import adams.data.report.Field;
-import adams.flow.webservice.WebserviceUtils;
+import gnu.trove.list.array.TByteArrayList;
+
+import javax.activation.DataHandler;
+import javax.mail.util.ByteArrayDataSource;
+import java.io.InputStream;
 
 /**
  * Helper class for converting blobs.
@@ -55,7 +53,7 @@ public class RatsBlobHelper {
     result = new nz.ac.waikato.adams.webservice.rats.blob.Blob();
     
     // blob
-    result.setData(new DataHandler(new ByteArrayDataSource(input.getContent(), WebserviceUtils.MIMETYPE_APPLICATION_OCTETSTREAM)));
+    result.setData(new DataHandler(new ByteArrayDataSource(input.getContent(), MimeTypeHelper.MIMETYPE_APPLICATION_OCTETSTREAM)));
     
     // report
     props = new nz.ac.waikato.adams.webservice.rats.blob.Properties();

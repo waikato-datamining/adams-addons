@@ -19,18 +19,18 @@
  */
 package adams.flow.webservice.text;
 
-import java.net.URL;
-
-import javax.xml.ws.BindingProvider;
-
-import nz.ac.waikato.adams.webservice.rats.text.RatsTextService;
-import nz.ac.waikato.adams.webservice.rats.text.RatsTextServiceService;
-import nz.ac.waikato.adams.webservice.rats.text.UploadRequest;
-import nz.ac.waikato.adams.webservice.rats.text.UploadResponse;
+import adams.core.net.MimeTypeHelper;
 import adams.data.text.TextContainer;
 import adams.flow.core.RatsTextHelper;
 import adams.flow.webservice.AbstractWebServiceClientSink;
 import adams.flow.webservice.WebserviceUtils;
+import nz.ac.waikato.adams.webservice.rats.text.RatsTextService;
+import nz.ac.waikato.adams.webservice.rats.text.RatsTextServiceService;
+import nz.ac.waikato.adams.webservice.rats.text.UploadRequest;
+import nz.ac.waikato.adams.webservice.rats.text.UploadResponse;
+
+import javax.xml.ws.BindingProvider;
+import java.net.URL;
 
 /**
  * Uploads a TextContainer.
@@ -69,7 +69,7 @@ public class Upload
 
     m_OptionManager.add(
 	    "format", "format",
-	    WebserviceUtils.MIMETYPE_PLAIN_TEXT);
+	    MimeTypeHelper.MIMETYPE_PLAIN_TEXT);
   }
   
   /**

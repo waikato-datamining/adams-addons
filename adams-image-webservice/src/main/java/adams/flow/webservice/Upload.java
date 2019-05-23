@@ -19,18 +19,18 @@
  */
 package adams.flow.webservice;
 
-import java.net.URL;
-
-import javax.activation.DataHandler;
-import javax.mail.util.ByteArrayDataSource;
-import javax.xml.ws.BindingProvider;
-
+import adams.core.net.MimeTypeHelper;
 import nz.ac.waikato.adams.webservice.image.Image;
 import nz.ac.waikato.adams.webservice.image.ImageFormat;
 import nz.ac.waikato.adams.webservice.image.ImageService;
 import nz.ac.waikato.adams.webservice.image.ImageServiceService;
 import nz.ac.waikato.adams.webservice.image.UploadRequest;
 import nz.ac.waikato.adams.webservice.image.UploadResponse;
+
+import javax.activation.DataHandler;
+import javax.mail.util.ByteArrayDataSource;
+import javax.xml.ws.BindingProvider;
+import java.net.URL;
 
 /**
  * Uploads an image.
@@ -197,7 +197,7 @@ public class Upload
     request.setId(m_ID);
     request.setFormat(m_Format);
     img = new Image();
-    img.setData(new DataHandler(new ByteArrayDataSource(m_ImageIn, WebserviceUtils.MIMETYPE_APPLICATION_OCTETSTREAM)));
+    img.setData(new DataHandler(new ByteArrayDataSource(m_ImageIn, MimeTypeHelper.MIMETYPE_APPLICATION_OCTETSTREAM)));
     request.setImage(img);
     response = imageService.upload(request);
     

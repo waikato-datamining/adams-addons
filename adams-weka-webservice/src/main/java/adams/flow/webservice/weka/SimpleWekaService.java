@@ -22,6 +22,7 @@ package adams.flow.webservice.weka;
 
 import adams.core.SerializationHelper;
 import adams.core.Utils;
+import adams.core.net.MimeTypeHelper;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.OptionUtils;
 import adams.core.option.WekaCommandLineHandler;
@@ -36,7 +37,6 @@ import adams.flow.core.InputConsumer;
 import adams.flow.core.OutputProducer;
 import adams.flow.core.Token;
 import adams.flow.core.WekaDatasetHelper;
-import adams.flow.webservice.WebserviceUtils;
 import nz.ac.waikato.adams.webservice.weka.Attributes;
 import nz.ac.waikato.adams.webservice.weka.Body;
 import nz.ac.waikato.adams.webservice.weka.CrossValidateResponseObject;
@@ -464,7 +464,7 @@ public class SimpleWekaService
     }
     
     try {
-      result.setModelData(new DataHandler(new ByteArrayDataSource(SerializationHelper.toByteArray(cls), WebserviceUtils.MIMETYPE_APPLICATION_OCTETSTREAM)));
+      result.setModelData(new DataHandler(new ByteArrayDataSource(SerializationHelper.toByteArray(cls), MimeTypeHelper.MIMETYPE_APPLICATION_OCTETSTREAM)));
     }
     catch (Exception e) {
       result.setErrorMessage(Utils.handleException(this, "Failed to serialize classifier: " + modelName, e));

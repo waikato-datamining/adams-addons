@@ -64,12 +64,6 @@ import java.util.List;
  */
 public class RESTUtils {
 
-  /** mime type: application/octet-stream. */
-  public final static String MIMETYPE_APPLICATION_OCTETSTREAM = "application/octet-stream";
-
-  /** mime type: plain/text. */
-  public final static String MIMETYPE_PLAIN_TEXT = "plain/text";
-
   /**
    * Sets the timeouts for connection and receiving. Also configures the
    * proxy settings in case there is a system-wide proxy configured.

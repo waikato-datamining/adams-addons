@@ -22,6 +22,7 @@ package adams.flow.webservice.meka;
 
 import adams.core.SerializationHelper;
 import adams.core.Utils;
+import adams.core.net.MimeTypeHelper;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.OptionUtils;
 import adams.data.spreadsheet.LookUpHelper;
@@ -35,7 +36,6 @@ import adams.flow.core.InputConsumer;
 import adams.flow.core.MekaDatasetHelper;
 import adams.flow.core.OutputProducer;
 import adams.flow.core.Token;
-import adams.flow.webservice.WebserviceUtils;
 import meka.classifiers.multilabel.Evaluation;
 import meka.core.MLUtils;
 import nz.ac.waikato.adams.webservice.meka.Attributes;
@@ -394,7 +394,7 @@ public class SimpleMekaService
     }
     
     try {
-      result.setModelData(new DataHandler(new ByteArrayDataSource(SerializationHelper.toByteArray(cls), WebserviceUtils.MIMETYPE_APPLICATION_OCTETSTREAM)));
+      result.setModelData(new DataHandler(new ByteArrayDataSource(SerializationHelper.toByteArray(cls), MimeTypeHelper.MIMETYPE_APPLICATION_OCTETSTREAM)));
     }
     catch (Exception e) {
       result.setErrorMessage(Utils.handleException(this, "Failed to serialize classifier: " + modelName, e));

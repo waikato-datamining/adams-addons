@@ -19,18 +19,18 @@
  */
 package adams.flow.webservice.blob;
 
-import java.net.URL;
-
-import javax.xml.ws.BindingProvider;
-
-import nz.ac.waikato.adams.webservice.rats.blob.RatsBlobService;
-import nz.ac.waikato.adams.webservice.rats.blob.RatsBlobServiceService;
-import nz.ac.waikato.adams.webservice.rats.blob.UploadRequest;
-import nz.ac.waikato.adams.webservice.rats.blob.UploadResponse;
+import adams.core.net.MimeTypeHelper;
 import adams.data.blob.BlobContainer;
 import adams.flow.core.RatsBlobHelper;
 import adams.flow.webservice.AbstractWebServiceClientSink;
 import adams.flow.webservice.WebserviceUtils;
+import nz.ac.waikato.adams.webservice.rats.blob.RatsBlobService;
+import nz.ac.waikato.adams.webservice.rats.blob.RatsBlobServiceService;
+import nz.ac.waikato.adams.webservice.rats.blob.UploadRequest;
+import nz.ac.waikato.adams.webservice.rats.blob.UploadResponse;
+
+import javax.xml.ws.BindingProvider;
+import java.net.URL;
 
 /**
  * Uploads a BlobContainer.
@@ -69,7 +69,7 @@ public class Upload
 
     m_OptionManager.add(
 	    "format", "format",
-	    WebserviceUtils.MIMETYPE_APPLICATION_OCTETSTREAM);
+	    MimeTypeHelper.MIMETYPE_APPLICATION_OCTETSTREAM);
   }
   
   /**

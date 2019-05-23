@@ -19,18 +19,16 @@
  */
 package adams.flow.core;
 
-import java.io.StringWriter;
-
-import javax.activation.DataHandler;
-import javax.mail.util.ByteArrayDataSource;
-
-import org.apache.commons.io.IOUtils;
-
 import adams.core.Utils;
+import adams.core.net.MimeTypeHelper;
 import adams.data.report.AbstractField;
 import adams.data.report.Field;
 import adams.data.text.TextContainer;
-import adams.flow.webservice.WebserviceUtils;
+import org.apache.commons.io.IOUtils;
+
+import javax.activation.DataHandler;
+import javax.mail.util.ByteArrayDataSource;
+import java.io.StringWriter;
 
 /**
  * Helper class for converting text.
@@ -55,7 +53,7 @@ public class RatsTextHelper {
     result = new nz.ac.waikato.adams.webservice.rats.text.Text();
     
     // text
-    result.setData(new DataHandler(new ByteArrayDataSource(input.getContent().getBytes(), WebserviceUtils.MIMETYPE_APPLICATION_OCTETSTREAM)));
+    result.setData(new DataHandler(new ByteArrayDataSource(input.getContent().getBytes(), MimeTypeHelper.MIMETYPE_APPLICATION_OCTETSTREAM)));
     
     // report
     props = new nz.ac.waikato.adams.webservice.rats.text.Properties();
