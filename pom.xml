@@ -65,6 +65,7 @@
     <module>adams-twitter</module>
     <module>adams-twitter-rats</module>
     <module>adams-video</module>
+    <module>adams-webservice-core</module>
     <module>adams-webservice</module>
     <module>adams-weka-nd4j</module>
     <module>adams-weka-webservice</module>

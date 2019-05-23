@@ -25,14 +25,13 @@ import adams.core.net.ProxyHelper;
 import adams.core.option.OptionHandler;
 import adams.core.option.OptionUtils;
 import adams.flow.core.Actor;
-import adams.flow.core.ActorUtils;
+import adams.flow.core.TLSUtils;
 import adams.flow.standalone.KeyManager;
 import adams.flow.standalone.SSLContext;
 import adams.flow.standalone.TrustManager;
 import adams.flow.webservice.interceptor.InterceptorWithActor;
 import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
-import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -54,7 +53,6 @@ import java.net.URL;
  * Utility class around webservices.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class WebserviceUtils {
 
@@ -80,45 +78,6 @@ public class WebserviceUtils {
    */
   public static void disableSchemaValidation(BindingProvider provider) {
     provider.getRequestContext().put("schema-validation-enabled", "false");
-  }
-
-  /**
-   * Sets TrustManager and KeyManager if within the context of the actor.
-   *
-   * @param owner	the owning actor
-   * @param http	the HTTP conduit to configure
-   * @return		whether successfully enabled TLS
-   */
-  public static boolean configureClientTLS(Actor owner, HTTPConduit http) {
-    KeyManager 		keyManager;
-    TrustManager 	trustManager;
-    SSLContext		sslContext;
-    String		protocol;
-    TLSClientParameters tlsParams;
-
-    keyManager = (KeyManager) ActorUtils.findClosestType(owner, KeyManager.class, true);
-    if (keyManager == null)
-      return false;
-    if (keyManager.getKeyManagerFactory() == null)
-      return false;
-
-    trustManager = (TrustManager) ActorUtils.findClosestType(owner, TrustManager.class, true);
-    if (trustManager == null)
-      return false;
-    if (trustManager.getTrustManagerFactory() == null)
-      return false;
-
-    protocol = "TLS";
-    sslContext = (SSLContext) ActorUtils.findClosestType(owner, SSLContext.class, true);
-    if (sslContext != null)
-      protocol = sslContext.getProtocol();
-
-    tlsParams = new TLSClientParameters();
-    tlsParams.setKeyManagers(keyManager.getKeyManagerFactory().getKeyManagers());
-    tlsParams.setTrustManagers(trustManager.getTrustManagerFactory().getTrustManagers());
-    tlsParams.setSecureSocketProtocol(protocol);
-    http.setTlsClientParameters(tlsParams);
-    return true;
   }
 
   /**
@@ -221,9 +180,9 @@ public class WebserviceUtils {
     // configure TLS (if https:// and actors present in flow)
     actualURL = "" + ((BindingProvider) servicePort).getRequestContext().get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
     if (actualURL.toLowerCase().startsWith("https://")) {
-      if (!configureClientTLS(owner, http))
+      if (!TLSUtils.configureClientTLS(owner, http))
         throw new IllegalStateException(
-          "Failed configure SSL context for '" + actualURL + "' - missing actors ("
+          "Failed to configure SSL context for '" + actualURL + "' - missing actors ("
 	    + Utils.classesToString(new Class[]{KeyManager.class, TrustManager.class, SSLContext.class}) + ")?");
     }
   }

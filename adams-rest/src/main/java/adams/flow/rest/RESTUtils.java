@@ -23,9 +23,13 @@ import adams.core.Utils;
 import adams.core.logging.LoggingLevelHandler;
 import adams.core.net.ProxyHelper;
 import adams.flow.core.Actor;
+import adams.flow.core.TLSUtils;
 import adams.flow.rest.interceptor.InterceptorWithActor;
 import adams.flow.rest.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.rest.interceptor.outgoing.AbstractOutInterceptorGenerator;
+import adams.flow.standalone.KeyManager;
+import adams.flow.standalone.SSLContext;
+import adams.flow.standalone.TrustManager;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -83,6 +87,7 @@ public class RESTUtils {
     HTTPClientPolicy 			clPolicy;
     ProxyAuthorizationPolicy		proxyPolicy;
     BindingProvider 			bindingProvider;
+    String				actualURL;
 
     client   = ClientBuilder.newClient();
     http     = WebClient.getConfig(client).getHttpConduit();
@@ -139,6 +144,15 @@ public class RESTUtils {
       bindingProvider = (BindingProvider) servicePort;
       bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
     }
+
+    // configure TLS (if https:// and actors present in flow)
+    actualURL = "" + ((BindingProvider) servicePort).getRequestContext().get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
+    if (actualURL.toLowerCase().startsWith("https://")) {
+      if (!TLSUtils.configureClientTLS(owner, http))
+        throw new IllegalStateException(
+          "Failed to configure SSL context for '" + actualURL + "' - missing actors ("
+	    + Utils.classesToString(new Class[]{KeyManager.class, TrustManager.class, SSLContext.class}) + ")?");
+    }
   }
 
   /**
@@ -158,16 +172,16 @@ public class RESTUtils {
     
     // logging
     if (owner.isLoggingEnabled()) {
-      if ((in != null) && (in instanceof LoggingLevelHandler))
+      if (in instanceof LoggingLevelHandler)
 	((LoggingLevelHandler) in).setLoggingLevel(owner.getLoggingLevel());
-      if ((out != null) && (out instanceof LoggingLevelHandler))
+      if (out instanceof LoggingLevelHandler)
 	((LoggingLevelHandler) out).setLoggingLevel(owner.getLoggingLevel());
     }
     
     // actor aware?
-    if ((in != null) && (in instanceof InterceptorWithActor))
+    if (in instanceof InterceptorWithActor)
       ((InterceptorWithActor) in).setActor(owner);
-    if ((out != null) && (out instanceof InterceptorWithActor))
+    if (out instanceof InterceptorWithActor)
       ((InterceptorWithActor) out).setActor(owner);
       
     // add interceptors
