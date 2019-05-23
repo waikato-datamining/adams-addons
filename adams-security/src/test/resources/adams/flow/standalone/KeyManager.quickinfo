@@ -1,0 +1,1 @@
+type: PKCS12, file: ${CWD}, algorithm: SunX509
