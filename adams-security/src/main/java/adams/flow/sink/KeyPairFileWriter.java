@@ -14,26 +14,29 @@
  */
 
 /*
- * SSLContext.java
+ * KeyPairFileWriter.java
  * Copyright (C) 2019 University of Waikato, Hamilton, NZ
  */
 
-package adams.flow.standalone;
+package adams.flow.sink;
 
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
-import adams.flow.core.ActorUtils;
+import adams.core.io.FileUtils;
+import adams.flow.core.KeyPairElement;
+
+import java.io.FileOutputStream;
 
 /**
  <!-- globalinfo-start -->
- * Initializes an SSL context using the specified context.<br>
- * For protocols, see:<br>
- * https:&#47;&#47;docs.oracle.com&#47;en&#47;java&#47;javase&#47;11&#47;docs&#47;specs&#47;security&#47;standard-names.html#sslcontext-algorithms<br>
- * Requires adams.flow.standalone.KeyManager and adams.flow.standalone.TrustManager standalones to be present.
+ * Writes either the private or public key of a key pair to disk using the binary DER format.
  * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
+ * Input&#47;output:<br>
+ * - accepts:<br>
+ * &nbsp;&nbsp;&nbsp;java.security.KeyPair<br>
+ * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->
@@ -44,7 +47,7 @@ import adams.flow.core.ActorUtils;
  *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
- * &nbsp;&nbsp;&nbsp;default: SSLContext
+ * &nbsp;&nbsp;&nbsp;default: KeyPairFileWriter
  * </pre>
  *
  * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
@@ -71,31 +74,27 @@ import adams.flow.core.ActorUtils;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
- * <pre>-protocol &lt;java.lang.String&gt; (property: protocol)
- * &nbsp;&nbsp;&nbsp;The protocol to use, eg TLSv1, TLSv1.1 or TLSv1.2.
- * &nbsp;&nbsp;&nbsp;default: TLSv1.2
+ * <pre>-output &lt;adams.core.io.PlaceholderFile&gt; (property: outputFile)
+ * &nbsp;&nbsp;&nbsp;The file to write the key to.
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
+ * </pre>
+ *
+ * <pre>-type &lt;PUBLIC|PRIVATE&gt; (property: type)
+ * &nbsp;&nbsp;&nbsp;The key type to write to disk.
+ * &nbsp;&nbsp;&nbsp;default: PUBLIC
  * </pre>
  *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class SSLContext
-  extends AbstractStandalone {
+public class KeyPairFileWriter
+  extends AbstractFileWriter {
 
-  private static final long serialVersionUID = 3010371119440218991L;
+  private static final long serialVersionUID = 6251487815648451979L;
 
-  /** the protocol to use. */
-  protected String m_Protocol;
-
-  /** the KeyManager instance to use. */
-  protected transient KeyManager m_KeyManager;
-
-  /** the TrustManager instance to use. */
-  protected transient TrustManager m_TrustManager;
-
-  /** the SSL context. */
-  protected transient javax.net.ssl.SSLContext m_SSLContext;
+  /** which key to write. */
+  protected KeyPairElement m_Type;
 
   /**
    * Returns a string describing the object.
@@ -104,11 +103,7 @@ public class SSLContext
    */
   @Override
   public String globalInfo() {
-    return "Initializes an SSL context using the specified context.\n"
-      + "For protocols, see:\n"
-      + "https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html#sslcontext-algorithms\n"
-      + "Requires " + Utils.classToString(KeyManager.class) + " and "
-      + Utils.classToString(TrustManager.class) + " standalones to be present.";
+    return "Writes either the private or public key of a key pair to disk using the binary DER format.";
   }
 
   /**
@@ -119,8 +114,8 @@ public class SSLContext
     super.defineOptions();
 
     m_OptionManager.add(
-      "protocol", "protocol",
-      "TLSv1.2");
+      "type", "type",
+      KeyPairElement.PUBLIC);
   }
 
   /**
@@ -130,26 +125,26 @@ public class SSLContext
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "protocol", m_Protocol);
+    return QuickInfoHelper.toString(this, "type", m_Type);
   }
 
   /**
-   * Sets the protocol to use.
+   * Sets the key type to write.
    *
-   * @param value	the protocol
+   * @param value	the type
    */
-  public void setProtocol(String value) {
-    m_Protocol = value;
+  public void setType(KeyPairElement value) {
+    m_Type = value;
     reset();
   }
 
   /**
-   * Returns the protocol to use.
+   * Returns the key type to write.
    *
-   * @return		the protocol
+   * @return		the type
    */
-  public String getProtocol() {
-    return m_Protocol;
+  public KeyPairElement getType() {
+    return m_Type;
   }
 
   /**
@@ -158,43 +153,29 @@ public class SSLContext
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String protocolTipText() {
-    return "The protocol to use, eg TLSv1, TLSv1.1 or TLSv1.2.";
+  public String typeTipText() {
+    return "The key type to write to disk.";
   }
 
   /**
-   * Initializes the item for flow execution.
+   * Returns the tip text for this property.
    *
-   * @return		null if everything is fine, otherwise error message
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
    */
   @Override
-  public String setUp() {
-    String	result;
-
-    result = super.setUp();
-
-    if (result == null) {
-      m_KeyManager = (KeyManager) ActorUtils.findClosestType(this, KeyManager.class, true);
-      if (m_KeyManager == null)
-        result = "Failed to locate " + Utils.classToString(KeyManager.class) + " actor!";
-    }
-
-    if (result == null) {
-      m_TrustManager = (TrustManager) ActorUtils.findClosestType(this, TrustManager.class, true);
-      if (m_TrustManager == null)
-        result = "Failed to locate " + Utils.classToString(TrustManager.class) + " actor!";
-    }
-
-    return result;
+  public String outputFileTipText() {
+    return "The file to write the key to.";
   }
 
   /**
-   * Returns the SSLContext instance.
+   * Returns the class that the consumer accepts.
    *
-   * @return		the instance, null if not available
+   * @return		the Class of objects that can be processed
    */
-  public javax.net.ssl.SSLContext getSSLContext() {
-    return m_SSLContext;
+  @Override
+  public Class[] accepts() {
+    return new Class[]{java.security.KeyPair.class};
   }
 
   /**
@@ -204,19 +185,33 @@ public class SSLContext
    */
   @Override
   protected String doExecute() {
-    String	result;
+    String			result;
+    java.security.KeyPair	pair;
+    FileOutputStream		fos;
 
     result = null;
+    pair   = m_InputToken.getPayload(java.security.KeyPair.class);
 
-    m_SSLContext = null;
+    fos = null;
     try {
-      m_SSLContext = javax.net.ssl.SSLContext.getInstance(m_Protocol);
-      m_SSLContext.init(
-        m_KeyManager.getKeyManagerFactory().getKeyManagers(),
-	m_TrustManager.getTrustManagerFactory().getTrustManagers(), null);
+      fos = new FileOutputStream(m_OutputFile.getAbsolutePath());
+      switch (m_Type) {
+	case PUBLIC:
+	  fos.write(pair.getPublic().getEncoded());
+	  break;
+	case PRIVATE:
+	  fos.write(pair.getPrivate().getEncoded());
+	  break;
+	default:
+	  throw new IllegalStateException("Unhandled key type: " + m_Type);
+      }
+      fos.close();
     }
     catch (Exception e) {
-      result = handleException("Failed to instantiate SSL context!", e);
+      result = handleException("Failed to write key to file: " + m_OutputFile, e);
+    }
+    finally {
+      FileUtils.closeQuietly(fos);
     }
 
     return result;

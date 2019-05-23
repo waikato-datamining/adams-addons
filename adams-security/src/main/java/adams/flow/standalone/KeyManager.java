@@ -41,7 +41,9 @@ import java.util.List;
 
 /**
  <!-- globalinfo-start -->
- * Initializes a KeyManagerFactory instance using the specified keystore file and algorithm.
+ * Initializes a KeyManagerFactory instance using the specified keystore file and algorithm.<br>
+ * For keystore types, please refer to:<br>
+ * https:&#47;&#47;docs.oracle.com&#47;en&#47;java&#47;javase&#47;11&#47;docs&#47;specs&#47;security&#47;standard-names.html#keystore-types
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -171,7 +173,9 @@ public class KeyManager
    */
   @Override
   public String globalInfo() {
-    return "Initializes a KeyManagerFactory instance using the specified keystore file and algorithm.";
+    return "Initializes a KeyManagerFactory instance using the specified keystore file and algorithm.\n"
+      + "For keystore types, please refer to:\n"
+      + "https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html#keystore-types";
   }
 
   /**
