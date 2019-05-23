@@ -143,6 +143,7 @@ public class WebserviceUtils {
     BindingProvider 			bindingProvider;
     AbstractPhaseInterceptor<Message> 	in;
     AbstractPhaseInterceptor<Message> 	out;
+    String				actualURL;
     
     client   = ClientProxy.getClient(servicePort);
     http     = (HTTPConduit) client.getConduit();
@@ -204,7 +205,7 @@ public class WebserviceUtils {
     in = null;
     if (inInterceptor != null)
       in = inInterceptor.generate();
-    if ((in != null) && (in instanceof InterceptorWithActor))
+    if (in instanceof InterceptorWithActor)
       ((InterceptorWithActor) in).setActor(owner);
     if (in != null)
       client.getInInterceptors().add(in);
@@ -212,13 +213,19 @@ public class WebserviceUtils {
     out = null;
     if (outInterceptor != null)
       out = outInterceptor.generate();
-    if ((out != null) && (out instanceof InterceptorWithActor))
+    if (out instanceof InterceptorWithActor)
       ((InterceptorWithActor) out).setActor(owner);
     if (out != null)
       client.getOutInterceptors().add(out);
 
-    // configure TLS (if present in flow)
-    configureClientTLS(owner, http);
+    // configure TLS (if https:// and actors present in flow)
+    actualURL = "" + ((BindingProvider) servicePort).getRequestContext().get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
+    if (actualURL.toLowerCase().startsWith("https://")) {
+      if (!configureClientTLS(owner, http))
+        throw new IllegalStateException(
+          "Failed configure SSL context for '" + actualURL + "' - missing actors ("
+	    + Utils.classesToString(new Class[]{KeyManager.class, TrustManager.class, SSLContext.class}) + ")?");
+    }
   }
 
   /**
@@ -238,16 +245,16 @@ public class WebserviceUtils {
     
     // logging
     if (owner.isLoggingEnabled()) {
-      if ((in != null) && (in instanceof LoggingLevelHandler))
+      if (in instanceof LoggingLevelHandler)
 	((LoggingLevelHandler) in).setLoggingLevel(owner.getLoggingLevel());
-      if ((out != null) && (out instanceof LoggingLevelHandler))
+      if (out instanceof LoggingLevelHandler)
 	((LoggingLevelHandler) out).setLoggingLevel(owner.getLoggingLevel());
     }
     
     // actor aware?
-    if ((in != null) && (in instanceof InterceptorWithActor))
+    if (in instanceof InterceptorWithActor)
       ((InterceptorWithActor) in).setActor(owner);
-    if ((out != null) && (out instanceof InterceptorWithActor))
+    if (out instanceof InterceptorWithActor)
       ((InterceptorWithActor) out).setActor(owner);
       
     // add interceptors
@@ -307,7 +314,6 @@ public class WebserviceUtils {
    * @return		the HTML code
    */
   public static String wsdlToHtml(String wsdl) {
-    // TODO better syntax highlighting
     StringBuilder	result;
     int			i;
     char		c;
@@ -321,28 +327,6 @@ public class WebserviceUtils {
     lineStart = true;
     for (i = 0; i < wsdl.length(); i++) {
       c = wsdl.charAt(i);
-      // convert character?
-      switch (c) {
-	case '<':
-	  conv = "&lt;";
-	  break;
-	case '>':
-	  conv = "&gt;";
-	  break;
-	case '/':
-	  conv = "&#47;";
-	  break;
-	case '&':
-	  conv = "&amp;";
-	  break;
-	case '@':
-	  conv = "&#64;";
-	  break;
-	default:
-	  conv = "" + c;
-	  break;
-      }
-      
       // line handling/indentation
       switch (c) {
 	case '\r':
