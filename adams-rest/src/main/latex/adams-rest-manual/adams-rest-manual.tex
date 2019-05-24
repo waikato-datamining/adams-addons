@@ -66,7 +66,7 @@ ADAMS provides a general framework for accessing and implementing REST webservic
 The following sections describe how you can access REST webservices and write
 your own ones.
 
-\section{Accessing a web-service}
+\section{Client}
 There are two options for accessing a webservice: custom code for sending/receiving
 data or generic processing in the flow itself.
 
@@ -167,7 +167,7 @@ component available through the flow\footnote{See example flow: adams-rest-use\_
   be turned into a regular string again.
 \end{tight_itemize}
 
-\section{Creating a web-service}
+\section{Server}
 TODO
 
 \subsection{Context}
@@ -214,14 +214,24 @@ The following sinks are available:
 
 \section{TLS support}
 TLS support is automatically configured in case the URL uses \verb|https://| as
-protocol and the \verb|RESTUtils.configureClient| method is called. The following
-standalones have to be present (and configured) in that case:
+protocol and the \verb|RESTUtils.configureClient| method is called. For the
+server side, you need to call the \verb|AbstractRESTProvider.configureTLS| method
+after the URL has been set for the \verb|JAXRSServerFactoryBean| factory instance.
+The following standalones have to be present (and configured) to successfully
+set up TLS support:
 \begin{tight_itemize}
   \item \textit{KeyManager}
   \item \textit{TrustManager}
   \item \textit{SSLContext} -- optional, only used to determine the version of the
   TLS protocol (fallback is \textit{TSL}).
 \end{tight_itemize}
+See the following flows for example setups using self-signed certificates:
+\begin{tight_itemize}
+  \item \textit{adams-rest-generic\_server-ssl.flow} -- echo server via https
+  \item \textit{adams-rest-use\_service-ssl.flow} -- access the echo server
+\end{tight_itemize}
+The \verb|README.md| file in the \verb|${FLOWS}/restssl| directory contains
+more information on how these self-signed certificates were generated.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
