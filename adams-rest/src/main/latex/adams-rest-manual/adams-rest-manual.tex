@@ -42,7 +42,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright -2017} &
+		\parbox[c][2cm]{2cm}{\copyright 2018-2019} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -108,6 +108,17 @@ The following transformers are available:
 The following sinks are available:
 \begin{tight_itemize}
 	\item \textit{RESTSink} -- simply sends data to a web-service\footnote{adams-rest-echo\_sink.flow}.
+\end{tight_itemize}
+
+\subsection{TLS support}
+TLS support is automatically configured in case the URL uses \verb|https://| as
+protocol and the \verb|RESTUtils.configureClient| method is called. The following
+standalones have to be present (and configured) in that case:
+\begin{tight_itemize}
+  \item \textit{KeyManager}
+  \item \textit{TrustManager}
+  \item \textit{SSLContext} -- optional, only used to determine the version of the
+  TLS protocol (fallback is \textit{TSL}).
 \end{tight_itemize}
 
 
