@@ -19,16 +19,14 @@
  */
 package com.example.customerservice.flow;
 
-import javax.xml.ws.Endpoint;
-
-import org.apache.cxf.jaxws.EndpointImpl;
-
 import adams.core.License;
 import adams.core.annotation.MixedCopyright;
 import adams.flow.webservice.AbstractWebServiceProvider;
-
 import com.example.customerservice.CustomerService;
 import com.example.customerservice.server.CustomerServiceImpl;
+import org.apache.cxf.jaxws.EndpointImpl;
+
+import javax.xml.ws.Endpoint;
 
 /**
  * Simple webservice that returns example customer data.
@@ -83,7 +81,9 @@ public class CustomerServiceWS
     CustomerService 	implementor;
     
     implementor = new CustomerServiceImpl(this);
-    m_Endpoint  = (EndpointImpl) Endpoint.publish(getURL(), implementor);
+    m_Endpoint = (EndpointImpl) Endpoint.create(implementor);
+    configureTLS(m_Endpoint, getURL());
+    m_Endpoint.publish(getURL());
 
     configureInterceptors(m_Endpoint);
   }

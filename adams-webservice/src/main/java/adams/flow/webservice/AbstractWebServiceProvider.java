@@ -13,19 +13,26 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractWebServiceProvider.java
- * Copyright (C) 2012-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
 import adams.core.Utils;
+import adams.core.base.BaseURL;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.Actor;
+import adams.flow.core.TLSUtils;
+import adams.flow.standalone.KeyManager;
+import adams.flow.standalone.SSLContext;
+import adams.flow.standalone.TrustManager;
 import adams.flow.standalone.WSServer;
 import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
+import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 
 import java.net.URL;
 import java.util.logging.Level;
@@ -34,7 +41,6 @@ import java.util.logging.Level;
  * Ancestor for servers providing webservices.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public abstract class AbstractWebServiceProvider
   extends AbstractOptionHandler
@@ -245,7 +251,34 @@ public abstract class AbstractWebServiceProvider
   protected void configureInterceptors(EndpointImpl endpoint) {
     WebserviceUtils.configureServiceInterceptors(m_Owner, endpoint, m_InInterceptor, m_OutInterceptor);
   }
-  
+
+  /**
+   * Configures TLS support (if using https:// and actors present in flow).
+   *
+   * @param endpoint	the (unpublished) endpoint to configure
+   * @param url		the URL to publish under
+   * @throws IllegalStateException	if https used but failed to configure TLS params
+   */
+  protected void configureTLS(EndpointImpl endpoint, String url) throws Exception {
+    TLSServerParameters tlsparams;
+    JettyHTTPServerEngineFactory jettyFactory;
+    BaseURL baseURL;
+
+    if (url.startsWith("https://")) {
+      tlsparams = TLSUtils.configureServerTLS(m_Owner);
+      if (tlsparams != null) {
+	jettyFactory = endpoint.getServerFactory().getBus().getExtension(JettyHTTPServerEngineFactory.class);
+	baseURL = new BaseURL(url);
+	jettyFactory.setTLSServerParametersForPort(baseURL.urlValue().getPort(), tlsparams);
+      }
+      else {
+	throw new IllegalStateException(
+	  "Failed to configure SSL context for '" + url + "' - missing actors ("
+	    + Utils.classesToString(new Class[]{KeyManager.class, TrustManager.class, SSLContext.class}) + ")?");
+      }
+    }
+  }
+
   /**
    * Performs the actual start of the service.
    * 
