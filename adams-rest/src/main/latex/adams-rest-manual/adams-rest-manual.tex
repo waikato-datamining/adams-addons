@@ -149,8 +149,23 @@ public class EchoClientTransformer
 \end{verbatim}}
 
 \subsection{Generic flow}
-TODO
-
+Using the above example of accessing an echo server, we can simply use existing
+component available through the flow\footnote{See example flow: adams-rest-use\_service.flow}:
+\begin{tight_itemize}
+  \item The string to be sent to the server would be encoded via the \verb|URLEncode|
+  conversion.
+  \item This string would then be prefixed with the URL of the actual server
+  (e.g., \verb|http://localhost:8080/echo/|) to construct the complete URL.
+  \item Via the \verb|HTTPRequest| source, you can then connect to the
+  complete URL. Choose the correct method for accessing, like \verb|GET|
+  or \verb|POST|. This source actor allows you to attach additional headers and
+  parameters as key-value pairs to your request. Cookies are accessed through
+  storage, expecting a map object.
+  \item Using the \verb|ContainerValuePicker| control actor, the response
+  returned by the echo server can be retrieved.
+  \item With the \verb|URLDecode| conversion, the URL encoded response can
+  be turned into a regular string again.
+\end{tight_itemize}
 
 \section{Creating a web-service}
 TODO
