@@ -51,31 +51,118 @@
 \end{titlepage}
 
 \tableofcontents
-\listoffigures
+%\listoffigures
 %\listoftables
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Introduction}
-REST webservices (\cite(rest)) are a popular variant of webservices, that
-are quite often easier to implement than full-blown SOAP-based ones (\cite(soap)).
+REST webservices (\cite{rest}) are a popular variant of webservices, that
+are quite often easier to implement than full-blown SOAP-based ones (\cite{soap}).
 
 ADAMS provides a general framework for accessing and implementing REST webservices.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Accessing a web-service}
+\chapter{Using REST}
+The following sections describe how you can access REST webservices and write
+your own ones.
+
+\section{Accessing a web-service}
+There are two options for accessing a webservice: custom code for sending/receiving
+data or generic processing in the flow itself.
+
+\subsection{Custom code}
+When using custom code, you can use one of the following superclasses to derive
+your own code from:
+\begin{tight_itemize}
+  \item adams.flow.rest.AbstractRESTClientSource
+  \item adams.flow.rest.AbstractRESTClientTransformer
+  \item adams.flow.rest.AbstractRESTClientSink
+\end{tight_itemize}
+These classes are generics and require you to supply the input and/or output
+types, override methods for integrating them in the flow (accepts/generates)
+and methods for handling input/output data.
+These superclasses are available in the flow through the following, corresponding
+actors:
+\begin{tight_itemize}
+  \item adams.flow.source.RESTSource
+  \item adams.flow.transformer.RESTTransformer
+  \item adams.flow.sink.RESTSink
+\end{tight_itemize}
+
+The \textit{adams.flow.rest.echo.EchoClientTransformer} class is a simple
+example that sends a UTF-8 string it receives to an Echo REST server, which simply
+returns the same data. In the \verb|doQuery()| method, a URL is constructed
+from the URL of the echo server and the URL-encoded string that is to be sent
+to the server. The actual sending via the \verb|GET| method is handled by the
+\verb|adams.core.net.HttpRequestHelper| class. The response from the echo
+server is then decoded from a UTF-8 string and forwarded in the flow.
+
+{\scriptsize
+\begin{verbatim}
+package adams.flow.rest.echo;
+import adams.core.base.BaseURL;
+import adams.core.net.HttpRequestHelper;
+import adams.flow.container.HTMLRequestResult;
+import adams.flow.rest.AbstractRESTClientTransformer;
+import org.jsoup.Connection.Method;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+
+public class EchoClientTransformer
+  extends AbstractRESTClientTransformer<String,String> {
+
+  protected String m_RequestData;
+
+  public String globalInfo() {
+    return "Client (transformer) for Echo REST service.";
+  }
+
+  public Class[] accepts() {
+    return new Class[]{String.class};
+  }
+
+  public Class[] generates() {
+    return new Class[]{String.class};
+  }
+
+  public void setRequestData(String value) {
+    m_RequestData = value;
+  }
+
+  protected void doQuery() throws Exception {
+    String		url;
+    HTMLRequestResult 	result;
+
+    if (getUseAlternativeURL())
+      url = getAlternativeURL();
+    else
+      url = new EchoServer().getDefaultURL();
+    url += "echo/" + URLEncoder.encode(m_RequestData, "UTF-8");
+    result = HttpRequestHelper.send(new BaseURL(url), Method.GET, null, null);
+    if (result.getValue(HTMLRequestResult.VALUE_STATUSCODE, Integer.class) == 200)
+      setResponseData(URLDecoder.decode(result.getValue(HTMLRequestResult.VALUE_BODY, String.class), "UTF-8"));
+    else
+      m_LastError = result.getValue(HTMLRequestResult.VALUE_STATUSCODE) + ": "
+          + result.getValue(HTMLRequestResult.VALUE_STATUSMESSAGE);
+  }
+}
+\end{verbatim}}
+
+\subsection{Generic flow}
 TODO
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Creating a web-service}
+
+\section{Creating a web-service}
 TODO
 
-\section{Context}
+\subsection{Context}
 If your REST service components require a context, e.g., flow context, then
 you have to use the following approach for setting up the service
 factory\footnote{\url{http://cxf.apache.org/docs/jaxrs-services-configuration.html}{}}:
 \begin{verbatim}
 JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
 CustomerService cs = new CustomerService();
+// set context in CustomerService service bean
 sf.setServiceBeans(cs);
 sf.setAddress("http://localhost:9080/");
 sf.create();
@@ -110,7 +197,7 @@ The following sinks are available:
 	\item \textit{RESTSink} -- simply sends data to a web-service\footnote{adams-rest-echo\_sink.flow}.
 \end{tight_itemize}
 
-\subsection{TLS support}
+\section{TLS support}
 TLS support is automatically configured in case the URL uses \verb|https://| as
 protocol and the \verb|RESTUtils.configureClient| method is called. The following
 standalones have to be present (and configured) in that case:
