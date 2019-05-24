@@ -1,0 +1,21 @@
+# Project: adams
+# Date: 2019-05-24 13:35:17
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-event,adams-net,adams-rest,adams-security,adams-webservice-core
+#
+adams.flow.control.Flow -annotation "Shows how to connect to a REST \\\"https\\\" webservice, constructing URL \\nand connecting to service to obtain and display result.\\nUses certificates stored in ${FLOWS}/restssl\\n\\nNB: Requires \\\"adams-rest-echo_server-ssl.flow\\\" to be running." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.KeyManager -keystore-file ${FLOWS}/restssl/client_key.p12 -keystore-passphrase {YWRhbXN0ZXN0}
+ adams.flow.standalone.TrustManager -keystore-file ${FLOWS}/restssl/adamstest.jks -keystore-passphrase {YWRhbXN0ZXN0}
+ adams.flow.standalone.SSLContext
+ adams.flow.standalone.SetVariable -name "webservice URL" -var-name service_url -var-value https://localhost:8080/echo/
+ adams.flow.source.EnterValue -stop-if-canceled true -message "Please value to send to webservice" -initial-value "The brown fox jumps over the lazy dog."
+ adams.flow.control.Tee -name encode
+  adams.flow.transformer.Convert -conversion adams.data.conversion.URLEncode
+  adams.flow.transformer.StringInsert -position first -value @{service_url}
+  adams.flow.transformer.SetVariable -var-name url
+ adams.flow.control.Trigger -name send
+  adams.flow.source.HttpRequest -url @{url} -method GET
+  adams.flow.control.ContainerValuePicker -value Body -switch-outputs true
+  adams.flow.transformer.Convert -conversion adams.data.conversion.URLDecode
+  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
