@@ -59,16 +59,17 @@
 REST webservices (\cite{rest}) are a popular variant of webservices, that
 are quite often easier to implement than full-blown SOAP-based ones (\cite{soap}).
 
-ADAMS provides a general framework for accessing and implementing REST webservices.
+ADAMS provides a general framework for accessing and implementing REST webservices
+using Apache CXF\cite{cxf}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Using REST}
-The following sections describe how you can access REST webservices and write
-your own ones.
+The following sections describe how you can access REST webservices (\textit{client})
+and write your own ones (\textit{server}).
 
 \section{Client}
 There are two options for accessing a webservice: custom code for sending/receiving
-data or generic processing in the flow itself.
+data or via generic processing in the flow itself.
 
 \subsection{Custom code}
 When using custom code, you can use one of the following superclasses to derive
@@ -91,12 +92,13 @@ actors:
 
 The \textit{adams.flow.rest.echo.EchoClientTransformer} class is a simple
 example that sends a UTF-8 string it receives to an Echo REST server, which simply
-returns the same data. In the \verb|doQuery()| method, a URL is constructed
+returns the same data. In the \verb|doQuery| method, a URL is constructed
 from the URL of the echo server and the URL-encoded string that is to be sent
 to the server. The actual sending via the \verb|GET| method is handled by the
 \verb|adams.core.net.HttpRequestHelper| class. The response from the echo
 server is then decoded from a UTF-8 string and forwarded in the flow.
 
+\clearpage
 {\scriptsize
 \begin{verbatim}
 package adams.flow.rest.echo;
@@ -113,32 +115,22 @@ public class EchoClientTransformer
 
   protected String m_RequestData;
 
-  public String globalInfo() {
-    return "Client (transformer) for Echo REST service.";
-  }
+  public String globalInfo() { return "Client (transformer) for Echo REST service."; }
 
-  public Class[] accepts() {
-    return new Class[]{String.class};
-  }
+  public Class[] accepts() { return new Class[]{String.class}; }
 
-  public Class[] generates() {
-    return new Class[]{String.class};
-  }
+  public Class[] generates() { return new Class[]{String.class}; }
 
-  public void setRequestData(String value) {
-    m_RequestData = value;
-  }
+  public void setRequestData(String value) { m_RequestData = value; }
 
   protected void doQuery() throws Exception {
-    String		url;
-    HTMLRequestResult 	result;
-
+    String url;
     if (getUseAlternativeURL())
       url = getAlternativeURL();
     else
       url = new EchoServer().getDefaultURL();
     url += "echo/" + URLEncoder.encode(m_RequestData, "UTF-8");
-    result = HttpRequestHelper.send(new BaseURL(url), Method.GET, null, null);
+    HTMLRequestResult result = HttpRequestHelper.send(new BaseURL(url), Method.GET, null, null);
     if (result.getValue(HTMLRequestResult.VALUE_STATUSCODE, Integer.class) == 200)
       setResponseData(URLDecoder.decode(result.getValue(HTMLRequestResult.VALUE_BODY, String.class), "UTF-8"));
     else
@@ -167,8 +159,137 @@ component available through the flow\footnote{See example flow: adams-rest-use\_
   be turned into a regular string again.
 \end{tight_itemize}
 
+
+\clearpage
 \section{Server}
-TODO
+For implementing the server side, you can use two different approaches:
+\begin{tight_itemize}
+  \item Custom class to encapsulate complete server
+  \item Creating fine-grained plugins for the \verb|GenericServer|
+\end{tight_itemize}
+For both approaches, it is recommended to look at the some of the tutorials
+listed on the Wikipedia article on JAX-RS\cite{jax-rs}, the Java API for
+RESTful Web Services, to get an understanding on how to code for REST.
+
+JAX-RS handles everything, methods (GET/POST), paths and path parameters through
+Java annotations, which you will see in the following examples.
+
+\subsection{Custom class}
+In order to make the custom REST service available through the \verb|RESTServer|
+standalone, it needs to be either sub-classed from \verb|AbstractRESTProvider|
+or implement \verb|RESTProvider| interface (both are located in
+\verb|adams.flow.rest|). In the following the use of \verb|AbstractRESTProvider|
+is discussed, as it simplifies the implementation and supports handling for
+custom URLs, interceptors, etc.
+
+The \verb|doStart| method configures an \verb|JAXRSServerFactoryBean| (located
+in package \verb|org.apache.cxf.jaxrs|) instance and returns the
+\verb|Server| (package \verb|org.apache.cxf.endpoint|) generated from it.
+The functionality to be offered by the REST service is defined by the
+service bean that is set via the \verb|setServiceBean| method or the beans
+that are set via the \verb|setServiceBeans| method. Optional TLS support,
+i.e., serving content via \textit{https} is configured by calling the \verb|configureTLS|
+method with the configured factory bean (see \ref{tls_support} for more details).
+
+{\scriptsize
+\begin{verbatim}
+package adams.flow.rest;
+
+import adams.core.Utils;
+import adams.flow.rest.AbstractRESTProvider;
+import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import somewhere.Echo;
+
+public class EchoServer extends AbstractRESTProvider {
+
+  public String globalInfo() {
+    return "Simple echo server.";
+  }
+
+  public String getDefaultURL() {
+    return "http://localhost:8080/";
+  }
+
+  protected Server doStart() throws Exception {
+    JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
+    configureInterceptors(factory);
+    factory.setServiceBean(new Echo());
+    factory.setAddress(getURL());
+    configureTLS(factory);
+    return factory.create();
+  }
+}
+\end{verbatim}}
+
+\clearpage
+{\scriptsize
+\begin{verbatim}
+package somewhere;
+
+public class Echo {
+
+  @GET
+  @Path("/echo/{input}")
+  @Produces("text/plain")
+  public String ping(@PathParam("input") String input) {
+    return input;
+  }
+}
+\end{verbatim}}
+
+\subsection{Generic server}
+The light-weight approach of REST and being able to just supply an arbitrary
+number of service beans, makes it possible to break up monolithic servers
+into micro-servers and opening up the possibility of given the user the choice
+in the flow over what functionality the server shoudl have. For that purpose,
+the \verb|GenericServer| (package \verb|adams.flow.rest|) was developed.
+In order to add functionality to this REST server, plugins need to be developed.
+These plugins either just implement the \verb|RESTPlugin| interface or are
+sub-classed from \verb|AbstractRESTPlugin| (also in package \verb|adams.flow.rest|).
+
+The following code shows the plugin for out echo server, which would be selected
+as plugin in our \verb|GenericServer|, which in turn is configured through the
+\verb|RESTServer| standalone.
+
+{\scriptsize
+\begin{verbatim}
+package adams.flow.rest;
+
+import adams.flow.rest.AbstractRESTPlugin;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+public class Echo extends AbstractRESTPlugin {
+
+  public String globalInfo() {
+    return "Simple echo of the input.";
+  }
+
+  @GET
+  @Path("/echo/{input}")
+  @Produces("text/plain")
+  public String ping(@PathParam("input") String input) {
+    getLogger().info("input: " + input);
+    return input;
+  }
+}
+\end{verbatim}}
+
+\noindent There are more abstract superclasses available for plugins, to
+avoid unnecessary duplication:
+\begin{tight_itemize}
+  \item \textit{AbstractRegisteredFlowRESTPlugin} -- allows retrieval of
+  registered flows via their ID.
+  \item \textit{AbstractRESTPluginWithDatabaseConnection} -- enables database
+  access via its flow context and the available \textit{DatabaseConnection}
+  standalone.
+  \item \textit{AbstractRESTPluginWithFlowContext} -- for any plugin that
+  requires flow context, e.g., for accessing configurations.
+\end{tight_itemize}
 
 \subsection{Context}
 If your REST service components require a context, e.g., flow context, then
@@ -177,8 +298,8 @@ factory\footnote{\url{http://cxf.apache.org/docs/jaxrs-services-configuration.ht
 \begin{verbatim}
 JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
 CustomerService cs = new CustomerService();
-// set context in CustomerService service bean
-sf.setServiceBeans(cs);
+// HERE: set context in CustomerService service bean
+sf.setServiceBean(cs);
 sf.setAddress("http://localhost:9080/");
 sf.create();
 \end{verbatim}
@@ -213,6 +334,7 @@ The following sinks are available:
 \end{tight_itemize}
 
 \section{TLS support}
+\label{tls_support}
 TLS support is automatically configured in case the URL uses \verb|https://| as
 protocol and the \verb|RESTUtils.configureClient| method is called. For the
 server side, you need to call the \verb|AbstractRESTProvider.configureTLS| method
