@@ -23,12 +23,12 @@ import adams.core.Utils;
 import adams.core.base.BaseURL;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.Actor;
+import adams.flow.core.SSLContextProvider;
 import adams.flow.core.TLSUtils;
 import adams.flow.rest.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.rest.interceptor.outgoing.AbstractOutInterceptorGenerator;
 import adams.flow.standalone.KeyManager;
 import adams.flow.standalone.RESTServer;
-import adams.flow.standalone.SSLContext;
 import adams.flow.standalone.TrustManager;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.endpoint.Server;
@@ -277,7 +277,7 @@ public abstract class AbstractRESTProvider
       else {
 	throw new IllegalStateException(
 	  "Failed to configure SSL context for '" + factory.getAddress() + "' - missing actors ("
-	    + Utils.classesToString(new Class[]{KeyManager.class, TrustManager.class, SSLContext.class}) + ")?");
+	    + Utils.classesToString(new Class[]{KeyManager.class, TrustManager.class, SSLContextProvider.class}) + ")?");
       }
     }
   }

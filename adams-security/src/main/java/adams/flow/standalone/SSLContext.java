@@ -23,6 +23,7 @@ package adams.flow.standalone;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.flow.core.ActorUtils;
+import adams.flow.core.SSLContextProvider;
 
 /**
  <!-- globalinfo-start -->
@@ -81,7 +82,8 @@ import adams.flow.core.ActorUtils;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class SSLContext
-  extends AbstractStandalone {
+  extends AbstractStandalone
+  implements SSLContextProvider {
 
   private static final long serialVersionUID = 3010371119440218991L;
 
@@ -193,6 +195,7 @@ public class SSLContext
    *
    * @return		the instance, null if not available
    */
+  @Override
   public javax.net.ssl.SSLContext getSSLContext() {
     return m_SSLContext;
   }

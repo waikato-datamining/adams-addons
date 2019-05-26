@@ -23,9 +23,9 @@ import adams.core.Utils;
 import adams.core.base.BaseURL;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.Actor;
+import adams.flow.core.SSLContextProvider;
 import adams.flow.core.TLSUtils;
 import adams.flow.standalone.KeyManager;
-import adams.flow.standalone.SSLContext;
 import adams.flow.standalone.TrustManager;
 import adams.flow.standalone.WSServer;
 import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
@@ -274,7 +274,7 @@ public abstract class AbstractWebServiceProvider
       else {
 	throw new IllegalStateException(
 	  "Failed to configure SSL context for '" + url + "' - missing actors ("
-	    + Utils.classesToString(new Class[]{KeyManager.class, TrustManager.class, SSLContext.class}) + ")?");
+	    + Utils.classesToString(new Class[]{KeyManager.class, TrustManager.class, SSLContextProvider.class}) + ")?");
       }
     }
   }
