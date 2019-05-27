@@ -23,13 +23,13 @@ import adams.core.Utils;
 import adams.core.logging.LoggingLevelHandler;
 import adams.core.net.ProxyHelper;
 import adams.flow.core.Actor;
+import adams.flow.core.KeyManagerFactoryProvider;
 import adams.flow.core.SSLContextProvider;
 import adams.flow.core.TLSUtils;
+import adams.flow.core.TrustManagerFactoryProvider;
 import adams.flow.rest.interceptor.InterceptorWithActor;
 import adams.flow.rest.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.rest.interceptor.outgoing.AbstractOutInterceptorGenerator;
-import adams.flow.standalone.KeyManager;
-import adams.flow.standalone.TrustManager;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -145,7 +145,7 @@ public class RESTUtils {
       if (!TLSUtils.configureClientTLS(owner, http))
         throw new IllegalStateException(
           "Failed to configure SSL context for '" + actualURL + "' - missing actors ("
-	    + Utils.classesToString(new Class[]{KeyManager.class, TrustManager.class, SSLContextProvider.class}) + ")?");
+	    + Utils.classesToString(new Class[]{KeyManagerFactoryProvider.class, TrustManagerFactoryProvider.class, SSLContextProvider.class}) + ")?");
     }
   }
 

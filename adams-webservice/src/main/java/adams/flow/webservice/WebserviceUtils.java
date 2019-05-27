@@ -25,10 +25,10 @@ import adams.core.net.ProxyHelper;
 import adams.core.option.OptionHandler;
 import adams.core.option.OptionUtils;
 import adams.flow.core.Actor;
+import adams.flow.core.KeyManagerFactoryProvider;
 import adams.flow.core.SSLContextProvider;
 import adams.flow.core.TLSUtils;
-import adams.flow.standalone.KeyManager;
-import adams.flow.standalone.TrustManager;
+import adams.flow.core.TrustManagerFactoryProvider;
 import adams.flow.webservice.interceptor.InterceptorWithActor;
 import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
@@ -177,7 +177,7 @@ public class WebserviceUtils {
       if (!TLSUtils.configureClientTLS(owner, http))
         throw new IllegalStateException(
           "Failed to configure SSL context for '" + actualURL + "' - missing actors ("
-	    + Utils.classesToString(new Class[]{KeyManager.class, TrustManager.class, SSLContextProvider.class}) + ")?");
+	    + Utils.classesToString(new Class[]{KeyManagerFactoryProvider.class, TrustManagerFactoryProvider.class, SSLContextProvider.class}) + ")?");
     }
   }
 

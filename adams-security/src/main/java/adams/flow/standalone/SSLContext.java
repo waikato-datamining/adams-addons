@@ -23,7 +23,9 @@ package adams.flow.standalone;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.flow.core.ActorUtils;
+import adams.flow.core.KeyManagerFactoryProvider;
 import adams.flow.core.SSLContextProvider;
+import adams.flow.core.TrustManagerFactoryProvider;
 
 /**
  <!-- globalinfo-start -->
@@ -91,10 +93,10 @@ public class SSLContext
   protected String m_Protocol;
 
   /** the KeyManager instance to use. */
-  protected transient KeyManager m_KeyManager;
+  protected transient KeyManagerFactoryProvider m_KeyManager;
 
   /** the TrustManager instance to use. */
-  protected transient TrustManager m_TrustManager;
+  protected transient TrustManagerFactoryProvider m_TrustManager;
 
   /** the SSL context. */
   protected transient javax.net.ssl.SSLContext m_SSLContext;
@@ -109,8 +111,8 @@ public class SSLContext
     return "Initializes an SSL context using the specified context.\n"
       + "For protocols, see:\n"
       + "https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html#sslcontext-algorithms\n"
-      + "Requires " + Utils.classToString(KeyManager.class) + " and "
-      + Utils.classToString(TrustManager.class) + " standalones to be present.";
+      + "Requires " + Utils.classToString(KeyManagerFactoryProvider.class) + " and "
+      + Utils.classToString(TrustManagerFactoryProvider.class) + " standalones to be present.";
   }
 
   /**
@@ -176,15 +178,15 @@ public class SSLContext
     result = super.setUp();
 
     if (result == null) {
-      m_KeyManager = (KeyManager) ActorUtils.findClosestType(this, KeyManager.class, true);
+      m_KeyManager = (KeyManagerFactoryProvider) ActorUtils.findClosestType(this, KeyManagerFactoryProvider.class, true);
       if (m_KeyManager == null)
-        result = "Failed to locate " + Utils.classToString(KeyManager.class) + " actor!";
+        result = "Failed to locate " + Utils.classToString(KeyManagerFactoryProvider.class) + " actor!";
     }
 
     if (result == null) {
-      m_TrustManager = (TrustManager) ActorUtils.findClosestType(this, TrustManager.class, true);
+      m_TrustManager = (TrustManagerFactoryProvider) ActorUtils.findClosestType(this, TrustManagerFactoryProvider.class, true);
       if (m_TrustManager == null)
-        result = "Failed to locate " + Utils.classToString(TrustManager.class) + " actor!";
+        result = "Failed to locate " + Utils.classToString(TrustManagerFactoryProvider.class) + " actor!";
     }
 
     return result;

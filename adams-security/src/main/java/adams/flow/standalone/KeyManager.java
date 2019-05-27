@@ -26,6 +26,7 @@ import adams.core.io.ConsoleHelper;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 import adams.flow.control.Flow;
+import adams.flow.core.KeyManagerFactoryProvider;
 import adams.flow.core.OptionalPasswordPrompt;
 import adams.flow.core.StopHelper;
 import adams.flow.core.StopMode;
@@ -132,7 +133,7 @@ import java.util.List;
  */
 public class KeyManager
   extends AbstractStandalone
-  implements OptionalPasswordPrompt {
+  implements OptionalPasswordPrompt, KeyManagerFactoryProvider {
 
   private static final long serialVersionUID = 3990761211470952210L;
 
@@ -546,6 +547,7 @@ public class KeyManager
    *
    * @return		the instance, null if none available
    */
+  @Override
   public KeyManagerFactory getKeyManagerFactory() {
     return m_KeyManagerFactory;
   }

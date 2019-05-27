@@ -29,6 +29,7 @@ import adams.flow.control.Flow;
 import adams.flow.core.OptionalPasswordPrompt;
 import adams.flow.core.StopHelper;
 import adams.flow.core.StopMode;
+import adams.flow.core.TrustManagerFactoryProvider;
 import adams.gui.dialog.PasswordDialog;
 
 import javax.net.ssl.TrustManagerFactory;
@@ -130,7 +131,7 @@ import java.util.List;
  */
 public class TrustManager
   extends AbstractStandalone
-  implements OptionalPasswordPrompt {
+  implements OptionalPasswordPrompt, TrustManagerFactoryProvider {
 
   private static final long serialVersionUID = 3990761211470952210L;
 
@@ -542,6 +543,7 @@ public class TrustManager
    *
    * @return		the instance, null if none available
    */
+  @Override
   public TrustManagerFactory getTrustManagerFactory() {
     return m_TrustManagerFactory;
   }

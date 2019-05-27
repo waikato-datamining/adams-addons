@@ -20,8 +20,6 @@
 
 package adams.flow.core;
 
-import adams.flow.standalone.KeyManager;
-import adams.flow.standalone.TrustManager;
 import com.github.fracpete.javautils.struct.Struct3;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
@@ -43,14 +41,14 @@ public class TLSUtils {
    * @param requireAll 	whether all the actors need to be present
    * @return		the actors, null if all required and not all were present
    */
-  public static Struct3<KeyManager,TrustManager,SSLContextProvider> locateActors(Actor context, boolean requireAll) {
-    Struct3<KeyManager,TrustManager,SSLContextProvider>	result;
-    KeyManager 					keyManager;
-    TrustManager 				trustManager;
-    SSLContextProvider				sslContext;
+  public static Struct3<KeyManagerFactoryProvider,TrustManagerFactoryProvider,SSLContextProvider> locateActors(Actor context, boolean requireAll) {
+    Struct3<KeyManagerFactoryProvider,TrustManagerFactoryProvider,SSLContextProvider>	result;
+    KeyManagerFactoryProvider 		keyManager;
+    TrustManagerFactoryProvider 	trustManager;
+    SSLContextProvider			sslContext;
 
-    keyManager   = (KeyManager) ActorUtils.findClosestType(context, KeyManager.class, true);
-    trustManager = (TrustManager) ActorUtils.findClosestType(context, TrustManager.class, true);
+    keyManager   = (KeyManagerFactoryProvider) ActorUtils.findClosestType(context, KeyManagerFactoryProvider.class, true);
+    trustManager = (TrustManagerFactoryProvider) ActorUtils.findClosestType(context, TrustManagerFactoryProvider.class, true);
     sslContext   = (SSLContextProvider) ActorUtils.findClosestType(context, SSLContextProvider.class, true);
 
     if (requireAll) {
@@ -73,9 +71,9 @@ public class TLSUtils {
    * @return		the parameters, null if failed to configure
    */
   public static TLSClientParameters configureClientTLS(Actor context) {
-    TLSClientParameters 				result;
-    Struct3<KeyManager,TrustManager,SSLContextProvider> actors;
-    String						protocol;
+    TLSClientParameters 	result;
+    Struct3<KeyManagerFactoryProvider,TrustManagerFactoryProvider,SSLContextProvider> actors;
+    String			protocol;
 
     actors = locateActors(context, false);
     if (actors == null)
@@ -125,9 +123,9 @@ public class TLSUtils {
    * @return		the parameters, null if failed to configure
    */
   public static TLSServerParameters configureServerTLS(Actor context) {
-    TLSServerParameters 				result;
-    Struct3<KeyManager,TrustManager,SSLContextProvider> actors;
-    String						protocol;
+    TLSServerParameters 	result;
+    Struct3<KeyManagerFactoryProvider,TrustManagerFactoryProvider,SSLContextProvider> actors;
+    String			protocol;
 
     actors = locateActors(context, false);
     if (actors == null)
