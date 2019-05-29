@@ -20,19 +20,14 @@
 
 package adams.flow.source;
 
+import adams.core.QuickInfoHelper;
+import adams.flow.core.Token;
 import moa.options.ClassOption;
 import moa.streams.InstanceStream;
 import moa.streams.generators.AgrawalGenerator;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.MOAUtils;
-import adams.core.QuickInfoHelper;
-import adams.flow.core.Token;
-import adams.flow.provenance.ActorType;
-import adams.flow.provenance.Provenance;
-import adams.flow.provenance.ProvenanceContainer;
-import adams.flow.provenance.ProvenanceInformation;
-import adams.flow.provenance.ProvenanceSupporter;
 
 /**
  <!-- globalinfo-start -->
@@ -96,11 +91,9 @@ import adams.flow.provenance.ProvenanceSupporter;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class MOAStream
-  extends AbstractSource
-  implements ProvenanceSupporter {
+  extends AbstractSource {
 
   /** for serialization. */
   private static final long serialVersionUID = 1862828539481494711L;
@@ -395,8 +388,6 @@ public class MOAStream
       result = new Token(data);
     }
 
-    updateProvenance(result);
-
     return result;
   }
 
@@ -412,15 +403,5 @@ public class MOAStream
     maxReached = ((m_NumExamples > -1) && (m_CountExamples >= m_NumExamples));
 
     return (m_ActualStreamGenerator != null) && !maxReached && m_ActualStreamGenerator.hasMoreInstances();
-  }
-
-  /**
-   * Updates the provenance information in the provided container.
-   *
-   * @param cont	the provenance container to update
-   */
-  public void updateProvenance(ProvenanceContainer cont) {
-    if (Provenance.getSingleton().isEnabled())
-      cont.addProvenance(new ProvenanceInformation(ActorType.DATAGENERATOR, this, ((Token) cont).getPayload().getClass()));
   }
 }

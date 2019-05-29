@@ -20,13 +20,13 @@
 
 package adams.flow.transformer;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import moa.core.Measurement;
 import adams.core.QuickInfoHelper;
 import adams.core.base.BaseRegExp;
 import adams.flow.core.Token;
+import moa.core.Measurement;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -240,11 +240,8 @@ public class MOAMeasurementsFilter
       }
     }
 
-    if (filtered.size() > 0) {
+    if (filtered.size() > 0)
       m_OutputToken = new Token(filtered.toArray(new Measurement[filtered.size()]));
-      if (m_InputToken.hasProvenance())
-	m_OutputToken.setProvenance(m_InputToken.getProvenance().getClone());
-    }
 
     return result;
   }

@@ -20,32 +20,23 @@
 
 package adams.flow.transformer;
 
-import gnu.trove.list.array.TIntArrayList;
-
-import java.lang.reflect.Array;
-
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.data.SplitResultType;
 import adams.data.random.JavaRandomInt;
 import adams.data.random.RandomIntegerRangeGenerator;
-import adams.flow.core.Token;
 import adams.flow.core.Unknown;
-import adams.flow.provenance.ActorType;
-import adams.flow.provenance.Provenance;
-import adams.flow.provenance.ProvenanceContainer;
-import adams.flow.provenance.ProvenanceInformation;
-import adams.flow.provenance.ProvenanceSupporter;
+import gnu.trove.list.array.TIntArrayList;
+
+import java.lang.reflect.Array;
 
 /**
  * Ancestor for array splitters.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 7732 $
  */
 public abstract class AbstractArraySplitter
-  extends AbstractTransformer
-  implements ProvenanceSupporter {
+  extends AbstractTransformer {
 
   /** for serialization. */
   private static final long serialVersionUID = 8536100625511019961L;
@@ -183,18 +174,5 @@ public abstract class AbstractArraySplitter
       Array.set(result, i, Utils.deepCopy(Array.get(arrayOld, indices.get(i))));
     
     return result;
-  }
-
-  /**
-   * Updates the provenance information in the provided container.
-   *
-   * @param cont	the provenance container to update
-   */
-  public void updateProvenance(ProvenanceContainer cont) {
-    if (Provenance.getSingleton().isEnabled()) {
-      if (m_InputToken.hasProvenance())
-	cont.setProvenance(m_InputToken.getProvenance().getClone());
-      cont.addProvenance(new ProvenanceInformation(ActorType.PREPROCESSOR, m_InputToken.getPayload().getClass(), this, ((Token) cont).getPayload().getClass()));
-    }
   }
 }

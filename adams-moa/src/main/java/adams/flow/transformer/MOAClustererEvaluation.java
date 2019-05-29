@@ -25,10 +25,6 @@ import adams.core.QuickInfoHelper;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.Token;
-import adams.flow.provenance.ActorType;
-import adams.flow.provenance.Provenance;
-import adams.flow.provenance.ProvenanceContainer;
-import adams.flow.provenance.ProvenanceInformation;
 import moa.clusterers.AbstractClusterer;
 import moa.core.Measurement;
 import moa.evaluation.BasicClusteringPerformanceEvaluator;
@@ -455,28 +451,13 @@ public class MOAClustererEvaluation
       if (m_Count % m_OutputInterval == 0) {
 	m_Count = 0;
 	m_OutputToken = new Token(m_ActualEvaluator.getPerformanceMeasurements());
-	updateProvenance(m_OutputToken);
       }
     }
     else {
       m_OutputToken = new Token(m_ActualEvaluator.getPerformanceMeasurements());
-      updateProvenance(m_OutputToken);
     }
 
     return result;
-  }
-
-  /**
-   * Updates the provenance information in the provided container.
-   *
-   * @param cont	the provenance container to update
-   */
-  public void updateProvenance(ProvenanceContainer cont) {
-    if (Provenance.getSingleton().isEnabled()) {
-      if (m_InputToken.hasProvenance())
-	cont.setProvenance(m_InputToken.getProvenance().getClone());
-      cont.addProvenance(new ProvenanceInformation(ActorType.EVALUATOR, m_InputToken.getPayload().getClass(), this, m_OutputToken.getPayload().getClass()));
-    }
   }
 
   /**

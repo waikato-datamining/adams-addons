@@ -20,15 +20,14 @@
 
 package adams.flow.transformer;
 
+import adams.core.QuickInfoHelper;
+import adams.flow.core.Token;
 import gnu.trove.list.array.TIntArrayList;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-
-import adams.core.QuickInfoHelper;
-import adams.flow.core.Token;
 
 /**
  <!-- globalinfo-start -->
@@ -98,7 +97,6 @@ import adams.flow.core.Token;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 7732 $
  */
 public class ArrayFolds
   extends AbstractArraySplitter {
@@ -354,9 +352,7 @@ public class ArrayFolds
       default:
 	throw new IllegalStateException("Unhandled split result: " + m_SplitResult);
     }
-    
-    updateProvenance(m_OutputToken);
-    
+
     return m_OutputToken;
   }
 }

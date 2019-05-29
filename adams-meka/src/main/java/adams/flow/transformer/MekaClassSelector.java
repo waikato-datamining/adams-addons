@@ -20,18 +20,13 @@
 
 package adams.flow.transformer;
 
-import gnu.trove.list.array.TIntArrayList;
-import meka.filters.unsupervised.attribute.MekaClassAttributes;
-import weka.filters.Filter;
 import adams.core.QuickInfoHelper;
 import adams.core.base.BaseRegExp;
 import adams.data.weka.WekaAttributeRange;
 import adams.flow.core.Token;
-import adams.flow.provenance.ActorType;
-import adams.flow.provenance.Provenance;
-import adams.flow.provenance.ProvenanceContainer;
-import adams.flow.provenance.ProvenanceInformation;
-import adams.flow.provenance.ProvenanceSupporter;
+import gnu.trove.list.array.TIntArrayList;
+import meka.filters.unsupervised.attribute.MekaClassAttributes;
+import weka.filters.Filter;
 
 /**
  <!-- globalinfo-start -->
@@ -93,11 +88,9 @@ import adams.flow.provenance.ProvenanceSupporter;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 8065 $
  */
 public class MekaClassSelector
-  extends AbstractTransformer
-  implements ProvenanceSupporter {
+  extends AbstractTransformer {
 
   /** for serialization. */
   private static final long serialVersionUID = -3019442578354930841L;
@@ -282,25 +275,11 @@ public class MekaClassSelector
       newName = oldName + ": -C " + indices.length;
       inst.setRelationName(newName);
       m_OutputToken = new Token(inst);
-      updateProvenance(m_OutputToken);
     }
     catch (Exception e) {
       result = handleException("Failed to set class attributes!", e);
     }
 
     return result;
-  }
-
-  /**
-   * Updates the provenance information in the provided container.
-   *
-   * @param cont	the provenance container to update
-   */
-  public void updateProvenance(ProvenanceContainer cont) {
-    if (Provenance.getSingleton().isEnabled()) {
-      if (m_InputToken.hasProvenance())
-	cont.setProvenance(m_InputToken.getProvenance().getClone());
-      cont.addProvenance(new ProvenanceInformation(ActorType.PREPROCESSOR, m_InputToken.getPayload().getClass(), this, m_OutputToken.getPayload().getClass()));
-    }
   }
 }

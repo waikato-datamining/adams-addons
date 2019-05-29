@@ -25,11 +25,6 @@ import adams.data.audio.WaveContainer;
 import adams.data.wavefilter.AbstractWaveFilter;
 import adams.data.wavefilter.PassThrough;
 import adams.flow.core.Token;
-import adams.flow.provenance.ActorType;
-import adams.flow.provenance.Provenance;
-import adams.flow.provenance.ProvenanceContainer;
-import adams.flow.provenance.ProvenanceInformation;
-import adams.flow.provenance.ProvenanceSupporter;
 
 /**
  <!-- globalinfo-start -->
@@ -44,8 +39,7 @@ import adams.flow.provenance.ProvenanceSupporter;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class WaveFilter
-  extends AbstractTransformer
-  implements ProvenanceSupporter {
+  extends AbstractTransformer {
 
   /** for serialization. */
   private static final long serialVersionUID = -1998955116780561587L;
@@ -154,24 +148,9 @@ public class WaveFilter
       result = handleException("Failed to filter data: " + data, e);
     }
 
-    if (filtered != null) {
+    if (filtered != null)
       m_OutputToken = new Token(filtered);
-      updateProvenance(m_OutputToken);
-    }
 
     return result;
-  }
-
-  /**
-   * Updates the provenance information in the provided container.
-   *
-   * @param cont	the provenance container to update
-   */
-  public void updateProvenance(ProvenanceContainer cont) {
-    if (Provenance.getSingleton().isEnabled()) {
-      if (m_InputToken.hasProvenance())
-	cont.setProvenance(m_InputToken.getProvenance().getClone());
-      cont.addProvenance(new ProvenanceInformation(ActorType.PREPROCESSOR, m_InputToken.getPayload().getClass(), this, ((Token) cont).getPayload().getClass()));
-    }
   }
 }

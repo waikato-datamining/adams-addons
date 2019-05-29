@@ -25,11 +25,6 @@ import adams.data.conversion.BufferedImageToOtherFormatConversion;
 import adams.data.image.AbstractImageContainer;
 import adams.data.image.BufferedImageContainer;
 import adams.flow.core.Token;
-import adams.flow.provenance.ActorType;
-import adams.flow.provenance.Provenance;
-import adams.flow.provenance.ProvenanceContainer;
-import adams.flow.provenance.ProvenanceInformation;
-import adams.flow.provenance.ProvenanceSupporter;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
 import com.github.sarxos.webcam.Webcam;
 
@@ -107,11 +102,9 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class WebcamImage
-  extends AbstractSource
-  implements ProvenanceSupporter {
+  extends AbstractSource {
 
   /** for serialization. */
   private static final long serialVersionUID = -5718059337341470131L;
@@ -412,20 +405,7 @@ public class WebcamImage
       }
     }
 
-    if (result != null)
-      updateProvenance(result);
-
     return result;
-  }
-
-  /**
-   * Updates the provenance information in the provided container.
-   *
-   * @param cont	the provenance container to update
-   */
-  public void updateProvenance(ProvenanceContainer cont) {
-    if (Provenance.getSingleton().isEnabled())
-      cont.addProvenance(new ProvenanceInformation(ActorType.DATAGENERATOR, this, ((Token) cont).getPayload().getClass()));
   }
 
   /**

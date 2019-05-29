@@ -23,12 +23,6 @@ package adams.flow.transformer;
 import adams.core.QuickInfoHelper;
 import adams.core.io.PlaceholderFile;
 import adams.data.image.AbstractImageContainer;
-import adams.flow.core.Token;
-import adams.flow.provenance.ActorType;
-import adams.flow.provenance.Provenance;
-import adams.flow.provenance.ProvenanceContainer;
-import adams.flow.provenance.ProvenanceInformation;
-import adams.flow.provenance.ProvenanceSupporter;
 import adams.flow.transformer.movieimagesampler.AbstractMovieImageSampler;
 import adams.flow.transformer.movieimagesampler.FixedIntervalBufferedImageSampler;
 
@@ -97,11 +91,9 @@ import java.util.Arrays;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class MovieImageSampler
-  extends AbstractArrayProvider
-  implements ProvenanceSupporter {
+  extends AbstractArrayProvider {
 
   /** for serialization. */
   private static final long serialVersionUID = 3690378527551302472L;
@@ -230,32 +222,6 @@ public class MovieImageSampler
     }
 
     return result;
-  }
-
-  /**
-   * Returns the generated token.
-   *
-   * @return		the generated token
-   */
-  @Override
-  public Token output() {
-    Token	result;
-
-    result = super.output();
-    if (result != null)
-      updateProvenance(result);
-
-    return result;
-  }
-
-  /**
-   * Updates the provenance information in the provided container.
-   *
-   * @param cont	the provenance container to update
-   */
-  public void updateProvenance(ProvenanceContainer cont) {
-    if (Provenance.getSingleton().isEnabled())
-      cont.addProvenance(new ProvenanceInformation(ActorType.DATAGENERATOR, this, ((Token) cont).getPayload().getClass()));
   }
 
   /**

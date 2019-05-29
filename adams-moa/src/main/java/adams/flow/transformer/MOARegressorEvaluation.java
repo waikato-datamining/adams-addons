@@ -25,11 +25,6 @@ import adams.core.QuickInfoHelper;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.Token;
-import adams.flow.provenance.ActorType;
-import adams.flow.provenance.Provenance;
-import adams.flow.provenance.ProvenanceContainer;
-import adams.flow.provenance.ProvenanceInformation;
-import adams.flow.provenance.ProvenanceSupporter;
 import moa.classifiers.AbstractClassifier;
 import moa.classifiers.Regressor;
 import moa.core.Measurement;
@@ -114,11 +109,9 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class MOARegressorEvaluation
-  extends AbstractTransformer
-  implements ProvenanceSupporter {
+  extends AbstractTransformer {
 
   /** for serialization. */
   private static final long serialVersionUID = 1410487605033307517L;
@@ -469,28 +462,13 @@ public class MOARegressorEvaluation
       if (m_Count % m_OutputInterval == 0) {
 	m_Count = 0;
 	m_OutputToken = new Token(m_ActualEvaluator.getPerformanceMeasurements());
-	updateProvenance(m_OutputToken);
       }
     }
     else {
       m_OutputToken = new Token(m_ActualEvaluator.getPerformanceMeasurements());
-      updateProvenance(m_OutputToken);
     }
 
     return result;
-  }
-  
-  /**
-   * Updates the provenance information in the provided container.
-   *
-   * @param cont	the provenance container to update
-   */
-  public void updateProvenance(ProvenanceContainer cont) {
-    if (Provenance.getSingleton().isEnabled()) {
-      if (m_InputToken.hasProvenance())
-	cont.setProvenance(m_InputToken.getProvenance().getClone());
-      cont.addProvenance(new ProvenanceInformation(ActorType.EVALUATOR, m_InputToken.getPayload().getClass(), this, m_OutputToken.getPayload().getClass()));
-    }
   }
 
   /**

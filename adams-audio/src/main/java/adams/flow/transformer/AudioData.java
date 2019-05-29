@@ -22,11 +22,6 @@ package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
 import adams.flow.core.Token;
-import adams.flow.provenance.ActorType;
-import adams.flow.provenance.Provenance;
-import adams.flow.provenance.ProvenanceContainer;
-import adams.flow.provenance.ProvenanceInformation;
-import adams.flow.provenance.ProvenanceSupporter;
 import adams.flow.transformer.audiodata.AbstractAudioDataReader;
 import adams.flow.transformer.audiodata.Wave;
 
@@ -92,8 +87,7 @@ import adams.flow.transformer.audiodata.Wave;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class AudioData
-  extends AbstractTransformer
-  implements ProvenanceSupporter {
+  extends AbstractTransformer {
 
   private static final long serialVersionUID = -3658530451429589935L;
 
@@ -199,19 +193,6 @@ public class AudioData
       result = handleException("Failed to read audio data from: " + m_InputToken.getPayload(), e);
     }
 
-    if (m_OutputToken != null)
-      updateProvenance(m_OutputToken);
-
     return result;
-  }
-
-  /**
-   * Updates the provenance information in the provided container.
-   *
-   * @param cont	the provenance container to update
-   */
-  public void updateProvenance(ProvenanceContainer cont) {
-    if (Provenance.getSingleton().isEnabled())
-      cont.addProvenance(new ProvenanceInformation(ActorType.DATAGENERATOR, m_InputToken.getPayload().getClass(), this, m_OutputToken.getPayload().getClass()));
   }
 }

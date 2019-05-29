@@ -30,11 +30,6 @@ import adams.data.image.BufferedImageContainer;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.flow.core.Token;
-import adams.flow.provenance.ActorType;
-import adams.flow.provenance.Provenance;
-import adams.flow.provenance.ProvenanceContainer;
-import adams.flow.provenance.ProvenanceInformation;
-import adams.flow.provenance.ProvenanceSupporter;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoMjpegCodec;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
@@ -115,11 +110,9 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class MjpegImageSequence
-  extends AbstractTransformer
-  implements ProvenanceSupporter {
+  extends AbstractTransformer {
 
   /** for serialization. */
   private static final long serialVersionUID = 3690378527551302472L;
@@ -394,18 +387,6 @@ public class MjpegImageSequence
     if ((m_MaxImages > 0) && (m_Count >= m_MaxImages))
       m_Video = null;
 
-    updateProvenance(result);
-
     return result;
-  }
-
-  /**
-   * Updates the provenance information in the provided container.
-   *
-   * @param cont	the provenance container to update
-   */
-  public void updateProvenance(ProvenanceContainer cont) {
-    if (Provenance.getSingleton().isEnabled())
-      cont.addProvenance(new ProvenanceInformation(ActorType.DATAGENERATOR, this, ((Token) cont).getPayload().getClass()));
   }
 }

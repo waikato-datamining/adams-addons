@@ -94,7 +94,6 @@ import java.lang.reflect.Array;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 7732 $
  */
 public class ArraySubSample
   extends AbstractArraySplitter {
@@ -244,8 +243,7 @@ public class ArraySubSample
     }
 
     m_OutputToken = new Token(arrayNew);
-    updateProvenance(m_OutputToken);
-    
+
     return result;
   }
 }

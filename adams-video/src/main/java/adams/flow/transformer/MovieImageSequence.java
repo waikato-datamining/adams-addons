@@ -30,11 +30,6 @@ import adams.data.image.BufferedImageContainer;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.flow.core.Token;
-import adams.flow.provenance.ActorType;
-import adams.flow.provenance.Provenance;
-import adams.flow.provenance.ProvenanceContainer;
-import adams.flow.provenance.ProvenanceInformation;
-import adams.flow.provenance.ProvenanceSupporter;
 import com.xuggle.mediatool.IMediaReader;
 import com.xuggle.mediatool.MediaListenerAdapter;
 import com.xuggle.mediatool.ToolFactory;
@@ -112,7 +107,6 @@ import java.util.concurrent.TimeUnit;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 @MixedCopyright(
   author = "Xuggle-Xuggler-Main",
@@ -120,8 +114,7 @@ import java.util.concurrent.TimeUnit;
   url = "http://xuggle.googlecode.com/svn/trunk/java/xuggle-xuggler/src/com/xuggle/mediatool/demos/DecodeAndCaptureFrames.java"
 )
 public class MovieImageSequence
-  extends AbstractTransformer
-  implements ProvenanceSupporter {
+  extends AbstractTransformer {
 
   /** for serialization. */
   private static final long serialVersionUID = 3690378527551302472L;
@@ -395,20 +388,7 @@ public class MovieImageSequence
       m_Listener = null;
     }
 
-    if (result != null)
-      updateProvenance(result);
-
     return result;
-  }
-
-  /**
-   * Updates the provenance information in the provided container.
-   *
-   * @param cont	the provenance container to update
-   */
-  public void updateProvenance(ProvenanceContainer cont) {
-    if (Provenance.getSingleton().isEnabled())
-      cont.addProvenance(new ProvenanceInformation(ActorType.DATAGENERATOR, this, ((Token) cont).getPayload().getClass()));
   }
 
   /**
