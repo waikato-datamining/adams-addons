@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Step.java
- * Copyright (C) 2015-2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.trail;
@@ -32,7 +32,6 @@ import java.util.HashMap;
  * Represents a single step in a trail.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class Step
   extends AbstractDataPoint {
@@ -52,10 +51,7 @@ public class Step
   protected HashMap<String,Object> m_MetaData;
 
   /** for formatting the timestamp. */
-  protected static DateFormat m_DateFormat;
-  static {
-    m_DateFormat = DateUtils.getTimeFormatterMsecs();
-  }
+  protected static DateFormat m_Format;
 
   /**
    * Initializes the step with default values.
@@ -93,6 +89,19 @@ public class Step
     m_MetaData  = null;
     if (metaData != null)
       m_MetaData = new HashMap<>(metaData);
+  }
+
+  /**
+   * Returns the formatter.
+   *
+   * @return		the formatter
+   */
+  protected static synchronized DateFormat getFormat() {
+    if (m_Format == null) {
+      m_Format = DateUtils.getTimestampFormatterMsecs();
+      //m_Format.setTimeZone(TimeZone.getDefault());
+    }
+    return m_Format;
   }
 
   /**
@@ -250,6 +259,6 @@ public class Step
    */
   @Override
   public String toString() {
-    return m_DateFormat.format(m_Timestamp) + ": x=" + m_X + " y=" + m_Y + (hasMetaData() ? getMetaData().toString() : "");
+    return getFormat().format(m_Timestamp) + ": x=" + m_X + " y=" + m_Y + (hasMetaData() ? getMetaData().toString() : "");
   }
 }
