@@ -82,6 +82,12 @@
       <artifactId>jmapviewer</artifactId>
       <version>1.0.2</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.jxmapviewer</groupId>
+      <artifactId>jxmapviewer2</artifactId>
+      <version>2.4</version>
+    </dependency>
   </dependencies>
 
   <build>
