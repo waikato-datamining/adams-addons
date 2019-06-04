@@ -15,7 +15,7 @@
 
 /*
  * RatHelper.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.core;
@@ -23,6 +23,7 @@ package adams.flow.core;
 import adams.core.logging.LoggingObject;
 import adams.flow.control.AbstractDirectedControlActor;
 import adams.flow.standalone.Rats;
+import adams.flow.standalone.Standalones;
 
 import java.util.List;
 
@@ -30,7 +31,6 @@ import java.util.List;
  * Helper class for Rat actors.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class RatHelper
   extends LoggingObject {
@@ -71,6 +71,11 @@ public class RatHelper
 	  if (result != null)
 	    break;
 	}
+      }
+      else if (group.get(i) instanceof Standalones) {
+	result = findRat((Standalones) group.get(i), name);
+	if (result != null)
+	  break;
       }
     }
 
