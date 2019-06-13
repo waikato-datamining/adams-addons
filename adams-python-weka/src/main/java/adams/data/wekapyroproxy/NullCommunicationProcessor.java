@@ -69,13 +69,51 @@ public class NullCommunicationProcessor
     throw new NotImplementedException();
   }
 
+  /**
+   * Converts the instance into a different format.
+   *
+   * @param owner 	the owning classifier
+   * @param inst	the instance to convert
+   * @return		the generated data structure
+   * @throws Exception	if conversion fails
+   */
   @Override
   protected Object doConvertInstance(PyroProxy owner, Instance inst) throws Exception {
     throw new NotImplementedException();
   }
 
+  /**
+   * Parses the prediction.
+   *
+   * @param owner 	the owning classifier
+   * @param prediction	the prediction to parse
+   * @return		the class distribution
+   * @throws Exception	if conversion fails
+   */
   @Override
   protected double[] doParsePrediction(PyroProxy owner, Object prediction) throws Exception {
+    throw new NotImplementedException();
+  }
+
+  /**
+   * Returns whether batch predictions are supported.
+   *
+   * @return		true if supported
+   */
+  public boolean supportsBatchPredictions() {
+    return false;
+  }
+
+  /**
+   * Parses the predictions.
+   *
+   * @param owner 	the owning classifier
+   * @param predictions	the prediction to parse
+   * @return		the class distribution
+   * @throws Exception	if conversion fails
+   */
+  @Override
+  protected double[][] doParsePredictions(PyroProxy owner, Object predictions) throws Exception {
     throw new NotImplementedException();
   }
 }

@@ -188,4 +188,50 @@ public abstract class AbstractCommunicationProcessor
       throw new Exception(msg);
     return doParsePrediction(owner, prediction);
   }
+
+  /**
+   * Returns whether batch predictions are supported.
+   *
+   * @return		true if supported
+   */
+  public abstract boolean supportsBatchPredictions();
+
+  /**
+   * Hook method for performing checks before parsing the predictions.
+   *
+   * @param predictions	the prediction to check
+   * @return		null if successful, otherwise the error message
+   */
+  protected String checkPredictions(Object predictions) {
+    if (predictions == null)
+      return "No prediction provided!";
+    return null;
+  }
+
+  /**
+   * Parses the predictions.
+   *
+   * @param owner 	the owning classifier
+   * @param predictions	the predictions to parse
+   * @return		the class distribution
+   * @throws Exception	if conversion fails
+   */
+  protected abstract double[][] doParsePredictions(PyroProxy owner, Object predictions) throws Exception;
+
+  /**
+   * Parses the predictions.
+   *
+   * @param owner 	the owning classifier
+   * @param predictions	the predictions to parse
+   * @return		the class distribution
+   * @throws Exception	if check or conversion fails
+   */
+  public double[][] parsePredictions(PyroProxy owner, Object predictions) throws Exception {
+    String	msg;
+
+    msg = checkPrediction(predictions);
+    if (msg != null)
+      throw new Exception(msg);
+    return doParsePredictions(owner, predictions);
+  }
 }

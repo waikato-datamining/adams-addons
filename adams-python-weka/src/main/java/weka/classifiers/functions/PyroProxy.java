@@ -32,6 +32,7 @@ import adams.flow.standalone.PyroNameServer;
 import net.razorvine.pyro.Config;
 import net.razorvine.pyro.NameServerProxy;
 import weka.classifiers.simple.AbstractSimpleClassifier;
+import weka.core.BatchPredictor;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
 import weka.core.Instance;
@@ -45,7 +46,7 @@ import weka.core.PyroProxyObject;
  */
 public class PyroProxy
   extends AbstractSimpleClassifier
-  implements PyroProxyObject, FlowContextHandler {
+  implements PyroProxyObject, FlowContextHandler, BatchPredictor {
 
   private static final long serialVersionUID = -4578812400878994526L;
 
@@ -69,6 +70,9 @@ public class PyroProxy
 
   /** whether to perform training. */
   protected boolean m_PerformTraining;
+
+  /** the batch size. */
+  protected int m_BatchSize;
 
   /** the flow context. */
   protected transient Actor m_FlowContext;
@@ -132,6 +136,10 @@ public class PyroProxy
     m_OptionManager.add(
       "communication", "communication",
       new NullCommunicationProcessor());
+
+    m_OptionManager.add(
+      "batch-size", "batchSize",
+      1, 1, null);
   }
 
   /**
@@ -356,6 +364,55 @@ public class PyroProxy
   }
 
   /**
+   * Set the batch size to use. The implementer will
+   * prefer (but not necessarily expect) this many instances
+   * to be passed in to distributionsForInstances().
+   *
+   * @param value the batch size to use
+   */
+  public void setBatchSize(String value) {
+    int		intValue;
+
+    intValue = Integer.parseInt(value);
+    if (getOptionManager().isValid("batchSize", intValue)) {
+      m_BatchSize = intValue;
+      reset();
+    }
+  }
+
+  /**
+   * Get the batch size to use. The implementer will prefer (but not
+   * necessarily expect) this many instances to be passed in to
+   * distributionsForInstances(). Allows the preferred batch size
+   * to be encapsulated with the client.
+   *
+   * @return the batch size to use
+   */
+  public String getBatchSize() {
+    return "" + m_BatchSize;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String batchSizeTipText() {
+    return "The batch size to use for generating multiple predictions (if possible).";
+  }
+
+  /**
+   * Returns true if this BatchPredictor can generate batch predictions
+   * in an efficient manner.
+   *
+   * @return true if batch predictions can be generated efficiently
+   */
+  public boolean implementsMoreEfficientBatchPrediction() {
+    return m_Communication.supportsBatchPredictions();
+  }
+
+  /**
    * Returns the Capabilities of this classifier.
    *
    * @return the capabilities of this object
@@ -485,6 +542,32 @@ public class PyroProxy
       getLogger().info("duration/distributionForInstance: " + ((double) (end - start) / 1000.0));
 
     return m_Communication.parsePrediction(this, prediction);
+  }
+
+  /**
+   * Batch scoring method
+   *
+   * @param insts the instances to get predictions for
+   * @return an array of probability distributions, one for each instance
+   * @throws Exception if a problem occurs
+   */
+  public double[][] distributionsForInstances(Instances insts) throws Exception {
+    Object	data;
+    Object 	predictions;
+    long	start;
+    long	end;
+
+    if (m_RemoteObject == null)
+      throw new IllegalStateException("No remote object available for remote calls!");
+
+    data        = m_Communication.convertDataset(this, insts);
+    start       = System.currentTimeMillis();
+    predictions = m_RemoteObject.call(m_MethodNamePrediction, data);
+    end         = System.currentTimeMillis();
+    if (isLoggingEnabled())
+      getLogger().info("duration/distributionForInstance: " + ((double) (end - start) / 1000.0));
+
+    return m_Communication.parsePredictions(this, predictions);
   }
 
   /**

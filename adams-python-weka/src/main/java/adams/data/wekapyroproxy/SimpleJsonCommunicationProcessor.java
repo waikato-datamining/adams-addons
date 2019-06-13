@@ -20,6 +20,7 @@
 
 package adams.data.wekapyroproxy;
 
+import adams.core.exception.NotImplementedException;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
@@ -196,5 +197,27 @@ public class SimpleJsonCommunicationProcessor
       result[i] = ((Number) array.get(i)).doubleValue();
 
     return result;
+  }
+
+  /**
+   * Returns whether batch predictions are supported.
+   *
+   * @return		true if supported
+   */
+  public boolean supportsBatchPredictions() {
+    return false;
+  }
+
+  /**
+   * Parses the predictions.
+   *
+   * @param owner 	the owning classifier
+   * @param predictions	the predictions to parse
+   * @return		the class distribution
+   * @throws Exception	if conversion fails
+   */
+  @Override
+  protected double[][] doParsePredictions(PyroProxy owner, Object predictions) throws Exception {
+    throw new NotImplementedException();
   }
 }
