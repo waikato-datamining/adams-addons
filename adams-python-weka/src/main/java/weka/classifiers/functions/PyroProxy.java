@@ -20,10 +20,15 @@
 
 package weka.classifiers.functions;
 
+import adams.core.Utils;
 import adams.core.base.BaseHostname;
 import adams.data.wekapyroproxy.AbstractCommunicationProcessor;
 import adams.data.wekapyroproxy.NullCommunicationProcessor;
 import adams.env.Environment;
+import adams.flow.core.Actor;
+import adams.flow.core.ActorUtils;
+import adams.flow.core.FlowContextHandler;
+import adams.flow.standalone.PyroNameServer;
 import net.razorvine.pyro.Config;
 import net.razorvine.pyro.NameServerProxy;
 import weka.classifiers.simple.AbstractSimpleClassifier;
@@ -40,7 +45,7 @@ import weka.core.PyroProxyObject;
  */
 public class PyroProxy
   extends AbstractSimpleClassifier
-  implements PyroProxyObject {
+  implements PyroProxyObject, FlowContextHandler {
 
   private static final long serialVersionUID = -4578812400878994526L;
 
@@ -65,6 +70,12 @@ public class PyroProxy
   /** whether to perform training. */
   protected boolean m_PerformTraining;
 
+  /** the flow context. */
+  protected transient Actor m_FlowContext;
+
+  /** the nameserver actor. */
+  protected transient PyroNameServer m_NameServerActor;
+
   /** the nameserver. */
   protected transient NameServerProxy m_NameServerProxy;
 
@@ -80,8 +91,11 @@ public class PyroProxy
   public String globalInfo() {
     return
       "Proxy for a Python model using Pyro4 for communication.\n\n"
-      + "For more information see:\n"
-      + "https://github.com/irmen/Pyro4";
+	+ "If a flow context is set and a " + Utils.classToString(PyroNameServer.class) + " "
+	+ "can provide a Pyro NameServerProxy instance, then this will override "
+	+ "the namerserver settings defined by the classifier.\n"
+	+ "For more information see on Pyro:\n"
+	+ "https://github.com/irmen/Pyro4";
   }
 
   /**
@@ -118,6 +132,24 @@ public class PyroProxy
     m_OptionManager.add(
       "communication", "communication",
       new NullCommunicationProcessor());
+  }
+
+  /**
+   * Sets the flow context.
+   *
+   * @param value the actor
+   */
+  public void setFlowContext(Actor value) {
+    m_FlowContext = value;
+  }
+
+  /**
+   * Returns the flow context, if any.
+   *
+   * @return the actor, null if none available
+   */
+  public Actor getFlowContext() {
+    return m_FlowContext;
   }
 
   /**
@@ -372,19 +404,34 @@ public class PyroProxy
 
     m_Communication.initialize(this, data);
 
-    // nameserver
-    try {
+    // nameserver from flow context
+    m_NameServerProxy = null;
+    m_NameServerActor = null;
+    if (m_FlowContext != null) {
       if (isLoggingEnabled())
-	getLogger().info("Connecting to: " + m_NameServer);
-      start = System.currentTimeMillis();
-      m_NameServerProxy = NameServerProxy.locateNS(
-	m_NameServer.hostnameValue(), m_NameServer.portValue(Config.NS_PORT), null);
-      end = System.currentTimeMillis();
+        getLogger().info("Using flow context to determine nameserver...");
+      m_NameServerActor = (PyroNameServer) ActorUtils.findClosestType(m_FlowContext, PyroNameServer.class, true);
+      if (m_NameServerActor != null)
+        m_NameServerProxy = m_NameServerActor.getNameServer();
       if (isLoggingEnabled())
-	getLogger().info("duration/nameserver: " + ((double) (end - start) / 1000.0));
+        getLogger().info("Determined nameserver through flow context: " + (m_NameServerProxy != null));
     }
-    catch (Exception e) {
-      throw new Exception("Failed to connect to Pyro nameserver: " + m_NameServer, e);
+
+    // nameserver
+    if (m_NameServerProxy == null) {
+      try {
+        if (isLoggingEnabled())
+          getLogger().info("Connecting to: " + m_NameServer);
+        start = System.currentTimeMillis();
+        m_NameServerProxy = NameServerProxy.locateNS(
+          m_NameServer.hostnameValue(), m_NameServer.portValue(Config.NS_PORT), null);
+        end = System.currentTimeMillis();
+        if (isLoggingEnabled())
+          getLogger().info("duration/nameserver: " + ((double) (end - start) / 1000.0));
+      }
+      catch (Exception e) {
+        throw new Exception("Failed to connect to Pyro nameserver: " + m_NameServer, e);
+      }
     }
 
     // remoteobject
