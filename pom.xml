@@ -43,6 +43,7 @@
     <module>adams-gnuplot</module>
     <module>adams-heatmap</module>
     <module>adams-groovy-webservice</module>
+    <module>adams-html</module>
     <module>adams-image-webservice</module>
     <module>adams-jooq</module>
     <module>adams-latex</module>

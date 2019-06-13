@@ -22,7 +22,7 @@ package adams.flow.rest.echo;
 
 import adams.core.base.BaseURL;
 import adams.core.net.HttpRequestHelper;
-import adams.flow.container.HTMLRequestResult;
+import adams.flow.container.HttpRequestResult;
 import adams.flow.rest.AbstractRESTClientSink;
 import org.jsoup.Connection.Method;
 
@@ -80,7 +80,7 @@ public class EchoClientSink
   @Override
   protected void doQuery() throws Exception {
     String		url;
-    HTMLRequestResult 	result;
+    HttpRequestResult result;
 
     if (getUseAlternativeURL())
       url = getAlternativeURL();
@@ -88,9 +88,9 @@ public class EchoClientSink
       url = new EchoServer().getDefaultURL();
     url += "echo/" + URLEncoder.encode(m_RequestData, "UTF-8");
     result = HttpRequestHelper.send(new BaseURL(url), Method.GET, null, null);
-    if (result.getValue(HTMLRequestResult.VALUE_STATUSCODE, Integer.class) == 200)
-      getLogger().info(URLDecoder.decode(result.getValue(HTMLRequestResult.VALUE_BODY, String.class), "UTF-8"));
+    if (result.getValue(HttpRequestResult.VALUE_STATUSCODE, Integer.class) == 200)
+      getLogger().info(URLDecoder.decode(result.getValue(HttpRequestResult.VALUE_BODY, String.class), "UTF-8"));
     else
-      m_LastError = result.getValue(HTMLRequestResult.VALUE_STATUSCODE) + ": " + result.getValue(HTMLRequestResult.VALUE_STATUSMESSAGE);
+      m_LastError = result.getValue(HttpRequestResult.VALUE_STATUSCODE) + ": " + result.getValue(HttpRequestResult.VALUE_STATUSMESSAGE);
   }
 }
