@@ -139,7 +139,7 @@ public class PyroProxy
 
     m_OptionManager.add(
       "batch-size", "batchSize",
-      1, 1, null);
+      "1");
   }
 
   /**
