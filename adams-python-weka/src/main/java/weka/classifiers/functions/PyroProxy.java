@@ -541,7 +541,12 @@ public class PyroProxy
     if (isLoggingEnabled())
       getLogger().info("duration/distributionForInstance: " + ((double) (end - start) / 1000.0));
 
-    return m_Communication.parsePrediction(this, prediction);
+    try {
+      return m_Communication.parsePrediction(this, prediction);
+    }
+    catch (Exception e) {
+      throw new Exception("Failed to process prediction:\n" + prediction, e);
+    }
   }
 
   /**
@@ -567,7 +572,12 @@ public class PyroProxy
     if (isLoggingEnabled())
       getLogger().info("duration/distributionForInstance: " + ((double) (end - start) / 1000.0));
 
-    return m_Communication.parsePredictions(this, predictions);
+    try {
+      return m_Communication.parsePredictions(this, predictions);
+    }
+    catch (Exception e) {
+      throw new Exception("Failed to process predictions:\n" + predictions, e);
+    }
   }
 
   /**

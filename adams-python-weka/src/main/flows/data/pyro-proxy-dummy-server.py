@@ -1,6 +1,7 @@
 # Based on:
 # https://pythonhosted.org/Pyro4/intro.html#with-a-name-server
 import Pyro4
+import json
 
 @Pyro4.expose
 class DummyProxy(object):
@@ -9,8 +10,8 @@ class DummyProxy(object):
 
     def predict(self, data):
         print("predict", data)
-        result = "{\"Prediction\": [0.314]}"
-        return result
+        result = {"outputs": {"class": [3.145]}}
+        return json.dumps(result)
 
 daemon = Pyro4.Daemon()
 ns = Pyro4.locateNS()

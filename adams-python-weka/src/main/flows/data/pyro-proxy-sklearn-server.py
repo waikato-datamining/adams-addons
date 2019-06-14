@@ -7,30 +7,31 @@ import traceback
 from sklearn.linear_model import LinearRegression
 
 MODELS = {}
-DEBUG = False
+DEBUG = True
 
 @Pyro4.expose
 class ScikitLearnProxy(object):
 
     def train(self, data):
         global MODELS
+        global DEBUG
 
         try:
             input = json.loads(data)
-            name = input["Model"]
+            name = input["name"]
             if DEBUG:
                 print("[train] Model", name)
 
-            X = np.array(input["Train"]["X"])
-            y = np.array(input["Train"]["y"])
-            if DEBUG:
-                print("[train] X", X)
-                print("[train] y", y)
+            X = np.array(input["inputs"]["input"])
+            cls = []
+            for row in input["inputs"]["class"]:
+                cls.append(row[0])
+            y = np.array(cls)
 
             reg = LinearRegression().fit(X, y)
             MODELS[name] = reg
             if DEBUG:
-                print("[train] models", models)
+                print("[train] models", MODELS)
 
             return "OK"
         except:
@@ -40,24 +41,26 @@ class ScikitLearnProxy(object):
 
     def predict(self, data):
         global MODELS
+        global DEBUG
 
         try:
             input = json.loads(data)
-            name = input["Model"]
+            name = input["name"]
             if DEBUG:
                 print("[predict] Model", name)
 
-            x = np.array([input["x"]])
-            if DEBUG:
-                print("[predict] x", x)
-
-            pred = MODELS[name].predict(x).tolist()
+            pred = []
+            for row in input["inputs"]["input"]:
+                x = np.array([row])
+                npp = MODELS[name].predict(x)
+                p = npp.tolist()
+                pred.append(p)
             if DEBUG:
                 print("[predict] pred", pred)
-            result = {"Prediction": pred}
+            result = {"outputs": {"class": pred}}
         except:
             error = traceback.format_exc()
-            result = {"Error": error}
+            result = {"error": error}
 
         return json.dumps(result)
 

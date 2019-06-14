@@ -309,7 +309,7 @@ public class FusionJsonCommunicationProcessor
     result.put("inputs", inputs);
     for (BaseString name: m_Names) {
       input = new JSONArray();
-      result.put(name.getValue(), input);
+      inputs.put(name.getValue(), input);
       input.add(instanceToRow(inst, name));
     }
 
@@ -332,6 +332,7 @@ public class FusionJsonCommunicationProcessor
     JSONObject 		parsed;
     JSONObject		outputs;
     JSONArray 		output;
+    JSONArray 		outputElem;
 
     sreader = new StringReader((String) prediction);
     parser  = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
@@ -340,7 +341,8 @@ public class FusionJsonCommunicationProcessor
       throw new Exception(parsed.getAsString("error"));
     outputs = (JSONObject) parsed.get("outputs");
     output  = (JSONArray) outputs.get(m_ClassAttName);
-    result  = new double[]{((Number) output.get(0)).doubleValue()};
+    outputElem = (JSONArray) output.get(0);
+    result  = new double[]{((Number) outputElem.get(0)).doubleValue()};
 
     return result;
   }
@@ -370,6 +372,7 @@ public class FusionJsonCommunicationProcessor
     JSONObject 		parsed;
     JSONObject		outputs;
     JSONArray 		output;
+    JSONArray 		outputElem;
     int			i;
 
     sreader = new StringReader((String) predictions);
@@ -380,8 +383,10 @@ public class FusionJsonCommunicationProcessor
     outputs = (JSONObject) parsed.get("outputs");
     output  = (JSONArray) outputs.get(m_ClassAttName);
     result  = new double[output.size()][];
-    for (i = 0; i < output.size(); i++)
-      result[i] = new double[]{((Number) output.get(i)).doubleValue()};
+    for (i = 0; i < output.size(); i++) {
+      outputElem = (JSONArray) output.get(i);
+      result[i] = new double[]{((Number) outputElem.get(0)).doubleValue()};
+    }
 
     return result;
   }
