@@ -466,7 +466,7 @@ public class PyroProxy
     m_NameServerActor = null;
     if (m_FlowContext != null) {
       if (isLoggingEnabled())
-        getLogger().info("Using flow context to determine nameserver...");
+        getLogger().info("Using flow context (" + m_FlowContext.getFullName() + ") to determine nameserver...");
       m_NameServerActor = (PyroNameServer) ActorUtils.findClosestType(m_FlowContext, PyroNameServer.class, true);
       if (m_NameServerActor != null)
         m_NameServerProxy = m_NameServerActor.getNameServer();
