@@ -1,19 +1,19 @@
 # Project: adams
-# Date: 2019-06-14 12:48:04
+# Date: 2019-06-14 16:10:17
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-ml,adams-python,adams-python-weka,adams-spreadsheet,adams-visualstats,adams-weka
 #
 adams.flow.control.Flow -annotation "Builds a Pyro4 model and uses it to make predictions.\\n\\nNotes:\\nRequires \\\"adams-python-weka-pyro_namserver_and_sklearn_proxyserver.flow\\\" running." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
- adams.flow.standalone.CallableActors
-  adams.flow.source.WekaClassifierSetup -classifier "weka.classifiers.functions.PyroProxy -name-server @{hostport} -remote-object-name sklearn -perform-training true -method-name-train train -method-name-prediction predict -model-name lr -communication \"adams.data.wekapyroproxy.FusionJsonCommunicationProcessor -regexp [A-Z].* -regexp class -name input -name class\""
-  adams.flow.sink.Display -name Predictions -short-title true -display-type adams.flow.core.displaytype.Default -x -3 -writer adams.data.io.output.NullWriter
-  adams.flow.sink.ActualVsPredictedPlot -display-type adams.flow.core.displaytype.Default -x -3 -y -3 -writer adams.gui.print.NullWriter -meta-data-color adams.gui.visualization.sequence.metadatacolor.Dummy
  adams.flow.standalone.SetVariable -name host -var-name host -var-value localhost
  adams.flow.standalone.SetVariable -name port -var-name port -var-value 9090
  adams.flow.standalone.SetVariable -name "host/port combined" -var-name hostport -var-value @{host}:@{port} -expand-value true
  adams.flow.standalone.PythonEnvironment -python ${CWD}/venv/bin/python3
- adams.flow.standalone.PyroNameServer -server @{hostport} -mode LAUNCH_AND_CONNECT
+ adams.flow.standalone.PyroNameServer -server @{hostport}
+ adams.flow.standalone.CallableActors
+  adams.flow.source.WekaClassifierSetup -classifier "weka.classifiers.functions.PyroProxy -logging-level INFO -remote-object-name sklearn -perform-training true -method-name-train train -method-name-prediction predict -model-name lr -communication \"adams.data.wekapyroproxy.FusionJsonCommunicationProcessor -regexp [A-Z].* -regexp class -name input -name class\""
+  adams.flow.sink.Display -name Predictions -short-title true -display-type adams.flow.core.displaytype.Default -x -3 -writer adams.data.io.output.NullWriter
+  adams.flow.sink.ActualVsPredictedPlot -display-type adams.flow.core.displaytype.Default -x -3 -y -3 -writer adams.gui.print.NullWriter -meta-data-color adams.gui.visualization.sequence.metadatacolor.Dummy
  adams.flow.source.Start
  adams.flow.control.Trigger -name "generate train/test"
   adams.flow.source.FileSupplier -file ${FLOWS}/data/bodyfat.arff

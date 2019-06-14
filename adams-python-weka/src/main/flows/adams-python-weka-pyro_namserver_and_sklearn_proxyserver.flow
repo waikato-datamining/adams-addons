@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2019-06-14 12:59:41
+# Date: 2019-06-14 16:10:12
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-ml,adams-python,adams-python-weka,adams-spreadsheet,adams-visualstats,adams-weka
@@ -12,5 +12,5 @@ adams.flow.control.Flow -annotation "Starts up the Pyro4 nameserver and scikit-l
  adams.flow.standalone.PyroNameServer -server @{hostport} -mode LAUNCH_AND_CONNECT
  adams.flow.source.Start
  adams.flow.control.Trigger -name "start scikit-learn proxy server"
-  adams.flow.source.PythonExec -logging-level INFO -output-type BOTH -prefix-stdout "[OUT] " -prefix-stderr "[ERR] " -script ${FLOWS}/data/pyro-proxy-sklearn-server.py
+  adams.flow.source.PythonExec -output-type BOTH -prefix-stdout "[OUT] " -prefix-stderr "[ERR] " -script ${FLOWS}/data/pyro-proxy-sklearn-server.py
   adams.flow.sink.Display -name "Pyro4 Model Server" -short-title true -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
