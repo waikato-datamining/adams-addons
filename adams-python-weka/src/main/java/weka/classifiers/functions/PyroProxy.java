@@ -587,7 +587,8 @@ public class PyroProxy
    */
   @Override
   public String toString() {
-    return "Nameserver: " + m_NameServer + "\n"
+    return "Flow context: " + (m_FlowContext == null ? "-none-"  : m_FlowContext.getFullName()) + "\n"
+      + "Nameserver: " + m_NameServer + "\n"
       + "Remote object name: " + m_RemoteObjectName + "\n"
       + "Perform training: " + m_PerformTraining + "\n"
       + "Method name (train): " + m_MethodNameTrain + "\n"
