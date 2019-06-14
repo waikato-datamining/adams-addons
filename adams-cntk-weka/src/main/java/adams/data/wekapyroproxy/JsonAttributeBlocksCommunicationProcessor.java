@@ -358,4 +358,27 @@ public class JsonAttributeBlocksCommunicationProcessor
 
     return result;
   }
+
+  /**
+   * Returns whether batch predictions are supported.
+   *
+   * @return		true if supported
+   */
+  @Override
+  public boolean supportsBatchPredictions() {
+    return false;
+  }
+
+  /**
+   * Parses the predictions.
+   *
+   * @param owner 	the owning classifier
+   * @param predictions	the predictions to parse
+   * @return		the class distribution
+   * @throws Exception	if conversion fails
+   */
+  @Override
+  protected double[][] doParsePredictions(PyroProxy owner, Object predictions) throws Exception {
+    throw new NotImplementedException();
+  }
 }
