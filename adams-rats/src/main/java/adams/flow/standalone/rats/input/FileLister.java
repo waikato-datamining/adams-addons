@@ -15,7 +15,7 @@
 
 /*
  * FileLister.java
- * Copyright (C) 2014-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
@@ -756,11 +756,14 @@ public class FileLister
     String		result;
     MessageCollection 	errors;
     List<String>	files;
+    List<String>	filesOut;
     int			i;
     PlaceholderFile	file;
 
     result = null;
     files  = new ArrayList<>(Arrays.asList(m_Lister.list()));
+    if (isLoggingEnabled())
+      getLogger().info("# files found: " + files.size());
     doWait(m_WaitList);
 
     if (files.size() > 0) {
@@ -781,14 +784,15 @@ public class FileLister
       }
 
       if (m_MoveFiles && !isStopped()) {
-	errors = new MessageCollection();
+	errors   = new MessageCollection();
+	filesOut = new ArrayList<>();
 	for (i = 0; i < files.size(); i++) {
 	  file = new PlaceholderFile(files.get(i));
 	  try {
 	    if (!FileUtils.move(file, m_Target, m_AtomicMove))
 	      errors.add("Failed to move '" + file + "' to '" + m_Target + "'!");
 	    else
-	      m_Files.add(m_Target.getAbsolutePath() + File.separator + file.getName());
+	      filesOut.add(m_Target.getAbsolutePath() + File.separator + file.getName());
 	  }
 	  catch (Exception e) {
 	    errors.add("Failed to move '" + file + "' to '" + m_Target + "': ", e);
@@ -800,10 +804,17 @@ public class FileLister
 	  else
 	    getLogger().warning(errors.toString());
 	}
+	files = filesOut;
       }
-      else {
-        if (!isStopped())
-	  m_Files.addAll(files);
+
+      if (!isStopped()) {
+	if (isLoggingEnabled()) {
+	  getLogger().info("# files before add: " + m_Files.size());
+	  getLogger().info("# files to add: " + files.size());
+	}
+	m_Files.addAll(files);
+	if (isLoggingEnabled())
+	  getLogger().info("# files after add: " + m_Files.size());
       }
     }
 
