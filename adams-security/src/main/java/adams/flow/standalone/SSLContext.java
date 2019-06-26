@@ -32,7 +32,8 @@ import adams.flow.core.TrustManagerFactoryProvider;
  * Initializes an SSL context using the specified context.<br>
  * For protocols, see:<br>
  * https:&#47;&#47;docs.oracle.com&#47;en&#47;java&#47;javase&#47;11&#47;docs&#47;specs&#47;security&#47;standard-names.html#sslcontext-algorithms<br>
- * Requires adams.flow.standalone.KeyManager and adams.flow.standalone.TrustManager standalones to be present.
+ * Requires adams.flow.core.KeyManagerFactoryProvider and adams.flow.core.TrustManagerFactoryProvider standalones to be present.<br>
+ * You don't have to use these actors if you enable the 'useDefaultContext' option.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -79,6 +80,12 @@ import adams.flow.core.TrustManagerFactoryProvider;
  * &nbsp;&nbsp;&nbsp;default: TLSv1.2
  * </pre>
  *
+ * <pre>-use-default-context &lt;boolean&gt; (property: useDefaultContext)
+ * &nbsp;&nbsp;&nbsp;If enabled, the default SSL context is used (doesn't require the keymanager
+ * &nbsp;&nbsp;&nbsp;&#47;trustmanager).
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -91,6 +98,9 @@ public class SSLContext
 
   /** the protocol to use. */
   protected String m_Protocol;
+
+  /** whether to use default context. */
+  protected boolean m_UseDefaultContext;
 
   /** the KeyManager instance to use. */
   protected transient KeyManagerFactoryProvider m_KeyManager;
@@ -112,7 +122,8 @@ public class SSLContext
       + "For protocols, see:\n"
       + "https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html#sslcontext-algorithms\n"
       + "Requires " + Utils.classToString(KeyManagerFactoryProvider.class) + " and "
-      + Utils.classToString(TrustManagerFactoryProvider.class) + " standalones to be present.";
+      + Utils.classToString(TrustManagerFactoryProvider.class) + " standalones to be present.\n"
+      + "You don't have to use these actors if you enable the 'useDefaultContext' option.";
   }
 
   /**
@@ -125,6 +136,10 @@ public class SSLContext
     m_OptionManager.add(
       "protocol", "protocol",
       "TLSv1.2");
+
+    m_OptionManager.add(
+      "use-default-context", "useDefaultContext",
+      false);
   }
 
   /**
@@ -134,7 +149,14 @@ public class SSLContext
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "protocol", m_Protocol);
+    String  	result;
+
+    if (m_UseDefaultContext)
+      result = "default context";
+    else
+      result = QuickInfoHelper.toString(this, "protocol", m_Protocol);
+
+    return result;
   }
 
   /**
@@ -167,6 +189,35 @@ public class SSLContext
   }
 
   /**
+   * Sets whether to use the default SSL context.
+   *
+   * @param value	true if to use default context
+   */
+  public void setUseDefaultContext(boolean value) {
+    m_UseDefaultContext = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to use the default SSL context.
+   *
+   * @return		true if to use default context
+   */
+  public boolean getUseDefaultContext() {
+    return m_UseDefaultContext;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String useDefaultContextTipText() {
+    return "If enabled, the default SSL context is used (doesn't require the keymanager/trustmanager).";
+  }
+
+  /**
    * Initializes the item for flow execution.
    *
    * @return		null if everything is fine, otherwise error message
@@ -177,16 +228,18 @@ public class SSLContext
 
     result = super.setUp();
 
-    if (result == null) {
-      m_KeyManager = (KeyManagerFactoryProvider) ActorUtils.findClosestType(this, KeyManagerFactoryProvider.class, true);
-      if (m_KeyManager == null)
-        result = "Failed to locate " + Utils.classToString(KeyManagerFactoryProvider.class) + " actor!";
-    }
+    if (!m_UseDefaultContext) {
+      if (result == null) {
+	m_KeyManager = (KeyManagerFactoryProvider) ActorUtils.findClosestType(this, KeyManagerFactoryProvider.class, true);
+	if (m_KeyManager == null)
+	  result = "Failed to locate " + Utils.classToString(KeyManagerFactoryProvider.class) + " actor!";
+      }
 
-    if (result == null) {
-      m_TrustManager = (TrustManagerFactoryProvider) ActorUtils.findClosestType(this, TrustManagerFactoryProvider.class, true);
-      if (m_TrustManager == null)
-        result = "Failed to locate " + Utils.classToString(TrustManagerFactoryProvider.class) + " actor!";
+      if (result == null) {
+	m_TrustManager = (TrustManagerFactoryProvider) ActorUtils.findClosestType(this, TrustManagerFactoryProvider.class, true);
+	if (m_TrustManager == null)
+	  result = "Failed to locate " + Utils.classToString(TrustManagerFactoryProvider.class) + " actor!";
+      }
     }
 
     return result;
@@ -215,10 +268,16 @@ public class SSLContext
 
     m_SSLContext = null;
     try {
-      m_SSLContext = javax.net.ssl.SSLContext.getInstance(m_Protocol);
-      m_SSLContext.init(
-        m_KeyManager.getKeyManagerFactory().getKeyManagers(),
-	m_TrustManager.getTrustManagerFactory().getTrustManagers(), null);
+      if (m_UseDefaultContext) {
+        getLogger().warning("Using default SSL context!");
+        m_SSLContext = javax.net.ssl.SSLContext.getDefault();
+      }
+      else {
+	m_SSLContext = javax.net.ssl.SSLContext.getInstance(m_Protocol);
+	m_SSLContext.init(
+	  m_KeyManager.getKeyManagerFactory().getKeyManagers(),
+	  m_TrustManager.getTrustManagerFactory().getTrustManagers(), null);
+      }
     }
     catch (Exception e) {
       result = handleException("Failed to instantiate SSL context!", e);
