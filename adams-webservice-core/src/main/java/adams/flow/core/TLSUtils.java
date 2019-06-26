@@ -20,6 +20,7 @@
 
 package adams.flow.core;
 
+import adams.core.Utils;
 import com.github.fracpete.javautils.struct.Struct3;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
@@ -37,34 +38,46 @@ public class TLSUtils
 
   /**
    * Configures TLS client parameters based on KeyManager, TrustManager, SSLContext
-   * actors.
+   * actors. If not SSLContext actor is present, the default SSL context is used.
    *
    * @param context	the flow context
    * @return		the parameters, null if failed to configure
    */
   public static TLSClientParameters configureClientTLS(Actor context) {
-    TLSClientParameters 	result;
-    Struct3<KeyManagerFactoryProvider,TrustManagerFactoryProvider,SSLContextProvider> actors;
-    String			protocol;
+    TLSClientParameters result;
+    Struct3<KeyManagerFactoryProvider, TrustManagerFactoryProvider, SSLContextProvider> actors;
+    String protocol;
 
     actors = locateActors(context, false);
-    if (actors == null)
-      return null;
-    if ((actors.value1 == null) || (actors.value1.getKeyManagerFactory() == null))
-      return null;
-    if ((actors.value2 == null) || (actors.value2.getTrustManagerFactory() == null))
-      return null;
 
-    protocol = FALLBACK_TLS_VERSION;
-    if (actors.value3 != null)
-      protocol = actors.value3.getProtocol();
+    // default context?
+    if ((actors == null) || (actors.value3 == null) || (actors.value3.getUseDefaultContext())) {
+      result = new TLSClientParameters();
+      result.setUseHttpsURLConnectionDefaultSslSocketFactory(true);
+      result.setUseHttpsURLConnectionDefaultHostnameVerifier(true);
+      context.getLogger().warning("Using default SSL socket factory and hostname verifier!");
+      return result;
+    }
+    else {
+      if ((actors.value1 == null) || (actors.value1.getKeyManagerFactory() == null)) {
+        context.getLogger().severe("No " + Utils.classToString(KeyManagerFactoryProvider.class) + " instance found, cannot configure SSL context!");
+	return null;
+      }
+      if ((actors.value2 == null) || (actors.value2.getTrustManagerFactory() == null)) {
+        context.getLogger().severe("No " + Utils.classToString(TrustManagerFactoryProvider.class) + " instance found, cannot configure SSL context!");
+	return null;
+      }
 
-    result = new TLSClientParameters();
-    result.setKeyManagers(actors.value1.getKeyManagerFactory().getKeyManagers());
-    result.setTrustManagers(actors.value2.getTrustManagerFactory().getTrustManagers());
-    result.setSecureSocketProtocol(protocol);
+      protocol = FALLBACK_TLS_VERSION;
+      if (actors.value3 != null)
+	protocol = actors.value3.getProtocol();
 
-    return result;
+      result = new TLSClientParameters();
+      result.setKeyManagers(actors.value1.getKeyManagerFactory().getKeyManagers());
+      result.setTrustManagers(actors.value2.getTrustManagerFactory().getTrustManagers());
+      result.setSecureSocketProtocol(protocol);
+      return result;
+    }
   }
 
   /**
