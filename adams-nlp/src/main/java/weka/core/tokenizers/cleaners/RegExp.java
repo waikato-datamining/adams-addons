@@ -20,6 +20,7 @@
 
 package weka.core.tokenizers.cleaners;
 
+import adams.core.net.HtmlUtils;
 import weka.core.WekaOptionUtils;
 
 import java.util.ArrayList;
@@ -63,7 +64,7 @@ public class RegExp
     return "Cleans tokens based on regular expressions, i.e., if token "
       + "matches regexp, it gets replaced with the specified expression.\n\n"
       + "For more information see:\n"
-      + "http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html";
+      + HtmlUtils.toJavaApiURL(Pattern.class);
   }
 
   /**
