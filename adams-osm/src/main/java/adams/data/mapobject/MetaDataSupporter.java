@@ -13,25 +13,24 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * MetaDataSupporter.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.mapobject;
 
-import java.util.HashMap;
-import java.util.Set;
-
 import org.openstreetmap.gui.jmapviewer.interfaces.MapObject;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface for {@link MapObject} objects that support meta-data.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public interface MetaDataSupporter 
-  extends MapObject {
+  extends MapObject, adams.core.MetaDataSupporter {
 
   /**
    * Adds a key-value pair to the meta-data store.
@@ -63,7 +62,7 @@ public interface MetaDataSupporter
    * 
    * @return		the meta-data
    */
-  public HashMap<String,Object> getMetaData();
+  public Map<String,Object> getMetaData();
   
   /**
    * Returns the set of meta-data keys.
