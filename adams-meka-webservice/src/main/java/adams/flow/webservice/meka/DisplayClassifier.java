@@ -15,7 +15,7 @@
 
 /*
  * DisplayClassifier.java
- * Copyright (C) 2013-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice.meka;
 
@@ -32,7 +32,6 @@ import java.net.URL;
  * Displays the string representation of a built classifier model.
  * 
  * @author fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class DisplayClassifier 
 extends AbstractWebServiceClientSource<String> {
@@ -42,6 +41,12 @@ extends AbstractWebServiceClientSource<String> {
 
   /** name of model to display */
   protected String m_Classifier;
+
+  /** the service instance. */
+  protected transient MekaServiceService m_Service;
+
+  /** the port instance. */
+  protected transient MekaService m_Port;
 
   /**
    * Returns a string describing the object.
@@ -63,7 +68,18 @@ extends AbstractWebServiceClientSource<String> {
     m_OptionManager.add(
 	"classifier", "classifier", "");
   }
-  
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_Service = null;
+    m_Port    = null;
+  }
+
   /**
    * set the name of the classifier to display.
    * 
@@ -119,26 +135,37 @@ extends AbstractWebServiceClientSource<String> {
    */
   @Override
   protected void doQuery() throws Exception {
-    MekaServiceService mekaServiceService;
-    MekaService mekaService;
-    mekaServiceService = new MekaServiceService(getWsdlLocation());
-    mekaService = mekaServiceService.getMekaServicePort();
-    WebserviceUtils.configureClient(
-	m_Owner,
-	mekaService, 
-	m_ConnectionTimeout, 
-	m_ReceiveTimeout, 
-	(getUseAlternativeURL() ? getAlternativeURL() : null),
-	m_InInterceptor,
-	null);
-    //check against schema
-    WebserviceUtils.enableSchemaValidation(((BindingProvider) mekaService));
-    DisplayClassifierResponseObject returned = mekaService.displayClassifier(m_Classifier);
+    if (m_Service == null) {
+      m_Service = new MekaServiceService(getWsdlLocation());
+      m_Port = m_Service.getMekaServicePort();
+      WebserviceUtils.configureClient(
+        m_Owner,
+        m_Port,
+        m_ConnectionTimeout,
+        m_ReceiveTimeout,
+        (getUseAlternativeURL() ? getAlternativeURL() : null),
+        m_InInterceptor,
+        null);
+      //check against schema
+      WebserviceUtils.enableSchemaValidation(((BindingProvider) m_Port));
+    }
+    DisplayClassifierResponseObject returned = m_Port.displayClassifier(m_Classifier);
     // failed to generate data?
     if (returned.getErrorMessage() != null)
       throw new IllegalStateException(returned.getErrorMessage());
     setResponseData(returned.getDisplayString());
 
     m_Classifier = null;
+  }
+
+  /**
+   * Cleans up the client.
+   */
+  @Override
+  public void cleanUp() {
+    m_Service = null;
+    m_Port    = null;
+
+    super.cleanUp();
   }
 }

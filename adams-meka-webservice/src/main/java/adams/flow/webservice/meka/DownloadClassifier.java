@@ -15,7 +15,7 @@
 
 /*
  * DownloadClassifier.java
- * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.webservice.meka;
@@ -35,7 +35,6 @@ import java.net.URL;
  * Client for download a classifier model.
  * 
  * @author FracPete (fracpete at waikato ac dot nz)
- * @version $Revision$
  */
 public class DownloadClassifier 
 extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.meka.DownloadClassifier, MultiLabelClassifier> {
@@ -49,6 +48,12 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.meka.
   /** response object */
   protected DownloadClassifierResponseObject m_Returned;
 
+  /** the service instance. */
+  protected transient MekaServiceService m_Service;
+
+  /** the port instance. */
+  protected transient MekaService m_Port;
+
   /**
    * Returns a string describing the object.
    *
@@ -57,6 +62,17 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.meka.
   @Override
   public String globalInfo() {
     return "Downloads a previously generated classifier model.";
+  }
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_Service = null;
+    m_Port    = null;
   }
 
   /**
@@ -108,27 +124,38 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.meka.
    */
   @Override
   protected void doQuery() throws Exception {
-    MekaServiceService mekaServiceService;
-    MekaService mekaService;
-    mekaServiceService = new MekaServiceService(getWsdlLocation());
-    mekaService = mekaServiceService.getMekaServicePort();
-    WebserviceUtils.configureClient(
-	m_Owner,
-	mekaService, 
-	m_ConnectionTimeout, 
-	m_ReceiveTimeout, 
-	(getUseAlternativeURL() ? getAlternativeURL() : null),
-	m_InInterceptor,
-	m_OutInterceptor);
-    //check against schema
-    WebserviceUtils.enableSchemaValidation(((BindingProvider) mekaService));
+    if (m_Service == null) {
+      m_Service = new MekaServiceService(getWsdlLocation());
+      m_Port = m_Service.getMekaServicePort();
+      WebserviceUtils.configureClient(
+        m_Owner,
+        m_Port,
+        m_ConnectionTimeout,
+        m_ReceiveTimeout,
+        (getUseAlternativeURL() ? getAlternativeURL() : null),
+        m_InInterceptor,
+        m_OutInterceptor);
+      //check against schema
+      WebserviceUtils.enableSchemaValidation(((BindingProvider) m_Port));
+    }
     
-    m_Returned = mekaService.downloadClassifier(m_Download.getModelName()); 
+    m_Returned = m_Port.downloadClassifier(m_Download.getModelName());
     // failed to download model?
     if (m_Returned.getErrorMessage() != null)
       throw new IllegalStateException(m_Returned.getErrorMessage());
     setResponseData((meka.classifiers.multilabel.MultiLabelClassifier) SerializationHelper.read(m_Returned.getModelData().getInputStream()));
 
     m_Download = null;
+  }
+
+  /**
+   * Cleans up the client.
+   */
+  @Override
+  public void cleanUp() {
+    m_Service = null;
+    m_Port    = null;
+
+    super.cleanUp();
   }
 }

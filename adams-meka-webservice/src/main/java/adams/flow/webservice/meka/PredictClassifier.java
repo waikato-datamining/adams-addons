@@ -15,7 +15,7 @@
 
 /*
  * PredictClassifier.java
- * Copyright (C) 2013-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.webservice.meka;
@@ -23,9 +23,9 @@ package adams.flow.webservice.meka;
 import adams.flow.webservice.AbstractWebServiceClientTransformer;
 import adams.flow.webservice.WebserviceUtils;
 import nz.ac.waikato.adams.webservice.meka.Dataset;
-import nz.ac.waikato.adams.webservice.meka.PredictClassifierResponseObject;
 import nz.ac.waikato.adams.webservice.meka.MekaService;
 import nz.ac.waikato.adams.webservice.meka.MekaServiceService;
+import nz.ac.waikato.adams.webservice.meka.PredictClassifierResponseObject;
 
 import javax.xml.ws.BindingProvider;
 import java.net.URL;
@@ -34,7 +34,6 @@ import java.net.URL;
  * client for using the predict web service .
  * 
  * @author fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class PredictClassifier 
 extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.meka.PredictClassifier, Dataset> {
@@ -45,6 +44,12 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.meka.
   /** predict input object */
   protected nz.ac.waikato.adams.webservice.meka.PredictClassifier m_Predict;
 
+  /** the service instance. */
+  protected transient MekaServiceService m_Service;
+
+  /** the port instance. */
+  protected transient MekaService m_Port;
+
   /**
    * Returns a string describing the object.
    *
@@ -53,6 +58,17 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.meka.
   @Override
   public String globalInfo() {
     return "Makes a prediction using the meka web service.";
+  }
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_Service = null;
+    m_Port    = null;
   }
 
   /**
@@ -103,27 +119,38 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.meka.
    */
   @Override
   protected void doQuery() throws Exception {
-    MekaServiceService mekaServiceService;
-    MekaService mekaService;
-    mekaServiceService = new MekaServiceService(getWsdlLocation());
-    mekaService = mekaServiceService.getMekaServicePort();
-    WebserviceUtils.configureClient(
-	m_Owner,
-	mekaService, 
-	m_ConnectionTimeout, 
-	m_ReceiveTimeout, 
-	(getUseAlternativeURL() ? getAlternativeURL() : null),
-	m_InInterceptor,
-	m_OutInterceptor);
-    //check against schema
-    WebserviceUtils.enableSchemaValidation(((BindingProvider) mekaService));
+    if (m_Service == null) {
+      m_Service = new MekaServiceService(getWsdlLocation());
+      m_Port = m_Service.getMekaServicePort();
+      WebserviceUtils.configureClient(
+        m_Owner,
+        m_Port,
+        m_ConnectionTimeout,
+        m_ReceiveTimeout,
+        (getUseAlternativeURL() ? getAlternativeURL() : null),
+        m_InInterceptor,
+        m_OutInterceptor);
+      //check against schema
+      WebserviceUtils.enableSchemaValidation(((BindingProvider) m_Port));
+    }
     
-    PredictClassifierResponseObject returned = mekaService.predictClassifier(m_Predict.getDataset(), m_Predict.getModelName());
+    PredictClassifierResponseObject returned = m_Port.predictClassifier(m_Predict.getDataset(), m_Predict.getModelName());
     // failed to generate data?
     if (returned.getErrorMessage() != null)
       throw new IllegalStateException(returned.getErrorMessage());
     setResponseData(returned.getReturnDataset());
 
     m_Predict = null;
+  }
+
+  /**
+   * Cleans up the client.
+   */
+  @Override
+  public void cleanUp() {
+    m_Service = null;
+    m_Port    = null;
+
+    super.cleanUp();
   }
 }
