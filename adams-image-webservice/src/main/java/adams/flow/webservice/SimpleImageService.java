@@ -15,7 +15,7 @@
 
 /*
  * SimpleImageService.java
- * Copyright (C) 2014-2017 Image BV, Wageningen, NL
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.webservice;
@@ -40,7 +40,6 @@ import java.util.logging.Level;
  * Class that implements the Image web service.  
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 91 $
  */
 public class SimpleImageService
   extends AbstractOptionHandler

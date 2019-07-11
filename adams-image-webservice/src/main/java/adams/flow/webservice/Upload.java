@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Upload.java
- * Copyright (C) 2014 Image BV, Wageningen, NL
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
@@ -36,7 +36,6 @@ import java.net.URL;
  * Uploads an image.
  * 
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 102 $
  */
 public class Upload 
   extends AbstractWebServiceClientSink<byte[]>{
@@ -52,6 +51,12 @@ public class Upload
   
   /** input image (as byte array). */
   protected byte[] m_ImageIn;
+
+  /** the service instance. */
+  protected transient ImageServiceService m_Service;
+
+  /** the port instance. */
+  protected transient ImageService m_Port;
 
   /**
    * Returns a string describing the object.
@@ -78,7 +83,18 @@ public class Upload
 	    "format", "format",
 	    ImageFormat.PNG);
   }
-  
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_Service = null;
+    m_Port    = null;
+  }
+
   /**
    * Sets the ID of the image to upload.
    *
@@ -174,24 +190,24 @@ public class Upload
    */
   @Override
   protected void doQuery() throws Exception {
-    ImageServiceService 	imageServiceService;
-    ImageService 		imageService;
     UploadRequest 		request;
     UploadResponse 		response;
     Image 			img;
 
-    imageServiceService = new ImageServiceService(getWsdlLocation());
-    imageService = imageServiceService.getImageServicePort();
-    WebserviceUtils.configureClient(
-	m_Owner,
-	imageService, 
-	m_ConnectionTimeout, 
-	m_ReceiveTimeout, 
-	(getUseAlternativeURL() ? getAlternativeURL() : null),
-	null,
-	m_OutInterceptor);
-    //check against schema
-    WebserviceUtils.enableSchemaValidation(((BindingProvider) imageService));
+    if (m_Service == null) {
+      m_Service = new ImageServiceService(getWsdlLocation());
+      m_Port = m_Service.getImageServicePort();
+      WebserviceUtils.configureClient(
+        m_Owner,
+        m_Port,
+        m_ConnectionTimeout,
+        m_ReceiveTimeout,
+        (getUseAlternativeURL() ? getAlternativeURL() : null),
+        null,
+        m_OutInterceptor);
+      //check against schema
+      WebserviceUtils.enableSchemaValidation(((BindingProvider) m_Port));
+    }
    
     request = new UploadRequest();
     request.setId(m_ID);
@@ -199,10 +215,21 @@ public class Upload
     img = new Image();
     img.setData(new DataHandler(new ByteArrayDataSource(m_ImageIn, MimeTypeHelper.MIMETYPE_APPLICATION_OCTETSTREAM)));
     request.setImage(img);
-    response = imageService.upload(request);
+    response = m_Port.upload(request);
     
     // failed to generate data?
     if (!response.isSuccess())
       throw new IllegalStateException(response.getMessage());
+  }
+
+  /**
+   * Cleans up the client.
+   */
+  @Override
+  public void cleanUp() {
+    m_Service = null;
+    m_Port    = null;
+
+    super.cleanUp();
   }
 }

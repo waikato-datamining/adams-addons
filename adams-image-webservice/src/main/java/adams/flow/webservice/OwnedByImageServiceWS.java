@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * OwnedByImageServiceWS.java
- * Copyright (C) 2014 Image BV, Wageningen, NL
+ * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
@@ -23,7 +23,6 @@ package adams.flow.webservice;
  * Interface for classes that are owned by {@link ImageServiceWS}.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 91 $
  */
 public interface OwnedByImageServiceWS {
   

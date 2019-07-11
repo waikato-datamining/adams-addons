@@ -15,7 +15,7 @@
 
 /*
  * ImageServiceWS.java
- * Copyright (C) 2014 Image BV, Wageningen, NL
+ * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.webservice;
@@ -30,7 +30,6 @@ import javax.xml.ws.soap.SOAPBinding;
  * Webservice for Image.
  * 
  * @author Fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 124 $
  */
 public class ImageServiceWS
   extends AbstractWebServiceProvider {
