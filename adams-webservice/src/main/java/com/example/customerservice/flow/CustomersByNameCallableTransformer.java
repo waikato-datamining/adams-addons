@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * CustomersByNameCallableTransformer.java
- * Copyright (C) 2012-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2019 University of Waikato, Hamilton, New Zealand
  */
 package com.example.customerservice.flow;
 
@@ -57,6 +57,12 @@ public class CustomersByNameCallableTransformer
   /** the provided customer name. */
   protected String m_ProvidedCustomerName;
 
+  /** the service instance. */
+  protected transient CustomerServiceService m_Service;
+
+  /** the port instance. */
+  protected transient CustomerService m_Port;
+
   /**
    * Returns a string describing the object.
    *
@@ -78,7 +84,18 @@ public class CustomersByNameCallableTransformer
 	    "customer-name", "customerName",
 	    "Smith");
   }
-  
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_Service = null;
+    m_Port    = null;
+  }
+
   /**
    * Sets the customer name to look up.
    * 
@@ -145,8 +162,6 @@ public class CustomersByNameCallableTransformer
    */
   @Override
   protected void doQuery() throws Exception {
-    CustomerServiceService 	customerServiceService;
-    CustomerService 		customerService;
     String			name;
     String			customer;
     
@@ -155,18 +170,20 @@ public class CustomersByNameCallableTransformer
     else
       name = m_ProvidedCustomerName;
     
-    customerServiceService = new CustomerServiceService(getWsdlLocation());
-    customerService        = customerServiceService.getCustomerServicePort();
-    WebserviceUtils.configureClient(
-	m_Owner,
-	customerService, 
-	m_ConnectionTimeout, 
-	m_ReceiveTimeout, 
-	(getUseAlternativeURL() ? getAlternativeURL() : null), 
-	m_InInterceptor, 
-	m_OutInterceptor);
-    WebserviceUtils.enableSchemaValidation(((BindingProvider) customerService));
-    List<Customer> customers = customerService.getCustomersByName(name);
+    if (m_Service == null) {
+      m_Service = new CustomerServiceService(getWsdlLocation());
+      m_Port    = m_Service.getCustomerServicePort();
+      WebserviceUtils.configureClient(
+        m_Owner,
+        m_Port,
+        m_ConnectionTimeout,
+        m_ReceiveTimeout,
+        (getUseAlternativeURL() ? getAlternativeURL() : null),
+        m_InInterceptor,
+        m_OutInterceptor);
+      WebserviceUtils.enableSchemaValidation(((BindingProvider) m_Port));
+    }
+    List<Customer> customers = m_Port.getCustomersByName(name);
     customer = customers.get(0).getCustomerId() + ": " + customers.get(0).getName() + ", " + Utils.flatten(customers.get(0).getAddress(), " ");
 
     try {
@@ -186,5 +203,16 @@ public class CustomersByNameCallableTransformer
   @Override
   public Class[] generates() {
     return new Class[]{String.class};
+  }
+
+  /**
+   * Cleans up the client.
+   */
+  @Override
+  public void cleanUp() {
+    m_Service = null;
+    m_Port    = null;
+
+    super.cleanUp();
   }
 }

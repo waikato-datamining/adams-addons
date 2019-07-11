@@ -313,10 +313,19 @@ public class CustomersByName extends AbstractWebServiceClientTransformer<String,
   protected String m_CustomerName;  // the name of the customers to look up
   protected String m_ProvidedCustomerName;  // the customer name received by actor
   protected List<Customer> m_Customers;  // the list of customers that were obtained from webservice
+  protected transient CustomerServiceService m_Service;
+  protected transient CustomerService m_Port;
 
   @Override
   public String globalInfo() {
     return "Returns customer names.";
+  }
+
+  @Override
+  protected void reset() {
+    super.reset();
+    m_Service = null;
+    m_Port    = null;
   }
 
   @Override
@@ -337,18 +346,20 @@ public class CustomersByName extends AbstractWebServiceClientTransformer<String,
   @Override
   protected void doQuery() throws Exception {
     m_Customers = null;
-    CustomerServiceService customerServiceService = new CustomerServiceService(getWsdlLocation());
-    CustomerService customerService = customerServiceService.getCustomerServicePort();
-    WebserviceUtils.configureClient(
-	m_Owner,
-	customerService,
-	m_ConnectionTimeout,
-	m_ReceiveTimeout,
-	(getUseAlternativeURL() ? getAlternativeURL() : null),
-	m_InInterceptor,
-	m_OutInterceptor);
-    WebserviceUtils.enableSchemaValidation(((BindingProvider) customerService));
-    m_Customers = customerService.getCustomersByName(m_ProvidedCustomerName);
+    if (m_Service == null) {
+      m_Service = new CustomerServiceService(getWsdlLocation());
+      m_Port = m_Service.getCustomerServicePort();
+      WebserviceUtils.configureClient(
+          m_Owner,
+          m_Port,
+          m_ConnectionTimeout,
+          m_ReceiveTimeout,
+          (getUseAlternativeURL() ? getAlternativeURL() : null),
+          m_InInterceptor,
+          m_OutInterceptor);
+      WebserviceUtils.enableSchemaValidation(((BindingProvider) m_Port));
+    }
+    m_Customers = m_Port.getCustomersByName(m_ProvidedCustomerName);
     m_ProvidedCustomerName = null;
   }
 
@@ -367,6 +378,13 @@ public class CustomersByName extends AbstractWebServiceClientTransformer<String,
         + ", " + Utils.flatten(m_Customers.get(0).getAddress(), " ");
     m_Customers.remove(0);
     return result;
+  }
+
+  @Override
+  public void cleanUp() {
+    m_Service = null;
+    m_Port    = null;
+    super.cleanUp();
   }
 }
 \end{verbatim}

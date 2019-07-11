@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * UpdateCustomer.java
- * Copyright (C) 2012-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2019 University of Waikato, Hamilton, New Zealand
  */
 package com.example.customerservice.flow;
 
@@ -54,6 +54,12 @@ public class UpdateCustomer
   /** the provided customer name. */
   protected String m_ProvidedCustomerName;
 
+  /** the service instance. */
+  protected transient CustomerServiceService m_Service;
+
+  /** the port instance. */
+  protected transient CustomerService m_Port;
+
   /**
    * Returns a string describing the object.
    *
@@ -75,7 +81,18 @@ public class UpdateCustomer
 	    "customer-name", "customerName",
 	    "Smith");
   }
-  
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_Service = null;
+    m_Port    = null;
+  }
+
   /**
    * Sets the customer name to update.
    * 
@@ -142,8 +159,6 @@ public class UpdateCustomer
    */
   @Override
   public void doQuery() throws Exception {
-    CustomerServiceService 	customerServiceService;
-    CustomerService 		customerService;
     String			name;
     Customer			customer;
     
@@ -154,18 +169,31 @@ public class UpdateCustomer
 
     customer = new Customer();
     customer.setName(name);
-    customerServiceService = new CustomerServiceService(getWsdlLocation());
-    customerService        = customerServiceService.getCustomerServicePort();
-    WebserviceUtils.configureClient(
-	m_Owner,
-	customerService, 
-	m_ConnectionTimeout, 
-	m_ReceiveTimeout, 
-	(getUseAlternativeURL() ? getAlternativeURL() : null),
-	null,
-	m_OutInterceptor);
-    WebserviceUtils.enableSchemaValidation(((BindingProvider) customerService));
-    customerService.updateCustomer(customer);
+    if (m_Service == null) {
+      m_Service = new CustomerServiceService(getWsdlLocation());
+      m_Port    = m_Service.getCustomerServicePort();
+      WebserviceUtils.configureClient(
+        m_Owner,
+        m_Port,
+        m_ConnectionTimeout,
+        m_ReceiveTimeout,
+        (getUseAlternativeURL() ? getAlternativeURL() : null),
+        null,
+        m_OutInterceptor);
+      WebserviceUtils.enableSchemaValidation(((BindingProvider) m_Port));
+    }
+    m_Port.updateCustomer(customer);
     m_ProvidedCustomerName = null;
+  }
+
+  /**
+   * Cleans up the client.
+   */
+  @Override
+  public void cleanUp() {
+    m_Service = null;
+    m_Port    = null;
+
+    super.cleanUp();
   }
 }
