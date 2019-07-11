@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * TrainClusterer.java
- * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice.weka;
 
@@ -32,7 +32,6 @@ import java.net.URL;
  * Builds a clusterer model.
  * 
  * @author msf8
- * @version $Revision$
  */
 public class TrainClusterer 
 extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.TrainClusterer, String> {
@@ -43,6 +42,12 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   /** train cluster input */
   protected nz.ac.waikato.adams.webservice.weka.TrainClusterer m_Train;
 
+  /** the service instance. */
+  protected transient WekaServiceService m_Service;
+
+  /** the port instance. */
+  protected transient WekaService m_Port;
+
   /**
    * Returns a string describing the object.
    *
@@ -51,6 +56,17 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   @Override
   public String globalInfo() {
    return "trains a dataset into clusters";
+  }
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_Service = null;
+    m_Port    = null;
   }
 
   /**
@@ -100,26 +116,37 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   protected void doQuery() throws Exception {
-    WekaServiceService wekaServiceService;
-    WekaService wekaService;
-    wekaServiceService = new WekaServiceService(getWsdlLocation());
-    wekaService = wekaServiceService.getWekaServicePort();
-    WebserviceUtils.configureClient(
-	m_Owner,
-	wekaService, 
-	m_ConnectionTimeout, 
-	m_ReceiveTimeout, 
-	(getUseAlternativeURL() ? getAlternativeURL() : null),
-	m_InInterceptor,
-	m_OutInterceptor);
-    //check against schema
-    WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
-    TrainClustererResponseObject response = wekaService.trainClusterer(m_Train.getDataset(), m_Train.getClusterer(), m_Train.getModelName());
+    if (m_Service == null) {
+      m_Service = new WekaServiceService(getWsdlLocation());
+      m_Port = m_Service.getWekaServicePort();
+      WebserviceUtils.configureClient(
+        m_Owner,
+        m_Port,
+        m_ConnectionTimeout,
+        m_ReceiveTimeout,
+        (getUseAlternativeURL() ? getAlternativeURL() : null),
+        m_InInterceptor,
+        m_OutInterceptor);
+      //check against schema
+      WebserviceUtils.enableSchemaValidation(((BindingProvider) m_Port));
+    }
+    TrainClustererResponseObject response = m_Port.trainClusterer(m_Train.getDataset(), m_Train.getClusterer(), m_Train.getModelName());
     // failed to generate data?
     if (response.getErrorMessage() != null)
       throw new IllegalStateException(response.getErrorMessage());
     setResponseData(response.getModel());
 
     m_Train = null;
+  }
+
+  /**
+   * Cleans up the client.
+   */
+  @Override
+  public void cleanUp() {
+    m_Service = null;
+    m_Port    = null;
+
+    super.cleanUp();
   }
 }

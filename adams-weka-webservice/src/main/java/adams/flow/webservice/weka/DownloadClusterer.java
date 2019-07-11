@@ -15,7 +15,7 @@
 
 /*
  * DownloadClusterer.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.webservice.weka;
@@ -35,7 +35,6 @@ import java.net.URL;
  * Client for download a cluster model.
  * 
  * @author FracPete (fracpete at waikato ac dot nz)
- * @version $Revision$
  */
 public class DownloadClusterer 
 extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.DownloadClusterer, Clusterer> {
@@ -46,6 +45,12 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   /** download input object */
   protected nz.ac.waikato.adams.webservice.weka.DownloadClusterer m_Download;
 
+  /** the service instance. */
+  protected transient WekaServiceService m_Service;
+
+  /** the port instance. */
+  protected transient WekaService m_Port;
+
   /**
    * Returns a string describing the object.
    *
@@ -54,6 +59,17 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   @Override
   public String globalInfo() {
     return "Downloads a previously generated cluster model.";
+  }
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_Service = null;
+    m_Port    = null;
   }
 
   /**
@@ -105,27 +121,38 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   protected void doQuery() throws Exception {
-    WekaServiceService wekaServiceService;
-    WekaService wekaService;
-    wekaServiceService = new WekaServiceService(getWsdlLocation());
-    wekaService = wekaServiceService.getWekaServicePort();
-    WebserviceUtils.configureClient(
-	m_Owner,
-	wekaService, 
-	m_ConnectionTimeout, 
-	m_ReceiveTimeout, 
-	(getUseAlternativeURL() ? getAlternativeURL() : null),
-	m_InInterceptor,
-	m_OutInterceptor);
-    //check against schema
-    WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
+    if (m_Service == null) {
+      m_Service = new WekaServiceService(getWsdlLocation());
+      m_Port = m_Service.getWekaServicePort();
+      WebserviceUtils.configureClient(
+        m_Owner,
+        m_Port,
+        m_ConnectionTimeout,
+        m_ReceiveTimeout,
+        (getUseAlternativeURL() ? getAlternativeURL() : null),
+        m_InInterceptor,
+        m_OutInterceptor);
+      //check against schema
+      WebserviceUtils.enableSchemaValidation(((BindingProvider) m_Port));
+    }
     
-    DownloadClustererResponseObject returned = wekaService.downloadClusterer(m_Download.getModelName());
+    DownloadClustererResponseObject returned = m_Port.downloadClusterer(m_Download.getModelName());
     // failed to download model?
     if (returned.getErrorMessage() != null)
       throw new IllegalStateException(returned.getErrorMessage());
     setResponseData((Clusterer) SerializationHelper.read(returned.getModelData().getInputStream()));
 
     m_Download = null;
+  }
+
+  /**
+   * Cleans up the client.
+   */
+  @Override
+  public void cleanUp() {
+    m_Service = null;
+    m_Port    = null;
+
+    super.cleanUp();
   }
 }

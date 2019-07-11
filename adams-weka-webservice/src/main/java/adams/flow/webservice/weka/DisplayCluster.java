@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * DisplayCluster.java
- * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice.weka;
 
@@ -32,7 +32,6 @@ import java.net.URL;
  * Displays the string representation of a clusterer model.
  * 
  * @author msf8
- * @version $Revision$
  */
 public class DisplayCluster 
 extends AbstractWebServiceClientSource<String> {
@@ -43,6 +42,12 @@ extends AbstractWebServiceClientSource<String> {
   /** clusterer to display */
   protected String m_Clusterer;
 
+  /** the service instance. */
+  protected transient WekaServiceService m_Service;
+
+  /** the port instance. */
+  protected transient WekaService m_Port;
+
   /**
    * Adds options to the internal list of options.
    */
@@ -50,7 +55,7 @@ extends AbstractWebServiceClientSource<String> {
   public String globalInfo() {
     return "displays a string representing a clusterer";
   }
-  
+
   /**
    * Adds options to the internal list of options.
    */
@@ -61,7 +66,18 @@ extends AbstractWebServiceClientSource<String> {
     m_OptionManager.add(
 	"clusterer", "clusterer", "");
   }
-  
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_Service = null;
+    m_Port    = null;
+  }
+
   /**
    * set the name of the clusterer.
    * 
@@ -118,26 +134,37 @@ extends AbstractWebServiceClientSource<String> {
    */
   @Override
   protected void doQuery() throws Exception {
-    WekaServiceService wekaServiceService;
-    WekaService wekaService;
-    wekaServiceService = new WekaServiceService(getWsdlLocation());
-    wekaService = wekaServiceService.getWekaServicePort();
-    WebserviceUtils.configureClient(
-	m_Owner,
-	wekaService, 
-	m_ConnectionTimeout, 
-	m_ReceiveTimeout, 
-	(getUseAlternativeURL() ? getAlternativeURL() : null),
-	m_InInterceptor,
-	null);
-    //check against schema
-    WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
-    DisplayClustererResponseObject returned = wekaService.displayClusterer(m_Clusterer);
+    if (m_Service == null) {
+      m_Service = new WekaServiceService(getWsdlLocation());
+      m_Port = m_Service.getWekaServicePort();
+      WebserviceUtils.configureClient(
+        m_Owner,
+        m_Port,
+        m_ConnectionTimeout,
+        m_ReceiveTimeout,
+        (getUseAlternativeURL() ? getAlternativeURL() : null),
+        m_InInterceptor,
+        null);
+      //check against schema
+      WebserviceUtils.enableSchemaValidation(((BindingProvider) m_Port));
+    }
+    DisplayClustererResponseObject returned = m_Port.displayClusterer(m_Clusterer);
     // failed to generate data?
     if (returned.getErrorMessage() != null)
       throw new IllegalStateException(returned.getErrorMessage());
     setResponseData(returned.getDisplayString());
 
     m_Clusterer = null;
+  }
+
+  /**
+   * Cleans up the client.
+   */
+  @Override
+  public void cleanUp() {
+    m_Service = null;
+    m_Port    = null;
+
+    super.cleanUp();
   }
 }

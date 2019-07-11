@@ -15,7 +15,7 @@
 
 /*
  * TrainClassifier.java
- * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.webservice.weka;
@@ -33,7 +33,6 @@ import java.net.URL;
  * client for using the training webservice.
  * 
  * @author msf8
- * @version $Revision$
  */
 public class TrainClassifier 
 extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.TrainClassifier, String> {
@@ -44,6 +43,12 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   /** input object for the train webservice */
   protected nz.ac.waikato.adams.webservice.weka.TrainClassifier m_Train;
 
+  /** the service instance. */
+  protected transient WekaServiceService m_Service;
+
+  /** the port instance. */
+  protected transient WekaService m_Port;
+
   /**
    * Returns a string describing the object.
    *
@@ -53,7 +58,18 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   public String globalInfo() {
     return "Train a classifier on a dataset and returns whether it was succesful.";
   }
-  
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_Service = null;
+    m_Port    = null;
+  }
+
   /**
    * Returns the classes that are accepted input.
    * 
@@ -101,24 +117,35 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   protected void doQuery() throws Exception {
-    WekaServiceService wekaServiceService;
-    WekaService wekaService;
-    wekaServiceService = new WekaServiceService(getWsdlLocation());
-    wekaService = wekaServiceService.getWekaServicePort();
-    WebserviceUtils.configureClient(
-	m_Owner,
-	wekaService, 
-	m_ConnectionTimeout, 
-	m_ReceiveTimeout, 
-	(getUseAlternativeURL() ? getAlternativeURL() : null),
-	m_InInterceptor,
-	m_OutInterceptor);
-    //check against schema
-    WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
-    TrainClassifierResponseObject response = wekaService.trainClassifier(m_Train.getDataset(), m_Train.getClassifier(), m_Train.getName());
+    if (m_Service == null) {
+      m_Service = new WekaServiceService(getWsdlLocation());
+      m_Port = m_Service.getWekaServicePort();
+      WebserviceUtils.configureClient(
+        m_Owner,
+        m_Port,
+        m_ConnectionTimeout,
+        m_ReceiveTimeout,
+        (getUseAlternativeURL() ? getAlternativeURL() : null),
+        m_InInterceptor,
+        m_OutInterceptor);
+      //check against schema
+      WebserviceUtils.enableSchemaValidation(((BindingProvider) m_Port));
+    }
+    TrainClassifierResponseObject response = m_Port.trainClassifier(m_Train.getDataset(), m_Train.getClassifier(), m_Train.getName());
     if (response.getErrorMessage() != null)
       throw new IllegalStateException(response.getErrorMessage());
     setResponseData(response.getModel());
     m_Train = null;
+  }
+
+  /**
+   * Cleans up the client.
+   */
+  @Override
+  public void cleanUp() {
+    m_Service = null;
+    m_Port    = null;
+
+    super.cleanUp();
   }
 }

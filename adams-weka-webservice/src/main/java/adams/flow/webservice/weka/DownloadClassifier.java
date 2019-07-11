@@ -15,7 +15,7 @@
 
 /*
  * DownloadClassifier.java
- * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.webservice.weka;
@@ -35,7 +35,6 @@ import java.net.URL;
  * Client for download a classifier model.
  * 
  * @author FracPete (fracpete at waikato ac dot nz)
- * @version $Revision$
  */
 public class DownloadClassifier 
 extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.DownloadClassifier, Classifier> {
@@ -49,6 +48,12 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   /** response object */
   protected DownloadClassifierResponseObject m_Returned;
 
+  /** the service instance. */
+  protected transient WekaServiceService m_Service;
+
+  /** the port instance. */
+  protected transient WekaService m_Port;
+
   /**
    * Returns a string describing the object.
    *
@@ -57,6 +62,17 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
   @Override
   public String globalInfo() {
     return "Downloads a previously generated classifier model.";
+  }
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_Service = null;
+    m_Port    = null;
   }
 
   /**
@@ -108,27 +124,38 @@ extends AbstractWebServiceClientTransformer<nz.ac.waikato.adams.webservice.weka.
    */
   @Override
   protected void doQuery() throws Exception {
-    WekaServiceService wekaServiceService;
-    WekaService wekaService;
-    wekaServiceService = new WekaServiceService(getWsdlLocation());
-    wekaService = wekaServiceService.getWekaServicePort();
-    WebserviceUtils.configureClient(
-	m_Owner,
-	wekaService, 
-	m_ConnectionTimeout, 
-	m_ReceiveTimeout, 
-	(getUseAlternativeURL() ? getAlternativeURL() : null),
-	m_InInterceptor,
-	m_OutInterceptor);
-    //check against schema
-    WebserviceUtils.enableSchemaValidation(((BindingProvider) wekaService));
+    if (m_Service == null) {
+      m_Service = new WekaServiceService(getWsdlLocation());
+      m_Port = m_Service.getWekaServicePort();
+      WebserviceUtils.configureClient(
+        m_Owner,
+        m_Port,
+        m_ConnectionTimeout,
+        m_ReceiveTimeout,
+        (getUseAlternativeURL() ? getAlternativeURL() : null),
+        m_InInterceptor,
+        m_OutInterceptor);
+      //check against schema
+      WebserviceUtils.enableSchemaValidation(((BindingProvider) m_Port));
+    }
     
-    m_Returned = wekaService.downloadClassifier(m_Download.getModelName()); 
+    m_Returned = m_Port.downloadClassifier(m_Download.getModelName());
     // failed to download model?
     if (m_Returned.getErrorMessage() != null)
       throw new IllegalStateException(m_Returned.getErrorMessage());
     setResponseData((Classifier) SerializationHelper.read(m_Returned.getModelData().getInputStream()));
 
     m_Download = null;
+  }
+
+  /**
+   * Cleans up the client.
+   */
+  @Override
+  public void cleanUp() {
+    m_Service = null;
+    m_Port    = null;
+
+    super.cleanUp();
   }
 }
