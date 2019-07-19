@@ -36,7 +36,7 @@ import java.awt.Dialog;
 import java.awt.Dialog.ModalityType;
 
 /**
- * Does not use any authentication.
+ * Performs user/password authentication.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
@@ -50,6 +50,9 @@ public class BasicAuthConnectionFactory
 
   /** the port. */
   protected int m_Port;
+
+  /** the virtual host. */
+  protected String m_VirtualHost;
 
   /** database username. */
   protected String m_User;
@@ -98,6 +101,10 @@ public class BasicAuthConnectionFactory
       AMQP.PROTOCOL.PORT, 1, 65535);
 
     m_OptionManager.add(
+      "virtual-host", "virtualHost",
+      "/");
+
+    m_OptionManager.add(
       "user", "user",
       "", false);
 
@@ -134,6 +141,7 @@ public class BasicAuthConnectionFactory
     result = QuickInfoHelper.toString(this, "user", (m_User.isEmpty() ? "guest" : m_User));
     result += QuickInfoHelper.toString(this, "host", (m_Host.length() == 0 ? "??" : m_Host), "@");
     result += QuickInfoHelper.toString(this, "port", m_Port, ":");
+    result += QuickInfoHelper.toString(this, "virtualHost", m_VirtualHost, "");
 
     if (QuickInfoHelper.hasVariable(this, "promptForPassword") || m_PromptForPassword) {
       result += ", prompt for password";
@@ -201,6 +209,35 @@ public class BasicAuthConnectionFactory
    */
   public String portTipText() {
     return "The port to connect to.";
+  }
+
+  /**
+   * Sets the virtual host to use.
+   *
+   * @param value	the virtual host
+   */
+  public void setVirtualHost(String value) {
+    m_VirtualHost = value;
+    reset();
+  }
+
+  /**
+   * Returns the virtual host to use.
+   *
+   * @return		the virtual host
+   */
+  public String getVirtualHost() {
+    return m_VirtualHost;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String virtualHostTipText() {
+    return "The virtual host to use on the RabbitMQ server.";
   }
 
   /**
@@ -473,6 +510,7 @@ public class BasicAuthConnectionFactory
     result = new ConnectionFactory();
     result.setHost(m_Host);
     result.setPort(m_Port);
+    result.setVirtualHost(m_VirtualHost);
     result.setUsername(m_User);
 
     m_ActualPassword = m_Password;

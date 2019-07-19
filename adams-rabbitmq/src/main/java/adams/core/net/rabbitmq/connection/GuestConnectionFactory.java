@@ -41,6 +41,9 @@ public class GuestConnectionFactory
   /** the port. */
   protected int m_Port;
 
+  /** the virtual host. */
+  protected String m_VirtualHost;
+
   /**
    * Returns a string describing the object.
    *
@@ -65,6 +68,10 @@ public class GuestConnectionFactory
     m_OptionManager.add(
       "port", "port",
       AMQP.PROTOCOL.PORT, 1, 65535);
+
+    m_OptionManager.add(
+      "virtual-host", "virtualHost",
+      "/");
   }
 
   /**
@@ -78,6 +85,7 @@ public class GuestConnectionFactory
 
     result = QuickInfoHelper.toString(this, "host", (m_Host.length() == 0 ? "??" : m_Host), "guest@");
     result += QuickInfoHelper.toString(this, "port", m_Port, ":");
+    result += QuickInfoHelper.toString(this, "virtualHost", m_VirtualHost, "");
 
     return result;
   }
@@ -143,6 +151,35 @@ public class GuestConnectionFactory
   }
 
   /**
+   * Sets the virtual host to use.
+   *
+   * @param value	the virtual host
+   */
+  public void setVirtualHost(String value) {
+    m_VirtualHost = value;
+    reset();
+  }
+
+  /**
+   * Returns the virtual host to use.
+   *
+   * @return		the virtual host
+   */
+  public String getVirtualHost() {
+    return m_VirtualHost;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String virtualHostTipText() {
+    return "The virtual host to use on the RabbitMQ server.";
+  }
+
+  /**
    * Returns whether a flow context is required.
    *
    * @return		true if required
@@ -164,6 +201,7 @@ public class GuestConnectionFactory
     result = new ConnectionFactory();
     result.setHost(m_Host);
     result.setPort(m_Port);
+    result.setVirtualHost(m_VirtualHost);
 
     return result;
   }
