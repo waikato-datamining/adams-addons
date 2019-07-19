@@ -1,11 +1,11 @@
 # Project: adams
-# Date: 2019-05-08 15:11:45
+# Date: 2019-07-19 12:42:50
 # User: fracpete
 # Charset: UTF-8
-# Modules: adams-core,adams-rabbitmq
+# Modules: adams-core,adams-meta,adams-rabbitmq
 #
 adams.flow.control.Flow -annotation "Performs an Remote Procedure Call (RPC) via a RabbitMQ broker.\\n\\nRequires the following flow to run:\\n  adams-rabbitmq-rpc_processor.flow" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
- adams.flow.standalone.RabbitMQConnection -host localhost
+ adams.flow.standalone.RabbitMQConnection -connection-factory adams.core.net.rabbitmq.connection.GuestConnectionFactory
  adams.flow.source.ForLoop
  adams.flow.transformer.SetVariable -var-name input
  adams.flow.transformer.RabbitMQRemoteProcedureCall -queue rpc -send-converter adams.core.net.rabbitmq.send.BinaryConverter -receive-converter adams.core.net.rabbitmq.receive.BinaryConverter
