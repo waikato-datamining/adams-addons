@@ -1,0 +1,44 @@
+# Project: adams
+# Date: 2019-07-22 15:16:57
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-meta,adams-rabbitmq
+#
+adams.flow.control.Flow -annotation "Executes jobs objects received via a RabbitMQ broker.\\nUses the following environment variables:\\n- RABBITMQ_HOST\\n- RABBITMQ_PORT\\n- RABBITMQ_VHOST\\n- RABBITMQ_USER\\n- RABBITMQ_PW\\n- RABBITMQ_QUEUE" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.JavaLogging -name log -logger-name job
+ adams.flow.standalone.Standalones -name "env vars"
+  adams.flow.standalone.SetVariable -name host -annotation "fallback: localhost" -var-name host -var-value localhost -override-with-env-var true -env-variable RABBITMQ_HOST
+  adams.flow.standalone.SetVariable -name port -annotation "fallback: 5672" -var-name port -var-value 5672 -override-with-env-var true -env-variable RABBITMQ_PORT
+  adams.flow.standalone.SetVariable -name vhost -annotation "fallback: /" -var-name vhost -var-value / -override-with-env-var true -env-variable RABBITMQ_VHOST
+  adams.flow.standalone.SetVariable -name user -var-name user -var-value "" -override-with-env-var true -env-variable RABBITMQ_USER
+  adams.flow.standalone.SetVariable -name password -var-name password -var-value "" -override-with-env-var true -env-variable RABBITMQ_PW
+  adams.flow.standalone.SetVariable -name queue -annotation "fallback: jobs" -var-name queue -var-value jobs -override-with-env-var true -env-variable RABBITMQ_QUEUE
+ adams.flow.standalone.RabbitMQConnection -connection-factory "adams.core.net.rabbitmq.connection.BasicAuthConnectionFactory -host @{host} -port @{port} -virtual-host @{vhost} -user @{user} -password @{password}"
+ adams.flow.standalone.RabbitMQChannelAction -action "adams.core.net.rabbitmq.channelaction.DeclareQueue -queue @{queue}"
+ adams.flow.source.RabbitMQConsume -queue @{queue} -auto-ack false -converter adams.core.net.rabbitmq.receive.BinaryConverter -output-container true
+ adams.flow.control.ContainerValuePicker -value Data
+  adams.flow.transformer.SetStorageValue -storage-name jobs
+ adams.flow.control.ContainerValuePicker -name "ContainerValuePicker (2)" -value Properties
+  adams.flow.transformer.Convert -conversion adams.data.conversion.RabbitMQPropertiesToMap
+  adams.flow.transformer.GetMapValue -key ReplyTo
+  adams.flow.transformer.SetVariable -var-name replyto
+ adams.flow.control.ContainerValuePicker -name "ContainerValuePicker (3)" -value Envelope
+  adams.flow.transformer.Convert -conversion adams.data.conversion.RabbitMQEnvelopeToMap
+  adams.flow.transformer.GetMapValue -key DeliveryTag
+  adams.flow.transformer.SetVariable -var-name deliverytag
+ adams.flow.control.ContainerValuePicker -name "ContainerValuePicker (4)" -value Channel
+  adams.flow.transformer.SetStorageValue -storage-name channel
+ adams.flow.control.Trigger -name info
+  adams.flow.source.CombineVariables -expression "received: @{replyto}" -conversion adams.data.conversion.StringToString
+  adams.flow.sink.CallableSink -callable log
+ adams.flow.control.Trigger -name "execute and send back"
+  adams.flow.source.StorageValue -storage-name jobs -conversion adams.data.conversion.UnknownToUnknown
+  adams.flow.transformer.ExecuteJobs -update-num-threads true
+  adams.flow.sink.RabbitMQPublish -queue @{replyto} -converter adams.core.net.rabbitmq.send.BinaryConverter
+ adams.flow.control.Trigger -name "acknowledge message using deliverytag and channel"
+  adams.flow.source.Variable -var-name deliverytag -conversion adams.data.conversion.StringToLong
+  adams.flow.sink.RabbitMQMessageDeliveryAction -storage-name channel -action adams.core.net.rabbitmq.deliveryaction.Ack
+ adams.flow.control.Trigger -name "info (2)"
+  adams.flow.source.CombineVariables -expression "finished: @{replyto}" -conversion adams.data.conversion.StringToString
+  adams.flow.sink.CallableSink -callable log
