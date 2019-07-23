@@ -27,12 +27,8 @@ import adams.flow.core.CallableActorReference;
 import adams.flow.core.Token;
 import moa.clusterers.AbstractClusterer;
 import moa.core.Measurement;
-import moa.evaluation.BasicClusteringPerformanceEvaluator;
-import moa.evaluation.LearningPerformanceEvaluator;
-import moa.options.ClassOption;
-import weka.core.Instance;
-import weka.core.Instances;
-import weka.core.MOAUtils;
+import com.yahoo.labs.samoa.instances.Instance;
+import com.yahoo.labs.samoa.instances.Instances;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -119,12 +115,6 @@ public class MOAClustererEvaluation
   /** the model to use for prediction/training. */
   protected AbstractClusterer m_ActualClusterer;
 
-  /** the evaluation to use. */
-  protected moa.options.ClassOption m_Evaluator;
-
-  /** the actual evaluator to use. */
-  protected moa.evaluation.LearningPerformanceEvaluator m_ActualEvaluator;
-
   /** the output interval. */
   protected int m_OutputInterval;
 
@@ -155,10 +145,6 @@ public class MOAClustererEvaluation
 	    new CallableActorReference("MOAClusterer"));
 
     m_OptionManager.add(
-	    "evaluator", "evaluator",
-	    getDefaultOption());
-
-    m_OptionManager.add(
 	    "output-interval", "outputInterval",
 	    1, 1, null);
   }
@@ -170,21 +156,10 @@ public class MOAClustererEvaluation
   protected void reset() {
     super.reset();
 
-    m_ActualEvaluator = null;
     m_Count           = 0;
     m_ActualClusterer = null;
   }
 
-  /**
-   * Initializes the members.
-   */
-  @Override
-  protected void initialize() {
-    super.initialize();
-    
-    m_Evaluator = getDefaultOption();
-  }
-  
   /**
    * Sets the callable clusterer to use.
    *
@@ -212,69 +187,6 @@ public class MOAClustererEvaluation
    */
   public String clustererTipText() {
     return "The name of the callable MOA clusterer to train/evaluate.";
-  }
-
-  /**
-   * Returns the default evaluator.
-   *
-   * @return		the evaluator
-   */
-  protected moa.evaluation.LearningPerformanceEvaluator getDefaultEvaluator() {
-    return new BasicClusteringPerformanceEvaluator();
-  }
-
-  /**
-   * Returns the default class option.
-   *
-   * @return		the option
-   */
-  protected ClassOption getDefaultOption() {
-    return new ClassOption(
-	"evaluator",
-	'e',
-	"The MOA clusterer performance evaluator to use from within ADAMS.",
-	moa.evaluation.LearningPerformanceEvaluator.class,
-	getDefaultEvaluator().getClass().getName().replace("moa.evaluation.", ""),
-	getDefaultEvaluator().getClass().getName());
-  }
-
-  /**
-   * Sets the evaluator to use.
-   *
-   * @param value	the evaluator
-   */
-  public void setEvaluator(ClassOption value) {
-    m_Evaluator.setValueViaCLIString(value.getValueAsCLIString());
-    reset();
-  }
-
-  /**
-   * Returns the evaluator in use.
-   *
-   * @return		the evaluator
-   */
-  public ClassOption getEvaluator() {
-    return m_Evaluator;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String evaluatorTipText() {
-    return "The MOA evaluator to use for evaluating a trained MOA clusterer.";
-  }
-
-  /**
-   * Returns the current evaluator, based on the class option.
-   *
-   * @return		the evaluator
-   * @see		#getEvaluator()
-   */
-  protected LearningPerformanceEvaluator getCurrentEvaluator() {
-    return (moa.evaluation.LearningPerformanceEvaluator) MOAUtils.fromOption(m_Evaluator);
   }
 
   /**
@@ -316,7 +228,6 @@ public class MOAClustererEvaluation
     String	result;
 
     result  = QuickInfoHelper.toString(this, "clusterer", m_Clusterer);
-    result += QuickInfoHelper.toString(this, "evaluator", getCurrentEvaluator().getClass(), ", ");
     result += QuickInfoHelper.toString(this, "outputInterval", ((m_OutputInterval == 1) ? "always" : m_OutputInterval), "/");
 
     return result;
@@ -416,8 +327,6 @@ public class MOAClustererEvaluation
 
     result = null;
 
-    if (m_ActualEvaluator == null)
-      m_ActualEvaluator = (moa.evaluation.LearningPerformanceEvaluator) MOAUtils.fromOption(m_Evaluator);
     if (m_ActualClusterer == null) {
       m_ActualClusterer = getClustererInstance();
       if (m_ActualClusterer == null) {
@@ -426,9 +335,11 @@ public class MOAClustererEvaluation
       }
     }
 
-    data = new ArrayList<Instance>();
+    data = new ArrayList<>();
     if (m_InputToken.getPayload() instanceof Instances) {
-      data.addAll((Instances) m_InputToken.getPayload());
+      Instances instances = (Instances) m_InputToken.getPayload();
+      for (int i = 0; i < instances.numInstances(); i++)
+        data.add(instances.get(i));
       single = false;
     }
     else {
@@ -437,11 +348,6 @@ public class MOAClustererEvaluation
     }
 
     for (Instance inst: data) {
-      // test
-      testInst   = (Instance) inst.copy();
-      prediction = m_ActualClusterer.getVotesForInstance(testInst);
-      m_ActualEvaluator.addLearningAttempt(-1, prediction, testInst.weight());  // TODO: class necessary???
-
       // train
       m_ActualClusterer.trainOnInstance(inst);
     }
@@ -450,11 +356,11 @@ public class MOAClustererEvaluation
       m_Count++;
       if (m_Count % m_OutputInterval == 0) {
 	m_Count = 0;
-	m_OutputToken = new Token(m_ActualEvaluator.getPerformanceMeasurements());
+	m_OutputToken = new Token(m_ActualClusterer.getModelMeasurements());
       }
     }
     else {
-      m_OutputToken = new Token(m_ActualEvaluator.getPerformanceMeasurements());
+      m_OutputToken = new Token(m_ActualClusterer.getModelMeasurements());
     }
 
     return result;
@@ -467,7 +373,6 @@ public class MOAClustererEvaluation
   public void wrapUp() {
     super.wrapUp();
 
-    m_ActualEvaluator = null;
     m_ActualClusterer = null;
   }
 }

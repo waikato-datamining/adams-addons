@@ -1,7 +1,9 @@
 # Project: adams
-# Date: 2016-02-15 14:39:08
-# User: fracpete
+# Date: 2019-07-22 14:20:52
+# User: csterlin
 # Charset: UTF-8
+# Modules: adams-core,adams-ml,adams-moa,adams-spreadsheet,adams-visualstats,adams-weka
+#
 adams.flow.control.Flow -annotation "Visualizes the clustering of the data stream.\\nOne on the raw data, the other one with\\nfiltered data." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
   adams.flow.source.MOAClustererSetup -clusterer moa.clusterers.ClusterGenerator
@@ -10,5 +12,5 @@ adams.flow.control.Flow -annotation "Visualizes the clustering of the data strea
   adams.flow.control.Sequence -name raw
    adams.flow.sink.MOAClusterVisualization -name "MOAClusterVisualization (raw)" -short-title true -writer adams.gui.print.NullWriter -measure F1 -measure SSQ
   adams.flow.control.Sequence -name filtered
-   adams.flow.transformer.WekaStreamFilter -filter "weka.filters.MultiFilter -F \"weka.filters.unsupervised.attribute.AndrewsCurves -num-points 10\" -F \"weka.filters.unsupervised.instance.Scale -min 0.0 -max 1.0\""
+   adams.flow.transformer.MOAFilter -filter "moa.streams.filters.AddNoiseFilter -a 0.1 -c 0.0"
    adams.flow.sink.MOAClusterVisualization -name "MOAClusterVisualization (filtered)" -short-title true -x -3 -writer adams.gui.print.NullWriter -measure F1 -measure SSQ

@@ -24,13 +24,13 @@ import adams.core.QuickInfoHelper;
 import adams.core.SerializationHelper;
 import adams.core.io.ModelFileHandler;
 import adams.core.io.PlaceholderFile;
-import adams.flow.container.WekaModelContainer;
+import adams.flow.container.MOAModelContainer;
 import adams.flow.core.Actor;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.Token;
 import moa.classifiers.AbstractClassifier;
-import weka.core.Instance;
+import com.yahoo.labs.samoa.instances.Instance;
 import weka.core.Utils;
 
 import java.util.logging.Level;
@@ -261,8 +261,8 @@ public class MOAClassification
 	    result = errors.toString();
 	}
 	else {
-	  if (obj instanceof WekaModelContainer)
-	    m_Model = (AbstractClassifier) ((WekaModelContainer) obj).getValue(WekaModelContainer.VALUE_MODEL);
+	  if (obj instanceof MOAModelContainer)
+	    m_Model = (AbstractClassifier) ((MOAModelContainer) obj).getValue(MOAModelContainer.VALUE_MODEL);
 	  else
 	    m_Model = (AbstractClassifier) obj;
 	}

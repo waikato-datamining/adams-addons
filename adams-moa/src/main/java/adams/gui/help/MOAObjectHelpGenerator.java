@@ -100,7 +100,7 @@ public class MOAObjectHelpGenerator
     if (obj instanceof moa.options.OptionHandler) {
       result.append("OPTIONS\n\n");
       handler = (moa.options.OptionHandler) obj;
-      for (moa.options.Option opt: handler.getOptions().getOptionArray()) {
+      for (com.github.javacliparser.Option opt: handler.getOptions().getOptionArray()) {
 	result.append(opt.getName() + "/-" + opt.getCLIChar() + "\n");
         result.append(opt.getPurpose() + "\n");
 	result.append("\n");

@@ -24,7 +24,7 @@ import adams.core.MessageCollection;
 import adams.core.SerializationHelper;
 import adams.core.Utils;
 import adams.flow.container.AbstractContainer;
-import adams.flow.container.WekaModelContainer;
+import adams.flow.container.MOAModelContainer;
 import moa.clusterers.Clusterer;
 
 /**
@@ -88,8 +88,8 @@ public class MOAClustererModelLoader
    */
   @Override
   protected Clusterer getModelFromContainer(AbstractContainer cont, MessageCollection errors) {
-    if (cont instanceof WekaModelContainer)
-      return (Clusterer) cont.getValue(WekaModelContainer.VALUE_MODEL);
+    if (cont instanceof MOAModelContainer)
+      return (Clusterer) cont.getValue(MOAModelContainer.VALUE_MODEL);
 
     unhandledContainer(cont, errors);
     return null;

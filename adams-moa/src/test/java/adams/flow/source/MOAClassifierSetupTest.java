@@ -35,6 +35,7 @@ import adams.flow.transformer.WekaClassSelector;
 import adams.flow.transformer.WekaFileReader;
 import adams.flow.transformer.WekaFileReader.OutputType;
 import adams.test.TmpFile;
+import moa.streams.ExampleStream;
 
 /**
  * Tests the MOAClassifierSetup actor.
@@ -102,13 +103,17 @@ public class MOAClassifierSetupTest
     cls.setClassifier(option);
     ga.add(cls);
 
-    FileSupplier sfs = new FileSupplier();
-    sfs.setFiles(new adams.core.io.PlaceholderFile[]{new TmpFile("iris.arff")});
+    ClassOption arffOption = new ClassOption(
+      "stream",
+      's',
+      "The MOA stream generator to use from within ADAMS.",
+      ExampleStream.class,
+      "ArffFileStream -f " + new TmpFile("iris.arff").getAbsolutePath(),
+      "moa.streams.ArffFileStream");
 
-    WekaFileReader fr = new WekaFileReader();
-    fr.setOutputType(OutputType.INCREMENTAL);
-
-    WekaClassSelector cs = new WekaClassSelector();
+    MOAStream stream = new MOAStream();
+    stream.setNumExamples(-1);
+    stream.setStreamGenerator(arffOption);
 
     MOATrainClassifier cts = new MOATrainClassifier();
     cts.setClassifier(new CallableActorReference("cls"));
@@ -118,7 +123,7 @@ public class MOAClassifierSetupTest
     df.setOutputFile(new TmpFile("dumpfile.txt"));
 
     Flow flow = new Flow();
-    flow.setActors(new Actor[]{ga, sfs, fr, cs, cts, df});
+    flow.setActors(new Actor[]{ga, stream, cts, df});
 
     return flow;
   }

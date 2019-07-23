@@ -20,6 +20,7 @@
 
 package adams.flow.source;
 
+import adams.data.conversion.WEKAInstancesToMOAInstances;
 import adams.env.Environment;
 import adams.flow.AbstractFlowTest;
 import adams.flow.control.Flow;
@@ -27,6 +28,7 @@ import adams.flow.core.Actor;
 import adams.flow.core.CallableActorReference;
 import adams.flow.sink.DumpFile;
 import adams.flow.standalone.CallableActors;
+import adams.flow.transformer.Convert;
 import adams.flow.transformer.MOATrainRegressor;
 import adams.flow.transformer.WekaClassSelector;
 import adams.flow.transformer.WekaFileReader;
@@ -106,9 +108,12 @@ public class MOARegressorSetupTest
     sfs.setFiles(new adams.core.io.PlaceholderFile[]{new TmpFile("bolts.arff")});
 
     WekaFileReader fr = new WekaFileReader();
-    fr.setOutputType(OutputType.INCREMENTAL);
+    fr.setOutputType(OutputType.DATASET);
 
     WekaClassSelector cs = new WekaClassSelector();
+
+    Convert convert = new Convert();
+    convert.setConversion(new WEKAInstancesToMOAInstances());
 
     MOATrainRegressor cts = new MOATrainRegressor();
     cts.setRegressor(new CallableActorReference("reg"));
@@ -118,7 +123,7 @@ public class MOARegressorSetupTest
     df.setOutputFile(new TmpFile("dumpfile.txt"));
 
     Flow flow = new Flow();
-    flow.setActors(new Actor[]{ga, sfs, fr, cs, cts, df});
+    flow.setActors(new Actor[]{ga, sfs, fr, cs, convert, cts, df});
 
     return flow;
   }

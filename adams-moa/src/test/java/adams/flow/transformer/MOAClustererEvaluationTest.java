@@ -20,9 +20,9 @@
 
 package adams.flow.transformer;
 
+import adams.data.conversion.WEKAInstancesToMOAInstances;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import moa.evaluation.BasicClusteringPerformanceEvaluator;
 import moa.options.ClassOption;
 import adams.env.Environment;
 import adams.flow.AbstractFlowTest;
@@ -106,19 +106,13 @@ public class MOAClustererEvaluationTest
     sfs.setFiles(new adams.core.io.PlaceholderFile[]{new TmpFile("iris.arff")});
 
     WekaFileReader fr = new WekaFileReader();
-    fr.setOutputType(OutputType.INCREMENTAL);
+    fr.setOutputType(OutputType.DATASET);
 
-    option = new ClassOption(
-	"evaluator",
-	'e',
-	"The MOA clusterer performance evaluator to use from within ADAMS.",
-	moa.evaluation.LearningPerformanceEvaluator.class,
-	"BasicClusteringPerformanceEvaluator",
-	BasicClusteringPerformanceEvaluator.class.getName());
+    Convert convert = new Convert();
+    convert.setConversion(new WEKAInstancesToMOAInstances());
 
     MOAClustererEvaluation mce = new MOAClustererEvaluation();
     mce.setClusterer(new CallableActorReference("clusterer"));
-    mce.setEvaluator(option);
     mce.setOutputInterval(50);   // 150 instances in the dataset
 
     MOALearningEvaluation mle = new MOALearningEvaluation();
@@ -128,7 +122,7 @@ public class MOAClustererEvaluationTest
     df.setOutputFile(new TmpFile("dumpfile.txt"));
 
     Flow flow = new Flow();
-    flow.setActors(new Actor[]{ga, sfs, fr, mce, mle, df});
+    flow.setActors(new Actor[]{ga, sfs, fr, convert, mce, mle, df});
 
     return flow;
   }

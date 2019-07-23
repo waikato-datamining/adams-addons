@@ -27,13 +27,13 @@ import adams.flow.core.CallableActorReference;
 import adams.flow.core.Token;
 import moa.classifiers.AbstractClassifier;
 import moa.classifiers.Regressor;
+import moa.core.InstanceExample;
 import moa.core.Measurement;
 import moa.evaluation.BasicRegressionPerformanceEvaluator;
-import moa.evaluation.ClassificationPerformanceEvaluator;
 import moa.evaluation.RegressionPerformanceEvaluator;
 import moa.options.ClassOption;
-import weka.core.Instance;
-import weka.core.Instances;
+import com.yahoo.labs.samoa.instances.Instance;
+import com.yahoo.labs.samoa.instances.Instances;
 import weka.core.MOAUtils;
 
 import java.util.ArrayList;
@@ -49,8 +49,8 @@ import java.util.List;
  <!-- flow-summary-start -->
  * Input&#47;output:<br>
  * - accepts:<br>
- * &nbsp;&nbsp;&nbsp;weka.core.Instance<br>
- * &nbsp;&nbsp;&nbsp;weka.core.Instances<br>
+ * &nbsp;&nbsp;&nbsp;com.yahoo.labs.samoa.instances.Instance<br>
+ * &nbsp;&nbsp;&nbsp;com.yahoo.labs.samoa.instances.Instances<br>
  * - generates:<br>
  * &nbsp;&nbsp;&nbsp;moa.core.Measurement[]<br>
  * <br><br>
@@ -61,51 +61,53 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- * 
+ *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
  * &nbsp;&nbsp;&nbsp;default: MOARegressorEvaluation
  * </pre>
- * 
+ *
  * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
  * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
- * &nbsp;&nbsp;&nbsp;default: 
+ * &nbsp;&nbsp;&nbsp;default:
  * </pre>
- * 
+ *
  * <pre>-skip &lt;boolean&gt; (property: skip)
- * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
+ * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded
  * &nbsp;&nbsp;&nbsp;as it is.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
- * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
+ * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-silent &lt;boolean&gt; (property: silent)
- * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console.
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-regressor &lt;adams.flow.core.CallableActorReference&gt; (property: regressor)
  * &nbsp;&nbsp;&nbsp;The name of the callable MOA regressor to train&#47;evaluate.
  * &nbsp;&nbsp;&nbsp;default: MOARegressor
  * </pre>
- * 
+ *
  * <pre>-evaluator &lt;moa.options.ClassOption&gt; (property: evaluator)
  * &nbsp;&nbsp;&nbsp;The MOA evaluator to use for evaluating a trained MOA regressor.
- * &nbsp;&nbsp;&nbsp;default: moa.evaluation.BasicRegressionPerformanceEvaluator
+ * &nbsp;&nbsp;&nbsp;default: BasicRegressionPerformanceEvaluator
  * </pre>
- * 
+ *
  * <pre>-output-interval &lt;int&gt; (property: outputInterval)
- * &nbsp;&nbsp;&nbsp;The number of tokens to skip before evaluating the regressor stored in the 
+ * &nbsp;&nbsp;&nbsp;The number of tokens to skip before evaluating the regressor stored in the
  * &nbsp;&nbsp;&nbsp;token (only used when receiving Instance objects).
  * &nbsp;&nbsp;&nbsp;default: 1
  * &nbsp;&nbsp;&nbsp;minimum: 1
  * </pre>
- * 
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -129,7 +131,7 @@ public class MOARegressorEvaluation
   protected ClassOption m_Evaluator;
 
   /** the actual evaluator to use. */
-  protected ClassificationPerformanceEvaluator m_ActualEvaluator;
+  protected RegressionPerformanceEvaluator m_ActualEvaluator;
 
   /** the output interval. */
   protected int m_OutputInterval;
@@ -145,8 +147,8 @@ public class MOARegressorEvaluation
   @Override
   public String globalInfo() {
     return
-        "Evaluates a MOA regressor using prequential evaluation. With each "
-      + "incoming instance, the regressor is first evaluated, then trained.";
+      "Evaluates a MOA regressor using prequential evaluation. With each "
+        + "incoming instance, the regressor is first evaluated, then trained.";
   }
 
   /**
@@ -157,16 +159,16 @@ public class MOARegressorEvaluation
     super.defineOptions();
 
     m_OptionManager.add(
-	    "regressor", "regressor",
-	    new CallableActorReference("MOARegressor"));
+      "regressor", "regressor",
+      new CallableActorReference("MOARegressor"));
 
     m_OptionManager.add(
-	    "evaluator", "evaluator",
-	    getDefaultOption());
+      "evaluator", "evaluator",
+      getDefaultOption());
 
     m_OptionManager.add(
-	    "output-interval", "outputInterval",
-	    1, 1, null);
+      "output-interval", "outputInterval",
+      1, 1, null);
   }
 
   /**
@@ -236,12 +238,12 @@ public class MOARegressorEvaluation
    */
   protected ClassOption getDefaultOption() {
     return new ClassOption(
-	"evaluator",
-	'e',
-	"The MOA regressor performance evaluator to use from within ADAMS.",
-	RegressionPerformanceEvaluator.class,
-	getDefaultEvaluator().getClass().getName().replace("moa.evaluation.", ""),
-	getDefaultEvaluator().getClass().getName());
+      "evaluator",
+      'e',
+      "The MOA regressor performance evaluator to use from within ADAMS.",
+      RegressionPerformanceEvaluator.class,
+      getDefaultEvaluator().getClass().getName().replace("moa.evaluation.", ""),
+      getDefaultEvaluator().getClass().getName());
   }
 
   /**
@@ -331,7 +333,7 @@ public class MOARegressorEvaluation
   /**
    * Returns the class that the consumer accepts.
    *
-   * @return		<!-- flow-accepts-start -->weka.core.Instance.class, weka.core.Instances.class<!-- flow-accepts-end -->
+   * @return		<!-- flow-accepts-start -->com.yahoo.labs.samoa.instances.Instance.class, com.yahoo.labs.samoa.instances.Instances.class<!-- flow-accepts-end -->
    */
   public Class[] accepts() {
     return new Class[]{Instance.class, Instances.class};
@@ -401,7 +403,7 @@ public class MOARegressorEvaluation
     result = (AbstractClassifier) CallableActorHelper.getSetup(Regressor.class, m_Regressor, this, errors);
     if (result == null) {
       if (!errors.isEmpty())
-	getLogger().severe(errors.toString());
+        getLogger().severe(errors.toString());
     }
 
     return result;
@@ -428,14 +430,16 @@ public class MOARegressorEvaluation
     if (m_ActualRegressor == null) {
       m_ActualRegressor = getRegressorInstance();
       if (m_ActualRegressor == null) {
-	result = "Failed to located regressor '" + m_Regressor + "'!";
-	return result;
+        result = "Failed to located regressor '" + m_Regressor + "'!";
+        return result;
       }
     }
-    
+
     data = new ArrayList<Instance>();
     if (m_InputToken.getPayload() instanceof Instances) {
-      data.addAll((Instances) m_InputToken.getPayload());
+      Instances instances = (Instances) m_InputToken.getPayload();
+      for (int i = 0; i < instances.numInstances(); i++)
+        data.add(instances.get(i));
       single = false;
     }
     else {
@@ -447,11 +451,11 @@ public class MOARegressorEvaluation
       // test
       testInst  = (Instance) inst.copy();
       trueClass = (int) testInst.classValue();
-      testInst.setClassMissing();
+      testInst.setMissing(testInst.classIndex());
       prediction = m_ActualRegressor.getVotesForInstance(testInst);
       if (isLoggingEnabled())
-	getLogger().info("trueClass=" + trueClass + ", prediction=" + prediction[0] + ", weight=" + testInst.weight());
-      m_ActualEvaluator.addResult(inst, prediction);
+        getLogger().info("trueClass=" + trueClass + ", prediction=" + prediction[0] + ", weight=" + testInst.weight());
+      m_ActualEvaluator.addResult(new InstanceExample(inst), prediction);
 
       // train
       m_ActualRegressor.trainOnInstance(inst);
@@ -460,8 +464,8 @@ public class MOARegressorEvaluation
     if (single) {
       m_Count++;
       if (m_Count % m_OutputInterval == 0) {
-	m_Count = 0;
-	m_OutputToken = new Token(m_ActualEvaluator.getPerformanceMeasurements());
+        m_Count = 0;
+        m_OutputToken = new Token(m_ActualEvaluator.getPerformanceMeasurements());
       }
     }
     else {

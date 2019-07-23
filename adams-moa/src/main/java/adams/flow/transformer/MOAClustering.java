@@ -21,11 +21,11 @@
 package adams.flow.transformer;
 
 import adams.data.statistics.StatUtils;
-import adams.flow.container.WekaClusteringContainer;
+import adams.flow.container.MOAClusteringContainer;
 import adams.flow.core.AbstractModelLoader;
 import adams.flow.core.MOAClustererModelLoader;
 import adams.flow.core.Token;
-import weka.core.Instance;
+import com.yahoo.labs.samoa.instances.Instance;
 
 /**
  <!-- globalinfo-start -->
@@ -135,7 +135,7 @@ import weka.core.Instance;
  * @version $Revision$
  */
 public class MOAClustering
-  extends AbstractProcessWekaInstanceWithModel<moa.clusterers.Clusterer> {
+  extends AbstractProcessMOAInstanceWithModel<moa.clusterers.Clusterer> {
 
   /** for serialization. */
   private static final long serialVersionUID = 8362932772732931480L;
@@ -216,7 +216,7 @@ public class MOAClustering
    */
   @Override
   public Class[] generates() {
-    return new Class[]{WekaClusteringContainer.class};
+    return new Class[]{MOAClusteringContainer.class};
   }
 
   /**
@@ -229,19 +229,19 @@ public class MOAClustering
   @Override
   protected Token processInstance(Instance inst) throws Exception {
     Token			result;
-    WekaClusteringContainer	cont;
+    MOAClusteringContainer	cont;
     double[]			vote;
 
     vote = m_Model.getVotesForInstance(inst);
-    cont = new WekaClusteringContainer(
-	inst,
+    cont = new MOAClusteringContainer(
+        inst,
 	StatUtils.minIndex(vote),
 	vote);
 
     if (m_UpdateModel)
       m_Model.trainOnInstance(inst);
 
-    result = new Token((WekaClusteringContainer) cont.getClone());
+    result = new Token(cont.getClone());
 
     return result;
   }

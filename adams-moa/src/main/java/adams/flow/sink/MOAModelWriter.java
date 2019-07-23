@@ -77,7 +77,7 @@ import moa.clusterers.AbstractClusterer;
  * @version $Revision$
  */
 public class MOAModelWriter
-  extends AbstractWekaModelWriter {
+  extends AbstractMOAModelWriter {
 
   /** for serialization. */
   private static final long serialVersionUID = -3648763045364288762L;

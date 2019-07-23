@@ -27,6 +27,7 @@ import adams.flow.core.Actor;
 import adams.flow.core.CallableActorReference;
 import adams.flow.source.FileSupplier;
 import adams.flow.source.MOAClassifierSetup;
+import adams.flow.source.MOAStream;
 import adams.flow.standalone.CallableActors;
 import adams.flow.transformer.MOATrainClassifier;
 import adams.flow.transformer.WekaClassSelector;
@@ -36,6 +37,8 @@ import adams.test.TmpFile;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import moa.options.ClassOption;
+import moa.streams.ArffFileStream;
+import moa.streams.ExampleStream;
 
 /**
  * Tests the FileReader, ClassSelector, Classifier and ModelWriter actor.
@@ -103,13 +106,17 @@ public class MOAModelWriterTest
     cls.setClassifier(option);
     call.add(cls);
 
-    FileSupplier sfs = new FileSupplier();
-    sfs.setFiles(new adams.core.io.PlaceholderFile[]{new TmpFile("iris.arff")});
+    ClassOption arffOption = new ClassOption(
+      "stream",
+      's',
+      "The MOA stream generator to use from within ADAMS.",
+      ExampleStream.class,
+      "ArffFileStream -f " + new TmpFile("iris.arff").getAbsolutePath(),
+      "moa.streams.ArffFileStream");
 
-    WekaFileReader fr = new WekaFileReader();
-    fr.setOutputType(OutputType.INCREMENTAL);
-
-    WekaClassSelector cs = new WekaClassSelector();
+    MOAStream stream = new MOAStream();
+    stream.setNumExamples(-1);
+    stream.setStreamGenerator(arffOption);
 
     MOATrainClassifier train = new MOATrainClassifier();
     train.setClassifier(new CallableActorReference("classifier"));
@@ -119,7 +126,7 @@ public class MOAModelWriterTest
     mw.setOutputFile(new TmpFile("dumpfile.model"));
 
     Flow flow = new Flow();
-    flow.setActors(new Actor[]{call, sfs, fr, cs, train, mw});
+    flow.setActors(new Actor[]{call, stream, train, mw});
 
     return flow;
   }

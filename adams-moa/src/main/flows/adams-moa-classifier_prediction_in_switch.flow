@@ -1,7 +1,9 @@
 # Project: adams
-# Date: 2016-02-15 14:38:49
-# User: fracpete
+# Date: 2019-07-22 10:52:57
+# User: csterlin
 # Charset: UTF-8
+# Modules: adams-core,adams-ml,adams-moa,adams-spreadsheet,adams-visualstats,adams-weka
+#
 adams.flow.control.Flow -annotation "This flow demonstrates how to use the class label\\nindex from the prediction that a trained classifier\\nreturned in a Switch statement." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
   adams.flow.source.StorageValue -name model -storage-name model
@@ -9,16 +11,12 @@ adams.flow.control.Flow -annotation "This flow demonstrates how to use the class
   adams.flow.source.MOAClassifierSetup -classifier moa.classifiers.bayes.NaiveBayes
  adams.flow.source.Start
  adams.flow.control.Trigger -name train
-  adams.flow.source.FileSupplier -file ${FLOWS}/data/anneal_train.arff
-  adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader -output-type INCREMENTAL
-  adams.flow.transformer.WekaClassSelector
+  adams.flow.source.MOAStream -stream "moa.streams.ArffFileStream -f /Scratch/adams-addons/adams-moa/src/main/flows/data/anneal_train.arff" -num-examples -1
   adams.flow.transformer.MOATrainClassifier -name MOAClassifier -output-interval 1
   adams.flow.control.ContainerValuePicker -value Model -switch-outputs true
   adams.flow.transformer.SetStorageValue -storage-name model
  adams.flow.control.Trigger -name classify
-  adams.flow.source.FileSupplier -file ${FLOWS}/data/anneal_test.arff
-  adams.flow.transformer.WekaFileReader -loader weka.core.converters.ArffLoader -output-type INCREMENTAL
-  adams.flow.transformer.WekaClassSelector
+  adams.flow.source.MOAStream -stream "moa.streams.ArffFileStream -f /Scratch/adams-addons/adams-moa/src/main/flows/data/anneal_test.arff" -num-examples -1
   adams.flow.control.Switch -condition "adams.flow.condition.bool.MOAClassification -model-actor model -on-the-fly true" -case adams.flow.sink.Null
    adams.flow.control.Trigger -name "class 1"
     adams.flow.source.StringConstants -string "Class 1"

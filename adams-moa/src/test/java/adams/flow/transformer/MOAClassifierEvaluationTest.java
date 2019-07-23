@@ -20,6 +20,7 @@
 
 package adams.flow.transformer;
 
+import adams.data.conversion.WEKAInstancesToMOAInstances;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import moa.evaluation.BasicClassificationPerformanceEvaluator;
@@ -106,9 +107,12 @@ public class MOAClassifierEvaluationTest
     sfs.setFiles(new adams.core.io.PlaceholderFile[]{new TmpFile("iris.arff")});
 
     WekaFileReader fr = new WekaFileReader();
-    fr.setOutputType(OutputType.INCREMENTAL);
+    fr.setOutputType(OutputType.DATASET);
 
     WekaClassSelector cs = new WekaClassSelector();
+
+    Convert convert = new Convert();
+    convert.setConversion(new WEKAInstancesToMOAInstances());
 
     option = new ClassOption(
 	"evaluator",
@@ -130,7 +134,7 @@ public class MOAClassifierEvaluationTest
     df.setOutputFile(new TmpFile("dumpfile.txt"));
 
     Flow flow = new Flow();
-    flow.setActors(new Actor[]{ga, sfs, fr, cs, mce, mle, df});
+    flow.setActors(new Actor[]{ga, sfs, fr, cs, convert, mce, mle, df});
 
     return flow;
   }

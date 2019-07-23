@@ -22,15 +22,15 @@ package adams.flow.transformer;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
-import adams.flow.container.WekaModelContainer;
+import adams.flow.container.MOAModelContainer;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.Token;
 import adams.flow.source.MOAClassifierSetup;
 import moa.classifiers.trees.DecisionStump;
 import moa.options.ClassOption;
-import weka.core.Instance;
-import weka.core.Instances;
+import com.yahoo.labs.samoa.instances.Instance;
+import com.yahoo.labs.samoa.instances.Instances;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -45,13 +45,13 @@ import java.util.List;
  <!-- flow-summary-start -->
  * Input&#47;output:<br>
  * - accepts:<br>
- * &nbsp;&nbsp;&nbsp;weka.core.Instance<br>
- * &nbsp;&nbsp;&nbsp;weka.core.Instances<br>
+ * &nbsp;&nbsp;&nbsp;com.yahoo.labs.samoa.instances.Instance<br>
+ * &nbsp;&nbsp;&nbsp;com.yahoo.labs.samoa.instances.Instances<br>
  * - generates:<br>
- * &nbsp;&nbsp;&nbsp;adams.flow.container.WekaModelContainer<br>
+ * &nbsp;&nbsp;&nbsp;adams.flow.container.MOAModelContainer<br>
  * <br><br>
  * Container information:<br>
- * - adams.flow.container.WekaModelContainer: Model, Header, Dataset
+ * - adams.flow.container.MOAModelContainer: Model, Header, Dataset
  * <br><br>
  <!-- flow-summary-end -->
  *
@@ -60,41 +60,48 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- * 
+ *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
  * &nbsp;&nbsp;&nbsp;default: MOATrainClassifier
  * </pre>
- * 
- * <pre>-annotation &lt;adams.core.base.BaseText&gt; (property: annotations)
+ *
+ * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
  * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
- * &nbsp;&nbsp;&nbsp;default: 
+ * &nbsp;&nbsp;&nbsp;default:
  * </pre>
- * 
+ *
  * <pre>-skip &lt;boolean&gt; (property: skip)
- * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
+ * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded
  * &nbsp;&nbsp;&nbsp;as it is.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
- * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
+ * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  * <pre>-classifier &lt;adams.flow.core.CallableActorReference&gt; (property: classifier)
- * &nbsp;&nbsp;&nbsp;The callable MOA classifier to train on the input data and outputs the built 
+ * &nbsp;&nbsp;&nbsp;The callable MOA classifier to train on the input data and outputs the built
  * &nbsp;&nbsp;&nbsp;classifier alongside the training header (in a model container).
  * &nbsp;&nbsp;&nbsp;default: MOAClassifierSetup
  * </pre>
- * 
+ *
  * <pre>-output-interval &lt;int&gt; (property: outputInterval)
  * &nbsp;&nbsp;&nbsp;The number of tokens to wait before forwarding the trained classifier.
  * &nbsp;&nbsp;&nbsp;default: 1000
  * &nbsp;&nbsp;&nbsp;minimum: 1
  * </pre>
- * 
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -129,7 +136,7 @@ public class MOATrainClassifier
   @Override
   public String globalInfo() {
     return
-        "Trains a MOA classifier based on the incoming data.";
+      "Trains a MOA classifier based on the incoming data.";
   }
 
   /**
@@ -140,12 +147,12 @@ public class MOATrainClassifier
     super.defineOptions();
 
     m_OptionManager.add(
-	    "classifier", "classifier",
-	    new CallableActorReference(MOAClassifierSetup.class.getSimpleName()));
+      "classifier", "classifier",
+      new CallableActorReference(MOAClassifierSetup.class.getSimpleName()));
 
     m_OptionManager.add(
-	    "output-interval", "outputInterval",
-	    1000, 1, null);
+      "output-interval", "outputInterval",
+      1000, 1, null);
   }
 
   /**
@@ -175,12 +182,12 @@ public class MOATrainClassifier
    */
   protected ClassOption getDefaultOption() {
     return new ClassOption(
-	"classifier",
-	'c',
-	"The MOA classifier to use from within ADAMS.",
-	moa.classifiers.Classifier.class,
-	getDefaultClassifier().getClass().getName().replace("moa.classifiers.", ""),
-	getDefaultClassifier().getClass().getName());
+      "classifier",
+      'c',
+      "The MOA classifier to use from within ADAMS.",
+      moa.classifiers.Classifier.class,
+      getDefaultClassifier().getClass().getName().replace("moa.classifiers.", ""),
+      getDefaultClassifier().getClass().getName());
   }
 
   /**
@@ -210,8 +217,8 @@ public class MOATrainClassifier
    */
   public String classifierTipText() {
     return
-        "The callable MOA classifier to train on the input data and outputs the "
-      + "built classifier alongside the training header (in a model container).";
+      "The callable MOA classifier to train on the input data and outputs the "
+        + "built classifier alongside the training header (in a model container).";
   }
 
   /**
@@ -227,7 +234,7 @@ public class MOATrainClassifier
     result = (moa.classifiers.Classifier) CallableActorHelper.getSetup(moa.classifiers.Classifier.class, m_Classifier, this, errors);
     if (result == null) {
       if (!errors.isEmpty())
-	getLogger().severe(errors.toString());
+        getLogger().severe(errors.toString());
     }
 
     return result;
@@ -322,7 +329,7 @@ public class MOATrainClassifier
   /**
    * Returns the class that the consumer accepts.
    *
-   * @return		<!-- flow-accepts-start -->weka.core.Instance.class, weka.core.Instances.class<!-- flow-accepts-end -->
+   * @return		<!-- flow-accepts-start -->com.yahoo.labs.samoa.instances.Instance.class, com.yahoo.labs.samoa.instances.Instances.class<!-- flow-accepts-end -->
    */
   public Class[] accepts() {
     return new Class[]{Instance.class, Instances.class};
@@ -331,10 +338,10 @@ public class MOATrainClassifier
   /**
    * Returns the class of objects that it generates.
    *
-   * @return		<!-- flow-generates-start -->adams.flow.container.WekaModelContainer.class<!-- flow-generates-end -->
+   * @return		<!-- flow-generates-start -->adams.flow.container.MOAModelContainer.class<!-- flow-generates-end -->
    */
   public Class[] generates() {
-    return new Class[]{WekaModelContainer.class};
+    return new Class[]{MOAModelContainer.class};
   }
 
   /**
@@ -351,29 +358,32 @@ public class MOATrainClassifier
 
     try {
       if (m_InputToken != null) {
-	data = new ArrayList<Instance>();
-	if (m_InputToken.getPayload() instanceof Instance)
-	  data.add((Instance) m_InputToken.getPayload());
-	else
-	  data.addAll((Instances) m_InputToken.getPayload());
-	
-	if (m_ActualClassifier == null)
-	  m_ActualClassifier = getClassifierInstance();
-	if (m_ActualClassifier == null) {
-	  result = "Failed to located classifier '" + m_Classifier + "'!";
-	  return result;
-	}
+        data = new ArrayList<Instance>();
+        if (m_InputToken.getPayload() instanceof Instance)
+          data.add((Instance) m_InputToken.getPayload());
+        else {
+          Instances instances = (Instances) m_InputToken.getPayload();
+          for (int i = 0; i < instances.numInstances(); i++)
+            data.add(instances.get(i));
+        }
 
-	// train
-	for (Instance inst: data)
-	  m_ActualClassifier.trainOnInstance(inst);
+        if (m_ActualClassifier == null)
+          m_ActualClassifier = getClassifierInstance();
+        if (m_ActualClassifier == null) {
+          result = "Failed to located classifier '" + m_Classifier + "'!";
+          return result;
+        }
 
-	// generate output
-	m_Count++;
-	if (m_Count % m_OutputInterval == 0) {
-	  m_Count = 0;
-	  m_OutputToken = new Token(new WekaModelContainer(m_ActualClassifier, new Instances(data.get(0).dataset(), 0)));
-	}
+        // train
+        for (Instance inst: data)
+          m_ActualClassifier.trainOnInstance(inst);
+
+        // generate output
+        m_Count += data.size();
+        if (m_Count >= m_OutputInterval) {
+          m_Count %= m_OutputInterval;
+          m_OutputToken = new Token(new MOAModelContainer(m_ActualClassifier, new Instances(data.get(0).dataset(), 0)));
+        }
       }
     }
     catch (Exception e) {

@@ -22,11 +22,11 @@ package adams.flow.transformer;
 
 import adams.core.MOAHelper;
 import adams.data.statistics.StatUtils;
-import adams.flow.container.WekaPredictionContainer;
+import adams.flow.container.MOAPredictionContainer;
 import adams.flow.core.AbstractModelLoader;
 import adams.flow.core.MOAClassifierModelLoader;
 import adams.flow.core.Token;
-import weka.core.Instance;
+import com.yahoo.labs.samoa.instances.Instance;
 
 /**
  <!-- globalinfo-start -->
@@ -143,7 +143,7 @@ import weka.core.Instance;
  * @version $Revision$
  */
 public class MOAClassifying
-  extends AbstractProcessWekaInstanceWithModel<moa.classifiers.Classifier> {
+  extends AbstractProcessMOAInstanceWithModel<moa.classifiers.Classifier> {
 
   /** for serialization. */
   private static final long serialVersionUID = 5781363684886301467L;
@@ -263,7 +263,7 @@ public class MOAClassifying
    */
   @Override
   public Class[] generates() {
-    return new Class[]{WekaPredictionContainer.class, Instance.class};
+    return new Class[]{MOAPredictionContainer.class, Instance.class};
   }
 
   /**
@@ -276,23 +276,23 @@ public class MOAClassifying
   @Override
   protected Token processInstance(Instance inst) throws Exception {
     Token			result;
-    WekaPredictionContainer	cont;
+    MOAPredictionContainer      cont;
     double[]			votes;
 
     votes = MOAHelper.fixVotes(m_Model.getVotesForInstance(inst), inst);
-    cont  = new WekaPredictionContainer(
+    cont  = new MOAPredictionContainer(
 	inst,
 	StatUtils.maxIndex(votes),
 	votes);
     if (m_UpdateModel && !inst.classIsMissing())
       m_Model.trainOnInstance(inst);
     if (m_OutputInstance) {
-      inst = (Instance) ((Instance) cont.getValue(WekaPredictionContainer.VALUE_INSTANCE)).copy();
-      inst.setClassValue((Double) cont.getValue(WekaPredictionContainer.VALUE_CLASSIFICATION));
+      inst = ((Instance) cont.getValue(MOAPredictionContainer.VALUE_INSTANCE)).copy();
+      inst.setClassValue((Double) cont.getValue(MOAPredictionContainer.VALUE_CLASSIFICATION));
       result = new Token(inst);
     }
     else {
-      result = new Token((WekaPredictionContainer) cont.getClone());
+      result = new Token(cont.getClone());
     }
 
     return result;

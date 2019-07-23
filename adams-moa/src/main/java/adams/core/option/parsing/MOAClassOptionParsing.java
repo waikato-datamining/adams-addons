@@ -45,10 +45,8 @@ public class MOAClassOptionParsing {
     MOAObject arg;
 
     classoption = (ClassOption) object;
-    arg         = MOAUtils.fromOption(classoption);
-    result      = MOAUtils.toCommandLine(arg);
 
-    return result;
+    return classoption.getValueAsCLIString();
   }
 
   /**
@@ -61,7 +59,7 @@ public class MOAClassOptionParsing {
   public static Object valueOf(AbstractOption option, String str) {
     ClassOption	result;
 
-    result = (ClassOption) ((MOAObject) option.getDefaultValue()).copy();
+    result = (ClassOption) ((ClassOption) option.getDefaultValue()).copy();
     result.setCurrentObject(MOAUtils.fromCommandLine(result, str));
 
     return result;

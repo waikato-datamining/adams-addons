@@ -20,6 +20,7 @@
 
 package adams.flow.transformer;
 
+import adams.data.conversion.WEKAInstancesToMOAInstances;
 import adams.env.Environment;
 import adams.flow.AbstractFlowTest;
 import adams.flow.control.Flow;
@@ -106,7 +107,7 @@ public class MOARegressorEvaluationTest
     sfs.setFiles(new adams.core.io.PlaceholderFile[]{new TmpFile("bolts.arff")});
 
     WekaFileReader fr = new WekaFileReader();
-    fr.setOutputType(OutputType.INCREMENTAL);
+    fr.setOutputType(OutputType.DATASET);
 
     WekaClassSelector cs = new WekaClassSelector();
 
@@ -117,6 +118,9 @@ public class MOARegressorEvaluationTest
 	moa.evaluation.RegressionPerformanceEvaluator.class,
 	"BasicRegressionPerformanceEvaluator",
 	BasicRegressionPerformanceEvaluator.class.getName());
+
+    Convert convert = new Convert();
+    convert.setConversion(new WEKAInstancesToMOAInstances());
 
     MOARegressorEvaluation mce = new MOARegressorEvaluation();
     mce.setRegressor(new CallableActorReference("reg"));
@@ -130,7 +134,7 @@ public class MOARegressorEvaluationTest
     df.setOutputFile(new TmpFile("dumpfile.txt"));
 
     Flow flow = new Flow();
-    flow.setActors(new Actor[]{ga, sfs, fr, cs, mce, mle, df});
+    flow.setActors(new Actor[]{ga, sfs, fr, cs, convert, mce, mle, df});
 
     return flow;
   }

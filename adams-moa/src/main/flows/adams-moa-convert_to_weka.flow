@@ -1,0 +1,15 @@
+# Project: adams
+# Date: 2019-07-22 14:57:01
+# User: csterlin
+# Charset: UTF-8
+# Modules: adams-core,adams-ml,adams-moa,adams-spreadsheet,adams-visualstats,adams-weka
+#
+adams.flow.control.Flow -annotation "Converts a random dataset from MOA format to WEKA format and back again." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.source.MOAStream -num-examples 100 -chunk-size 100
+ adams.flow.control.Tee
+  adams.flow.sink.Display -name "Original MOA Dataset" -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
+ adams.flow.transformer.Convert -conversion adams.data.conversion.MOAInstancesToWEKAInstances
+ adams.flow.control.Tee -name Tee2
+  adams.flow.sink.Display -name "Converted WEKA Dataset" -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
+ adams.flow.transformer.Convert -name Convert2 -conversion adams.data.conversion.WEKAInstancesToMOAInstances
+ adams.flow.sink.Display -name "Reconverted MOA Dataset" -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter

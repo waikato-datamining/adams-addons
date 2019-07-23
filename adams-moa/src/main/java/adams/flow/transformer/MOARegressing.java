@@ -20,11 +20,11 @@
 
 package adams.flow.transformer;
 
-import adams.flow.container.WekaPredictionContainer;
+import adams.flow.container.MOAPredictionContainer;
 import adams.flow.core.AbstractModelLoader;
 import adams.flow.core.MOARegressorModelLoader;
 import adams.flow.core.Token;
-import weka.core.Instance;
+import com.yahoo.labs.samoa.instances.Instance;
 
 /**
  <!-- globalinfo-start -->
@@ -40,13 +40,13 @@ import weka.core.Instance;
  <!-- flow-summary-start -->
  * Input&#47;output:<br>
  * - accepts:<br>
- * &nbsp;&nbsp;&nbsp;weka.core.Instance<br>
+ * &nbsp;&nbsp;&nbsp;com.yahoo.labs.samoa.instances.Instance<br>
  * - generates:<br>
- * &nbsp;&nbsp;&nbsp;adams.flow.container.WekaPredictionContainer<br>
- * &nbsp;&nbsp;&nbsp;weka.core.Instance<br>
+ * &nbsp;&nbsp;&nbsp;adams.flow.container.MOAPredictionContainer<br>
+ * &nbsp;&nbsp;&nbsp;com.yahoo.labs.samoa.instances.Instance<br>
  * <br><br>
  * Container information:<br>
- * - adams.flow.container.WekaPredictionContainer: Instance, Classification, Classification label, Distribution, Range check, Abstention classification, Abstention classification label, Abstention distribution
+ * - adams.flow.container.MOAPredictionContainer: Instance, Classification, Classification label, Distribution, Range check, Abstention classification, Abstention classification label, Abstention distribution, Report
  * <br><br>
  <!-- flow-summary-end -->
  *
@@ -105,43 +105,43 @@ import weka.core.Instance;
  * &nbsp;&nbsp;&nbsp;The storage item to obtain the model from, ignored if not present.
  * &nbsp;&nbsp;&nbsp;default: storage
  * </pre>
- * 
+ *
  * <pre>-on-the-fly &lt;boolean&gt; (property: onTheFly)
- * &nbsp;&nbsp;&nbsp;If set to true, the model file is not required to be present at set up time 
+ * &nbsp;&nbsp;&nbsp;If set to true, the model file is not required to be present at set up time
  * &nbsp;&nbsp;&nbsp;(eg if built on the fly), only at execution time.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-use-model-reset-variable &lt;boolean&gt; (property: useModelResetVariable)
- * &nbsp;&nbsp;&nbsp;If enabled, chnages to the specified variable are monitored in order to 
+ * &nbsp;&nbsp;&nbsp;If enabled, chnages to the specified variable are monitored in order to
  * &nbsp;&nbsp;&nbsp;reset the model, eg when a storage model changed.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-model-reset-variable &lt;adams.core.VariableName&gt; (property: modelResetVariable)
- * &nbsp;&nbsp;&nbsp;The variable to monitor for changes in order to reset the model, eg when 
+ * &nbsp;&nbsp;&nbsp;The variable to monitor for changes in order to reset the model, eg when
  * &nbsp;&nbsp;&nbsp;a storage model changed.
  * &nbsp;&nbsp;&nbsp;default: variable
  * </pre>
- * 
+ *
  * <pre>-output-instance &lt;boolean&gt; (property: outputInstance)
  * &nbsp;&nbsp;&nbsp;Whether to output weka.core.Instance objects or PredictionContainer objects.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-update-model &lt;boolean&gt; (property: updateModel)
- * &nbsp;&nbsp;&nbsp;Whether to update the model with the Instance (in case its class value isn't 
+ * &nbsp;&nbsp;&nbsp;Whether to update the model with the Instance (in case its class value isn't
  * &nbsp;&nbsp;&nbsp;missing) after making the prediction.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
 public class MOARegressing<T extends moa.classifiers.Classifier & moa.classifiers.Regressor>
-  extends AbstractProcessWekaInstanceWithModel<T> {
+  extends AbstractProcessMOAInstanceWithModel<T> {
 
   /** for serialization. */
   private static final long serialVersionUID = 5781363684886301467L;
@@ -174,12 +174,12 @@ public class MOARegressing<T extends moa.classifiers.Classifier & moa.classifier
     super.defineOptions();
 
     m_OptionManager.add(
-	    "output-instance", "outputInstance",
-	    false);
+      "output-instance", "outputInstance",
+      false);
 
     m_OptionManager.add(
-	    "update-model", "updateModel",
-	    false);
+      "update-model", "updateModel",
+      false);
   }
 
   /**
@@ -257,11 +257,11 @@ public class MOARegressing<T extends moa.classifiers.Classifier & moa.classifier
   /**
    * Returns the class of objects that it generates.
    *
-   * @return		<!-- flow-generates-start -->adams.flow.container.WekaPredictionContainer.class, weka.core.Instance.class<!-- flow-generates-end -->
+   * @return		<!-- flow-generates-start -->adams.flow.container.MOAPredictionContainer.class, com.yahoo.labs.samoa.instances.Instance.class<!-- flow-generates-end -->
    */
   @Override
   public Class[] generates() {
-    return new Class[]{WekaPredictionContainer.class, Instance.class};
+    return new Class[]{MOAPredictionContainer.class, Instance.class};
   }
 
   /**
@@ -274,19 +274,19 @@ public class MOARegressing<T extends moa.classifiers.Classifier & moa.classifier
   @Override
   protected Token processInstance(Instance inst) throws Exception {
     Token			result;
-    WekaPredictionContainer	cont;
+    MOAPredictionContainer	cont;
     double[]			votes;
 
     votes = m_Model.getVotesForInstance(inst);
-    cont  = new WekaPredictionContainer(
-	inst,
-	votes[0],
-	votes);
+    cont  = new MOAPredictionContainer(
+      inst,
+      votes[0],
+      votes);
     if (m_UpdateModel && !inst.classIsMissing())
       m_Model.trainOnInstance(inst);
     if (m_OutputInstance) {
-      inst = (Instance) ((Instance) cont.getValue(WekaPredictionContainer.VALUE_INSTANCE)).copy();
-      inst.setClassValue((Double) cont.getValue(WekaPredictionContainer.VALUE_CLASSIFICATION));
+      inst = (Instance) ((Instance) cont.getValue(MOAPredictionContainer.VALUE_INSTANCE)).copy();
+      inst.setClassValue((Double) cont.getValue(MOAPredictionContainer.VALUE_CLASSIFICATION));
       result = new Token(inst);
     }
     else {

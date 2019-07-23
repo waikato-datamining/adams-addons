@@ -27,12 +27,13 @@ import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.Token;
 import moa.classifiers.AbstractClassifier;
+import moa.core.InstanceExample;
 import moa.core.Measurement;
 import moa.evaluation.BasicClassificationPerformanceEvaluator;
 import moa.evaluation.ClassificationPerformanceEvaluator;
 import moa.options.ClassOption;
-import weka.core.Instance;
-import weka.core.Instances;
+import com.yahoo.labs.samoa.instances.Instance;
+import com.yahoo.labs.samoa.instances.Instances;
 import weka.core.MOAUtils;
 import weka.core.Utils;
 
@@ -430,7 +431,9 @@ public class MOAClassifierEvaluation
     
     data = new ArrayList<Instance>();
     if (m_InputToken.getPayload() instanceof Instances) {
-      data.addAll((Instances) m_InputToken.getPayload());
+      Instances instances = (Instances) m_InputToken.getPayload();
+      for (int i = 0; i < instances.numInstances(); i++)
+        data.add(instances.get(i));
       single = false;
     }
     else {
@@ -442,11 +445,11 @@ public class MOAClassifierEvaluation
       // test
       testInst  = (Instance) inst.copy();
       trueClass = (int) testInst.classValue();
-      testInst.setClassMissing();
+      testInst.setMissing(testInst.classIndex());
       prediction = MOAHelper.fixVotes(m_ActualClassifier.getVotesForInstance(testInst), testInst);
       if (isLoggingEnabled())
 	getLogger().info("trueClass=" + trueClass + ", prediction=" + Utils.arrayToString(prediction) + ", weight=" + testInst.weight());
-      m_ActualEvaluator.addResult(inst, prediction);
+      m_ActualEvaluator.addResult(new InstanceExample(inst), prediction);
 
       // train
       m_ActualClassifier.trainOnInstance(inst);

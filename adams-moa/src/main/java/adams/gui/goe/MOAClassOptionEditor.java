@@ -20,7 +20,7 @@
 
 package adams.gui.goe;
 
-import moa.gui.ClassOptionEditComponent;
+import com.github.javacliparser.gui.ClassOptionEditComponent;
 import moa.options.ClassOption;
 
 import javax.swing.JComponent;
@@ -63,7 +63,7 @@ public class MOAClassOptionEditor
     JPanel			panel;
 
     panel = new JPanel(new BorderLayout());
-    m_EditComponent = (ClassOptionEditComponent) ((ClassOption) getValue()).getEditComponent();
+    m_EditComponent = new ClassOptionEditComponent((ClassOption) getValue());
     m_EditComponent.addChangeListener(new ChangeListener() {
       public void stateChanged(ChangeEvent e) {
 	m_EditComponent.applyState();

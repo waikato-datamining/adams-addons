@@ -23,10 +23,10 @@ package adams.flow.source;
 import adams.core.QuickInfoHelper;
 import adams.flow.core.Token;
 import moa.options.ClassOption;
-import moa.streams.InstanceStream;
+import moa.streams.ExampleStream;
 import moa.streams.generators.AgrawalGenerator;
-import weka.core.Instance;
-import weka.core.Instances;
+import com.yahoo.labs.samoa.instances.Instance;
+import com.yahoo.labs.samoa.instances.Instances;
 import weka.core.MOAUtils;
 
 /**
@@ -99,7 +99,7 @@ public class MOAStream
   private static final long serialVersionUID = 1862828539481494711L;
 
   /** the actual stream generator to use. */
-  protected InstanceStream m_ActualStreamGenerator;
+  protected ExampleStream m_ActualStreamGenerator;
 
   /** the stream generator object. */
   protected ClassOption m_StreamGenerator;
@@ -185,7 +185,7 @@ public class MOAStream
    *
    * @return		the generator
    */
-  protected InstanceStream getDefaultGenerator() {
+  protected ExampleStream getDefaultGenerator() {
     return new AgrawalGenerator();
   }
 
@@ -199,7 +199,7 @@ public class MOAStream
 	"stream",
 	's',
 	"The MOA stream generator to use from within ADAMS.",
-	InstanceStream.class,
+	ExampleStream.class,
 	getDefaultGenerator().getClass().getName().replace("moa.streams.", ""),
 	getDefaultGenerator().getClass().getName());
   }
@@ -239,8 +239,8 @@ public class MOAStream
    * @return		the stream generator
    * @see		#getStreamGenerator()
    */
-  protected InstanceStream getCurrentStreamGenerator() {
-    return (moa.streams.InstanceStream) MOAUtils.fromOption(m_StreamGenerator);
+  protected ExampleStream getCurrentStreamGenerator() {
+    return (moa.streams.ExampleStream) MOAUtils.fromOption(m_StreamGenerator);
   }
 
   /**
@@ -365,7 +365,7 @@ public class MOAStream
     int		count;
 
     if (m_ChunkSize == 1) {
-      result = new Token(m_ActualStreamGenerator.nextInstance());
+      result = new Token(m_ActualStreamGenerator.nextInstance().getData());
       if (m_NumExamples > -1)
 	m_CountExamples++;
     }
@@ -374,7 +374,7 @@ public class MOAStream
       count = 0;
       while ((count < m_ChunkSize) && m_ActualStreamGenerator.hasMoreInstances()) {
 	count++;
-	inst = m_ActualStreamGenerator.nextInstance();
+	inst = (Instance) m_ActualStreamGenerator.nextInstance().getData();
 	if (data == null)
 	  data = new Instances(inst.dataset(), m_ChunkSize);
 	data.add(inst);
@@ -384,7 +384,6 @@ public class MOAStream
 	    break;
 	}
       }
-      data.compactify();
       result = new Token(data);
     }
 

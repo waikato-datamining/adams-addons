@@ -202,7 +202,7 @@ public class MOAClustererSetup
    * @return		<!-- flow-generates-start -->weka.clusterers.Clusterer.class<!-- flow-generates-end -->
    */
   public Class[] generates() {
-    return new Class[]{weka.clusterers.Clusterer.class};
+    return new Class[]{moa.clusterers.Clusterer.class};
   }
 
   /**

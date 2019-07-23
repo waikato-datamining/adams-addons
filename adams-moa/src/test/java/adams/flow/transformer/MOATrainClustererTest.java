@@ -20,6 +20,7 @@
 
 package adams.flow.transformer;
 
+import adams.data.conversion.WEKAInstancesToMOAInstances;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import moa.options.ClassOption;
@@ -106,12 +107,15 @@ public class MOATrainClustererTest
     sfs.setFiles(new adams.core.io.PlaceholderFile[]{new TmpFile("iris.arff")});
 
     WekaFileReader fr = new WekaFileReader();
-    fr.setOutputType(OutputType.INCREMENTAL);
+    fr.setOutputType(OutputType.DATASET);
 
     Remove remove = new Remove();
     remove.setAttributeIndices("last");
     WekaFilter wf = new WekaFilter();
     wf.setFilter(remove);
+
+    Convert convert = new Convert();
+    convert.setConversion(new WEKAInstancesToMOAInstances());
 
     MOATrainClusterer cts = new MOATrainClusterer();
     cts.setClusterer(new CallableActorReference("cls"));
@@ -121,7 +125,7 @@ public class MOATrainClustererTest
     df.setOutputFile(new TmpFile("dumpfile.txt"));
 
     Flow flow = new Flow();
-    flow.setActors(new Actor[]{ga, sfs, fr, wf, cts, df});
+    flow.setActors(new Actor[]{ga, sfs, fr, wf, convert, cts, df});
 
     return flow;
   }

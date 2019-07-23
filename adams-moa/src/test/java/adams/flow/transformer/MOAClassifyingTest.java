@@ -20,6 +20,8 @@
 
 package adams.flow.transformer;
 
+import adams.data.conversion.WEKAInstancesToMOAInstances;
+import adams.flow.source.MOAStream;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import adams.env.Environment;
@@ -29,6 +31,8 @@ import adams.flow.core.Actor;
 import adams.flow.source.FileSupplier;
 import adams.flow.transformer.WekaFileReader.OutputType;
 import adams.test.TmpFile;
+import moa.options.ClassOption;
+import moa.streams.ExampleStream;
 
 /**
  * Tests the MOAClassifying actor.
@@ -84,23 +88,27 @@ public class MOAClassifyingTest
    */
   @Override
   public Actor getActor() {
-    FileSupplier sfs = new FileSupplier();
-    sfs.setFiles(new adams.core.io.PlaceholderFile[]{new TmpFile("iris.arff")});
+    ClassOption arffOption = new ClassOption(
+      "stream",
+      's',
+      "The MOA stream generator to use from within ADAMS.",
+      ExampleStream.class,
+      "ArffFileStream -f " + new TmpFile("iris.arff").getAbsolutePath(),
+      "moa.streams.ArffFileStream");
 
-    WekaFileReader fr = new WekaFileReader();
-    fr.setOutputType(OutputType.INCREMENTAL);
-
-    WekaClassSelector cs = new WekaClassSelector();
+    MOAStream stream = new MOAStream();
+    stream.setNumExamples(-1);
+    stream.setStreamGenerator(arffOption);
 
     MOAClassifying cls = new MOAClassifying();
     cls.setOutputInstance(true);
     cls.setModelFile(new TmpFile("naivebayes.model"));
 
-    WekaInstanceDumper id = new WekaInstanceDumper();
+    MOAInstanceDumper id = new MOAInstanceDumper();
     id.setOutputPrefix(new TmpFile("dumpfile"));
 
     Flow flow = new Flow();
-    flow.setActors(new Actor[]{sfs, fr, cs, cls, id});
+    flow.setActors(new Actor[]{stream, cls, id});
 
     return flow;
   }

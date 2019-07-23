@@ -26,14 +26,14 @@ import adams.flow.control.Flow;
 import adams.flow.core.Actor;
 import adams.flow.core.CallableActorReference;
 import adams.flow.sink.DumpFile;
-import adams.flow.source.FileSupplier;
 import adams.flow.source.MOARegressorSetup;
+import adams.flow.source.MOAStream;
 import adams.flow.standalone.CallableActors;
-import adams.flow.transformer.WekaFileReader.OutputType;
 import adams.test.TmpFile;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import moa.options.ClassOption;
+import moa.streams.ExampleStream;
 
 /**
  * Tests the MOATrainRegressor actor.
@@ -101,13 +101,17 @@ public class MOATrainRegressorTest
     cls.setRegressor(option);
     ga.add(cls);
 
-    FileSupplier sfs = new FileSupplier();
-    sfs.setFiles(new adams.core.io.PlaceholderFile[]{new TmpFile("bolts.arff")});
+    ClassOption arffOption = new ClassOption(
+      "stream",
+      's',
+      "The MOA stream generator to use from within ADAMS.",
+      ExampleStream.class,
+      "ArffFileStream -f " + new TmpFile("bolts.arff").getAbsolutePath(),
+      "moa.streams.ArffFileStream");
 
-    WekaFileReader fr = new WekaFileReader();
-    fr.setOutputType(OutputType.INCREMENTAL);
-
-    WekaClassSelector cs = new WekaClassSelector();
+    MOAStream stream = new MOAStream();
+    stream.setNumExamples(-1);
+    stream.setStreamGenerator(arffOption);
 
     MOATrainRegressor cts = new MOATrainRegressor();
     cts.setRegressor(new CallableActorReference("reg"));
@@ -117,7 +121,7 @@ public class MOATrainRegressorTest
     df.setOutputFile(new TmpFile("dumpfile.txt"));
 
     Flow flow = new Flow();
-    flow.setActors(new Actor[]{ga, sfs, fr, cs, cts, df});
+    flow.setActors(new Actor[]{ga, stream, cts, df});
 
     return flow;
   }

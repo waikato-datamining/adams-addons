@@ -45,9 +45,9 @@ import moa.evaluation.MeasureCollection;
 import moa.gui.visualization.DataPoint;
 import moa.gui.visualization.GraphCanvas;
 import moa.gui.visualization.StreamPanel;
-import weka.core.DenseInstance;
-import weka.core.Instance;
-import weka.core.Instances;
+import com.yahoo.labs.samoa.instances.DenseInstance;
+import com.yahoo.labs.samoa.instances.Instance;
+import com.yahoo.labs.samoa.instances.Instances;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -74,8 +74,8 @@ import java.util.logging.Level;
  <!-- flow-summary-start -->
  * Input&#47;output:<br>
  * - accepts:<br>
- * &nbsp;&nbsp;&nbsp;weka.core.Instance<br>
- * &nbsp;&nbsp;&nbsp;weka.core.Instances<br>
+ * &nbsp;&nbsp;&nbsp;com.yahoo.labs.samoa.instances.Instance<br>
+ * &nbsp;&nbsp;&nbsp;com.yahoo.labs.samoa.instances.Instances<br>
  * <br><br>
  <!-- flow-summary-end -->
  *
@@ -294,10 +294,10 @@ public class MOAClusterVisualization
   protected int m_SpeedCounter;
 
   /** the combobox for the X dimension. */
-  protected BaseComboBox m_ComboBoxDimX;
+  protected BaseComboBox<String> m_ComboBoxDimX;
 
   /** the combobox for the Y dimension. */
-  protected BaseComboBox m_ComboBoxDimY;
+  protected BaseComboBox<String> m_ComboBoxDimY;
 
   /**
    * Returns a string describing the object.
@@ -316,7 +316,7 @@ public class MOAClusterVisualization
   protected void reset() {
     super.reset();
 
-    m_PointBuffer    = new LinkedList<DataPoint>();
+    m_PointBuffer    = new LinkedList<>();
     m_PointArray     = null;
     m_Timestamp      = 0;
     m_ProcessCounter = 0;
@@ -784,14 +784,17 @@ public class MOAClusterVisualization
     if (m_ActualMeasures.length == 0)
       throw new IllegalStateException("No measures configured!");
 
-    m_DecayRate = (Math.log(1.0/ m_DecayThreshold)/Math.log(2)/ m_DecayHorizon);;
+    m_DecayRate = (Math.log(1.0/ m_DecayThreshold)/Math.log(2)/ m_DecayHorizon);
 
     if (token.getPayload() instanceof Instance) {
       list = new ArrayList<>();
       list.add((Instance) token.getPayload());
     }
     else {
-      list = new ArrayList<>((Instances) token.getPayload());
+      list = new ArrayList<>();
+      Instances instances = (Instances) token.getPayload();
+      for (i = 0; i < instances.numInstances(); i++)
+        list.add(instances.get(i));
     }
 
     // dimensions
@@ -803,9 +806,9 @@ public class MOAClusterVisualization
 	atts.add(list.get(0).dataset().attribute(i).name());
       }
       if (atts.size() > 0) {
-	m_ComboBoxDimX.setModel(new DefaultComboBoxModel<String>(atts.toArray(new String[atts.size()])));
+	m_ComboBoxDimX.setModel(new DefaultComboBoxModel<>(atts.toArray(new String[0])));
 	m_ComboBoxDimX.setSelectedIndex(0);
-	m_ComboBoxDimY.setModel(new DefaultComboBoxModel<String>(atts.toArray(new String[atts.size()])));
+	m_ComboBoxDimY.setModel(new DefaultComboBoxModel<>(atts.toArray(new String[0])));
 	m_ComboBoxDimY.setSelectedIndex(atts.size() > 1 ? 1 : 0);
       }
     }
@@ -842,7 +845,7 @@ public class MOAClusterVisualization
 	for (DataPoint p: m_PointBuffer)
 	  p.updateWeight(m_Timestamp, m_DecayRate);
 
-	m_PointArray = new ArrayList<DataPoint>(m_PointBuffer);
+	m_PointArray = new ArrayList<>(m_PointBuffer);
 
 	processClusterings(m_PointArray);
       }
@@ -893,7 +896,7 @@ public class MOAClusterVisualization
     m_StreamPanel.setPointVisibility(m_DrawPoints);
     panelClusters.add(new BaseScrollPane(m_StreamPanel), BorderLayout.CENTER);
 
-    m_ComboBoxDimX = new BaseComboBox(new String[0]);
+    m_ComboBoxDimX = new BaseComboBox<>(new String[0]);
     m_ComboBoxDimX.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -901,7 +904,7 @@ public class MOAClusterVisualization
 	m_StreamPanel.repaint();
       }
     });
-    m_ComboBoxDimY = new BaseComboBox(new String[0]);
+    m_ComboBoxDimY = new BaseComboBox<>(new String[0]);
     m_ComboBoxDimY.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -968,7 +971,7 @@ public class MOAClusterVisualization
       public void actionPerformed(ActionEvent e) {
 	if (comboBox.getSelectedIndex() == -1)
 	  return;
-	String name = (String) comboBox.getSelectedItem();
+	String name = comboBox.getSelectedItem();
 	int sel = -1;
 	MeasureCollection coll = null;
 	for (MeasureCollection measure: m_ActualMeasures) {
