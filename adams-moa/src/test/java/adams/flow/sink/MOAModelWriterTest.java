@@ -111,7 +111,7 @@ public class MOAModelWriterTest
       's',
       "The MOA stream generator to use from within ADAMS.",
       ExampleStream.class,
-      "ArffFileStream -f " + new TmpFile("iris.arff").getAbsolutePath(),
+      "ArffFileStream -f (" + new TmpFile("iris.arff").getAbsolutePath() + ")",
       "moa.streams.ArffFileStream");
 
     MOAStream stream = new MOAStream();
