@@ -44,7 +44,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2013-2016} &
+		\parbox[c][2cm]{2cm}{\copyright 2013-2019} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -90,6 +90,8 @@ The following actors are available:
 	splitter/tokenizer.\footnote{adams-nlp-split\_document\_and\_parse.flow}
 	\item \textit{EditDistance} -- computes the edit distance between
 	a supplied base string and the strings received.
+	\item \textit{GenerateWordCloud} -- transformer for generating a word
+	cloud image from word frequencies.
 	\item \textit{StanfordGrammaticalStructure} -- transformer for generating a
 	grammatical structure from a parse tree.\footnote{adams-nlp-parse.flow}
 	\item \textit{StanfordLexicalizedParser} -- transformer for generating a 
@@ -103,13 +105,21 @@ The following actors are available:
 	(requires the external TweeboParser executables).
 	\item \textit{TweetNLPTagger} -- transformer for tokenizing/tagging
 	tweets.
+	\item \textit{WordFrequencyAnalyzer} -- transformer for generating word
+	frequencies from text.
 \end{tight_itemize}
 The following conversions are available:
 \begin{tight_itemize}
+   	\item \textit{SpreadSheetToWordFrequencies} -- turns a spreadsheet
+   	with two columns (word/frequency) into a word frequency array.
    	\item \textit{StanfordParseTreeToSpreadSheet} -- turns the leaves of a
    	parse tree into a spreadsheet.
 	\item \textit{StanfordParseTreeToXML} -- turns a parse tree into an
 	XML string.\footnote{adams-nlp-parse.flow}
+   	\item \textit{WordFrequenciesToSpreadShet} -- turns a word frequency
+   	array into a spreadsheet.
+   	\item \textit{WordFrequencyToString} -- generates a string representation
+   	of a single word frequency object.
 \end{tight_itemize}
 The following Weka tokenizers are available:
 \begin{tight_itemize}
