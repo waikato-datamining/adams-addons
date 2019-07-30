@@ -1,6 +1,6 @@
 # Project: adams
-# Date: 2019-07-22 14:20:52
-# User: csterlin
+# Date: 2019-07-30 16:25:52
+# User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-ml,adams-moa,adams-spreadsheet,adams-visualstats,adams-weka
 #
@@ -12,5 +12,5 @@ adams.flow.control.Flow -annotation "Visualizes the clustering of the data strea
   adams.flow.control.Sequence -name raw
    adams.flow.sink.MOAClusterVisualization -name "MOAClusterVisualization (raw)" -short-title true -writer adams.gui.print.NullWriter -measure F1 -measure SSQ
   adams.flow.control.Sequence -name filtered
-   adams.flow.transformer.MOAFilter -filter "moa.streams.filters.AddNoiseFilter -a 0.1 -c 0.0"
+   adams.flow.transformer.MOAFilter -filter "AddNoiseFilter -c 0.05"
    adams.flow.sink.MOAClusterVisualization -name "MOAClusterVisualization (filtered)" -short-title true -x -3 -writer adams.gui.print.NullWriter -measure F1 -measure SSQ

@@ -1,6 +1,6 @@
 # Project: adams
-# Date: 2019-07-22 10:52:57
-# User: csterlin
+# Date: 2019-07-30 16:29:05
+# User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-ml,adams-moa,adams-spreadsheet,adams-visualstats,adams-weka
 #
@@ -11,12 +11,12 @@ adams.flow.control.Flow -annotation "This flow demonstrates how to use the class
   adams.flow.source.MOAClassifierSetup -classifier moa.classifiers.bayes.NaiveBayes
  adams.flow.source.Start
  adams.flow.control.Trigger -name train
-  adams.flow.source.MOAStream -stream "moa.streams.ArffFileStream -f /Scratch/adams-addons/adams-moa/src/main/flows/data/anneal_train.arff" -num-examples -1
+  adams.flow.source.MOAStream
   adams.flow.transformer.MOATrainClassifier -name MOAClassifier -output-interval 1
   adams.flow.control.ContainerValuePicker -value Model -switch-outputs true
   adams.flow.transformer.SetStorageValue -storage-name model
  adams.flow.control.Trigger -name classify
-  adams.flow.source.MOAStream -stream "moa.streams.ArffFileStream -f /Scratch/adams-addons/adams-moa/src/main/flows/data/anneal_test.arff" -num-examples -1
+  adams.flow.source.MOAStream -num-examples 100
   adams.flow.control.Switch -condition "adams.flow.condition.bool.MOAClassification -model-actor model -on-the-fly true" -case adams.flow.sink.Null
    adams.flow.control.Trigger -name "class 1"
     adams.flow.source.StringConstants -string "Class 1"

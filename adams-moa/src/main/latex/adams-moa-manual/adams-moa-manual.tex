@@ -46,7 +46,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2011-2015} &
+		\parbox[c][2cm]{2cm}{\copyright 2011-2019} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -211,20 +211,16 @@ At the moment, only cluster visualization is available in the flow\footnote{adam
 \clearpage
 \newpage
 \section{Filtering}
-Even though there is no filtering support in MOA at the time of writing, it is
-possible using WEKA's stream filters to filter data streams in MOA.
-You can use the \textit{WekaStreamFilter} transformer to apply one of WEKA's
-stream filters to the stream of \textit{weka.core.Instance} objects passing
-through.
+MOA has its own filtering framework, which can be used via the \textit{MOAFilter}
+transformer.
 
 In Figure \ref{moa-stream-filtering_flow} you can see a flow\footnote{adams-moa-filtering.flow} 
 that generates a data stream using the \textit{RandomRBFGenerator} class. It
 outputs a stream with 40 attributes and 4 class labels. This flow applies
-the \textit{DownSample} filter (only uses every nth attribute) to the stream
+the \textit{AddNoise} filter to the stream
 and plots the classifier performance, percentage correct and kappa, in a graph
-(see Figure \ref{moa-stream-filtering_output}). Three plots are generated: evaluation
-on the full attribute range, down-sampled with using only every 2nd and 4th
-attribute.
+(see Figure \ref{moa-stream-filtering_output}). For each, two plot streams are
+generated: using the original data and the noisy one.
 
 \begin{figure}[htb]
   \centering
@@ -240,9 +236,18 @@ attribute.
   \label{moa-stream-filtering_output}
 \end{figure}
 
+\clearpage
+\newpage
+\section{Conversions}
+The following conversions are available:
+\begin{tight_itemize}
+  \item \textit{MOAInstancesToWEKAInstances} -- converts MOA dataset to WEKA one
+  \item \textit{WEKAInstancesToMOAInstances} -- converts WEKA dataset to MOA one
+\end{tight_itemize}
+
 \chapter{Tools}
 The main interface for MOA is available from within ADAMS as well. You can
-find it under the \textit{MOA} menu. Figure \ref{moa-gui} shows a screenshot
+find it under the \textit{Machine learning} menu. Figure \ref{moa-gui} shows a screenshot
 of the user interface in action.
 \begin{figure}[htb]
   \centering

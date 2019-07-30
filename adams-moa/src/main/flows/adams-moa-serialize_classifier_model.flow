@@ -1,12 +1,12 @@
 # Project: adams
-# Date: 2019-07-22 10:56:35
-# User: csterlin
+# Date: 2019-07-30 16:17:31
+# User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-ml,adams-moa,adams-spreadsheet,adams-visualstats,adams-weka
 #
 adams.flow.control.Flow -annotation "This flow trains a NaiveBayes classifier on the UCI \\\"iris\\\" dataset\\nand stores the generated model in \\\"output/naivebayes.model\\\"." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
   adams.flow.source.MOAClassifierSetup -classifier moa.classifiers.bayes.NaiveBayes
- adams.flow.source.MOAStream -stream "moa.streams.ArffFileStream -f /Scratch/adams-addons/adams-moa/src/main/flows/data/iris.arff" -num-examples -1
- adams.flow.transformer.MOATrainClassifier -name MOAClassifier -output-interval 150
+ adams.flow.source.MOAStream -num-examples 1000
+ adams.flow.transformer.MOATrainClassifier -name MOAClassifier
  adams.flow.sink.MOAModelWriter -output ${FLOWS}/output/naivebayes.model
