@@ -25,3 +25,23 @@ adams.core.net.rabbitmq.send.AbstractConverter=\
 # the receive converters
 adams.core.net.rabbitmq.receive.AbstractConverter=\
   adams.core.net.rabbitmq.receive
+
+# the REST servers
+adams.flow.rest.RESTProvider=\
+  adams.flow.rest.dex
+
+# classes providing REST functionality
+adams.flow.rest.RESTPlugin=\
+  adams.flow.rest.dex
+
+# REST clients
+adams.flow.rest.RESTClient=\
+  adams.flow.rest.dex
+
+# the authentication schemes for the data exchange server
+adams.flow.rest.dex.authentication.AbstractAuthentication=\
+  adams.flow.rest.dex.authentication
+
+# the backend schemes for the data exchange server
+adams.flow.rest.dex.backend.AbstractBackend=\
+  adams.flow.rest.dex.backend
