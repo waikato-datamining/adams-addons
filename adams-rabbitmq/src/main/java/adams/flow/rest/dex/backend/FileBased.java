@@ -303,10 +303,12 @@ public class FileBased
     String  		result;
     DataContainer	cont;
     PlaceholderFile	file;
+    long		expiry;
 
     result = nextToken();
-    file   = new PlaceholderFile(m_DataDir.getAbsolutePath() + File.separator + result + "-" + (System.currentTimeMillis() + m_TimeToLive * 1000) + ".ser");
-    cont   = new DataContainer(data, file, new Date(System.currentTimeMillis() + m_TimeToLive * 1000));
+    expiry = System.currentTimeMillis() + m_TimeToLive * 1000;
+    file   = new PlaceholderFile(m_DataDir.getAbsolutePath() + File.separator + result + "-" + expiry + ".ser");
+    cont   = new DataContainer(data, file, new Date(expiry));
     m_Storage.put(result, cont);
     if (isLoggingEnabled())
       getLogger().info("Data added: token=" + result + ", expiry=" + cont.getExpiry());
