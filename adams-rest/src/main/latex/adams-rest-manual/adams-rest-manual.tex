@@ -312,6 +312,13 @@ methods to set one or more beans.
 This module contains generic actors in which you can simply plug your 
 web-services that you have implemented. In the following a short overview.
 
+The following conversions are available:
+\begin{tight_itemize}
+	\item \textit{JsonToObject} -- maps a JSON string into a Java object
+	(using Jackson's Databind functionality\cite{jackson}).
+	\item \textit{ObjectToJson} -- turns any Java object into a JSON string
+	(using Jackson's ObjectMapper\cite{jackson}).
+\end{tight_itemize}
 The following standalones are available:
 \begin{tight_itemize}
 	\item \textit{RESTServer} -- runs a web-service. waiting for
