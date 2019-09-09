@@ -45,3 +45,7 @@ adams.flow.rest.dex.authentication.AbstractAuthentication=\
 # the backend schemes for the data exchange server
 adams.flow.rest.dex.backend.AbstractBackend=\
   adams.flow.rest.dex.backend
+
+# the client authentication schemes for the data exchange server
+adams.flow.rest.dex.clientauthentication.AbstractClientAuthentication=\
+  adams.flow.rest.dex.clientauthentication
