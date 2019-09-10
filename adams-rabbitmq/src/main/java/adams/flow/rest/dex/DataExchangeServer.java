@@ -20,8 +20,8 @@
 
 package adams.flow.rest.dex;
 
-import adams.core.ObjectCopyHelper;
 import adams.core.Utils;
+import adams.core.option.OptionUtils;
 import adams.flow.rest.AbstractRESTProvider;
 import adams.flow.rest.dex.authentication.AbstractAuthentication;
 import adams.flow.rest.dex.authentication.NoAuthenticationRequired;
@@ -160,8 +160,8 @@ public class DataExchangeServer
     configureInterceptors(factory);
 
     exchange = new DataExchange();
-    exchange.setAuthentication(ObjectCopyHelper.copyObject(m_Authentication));
-    exchange.setBackend(ObjectCopyHelper.copyObject(m_Backend));
+    exchange.setAuthentication((AbstractAuthentication) OptionUtils.shallowCopy(m_Authentication, true));
+    exchange.setBackend((AbstractBackend) OptionUtils.shallowCopy(m_Backend, true));
     exchange.setLoggingLevel(getLoggingLevel());
     factory.setServiceBean(exchange);
     factory.setAddress(getURL());
