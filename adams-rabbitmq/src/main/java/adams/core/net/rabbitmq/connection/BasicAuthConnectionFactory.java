@@ -21,6 +21,7 @@
 package adams.core.net.rabbitmq.connection;
 
 import adams.core.MessageCollection;
+import adams.core.PasswordPrompter;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.base.BasePassword;
@@ -41,7 +42,8 @@ import java.awt.Dialog.ModalityType;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class BasicAuthConnectionFactory
-  extends AbstractConnectionFactory {
+  extends AbstractConnectionFactory
+  implements PasswordPrompter {
 
   private static final long serialVersionUID = 1730696755155054710L;
 

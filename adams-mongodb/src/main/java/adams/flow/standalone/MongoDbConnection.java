@@ -15,11 +15,12 @@
 
 /*
  * MongoDbConnection.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.standalone;
 
+import adams.core.PasswordSupporter;
 import adams.core.Placeholders;
 import adams.core.QuickInfoHelper;
 import adams.core.base.BasePassword;
@@ -48,7 +49,7 @@ import java.awt.Dialog.ModalityType;
  */
 public class MongoDbConnection
   extends AbstractStandalone
-  implements OptionalPasswordPrompt {
+  implements OptionalPasswordPrompt, PasswordSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = -1726172998200420556L;
