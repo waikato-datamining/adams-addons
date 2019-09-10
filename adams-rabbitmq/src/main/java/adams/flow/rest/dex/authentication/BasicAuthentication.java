@@ -154,6 +154,8 @@ public class BasicAuthentication
       m_Lookup = new HashMap<>();
       for (i = 0; i < m_Users.length; i++)
         m_Lookup.put(m_Users[i].getValue(), m_Passwords[i].getValue());
+      if (isLoggingEnabled())
+        getLogger().info("users/passwords: " + m_Lookup);
     }
 
     if (!params.containsKey(KEY_USER))
