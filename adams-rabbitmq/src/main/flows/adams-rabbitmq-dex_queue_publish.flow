@@ -1,0 +1,11 @@
+# Project: adams
+# Date: 2019-09-10 14:33:22
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-event,adams-meta,adams-net,adams-rabbitmq,adams-rest,adams-security,adams-webservice-core
+#
+adams.flow.control.Flow -annotation "Publishes a log file.\\nUses a data exchange server for transferring the payload.\\n\\nRequires the following flows to run:\\n  adams-rabbitmq-dex_server.flow\\n  adams-rabbitmq-dex_queue_consume.flow" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.RabbitMQConnection -connection-factory adams.core.net.rabbitmq.connection.GuestConnectionFactory
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/apache.log
+ adams.flow.transformer.TextFileReader -reader adams.data.io.input.SingleStringTextReader
+ adams.flow.sink.RabbitMQPublish -queue hello -converter "adams.core.net.rabbitmq.send.DataExchangeServerBasedConverter -converter adams.core.net.rabbitmq.send.StringConverter -authentication adams.flow.rest.dex.clientauthentication.NoAuthentication"

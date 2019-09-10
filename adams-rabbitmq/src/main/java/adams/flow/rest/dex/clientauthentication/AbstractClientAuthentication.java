@@ -23,6 +23,8 @@ package adams.flow.rest.dex.clientauthentication;
 import adams.core.MessageCollection;
 import adams.core.base.BaseKeyValuePair;
 import adams.core.option.AbstractOptionHandler;
+import adams.flow.core.Actor;
+import adams.flow.core.FlowContextHandler;
 
 /**
  * Ancestor for client authentication schemes.
@@ -30,9 +32,38 @@ import adams.core.option.AbstractOptionHandler;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public abstract class AbstractClientAuthentication
-  extends AbstractOptionHandler {
+  extends AbstractOptionHandler
+  implements FlowContextHandler {
 
   private static final long serialVersionUID = 3157981057620546957L;
+
+  /** the flow context. */
+  protected transient Actor m_FlowContext;
+
+  /**
+   * Sets the flow context.
+   *
+   * @param value the actor
+   */
+  public void setFlowContext(Actor value) {
+    m_FlowContext = value;
+  }
+
+  /**
+   * Returns the flow context, if any.
+   *
+   * @return the actor, null if none available
+   */
+  public Actor getFlowContext() {
+    return m_FlowContext;
+  }
+
+  /**
+   * Whether the scheme actually requires a flow context.
+   *
+   * @return		true if required
+   */
+  protected abstract boolean requiresFlowContext();
 
   /**
    * Hook method for checks.
@@ -40,6 +71,8 @@ public abstract class AbstractClientAuthentication
    * @return		null if check passed, otherwise error message
    */
   protected String check() {
+    if (requiresFlowContext() && (m_FlowContext == null))
+      return "No flow context set!";
     return null;
   }
 

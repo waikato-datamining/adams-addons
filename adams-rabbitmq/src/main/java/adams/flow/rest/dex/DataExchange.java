@@ -25,6 +25,7 @@ import adams.flow.rest.dex.authentication.AbstractAuthentication;
 import adams.flow.rest.dex.authentication.NoAuthenticationRequired;
 import adams.flow.rest.dex.backend.AbstractBackend;
 import adams.flow.rest.dex.backend.InMemory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import gnu.trove.list.TByteList;
 import gnu.trove.list.array.TByteArrayList;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -51,11 +52,44 @@ public class DataExchange
 
   private static final long serialVersionUID = -5218893638471880150L;
 
+  public static final String PARAMKEY_NAME = "name";
+
+  public static final String PARAMKEY_PAYLOAD = "payload";
+
+  public static final String PARAMVALUE_TOKEN = "token";
+
+  /**
+   * Wrapper class for the token.
+   */
+  public static class TokenMessage {
+
+    protected String m_Token;
+
+    public TokenMessage() {
+      this(null);
+    }
+
+    public TokenMessage(String token) {
+      setToken(token);
+    }
+
+    public void setToken(String value) {
+      m_Token = value;
+    }
+
+    public String getToken() {
+      return m_Token;
+    }
+  }
+
   /** the authentication scheme. */
   protected AbstractAuthentication m_Authentication;
 
   /** the backend in use. */
   protected AbstractBackend m_Backend;
+
+  /** the object mapper to use. */
+  protected transient ObjectMapper m_Mapper;
 
   /**
    * Returns a string describing the object.
@@ -81,6 +115,16 @@ public class DataExchange
     m_OptionManager.add(
       "backend", "backend",
       new InMemory());
+  }
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_Mapper = null;
   }
 
   /**
@@ -149,7 +193,7 @@ public class DataExchange
    */
   protected Response handleError(String msg) {
     getLogger().severe(msg);
-    return Response.status(400, msg).build();
+    return Response.status(500, msg).build();
   }
 
   /**
@@ -180,9 +224,9 @@ public class DataExchange
 
     // get parameters and payload
     for (Attachment att: body.getAllAttachments()) {
-      name = att.getContentDisposition().getParameter("name");
+      name = att.getContentDisposition().getParameter(PARAMKEY_NAME);
       if (name != null) {
-        if (name.equals("payload")) {
+        if (name.equals(PARAMKEY_PAYLOAD)) {
           try {
 	    is = att.getDataHandler().getInputStream();
 	    while ((data = is.read()) != -1)
@@ -193,7 +237,7 @@ public class DataExchange
 	  }
 	}
 	else {
-          parameters.put(name, att.getObject(String.class));
+          parameters.put(name, att.getObject(String.class).trim());
 	}
       }
     }
@@ -222,7 +266,14 @@ public class DataExchange
     else if (isLoggingEnabled())
       getLogger().info("Data stored under: " + token);
 
-    json = "{\"token\": \"" + token + "\"}";
+    if (m_Mapper == null)
+      m_Mapper = new ObjectMapper();
+    try {
+      json = m_Mapper.writeValueAsString(new TokenMessage(token));
+    }
+    catch (Exception e) {
+      return handleError("Failed to generate response with token!");
+    }
     return Response.ok(json, MediaType.APPLICATION_JSON).build();
   }
 
@@ -249,13 +300,13 @@ public class DataExchange
 
     // get parameters and payload
     for (Attachment att: body.getAllAttachments()) {
-      name = att.getContentDisposition().getParameter("name");
+      name = att.getContentDisposition().getParameter(PARAMKEY_NAME);
       if (name != null) {
-        if (name.equals("token")) {
-          token = att.getObject(String.class);
+        if (name.equals(PARAMVALUE_TOKEN)) {
+          token = att.getObject(String.class).trim();
 	}
 	else {
-          parameters.put(name, att.getObject(String.class));
+          parameters.put(name, att.getObject(String.class).trim());
 	}
       }
     }
@@ -307,13 +358,13 @@ public class DataExchange
 
     // get parameters and payload
     for (Attachment att: body.getAllAttachments()) {
-      name = att.getContentDisposition().getParameter("name");
+      name = att.getContentDisposition().getParameter(PARAMKEY_NAME);
       if (name != null) {
-        if (name.equals("token")) {
-          token = att.getObject(String.class);
+        if (name.equals(PARAMVALUE_TOKEN)) {
+          token = att.getObject(String.class).trim();
 	}
 	else {
-          parameters.put(name, att.getObject(String.class));
+          parameters.put(name, att.getObject(String.class).trim());
 	}
       }
     }

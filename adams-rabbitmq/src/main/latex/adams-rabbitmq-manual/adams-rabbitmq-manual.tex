@@ -91,57 +91,64 @@ You can find information on how to set up RabbitMQ using TLS on the
 following URL: \\
 \url{https://www.rabbitmq.com/ssl.html}{}
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
 The following standalones are available:
-\begin{verbatim}
+\begin{tight_itemize}
   \item \textit{RabbitMQConnection} -- defines a RabbitMQ broker connection.
   \item \textit{RabbitMQChannelAction} -- peforms the specified channel action.
-\end{verbatim}
+\end{tight_itemize}
 
-The following sources are available:
-\begin{verbatim}
+\noindent The following sources are available:
+\begin{tight_itemize}
   \item \textit{RabbitMQConsume} -- outputs the data it consumes from either
   a queue or an exchange.
-\end{verbatim}
+\end{tight_itemize}
 
-The following transformers are available:
-\begin{verbatim}
+\noindent The following transformers are available:
+\begin{tight_itemize}
+  \item \textit{DataExchangeServerDownload} -- downloads data from a data exchange
+  server using the specified token.
+  \item \textit{DataExchangeServerRemove} -- removes data from a data exchange
+  using the received token.
+  \item \textit{DataExchangeServerUpload} -- uploads a file or byte array to a data exchange
+  server and forwards the received token.
   \item \textit{RabbitMQRemoteProcedureCall} -- for performing remote procedure
   calls via a RabbitMQ broker.
-\end{verbatim}
+\end{tight_itemize}
 
-The following sinks are available:
-\begin{verbatim}
+\noindent The following sinks are available:
+\begin{tight_itemize}
   \item \textit{RabbitMQMessageDeliveryAction} -- for executing an action using
   the incoming delivery tag, e.g., acknowledging it.
   \item \textit{RabbitMQPublish} -- publishes the incoming data to a queue
   or an exchange.
-\end{verbatim}
+\end{tight_itemize}
 
-The following control actors are available:
-\begin{verbatim}
+\noindent The following control actors are available:
+\begin{tight_itemize}
   \item \textit{RabbitMQRemoteSubProcess} -- executes the sub-actors remotely
   for processing the input, forwards the generated output.
   \item \textit{RabbitMQRemoteTee} -- executes the sub-actors remotely
   for processing the input, forwards the input.
   \item \textit{RabbitMQRemoteTrigger} -- executes the sub-actors remotely,
   forwards the input.
-\end{verbatim}
+\end{tight_itemize}
 
-The following conversions are available:
-\begin{verbatim}
+\noindent The following conversions are available:
+\begin{tight_itemize}
   \item \textit{RabbitMQEnvelopeToMap} -- converts RabbitMQ envelope into a
   Java Map, e.g., to obtain a delivery tag to acknowledge consumption of a message.
   \item \textit{RabbitMQPropertiesToMap} -- converts RabbitMQ basic properties
   into a Java Map, e.g., to obtain the reply-to queue name.
-\end{verbatim}
+\end{tight_itemize}
 
-The following JobRunners are available:
-\begin{verbatim}
+\noindent The following JobRunners are available:
+\begin{tight_itemize}
   \item \textit{RabbitMQJobRunner} -- distributes the jobs using the specified
   broker.
-\end{verbatim}
+\end{tight_itemize}
 
 \section{TLS Support}
 If you want to take advantage of TLS, i.e., encrypting your connections to
@@ -168,6 +175,46 @@ converters:
 \end{tight_itemize}
 The receiving converter automatically deletes the payload file ones read
 successfully.
+
+In case a shared directory is not an option, see chapter \ref{dex} on how to use
+a \textit{data exchange server} instead.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Data exchange server}
+\label{dex}
+The \textit{Data exchange server} (DEX) is a simple REST webservice plugin that enables
+one to store data temporarily on a server and access it. The underlying idea is
+to avoid clogging up message queues on RabbitMQ servers. Rather than sending the
+data as well in the message, only a token that is associated with the actual
+data on such an exchange server will get sent through RabbitMQ.
+
+\noindent The following \textit{RESTProvider} that can be used for this service:
+\begin{verbatim}
+adams.flow.rest.dex.DataExchangeServer
+\end{verbatim}
+
+\noindent The \textit{RESTPlugin} itself (used internally by the above provider)
+is the following:
+\begin{verbatim}
+adams.flow.rest.dex.DataExchange
+\end{verbatim}
+
+\noindent You can use a data exchange server for offloading payloads from
+RabbitMQ messages with the following converters:
+\begin{tight_itemize}
+  \item \textit{adams.core.net.rabbitmq.receive.DataExchangeServerBasedConverter}
+  \item \textit{adams.core.net.rabbitmq.send.DataExchangeServerBasedConverter}
+\end{tight_itemize}
+
+\noindent The following example flows demonstrate the data exchange functionality:
+\begin{tight_itemize}
+  \item \textit{adams-rabbitmq-dex\_server.flow} -- starts an in-memory data exchange server.
+  \item \textit{adams-rabbitmq-dex\_upload.flow} -- uploads a file to the data exchange server.
+  \item \textit{adams-rabbitmq-dex\_download.flow} -- downloads data from the data exchange server using the entered token.
+  \item \textit{adams-rabbitmq-dex\_queue\_publish.flow} -- publishes data through RabbitMQ via a data exchange server.
+  \item \textit{adams-rabbitmq-dex\_queue\_consume.flow} -- consumes data through RabbitMQ via a data exchange server.
+\end{tight_itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}

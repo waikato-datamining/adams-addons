@@ -1,0 +1,28 @@
+# Project: adams
+# Date: 2019-09-10 14:09:18
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-event,adams-meta,adams-net,adams-rabbitmq,adams-rest,adams-security,adams-webservice-core
+#
+adams.flow.control.Flow -annotation "Downloads data from the data exchange (dex) server running on localhost:8080\\nand stores it in the \\\"output\\\" folder. It then prompts the user whether to delete\\nthe data on the server associated with this token.\\nThe following flow needs to run (starts the dex server):\\n  adams-rabbitmq-dex_server.flow" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.SetVariable -name "output file" -var-name outfile -var-value ${FLOWS}/output/data.bin -value-type FILE_FORWARD_SLASHES
+ adams.flow.source.EnterValue -stop-if-canceled true -message "Please enter token for data to download"
+ adams.flow.transformer.SetVariable -name token -var-name token
+ adams.flow.control.Tee -name info
+  adams.flow.transformer.StringInsert -position first -value "Using token: "
+  adams.flow.sink.CallableSink -callable Display
+ adams.flow.control.Tee -name download
+  adams.flow.transformer.DataExchangeServerDownload -authentication adams.flow.rest.dex.clientauthentication.NoAuthentication
+  adams.flow.sink.BinaryFileWriter -output @{outfile}
+ adams.flow.control.Trigger -name "display output file name"
+  adams.flow.source.Variable -var-name outfile -conversion adams.data.conversion.StringToString
+  adams.flow.transformer.StringInsert -position first -value "Data written to: "
+  adams.flow.sink.CallableSink -callable Display
+ adams.flow.control.ConditionalTrigger -name "remove data from server" -condition adams.flow.condition.bool.PromptUser
+  adams.flow.source.Variable -var-name token -conversion adams.data.conversion.StringToString
+  adams.flow.transformer.DataExchangeServerRemove -authentication adams.flow.rest.dex.clientauthentication.NoAuthentication
+  adams.flow.transformer.Convert -conversion adams.data.conversion.AnyToString
+  adams.flow.transformer.StringInsert -position first -value "Data removal response: "
+  adams.flow.sink.CallableSink -callable Display

@@ -22,8 +22,13 @@ package adams.flow.rest.dex.clientauthentication;
 
 import adams.core.ClassCrossReference;
 import adams.core.MessageCollection;
+import adams.core.PasswordPrompter;
 import adams.core.base.BaseKeyValuePair;
 import adams.core.base.BasePassword;
+import adams.flow.control.Flow;
+import adams.gui.dialog.PasswordDialog;
+
+import java.awt.Dialog.ModalityType;
 
 /**
  * Generates simple user/password authentication.
@@ -32,7 +37,7 @@ import adams.core.base.BasePassword;
  */
 public class BasicAuthentication
   extends AbstractClientAuthentication
-  implements ClassCrossReference {
+  implements ClassCrossReference, PasswordPrompter {
 
   private static final long serialVersionUID = -8658731460295213717L;
 
@@ -41,6 +46,12 @@ public class BasicAuthentication
 
   /** the password. */
   protected BasePassword m_Password;
+
+  /** the actual password to use. */
+  protected BasePassword m_ActualPassword;
+
+  /** whether to prompt the user for a password if none provided. */
+  protected boolean m_PromptForPassword;
 
   /**
    * Returns a string describing the object.
@@ -66,6 +77,20 @@ public class BasicAuthentication
     m_OptionManager.add(
       "password", "password",
       new BasePassword());
+
+    m_OptionManager.add(
+      "prompt-for-password", "promptForPassword",
+      false);
+  }
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_ActualPassword = null;
   }
 
   /**
@@ -127,12 +152,75 @@ public class BasicAuthentication
   }
 
   /**
+   * Sets whether to prompt for a password if none currently provided.
+   *
+   * @param value	true if to prompt for a password
+   */
+  public void setPromptForPassword(boolean value) {
+    m_PromptForPassword = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to prompt for a password if none currently provided.
+   *
+   * @return		true if to prompt for a password
+   */
+  public boolean getPromptForPassword() {
+    return m_PromptForPassword;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String promptForPasswordTipText() {
+    return
+      "If enabled, the user gets prompted "
+        + "for enter a password if none has been provided in the setup.";
+  }
+
+  /**
    * Returns the cross-referenced classes.
    *
    * @return		the classes
    */
   public Class[] getClassCrossReferences() {
     return new Class[]{adams.flow.rest.dex.authentication.BasicAuthentication.class};
+  }
+
+  /**
+   * Whether the scheme actually requires a flow context.
+   *
+   * @return		true if required
+   */
+  @Override
+  protected boolean requiresFlowContext() {
+    return m_PromptForPassword;
+  }
+
+  /**
+   * Performs the interaction with the user.
+   *
+   * @return		true if successfully interacted
+   */
+  protected boolean doInteract() {
+    boolean		result;
+    PasswordDialog 	dlg;
+
+    dlg = new PasswordDialog(null, ModalityType.DOCUMENT_MODAL);
+    dlg.setLocationRelativeTo(getFlowContext().getParentComponent());
+    ((Flow) getFlowContext().getRoot()).registerWindow(dlg, dlg.getTitle());
+    dlg.setVisible(true);
+    ((Flow) getFlowContext().getRoot()).deregisterWindow(dlg);
+    result = (dlg.getOption() == PasswordDialog.APPROVE_OPTION);
+
+    if (result)
+      m_ActualPassword = dlg.getPassword();
+
+    return result;
   }
 
   /**
@@ -143,9 +231,21 @@ public class BasicAuthentication
    */
   @Override
   protected BaseKeyValuePair[] doGenerate(MessageCollection errors) {
+    if (m_ActualPassword == null) {
+      if (m_PromptForPassword) {
+	if (!doInteract()) {
+	  errors.add("User canceled password dialog!");
+	  return null;
+	}
+      }
+      else {
+        m_ActualPassword = m_Password;
+      }
+    }
+
     return new BaseKeyValuePair[]{
       new BaseKeyValuePair(adams.flow.rest.dex.authentication.BasicAuthentication.KEY_USER, m_User),
-      new BaseKeyValuePair(adams.flow.rest.dex.authentication.BasicAuthentication.KEY_PASSWORD, m_Password.getValue()),
+      new BaseKeyValuePair(adams.flow.rest.dex.authentication.BasicAuthentication.KEY_PASSWORD, m_ActualPassword.getValue()),
     };
   }
 }

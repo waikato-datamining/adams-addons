@@ -56,6 +56,15 @@ public class NoAuthentication
   }
 
   /**
+   * Whether the scheme actually requires a flow context.
+   *
+   * @return		true if required
+   */
+  protected boolean requiresFlowContext() {
+    return false;
+  }
+
+  /**
    * Generates the authentication parameters for sending to the server.
    *
    * @param errors  	for collecting errors
