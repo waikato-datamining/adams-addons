@@ -241,6 +241,8 @@ public class BasicAuthentication
       else {
         m_ActualPassword = m_Password;
       }
+      if (isLoggingEnabled())
+        getLogger().info("user/password: " + m_User + "/" + m_ActualPassword);
     }
 
     return new BaseKeyValuePair[]{
