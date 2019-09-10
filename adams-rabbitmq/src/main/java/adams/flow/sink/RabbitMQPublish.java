@@ -293,6 +293,7 @@ public class RabbitMQPublish
     byte[]			data;
 
     result = null;
+    m_Converter.setFlowContext(this);
 
     if (m_Channel == null) {
       m_Channel = m_Connection.createChannel();

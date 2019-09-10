@@ -24,7 +24,9 @@ import adams.core.MessageCollection;
 import adams.core.QuickInfoSupporter;
 import adams.core.Utils;
 import adams.core.option.AbstractOptionHandler;
+import adams.flow.core.Actor;
 import adams.flow.core.Compatibility;
+import adams.flow.core.FlowContextHandler;
 
 /**
  * Ancestor for converters that convert the data to be sent.
@@ -33,9 +35,30 @@ import adams.flow.core.Compatibility;
  */
 public abstract class AbstractConverter
   extends AbstractOptionHandler
-  implements QuickInfoSupporter {
+  implements QuickInfoSupporter, FlowContextHandler {
 
   private static final long serialVersionUID = 6503474005673475838L;
+
+  /** the flow context. */
+  protected transient Actor m_FlowContext;
+
+  /**
+   * Sets the flow context.
+   *
+   * @param value	the context
+   */
+  public void setFlowContext(Actor value) {
+    m_FlowContext = value;
+  }
+
+  /**
+   * Returns the flow context.
+   *
+   * @return		the context, null if not available
+   */
+  public Actor getFlowContext() {
+    return m_FlowContext;
+  }
 
   /**
    * Returns a quick info about the object, which can be displayed in the GUI.

@@ -323,6 +323,8 @@ public class RabbitMQRemoteSubProcess
   protected DeliverCallback generateDeliverCallback() {
     DeliverCallback 	result;
 
+    m_ReceiveConverter.setFlowContext(this);
+
     result = (consumerTag, delivery) -> {
       try {
 	byte[] dataRec = delivery.getBody();

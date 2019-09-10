@@ -258,6 +258,8 @@ public class RabbitMQPublish
 
     result = null;
 
+    m_Converter.setFlowContext(getOwner());
+
     if (m_Channel == null) {
       m_Channel = m_Connection.createChannel();
       if (m_Channel == null)

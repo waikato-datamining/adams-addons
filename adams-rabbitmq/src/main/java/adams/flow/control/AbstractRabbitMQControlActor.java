@@ -578,6 +578,7 @@ public abstract class AbstractRabbitMQControlActor
     DeliverCallback 		deliverCallback;
 
     result = null;
+    m_SendConverter.setFlowContext(this);
 
     if (m_Channel == null) {
       m_Channel = m_Connection.createChannel();

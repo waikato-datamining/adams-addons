@@ -329,6 +329,8 @@ public class RabbitMQRemoteProcedureCall
 
     result = null;
     m_Data.clear();
+    m_SendConverter.setFlowContext(this);
+    m_ReceiveConverter.setFlowContext(this);
 
     if (m_Channel == null) {
       m_Channel = m_Connection.createChannel();

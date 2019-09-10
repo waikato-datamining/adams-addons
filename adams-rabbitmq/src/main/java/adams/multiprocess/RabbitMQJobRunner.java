@@ -407,6 +407,9 @@ public class RabbitMQJobRunner<T extends Job>
 
     result = null;
 
+    m_SendConverter.setFlowContext(getFlowContext());
+    m_ReceiveConverter.setFlowContext(getFlowContext());
+
     // callback queue
     m_CallbackQueue = null;
     try {
