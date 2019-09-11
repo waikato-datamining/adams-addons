@@ -23,9 +23,11 @@ package adams.core.net.rabbitmq.send;
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.core.base.BaseURL;
+import adams.flow.core.ActorUtils;
 import adams.flow.rest.dex.DataExchangeHelper;
 import adams.flow.rest.dex.clientauthentication.AbstractClientAuthentication;
 import adams.flow.rest.dex.clientauthentication.NoAuthentication;
+import adams.flow.standalone.DataExchangeServerConnection;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -43,6 +45,12 @@ public class DataExchangeServerBasedConverter
   /** the base converter. */
   protected AbstractConverter m_Converter;
 
+  /** whether to use a DEX connection from the flow context. */
+  protected boolean m_UseFlowContextConnection;
+
+  /** the connection in use. */
+  protected transient DataExchangeServerConnection m_Connection;
+
   /** the data exchange server to use. */
   protected BaseURL m_Server;
 
@@ -51,6 +59,12 @@ public class DataExchangeServerBasedConverter
 
   /** the object mapper in use. */
   protected transient ObjectMapper m_Mapper;
+
+  /** the actual server URL. */
+  protected transient BaseURL m_ActualURL;
+
+  /** the actual authentication in use. */
+  protected AbstractClientAuthentication m_ActualAuthentication;
 
   /**
    * Returns a string describing the object.
@@ -74,6 +88,10 @@ public class DataExchangeServerBasedConverter
     m_OptionManager.add(
       "converter", "converter",
       new BinaryConverter());
+
+    m_OptionManager.add(
+      "use-flow-context-connection", "useFlowContextConnection",
+      false);
 
     m_OptionManager.add(
       "server", "server",
@@ -104,8 +122,13 @@ public class DataExchangeServerBasedConverter
     String	result;
 
     result = QuickInfoHelper.toString(this, "converter", m_Converter, "converter: ");
-    result += QuickInfoHelper.toString(this, "server", m_Server, ", server: ");
-    result += QuickInfoHelper.toString(this, "authentication", m_Authentication, ", auth: ");
+    if (m_UseFlowContextConnection) {
+      result += ", connection from flow context";
+    }
+    else {
+      result += QuickInfoHelper.toString(this, "server", m_Server, ", server: ");
+      result += QuickInfoHelper.toString(this, "authentication", m_Authentication, ", auth: ");
+    }
 
     return result;
   }
@@ -137,6 +160,37 @@ public class DataExchangeServerBasedConverter
    */
   public String converterTipText() {
     return "The base converter for performing the actual conversion.";
+  }
+
+  /**
+   * Sets whether the data exchange server connection available through the
+   * flow context is used rather than the server/authentication defined here.
+   *
+   * @param value	true if to use connection from context
+   */
+  public void setUseFlowContextConnection(boolean value) {
+    m_UseFlowContextConnection = value;
+    reset();
+  }
+
+  /**
+   * Returns whether the data exchange server connection available through the
+   * flow context is used rather than the server/authentication defined here.
+   *
+   * @return 		true if to use connection from context
+   */
+  public boolean getUseFlowContextConnection() {
+    return m_UseFlowContextConnection;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String useFlowContextConnectionTipText() {
+    return "If enabled, the data exchange server connection available through the flow context is used rather than the server/authentication defined here.";
   }
 
   /**
@@ -208,6 +262,42 @@ public class DataExchangeServerBasedConverter
   }
 
   /**
+   * Hook method for checks.
+   *
+   * @param payload	the payload to check
+   * @return		null if sucessfully checked, otherwise error message
+   */
+  public String check(Object payload) {
+    String	result;
+
+    result = super.check(payload);
+
+    if (result == null) {
+      if (m_UseFlowContextConnection && (m_Connection == null)) {
+	m_Connection = (DataExchangeServerConnection) ActorUtils.findClosestType(getFlowContext(), DataExchangeServerConnection.class);
+	if (m_Connection == null)
+	  result = "No " + DataExchangeServerConnection.class.getName() + " actor found!";
+      }
+    }
+
+    if (result == null) {
+      if (m_ActualURL == null) {
+        if (m_Connection != null) {
+          m_ActualURL            = m_Connection.buildURL("upload");
+          m_ActualAuthentication = m_Connection.getAuthentication();
+	}
+	else {
+          m_ActualURL = DataExchangeHelper.buildURL(m_Server, "upload");
+          m_ActualAuthentication = m_Authentication;
+	  m_ActualAuthentication.setFlowContext(getFlowContext());
+	}
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Converts the payload.
    *
    * @param payload	the payload
@@ -225,7 +315,7 @@ public class DataExchangeServerBasedConverter
       return null;
 
     m_Authentication.setFlowContext(getFlowContext());
-    token = DataExchangeHelper.upload(data, DataExchangeHelper.buildURL(m_Server, "upload"), m_Authentication, errors);
+    token = DataExchangeHelper.upload(data, m_ActualURL, m_ActualAuthentication, errors);
     if (errors.isEmpty() && (token != null))
       result = new StringConverter().convert(token, errors);
     else
