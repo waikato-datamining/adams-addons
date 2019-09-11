@@ -27,7 +27,6 @@ import adams.flow.container.HttpRequestResult;
 import adams.flow.rest.dex.DataExchangeHelper;
 import adams.flow.rest.dex.clientauthentication.AbstractClientAuthentication;
 import adams.flow.rest.dex.clientauthentication.NoAuthentication;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Instead of sending potentially large payloads via a RabbitMQ, this
@@ -52,9 +51,6 @@ public class DataExchangeServerBasedConverter
 
   /** whether to delete the data after use. */
   protected boolean m_Remove;
-
-  /** the object mapper in use. */
-  protected transient ObjectMapper m_Mapper;
 
   /**
    * Returns a string describing the object.
@@ -81,7 +77,7 @@ public class DataExchangeServerBasedConverter
 
     m_OptionManager.add(
       "server", "server",
-      new BaseURL("http://localhost:8080/download"));
+      new BaseURL("http://localhost:8080/"));
 
     m_OptionManager.add(
       "authentication", "authentication",
@@ -256,7 +252,7 @@ public class DataExchangeServerBasedConverter
       return null;
 
     m_Authentication.setFlowContext(getFlowContext());
-    data = DataExchangeHelper.download(token, m_Server, m_Authentication, errors);
+    data = DataExchangeHelper.download(token, DataExchangeHelper.buildURL(m_Server, "download"), m_Authentication, errors);
     if (errors.isEmpty() && (data != null))
       result = m_Converter.convert(data, errors);
     else
@@ -264,7 +260,7 @@ public class DataExchangeServerBasedConverter
 
     if ((result != null) && m_Remove) {
       errors.clear();
-      response = DataExchangeHelper.remove(token, m_Server, m_Authentication, errors);
+      response = DataExchangeHelper.remove(token, DataExchangeHelper.buildURL(m_Server, "remove"), m_Authentication, errors);
       if ((response != null) && (response.getValue(HttpRequestResult.VALUE_STATUSCODE, Integer.class) != 200))
 	errors.add("Failed to remove data for token '" + token + "': " + response);
     }

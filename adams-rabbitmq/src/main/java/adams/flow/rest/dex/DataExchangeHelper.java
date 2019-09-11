@@ -230,4 +230,24 @@ public class DataExchangeHelper {
 
     return null;
   }
+
+  /**
+   * Builds the actual URL to use.
+   *
+   * @param server 	the server URL
+   * @param path  	the path to append to the server's URL
+   * @return		the complete URL
+   */
+  public static BaseURL buildURL(BaseURL server, String path) {
+    String	url;
+
+    if (path.startsWith("/"))
+      path = path.substring(1);
+    url = server.getValue();
+    if (!url.endsWith("/"))
+      url += "/";
+    url += path;
+
+    return new BaseURL(url);
+  }
 }

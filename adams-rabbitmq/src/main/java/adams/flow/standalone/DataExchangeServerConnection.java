@@ -14,43 +14,87 @@
  */
 
 /*
- * DataExchangeServerBasedConverter.java
- * Copyright (C) 2019 University of Waikato, Hamilton, NZ
+ * DataExchangeServerConnection.java
+ * Copyright (C) 2019 University of Waikato, Hamilton, New Zealand
  */
 
-package adams.core.net.rabbitmq.send;
+package adams.flow.standalone;
 
-import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.core.base.BaseURL;
 import adams.flow.rest.dex.DataExchangeHelper;
 import adams.flow.rest.dex.clientauthentication.AbstractClientAuthentication;
 import adams.flow.rest.dex.clientauthentication.NoAuthentication;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Instead of sending potentially large payloads via a RabbitMQ, this
- * meta-converter uploads the payload to the specified data exchange server
- * and only sends the token for obtaining the data again via RabbitMQ.
+ <!-- globalinfo-start -->
+ * Defines a connection to a Data Exchange server.
+ * <br><br>
+ <!-- globalinfo-end -->
  *
- * @author FracPete (fracpete at waikato dot ac dot nz)
+ <!-- flow-summary-start -->
+ <!-- flow-summary-end -->
+ *
+ <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ *
+ * <pre>-name &lt;java.lang.String&gt; (property: name)
+ * &nbsp;&nbsp;&nbsp;The name of the actor.
+ * &nbsp;&nbsp;&nbsp;default: DataExchangeServerConnection
+ * </pre>
+ *
+ * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
+ * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
+ * <pre>-skip &lt;boolean&gt; (property: skip)
+ * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded
+ * &nbsp;&nbsp;&nbsp;as it is.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
+ * &nbsp;&nbsp;&nbsp;actors.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-server &lt;adams.core.base.BaseURL&gt; (property: server)
+ * &nbsp;&nbsp;&nbsp;The data exchange server to use.
+ * &nbsp;&nbsp;&nbsp;default: http:&#47;&#47;localhost:8080&#47;
+ * </pre>
+ *
+ * <pre>-authentication &lt;adams.flow.rest.dex.clientauthentication.AbstractClientAuthentication&gt; (property: authentication)
+ * &nbsp;&nbsp;&nbsp;The authentication to use for accessing the server.
+ * &nbsp;&nbsp;&nbsp;default: adams.flow.rest.dex.clientauthentication.NoAuthentication
+ * </pre>
+ *
+ <!-- options-end -->
+ *
+ * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
-public class DataExchangeServerBasedConverter
-  extends AbstractConverter {
+public class DataExchangeServerConnection
+  extends AbstractStandalone {
 
-  private static final long serialVersionUID = -736244897402323379L;
-
-  /** the base converter. */
-  protected AbstractConverter m_Converter;
+  /** for serialization. */
+  private static final long serialVersionUID = -1726172998200420556L;
 
   /** the data exchange server to use. */
   protected BaseURL m_Server;
 
   /** the authentication to use. */
   protected AbstractClientAuthentication m_Authentication;
-
-  /** the object mapper in use. */
-  protected transient ObjectMapper m_Mapper;
 
   /**
    * Returns a string describing the object.
@@ -59,9 +103,7 @@ public class DataExchangeServerBasedConverter
    */
   @Override
   public String globalInfo() {
-    return "Instead of sending potentially large payloads via a RabbitMQ, this "
-      + "meta-converter uploads the payload to the specified data exchange server "
-      + "and only sends the token for obtaining the data again via RabbitMQ.";
+    return "Defines a connection to a Data Exchange server.";
   }
 
   /**
@@ -72,26 +114,12 @@ public class DataExchangeServerBasedConverter
     super.defineOptions();
 
     m_OptionManager.add(
-      "converter", "converter",
-      new BinaryConverter());
-
-    m_OptionManager.add(
       "server", "server",
-      new BaseURL("http://localhost:8080/upload"));
+      new BaseURL("http://localhost:8080/"));
 
     m_OptionManager.add(
       "authentication", "authentication",
       new NoAuthentication());
-  }
-
-  /**
-   * Resets the scheme.
-   */
-  @Override
-  protected void reset() {
-    super.reset();
-
-    m_Mapper = null;
   }
 
   /**
@@ -101,42 +129,12 @@ public class DataExchangeServerBasedConverter
    */
   @Override
   public String getQuickInfo() {
-    String	result;
+    String  result;
 
-    result = QuickInfoHelper.toString(this, "converter", m_Converter, "converter: ");
-    result += QuickInfoHelper.toString(this, "server", m_Server, ", server: ");
+    result = QuickInfoHelper.toString(this, "server", m_Server, "server: ");
     result += QuickInfoHelper.toString(this, "authentication", m_Authentication, ", auth: ");
 
     return result;
-  }
-
-  /**
-   * Sets the base converter to use.
-   *
-   * @param value	the converter
-   */
-  public void setConverter(AbstractConverter value) {
-    m_Converter = value;
-    reset();
-  }
-
-  /**
-   * Returns the base converter to use.
-   *
-   * @return 		the converter
-   */
-  public AbstractConverter getConverter() {
-    return m_Converter;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return		tip text for this property suitable for
-   *             	displaying in the GUI or for listing the options.
-   */
-  public String converterTipText() {
-    return "The base converter for performing the actual conversion.";
   }
 
   /**
@@ -198,39 +196,23 @@ public class DataExchangeServerBasedConverter
   }
 
   /**
-   * Returns the classes that the converter accepts.
+   * Builds the actual URL to use.
    *
-   * @return		the classes
+   * @param path  	the path to append to the server's URL
+   * @return		the complete URL
    */
-  @Override
-  public Class[] accepts() {
-    return m_Converter.accepts();
+  public BaseURL buildURL(String path) {
+    return DataExchangeHelper.buildURL(m_Server, path);
   }
 
   /**
-   * Converts the payload.
+   * Executes the flow item.
    *
-   * @param payload	the payload
-   * @param errors	for recording errors
-   * @return		null if failed to convert, otherwise byte array
+   * @return		null if everything is fine, otherwise error message
    */
   @Override
-  protected byte[] doConvert(Object payload, MessageCollection errors) {
-    byte[]	result;
-    byte[]	data;
-    String	token;
-
-    data = m_Converter.convert(payload, errors);
-    if (!errors.isEmpty())
-      return null;
-
-    m_Authentication.setFlowContext(getFlowContext());
-    token = DataExchangeHelper.upload(data, DataExchangeHelper.buildURL(m_Server, "upload"), m_Authentication, errors);
-    if (errors.isEmpty() && (token != null))
-      result = new StringConverter().convert(token, errors);
-    else
-      result = null;
-
-    return result;
+  protected String doExecute() {
+    m_Authentication.setFlowContext(this);
+    return null;
   }
 }
