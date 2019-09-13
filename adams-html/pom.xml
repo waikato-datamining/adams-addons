@@ -124,6 +124,12 @@
       <artifactId>jsoup</artifactId>
       <version>${jsoup.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.github.fracpete</groupId>
+      <artifactId>requests4j</artifactId>
+      <version>${requests4j.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
