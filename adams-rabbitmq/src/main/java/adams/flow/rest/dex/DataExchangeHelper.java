@@ -23,25 +23,17 @@ package adams.flow.rest.dex;
 import adams.core.MessageCollection;
 import adams.core.base.BaseKeyValuePair;
 import adams.core.base.BaseURL;
-import adams.core.net.HttpRequestHelper;
 import adams.flow.container.HttpRequestResult;
 import adams.flow.rest.dex.DataExchange.TokenMessage;
 import adams.flow.rest.dex.clientauthentication.AbstractClientAuthentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.IOUtils;
+import com.github.fracpete.requests4j.Requests;
+import com.github.fracpete.requests4j.core.Request;
+import com.github.fracpete.requests4j.core.Response;
 import org.apache.tika.mime.MediaType;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Helper class for communicating with a Data Exchange server.
@@ -49,6 +41,21 @@ import java.util.List;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class DataExchangeHelper {
+
+  protected static Request initRequest(BaseURL server, AbstractClientAuthentication auth, MessageCollection errors) {
+    Request 		result;
+    BaseKeyValuePair[]	authPairs;
+
+    authPairs = auth.generate(errors);
+    if (!errors.isEmpty())
+      return null;
+
+    result = Requests.post(server.urlValue());
+    for (BaseKeyValuePair authPair: authPairs)
+      result.formData().add(authPair.getPairKey(), authPair.getPairValue());
+
+    return result;
+  }
 
   /**
    * Uploads the file to the data exchange server.
@@ -60,26 +67,27 @@ public class DataExchangeHelper {
    * @return		the token, null in case of error
    */
   public static String upload(File file, BaseURL server, AbstractClientAuthentication auth, MessageCollection errors) {
-    BaseKeyValuePair[]	authPairs;
-    HttpRequestResult	response;
+    Request		request;
+    Response 		response;
     ObjectMapper	mapper;
     TokenMessage	tokenMsg;
 
-    authPairs = auth.generate(errors);
-    if (!errors.isEmpty())
+    request = initRequest(server, auth, errors);
+    if (request == null)
       return null;
 
     try {
-      response = HttpRequestHelper.post(server, authPairs, DataExchange.PARAMKEY_PAYLOAD, file);
-      if (response.getValue(HttpRequestResult.VALUE_STATUSCODE, Integer.class) == 200) {
+      request.formData().addFile(DataExchange.PARAMKEY_PAYLOAD, file.getAbsolutePath());
+      response = request.execute();
+      if (response.statusCode() == 200) {
 	mapper   = new ObjectMapper();
-	tokenMsg = mapper.readValue("" + response.getValue(HttpRequestResult.VALUE_BODY), TokenMessage.class);
+	tokenMsg = mapper.readValue("" + response.text(), TokenMessage.class);
 	return tokenMsg.getToken();
       }
       else {
-	errors.add(HttpRequestResult.VALUE_STATUSCODE + ": " + response.getValue(HttpRequestResult.VALUE_STATUSCODE));
-	errors.add(HttpRequestResult.VALUE_STATUSMESSAGE + ": " + response.getValue(HttpRequestResult.VALUE_STATUSMESSAGE));
-	errors.add(HttpRequestResult.VALUE_BODY + ": " + response.getValue(HttpRequestResult.VALUE_BODY));
+	errors.add(HttpRequestResult.VALUE_STATUSCODE + ": " + response.statusCode());
+	errors.add(HttpRequestResult.VALUE_STATUSMESSAGE + ": " + response.statusMessage());
+	errors.add(HttpRequestResult.VALUE_BODY + ": " + response.text());
       }
     }
     catch (Exception e) {
@@ -99,28 +107,27 @@ public class DataExchangeHelper {
    * @return		the token, null in case of error
    */
   public static String upload(byte[] data, BaseURL server, AbstractClientAuthentication auth, MessageCollection errors) {
-    BaseKeyValuePair[]		authPairs;
-    ByteArrayInputStream	bis;
-    HttpRequestResult		response;
-    ObjectMapper		mapper;
-    TokenMessage		tokenMsg;
+    Request		request;
+    Response 		response;
+    ObjectMapper	mapper;
+    TokenMessage	tokenMsg;
 
-    authPairs = auth.generate(errors);
-    if (!errors.isEmpty())
+    request = initRequest(server, auth, errors);
+    if (request == null)
       return null;
 
     try {
-      bis      = new ByteArrayInputStream(data);
-      response = HttpRequestHelper.post(server, authPairs, DataExchange.PARAMKEY_PAYLOAD, "data.ser", MediaType.OCTET_STREAM, bis);
-      if (response.getValue(HttpRequestResult.VALUE_STATUSCODE, Integer.class) == 200) {
+      request.formData().addStream(DataExchange.PARAMKEY_PAYLOAD, "data.ser", MediaType.OCTET_STREAM, new ByteArrayInputStream(data));
+      response = request.execute();
+      if (response.statusCode() == 200) {
 	mapper   = new ObjectMapper();
-	tokenMsg = mapper.readValue("" + response.getValue(HttpRequestResult.VALUE_BODY), TokenMessage.class);
+	tokenMsg = mapper.readValue("" + response.text(), TokenMessage.class);
 	return tokenMsg.getToken();
       }
       else {
-	errors.add(HttpRequestResult.VALUE_STATUSCODE + ": " + response.getValue(HttpRequestResult.VALUE_STATUSCODE));
-	errors.add(HttpRequestResult.VALUE_STATUSMESSAGE + ": " + response.getValue(HttpRequestResult.VALUE_STATUSMESSAGE));
-	errors.add(HttpRequestResult.VALUE_BODY + ": " + response.getValue(HttpRequestResult.VALUE_BODY));
+	errors.add(HttpRequestResult.VALUE_STATUSCODE + ": " + response.statusCode());
+	errors.add(HttpRequestResult.VALUE_STATUSMESSAGE + ": " + response.statusMessage());
+	errors.add(HttpRequestResult.VALUE_BODY + ": " + response.text());
       }
     }
     catch (Exception e) {
@@ -140,63 +147,27 @@ public class DataExchangeHelper {
    * @return		the data, null in case of an error
    */
   public static byte[] download(String token, BaseURL server, AbstractClientAuthentication auth, MessageCollection errors) {
-    URL 			url;
-    HttpURLConnection 		conn;
-    BaseKeyValuePair[] 		authPairs;
-    List<BaseKeyValuePair>	params;
-    BufferedInputStream 	input;
-    ByteArrayOutputStream 	bos;
-    OutputStream 		out;
-    OutputStreamWriter 		writer;
-    String			boundary;
+    Request			request;
+    Response 			response;
 
-    authPairs = auth.generate(errors);
-    if (!errors.isEmpty())
+    request = initRequest(server, auth, errors);
+    if (request == null)
       return null;
 
-    url  = server.urlValue();
-    conn = null;
-    params = new ArrayList<>();
-    params.addAll(Arrays.asList(authPairs));
-    params.add(new BaseKeyValuePair(DataExchange.PARAMVALUE_TOKEN, token));
-    boundary = HttpRequestHelper.createBoundary();
     try {
-      bos  = new ByteArrayOutputStream();
-      conn = (HttpURLConnection) url.openConnection();
-      conn.setDoOutput(true);
-      conn.setRequestMethod("POST");
-      conn.setRequestProperty("Content-Type", javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA);
-
-      out = conn.getOutputStream();
-      writer = new OutputStreamWriter(out);
-      writer.write("\n\n");
-
-      // form parameters
-      for (BaseKeyValuePair param : params) {
-	writer.write("--" + boundary + "\r\n");
-	writer.write("Content-Disposition: form-data; name=\"" + param.getPairKey() + "\"\r\n");
-	writer.write("\r\n");
-	writer.write(param.getPairValue());
-	writer.write("\r\n");
+      request.formData().add(DataExchange.PARAMVALUE_TOKEN, token);
+      response = request.execute();
+      if (response.statusCode() == 200) {
+	return response.body();
       }
-
-      // finish
-      writer.write("\r\n--" + boundary + "--\r\n");
-      writer.flush();
-      writer.close();
-      out.flush();
-      out.close();
-
-      input = new BufferedInputStream(conn.getInputStream());
-      IOUtils.copy(input, bos);
-      return bos.toByteArray();
+      else {
+        errors.add("Failed to download data with token '" + token + "' from server '" + server + "': " + response);
+	return null;
+      }
     }
     catch (Exception e) {
       errors.add("Failed to download data with token '" + token + "' from: " + server, e);
     }
-
-    if (conn != null)
-      conn.disconnect();
 
     return null;
   }
@@ -211,18 +182,17 @@ public class DataExchangeHelper {
    * @return		the request response, null in case of an error
    */
   public static HttpRequestResult remove(String token, BaseURL server, AbstractClientAuthentication auth, MessageCollection errors) {
-    BaseKeyValuePair[] 		authPairs;
-    List<BaseKeyValuePair> 	params;
+    Request		request;
+    Response 		response;
 
-    authPairs = auth.generate(errors);
-    if (!errors.isEmpty())
+    request = initRequest(server, auth, errors);
+    if (request == null)
       return null;
 
-    params = new ArrayList<>();
-    params.add(new BaseKeyValuePair(DataExchange.PARAMVALUE_TOKEN, token));
-    params.addAll(Arrays.asList(authPairs));
     try {
-      return HttpRequestHelper.post(server, params.toArray(new BaseKeyValuePair[0]));
+      request.formData().add(DataExchange.PARAMVALUE_TOKEN, token);
+      response = request.execute();
+      return new HttpRequestResult(response.statusCode(), response.statusMessage(), response.text());
     }
     catch (Exception e) {
       errors.add("Failed to remove data with token '" + token + "' from: " + server, e);

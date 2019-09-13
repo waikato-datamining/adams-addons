@@ -1,11 +1,11 @@
 # Project: adams
-# Date: 2019-09-11 13:32:39
+# Date: 2019-09-13 13:23:16
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-event,adams-meta,adams-net,adams-rabbitmq,adams-rest,adams-security,adams-webservice-core
 #
 adams.flow.control.Flow -annotation "Uploads a file to the data exchange (dex) server running on localhost:8080.\\nThe following flow needs to run (starts the dex server):\\n  adams-rabbitmq-dex_server.flow" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.DataExchangeServerConnection -authentication adams.flow.rest.dex.clientauthentication.NoAuthentication
- adams.flow.source.FileSupplier -file ${HOME}/temp/toy-test.arff
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/apache.log
  adams.flow.transformer.DataExchangeServerUpload
  adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
