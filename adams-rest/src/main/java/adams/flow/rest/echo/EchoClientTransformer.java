@@ -15,16 +15,14 @@
 
 /*
  * EchoClientTransformer.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.rest.echo;
 
-import adams.core.base.BaseURL;
-import adams.core.net.HttpRequestHelper;
-import adams.flow.container.HttpRequestResult;
 import adams.flow.rest.AbstractRESTClientTransformer;
-import org.jsoup.Connection.Method;
+import com.github.fracpete.requests4j.Requests;
+import com.github.fracpete.requests4j.core.Response;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -90,17 +88,17 @@ public class EchoClientTransformer
   @Override
   protected void doQuery() throws Exception {
     String		url;
-    HttpRequestResult result;
+    Response 		r;
 
     if (getUseAlternativeURL())
       url = getAlternativeURL();
     else
       url = new EchoServer().getDefaultURL();
     url += "echo/" + URLEncoder.encode(m_RequestData, "UTF-8");
-    result = HttpRequestHelper.send(new BaseURL(url), Method.GET, null, null);
-    if (result.getValue(HttpRequestResult.VALUE_STATUSCODE, Integer.class) == 200)
-      setResponseData(URLDecoder.decode(result.getValue(HttpRequestResult.VALUE_BODY, String.class), "UTF-8"));
+    r = Requests.get(url).execute();
+    if (r.statusCode() == 200)
+      setResponseData(URLDecoder.decode(r.text(), "UTF-8"));
     else
-      m_LastError = result.getValue(HttpRequestResult.VALUE_STATUSCODE) + ": " + result.getValue(HttpRequestResult.VALUE_STATUSMESSAGE);
+      m_LastError = r.statusCode() + ": " + r.statusMessage();
   }
 }
