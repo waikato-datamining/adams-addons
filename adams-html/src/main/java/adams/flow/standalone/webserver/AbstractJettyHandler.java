@@ -13,17 +13,17 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractJettyHandler.java
- * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.webserver;
 
+import adams.core.io.FileUtils;
 import adams.core.net.MimeTypeHelper;
 import adams.flow.control.RunningFlowsRegistry;
 import adams.gui.core.GUIHelper;
 import org.apache.tika.mime.MediaType;
-import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.server.Request;
