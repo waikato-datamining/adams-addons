@@ -33,13 +33,12 @@ import javax.xml.ws.Endpoint;
  * Webservice for RATS Blob.
  * 
  * @author Fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2085 $
  */
 public class RatsBlobServiceWS
   extends AbstractWebServiceProvider
   implements RatInputUser {
 
-  /** for serilaization */
+  /** for serialization */
   private static final long serialVersionUID = -6865165378146103361L;
 
   /** end point for the web service */
