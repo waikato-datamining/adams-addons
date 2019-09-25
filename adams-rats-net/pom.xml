@@ -9,11 +9,11 @@
     <version>19.9.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>adams-rats</artifactId>
+  <artifactId>adams-rats-net</artifactId>
   <packaging>jar</packaging>
 
-  <name>adams-rats</name>
-  <description>Reception and Transmission System (RATS).</description>
+  <name>adams-rats-net</name>
+  <description>Internet module: Reception and Transmission System (RATS).</description>
   <url>https://adams.cms.waikato.ac.nz/</url>
   <organization>
     <name>University of Waikato, Hamilton, NZ</name>
@@ -73,41 +73,13 @@
 
     <dependency>
       <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-rats-net</artifactId>
+      <artifactId>adams-net</artifactId>
       <version>${adams.version}</version>
     </dependency>
 
     <dependency>
       <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-rats-net</artifactId>
-      <version>${adams.version}</version>
-      <scope>test</scope>
-      <type>test-jar</type>
-    </dependency>
-
-    <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-rats-rest</artifactId>
-      <version>${adams.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-rats-rest</artifactId>
-      <version>${adams.version}</version>
-      <scope>test</scope>
-      <type>test-jar</type>
-    </dependency>
-
-    <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-rats-webservice</artifactId>
-      <version>${adams.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-rats-webservice</artifactId>
+      <artifactId>adams-net</artifactId>
       <version>${adams.version}</version>
       <scope>test</scope>
       <type>test-jar</type>

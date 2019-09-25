@@ -1,0 +1,30 @@
+# Configuration file listing the superclasses and the packages in which to
+# look for derived classes.
+#
+# Format:
+# class.name=package1,package2,...
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+
+# the webservice response post-processors
+adams.flow.standalone.rats.output.webservice.AbstractWebserviceResponseDataPostProcessor=\
+  adams.flow.standalone.rats.output.webservice
+
+# the servers
+adams.flow.webservice.WebServiceProvider=\
+  adams.flow.webservice.blob,\
+  adams.flow.webservice.text
+
+# the clients
+adams.flow.webservice.WebServiceClient=\
+  adams.flow.webservice.blob,\
+  adams.flow.webservice.text
+  
+# the text webservice implementations
+nz.ac.waikato.adams.webservice.rats.text.RatsTextService=\
+  adams.flow.webservice.text
+  
+# the blob webservice implementations
+nz.ac.waikato.adams.webservice.rats.blob.RatsBlobService=\
+  adams.flow.webservice.blob
+  

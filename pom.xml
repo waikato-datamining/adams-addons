@@ -60,6 +60,10 @@
     <module>adams-rabbitmq-rats</module>
     <module>adams-random</module>
     <module>adams-rats</module>
+    <module>adams-rats-core</module>
+    <module>adams-rats-net</module>
+    <module>adams-rats-rest</module>
+    <module>adams-rats-webservice</module>
     <module>adams-rest</module>
     <module>adams-security</module>
     <module>adams-tensorflow</module>
