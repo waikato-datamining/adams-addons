@@ -58,57 +58,21 @@
 %\listoftables
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Introduction}
-The \textit{Reception And Transmission System}, or RATS for short, is aimed
-at scenarios where data is being received from various sources, processed
-and then transmitted to various destinations again. It simplifies the design
-of flows that handle these kind of scenarios, by providing off-the-shelf
-\textit{receivers} and \textit{transmitters}, e.g., for directory polling
-or FTPing files.
-
-In contrast to regular ADAMS flows, the RATS sub-system is event-driven
-and not data-driven. The received data can then be processed by a data-driven
-flow before sending it somewhere else.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
-\section{Actors}
-The following standalone actors are available:
-\begin{itemize}
-	\item \textit{Rats} -- This standalone encloses multiple RAT configurations.
-	\item \textit{Rat} -- Definition of how to receive data and how to transmit 
-	it, based on the specified \textit{RatInput} (= receiver) and 
-	\textit{RatOutput} (= transmitter).
-	\item \textit{RatPlague} -- creates copies of itself, one for each of
-	the defined input queues, feeding into the same output queue.
-	\item \textit{LabRat} -- the actual Rat setup gets generated at runtime
-	using a generator.
-\end{itemize}
-The following control actors are available:
-\begin{itemize}
-	\item \textit{ChangeRatState} -- changes the state (eg RUNNING, PAUSED)
-	of a \textit{Rat} actor. This allows the startup of Rat actors in a
-	paused state before activating them later on.
-	\item \textit{ExecuteRats} -- allows the execution of Rat actor(s) in
-	\textit{MANUAL} mode whenever a token passes through.
-\end{itemize}
 
-%%%%%%%%%%%%%%%%%%%
-% Remote commands %
-%%%%%%%%%%%%%%%%%%%
-
-\section{Remote commands}
-The Rats module has some additional remote commands that allow the control of
-individual \textit{Rat} actors, as long as they have been flagged to show up in a
-\textit{RatControl} actor and such an actor is also present in the flow.
-
-Available commands:
+\section{Rat inputs}
+The following Rat inputs are available:
 \begin{tight_itemize}
-  \item \textit{flow.GetRatControlStatus} -- returns the status
-  (stoppable/isstopped/pausable/ispaused) for all the registered Rat actors
-  \item \textit{flow.SendRatControlCommand} -- sends the specified control command
-  to a specific Rat actor (pause/resume/stop/start)
+  \item \textit{Socket} -- listens on a socket for incoming data.
+\end{tight_itemize}
+
+\section{Rat outputs}
+The following Rat outputs are available:
+\begin{tight_itemize}
+  \item \textit{FtpUpload} -- uploads the incoming file via FTP.
+  \item \textit{SendEmail} -- sends out the incoming email object.
+  \item \textit{Socket} -- transmits the data via the specified socket.
+  \item \textit{WebsocketOutput} -- uses a Websocket\cite{websocket} for transmitting the data.
 \end{tight_itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
