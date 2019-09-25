@@ -45,7 +45,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2014-2018} &
+		\parbox[c][2cm]{2cm}{\copyright 2014-2019} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}}
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -75,24 +75,67 @@ flow before sending it somewhere else.
 \chapter{Flow}
 \section{Actors}
 The following standalone actors are available:
-\begin{itemize}
+\begin{tight_itemize}
 	\item \textit{Rats} -- This standalone encloses multiple RAT configurations.
 	\item \textit{Rat} -- Definition of how to receive data and how to transmit 
 	it, based on the specified \textit{RatInput} (= receiver) and 
-	\textit{RatOutput} (= transmitter).
+	\textit{RatOutput} (= transmitter). See following sections.
+	\item \textit{RatControl} -- displays a control panel in the Flow editor for
+	all the Rat actors that are to be displayed (off by default).
 	\item \textit{RatPlague} -- creates copies of itself, one for each of
 	the defined input queues, feeding into the same output queue.
 	\item \textit{LabRat} -- the actual Rat setup gets generated at runtime
 	using a generator.
-\end{itemize}
+\end{tight_itemize}
 The following control actors are available:
-\begin{itemize}
+\begin{tight_itemize}
 	\item \textit{ChangeRatState} -- changes the state (eg RUNNING, PAUSED)
 	of a \textit{Rat} actor. This allows the startup of Rat actors in a
 	paused state before activating them later on.
 	\item \textit{ExecuteRats} -- allows the execution of Rat actor(s) in
 	\textit{MANUAL} mode whenever a token passes through.
-\end{itemize}
+\end{tight_itemize}
+
+\section{Rat inputs}
+The following Rat inputs are available:
+\begin{tight_itemize}
+  \item \textit{Cron} -- executes the base input scheme on the specified schedule.
+  \item \textit{DeQueue} -- pops off items from the specified queue as soon as they become available.
+  \item \textit{DirWatch} -- triggers the base input when the specified directory events occur (eg file created or changed).
+  \item \textit{DummyCronInput} -- used as a dummy for \textit{Cron}.
+  \item \textit{DummyInput} -- dummy, does nothing.
+  \item \textit{Exec} -- executes an external command.
+  \item \textit{FileLister} -- for generating a list of files in a directory.
+  \item \textit{InputPolling} -- simple meta-input that waits for the specified period before executing the base input again.
+  \item \textit{InputWithCallableTransformer} -- meta-input that passes the data through a callable transformer first before passing it on.
+  \item \textit{InputWithExternalTransformer} -- meta-input that passes the data through the external transformer first before passing it on.
+  \item \textit{Storage} -- retrieves the specified item from internal storage if available.
+  \item \textit{StringToken} -- just forwards the specified string.
+  \item \textit{Subscribe} -- subscribes to the specified pub/sub handler.
+  \item \textit{Variable} -- outputs the value of the specified variable if available.
+\end{tight_itemize}
+
+\section{Rat outputs}
+The following Rat outputs are available:
+\begin{tight_itemize}
+  \item \textit{BinaryFileWriter} -- writes the data as binary blob to a file.
+  \item \textit{Branch} -- fowards the same data to all of the defined outputs.
+  \item \textit{CallableActor} -- forwards the data to the specified callable actor.
+  \item \textit{ContainerValuePicker} -- extracts the specified value from the container and passes it on to the base output.
+  \item \textit{DistribuedEnQueue} -- incoming data is distributed among specified output queues (simply iterating through queues).
+  \item \textit{DummyOutput} -- dummy, does nothing with the data; can be used if there is no output generated.
+  \item \textit{EnQueue} -- adds the incoming data to the specified queue.
+  \item \textit{Exec} -- executes the command whenever data is received, but does nothing with the data.
+  \item \textit{FileMover} -- moves the incoming files to the specified target directory.
+  \item \textit{OutputWithCallableTransformer} -- meta-outout that passes the data through the callable transformer first before passing it on to base output.
+  \item \textit{OutputWithExternalTransformer} -- meta-outout that passes the data through the external transformer first before passing it on to base output.
+  \item \textit{Publish} -- publishes the data using the specified pub/sub handler.
+  \item \textit{QueueDistribute} -- similar to DistributedEnQueue.
+  \item \textit{Serialize} -- serializes the incoming data.
+  \item \textit{SimpleContainerContent} -- extracts the content from the incoming simple container and forwards it to the base output.
+  \item \textit{Switch} -- forwards the data to the sub-branch for which the corresponding condition evaluates to 'true'.
+  \item \textit{TextWriter} -- just writes the incoming data to a text file.
+\end{tight_itemize}
 
 %%%%%%%%%%%%%%%%%%%
 % Remote commands %
