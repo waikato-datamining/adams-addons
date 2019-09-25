@@ -98,6 +98,12 @@
     </dependency>
 
     <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+      <version>${xercesimpl.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>javax.jws</groupId>
       <artifactId>jsr181-api</artifactId>
       <version>1.0-MR1</version>
