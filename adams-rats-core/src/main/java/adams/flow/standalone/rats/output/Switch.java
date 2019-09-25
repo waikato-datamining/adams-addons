@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Switch.java
- * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
 
@@ -27,7 +27,7 @@ import adams.flow.standalone.Rat;
 
 /**
  <!-- globalinfo-start -->
- * Forwards the input data to all defined sub-outputs ('sub-branches').
+ * Forwards the input data to the sub-branch of the condition that evaluates to 'true'.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -51,7 +51,6 @@ import adams.flow.standalone.Rat;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class Switch
   extends AbstractRatOutput {
@@ -72,7 +71,7 @@ public class Switch
    */
   @Override
   public String globalInfo() {
-    return "Forwards the input data to all defined sub-outputs ('sub-branches').";
+    return "Forwards the input data to the sub-branch of the condition that evaluates to 'true'.";
   }
   
   /**
