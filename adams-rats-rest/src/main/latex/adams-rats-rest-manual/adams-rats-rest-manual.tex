@@ -45,7 +45,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2014-2018} &
+		\parbox[c][2cm]{2cm}{\copyright 2014-2019} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}}
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -57,58 +57,27 @@
 %\listoffigures
 %\listoftables
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Introduction}
-The \textit{Reception And Transmission System}, or RATS for short, is aimed
-at scenarios where data is being received from various sources, processed
-and then transmitted to various destinations again. It simplifies the design
-of flows that handle these kind of scenarios, by providing off-the-shelf
-\textit{receivers} and \textit{transmitters}, e.g., for directory polling
-or FTPing files.
-
-In contrast to regular ADAMS flows, the RATS sub-system is event-driven
-and not data-driven. The received data can then be processed by a data-driven
-flow before sending it somewhere else.
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
-\section{Actors}
-The following standalone actors are available:
-\begin{itemize}
-	\item \textit{Rats} -- This standalone encloses multiple RAT configurations.
-	\item \textit{Rat} -- Definition of how to receive data and how to transmit 
-	it, based on the specified \textit{RatInput} (= receiver) and 
-	\textit{RatOutput} (= transmitter).
-	\item \textit{RatPlague} -- creates copies of itself, one for each of
-	the defined input queues, feeding into the same output queue.
-	\item \textit{LabRat} -- the actual Rat setup gets generated at runtime
-	using a generator.
-\end{itemize}
-The following control actors are available:
-\begin{itemize}
-	\item \textit{ChangeRatState} -- changes the state (eg RUNNING, PAUSED)
-	of a \textit{Rat} actor. This allows the startup of Rat actors in a
-	paused state before activating them later on.
-	\item \textit{ExecuteRats} -- allows the execution of Rat actor(s) in
-	\textit{MANUAL} mode whenever a token passes through.
-\end{itemize}
+The \textit{adams-rats-rest} module provides plugins for the REST
+webservices\cite{rest}.
 
-%%%%%%%%%%%%%%%%%%%
-% Remote commands %
-%%%%%%%%%%%%%%%%%%%
-
-\section{Remote commands}
-The Rats module has some additional remote commands that allow the control of
-individual \textit{Rat} actors, as long as they have been flagged to show up in a
-\textit{RatControl} actor and such an actor is also present in the flow.
-
-Available commands:
+\section{Rat inputs}
+The following Rat inputs are available:
 \begin{tight_itemize}
-  \item \textit{flow.GetRatControlStatus} -- returns the status
-  (stoppable/isstopped/pausable/ispaused) for all the registered Rat actors
-  \item \textit{flow.SendRatControlCommand} -- sends the specified control command
-  to a specific Rat actor (pause/resume/stop/start)
+  \item \textit{RESTTextReception} -- generic reception of textual data, can be used with the \textit{RatsTextUpload} plugin.
+\end{tight_itemize}
+
+\section{REST}
+The following servers are available:
+\begin{tight_itemize}
+  \item \textit{RatsServer} -- generic REST server for the RATS framework.
+\end{tight_itemize}
+The following plugins are available:
+\begin{tight_itemize}
+  \item \textit{RatControl} -- provides a REST service for control the rat actors, similar to the \textit{RatControl} standalone.
+  \item \textit{RatsTextUpload} -- can receive textual data.
 \end{tight_itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
