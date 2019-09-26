@@ -14,28 +14,28 @@
  */
 
 /*
- * RatTest.java
+ * RatsTest.java
  * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.standalone;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 import adams.env.Environment;
 import adams.flow.AbstractFlowTest;
 import adams.flow.control.Flow;
 import adams.flow.core.Actor;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
- * Tests the Rat actor.
+ * Tests the Rats actor.
  * <br><br>
  * NB: Dummy test.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 4584 $
  */
-public class RatTest
+public class RatsTest
   extends AbstractFlowTest {
 
   /**
@@ -43,7 +43,7 @@ public class RatTest
    *
    * @param name	the name of the test
    */
-  public RatTest(String name) {
+  public RatsTest(String name) {
     super(name);
   }
 
@@ -63,7 +63,7 @@ public class RatTest
    * @return		the test suite
    */
   public static Test suite() {
-    return new TestSuite(RatTest.class);
+    return new TestSuite(RatsTest.class);
   }
 
   /**

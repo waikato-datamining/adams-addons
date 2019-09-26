@@ -28,4 +28,4 @@ Logo=rats-module.png
 
 # Whether this module is a meta-module and does not contain actual code etc.
 # (false|true)
-MetaModule=false
+MetaModule=true

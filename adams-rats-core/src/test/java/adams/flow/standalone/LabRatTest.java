@@ -20,12 +20,12 @@
 
 package adams.flow.standalone;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 import adams.env.Environment;
 import adams.flow.AbstractFlowTest;
 import adams.flow.control.Flow;
 import adams.flow.core.Actor;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * Tests the LabRat actor.

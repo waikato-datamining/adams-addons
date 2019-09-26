@@ -14,45 +14,47 @@
  */
 
 /*
- * DummyTest.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * RatTest.java
+ * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
  */
 
-package adams.flow.standalone.rats.generator;
+package adams.flow.standalone;
 
+import adams.env.Environment;
+import adams.flow.AbstractFlowTest;
+import adams.flow.control.Flow;
+import adams.flow.core.Actor;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import adams.env.Environment;
 
 /**
- * Tests the adams.flow.standalone.rats.generator.Dummy class. Run from commandline with: <br><br>
- * java adams.flow.standalone.rats.generator.DummyTest
+ * Tests the Rat actor.
+ * <br><br>
+ * NB: Dummy test.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 6555 $
+ * @version $Revision: 4584 $
  */
-public class DummyTest
-  extends AbstractRatGeneratorTestCase {
+public class RatTest
+  extends AbstractFlowTest {
 
   /**
    * Initializes the test.
    *
    * @param name	the name of the test
    */
-  public DummyTest(String name) {
+  public RatTest(String name) {
     super(name);
   }
 
   /**
-   * Returns the setups to use in the regression test.
+   * Used to create an instance of a specific actor.
    *
-   * @return		the setups
+   * @return a suitably configured <code>Actor</code> value
    */
   @Override
-  protected AbstractRatGenerator[] getRegressionSetups() {
-    return new Dummy[]{
-	new Dummy()
-    };
+  public Actor getActor() {
+    return new Flow();
   }
 
   /**
@@ -61,7 +63,7 @@ public class DummyTest
    * @return		the test suite
    */
   public static Test suite() {
-    return new TestSuite(DummyTest.class);
+    return new TestSuite(RatTest.class);
   }
 
   /**
