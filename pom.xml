@@ -48,6 +48,7 @@
     <module>adams-jooq</module>
     <module>adams-latex</module>
     <module>adams-maps</module>
+    <module>adams-maven-plugin</module>
     <module>adams-meka</module>
     <module>adams-meka-webservice</module>
     <module>adams-moa</module>

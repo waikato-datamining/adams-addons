@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>nz.ac.waikato.cms.adams</groupId>
+    <artifactId>adams-pom</artifactId>
+    <version>19.10.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>adams-maven-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
+
+  <name>ADAMS Maven Plugin</name>
+  <description>Plugin for, e.g., generating Java code from ADAMS flows.
+    Based on jaxb2-maven-plugin
+    (https://github.com/mojohaus/jaxb2-maven-plugin).
+  </description>
+  <url>https://github.com/waikato-datamining/maven-adamsflow-plugin</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>fracpete</id>
+      <name>Peter Reutemann</name>
+      <email>fracpete@waikato.ac.nz</email>
+      <url>http://www.cms.waikato.ac.nz/~fracpete/</url>
+      <organization>University of Waikato, CS department</organization>
+      <organizationUrl>http://www.cs.waikato.ac.nz/</organizationUrl>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>+12</timezone>
+    </developer>
+  </developers>
+
+  <prerequisites>
+    <maven>${mavenVersion}</maven>
+  </prerequisites>
+
+  <scm>
+    <connection>
+      scm:git:https://github.com/waikato-datamining/adams-maven-plugin
+    </connection>
+    <developerConnection>
+      scm:git:https://github.com/waikato-datamining/adams-maven-plugin
+    </developerConnection>
+    <url>https://github.com/waikato-datamining/adams-maven-plugin</url>
+    <tag>HEAD</tag>
+  </scm>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/waikato-datamining/adams-maven-plugin/issues
+    </url>
+  </issueManagement>
+
+  <properties>
+    <mavenVersion>3.0.5</mavenVersion>
+    <mojo.java.target>1.8</mojo.java.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven-plugin-plugin.version>3.5.1</maven-plugin-plugin.version>
+    <plexus-compiler-api.version>2.5</plexus-compiler-api.version>
+    <plexus-utils.version>3.1.0</plexus-utils.version>
+    <plexus-build-api.version>0.0.7</plexus-build-api.version>
+    <qdox.version>2.0-M10</qdox.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>nz.ac.waikato.cms.adams</groupId>
+        <artifactId>adams-core</artifactId>
+        <version>19.10.0-SNAPSHOT</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>nz.ac.waikato.cms.adams</groupId>
+      <artifactId>adams-core</artifactId>
+    </dependency>
+
+    <!-- QDox, used for JavaDoc processing -->
+    <dependency>
+      <groupId>com.thoughtworks.qdox</groupId>
+      <artifactId>qdox</artifactId>
+      <version>${qdox.version}</version>
+    </dependency>
+
+    <!-- Maven dependencies -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
+      <version>${maven-plugin-plugin.version}</version>
+      <!--
+          Annotations are not needed for plugin execution.
+          Therefore, use optional scope.
+      -->
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.skins</groupId>
+      <artifactId>maven-fluido-skin</artifactId>
+      <version>1.6</version>
+    </dependency>
+
+    <!--
+        Plexus components dependencies.
+    -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-compiler-api</artifactId>
+      <version>${plexus-compiler-api.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>${plexus-utils.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-build-api</artifactId>
+      <version>${plexus-build-api.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.1.7</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.7.1</version>
+          <configuration>
+            <skipDeploy>true
+            </skipDeploy><!-- don't deploy site with maven-site-plugin -->
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <version>${maven-plugin-plugin.version}</version>
+          <configuration>
+            <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+          </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.maven.plugin-tools</groupId>
+              <artifactId>maven-plugin-annotations</artifactId>
+              <version>${maven-plugin-plugin.version}</version>
+            </dependency>
+          </dependencies>
+          <executions>
+            <execution>
+              <id>help-mojo</id>
+              <goals>
+                <goal>helpmojo</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>generate-descriptor</id>
+            <goals>
+              <goal>descriptor</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Generate maven dependencies listing file -->
+      <plugin>
+        <groupId>org.apache.servicemix.tooling</groupId>
+        <artifactId>depends-maven-plugin</artifactId>
+        <version>1.2</version>
+        <executions>
+          <execution>
+            <id>generate-depends-file</id>
+            <goals>
+              <goal>generate-depends-file</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
+      <!-- Apache plugins in alphabetical order -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>${maven-plugin-plugin.version}</version>
+        <configuration>
+          <requirements>
+            <!--
+            NOTE: Maven 2.x does not interpolate properties of the form project.*|pom.* so the Maven Plugin Plugin
+            gets garbage when manually examining the config of the Maven Compiler Plugin.
+            -->
+            <jdk>${mojo.java.target}</jdk>
+          </requirements>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+</project>
