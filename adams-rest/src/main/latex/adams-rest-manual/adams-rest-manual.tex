@@ -307,6 +307,16 @@ By instantiating the \textit{beans} yourself rather than through the factory,
 you can provide them with context. You then use the \textit{setServiceBean(s)}
 methods to set one or more beans.
 
+\subsection{Available plugins}
+The following concrete \verb|RESTPlugin| implementations are available:
+\begin{tight_itemize}
+  \item \textit{control.StopFlow} -- stops the registered flow with the specified ID
+  \item \textit{echo.Echo} -- simply sends back the string received
+  \item \textit{flow.CallableJsonPipeline} -- for processing JSON strings (enforces JSON data)
+  \item \textit{flow.CallableTextPipeline} -- for processing arbitrary strings
+\end{tight_itemize}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
 This module contains generic actors in which you can simply plug your 

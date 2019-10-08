@@ -15,7 +15,8 @@ adams.flow.rest.RESTProvider=\
 adams.flow.rest.RESTPlugin=\
   adams.flow.rest,\
   adams.flow.rest.control,\
-  adams.flow.rest.echo
+  adams.flow.rest.echo,\
+  adams.flow.rest.flow
 
 # REST clients
 adams.flow.rest.RESTClient=\
