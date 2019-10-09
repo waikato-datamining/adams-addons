@@ -286,6 +286,8 @@ public abstract class AbstractCallablePipeline<T>
       scope = new LocalScopeTransformer();
       scope.removeAll();
       scope.add(pipeline);
+      scope.setScopeHandlingVariables(m_ScopeHandlingVariables);
+      scope.setScopeHandlingStorage(m_ScopeHandlingStorage);
       scope.setParent(getFlowContext());
       scope.setVariables(getFlowContext().getVariables());
       msg = scope.setUp();
