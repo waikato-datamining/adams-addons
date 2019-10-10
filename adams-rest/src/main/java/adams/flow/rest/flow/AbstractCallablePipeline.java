@@ -289,7 +289,6 @@ public abstract class AbstractCallablePipeline<T>
       scope.setScopeHandlingVariables(m_ScopeHandlingVariables);
       scope.setScopeHandlingStorage(m_ScopeHandlingStorage);
       scope.setParent(getFlowContext());
-      scope.setVariables(getFlowContext().getVariables());
       msg = scope.setUp();
       if (msg != null) {
         errors.add("Failed to setup pipeline (" + getPipeline() + "):\n" + msg);
