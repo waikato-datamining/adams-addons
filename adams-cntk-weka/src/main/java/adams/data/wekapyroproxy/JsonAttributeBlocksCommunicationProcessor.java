@@ -24,6 +24,7 @@ import adams.core.Utils;
 import adams.core.exception.NotImplementedException;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
+import adams.core.logging.LoggingHelper;
 import adams.core.option.OptionUtils;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -162,7 +163,7 @@ public class JsonAttributeBlocksCommunicationProcessor
       m_Filter = (Filter) OptionUtils.forAnyCommandLine(Filter.class, obj.getAsString("Filter"));
     }
     catch (Exception e) {
-      result = Utils.handleException(this, "Failed to read JSON file: " + m_DataDescriptionFile, e);
+      result = LoggingHelper.handleException(this, "Failed to read JSON file: " + m_DataDescriptionFile, e);
     }
     finally {
       FileUtils.closeQuietly(breader);

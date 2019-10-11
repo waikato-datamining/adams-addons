@@ -20,7 +20,7 @@
 
 package adams.terminal.menu;
 
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.terminal.application.AbstractTerminalApplication;
 import adams.terminal.core.MenuItem;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
@@ -133,7 +133,7 @@ public abstract class AbstractMenuItemDefinition
     if (m_Owner != null)
       m_Owner.logError(msg, t);
     else
-      System.err.println(msg + "\n" + Utils.throwableToString(t));
+      System.err.println(msg + "\n" + LoggingHelper.throwableToString(t));
   }
 
   /**

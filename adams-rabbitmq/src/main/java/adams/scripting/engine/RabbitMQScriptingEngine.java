@@ -22,6 +22,7 @@ package adams.scripting.engine;
 
 import adams.core.MessageCollection;
 import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.core.net.rabbitmq.RabbitMQHelper;
 import adams.core.net.rabbitmq.channelaction.AbstractChannelAction;
 import adams.core.net.rabbitmq.channelaction.NoAction;
@@ -344,7 +345,7 @@ public class RabbitMQScriptingEngine
 	result = "Failed to connect to broker (" + m_ConnectionFactory + ")!";
     }
     catch (Exception e) {
-      result = Utils.handleException(this, "Failed to connect to broker (" + m_ConnectionFactory + ")!", e);
+      result = LoggingHelper.handleException(this, "Failed to connect to broker (" + m_ConnectionFactory + ")!", e);
     }
 
     if (result == null) {
@@ -356,7 +357,7 @@ public class RabbitMQScriptingEngine
 	  m_Channel.basicQos(m_PrefetchCount);
       }
       catch (Exception e) {
-	result = Utils.handleException(this, "Failed to create channel!", e);
+	result = LoggingHelper.handleException(this, "Failed to create channel!", e);
       }
     }
 
@@ -463,7 +464,7 @@ public class RabbitMQScriptingEngine
 	  m_Channel.queueBind(queue, m_Exchange, "");
 	}
 	catch (Exception e) {
-	  result = Utils.handleException(this, "Failed to bind queue to exchange!", e);
+	  result = LoggingHelper.handleException(this, "Failed to bind queue to exchange!", e);
 	}
       }
     }
@@ -482,7 +483,7 @@ public class RabbitMQScriptingEngine
 	  m_Channel.basicConsume(queue, false, deliverCallback, consumerTag -> {});
 	}
 	catch (Exception e) {
-	  result = Utils.handleException(this, "Failed to consume data!", e);
+	  result = LoggingHelper.handleException(this, "Failed to consume data!", e);
 	}
 
 	data = null;

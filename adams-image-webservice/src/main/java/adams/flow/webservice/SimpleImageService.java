@@ -20,9 +20,9 @@
 
 package adams.flow.webservice;
 
-import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderDirectory;
+import adams.core.logging.LoggingHelper;
 import adams.core.option.AbstractOptionHandler;
 import adams.db.DatabaseConnectionUser;
 import adams.flow.core.ActorUtils;
@@ -187,7 +187,7 @@ public class SimpleImageService
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to store image '" + parameters.getId() + "/" + parameters.getFormat() + "' as '" + filename + "'!", e);
-      result.setMessage("Failed to store image '" + parameters.getId() + "/" + parameters.getFormat() + ":\n" + Utils.throwableToString(e));
+      result.setMessage("Failed to store image '" + parameters.getId() + "/" + parameters.getFormat() + ":\n" + LoggingHelper.throwableToString(e));
       result.setSuccess(true);
     }
     finally {

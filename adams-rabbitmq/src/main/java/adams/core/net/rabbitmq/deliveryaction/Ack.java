@@ -21,7 +21,7 @@
 package adams.core.net.rabbitmq.deliveryaction;
 
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import com.rabbitmq.client.Channel;
 
 /**
@@ -112,7 +112,7 @@ public class Ack
       return null;
     }
     catch (Exception e) {
-      return Utils.handleException(this, "Failed to ack tag " + tag + " (multiple=" + m_Multiple + ")!", e);
+      return LoggingHelper.handleException(this, "Failed to ack tag " + tag + " (multiple=" + m_Multiple + ")!", e);
     }
   }
 }

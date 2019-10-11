@@ -20,7 +20,7 @@
 
 package adams.terminal.menu.remotecommand;
 
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.core.option.OptionUtils;
 import adams.scripting.ScriptingHelper;
 import adams.scripting.engine.RemoteScriptingEngine;
@@ -119,7 +119,7 @@ public class StartListening
     }
     catch (Exception e) {
       MessageDialog.showMessageDialog(
-	context, "Error", "Failed to start listening!\n" + Utils.throwableToString(e), MessageDialogButton.OK);
+	context, "Error", "Failed to start listening!\n" + LoggingHelper.throwableToString(e), MessageDialogButton.OK);
     }
   }
 }

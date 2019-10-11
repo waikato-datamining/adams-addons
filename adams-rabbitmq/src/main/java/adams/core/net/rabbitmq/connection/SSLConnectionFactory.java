@@ -22,11 +22,11 @@ package adams.core.net.rabbitmq.connection;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
 import adams.core.base.BasePassword;
 import adams.core.io.ConsoleHelper;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
+import adams.core.logging.LoggingHelper;
 import adams.flow.control.Flow;
 import adams.flow.core.StopHelper;
 import adams.flow.core.StopMode;
@@ -786,7 +786,7 @@ public class SSLConnectionFactory
 	  m_KeyManagerFactory.init(keystore, m_ActualPassphrase.getValue().toCharArray());
 	}
 	catch (Exception e) {
-	  msg = Utils.handleException(this, "Failed to initialize the KeyManagerFactory!", e);
+	  msg = LoggingHelper.handleException(this, "Failed to initialize the KeyManagerFactory!", e);
 	}
 	finally {
 	  FileUtils.closeQuietly(fis);
@@ -839,7 +839,7 @@ public class SSLConnectionFactory
 	  m_TrustManagerFactory.init(keystore);
 	}
 	catch (Exception e) {
-	  msg = Utils.handleException(this, "Failed to initialize the TrustManagerFactory!", e);
+	  msg = LoggingHelper.handleException(this, "Failed to initialize the TrustManagerFactory!", e);
 	}
 	finally {
 	  FileUtils.closeQuietly(fis);
@@ -863,7 +863,7 @@ public class SSLConnectionFactory
 	result.enableHostnameVerification();
     }
     catch (Exception e) {
-      msg = Utils.handleException(this, "Failed to instantiate SSL context!", e);
+      msg = LoggingHelper.handleException(this, "Failed to instantiate SSL context!", e);
     }
     if (msg != null)
       errors.add(msg);

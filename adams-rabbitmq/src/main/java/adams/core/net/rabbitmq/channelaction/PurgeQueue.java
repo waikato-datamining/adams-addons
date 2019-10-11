@@ -21,7 +21,7 @@
 package adams.core.net.rabbitmq.channelaction;
 
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import com.rabbitmq.client.Channel;
 
 /**
@@ -114,7 +114,7 @@ public class PurgeQueue
       channel.queuePurge(m_Queue);
     }
     catch (Exception e) {
-      result = Utils.handleException(this, "Failed to purge queue '" + m_Queue + "'!", e);
+      result = LoggingHelper.handleException(this, "Failed to purge queue '" + m_Queue + "'!", e);
     }
 
     return result;

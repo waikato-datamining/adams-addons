@@ -21,8 +21,8 @@
 package adams.flow.transformer.mongodbdocumentupdate;
 
 import adams.core.MessageCollection;
-import adams.core.Utils;
 import adams.core.base.BaseKeyValuePair;
+import adams.core.logging.LoggingHelper;
 import adams.data.conversion.Conversion;
 import adams.data.conversion.ObjectToObject;
 import adams.flow.control.Storage;
@@ -169,7 +169,7 @@ public class AppendStorage
       }
     }
     catch (Exception e) {
-      errors.add(Utils.handleException(this, "Failed to update document!", e));
+      errors.add(LoggingHelper.handleException(this, "Failed to update document!", e));
     }
 
     if (!errors.isEmpty())

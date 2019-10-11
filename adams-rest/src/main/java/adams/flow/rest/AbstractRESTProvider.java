@@ -21,6 +21,7 @@ package adams.flow.rest;
 
 import adams.core.Utils;
 import adams.core.base.BaseURL;
+import adams.core.logging.LoggingHelper;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.Actor;
 import adams.flow.core.KeyManagerFactoryProvider;
@@ -308,7 +309,7 @@ public abstract class AbstractRESTProvider
     catch (Exception e) {
       msg = "Failed to start service: ";
       getLogger().log(Level.SEVERE, msg, e);
-      result = msg + Utils.throwableToString(e);
+      result = msg + LoggingHelper.throwableToString(e);
     }
 
     return result;
@@ -350,7 +351,7 @@ public abstract class AbstractRESTProvider
     catch (Exception e) {
       msg = "Failed to stop service: ";
       getLogger().log(Level.SEVERE, msg, e);
-      result = msg + Utils.throwableToString(e);
+      result = msg + LoggingHelper.throwableToString(e);
     }
 
     m_Running = false;

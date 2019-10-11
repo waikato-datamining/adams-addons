@@ -21,7 +21,7 @@
 package adams.core.net.rabbitmq.channelaction;
 
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import com.rabbitmq.client.Channel;
 
 /**
@@ -196,7 +196,7 @@ public class DeleteQueue
 	channel.queueDeleteNoWait(m_Queue, m_IfUnused, m_IfEmpty);
     }
     catch (Exception e) {
-      result = Utils.handleException(this, "Failed to delete queue '" + m_Queue + "'!", e);
+      result = LoggingHelper.handleException(this, "Failed to delete queue '" + m_Queue + "'!", e);
     }
 
     return result;

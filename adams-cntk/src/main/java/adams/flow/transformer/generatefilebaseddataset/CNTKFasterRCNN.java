@@ -21,12 +21,12 @@
 package adams.flow.transformer.generatefilebaseddataset;
 
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
 import adams.core.base.BaseKeyValuePair;
 import adams.core.base.BaseRegExp;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
+import adams.core.logging.LoggingHelper;
 import adams.data.RoundingType;
 import adams.data.SharedStringsTable;
 import adams.data.image.AbstractImageContainer;
@@ -778,7 +778,7 @@ public class CNTKFasterRCNN
 	}
       }
       catch (Exception e) {
-	result = Utils.handleException(this, "Failed to process " + (train ? "training" : "test") + " '" + file + "!", e);
+	result = LoggingHelper.handleException(this, "Failed to process " + (train ? "training" : "test") + " '" + file + "!", e);
       }
     }
 
@@ -847,7 +847,7 @@ public class CNTKFasterRCNN
 	  }
 	}
 	catch (Exception e) {
-	  result = Utils.handleException(this, "Failed to extract negative regions from '" + file + "' to: " + outDir, e);
+	  result = LoggingHelper.handleException(this, "Failed to extract negative regions from '" + file + "' to: " + outDir, e);
 	}
       }
     }
@@ -861,7 +861,7 @@ public class CNTKFasterRCNN
 	}
       }
       catch (Exception e) {
-	result = Utils.handleException(this, "Failed to copy negative images to: " + outDir, e);
+	result = LoggingHelper.handleException(this, "Failed to copy negative images to: " + outDir, e);
       }
     }
 

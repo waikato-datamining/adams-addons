@@ -20,7 +20,7 @@
 
 package adams.flow.transformer.mongodbcollectionupdate;
 
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import com.mongodb.client.MongoCollection;
 
 /**
@@ -59,7 +59,7 @@ public class Drop
       coll.drop();
     }
     catch (Exception e) {
-      result = Utils.handleException(this, "Failed to drop collection!", e);
+      result = LoggingHelper.handleException(this, "Failed to drop collection!", e);
     }
 
     return result;

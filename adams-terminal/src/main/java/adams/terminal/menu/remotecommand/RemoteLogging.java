@@ -20,7 +20,6 @@
 
 package adams.terminal.menu.remotecommand;
 
-import adams.core.Utils;
 import adams.core.base.BaseHostname;
 import adams.core.logging.LoggingHelper;
 import adams.core.logging.RemoteReceiveHandler.AbstractRemoteListenerRunnable;
@@ -228,7 +227,7 @@ public class RemoteLogging
    * @param t 		the exception
    */
   public void logError(String msg, Throwable t) {
-    m_TextLog.addLine(msg + "\n" + Utils.throwableToString(t));
+    m_TextLog.addLine(msg + "\n" + LoggingHelper.throwableToString(t));
   }
 
   /**

@@ -19,9 +19,8 @@
  */
 package adams.db.datatype;
 
+import adams.core.logging.LoggingHelper;
 import org.postgresql.PGConnection;
-
-import adams.core.Utils;
 
 /**
  <!-- globalinfo-start -->
@@ -72,7 +71,7 @@ public class DataTypeSetupPostGIS
       ((PGConnection) conn).addDataType("box3d", "org.postgis.PGbox3d");
     }
     catch (Exception e) {
-      result = Utils.handleException(this, "Failed to add data types!", e);
+      result = LoggingHelper.handleException(this, "Failed to add data types!", e);
     }
     
     return result;

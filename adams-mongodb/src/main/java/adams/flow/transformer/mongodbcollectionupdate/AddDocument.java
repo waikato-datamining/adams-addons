@@ -21,7 +21,7 @@
 package adams.flow.transformer.mongodbcollectionupdate;
 
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.flow.transformer.mongodbdocumentupdate.MongoDbDocumentAppend;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
@@ -167,7 +167,7 @@ public class AddDocument
       }
     }
     catch (Exception e) {
-      result = Utils.handleException(this, "Failed to add document!", e);
+      result = LoggingHelper.handleException(this, "Failed to add document!", e);
     }
 
     return result;

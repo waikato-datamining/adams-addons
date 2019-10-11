@@ -19,7 +19,7 @@
  */
 package adams.flow.core;
 
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.core.net.MimeTypeHelper;
 import adams.data.report.AbstractField;
 import adams.data.report.Field;
@@ -94,7 +94,7 @@ public class RatsTextHelper {
       result.setContent(writer.toString());
     }
     catch (Exception e) {
-      result.getNotes().addError(RatsTextHelper.class, Utils.throwableToString(e));
+      result.getNotes().addError(RatsTextHelper.class, LoggingHelper.throwableToString(e));
     }
     
     // report

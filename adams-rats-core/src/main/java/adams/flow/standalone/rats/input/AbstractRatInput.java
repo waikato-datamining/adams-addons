@@ -129,7 +129,7 @@ public abstract class AbstractRatInput
    * @return		the full error message (message + stacktrace)
    */
   protected String handleException(String msg, Throwable t) {
-    return Utils.handleException(this, msg, t);
+    return LoggingHelper.handleException(this, msg, t);
   }
 
   /**

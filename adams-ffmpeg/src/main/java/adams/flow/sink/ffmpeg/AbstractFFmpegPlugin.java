@@ -23,6 +23,7 @@ package adams.flow.sink.ffmpeg;
 import adams.core.QuickInfoSupporter;
 import adams.core.Utils;
 import adams.core.io.PlaceholderFile;
+import adams.core.logging.LoggingHelper;
 import adams.core.management.ProcessUtils;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.OptionUtils;
@@ -158,7 +159,7 @@ public abstract class AbstractFFmpegPlugin
    * @return		the full error message (message + stacktrace)
    */
   protected String handleException(String msg, Throwable t) {
-    return Utils.handleException(this, msg, t);
+    return LoggingHelper.handleException(this, msg, t);
   }
   
   /**

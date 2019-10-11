@@ -21,7 +21,7 @@
 package adams.core.net.rabbitmq.deliveryaction;
 
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import com.rabbitmq.client.Channel;
 
 import java.util.ArrayList;
@@ -159,7 +159,7 @@ public class Reject
       return null;
     }
     catch (Exception e) {
-      return Utils.handleException(this, "Failed to reject tag " + tag + " (multiple=" + m_Multiple + ", requeue=" + m_Requeue + ")!", e);
+      return LoggingHelper.handleException(this, "Failed to reject tag " + tag + " (multiple=" + m_Multiple + ", requeue=" + m_Requeue + ")!", e);
     }
   }
 }

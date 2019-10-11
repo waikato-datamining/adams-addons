@@ -23,9 +23,9 @@ package adams.flow.transformer.movieimagesampler;
 import adams.core.DateFormat;
 import adams.core.DateUtils;
 import adams.core.License;
-import adams.core.Utils;
 import adams.core.annotation.MixedCopyright;
 import adams.core.base.BaseTimeMsec;
+import adams.core.logging.LoggingHelper;
 import adams.data.image.BufferedImageContainer;
 import adams.data.report.DataType;
 import adams.data.report.Field;
@@ -299,7 +299,7 @@ public class FixedIntervalBufferedImageSampler
 	    }
 	  }
 	  catch (Exception e) {
-	    Utils.handleException(FixedIntervalBufferedImageSampler.this, "Failed to process video event!", e);
+	    LoggingHelper.handleException(FixedIntervalBufferedImageSampler.this, "Failed to process video event!", e);
 	  }
 	}
       };
@@ -317,7 +317,7 @@ public class FixedIntervalBufferedImageSampler
 	m_Reader.close();
     }
     catch (Exception e) {
-      Utils.handleException(this, "Failed to open video file: " + file, e);
+      LoggingHelper.handleException(this, "Failed to open video file: " + file, e);
     }
 
     return m_Samples.toArray(new BufferedImageContainer[m_Samples.size()]);

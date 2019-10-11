@@ -20,8 +20,8 @@
 
 package adams.flow.transformer.mongodbdocumentupdate;
 
-import adams.core.Utils;
 import adams.core.base.BaseString;
+import adams.core.logging.LoggingHelper;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
@@ -109,7 +109,7 @@ public class Remove
       coll.insertOne(doc);
     }
     catch (Exception e) {
-      result = Utils.handleException(this, "Failed to remove key(s)!", e);
+      result = LoggingHelper.handleException(this, "Failed to remove key(s)!", e);
     }
 
     return result;

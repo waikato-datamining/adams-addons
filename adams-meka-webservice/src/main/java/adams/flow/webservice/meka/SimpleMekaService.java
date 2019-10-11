@@ -21,7 +21,7 @@
 package adams.flow.webservice.meka;
 
 import adams.core.SerializationHelper;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.core.net.MimeTypeHelper;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.OptionUtils;
@@ -221,7 +221,7 @@ public class SimpleMekaService
       result.setModel(cls.toString());
     } 
     catch (java.lang.Exception ex) {
-      result.setErrorMessage(Utils.handleException(m_Owner, "Failed to train classifier: " + classifier, ex));
+      result.setErrorMessage(LoggingHelper.handleException(m_Owner, "Failed to train classifier: " + classifier, ex));
     }
     
     return result;
@@ -259,7 +259,7 @@ public class SimpleMekaService
       result.setReturnDataset(MekaDatasetHelper.evaluationToDataset(res));
     } 
     catch (java.lang.Exception ex) {
-      result.setErrorMessage(Utils.handleException(m_Owner, "Failed to test model '" + modelName + "'!", ex));
+      result.setErrorMessage(LoggingHelper.handleException(m_Owner, "Failed to test model '" + modelName + "'!", ex));
     }
 
     return result;
@@ -298,7 +298,7 @@ public class SimpleMekaService
       result.setReturnDataset(MekaDatasetHelper.evaluationToDataset(res));
     } 
     catch (java.lang.Exception ex) {
-      result.setErrorMessage(Utils.handleException(m_Owner, "Failed to cross-validate classifier '" + classifier + "'!", ex));
+      result.setErrorMessage(LoggingHelper.handleException(m_Owner, "Failed to cross-validate classifier '" + classifier + "'!", ex));
     }
 
     return result;
@@ -364,7 +364,7 @@ public class SimpleMekaService
       }
     } 
     catch (java.lang.Exception ex) {
-      result.setErrorMessage(Utils.handleException(m_Owner, "Failed to make predictions with classifier model '" + modelName + "'!", ex));
+      result.setErrorMessage(LoggingHelper.handleException(m_Owner, "Failed to make predictions with classifier model '" + modelName + "'!", ex));
     }
 
     return result;
@@ -397,7 +397,7 @@ public class SimpleMekaService
       result.setModelData(new DataHandler(new ByteArrayDataSource(SerializationHelper.toByteArray(cls), MimeTypeHelper.MIMETYPE_APPLICATION_OCTETSTREAM)));
     }
     catch (Exception e) {
-      result.setErrorMessage(Utils.handleException(this, "Failed to serialize classifier: " + modelName, e));
+      result.setErrorMessage(LoggingHelper.handleException(this, "Failed to serialize classifier: " + modelName, e));
     }
     
     return result;
@@ -469,7 +469,7 @@ public class SimpleMekaService
       }
     } 
     catch (java.lang.Exception ex) {
-      result.setErrorMessage(Utils.handleException(m_Owner, "Failed to transform data using callable transformer '" + actorName + "'!", ex));
+      result.setErrorMessage(LoggingHelper.handleException(m_Owner, "Failed to transform data using callable transformer '" + actorName + "'!", ex));
     }
     
     return result;

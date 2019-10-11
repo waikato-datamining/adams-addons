@@ -21,7 +21,7 @@
 package adams.core.net.rabbitmq.channelaction;
 
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 
@@ -234,7 +234,7 @@ public class DeclareExchange
         channel.exchangeDeclareNoWait(m_Exchange, m_Type, m_Durable, false, m_AutoDelete, null);
     }
     catch (Exception e) {
-      result = Utils.handleException(this, "Failed to declare exchange '" + m_Exchange + "'!", e);
+      result = LoggingHelper.handleException(this, "Failed to declare exchange '" + m_Exchange + "'!", e);
     }
 
     return result;

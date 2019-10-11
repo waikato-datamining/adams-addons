@@ -24,7 +24,6 @@ import adams.core.CleanUpHandler;
 import adams.core.DateFormat;
 import adams.core.DateUtils;
 import adams.core.Properties;
-import adams.core.Utils;
 import adams.core.logging.Logger;
 import adams.core.logging.LoggingHelper;
 import adams.gui.chooser.BaseFileChooser;
@@ -341,7 +340,7 @@ public class VLCjDirectRenderPanel
       update();
     }
     catch (Exception e) {
-      GUIHelper.showErrorMessage(this, "Failed to parse: " + rateString + "\n" + Utils.throwableToString(e));
+      GUIHelper.showErrorMessage(this, "Failed to parse: " + rateString + "\n" + LoggingHelper.throwableToString(e));
     }
   }
 

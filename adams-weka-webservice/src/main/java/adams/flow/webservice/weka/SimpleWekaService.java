@@ -21,7 +21,7 @@
 package adams.flow.webservice.weka;
 
 import adams.core.SerializationHelper;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.core.net.MimeTypeHelper;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.OptionUtils;
@@ -267,7 +267,7 @@ public class SimpleWekaService
       result.setModel(cls.toString());
     } 
     catch (java.lang.Exception ex) {
-      result.setErrorMessage(Utils.handleException(m_Owner, "Failed to train classifier: " + classifier, ex));
+      result.setErrorMessage(LoggingHelper.handleException(m_Owner, "Failed to train classifier: " + classifier, ex));
     }
     
     return result;
@@ -306,7 +306,7 @@ public class SimpleWekaService
       result.setReturnDataset(WekaDatasetHelper.evaluationToDataset(eval));
     } 
     catch (java.lang.Exception ex) {
-      result.setErrorMessage(Utils.handleException(m_Owner, "Failed to test model '" + modelName + "'!", ex));
+      result.setErrorMessage(LoggingHelper.handleException(m_Owner, "Failed to test model '" + modelName + "'!", ex));
     }
 
     return result;
@@ -345,7 +345,7 @@ public class SimpleWekaService
       result.setReturnDataset(WekaDatasetHelper.evaluationToDataset(eval));
     } 
     catch (java.lang.Exception ex) {
-      result.setErrorMessage(Utils.handleException(m_Owner, "Failed to cross-validate classifier '" + classifier + "'!", ex));
+      result.setErrorMessage(LoggingHelper.handleException(m_Owner, "Failed to cross-validate classifier '" + classifier + "'!", ex));
     }
 
     return result;
@@ -434,7 +434,7 @@ public class SimpleWekaService
       }
     } 
     catch (java.lang.Exception ex) {
-      result.setErrorMessage(Utils.handleException(m_Owner, "Failed to make predictions with classifier model '" + modelName + "'!", ex));
+      result.setErrorMessage(LoggingHelper.handleException(m_Owner, "Failed to make predictions with classifier model '" + modelName + "'!", ex));
     }
 
     return result;
@@ -467,7 +467,7 @@ public class SimpleWekaService
       result.setModelData(new DataHandler(new ByteArrayDataSource(SerializationHelper.toByteArray(cls), MimeTypeHelper.MIMETYPE_APPLICATION_OCTETSTREAM)));
     }
     catch (Exception e) {
-      result.setErrorMessage(Utils.handleException(this, "Failed to serialize classifier: " + modelName, e));
+      result.setErrorMessage(LoggingHelper.handleException(this, "Failed to serialize classifier: " + modelName, e));
     }
     
     return result;
@@ -500,7 +500,7 @@ public class SimpleWekaService
       result.setModelData(new DataHandler(new ByteArrayDataSource(SerializationHelper.toByteArray(cls), "application/octet-stream")));
     }
     catch (Exception e) {
-      result.setErrorMessage(Utils.handleException(this, "Failed to serialize clusterer: " + modelName, e));
+      result.setErrorMessage(LoggingHelper.handleException(this, "Failed to serialize clusterer: " + modelName, e));
     }
     
     return result;
@@ -572,7 +572,7 @@ public class SimpleWekaService
       }
     } 
     catch (java.lang.Exception ex) {
-      result.setErrorMessage(Utils.handleException(m_Owner, "Failed to transform data using callable transformer '" + actorName + "'!", ex));
+      result.setErrorMessage(LoggingHelper.handleException(m_Owner, "Failed to transform data using callable transformer '" + actorName + "'!", ex));
     }
     
     return result;
@@ -610,7 +610,7 @@ public class SimpleWekaService
       result.setModel(cls.toString());
     } 
     catch (java.lang.Exception ex) {
-      result.setErrorMessage(Utils.handleException(m_Owner, "Failed to train clusterer: " + clusterer, ex));
+      result.setErrorMessage(LoggingHelper.handleException(m_Owner, "Failed to train clusterer: " + clusterer, ex));
     }
     
     return result;
@@ -686,7 +686,7 @@ public class SimpleWekaService
       }
     } 
     catch (java.lang.Exception ex) {
-      result.setErrorMessage(Utils.handleException(m_Owner, "Failed to make predictions with model '" + modelName + "'!", ex));
+      result.setErrorMessage(LoggingHelper.handleException(m_Owner, "Failed to make predictions with model '" + modelName + "'!", ex));
     }
 
     return result;
@@ -832,7 +832,7 @@ public class SimpleWekaService
 	result.setBestClassifierSetup(handler.toCommandLine(search.getBestClassifier()));
       } 
       catch (java.lang.Exception ex) {
-	result.setErrorMessage(Utils.handleException(m_Owner, "Failed to optimize classifier!", ex));
+	result.setErrorMessage(LoggingHelper.handleException(m_Owner, "Failed to optimize classifier!", ex));
       }
     }
     

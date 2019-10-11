@@ -21,7 +21,7 @@
 package adams.opt.genetic.setupupload;
 
 import adams.core.Shortening;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.db.MongoDbConnection;
 import adams.db.MongoDbUrl;
 import adams.flow.core.MongoDbActorUtils;
@@ -134,7 +134,7 @@ public class MongoDB
       }
     }
     catch (Exception e) {
-      result = Utils.handleException(this, "Failed to load collection: " + m_Experiment, e);
+      result = LoggingHelper.handleException(this, "Failed to load collection: " + m_Experiment, e);
     }
 
     return result;
@@ -173,7 +173,7 @@ public class MongoDB
 	coll = m_Database.getCollection(m_Experiment);
       }
       catch (Exception e) {
-	result = Utils.handleException(this, "Failed to get collection: " + m_Experiment, e);
+	result = LoggingHelper.handleException(this, "Failed to get collection: " + m_Experiment, e);
       }
     }
 
@@ -190,7 +190,7 @@ public class MongoDB
 	coll.insertOne(doc);
       }
       catch (Exception e) {
-	result = Utils.handleException(this, "Failed to insert setup document!", e);
+	result = LoggingHelper.handleException(this, "Failed to insert setup document!", e);
       }
     }
 

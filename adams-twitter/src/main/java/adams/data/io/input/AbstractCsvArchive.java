@@ -20,9 +20,9 @@
 package adams.data.io.input;
 
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
 import adams.core.base.BaseRegExp;
 import adams.core.io.PlaceholderFile;
+import adams.core.logging.LoggingHelper;
 import adams.core.net.TwitterHelper;
 import adams.data.spreadsheet.Cell;
 import adams.data.spreadsheet.Row;
@@ -244,7 +244,7 @@ public abstract class AbstractCsvArchive
       }
       catch (Throwable t) {
 	if (isLoggingEnabled())
-	  Utils.handleException(this, "Failed to check missing status of cell at #" + index, t);
+	  LoggingHelper.handleException(this, "Failed to check missing status of cell at #" + index, t);
 	continue;
       }
       cell = row.getCell(index);
@@ -388,7 +388,7 @@ public abstract class AbstractCsvArchive
       }
       catch (Throwable t) {
 	if (isLoggingEnabled())
-	  Utils.handleException(this, "Failed to convert field '" + field + "': " + cell + "\n" + row, t);
+	  LoggingHelper.handleException(this, "Failed to convert field '" + field + "': " + cell + "\n" + row, t);
 	result = null;
       }
     }

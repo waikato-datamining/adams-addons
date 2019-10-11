@@ -20,7 +20,6 @@
 
 package adams.flow.core;
 
-import adams.core.Utils;
 import adams.core.logging.Logger;
 import adams.core.logging.LoggingHelper;
 
@@ -54,20 +53,20 @@ public class MongoDbActorUtils
     if (closest != null) {
       if (closest instanceof adams.flow.standalone.MongoDbConnection) {
 	result = ((adams.flow.standalone.MongoDbConnection) closest).getConnection();
-	LOGGER.fine("Database connection found: " + result + "\n" + Utils.getStackTrace(20));
+	LOGGER.fine("Database connection found: " + result + "\n" + LoggingHelper.getStackTrace(20));
       }
       else  if (closest instanceof adams.flow.standalone.MongoDbConnection) {
 	result = ((adams.flow.standalone.MongoDbConnection) closest).getConnection();
-	LOGGER.fine("Database connection found: " + result + "\n" + Utils.getStackTrace(20));
+	LOGGER.fine("Database connection found: " + result + "\n" + LoggingHelper.getStackTrace(20));
       }
       else {
 	result = defCon;
-	LOGGER.warning("Unhandled actor type '" + closest.getClass().getName() + "', using default connection: " + defCon + "\n" + Utils.getStackTrace(20));
+	LOGGER.warning("Unhandled actor type '" + closest.getClass().getName() + "', using default connection: " + defCon + "\n" + LoggingHelper.getStackTrace(20));
       }
     }
     else {
       result = defCon;
-      LOGGER.info("No database connection found, using default: " + defCon + "\n" + Utils.getStackTrace(20));
+      LOGGER.info("No database connection found, using default: " + defCon + "\n" + LoggingHelper.getStackTrace(20));
     }
     if (!result.isConnected() && result.getConnectOnStartUp()) {
       try {

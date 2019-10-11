@@ -20,7 +20,6 @@
 
 package adams.terminal.application;
 
-import adams.core.Utils;
 import adams.core.io.ConsoleHelper;
 import adams.core.io.console.Lanterna;
 import adams.core.logging.LoggingHelper;
@@ -140,9 +139,9 @@ public abstract class AbstractLanternaTerminalApplication
    */
   public void logError(String msg, Throwable t) {
     if (getLogTextBox() != null)
-      getLogTextBox().addLine(msg + "\n" + Utils.throwableToString(t));
+      getLogTextBox().addLine(msg + "\n" + LoggingHelper.throwableToString(t));
     else
-      System.err.println(msg + "\n" + Utils.throwableToString(t));
+      System.err.println(msg + "\n" + LoggingHelper.throwableToString(t));
   }
 
   /**

@@ -20,7 +20,7 @@
 
 package adams.core.net.rabbitmq;
 
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.core.logging.LoggingSupporter;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -68,7 +68,7 @@ public class RabbitMQHelper {
     }
     catch (Exception e) {
       if (logging != null)
-	Utils.handleException(logging, "Failed to create channel!", e);
+	LoggingHelper.handleException(logging, "Failed to create channel!", e);
     }
 
     return result;

@@ -22,7 +22,7 @@ package adams.scripting.connection;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.core.net.rabbitmq.RabbitMQHelper;
 import adams.core.net.rabbitmq.connection.AbstractConnectionFactory;
 import adams.core.net.rabbitmq.connection.GuestConnectionFactory;
@@ -289,7 +289,7 @@ public class RabbitMQConnection
 	result = "Failed to connect to broker (" + m_ConnectionFactory + ")!";
     }
     catch (Exception e) {
-      result = Utils.handleException(this, "Failed to connect to broker (" + m_ConnectionFactory + ")!", e);
+      result = LoggingHelper.handleException(this, "Failed to connect to broker (" + m_ConnectionFactory + ")!", e);
     }
 
     if (result == null) {
@@ -301,7 +301,7 @@ public class RabbitMQConnection
 	  m_Channel.basicQos(m_PrefetchCount);
       }
       catch (Exception e) {
-	result = Utils.handleException(this, "Failed to create channel!", e);
+	result = LoggingHelper.handleException(this, "Failed to create channel!", e);
       }
     }
 
@@ -376,7 +376,7 @@ public class RabbitMQConnection
 	m_Channel.basicPublish(m_Exchange, m_Queue, null, data);
       }
       catch (Exception e) {
-	result = Utils.handleException(this, "Failed to publish data (exchange=" + m_Exchange + ", queue=" + m_Queue + ")!", e);
+	result = LoggingHelper.handleException(this, "Failed to publish data (exchange=" + m_Exchange + ", queue=" + m_Queue + ")!", e);
       }
     }
 

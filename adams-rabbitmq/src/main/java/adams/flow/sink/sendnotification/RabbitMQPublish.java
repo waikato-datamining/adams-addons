@@ -22,7 +22,7 @@ package adams.flow.sink.sendnotification;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.core.net.rabbitmq.send.StringConverter;
 import adams.flow.core.ActorUtils;
 import adams.flow.standalone.RabbitMQConnection;
@@ -210,7 +210,7 @@ public class RabbitMQPublish
 	m_Channel.basicPublish(m_Exchange, m_Queue, null, data);
       }
       catch (Exception e) {
-        result = Utils.handleException(this, "Failed to publish data (exchange=" + m_Exchange + ", queue=" + m_Queue + ")!", e);
+        result = LoggingHelper.handleException(this, "Failed to publish data (exchange=" + m_Exchange + ", queue=" + m_Queue + ")!", e);
       }
     }
 

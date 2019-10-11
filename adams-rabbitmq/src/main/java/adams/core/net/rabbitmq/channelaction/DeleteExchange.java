@@ -21,7 +21,7 @@
 package adams.core.net.rabbitmq.channelaction;
 
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import com.rabbitmq.client.Channel;
 
 /**
@@ -159,7 +159,7 @@ public class DeleteExchange
 	channel.exchangeDeleteNoWait(m_Exchange, m_IfUnused);
     }
     catch (Exception e) {
-      result = Utils.handleException(this, "Failed to delete exchange '" + m_Exchange + "'!", e);
+      result = LoggingHelper.handleException(this, "Failed to delete exchange '" + m_Exchange + "'!", e);
     }
 
     return result;

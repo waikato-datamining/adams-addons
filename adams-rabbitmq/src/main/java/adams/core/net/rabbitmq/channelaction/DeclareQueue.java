@@ -21,7 +21,7 @@
 package adams.core.net.rabbitmq.channelaction;
 
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import com.rabbitmq.client.Channel;
 
 /**
@@ -233,7 +233,7 @@ public class DeclareQueue
         channel.queueDeclareNoWait(m_Queue, m_Durable, m_Exclusive, m_AutoDelete, null);
     }
     catch (Exception e) {
-      result = Utils.handleException(this, "Failed to declare queue '" + m_Queue + "'!", e);
+      result = LoggingHelper.handleException(this, "Failed to declare queue '" + m_Queue + "'!", e);
     }
 
     return result;

@@ -20,7 +20,7 @@
 package adams.gui.visualization.osm;
 
 import adams.core.Properties;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.core.option.OptionUtils;
 import adams.data.gps.AbstractGPS;
 import adams.data.gps.GPSDecimalDegrees;
@@ -410,7 +410,7 @@ public class OpenStreetMapViewerPanel
       GUIHelper.showErrorMessage(
 	  this, 
 	  "Failed to use tile source from provider: " + OptionUtils.getCommandLine(m_CurrentSource) + "\n" 
-	  + Utils.throwableToString(e), 
+	  + LoggingHelper.throwableToString(e),
 	  "Tile source provider");
     }
   }
@@ -443,7 +443,7 @@ public class OpenStreetMapViewerPanel
       GUIHelper.showErrorMessage(
 	  this, 
 	  "Failed to use tile loader from provider: " + OptionUtils.getCommandLine(m_CurrentLoader) + "\n" 
-	  + Utils.throwableToString(e), 
+	  + LoggingHelper.throwableToString(e),
 	  "Tile loader provider");
     }
   }

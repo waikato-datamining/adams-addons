@@ -22,7 +22,7 @@ package adams.core.net.rabbitmq.connection;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import com.rabbitmq.client.ConnectionFactory;
 
 /**
@@ -131,7 +131,7 @@ public class NonValidatingSSLConnectionFactory
       result.useSslProtocol();
     }
     catch (Exception e) {
-      msg = Utils.handleException(this, "Failed to enable use of SSL!", e);
+      msg = LoggingHelper.handleException(this, "Failed to enable use of SSL!", e);
     }
     if (msg != null)
       errors.add(msg);

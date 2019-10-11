@@ -20,7 +20,6 @@
 package adams.gui.tools.spreadsheetviewer;
 
 import adams.core.Properties;
-import adams.core.Utils;
 import adams.core.base.BaseString;
 import adams.core.io.FileUtils;
 import adams.core.logging.LoggingHelper;
@@ -369,7 +368,7 @@ public class OpenStreetMapView
     catch (Exception e) {
       GUIHelper.showErrorMessage(
 	  m_CurrentPanel, 
-	  "Failed to generate flow for GIS data display!\n" + Utils.throwableToString(e));
+	  "Failed to generate flow for GIS data display!\n" + LoggingHelper.throwableToString(e));
       return;
     }
     flow.setParentComponent(m_CurrentPanel);

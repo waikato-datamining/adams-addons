@@ -20,6 +20,7 @@
 package adams.flow.standalone.rats;
 
 import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.flow.core.RatMode;
 import adams.flow.core.RunnableWithLogging;
 import adams.flow.core.Token;
@@ -130,7 +131,7 @@ public class RatRunnable
 	result = m_Owner.getReceiver().receive();
       }
       catch (Throwable t) {
-	result = Utils.throwableToString(t);
+	result = LoggingHelper.throwableToString(t);
       }
 
       if (getOwner().getReceiver().getReceptionInterrupted())
@@ -177,7 +178,7 @@ public class RatRunnable
 		      result = transmit(token.getPayload());
 		    }
 		    catch (Throwable t) {
-		      result = Utils.throwableToString(t);
+		      result = LoggingHelper.throwableToString(t);
 		    }
 		    if (result != null) {
 		      getOwner().queueSendError(data, result);
@@ -198,7 +199,7 @@ public class RatRunnable
 		result = transmit(data);
 	      }
 	      catch (Throwable t) {
-		result = Utils.throwableToString(t);
+		result = LoggingHelper.throwableToString(t);
 	      }
 	      if (result != null)
 		getOwner().queueSendError(data, result);
@@ -206,7 +207,7 @@ public class RatRunnable
 	  }
 	}
 	catch (Throwable t) {
-	  result = Utils.throwableToString(t);
+	  result = LoggingHelper.throwableToString(t);
 	  getOwner().queueFlowError(data, result);
 	}
 

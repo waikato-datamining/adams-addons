@@ -21,7 +21,7 @@
 package adams.flow.transformer.mongodbcollectionupdate;
 
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 
@@ -118,7 +118,7 @@ public class RemoveDocument
 	coll.deleteOne(Filters.eq("_id", m_ID));
       }
       catch (Exception e) {
-	result = Utils.handleException(this, "Failed to add document!", e);
+	result = LoggingHelper.handleException(this, "Failed to add document!", e);
       }
     }
 

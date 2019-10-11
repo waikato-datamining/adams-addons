@@ -22,7 +22,7 @@ package adams.multiprocess;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.core.net.rabbitmq.RabbitMQHelper;
 import adams.core.net.rabbitmq.connection.AbstractConnectionFactory;
 import adams.core.net.rabbitmq.connection.GuestConnectionFactory;
@@ -352,7 +352,7 @@ public class RabbitMQJobRunner<T extends Job>
     }
     catch (Exception e) {
       errors.add("Failed to connect to broker (" + m_ConnectionFactory + ")!", e);
-      Utils.handleException(this, "Failed to connect to broker (" + m_ConnectionFactory + ")!", e);
+      LoggingHelper.handleException(this, "Failed to connect to broker (" + m_ConnectionFactory + ")!", e);
       return null;
     }
   }
@@ -382,7 +382,7 @@ public class RabbitMQJobRunner<T extends Job>
 	  m_Channel.basicQos(m_PrefetchCount);
       }
       catch (Exception e) {
-        result = Utils.handleException(this, "Failed to create channel!", e);
+        result = LoggingHelper.handleException(this, "Failed to create channel!", e);
       }
     }
 
@@ -416,7 +416,7 @@ public class RabbitMQJobRunner<T extends Job>
       m_CallbackQueue = m_Channel.queueDeclare().getQueue();
     }
     catch (Exception e) {
-      result = Utils.handleException(this, "Failed to create queue!", e);
+      result = LoggingHelper.handleException(this, "Failed to create queue!", e);
     }
 
     // convert jobs
@@ -459,7 +459,7 @@ public class RabbitMQJobRunner<T extends Job>
 	  m_Channel.basicPublish("", m_Queue, props, r);
 	}
 	catch (Exception e) {
-	  result = Utils.handleException(this, "Failed to publish job (queue=" + m_Queue + ")!", e);
+	  result = LoggingHelper.handleException(this, "Failed to publish job (queue=" + m_Queue + ")!", e);
 	}
 	if (result != null)
 	  break;
@@ -484,7 +484,7 @@ public class RabbitMQJobRunner<T extends Job>
 	m_Channel.queuePurge(m_Queue);
       }
       catch (Exception e) {
-        result = Utils.handleException(this, "Failed to purge queue: " + m_Queue, e);
+        result = LoggingHelper.handleException(this, "Failed to purge queue: " + m_Queue, e);
       }
     }
 
@@ -506,7 +506,7 @@ public class RabbitMQJobRunner<T extends Job>
 	m_Channel.queueDelete(m_CallbackQueue);
       }
       catch (Exception e) {
-        result = Utils.handleException(this, "Failed to delete queue: " + m_CallbackQueue, e);
+        result = LoggingHelper.handleException(this, "Failed to delete queue: " + m_CallbackQueue, e);
       }
     }
 
@@ -566,7 +566,7 @@ public class RabbitMQJobRunner<T extends Job>
 	m_Channel.basicConsume(m_CallbackQueue, true, deliverCallback, consumerTag -> {});
     }
     catch (Exception e) {
-      result = Utils.handleException(this, "Failed to receive data!", e);
+      result = LoggingHelper.handleException(this, "Failed to receive data!", e);
     }
 
     msg = doTerminate(false);
