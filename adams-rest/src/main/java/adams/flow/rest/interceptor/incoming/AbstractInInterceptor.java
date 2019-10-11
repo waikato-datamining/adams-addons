@@ -15,7 +15,7 @@
 
 /*
  * AbstractInInterceptor.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.rest.interceptor.incoming;
 
@@ -69,7 +69,7 @@ public abstract class AbstractInInterceptor
    * Pre-configures the logging.
    */
   protected void initializeLogging() {
-    m_LoggingLevel = LoggingLevel.WARNING;
+    m_LoggingLevel = LoggingHelper.getLoggingLevel(getClass());
   }
   
   /**

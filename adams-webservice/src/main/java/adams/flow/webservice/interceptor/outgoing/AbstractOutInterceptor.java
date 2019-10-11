@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractOutInterceptor.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice.interceptor.outgoing;
 
@@ -33,7 +33,6 @@ import java.util.logging.Level;
  * Interceptor for outgoing messages.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public abstract class AbstractOutInterceptor
   extends AbstractPhaseInterceptor<Message>
@@ -68,7 +67,7 @@ public abstract class AbstractOutInterceptor
    * Pre-configures the logging.
    */
   protected void initializeLogging() {
-    m_LoggingLevel = LoggingLevel.WARNING;
+    m_LoggingLevel = LoggingHelper.getLoggingLevel(getClass());
   }
   
   /**
