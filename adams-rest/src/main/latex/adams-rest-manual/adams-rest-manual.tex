@@ -312,8 +312,10 @@ The following concrete \verb|RESTPlugin| implementations are available:
 \begin{tight_itemize}
   \item \textit{control.StopFlow} -- stops the registered flow with the specified ID
   \item \textit{echo.Echo} -- simply sends back the string received
-  \item \textit{flow.CallableJsonPipeline} -- for processing JSON strings (enforces JSON data)
-  \item \textit{flow.CallableTextPipeline} -- for processing arbitrary strings
+  \item \textit{flow.CallableJsonPipeline} -- for processing JSON strings with a processing pipeline template (enforces JSON data)
+  \item \textit{flow.CallableTextPipeline} -- for processing arbitrary strings with a processing pipeline template
+  \item \textit{flow.CallableJsonTransformer} -- for processing JSON strings with a callable transformer (enforces JSON data)
+  \item \textit{flow.CallableTextTransformer} -- for processing arbitrary strings with a callable transformer
 \end{tight_itemize}
 
 
