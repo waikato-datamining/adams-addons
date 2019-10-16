@@ -24,13 +24,17 @@ import adams.core.MessageCollection;
 import adams.core.Utils;
 import adams.flow.control.LocalScopeTransformer;
 import adams.flow.control.ScopeHandler.ScopeHandling;
+import adams.flow.core.AbstractCallableActor;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.CallableActorUser;
 import adams.flow.core.Token;
+import adams.flow.core.actorfilter.SuperclassOrInterface;
 import adams.flow.rest.AbstractRESTPluginWithFlowContext;
+
+import java.util.List;
 
 /**
  * Ancestor for pipeline that process data with a callable pipeline template.
@@ -235,6 +239,7 @@ public abstract class AbstractCallablePipeline<T>
    */
   protected String initPipeline() {
     String		result;
+    List<Actor>		callables;
 
     result = null;
 
@@ -248,6 +253,15 @@ public abstract class AbstractCallablePipeline<T>
 	  result = "Pipeline actor '" + getPipeline() + "' is not a transformer!";
 	else
 	  result = checkCompatibility();
+      }
+      // nested callable actors are not supported/allowed
+      if (result == null) {
+        callables = ActorUtils.enumerate(m_PipelineActor, new SuperclassOrInterface(AbstractCallableActor.class));
+        if (callables.size() > 0) {
+	  result = "Using callable actors is not permitted as part of the pipeline! The following callable actors were found:\n";
+	  for (Actor callable: callables)
+	    result += "\n" + callable.getFullName();
+	}
       }
       m_PipelineActorInitialized = true;
     }
