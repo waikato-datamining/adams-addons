@@ -64,15 +64,21 @@ public class CallableJsonPipeline
     Response		result;
     Object		output;
     MessageCollection	errors;
+    String		msg;
 
     result = null;
     errors = new MessageCollection();
     output = doProcess(input, errors);
 
-    if (!errors.isEmpty())
+    if (!errors.isEmpty()) {
       result = Response.status(500, errors.toString()).build();
-    else if (output == null)
-      result = Response.status(500, "No output generated").build();
+      getLogger().severe(errors.toString());
+    }
+    else if (output == null) {
+      msg = "No output generated";
+      result = Response.status(500, msg).build();
+      getLogger().severe(msg);
+    }
 
     if ((result == null) && (output != null))
       result = Response.ok("" + output, MediaType.APPLICATION_JSON).build();
