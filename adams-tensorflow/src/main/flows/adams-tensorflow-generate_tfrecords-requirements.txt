@@ -1,0 +1,11 @@
+cython
+javaproperties
+argparse
+contextlib2
+pillow
+lxml
+jupyter
+matplotlib
+numpy
+tensorflow<2.0.0
+wai.tfrecords

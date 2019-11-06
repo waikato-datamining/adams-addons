@@ -28,7 +28,6 @@
 }
 \author{
   Peter Reutemann
-  Dale Fletcher
 }
 
 \setcounter{secnumdepth}{3}
@@ -43,7 +42,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2018} &
+		\parbox[c][2cm]{2cm}{\copyright 2018-2019} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -57,11 +56,11 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{TensorFlow}
-TensorFlow\cite{cntk} is an open source software library for high performance
+TensorFlow\cite{tensorflow} is an open source software library for high performance
 numerical computation. Its flexible architecture allows easy deployment of
 computation across a variety of platforms (CPUs, GPUs, TPUs), and from desktops
 to clusters of servers to mobile and edge devices. Originally developed by
-researchers and engineers from the Google Brain team within Google’s AI
+researchers and engineers from the Google Brain team within Google's AI
 organization, it comes with strong support for machine learning and deep
 learning and the flexible numerical computation core is used across many other
 scientific domains.
@@ -69,7 +68,32 @@ scientific domains.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
-TODO
+In order to use Tensorflow's Object Detection API\cite{objdet}, it is necessary
+to create tfrecords\cite{tfrecord} from your annotated data.
+Generating the tfrecords can be achieved with the \textit{wai.tfrecords}\cite{waitfrecords}
+library. But rather than having to split the data manually in train and test sets,
+you can use ADAMS' functionality to separate file lists into subsests (e.g., using
+\textit{PrepareFileBasedDataset}).
+
+To set up the wai.tfrecords library, create a virtual environment (Python 3.7+)
+and install the requirements from \textit{adams-tensorflow-generate\_tfrecords-requirements.txt}.
+
+\noindent For instance, on Linux run these commands (adjust the path accordingly):
+{\scriptsize
+\begin{verbatim}
+virtualenv -p /usr/bin/python3.7 venv
+./venv/bin/pip install -r adams-tensorflow-generate_tfrecords-requirements.txt
+\end{verbatim}}
+
+\noindent With the virtual environment in place, you can run the following flows:
+\begin{tight_itemize}
+  \item \textit{adams-tensorflow-generate\_tfrecords-cv.flow} -- generates cross-validation folds
+  \item \textit{adams-tensorflow-generate\_tfrecords-split.flow} -- generates train/test split
+\end{tight_itemize}
+When prompted by the flows to supply a Python executable, simply select the
+executable from within the previously generated virtual environment. The flow
+will construct file lists from the input data and call the conversion script
+to generate tfrecord files (and label/file lists) from these.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,10 +1,10 @@
 # Project: adams
-# Date: 2019-10-17 17:13:57
+# Date: 2019-11-06 15:48:04
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-imaging,adams-json,adams-math,adams-ml,adams-python,adams-spreadsheet,adams-tensorflow,adams-visualstats,adams-xml
 #
-adams.flow.control.Flow -annotation "Generates TFRecords for the object detection framework.\\nUses the specified training percentage to generate a train/test\\nsplit on the located .report files. These .report files are fed\\ninto the  tensorflow helper script \\\"convert_object_detection.py\\\"\\nto generate the actual tfrecords files (train.tfrecords and test.tfrecords).\\n\\nRequires:\\n- object detection framework (in \\\"research\\\" sub directory)\\n  https://github.com/tensorflow/models\\n- ADAMS tensorflow helper project\\n  https://github.com/waikato-datamining/tensorflow" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+adams.flow.control.Flow -annotation "Generates TFRecords for the object detection framework.\\nUses the specified training percentage to generate a train/test\\nsplit on the located .report files. These .report files are fed\\ninto the  tensorflow helper script \\\"tfrecords-convert\\\"\\nto generate the actual tfrecords files (train.tfrecords and test.tfrecords).\\n\\nRequires:\\n- virtualenv with Python 3.7 (use adams-tensorflow-generate_tfrecords-requirements.txt)\\n- point Python executable when prompted to Python exec in virtualenv" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.CallableActors
   adams.flow.sink.Display -name "Script output" -short-title true -writer adams.data.io.output.NullWriter -line-wrap true -wrap-style-word true
  adams.flow.standalone.SetVariable -name "restore file" -var-name restore_props -var-value @{flow_filename_long}.props -expand-value true
@@ -12,17 +12,13 @@ adams.flow.control.Flow -annotation "Generates TFRecords for the object detectio
  adams.flow.control.Trigger -name "prompt user"
   adams.flow.standalone.SetVariable -name "reset mappings" -var-name mappings -var-value ""
   adams.flow.standalone.SetVariable -name "reset labels" -var-name labels -var-value ""
-  adams.flow.source.EnterManyValues -stop-if-canceled true -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name object_detection_dir -display \"Object detection directory\" -help \"directory above the \\\"object_detection\\\" sub-directory\" -type DIRECTORY_ABSOLUTE -default-value ." -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name adams_tensorflow_dir -display \"ADAMS tensorflow dir\" -help \"top-level directory of the tensorflow ADAMS helper project\" -type DIRECTORY_ABSOLUTE -default-value ." -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name reports_dir -display \"Directory with annotations\" -help \"directory containing images and reports\" -type DIRECTORY_ABSOLUTE -default-value ." -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name output_dir -display \"Output directory for tfrecords\" -type DIRECTORY_ABSOLUTE -default-value ." -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name shards -display \"Number of tfrecords shards\" -help \"use < 2 to just turn off sharding\" -type INTEGER -default-value -1" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name label_mappings -display \"Label replacement mappings\" -help \"blank separated list of old=new\"" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name labels_predefined -display \"Predefined labels (comma-sep. list)\" -help \"optional list of predefined labels\"" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name label_regexp -display \"Regexp for labels to include\" -type REGEXP -default-value .*" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name train_perc -display \"Percentage to use for training (0-1)\" -type DOUBLE -default-value 0.5" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name python_exec -display \"Python executable\" -help \"Python executable to use\" -type FILE_ABSOLUTE -default-value python" -output-type MAP -restoration-enabled true -restoration-file @{restore_props}
+  adams.flow.source.EnterManyValues -stop-if-canceled true -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name reports_dir -display \"Directory with annotations\" -help \"directory containing images and reports\" -type DIRECTORY_ABSOLUTE -default-value ." -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name output_dir -display \"Output directory for tfrecords\" -type DIRECTORY_ABSOLUTE -default-value ." -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name shards -display \"Number of tfrecords shards\" -help \"use < 2 to just turn off sharding\" -type INTEGER -default-value -1" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name label_mappings -display \"Label replacement mappings\" -help \"blank separated list of old=new\"" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name labels_predefined -display \"Predefined labels (comma-sep. list)\" -help \"optional list of predefined labels\"" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name label_regexp -display \"Regexp for labels to include\" -type REGEXP -default-value .*" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name train_perc -display \"Percentage to use for training (0-1)\" -type DOUBLE -default-value 0.5" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name python_exec -display \"Python executable\" -help \"Python executable to use\" -type FILE_ABSOLUTE -default-value python" -output-type MAP -restoration-enabled true -restoration-file @{restore_props}
   adams.flow.transformer.MapToVariables
-  adams.flow.control.Trigger -name pythonpath
-   adams.flow.source.VariablesArray -var-name object_detection_dir -var-name adams_tensorflow_dir -conversion adams.data.conversion.StringToString
-   adams.flow.control.Tee -name info
-    adams.flow.transformer.StringJoin -glue :
-    adams.flow.transformer.StringInsert -position first -value PYTHONPATH=
-    adams.flow.sink.CallableSink -callable "Script output"
-   adams.flow.transformer.Convert -conversion adams.data.conversion.JoinOptions
-   adams.flow.transformer.SetVariable -var-name pythonpath
-  adams.flow.transformer.SetVariable -name convert_script -var-name convert_script -var-value @{adams_tensorflow_dir}/tfrecords/adams2objectdetection/convert.py -expand-value true
+  adams.flow.control.Trigger -name "convert script"
+   adams.flow.source.Variable -var-name python_exec -conversion adams.data.conversion.StringToString
+   adams.flow.transformer.DirName -use-forward-slashes true
+   adams.flow.transformer.AppendName -suffix tfrecords-convert -use-forward-slashes true
+   adams.flow.transformer.SetVariable -name convert_script -var-name convert_script -expand-value true
   adams.flow.transformer.SetVariable -name "train list" -var-name train_list -var-value @{output_dir}/train.list -expand-value true
   adams.flow.transformer.SetVariable -name "test list" -var-name test_list -var-value @{output_dir}/test.list -expand-value true
   adams.flow.transformer.SetVariable -name "train tfrecords" -var-name train_tfrecords -var-value @{output_dir}/train.tfrecords -expand-value true
@@ -39,7 +35,7 @@ adams.flow.control.Flow -annotation "Generates TFRecords for the object detectio
   adams.flow.control.ConditionalTrigger -name "predefined labels" -condition "adams.flow.condition.bool.Expression -expression \"\\\\\\\"@{labels_predefined}\\\\\\\" != \\\\\\\"\\\\\\\"\""
    adams.flow.standalone.SetVariable -var-name labels -var-value "--labels @{labels_predefined}" -expand-value true
  adams.flow.control.Trigger -name generate
-  adams.flow.standalone.PythonEnvironment -python-path-env-var @{pythonpath} -python-path-update-type REPLACE -python @{python_exec}
+  adams.flow.standalone.PythonEnvironment -python-path-update-type REPLACE -python @{python_exec}
   adams.flow.source.Start
   adams.flow.control.Trigger -name "locate files"
    adams.flow.source.FileSystemSearch -output-array true -search "adams.flow.source.filesystemsearch.LocalFileSearch -directory @{reports_dir} -regexp .*\\\\.report -sorting SORT_BY_NAME -recursive true"
