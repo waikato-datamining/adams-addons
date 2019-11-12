@@ -355,9 +355,19 @@ public class FusionJsonCommunicationProcessor
     if (parsed.containsKey("error"))
       throw new Exception(parsed.getAsString("error"));
     outputs = (JSONObject) parsed.get("outputs");
-    model   = (JSONObject) outputs.get(owner.getModelName());
-    output  = (JSONArray) model.get(m_ClassAttName);
+    if (outputs == null)
+      throw new IllegalStateException("Failed to retrieve key: outputs");
+    model = (JSONObject) outputs.get(owner.getModelName());
+    if (model == null)
+      throw new IllegalStateException("Failed to retrieve model: " + owner.getModelName());
+    output = (JSONArray) model.get(m_ClassAttName);
+    if (output == null)
+      throw new IllegalStateException("Failed to retrieve predictions for class attribute: " + m_ClassAttName);
+    if (output.size() == 0)
+      throw new IllegalStateException("Outer predictions array is empty!");
     outputElem = (JSONArray) output.get(0);
+    if (outputElem.size() == 0)
+      throw new IllegalStateException("Inner predictions array is empty!");
     result  = new double[]{((Number) outputElem.get(0)).doubleValue()};
 
     return result;
@@ -398,11 +408,21 @@ public class FusionJsonCommunicationProcessor
     if (parsed.containsKey("error"))
       throw new Exception(parsed.getAsString("error"));
     outputs = (JSONObject) parsed.get("outputs");
-    model   = (JSONObject) outputs.get(owner.getModelName());
-    output  = (JSONArray) model.get(m_ClassAttName);
-    result  = new double[output.size()][];
+    if (outputs == null)
+      throw new IllegalStateException("Failed to retrieve key: outputs");
+    model = (JSONObject) outputs.get(owner.getModelName());
+    if (model == null)
+      throw new IllegalStateException("Failed to retrieve model: " + owner.getModelName());
+    output = (JSONArray) model.get(m_ClassAttName);
+    if (output == null)
+      throw new IllegalStateException("Failed to retrieve predictions for class attribute: " + m_ClassAttName);
+    if (output.size() == 0)
+      throw new IllegalStateException("Outer predictions array is empty!");
+    result = new double[output.size()][];
     for (i = 0; i < output.size(); i++) {
       outputElem = (JSONArray) output.get(i);
+      if (outputElem.size() == 0)
+	throw new IllegalStateException("Inner predictions array #" + (i+1) + " is empty!");
       result[i] = new double[]{((Number) outputElem.get(0)).doubleValue()};
     }
 
