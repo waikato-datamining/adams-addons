@@ -45,7 +45,9 @@ import static com.github.fracpete.javautils.Enumerate.enumerate;
  * Train:
  * <pre>
  * {
- *   "name": <name>
+ *   "names": [
+ *     <modelname>  // the model name
+ *   ]
  *   "inputs": {
  *     "input1": [
  *         [...],  // single instance or class value
@@ -65,7 +67,9 @@ import static com.github.fracpete.javautils.Enumerate.enumerate;
  * Predict (send):
  * <pre>
  * {
- *   "name": <name>
+ *   "names": [
+ *     <modelname>  // the model name
+ *   ]
  *   "inputs": {
  *     "input1": [
  *         [...],  // single instance
@@ -87,10 +91,12 @@ import static com.github.fracpete.javautils.Enumerate.enumerate;
  * {
  *   "error": <only present if failed to make prediction>
  *   "outputs": {
- *     "output1": [
+ *     "<modelname>": {
+ *       "output1": [
  *         [...],  // single prediction
  *         ...
  *       ],
+ *     }
  *   }
  * }
  * <pre>
@@ -273,10 +279,14 @@ public class FusionJsonCommunicationProcessor
     JSONObject 		result;
     JSONObject 		inputs;
     JSONArray 		input;
+    JSONArray		names;
     int			i;
 
     result = new JSONObject();
-    result.put("name", owner.getModelName());
+    names  = new JSONArray();
+    names.add(owner.getModelName());
+    result.put("names", names);
+    result.put("names-are-tags", false);
     inputs = new JSONObject();
     result.put("inputs", inputs);
     for (BaseString name: m_Names) {
@@ -302,9 +312,13 @@ public class FusionJsonCommunicationProcessor
     JSONObject 		result;
     JSONObject		inputs;
     JSONArray		input;
+    JSONArray		names;
 
     result = new JSONObject();
-    result.put("name", owner.getModelName());
+    names  = new JSONArray();
+    names.add(owner.getModelName());
+    result.put("names", names);
+    result.put("names-are-tags", false);
     inputs = new JSONObject();
     result.put("inputs", inputs);
     for (BaseString name: m_Names) {
@@ -331,6 +345,7 @@ public class FusionJsonCommunicationProcessor
     JSONParser 		parser;
     JSONObject 		parsed;
     JSONObject		outputs;
+    JSONObject		model;
     JSONArray 		output;
     JSONArray 		outputElem;
 
@@ -340,7 +355,8 @@ public class FusionJsonCommunicationProcessor
     if (parsed.containsKey("error"))
       throw new Exception(parsed.getAsString("error"));
     outputs = (JSONObject) parsed.get("outputs");
-    output  = (JSONArray) outputs.get(m_ClassAttName);
+    model   = (JSONObject) outputs.get(owner.getModelName());
+    output  = (JSONArray) model.get(m_ClassAttName);
     outputElem = (JSONArray) output.get(0);
     result  = new double[]{((Number) outputElem.get(0)).doubleValue()};
 
@@ -371,6 +387,7 @@ public class FusionJsonCommunicationProcessor
     JSONParser 		parser;
     JSONObject 		parsed;
     JSONObject		outputs;
+    JSONObject		model;
     JSONArray 		output;
     JSONArray 		outputElem;
     int			i;
@@ -381,7 +398,8 @@ public class FusionJsonCommunicationProcessor
     if (parsed.containsKey("error"))
       throw new Exception(parsed.getAsString("error"));
     outputs = (JSONObject) parsed.get("outputs");
-    output  = (JSONArray) outputs.get(m_ClassAttName);
+    model   = (JSONObject) outputs.get(owner.getModelName());
+    output  = (JSONArray) model.get(m_ClassAttName);
     result  = new double[output.size()][];
     for (i = 0; i < output.size(); i++) {
       outputElem = (JSONArray) output.get(i);
