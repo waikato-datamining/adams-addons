@@ -234,11 +234,11 @@ public class FusionJsonCommunicationProcessor
       m_Mapping.put(name, new TIntArrayList());
 
     for (i = 0; i < data.numAttributes(); i++) {
-      if (!data.attribute(i).isNumeric())
-        throw new IllegalStateException("Attribute #" + (i+1) + " (" + data.attribute(i).name() + ") is not numeric!");
       for (Enumerated<BaseRegExp> regExp: enumerate(m_RegExps)) {
         if (regExp.value.isMatch(data.attribute(i).name())) {
           m_Mapping.get(m_Names[regExp.index]).add(i);
+	  if (!data.attribute(i).isNumeric())
+	    throw new IllegalStateException("Attribute #" + (i+1) + " (" + data.attribute(i).name() + ") is not numeric!");
 	}
       }
     }
