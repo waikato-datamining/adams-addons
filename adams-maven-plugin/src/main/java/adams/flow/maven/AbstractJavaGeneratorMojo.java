@@ -112,7 +112,6 @@ public abstract class AbstractJavaGeneratorMojo
    *
    * @return A non-null List holding URLs to sources for the code generation.
    */
-  @Override
   protected abstract List<URL> getSources();
 
   /**

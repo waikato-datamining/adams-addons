@@ -33,7 +33,6 @@ import org.apache.maven.project.MavenProject;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 import java.io.File;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -182,14 +181,6 @@ public abstract class AbstractAdamsMojo
    *                                Throwing this exception causes a "BUILD FAILURE" message to be displayed.
    */
   protected abstract boolean performExecution() throws MojoExecutionException, MojoFailureException;
-
-  /**
-   * Override this method to acquire a List holding all URLs to the sources which this
-   * AbstractAdamsMojo should use to produce its output.
-   *
-   * @return A non-null List holding URLs to sources used by this AbstractAdamsMojo to produce its output.
-   */
-  protected abstract List<URL> getSources();
 
   /**
    * Retrieves the directory where the generated files should be written to.
