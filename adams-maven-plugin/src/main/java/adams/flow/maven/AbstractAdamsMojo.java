@@ -20,6 +20,7 @@ package adams.flow.maven;
  */
 
 import adams.flow.maven.shared.FileSystemUtilities;
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
@@ -184,8 +185,7 @@ public abstract class AbstractAdamsMojo
 
   /**
    * Override this method to acquire a List holding all URLs to the sources which this
-   * AbstractAdamsMojo should use to produce its output (XSDs files for AbstractXsdGeneratorMojos and
-   * Java Source Code for AbstractJavaGeneratorMojos).
+   * AbstractAdamsMojo should use to produce its output.
    *
    * @return A non-null List holding URLs to sources used by this AbstractAdamsMojo to produce its output.
    */
@@ -199,12 +199,17 @@ public abstract class AbstractAdamsMojo
   protected abstract File getOutputDirectory();
 
   /**
-   * Retrieves the configured List of paths which the MOJO can use for launching Java processes.
+   * Returns the classpath parts that can be used for launching a Java process.
    *
-   * @return the configured List of classpath elements.
-   * @throws MojoExecutionException if the classpath could not be retrieved.
+   * @return the classpath parts
    */
-  protected abstract List<String> getClasspath() throws MojoExecutionException;
+  protected List<String> getClasspath() throws MojoExecutionException {
+    try {
+      return getProject().getCompileClasspathElements();
+    } catch (DependencyResolutionRequiredException e) {
+      throw new MojoExecutionException("Could not retrieve Compile classpath.", e);
+    }
+  }
 
   /**
    * Convenience method to invoke when some plugin configuration is incorrect.

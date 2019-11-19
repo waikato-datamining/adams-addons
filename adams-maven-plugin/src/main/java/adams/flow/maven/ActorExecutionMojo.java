@@ -28,7 +28,6 @@ import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
 import adams.flow.maven.shared.FileSystemUtilities;
 import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -215,17 +214,5 @@ public class ActorExecutionMojo
   @Override
   protected File getOutputDirectory() {
     return outputDirectory;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected List<String> getClasspath() throws MojoExecutionException {
-    try {
-      return getProject().getCompileClasspathElements();
-    } catch (DependencyResolutionRequiredException e) {
-      throw new MojoExecutionException("Could not retrieve Compile classpath.", e);
-    }
   }
 }
