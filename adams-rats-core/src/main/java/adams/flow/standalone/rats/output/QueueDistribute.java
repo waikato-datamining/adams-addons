@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * QueueDistribute.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
 
@@ -46,7 +46,6 @@ import adams.flow.core.Unknown;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class QueueDistribute
   extends AbstractRatOutput
@@ -181,18 +180,21 @@ public class QueueDistribute
   protected String doTransmit() {
     String		result;
     StorageQueueHandler	queue;
-    
-    result = null;
-    queue  = getQueue(m_StorageNames[m_Current]);
-    if (queue == null)
-      result = "Queue #" + (m_Current+1)+ " not available: " + m_StorageNames[m_Current];
-    else
-      queue.add(m_Input);
 
-    // next queue
-    m_Current++;
-    if (m_Current >= m_StorageNames.length)
-      m_Current = 0;
+    result = getOptionManager().ensureVariableForPropertyExists("storageNames");
+
+    if (result == null) {
+      queue = getQueue(m_StorageNames[m_Current]);
+      if (queue == null)
+        result = "Queue #" + (m_Current + 1) + " not available: " + m_StorageNames[m_Current];
+      else
+        queue.add(m_Input);
+
+      // next queue
+      m_Current++;
+      if (m_Current >= m_StorageNames.length)
+        m_Current = 0;
+    }
     
     return result;
   }

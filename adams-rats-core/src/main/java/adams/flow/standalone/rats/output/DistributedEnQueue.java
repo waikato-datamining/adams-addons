@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * DistributedEnQueue.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
 
@@ -45,7 +45,6 @@ import adams.flow.core.Unknown;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class DistributedEnQueue
   extends AbstractRatOutput
@@ -181,22 +180,24 @@ public class DistributedEnQueue
     String		result;
     StorageQueueHandler	queue;
 
-    result = null;
-
-    if (m_StorageNames.length < 1)
-      result = "At least one queue must be defined!";
+    result = getOptionManager().ensureVariableForPropertyExists("storageNames");
 
     if (result == null) {
-      queue = getQueue(m_StorageNames[m_NextQueue]);
-      if (queue == null)
-	result = "Queue not available: " + m_StorageNames[m_NextQueue];
-      else
-	queue.add(m_Input);
+      if (m_StorageNames.length < 1)
+        result = "At least one queue must be defined!";
 
-      // move to next queue
-      m_NextQueue++;
-      if (m_NextQueue >= m_StorageNames.length)
-	m_NextQueue = 0;
+      if (result == null) {
+        queue = getQueue(m_StorageNames[m_NextQueue]);
+        if (queue == null)
+          result = "Queue not available: " + m_StorageNames[m_NextQueue];
+        else
+          queue.add(m_Input);
+
+        // move to next queue
+        m_NextQueue++;
+        if (m_NextQueue >= m_StorageNames.length)
+          m_NextQueue = 0;
+      }
     }
 
     return result;
