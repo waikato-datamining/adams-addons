@@ -13,7 +13,7 @@
   <packaging>jar</packaging>
 
   <name>adams-groovy-webservice</name>
-  <description>Module for Webservice support (SOAP, REST) using Groovy.</description>
+  <description>Module for Webservice support (SOAP) using Groovy.</description>
   <url>https://adams.cms.waikato.ac.nz/</url>
   <organization>
     <name>University of Waikato, Hamilton, NZ</name>

@@ -13,7 +13,7 @@ Version=${project.version}
 BuildTimestamp=${timestamp}
 
 # A short description of the module
-Description=Module for Webservice support (SOAP, REST) using Groovy.
+Description=Module for Webservice support (SOAP) using Groovy.
 
 # The author of the module
 Author=Peter Reutemann
