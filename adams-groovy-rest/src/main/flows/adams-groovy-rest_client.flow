@@ -1,0 +1,16 @@
+# Project: adams
+# Date: 2019-11-25 10:55:39
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-event,adams-groovy,adams-groovy-rest,adams-json,adams-net,adams-rest,adams-security,adams-webservice-core
+#
+adams.flow.control.Flow -annotation "Constructs a URL with text entered by the user and sends it to the Groovy Echo REST service." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.source.EnterValue -stop-if-canceled true -message "Please enter text to send"
+ adams.flow.transformer.Convert -conversion adams.data.conversion.URLEncode
+ adams.flow.transformer.SetVariable -var-name echo
+ adams.flow.control.Trigger -name "query rest"
+  adams.flow.standalone.SetVariable -var-name url -var-value http://localhost:8080/echo/@{echo} -expand-value true
+  adams.flow.source.HttpRequest -url @{url} -method GET
+  adams.flow.control.ContainerValuePicker -value Body -switch-outputs true
+  adams.flow.transformer.Convert -conversion adams.data.conversion.URLDecode
+  adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter

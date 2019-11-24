@@ -1,0 +1,117 @@
+% This work is made available under the terms of the
+% Creative Commons Attribution-ShareAlike 4.0 license,
+% http://creativecommons.org/licenses/by-sa/4.0/.
+
+\documentclass[a4paper]{book}
+
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{scalefnt}
+\usepackage{tikz}
+
+% watermark -- for draft stage
+%\usepackage[firstpage]{draftwatermark}
+%\SetWatermarkLightness{0.9}
+%\SetWatermarkScale{5}
+
+\input{latex_extensions}
+
+\title{
+  \textbf{ADAMS} \\
+  {\Large \textbf{A}dvanced \textbf{D}ata mining \textbf{A}nd \textbf{M}achine
+  learning \textbf{S}ystem} \\
+  {\Large Module: adams-groovy-rest} \\
+  \vspace{1cm}
+  \includegraphics[width=2cm]{images/groovy-rest-module.png} \\
+}
+\author{
+  Peter Reutemann
+}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+
+\thispagestyle{empty}
+\center
+\begin{table}[b]
+	\begin{tabular}{c l l}
+		\parbox[c][2cm]{2cm}{\copyright 2019} &
+		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
+	\end{tabular}
+	\includegraphics[width=12cm]{images/cc.png} \\
+\end{table}
+
+\end{titlepage}
+
+\tableofcontents
+%\listoffigures
+%\listoftables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introduction}
+Developing REST webservices using JAX-RS\cite{jax-rs} is rather easy. However,
+during development, services can go through many iterations. Having to deploy
+a new build every single time can be time-consuming (and annoying).
+In order to fill the gap, the \textit{adams-groovy-rest} module allows you
+to write your REST plugins in Groovy\cite{groovy}, therefore avoiding the
+recompilation of code, resulting in a faster turn-around time for your services.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Flow}
+Use the following \textit{RESTProvider} in your \textit{RESTServer} standalone:
+\begin{verbatim}
+adams.flow.rest.GroovyServer
+\end{verbatim}
+\noindent This provider allows you to point to an arbitrary number of Groovy
+scripts that make up your REST service. It automatically sets the flow context
+if the scripts should implement the \textit{adams.flow.core.FlowContextHandler}
+interface. It also propagates its own logging level to the scripts, if they
+should implement the \textit{adams.core.logging.LoggingLevelHandler} interface.
+
+\newpage
+\section{Writing a plugin}
+Each of the Groovy scripts needs to contain a single class which either
+implements the \textit{RESTPlugin} interface or is derived from the
+\textit{AbstractRESTPlugin} or \textit{AbstractRESTPluginWithFlowContext}
+super classes (the latter should be used if you require access to variables or
+internal storage in the flow). The rest of the code uses the same JAX-RS annotations
+as for writing a Java class.
+
+Below is an example of a simple \textit{echo} client, which just sends
+back the data it received as part of the URL of the
+query\footnote{adams-groovy-rest\_echo.groovy}:
+\begin{verbatim}
+import adams.flow.rest.AbstractRESTPlugin
+import javax.ws.rs.GET
+import javax.ws.rs.Path
+import javax.ws.rs.PathParam
+import javax.ws.rs.Produces
+
+class Echo extends AbstractRESTPlugin {
+
+  @Override
+  String globalInfo() {
+    return "simple echo server"
+  }
+
+  @GET
+  @Path("/echo/{input}")
+  @Produces("text/plain")
+  public String ping(@PathParam("input") String input) {
+    getLogger().info("input: " + input)
+    return input
+  }
+}
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{bibliography}
+
+\end{document}
