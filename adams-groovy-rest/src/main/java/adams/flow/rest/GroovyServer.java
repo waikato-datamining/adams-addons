@@ -28,7 +28,9 @@ import adams.flow.core.FlowContextHandler;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -75,7 +77,10 @@ public class GroovyServer
   private static final long serialVersionUID = 6759800194384027943L;
 
   /** the scripts with the plugins that make up the server. */
-  protected PlaceholderFile[] m_Plugins;
+  protected PlaceholderFile[] m_UnparametrizedScripts;
+
+  /** the parametrized scripts. */
+  protected GroovyPlugin[] m_ParametrizedScripts;
 
   /**
    * Returns a string describing the object.
@@ -87,12 +92,16 @@ public class GroovyServer
     return
       "GenericREST service provider, which allows you to assemble the REST "
 	+ "plugins that should make up the service from Groovy scripts.\n"
+	+ "\n"
+	+ "Unparametrized scripts:\n"
         + "Scripts either need to implement " + Utils.classToString(RESTPlugin.class) + " interface "
         + "or be derived from the " + Utils.classToString(AbstractRESTPlugin.class) + " superclass.\n"
 	+ "Automatically sets the flow context of plugins, if they should implement "
 	+ "the " + Utils.classToString(FlowContextHandler.class) + " interface.\n"
         + "If implementing the " + Utils.classToString(LoggingLevelHandler.class) + " interface, "
-	+ "they plugin receives the same logging level as this server.";
+	+ "they plugin receives the same logging level as this server.\n"
+	+ "\n"
+	+ "Parametrized scripts:\n";
   }
 
   /**
@@ -103,36 +112,31 @@ public class GroovyServer
     super.defineOptions();
 
     m_OptionManager.add(
-      "plugin", "plugins",
-      getDefaultPlugins());
+      "unparametrized-script", "unparametrizedScripts",
+      new PlaceholderFile[0]);
+
+    m_OptionManager.add(
+      "parametrized-script", "parametrizedScripts",
+      new GroovyPlugin[0]);
   }
 
   /**
-   * Returns the default plugins to use.
+   * Sets the non-parametrized REST Groovy scripts to use.
    *
-   * @return		the default
+   * @param value	the scripts
    */
-  protected PlaceholderFile[] getDefaultPlugins() {
-    return new PlaceholderFile[0];
-  }
-
-  /**
-   * Sets the REST plugins (ie the Groovy scripts) to use.
-   *
-   * @param value	the plugins
-   */
-  public void setPlugins(PlaceholderFile[] value) {
-    m_Plugins = value;
+  public void setUnparametrizedScripts(PlaceholderFile[] value) {
+    m_UnparametrizedScripts = value;
     reset();
   }
 
   /**
-   * Returns the REST plugins (ie the Groovy scripts) in use.
+   * Returns the non-parametrized REST Groovy scripts in use.
    *
-   * @return		the plugins
+   * @return		the scripts
    */
-  public PlaceholderFile[] getPlugins() {
-    return m_Plugins;
+  public PlaceholderFile[] getUnparametrizedScripts() {
+    return m_UnparametrizedScripts;
   }
 
   /**
@@ -141,8 +145,37 @@ public class GroovyServer
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String pluginsTipText() {
-    return "The plugins (ie the Groovy scripts) that make up the REST service.";
+  public String unparametrizedScriptsTipText() {
+    return "The (non-parametrized) Groovy scripts that make up the REST service.";
+  }
+
+  /**
+   * Sets the parametrized REST Groovy scripts to use.
+   *
+   * @param value	the scripts
+   */
+  public void setParametrizedScripts(GroovyPlugin[] value) {
+    m_ParametrizedScripts = value;
+    reset();
+  }
+
+  /**
+   * Returns the parametrized REST Groovy scripts in use.
+   *
+   * @return		the scripts
+   */
+  public GroovyPlugin[] getParametrizedScripts() {
+    return m_ParametrizedScripts;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String parametrizedScriptsTipText() {
+    return "The (parametrized) Groovy scripts that make up the REST service.";
   }
 
   /**
@@ -159,16 +192,19 @@ public class GroovyServer
    * Loads the plugin scripts.
    *
    * @return		the loaded plugins
+   * @throws Exception	if loading fails
    */
-  protected RESTPlugin[] loadPlugins() {
-    RESTPlugin[] 	result;
+  protected Object[] loadPlugins() throws Exception {
+    List<Object> 	result;
     int			i;
 
-    result = new RESTPlugin[m_Plugins.length];
-    for (i = 0; i < m_Plugins.length; i++)
-      result[i] = (RESTPlugin) Groovy.getSingleton().newInstance(m_Plugins[i], RESTPlugin.class);
+    result = new ArrayList<>();
+    for (i = 0; i < m_UnparametrizedScripts.length; i++)
+      result.add(Groovy.getSingleton().newInstance(m_UnparametrizedScripts[i], Object.class));
+    for (i = 0; i < m_ParametrizedScripts.length; i++)
+      result.add(m_ParametrizedScripts[i].loadPlugin(getFlowContext()));
 
-    return result;
+    return result.toArray(new Object[0]);
   }
 
   /**
@@ -176,7 +212,7 @@ public class GroovyServer
    *
    * @param plugins	the plugins to configure
    */
-  protected void configurePlugins(RESTPlugin[] plugins) {
+  protected void configurePlugins(Object[] plugins) {
     int		i;
 
     for (i = 0; i < plugins.length; i++) {
@@ -196,7 +232,7 @@ public class GroovyServer
   @Override
   protected Server doStart() throws Exception {
     JAXRSServerFactoryBean 	factory;
-    RESTPlugin[] 		plugins;
+    Object[] 			plugins;
 
     factory = new JAXRSServerFactoryBean();
     configureInterceptors(factory);

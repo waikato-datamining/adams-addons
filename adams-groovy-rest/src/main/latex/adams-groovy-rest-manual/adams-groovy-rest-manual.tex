@@ -74,9 +74,14 @@ scripts that make up your REST service. It automatically sets the flow context
 if the scripts should implement the \textit{adams.flow.core.FlowContextHandler}
 interface. It also propagates its own logging level to the scripts, if they
 should implement the \textit{adams.core.logging.LoggingLevelHandler} interface.
+There are two types of scripts:
+\begin{tight_itemize}
+  \item without parameters
+  \item with parameters (to influence behavior)
+\end{tight_itemize}
 
 \newpage
-\section{Writing a plugin}
+\section{Writing a unparamtrized plugin}
 Each of the Groovy scripts needs to contain a single class which either
 implements the \textit{RESTPlugin} interface or is derived from the
 \textit{AbstractRESTPlugin} or \textit{AbstractRESTPluginWithFlowContext}
@@ -98,7 +103,7 @@ class Echo extends AbstractRESTPlugin {
 
   @Override
   String globalInfo() {
-    return "simple echo server"
+    return "simple echo server with optional uppercasing of the input"
   }
 
   @GET
@@ -110,6 +115,56 @@ class Echo extends AbstractRESTPlugin {
   }
 }
 \end{verbatim}
+
+\newpage
+\section{Writing a parametrized plugin}
+With more complex REST services, it can become necessary to add parameters
+to the service itself: e.g., what model to load from internal storage to
+process the data. For such REST plugins, you need to also implement the
+\textit{adams.flow.core.AdditionalOptionsHandler} interface in your script.
+To make things easier, just use \textit{adams.flow.rest.AbstractParametrizedGroovyRESTPlugin}
+to derive your plugin from.
+
+Parametrized scripts can be supplied in the \textit{GroovyServer} standalone via
+the \textit{parametrizedScripts} option. Each of these wrappers allows you to
+specify a script file and what options to supply to the script once loaded.
+These options are simple \textit{key=value} pairs and support variable
+expansion, e.g., \textit{uppercase=@\{some\_variable\}}.
+
+The example plugin below\footnote{adams-groovy-rest\_echo2.groovy} is a
+variation of the previous echo plugin. It supports the \textit{uppercase} parameter
+for influencing how to return the received input string. For that purpose,
+it uses the \textit{getAdditionalOptions()} (which will have parsed the options
+supplied to the script when loading it) to access the boolean parameter
+\textit{uppercase}:
+\begin{verbatim}
+import adams.flow.rest.AbstractParametrizedGroovyRESTPlugin
+import javax.ws.rs.GET
+import javax.ws.rs.Path
+import javax.ws.rs.PathParam
+import javax.ws.rs.Produces
+
+class Echo extends AbstractParametrizedGroovyRESTPlugin {
+
+  @Override
+  String globalInfo() {
+    return "simple echo server"
+  }
+
+  @GET
+  @Path("/echo2/{input}")
+  @Produces("text/plain")
+  public String ping(@PathParam("input") String input) {
+    getLogger().info("input: " + input)
+    if (getAdditionalOptions().getBoolean("uppercase"))
+      return input.toUpperCase()
+    else
+      return input
+  }
+
+}
+\end{verbatim}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
