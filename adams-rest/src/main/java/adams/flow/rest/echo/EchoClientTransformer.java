@@ -22,7 +22,7 @@ package adams.flow.rest.echo;
 
 import adams.flow.rest.AbstractRESTClientTransformer;
 import com.github.fracpete.requests4j.Requests;
-import com.github.fracpete.requests4j.core.Response;
+import com.github.fracpete.requests4j.response.BasicResponse;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -88,7 +88,7 @@ public class EchoClientTransformer
   @Override
   protected void doQuery() throws Exception {
     String		url;
-    Response 		r;
+    BasicResponse 	r;
 
     if (getUseAlternativeURL())
       url = getAlternativeURL();

@@ -28,8 +28,8 @@ import adams.flow.rest.dex.DataExchange.TokenMessage;
 import adams.flow.rest.dex.clientauthentication.AbstractClientAuthentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fracpete.requests4j.Requests;
-import com.github.fracpete.requests4j.core.Request;
-import com.github.fracpete.requests4j.core.Response;
+import com.github.fracpete.requests4j.request.Request;
+import com.github.fracpete.requests4j.response.BasicResponse;
 import org.apache.tika.mime.MediaType;
 
 import java.io.ByteArrayInputStream;
@@ -68,7 +68,7 @@ public class DataExchangeHelper {
    */
   public static String upload(File file, BaseURL server, AbstractClientAuthentication auth, MessageCollection errors) {
     Request		request;
-    Response 		response;
+    BasicResponse 	response;
     ObjectMapper	mapper;
     TokenMessage	tokenMsg;
 
@@ -108,7 +108,7 @@ public class DataExchangeHelper {
    */
   public static String upload(byte[] data, BaseURL server, AbstractClientAuthentication auth, MessageCollection errors) {
     Request		request;
-    Response 		response;
+    BasicResponse 	response;
     ObjectMapper	mapper;
     TokenMessage	tokenMsg;
 
@@ -148,7 +148,7 @@ public class DataExchangeHelper {
    */
   public static byte[] download(String token, BaseURL server, AbstractClientAuthentication auth, MessageCollection errors) {
     Request			request;
-    Response 			response;
+    BasicResponse 		response;
 
     request = initRequest(server, auth, errors);
     if (request == null)
@@ -183,7 +183,7 @@ public class DataExchangeHelper {
    */
   public static HttpRequestResult remove(String token, BaseURL server, AbstractClientAuthentication auth, MessageCollection errors) {
     Request		request;
-    Response 		response;
+    BasicResponse 	response;
 
     request = initRequest(server, auth, errors);
     if (request == null)
