@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * HeatmapRenderer.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.visualization.debug.objectrenderer;
@@ -31,12 +31,14 @@ import java.awt.BorderLayout;
  * Renders Heatmap objects.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class HeatmapRenderer
   extends AbstractObjectRenderer {
 
   private static final long serialVersionUID = -3528006886476495175L;
+
+  /** the cached setup. */
+  protected HeatmapPanel m_LastHeatmapPanel;
 
   /**
    * Checks whether the renderer can handle the specified class.
@@ -50,6 +52,32 @@ public class HeatmapRenderer
   }
 
   /**
+   * Checks whether the renderer can use a cached setup to render an object.
+   *
+   * @param obj		the object to render
+   * @param panel	the panel to render into
+   * @return		true if possible
+   */
+  @Override
+  public boolean canRenderCached(Object obj, JPanel panel) {
+    return (m_LastHeatmapPanel != null);
+  }
+
+  /**
+   * Performs the actual rendering.
+   *
+   * @param obj		the object to render
+   * @param panel	the panel to render into
+   * @return		null if successful, otherwise error message
+   */
+  @Override
+  protected String doRenderCached(Object obj, JPanel panel) {
+    m_LastHeatmapPanel.setHeatmap((Heatmap) obj);
+    panel.add(m_LastHeatmapPanel, BorderLayout.CENTER);
+    return null;
+  }
+
+  /**
    * Performs the actual rendering.
    *
    * @param obj		the object to render
@@ -58,13 +86,15 @@ public class HeatmapRenderer
    */
   @Override
   protected String doRender(Object obj, JPanel panel) {
-    Heatmap 		trail;
-    HeatmapPanel trailPanel;
+    Heatmap 		heatmap;
+    HeatmapPanel 	heatmapPanel;
 
-    trail = (Heatmap) obj;
-    trailPanel = new HeatmapPanel(null);
-    trailPanel.setHeatmap(trail);
-    panel.add(trailPanel, BorderLayout.CENTER);
+    heatmap = (Heatmap) obj;
+    heatmapPanel = new HeatmapPanel(null);
+    heatmapPanel.setHeatmap(heatmap);
+    panel.add(heatmapPanel, BorderLayout.CENTER);
+
+    m_LastHeatmapPanel = heatmapPanel;
 
     return null;
   }

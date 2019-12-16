@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * TrailRenderer.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.visualization.debug.objectrenderer;
@@ -31,12 +31,14 @@ import java.awt.BorderLayout;
  * Renders Trail objects.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class TrailRenderer
   extends AbstractObjectRenderer {
 
   private static final long serialVersionUID = -3528006886476495175L;
+
+  /** the last setup. */
+  protected TrailPanel m_LastTrailPanel;
 
   /**
    * Checks whether the renderer can handle the specified class.
@@ -47,6 +49,32 @@ public class TrailRenderer
   @Override
   public boolean handles(Class cls) {
     return ClassLocator.isSubclass(Trail.class, cls);
+  }
+
+  /**
+   * Checks whether the renderer can use a cached setup to render an object.
+   *
+   * @param obj		the object to render
+   * @param panel	the panel to render into
+   * @return		true if possible
+   */
+  @Override
+  public boolean canRenderCached(Object obj, JPanel panel) {
+    return (m_LastTrailPanel != null);
+  }
+
+  /**
+   * Performs the actual rendering.
+   *
+   * @param obj		the object to render
+   * @param panel	the panel to render into
+   * @return		null if successful, otherwise error message
+   */
+  @Override
+  protected String doRenderCached(Object obj, JPanel panel) {
+    m_LastTrailPanel.setTrail((Trail) obj);
+    panel.add(m_LastTrailPanel, BorderLayout.CENTER);
+    return null;
   }
 
   /**
@@ -65,6 +93,8 @@ public class TrailRenderer
     trailPanel = new TrailPanel(null);
     trailPanel.setTrail(trail);
     panel.add(trailPanel, BorderLayout.CENTER);
+
+    m_LastTrailPanel = trailPanel;
 
     return null;
   }
