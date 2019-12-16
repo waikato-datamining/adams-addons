@@ -1,10 +1,11 @@
 # Project: adams
-# Modules: adams-audio,adams-core,adams-spreadsheet
-# Date: 2018-04-09 10:48:36
+# Date: 2019-12-17 12:51:00
 # User: fracpete
 # Charset: UTF-8
+# Modules: adams-audio,adams-core,adams-ffmpeg,adams-spreadsheet
+#
 adams.flow.control.Flow -annotation "Generates a fingerprint for a WAV file." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.source.FileSupplier -file "${FLOWS}/data/h02880so - Northern jacana Jacana spinosa.wav"
  adams.flow.transformer.AudioData -reader adams.flow.transformer.audiodata.Wave
  adams.flow.transformer.WaveFeatureGenerator -algorithm "adams.data.audiofeaturegenerator.wave.Fingerprint -converter adams.data.featureconverter.Text"
- adams.flow.sink.Display -writer adams.data.io.output.NullWriter
+ adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter -line-wrap true
