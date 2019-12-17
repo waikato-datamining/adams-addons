@@ -1,8 +1,6 @@
 % This work is made available under the terms of the
 % Creative Commons Attribution-ShareAlike 4.0 license,
 % http://creativecommons.org/licenses/by-sa/4.0/.
-%
-% Version: $Revision$
 
 \documentclass[a4paper]{book}
 
@@ -44,7 +42,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2016} &
+		\parbox[c][2cm]{2cm}{\copyright 2016-2019} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -80,23 +78,26 @@ import wslite.soap.*
 And in the \texttt{doExecute} method, you instantiate the client and query the
 webservice.
 
-Below is an example of querying a webservice for US
-holidays\footnote{\url{http://www.holidaywebservice.com/Holidays/US/Dates/USHolidayDates.asmx}{}},
-asking for the date of \textit{Mother's Day} in 2016:
+Below is an example of querying a webservice for NZ public holidays
+holidays\footnote{\url{http://kayaposoft.com/enrico/ws/}{}} in 2020:
 {\scriptsize
 \begin{verbatim}
-def client = new SOAPClient('http://www.holidaywebservice.com/Holidays/US/Dates/USHolidayDates.asmx')
-def response = client.send(SOAPAction:'http://www.27seconds.com/Holidays/US/Dates/GetMothersDay') {
+def client = new SOAPClient('https://kayaposoft.com/enrico/ws/v2.0/index.php')
+def response = client.send(SOAPAction:'https://kayaposoft.com/enrico/ws/v2.0/index.php') {
   body {
-    GetMothersDay('xmlns':'http://www.27seconds.com/Holidays/US/Dates/') {
-      year(2016)
+    getHolidaysForYear('xmlns':'http://www.kayaposoft.com/enrico/ws/v2.0/') {
+      year(2020)     // year
+      country("nz")  // New Zealand
+      region("wko")  // Waikato
+      holidayType("public_holiday")   // the type
     }
   }
 }
 \end{verbatim}
 }
 \noindent This example is also used in the example flow
-\textit{adams-groovy-webservice\_usholidays.flow}.
+\textit{adams-groovy-webservice\_nzholidays.flow} and the groovy script
+\textit{adams-groovy-webservice\_nzholidays.groovy}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

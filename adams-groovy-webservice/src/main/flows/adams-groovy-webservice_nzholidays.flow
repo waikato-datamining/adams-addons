@@ -1,0 +1,10 @@
+# Project: adams
+# Date: 2019-12-18 10:14:42
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-groovy,adams-groovy-webservice
+#
+adams.flow.control.Flow -annotation "Returns the dates of public holidays in the Waikato region of New Zealand." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.source.EnterValue -stop-if-canceled true -message "Please enter year for the public holidays" -initial-value 2020
+ adams.flow.transformer.Groovy -script ${FLOWS}/adams-groovy-webservice_nzholidays.groovy
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter
