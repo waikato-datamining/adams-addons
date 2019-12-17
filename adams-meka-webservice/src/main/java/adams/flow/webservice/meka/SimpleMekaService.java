@@ -15,7 +15,7 @@
 
 /*
  * SimpleMekaService.java
- * Copyright (C) 2013-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.webservice.meka;
@@ -67,7 +67,6 @@ import java.util.Random;
  * Class that implements the meka web service.  
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SimpleMekaService
   extends AbstractOptionHandler
@@ -218,7 +217,7 @@ public class SimpleMekaService
       cls  = (meka.classifiers.multilabel.MultiLabelClassifier) OptionUtils.forAnyCommandLine(meka.classifiers.multilabel.MultiLabelClassifier.class, classifier);
       cls.buildClassifier(data);
       store(name, cls);
-      result.setModel(cls.toString());
+      result.setModel(classifier + "\n" + cls.getModel());
     } 
     catch (java.lang.Exception ex) {
       result.setErrorMessage(LoggingHelper.handleException(m_Owner, "Failed to train classifier: " + classifier, ex));

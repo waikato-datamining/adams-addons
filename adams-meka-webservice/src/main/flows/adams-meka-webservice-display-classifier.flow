@@ -1,7 +1,9 @@
 # Project: adams
-# Date: 2016-02-15 15:28:40
+# Date: 2019-12-18 11:07:12
 # User: fracpete
 # Charset: UTF-8
-adams.flow.control.Flow -annotation "Displays a previously trained model (\\\'j48\\\').\\nSee \\\"adams-meka-webservice-train-classifier.flow\\\" flow for training the model on the server-side." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.source.WSSource -client "adams.flow.webservice.meka.DisplayClassifier -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator -classifier j48"
+# Modules: adams-core,adams-event,adams-json,adams-math,adams-meka,adams-meka-webservice,adams-ml,adams-net,adams-security,adams-spreadsheet,adams-visualstats,adams-webservice,adams-webservice-core,adams-weka,adams-xml
+#
+adams.flow.control.Flow -annotation "Displays a previously trained model (\\\'cc\\\').\\nSee \\\"adams-meka-webservice-train-classifier.flow\\\" flow for training the model on the server-side." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.source.WSSource -client "adams.flow.webservice.meka.DisplayClassifier -in-interceptor adams.flow.webservice.interceptor.incoming.NullGenerator -classifier cc"
  adams.flow.sink.Display -writer adams.data.io.output.NullWriter

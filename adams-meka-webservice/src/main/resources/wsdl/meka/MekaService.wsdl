@@ -223,7 +223,7 @@
 
       <xsd:complexType name="downloadClassifierResponseObject">
         <xsd:sequence>
-          <xsd:element name="modelData" type="xsd:base64Binary"
+          <xsd:element name="modelData" type="xsd:base64Binary" minOccurs="0"
                        xmime:expectedContentTypes="application/octet-stream"/>
           <xsd:element minOccurs="0" name="errorMessage" type="xsd:string" />
         </xsd:sequence>
