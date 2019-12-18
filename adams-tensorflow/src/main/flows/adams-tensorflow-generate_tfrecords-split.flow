@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2019-11-06 15:48:04
+# Date: 2019-12-18 15:44:36
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-imaging,adams-json,adams-math,adams-ml,adams-python,adams-spreadsheet,adams-tensorflow,adams-visualstats,adams-xml
@@ -47,7 +47,7 @@ adams.flow.control.Flow -annotation "Generates TFRecords for the object detectio
     adams.flow.transformer.StringJoin -glue \n
     adams.flow.sink.DumpFile -output @{test_list}
   adams.flow.control.Trigger -name "generate train"
-   adams.flow.source.PythonExec -logging-level INFO -output-type BOTH -prefix-stdout "[train-out] " -prefix-stderr "[train-err] " -script @{convert_script} -script-options "--input @{train_list} --output @{train_tfrecords} --shards @{shards} @{mappings} --regexp @{label_regexp} @{labels} --protobuf_label_map @{train_pbtxt}" -working-directory @{adams_tensorflow_dir} -variable true
+   adams.flow.source.PythonExec -logging-level INFO -output-type BOTH -prefix-stdout "[train-out] " -prefix-stderr "[train-err] " -script @{convert_script} -script-options "--input @{train_list} --output @{train_tfrecords} --shards @{shards} @{mappings} --regexp @{label_regexp} @{labels} --protobuf_label_map @{train_pbtxt}" -variable true
    adams.flow.sink.CallableSink -callable "Script output"
   adams.flow.control.Trigger -name "generate test"
    adams.flow.source.PythonExec -logging-level INFO -output-type BOTH -prefix-stdout "[test-out] " -prefix-stderr "[test-err] " -script @{convert_script} -script-options "--input @{test_list} --output @{test_tfrecords} --shards @{shards} @{mappings} --regexp @{label_regexp} @{labels} --protobuf_label_map @{test_pbtxt}" -working-directory @{adams_tensorflow_dir} -variable true
