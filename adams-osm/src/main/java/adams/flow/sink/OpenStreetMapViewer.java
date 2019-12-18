@@ -13,39 +13,11 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * OpenStreetMapViewer.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.sink;
-
-import java.awt.BorderLayout;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.logging.Level;
-
-import javax.swing.JPanel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
-import org.openstreetmap.gui.jmapviewer.AbstractLayer;
-import org.openstreetmap.gui.jmapviewer.Coordinate;
-import org.openstreetmap.gui.jmapviewer.JMapViewerTree;
-import org.openstreetmap.gui.jmapviewer.Layer;
-import org.openstreetmap.gui.jmapviewer.LayerGroup;
-import org.openstreetmap.gui.jmapviewer.OsmTileLoader;
-import org.openstreetmap.gui.jmapviewer.checkBoxTree.CheckBoxNodeData;
-import org.openstreetmap.gui.jmapviewer.interfaces.MapMarker;
-import org.openstreetmap.gui.jmapviewer.interfaces.MapObject;
-import org.openstreetmap.gui.jmapviewer.interfaces.MapPolygon;
-import org.openstreetmap.gui.jmapviewer.interfaces.MapRectangle;
-import org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource.Mapnik;
 
 import adams.core.AdditionalInformationHandler;
 import adams.core.QuickInfoHelper;
@@ -73,6 +45,32 @@ import adams.gui.core.dotnotationtree.DotNotationTree;
 import adams.gui.event.MapClickEvent;
 import adams.gui.event.MapObjectHitEvent;
 import adams.gui.visualization.osm.OpenStreetMapViewerTree;
+import org.openstreetmap.gui.jmapviewer.AbstractLayer;
+import org.openstreetmap.gui.jmapviewer.Coordinate;
+import org.openstreetmap.gui.jmapviewer.JMapViewerTree;
+import org.openstreetmap.gui.jmapviewer.Layer;
+import org.openstreetmap.gui.jmapviewer.LayerGroup;
+import org.openstreetmap.gui.jmapviewer.OsmTileLoader;
+import org.openstreetmap.gui.jmapviewer.checkBoxTree.CheckBoxNodeData;
+import org.openstreetmap.gui.jmapviewer.interfaces.MapMarker;
+import org.openstreetmap.gui.jmapviewer.interfaces.MapObject;
+import org.openstreetmap.gui.jmapviewer.interfaces.MapPolygon;
+import org.openstreetmap.gui.jmapviewer.interfaces.MapRectangle;
+import org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource.Mapnik;
+
+import javax.swing.JPanel;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import java.awt.BorderLayout;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.logging.Level;
 
 /**
  <!-- globalinfo-start -->
@@ -233,8 +231,8 @@ import adams.gui.visualization.osm.OpenStreetMapViewerTree;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
+@Deprecated
 public class OpenStreetMapViewer
   extends AbstractGraphicalDisplay
   implements AdditionalInformationHandler {
@@ -300,9 +298,11 @@ public class OpenStreetMapViewer
    */
   @Override
   public String globalInfo() {
-    return 
-	"Displays data layers (markers, rectangles and polygons) on top of a "
-	+ "map provided by OpenStreetMap.";
+    return
+      "Displays data layers (markers, rectangles and polygons) on top of a "
+	+ "map provided by OpenStreetMap.\n"
+	+ "The " + Utils.classToString(org.openstreetmap.gui.jmapviewer.JMapViewerTree.class)
+	+ " no longer obtains the tiles and requires replacing.";
   }
   
   /**
