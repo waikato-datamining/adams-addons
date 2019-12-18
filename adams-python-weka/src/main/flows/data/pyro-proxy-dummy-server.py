@@ -10,7 +10,9 @@ class DummyProxy(object):
 
     def predict(self, data):
         print("predict", data)
-        result = {"outputs": {"class": [3.145]}}
+        input = json.loads(data)
+        name = input["names"][0]
+        result = {"outputs": {name: {"class": [[3.1415]]}}}
         return json.dumps(result)
 
 daemon = Pyro4.Daemon()

@@ -18,7 +18,7 @@ class ScikitLearnProxy(object):
 
         try:
             input = json.loads(data)
-            name = input["name"]
+            name = input["names"][0]
             if DEBUG:
                 print("[train] Model", name)
 
@@ -45,7 +45,7 @@ class ScikitLearnProxy(object):
 
         try:
             input = json.loads(data)
-            name = input["name"]
+            name = input["names"][0]
             if DEBUG:
                 print("[predict] Model", name)
 
@@ -57,7 +57,7 @@ class ScikitLearnProxy(object):
                 pred.append(p)
             if DEBUG:
                 print("[predict] pred", pred)
-            result = {"outputs": {"class": pred}}
+            result = {"outputs": {name: {"class": pred}}}
         except:
             error = traceback.format_exc()
             result = {"error": error}
