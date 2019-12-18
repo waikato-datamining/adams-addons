@@ -1,7 +1,9 @@
 # Project: adams
-# Date: 2018-01-19 14:32:43
+# Date: 2019-12-18 15:36:58
 # User: fracpete
 # Charset: UTF-8
+# Modules: adams-core,adams-event,adams-json,adams-net,adams-rest,adams-security,adams-webservice-core
+#
 adams.flow.control.Flow -annotation "Simple \\\"echo\\\" REST server" -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.RESTServer -web-service "adams.flow.rest.echo.EchoServer -in-interceptor adams.flow.rest.interceptor.incoming.NullGenerator -out-interceptor adams.flow.rest.interceptor.outgoing.NullGenerator"
  adams.flow.source.Start

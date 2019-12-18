@@ -1,7 +1,9 @@
 # Project: adams
-# Date: 2018-01-19 14:46:59
+# Date: 2019-12-18 15:36:47
 # User: fracpete
 # Charset: UTF-8
+# Modules: adams-core,adams-event,adams-json,adams-net,adams-rest,adams-security,adams-webservice-core
+#
 adams.flow.control.Flow -annotation "Sends the actor name to the \\\"echo\\\" server and outputs the results returned by the REST service.\\n\\nNotes:\\nYou need to start the \\\"adams-rest-echo_server.flow\\\" for this to work." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.source.RESTSource -client "adams.flow.rest.echo.EchoClientSource -in-interceptor adams.flow.rest.interceptor.incoming.NullGenerator"
- adams.flow.sink.Display -writer adams.data.io.output.NullWriter
+ adams.flow.source.RESTSource -client adams.flow.rest.echo.EchoClientSource
+ adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter

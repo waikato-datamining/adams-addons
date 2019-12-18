@@ -1,7 +1,9 @@
 # Project: adams
-# Date: 2018-01-19 14:46:00
+# Date: 2019-12-18 15:35:28
 # User: fracpete
 # Charset: UTF-8
+# Modules: adams-core,adams-event,adams-json,adams-net,adams-rest,adams-security,adams-webservice-core
+#
 adams.flow.control.Flow -annotation "Sends a string entered by the user to the \\\"echo\\\" server.\\nCheck console for output returned by REST service.\\n\\nNotes:\\nYou need to start the \\\"adams-rest-echo_server.flow\\\" for this to work." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.source.EnterValue -message "Please enter a string to echo" -initial-value "hello world"
- adams.flow.sink.RESTSink -client "adams.flow.rest.echo.EchoClientSink -out-interceptor adams.flow.rest.interceptor.outgoing.NullGenerator"
+ adams.flow.sink.RESTSink -client adams.flow.rest.echo.EchoClientSink
