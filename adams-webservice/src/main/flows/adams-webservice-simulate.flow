@@ -1,7 +1,9 @@
 # Project: adams
-# Date: 2017-04-10 15:47:40
+# Date: 2019-12-18 15:57:17
 # User: fracpete
 # Charset: UTF-8
+# Modules: adams-core,adams-event,adams-net,adams-security,adams-webservice,adams-webservice-core,adams-xml
+#
 adams.flow.control.Flow -annotation "Shows how to simulate a SOAP request by loading an existing XML \\ndocument and sending it via a HTTP POST request (with custom headers)." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.GridView -width 1200 -num-cols 2 -add-headers true -writer adams.gui.print.NullWriter
   adams.flow.sink.Display -name outgoing -short-title true -writer adams.data.io.output.NullWriter
@@ -10,7 +12,7 @@ adams.flow.control.Flow -annotation "Shows how to simulate a SOAP request by loa
  adams.flow.transformer.TextFileReader -reader adams.data.io.input.SingleStringTextReader
  adams.flow.control.Tee -name display
   adams.flow.sink.CallableSink -callable outgoing
- adams.flow.transformer.HttpRequest -url http://localhost:9090/CustomerServicePort -header Content-Type=text/xml -header Content-Length=length -header SOAPAction=
+ adams.flow.transformer.HttpRequest -url http://localhost:9090/CustomerServicePort -header Content-Type=text/xml -header SOAPAction=
  adams.flow.control.ContainerValuePicker -name "status code" -value "Status code"
   adams.flow.sink.CallableSink -callable response
  adams.flow.control.ContainerValuePicker -name body -value Body
