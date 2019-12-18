@@ -1,7 +1,9 @@
 # Project: adams
-# Date: 2016-02-15 15:10:20
+# Date: 2019-12-18 15:55:36
 # User: fracpete
 # Charset: UTF-8
+# Modules: adams-core,adams-ffmpeg,adams-imaging,adams-imaging-boofcv,adams-imaging-openimaj,adams-json,adams-spreadsheet,adams-video,adams-xml
+#
 adams.flow.control.Flow -annotation "Displays frames obtained from the default webcam, till you stop the flow.\\nThe first frame is used to select the object to track, for instance, your head." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.source.WebcamImage -conversion adams.data.conversion.BufferedImageToBufferedImage
  adams.flow.transformer.Convert -conversion adams.data.conversion.BufferedImageToBoofCV

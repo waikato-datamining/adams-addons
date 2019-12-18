@@ -1,7 +1,9 @@
 # Project: adams
-# Date: 2016-02-15 15:09:27
+# Date: 2019-12-18 15:53:57
 # User: fracpete
 # Charset: UTF-8
+# Modules: adams-core,adams-ffmpeg,adams-imaging,adams-imaging-boofcv,adams-imaging-openimaj,adams-json,adams-spreadsheet,adams-video,adams-xml
+#
 adams.flow.control.Flow -annotation "Tracks an object throughout a movie using a predefined, initial location.\\nSaves and displays the generated trail object." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.TabView -width 1000 -x -3
   adams.flow.sink.SpreadSheetDisplay -name Data -short-title true -writer adams.data.io.output.NullWriter
@@ -53,7 +55,7 @@ adams.flow.control.Flow -annotation "Tracks an object throughout a movie using a
     adams.flow.transformer.AddTrailStep -x @{x} -y @{y}
     adams.flow.transformer.SetStorageValue -storage-name trail
   adams.flow.control.Branch
-   adams.flow.control.Trigger -name image
+   adams.flow.control.ConditionalTrigger -name image -condition "adams.flow.condition.bool.HasVariable -variable-name current"
     adams.flow.source.StorageValue -storage-name image
     adams.flow.transformer.SetReportValue -field Tracker.Current[S] -value @{current}
     adams.flow.control.Cast -classname adams.data.image.AbstractImageContainer

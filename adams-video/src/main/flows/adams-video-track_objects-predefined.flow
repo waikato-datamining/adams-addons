@@ -1,7 +1,9 @@
 # Project: adams
-# Date: 2016-02-15 15:09:11
+# Date: 2019-12-18 15:53:32
 # User: fracpete
 # Charset: UTF-8
+# Modules: adams-core,adams-ffmpeg,adams-imaging,adams-imaging-boofcv,adams-imaging-openimaj,adams-json,adams-spreadsheet,adams-video,adams-xml
+#
 adams.flow.control.Flow -annotation "Tracks an object throughout a movie using a predefined, initial location." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
   adams.flow.sink.ImageViewer -name Frame -short-title true -writer adams.gui.print.NullWriter -zoom -1.0 -selection-processor adams.gui.visualization.image.selection.NullProcessor -image-overlay "adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport -regexp Tracker\\\\.Current"
@@ -27,7 +29,7 @@ adams.flow.control.Flow -annotation "Tracks an object throughout a movie using a
    adams.flow.transformer.GetReportValue -field Tracker.Current[S]
    adams.flow.transformer.SetVariable -var-name current
   adams.flow.control.Branch
-   adams.flow.control.Trigger -name image
+   adams.flow.control.ConditionalTrigger -name image -condition "adams.flow.condition.bool.HasVariable -variable-name current"
     adams.flow.source.StorageValue -storage-name image
     adams.flow.transformer.SetReportValue -field Tracker.Current[S] -value @{current}
     adams.flow.control.Cast -classname adams.data.image.AbstractImageContainer
