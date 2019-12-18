@@ -261,12 +261,21 @@ public abstract class AbstractWebServiceProvider
    * @throws IllegalStateException	if https used but failed to configure TLS params
    */
   protected void configureTLS(EndpointImpl endpoint, String url) throws Exception {
-    TLSServerParameters tlsparams;
-    JettyHTTPServerEngineFactory jettyFactory;
-    BaseURL baseURL;
+    TLSServerParameters 		tlsparams;
+    JettyHTTPServerEngineFactory 	jettyFactory;
+    BaseURL 				baseURL;
+    int					count;
 
     if (url.startsWith("https://")) {
       tlsparams = TLSUtils.configureServerTLS(m_Owner);
+
+      // wait for server to start up
+      count = 0;
+      while (!endpoint.getServer().isStarted() && (count < 20)) {
+        count++;
+	Utils.wait(this, 100, 100);
+      }
+
       if (tlsparams != null) {
 	jettyFactory = endpoint.getServerFactory().getBus().getExtension(JettyHTTPServerEngineFactory.class);
 	baseURL = new BaseURL(url);
