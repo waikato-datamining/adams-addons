@@ -1632,6 +1632,16 @@ public class Rat
   }
 
   /**
+   * For performing variable checks.
+   *
+   * @return		always null
+   */
+  @Override
+  protected String performVariableChecks() {
+    return null;
+  }
+
+  /**
    * Executes the flow item.
    *
    * @return		null if everything is fine, otherwise error message
