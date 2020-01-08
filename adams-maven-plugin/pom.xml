@@ -91,6 +91,7 @@
     <plexus-utils.version>3.1.0</plexus-utils.version>
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
     <qdox.version>2.0-M10</qdox.version>
+    <adams.version>20.1.1-SNAPSHOT</adams.version>
   </properties>
 
   <dependencyManagement>
@@ -98,7 +99,7 @@
       <dependency>
         <groupId>nz.ac.waikato.cms.adams</groupId>
         <artifactId>adams-core</artifactId>
-        <version>20.1.1-SNAPSHOT</version>
+        <version>${adams.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
