@@ -115,6 +115,8 @@ public class ClassListerMojo
    */
   @Override
   protected boolean performExecution() throws MojoExecutionException, MojoFailureException {
+    System.out.println(Utils.flatten(getClasspath(), System.getProperty("path.separator")));
+
     // classes
     List<String> cmd = new ArrayList<>();
     cmd.add(Java.getJavaExecutable());
