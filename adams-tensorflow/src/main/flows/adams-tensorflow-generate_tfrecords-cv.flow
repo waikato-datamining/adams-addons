@@ -1,10 +1,10 @@
 # Project: adams
-# Date: 2019-12-18 15:43:31
+# Date: 2020-01-24 13:48:43
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-imaging,adams-json,adams-math,adams-ml,adams-python,adams-spreadsheet,adams-tensorflow,adams-visualstats,adams-xml
 #
-adams.flow.control.Flow -annotation "Generates TFRecords for the object detection framework.\\nUses the specified cross-validation fold count to generate train/test\\nsplits on the located .report files. These .report files are fed\\ninto the  tensorflow helper script \\\"tfrecords-convert\\\"\\nto generate the actual tfrecords files (train.tfrecords and test.tfrecords).\\n\\nRequires:\\n- virtualenv with Python 3.7 (use adams-tensorflow-generate_tfrecords-requirements.txt)\\n- point Python executable when prompted to Python exec in virtualenv" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+adams.flow.control.Flow -annotation "Generates TFRecords for the object detection framework.\\nUses the specified cross-validation fold count to generate train/test\\nsplits on the located .report files. These .report files are fed\\ninto the \\\"convert-annotations\\\" tool to generate the actual \\ntfrecords files (train.tfrecords and test.tfrecords).\\n\\nRequires:\\n- virtualenv with Python 3.7 (use adams-tensorflow-generate_tfrecords-requirements.txt)\\n- point Python executable when prompted to Python exec in virtualenv" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.CallableActors
   adams.flow.sink.Display -name "Script output" -short-title true -writer adams.data.io.output.NullWriter -line-wrap true -wrap-style-word true
  adams.flow.standalone.SetVariable -name "restore file" -var-name restore_props -var-value @{flow_filename_long}.props -expand-value true
@@ -17,7 +17,7 @@ adams.flow.control.Flow -annotation "Generates TFRecords for the object detectio
   adams.flow.control.Trigger -name "convert script"
    adams.flow.source.Variable -var-name python_exec -conversion adams.data.conversion.StringToString
    adams.flow.transformer.DirName -use-forward-slashes true
-   adams.flow.transformer.AppendName -suffix tfrecords-convert -use-forward-slashes true
+   adams.flow.transformer.AppendName -suffix convert-annotations -use-forward-slashes true
    adams.flow.transformer.SetVariable -name convert_script -var-name convert_script -expand-value true
   adams.flow.transformer.SetVariable -name "train list" -var-name train_list -var-value @{output_dir}/train.list -expand-value true
   adams.flow.transformer.SetVariable -name "test list" -var-name test_list -var-value @{output_dir}/test.list -expand-value true
@@ -50,8 +50,8 @@ adams.flow.control.Flow -annotation "Generates TFRecords for the object detectio
     adams.flow.transformer.SetVariable -name "train pb label map" -var-name train_pbtxt -var-value @{output_dir}/train-@{fold_count}.pbtxt -expand-value true
     adams.flow.transformer.SetVariable -name "test pb label map" -var-name test_pbtxt -var-value @{output_dir}/test-@{fold_count}.pbtxt -expand-value true
    adams.flow.control.Trigger -name "generate train"
-    adams.flow.source.PythonExec -logging-level INFO -output-type BOTH -prefix-stdout "[train-out] " -prefix-stderr "[train-err] " -script @{convert_script} -script-options "--input @{train_list} --output @{train_tfrecords} --shards @{shards} @{mappings} --regexp @{label_regexp} @{labels} --protobuf_label_map @{train_pbtxt}" -variable true
+    adams.flow.source.PythonExec -logging-level INFO -output-type BOTH -prefix-stdout "[train-out] " -prefix-stderr "[train-err] " -script @{convert_script} -script-options "adams --input-files @{train_list} @{mappings} tfrecords --output @{train_tfrecords} --shards @{shards} --regexp @{label_regexp} @{labels} --protobuf @{train_pbtxt}" -variable true
     adams.flow.sink.CallableSink -callable "Script output"
    adams.flow.control.Trigger -name "generate test"
-    adams.flow.source.PythonExec -logging-level INFO -output-type BOTH -prefix-stdout "[test-out] " -prefix-stderr "[test-err] " -script @{convert_script} -script-options "--input @{test_list} --output @{test_tfrecords} --shards @{shards} @{mappings} --regexp @{label_regexp} @{labels} --protobuf_label_map @{test_pbtxt}" -working-directory @{adams_tensorflow_dir} -variable true
+    adams.flow.source.PythonExec -logging-level INFO -output-type BOTH -prefix-stdout "[test-out] " -prefix-stderr "[test-err] " -script @{convert_script} -script-options "adams --input-files @{test_list} @{mappings} tfrecords --output @{test_tfrecords} --shards @{shards} --regexp @{label_regexp} @{labels} --protobuf @{test_pbtxt}" -variable true
     adams.flow.sink.CallableSink -callable "Script output"

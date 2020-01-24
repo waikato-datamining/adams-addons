@@ -70,12 +70,12 @@ scientific domains.
 \chapter{Flow}
 In order to use Tensorflow's Object Detection API\cite{objdet}, it is necessary
 to create tfrecords\cite{tfrecord} from your annotated data.
-Generating the tfrecords can be achieved with the \textit{wai.tfrecords}\cite{waitfrecords}
+Generating the tfrecords can be achieved with the \textit{wai.annotations}\cite{waiannotations}
 library. But rather than having to split the data manually in train and test sets,
 you can use ADAMS' functionality to separate file lists into subsests (e.g., using
 \textit{PrepareFileBasedDataset}).
 
-To set up the wai.tfrecords library, create a virtual environment (Python 3.7+)
+To set up the wai.annotations library, create a virtual environment (Python 3.7+)
 and install the requirements from \textit{adams-tensorflow-generate\_tfrecords-requirements.txt}.
 
 \noindent For instance, on Linux run these commands (adjust the path accordingly):

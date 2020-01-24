@@ -8,4 +8,4 @@ jupyter
 matplotlib
 numpy
 tensorflow<2.0.0
-wai.tfrecords
+wai.annotations
