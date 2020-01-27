@@ -73,7 +73,7 @@
       scm:git:https://github.com/waikato-datamining/adams-maven-plugin
     </developerConnection>
     <url>https://github.com/waikato-datamining/adams-maven-plugin</url>
-    <tag>HEAD</tag>
+    <tag>adams-addons-pom-20.1.1</tag>
   </scm>
   <issueManagement>
     <system>GitHub</system>
