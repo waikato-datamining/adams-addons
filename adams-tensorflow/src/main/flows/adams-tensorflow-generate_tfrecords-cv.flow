@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2020-01-24 13:48:43
+# Date: 2020-02-12 14:25:32
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-imaging,adams-json,adams-math,adams-ml,adams-python,adams-spreadsheet,adams-tensorflow,adams-visualstats,adams-xml
@@ -12,7 +12,8 @@ adams.flow.control.Flow -annotation "Generates TFRecords for the object detectio
  adams.flow.control.Trigger -name "prompt user"
   adams.flow.standalone.SetVariable -name "reset mappings" -var-name mappings -var-value ""
   adams.flow.standalone.SetVariable -name "reset labels" -var-name labels -var-value ""
-  adams.flow.source.EnterManyValues -stop-if-canceled true -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name reports_dir -display \"Directory with annotations\" -help \"directory containing images and reports\" -type DIRECTORY_ABSOLUTE -default-value ." -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name output_dir -display \"Output directory for tfrecords\" -type DIRECTORY_ABSOLUTE -default-value ." -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name shards -display \"Number of tfrecords shards\" -help \"use < 2 to just turn off sharding\" -type INTEGER -default-value -1" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name label_mappings -display \"Label replacement mappings\" -help \"blank separated list of old=new\"" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name labels_predefined -display \"Predefined labels (comma-sep. list)\" -help \"optional list of predefined labels\"" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name label_regexp -display \"Regexp for labels to include\" -type REGEXP -default-value .*" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name folds -display \"Cross-validation folds\" -type INTEGER -default-value 10" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name python_exec -display \"Python executable\" -help \"Python executable to use\" -type FILE_ABSOLUTE -default-value python" -output-type MAP -restoration-enabled true -restoration-file @{restore_props}
+  adams.flow.standalone.SetVariable -name "reset verbose_option" -var-name verbose_option -var-value ""
+  adams.flow.source.EnterManyValues -stop-if-canceled true -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name reports_dir -display \"Directory with annotations\" -help \"directory containing images and reports\" -type DIRECTORY_ABSOLUTE -default-value ." -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name output_dir -display \"Output directory for tfrecords\" -type DIRECTORY_ABSOLUTE -default-value ." -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name shards -display \"Number of tfrecords shards\" -help \"use < 2 to just turn off sharding\" -type INTEGER -default-value -1" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name label_mappings -display \"Label replacement mappings\" -help \"blank separated list of old=new\"" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name labels_predefined -display \"Predefined labels (comma-sep. list)\" -help \"optional list of predefined labels\"" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name label_regexp -display \"Regexp for labels to include\" -type REGEXP -default-value .*" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name folds -display \"Cross-validation folds\" -type INTEGER -default-value 10" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name python_exec -display \"Python executable\" -help \"Python executable to use\" -type FILE_ABSOLUTE -default-value python" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name verbose -display \"Verbose mode?\" -help \"Will output progress information (useful when encountering errors)\" -type BOOLEAN -default-value false" -output-type MAP -restoration-enabled true -restoration-file @{restore_props}
   adams.flow.transformer.MapToVariables
   adams.flow.control.Trigger -name "convert script"
    adams.flow.source.Variable -var-name python_exec -conversion adams.data.conversion.StringToString
@@ -28,6 +29,8 @@ adams.flow.control.Flow -annotation "Generates TFRecords for the object detectio
     adams.flow.transformer.StringInsert -position first -value "--mapping "
    adams.flow.transformer.StringJoin -glue " "
    adams.flow.transformer.SetVariable -var-name mappings
+  adams.flow.control.ConditionalTrigger -name "verbose option" -condition "adams.flow.condition.bool.Expression -expression \"@{verbose} = true\""
+   adams.flow.standalone.SetVariable -name "reset verbose_option" -var-name verbose_option -var-value -v
   adams.flow.control.ConditionalTrigger -name "predefined labels" -condition "adams.flow.condition.bool.Expression -expression \"\\\\\\\"@{labels_predefined}\\\\\\\" != \\\\\\\"\\\\\\\"\""
    adams.flow.standalone.SetVariable -var-name labels -var-value "--labels @{labels_predefined}" -expand-value true
  adams.flow.control.Trigger -name generate
@@ -50,8 +53,8 @@ adams.flow.control.Flow -annotation "Generates TFRecords for the object detectio
     adams.flow.transformer.SetVariable -name "train pb label map" -var-name train_pbtxt -var-value @{output_dir}/train-@{fold_count}.pbtxt -expand-value true
     adams.flow.transformer.SetVariable -name "test pb label map" -var-name test_pbtxt -var-value @{output_dir}/test-@{fold_count}.pbtxt -expand-value true
    adams.flow.control.Trigger -name "generate train"
-    adams.flow.source.PythonExec -logging-level INFO -output-type BOTH -prefix-stdout "[train-out] " -prefix-stderr "[train-err] " -script @{convert_script} -script-options "adams --input-files @{train_list} @{mappings} tfrecords --output @{train_tfrecords} --shards @{shards} --regexp @{label_regexp} @{labels} --protobuf @{train_pbtxt}" -variable true
+    adams.flow.source.PythonExec -logging-level INFO -output-type BOTH -prefix-stdout "[train-out] " -prefix-stderr "[train-err] " -script @{convert_script} -script-options "@{verbose_option} adams --input-files @{train_list} @{mappings} tfrecords --output @{train_tfrecords} --shards @{shards} --regexp @{label_regexp} @{labels} --protobuf @{train_pbtxt}" -variable true
     adams.flow.sink.CallableSink -callable "Script output"
    adams.flow.control.Trigger -name "generate test"
-    adams.flow.source.PythonExec -logging-level INFO -output-type BOTH -prefix-stdout "[test-out] " -prefix-stderr "[test-err] " -script @{convert_script} -script-options "adams --input-files @{test_list} @{mappings} tfrecords --output @{test_tfrecords} --shards @{shards} --regexp @{label_regexp} @{labels} --protobuf @{test_pbtxt}" -variable true
+    adams.flow.source.PythonExec -logging-level INFO -output-type BOTH -prefix-stdout "[test-out] " -prefix-stderr "[test-err] " -script @{convert_script} -script-options "@{verbose_option} adams --input-files @{test_list} @{mappings} tfrecords --output @{test_tfrecords} --shards @{shards} --regexp @{label_regexp} @{labels} --protobuf @{test_pbtxt}" -variable true
     adams.flow.sink.CallableSink -callable "Script output"
