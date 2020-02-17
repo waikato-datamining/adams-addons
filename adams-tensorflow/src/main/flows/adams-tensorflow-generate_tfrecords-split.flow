@@ -1,12 +1,12 @@
 # Project: adams
-# Date: 2020-02-12 14:24:33
+# Date: 2020-02-17 13:39:40
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-imaging,adams-json,adams-math,adams-ml,adams-python,adams-spreadsheet,adams-tensorflow,adams-visualstats,adams-xml
 #
 adams.flow.control.Flow -annotation "Generates TFRecords for the object detection framework.\\nUses the specified training percentage to generate a train/test\\nsplit on the located .report files. These .report files are fed\\ninto the \\\"convert-annotations\\\" tool to generate the actual \\ntfrecords files (train.tfrecords and test.tfrecords).\\n\\nRequires:\\n- virtualenv with Python 3.7 (use adams-tensorflow-generate_tfrecords-requirements.txt)\\n- point Python executable when prompted to Python exec in virtualenv" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.CallableActors
-  adams.flow.sink.Display -name "Script output" -short-title true -writer adams.data.io.output.NullWriter -line-wrap true -wrap-style-word true
+  adams.flow.sink.Display -name "Script output" -short-title true -display-type adams.flow.core.displaytype.Default -width 1200 -writer adams.data.io.output.NullWriter -wrap-style-word true
  adams.flow.standalone.SetVariable -name "restore file" -var-name restore_props -var-value @{flow_filename_long}.props -expand-value true
  adams.flow.source.Start
  adams.flow.control.Trigger -name "prompt user"
