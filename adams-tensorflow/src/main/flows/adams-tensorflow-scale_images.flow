@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2020-02-17 12:13:15
+# Date: 2020-02-19 17:00:23
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-imaging,adams-json,adams-math,adams-ml,adams-python,adams-spreadsheet,adams-tensorflow,adams-visualstats,adams-xml
@@ -56,7 +56,8 @@ adams.flow.control.Flow -annotation "Allows the user to scale the images (and an
     adams.flow.transformer.SetVariable -name "scale x" -var-name act_scale_x
    adams.flow.control.Stop -stop-msg "Unhandled scaling type: @{scaling_type}"
   adams.flow.transformer.BufferedImageTransformer -transformer "adams.data.jai.transformer.Resize -width @{act_scale_x} -height @{act_scale_y}"
-  adams.flow.transformer.ImageObjectFilter -finder adams.data.objectfinder.AllFinder -filter "adams.data.objectfilter.Scale -scale-x @{act_scale_x} -scale-y @{act_scale_y} -round true"
+  adams.flow.transformer.ImageObjectFilter -name scale -finder adams.data.objectfinder.AllFinder -filter "adams.data.objectfilter.Scale -scale-x @{act_scale_x} -scale-y @{act_scale_y} -round true"
+  adams.flow.transformer.ImageObjectFilter -name "remove duplicate points" -skip true -finder adams.data.objectfinder.AllFinder -filter "adams.data.objectfilter.RemoveDuplicatePolygonPoints -logging-level INFO"
   adams.flow.control.Tee -name image
    adams.flow.sink.ImageFileWriter -output @{out_image} -writer adams.data.io.output.JAIImageWriter
   adams.flow.control.Tee -name report
