@@ -11,14 +11,14 @@ REPO_URL=$HOST/nexus/content/repositories/$REPO
 
 LIB_DIR=./
 
-GROUP=...
+GROUP=nz.ac.waikato.cms.moa
 mvn deploy:deploy-file -DgroupId=$GROUP \
-  -DartifactId=... \
-  -Dversion=... \
+  -DartifactId=moa \
+  -Dversion=2020.03.22 \
   -Dpackaging=jar \
-  -Dfile=$LIB_DIR/....jar \
-  -Dsources=$LIB_DIR/...-sources.jar \
-  -DgeneratePom.description="..." \
+  -Dfile=$LIB_DIR/moa-2020.03.22.jar \
+  -Dsources=$LIB_DIR/moa-2020.03.22-sources.jar \
+  -DgeneratePom.description="MOA: Massive Online Analysis" \
   -DrepositoryId=$REPO \
   -Durl=$REPO_URL
 
