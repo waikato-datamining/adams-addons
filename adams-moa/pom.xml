@@ -82,6 +82,7 @@
       </exclusions>
     </dependency>
 
+    <!-- temporary dependencies due to custom moa jar -->
     <dependency>
       <groupId>com.github.waikato</groupId>
       <artifactId>fcms-widgets</artifactId>
@@ -89,10 +90,17 @@
     </dependency>
 
     <dependency>
+    	<groupId>com.opencsv</groupId>
+    	<artifactId>opencsv</artifactId>
+    	<version>4.0</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.github.fracpete</groupId>
       <artifactId>jshell-scripting</artifactId>
       <version>0.1.0</version>
     </dependency>
+    <!-- temporary dependencies due to custom moa jar -->
 
     <dependency>
       <groupId>nz.ac.waikato.cms.adams</groupId>
