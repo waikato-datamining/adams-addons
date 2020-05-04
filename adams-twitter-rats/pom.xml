@@ -130,26 +130,6 @@
           </execution>
         </executions>
       </plugin>
-
-      <!-- for generating the parsers: mvn compile exec:java -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>java</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <mainClass>adams.parser.GenerateParser</mainClass>
-          <workingDirectory>.</workingDirectory>
-          <arguments>
-            <argument>${project.basedir}/src/main/resources/adams/parser/twitterfilter</argument>
-          </arguments>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 </project>

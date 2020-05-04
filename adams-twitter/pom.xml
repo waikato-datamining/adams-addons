@@ -151,23 +151,14 @@
         </executions>
       </plugin>
 
-      <!-- for generating the parsers: mvn compile exec:java -->
+      <!-- for generating the parsers: mvn parsergen:build -->
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>java</goal>
-            </goals>
-          </execution>
-        </executions>
+        <groupId>com.github.fracpete</groupId>
+        <artifactId>parsergen-maven-plugin</artifactId>
         <configuration>
-          <mainClass>adams.parser.GenerateParser</mainClass>
-          <workingDirectory>.</workingDirectory>
-          <arguments>
-            <argument>${project.basedir}/src/main/resources/adams/parser/twitterfilter</argument>
-          </arguments>
+          <directories>
+            <directory>${project.basedir}/src/main/resources/adams/parser/twitterfilter</directory>
+          </directories>
         </configuration>
       </plugin>
     </plugins>
