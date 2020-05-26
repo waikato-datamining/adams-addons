@@ -15,23 +15,22 @@
 
 /*
  * HeatmapTest.java
- * Copyright (C) 2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2020 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.heatmap;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import adams.core.Utils;
+import adams.core.classmanager.ClassManager;
 import adams.env.Environment;
 import adams.test.AdamsTestCase;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * Tests the adams.data.heatmap.Heatmap class. Run from commandline with: <br><br>
  * java adams.data.heatmap.HeatmapTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class HeatmapTest
   extends AdamsTestCase {
@@ -60,7 +59,7 @@ public class HeatmapTest
    */
   @Override
   protected void performSerializableTest(Class cls) {
-    assertNotNull("Serialization failed", Utils.deepCopy(new Heatmap(10, 10)));
+    assertNotNull("Serialization failed", ClassManager.getSingleton().deepCopy(new Heatmap(10, 10)));
   }
 
   /**

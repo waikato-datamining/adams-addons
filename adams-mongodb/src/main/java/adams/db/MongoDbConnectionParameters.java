@@ -15,7 +15,7 @@
 
 /*
  * MongoDbConnectionParameters.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2020 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -23,6 +23,7 @@ package adams.db;
 
 import adams.core.CloneHandler;
 import adams.core.base.BasePassword;
+import adams.core.classmanager.ClassManager;
 import adams.core.logging.LoggingLevel;
 
 import java.io.Serializable;
@@ -358,7 +359,7 @@ public class MongoDbConnectionParameters
     MongoDbConnectionParameters result;
 
     try {
-      result = (MongoDbConnectionParameters) Class.forName(classname).newInstance();
+      result = (MongoDbConnectionParameters) ClassManager.getSingleton().forName(classname).newInstance();
     }
     catch (Exception e) {
       result = new MongoDbConnectionParameters();

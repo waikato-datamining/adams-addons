@@ -15,11 +15,12 @@
 
 /*
  * AudioAnnotationsFileChooser.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2020 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.chooser;
 
+import adams.core.classmanager.ClassManager;
 import adams.data.audioannotations.AudioAnnotations;
 import adams.data.io.input.AbstractAudioAnnotationsReader;
 import adams.data.io.input.AbstractDataContainerReader;
@@ -133,7 +134,7 @@ public class AudioAnnotationsFileChooser
 	  continue;
 	if (filter.accept(file)) {
 	  try {
-	    result = (AbstractDataContainerReader<AudioAnnotations>) Class.forName(filter.getClassname()).newInstance();
+	    result = (AbstractDataContainerReader<AudioAnnotations>) ClassManager.getSingleton().forName(filter.getClassname()).newInstance();
 	  }
 	  catch (Exception e) {
 	    handleException("Failed to instantiate reader: " + filter.getClassname(), e);
@@ -147,7 +148,7 @@ public class AudioAnnotationsFileChooser
 	    continue;
 	  if (filter.accept(file)) {
 	    try {
-	      result = (AbstractDataContainerReader<AudioAnnotations>) Class.forName(filter.getClassname()).newInstance();
+	      result = (AbstractDataContainerReader<AudioAnnotations>) ClassManager.getSingleton().forName(filter.getClassname()).newInstance();
 	    }
 	    catch (Exception e) {
 	      handleException("Failed to instantiate reader: " + filter.getClassname(), e);
@@ -178,7 +179,7 @@ public class AudioAnnotationsFileChooser
 	  continue;
 	if (filter.accept(file)) {
 	  try {
-	    result = (AbstractDataContainerWriter<AudioAnnotations>) Class.forName(filter.getClassname()).newInstance();
+	    result = (AbstractDataContainerWriter<AudioAnnotations>) ClassManager.getSingleton().forName(filter.getClassname()).newInstance();
 	  }
 	  catch (Exception e) {
 	    handleException("Failed to instantiate writer: " + filter.getClassname(), e);
@@ -192,7 +193,7 @@ public class AudioAnnotationsFileChooser
 	    continue;
 	  if (filter.accept(file)) {
 	    try {
-	      result = (AbstractDataContainerWriter<AudioAnnotations>) Class.forName(filter.getClassname()).newInstance();
+	      result = (AbstractDataContainerWriter<AudioAnnotations>) ClassManager.getSingleton().forName(filter.getClassname()).newInstance();
 	    }
 	    catch (Exception e) {
 	      handleException("Failed to instantiate writer: " + filter.getClassname(), e);

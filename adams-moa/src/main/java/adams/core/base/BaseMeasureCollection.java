@@ -13,13 +13,14 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * BaseMeasureCollection.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2020 University of Waikato, Hamilton, NZ
  */
 
 package adams.core.base;
 
+import adams.core.classmanager.ClassManager;
 import moa.evaluation.F1;
 import moa.evaluation.MeasureCollection;
 
@@ -27,7 +28,6 @@ import moa.evaluation.MeasureCollection;
  * Wrapper for MOA's {@link MeasureCollection} classes.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class BaseMeasureCollection
   extends AbstractBaseString {
@@ -81,9 +81,9 @@ public class BaseMeasureCollection
   public boolean isValid(String value) {
     try {
       if (!value.contains("."))
-	Class.forName(DEFAULT_PACKAGE + "." + value);
+	ClassManager.getSingleton().forName(DEFAULT_PACKAGE + "." + value);
       else
-        Class.forName(value);
+        ClassManager.getSingleton().forName(value);
       return true;
     }
     catch (Exception e) {
@@ -99,9 +99,9 @@ public class BaseMeasureCollection
   public MeasureCollection collectionValue() {
     try {
       if (getValue().contains("."))
-	return (MeasureCollection) Class.forName(getValue()).newInstance();
+	return (MeasureCollection) ClassManager.getSingleton().forName(getValue()).newInstance();
       else
-	return (MeasureCollection) Class.forName(DEFAULT_PACKAGE + "." + getValue()).newInstance();
+	return (MeasureCollection) ClassManager.getSingleton().forName(DEFAULT_PACKAGE + "." + getValue()).newInstance();
     }
     catch (Exception e) {
       return new F1();

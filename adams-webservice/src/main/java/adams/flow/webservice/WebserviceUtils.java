@@ -15,11 +15,12 @@
 
 /*
  * WebserviceUtils.java
- * Copyright (C) 2013-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2020 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
 import adams.core.Utils;
+import adams.core.classmanager.ClassManager;
 import adams.core.logging.LoggingLevelHandler;
 import adams.core.net.ProxyHelper;
 import adams.core.option.OptionHandler;
@@ -307,7 +308,7 @@ public class WebserviceUtils {
 
   /**
    * Creates a copy of the WS implementation, either using a shallow copy
-   * (if implementing {@link OptionHandler}) or {@link Utils#deepCopy(Object)}.
+   * (if implementing {@link OptionHandler}) or {@link ClassManager#deepCopy(Object)}.
    *
    * @param implementation	the webservice implemntation to copy
    * @return			the copy, null if failed to copy
@@ -316,6 +317,6 @@ public class WebserviceUtils {
     if (implementation instanceof OptionHandler)
       return OptionUtils.shallowCopy((OptionHandler) implementation, false);
     else
-      return Utils.deepCopy(implementation);
+      return ClassManager.getSingleton().deepCopy(implementation);
   }
 }

@@ -15,13 +15,13 @@
 
 /*
  * AbstractArraySplitter.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2020 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
-import adams.core.Utils;
+import adams.core.classmanager.ClassManager;
 import adams.data.SplitResultType;
 import adams.data.random.JavaRandomInt;
 import adams.data.random.RandomIntegerRangeGenerator;
@@ -171,7 +171,7 @@ public abstract class AbstractArraySplitter
     
     result = Array.newInstance(arrayOld.getClass().getComponentType(), indices.size());
     for (i = 0; i < indices.size(); i++)
-      Array.set(result, i, Utils.deepCopy(Array.get(arrayOld, indices.get(i))));
+      Array.set(result, i, ClassManager.getSingleton().deepCopy(Array.get(arrayOld, indices.get(i))));
     
     return result;
   }

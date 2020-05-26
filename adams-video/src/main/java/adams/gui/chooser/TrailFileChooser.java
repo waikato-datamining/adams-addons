@@ -15,11 +15,12 @@
 
 /*
  * TrailFileChooser.java
- * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2020 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.chooser;
 
+import adams.core.classmanager.ClassManager;
 import adams.data.io.input.AbstractDataContainerReader;
 import adams.data.io.input.AbstractTrailReader;
 import adams.data.io.output.AbstractDataContainerWriter;
@@ -34,7 +35,6 @@ import java.util.List;
  * for trails.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class TrailFileChooser
   extends AbstractDataContainerFileChooser<Trail, AbstractDataContainerReader<Trail>, AbstractDataContainerWriter<Trail>> {
@@ -134,7 +134,7 @@ public class TrailFileChooser
 	  continue;
 	if (filter.accept(file)) {
 	  try {
-	    result = (AbstractDataContainerReader<Trail>) Class.forName(filter.getClassname()).newInstance();
+	    result = (AbstractDataContainerReader<Trail>) ClassManager.getSingleton().forName(filter.getClassname()).newInstance();
 	  }
 	  catch (Exception e) {
 	    handleException("Failed to instantiate reader: " + filter.getClassname(), e);
@@ -148,7 +148,7 @@ public class TrailFileChooser
 	    continue;
 	  if (filter.accept(file)) {
 	    try {
-	      result = (AbstractDataContainerReader<Trail>) Class.forName(filter.getClassname()).newInstance();
+	      result = (AbstractDataContainerReader<Trail>) ClassManager.getSingleton().forName(filter.getClassname()).newInstance();
 	    }
 	    catch (Exception e) {
 	      handleException("Failed to instantiate reader: " + filter.getClassname(), e);
@@ -179,7 +179,7 @@ public class TrailFileChooser
 	  continue;
 	if (filter.accept(file)) {
 	  try {
-	    result = (AbstractDataContainerWriter<Trail>) Class.forName(filter.getClassname()).newInstance();
+	    result = (AbstractDataContainerWriter<Trail>) ClassManager.getSingleton().forName(filter.getClassname()).newInstance();
 	  }
 	  catch (Exception e) {
 	    handleException("Failed to instantiate writer: " + filter.getClassname(), e);
@@ -193,7 +193,7 @@ public class TrailFileChooser
 	    continue;
 	  if (filter.accept(file)) {
 	    try {
-	      result = (AbstractDataContainerWriter<Trail>) Class.forName(filter.getClassname()).newInstance();
+	      result = (AbstractDataContainerWriter<Trail>) ClassManager.getSingleton().forName(filter.getClassname()).newInstance();
 	    }
 	    catch (Exception e) {
 	      handleException("Failed to instantiate writer: " + filter.getClassname(), e);
