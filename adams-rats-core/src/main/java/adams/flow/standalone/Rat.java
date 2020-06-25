@@ -1304,6 +1304,8 @@ public class Rat
    */
   @Override
   public String add(Actor actor) {
+    if (actor == this)
+      throw new IllegalArgumentException("Cannot add itself!");
     return m_Actors.add(actor);
   }
 
@@ -1316,6 +1318,8 @@ public class Rat
    */
   @Override
   public String add(int index, Actor actor) {
+    if (actor == this)
+      throw new IllegalArgumentException("Cannot add itself!");
     return m_Actors.add(index, actor);
   }
 
