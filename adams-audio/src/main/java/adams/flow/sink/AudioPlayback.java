@@ -15,14 +15,15 @@
 
 /*
  * AudioPlayback.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2020 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.sink;
 
-import adams.core.QuickInfoHelper;
 import adams.core.Utils;
+import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
+import javazoom.jl.player.Player;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -32,10 +33,11 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineEvent.Type;
 import javax.sound.sampled.LineListener;
+import java.io.FileInputStream;
 
 /**
  <!-- globalinfo-start -->
- * Plays back an audio file.
+ * Plays back an audio file (MP3&#47;WAV).
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -81,12 +83,6 @@ import javax.sound.sampled.LineListener;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
- * <pre>-start &lt;double&gt; (property: start)
- * &nbsp;&nbsp;&nbsp;The starting position for the playback in seconds.
- * &nbsp;&nbsp;&nbsp;default: 0.0
- * &nbsp;&nbsp;&nbsp;minimum: 0.0
- * </pre>
- *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -96,9 +92,6 @@ public class AudioPlayback
   implements LineListener {
 
   private static final long serialVersionUID = -1056104741820669736L;
-
-  /** the starting position in seconds. */
-  protected double m_Start;
 
   /** whether the playback has finished. */
   protected boolean m_PlaybackFinished;
@@ -110,60 +103,7 @@ public class AudioPlayback
    */
   @Override
   public String globalInfo() {
-    return "Plays back an audio file.";
-  }
-
-  /**
-   * Adds options to the internal list of options.
-   */
-  @Override
-  public void defineOptions() {
-    super.defineOptions();
-
-    m_OptionManager.add(
-      "start", "start",
-      0.0, 0.0, null);
-  }
-
-  /**
-   * Sets the starting position in seconds.
-   *
-   * @param value	the start
-   */
-  public void setStart(double value) {
-    if (getOptionManager().isValid("start", value)) {
-      m_Start = value;
-      reset();
-    }
-  }
-
-  /**
-   * Returns the starting position in seconds.
-   *
-   * @return		the start
-   */
-  public double getStart() {
-    return m_Start;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String startTipText() {
-    return "The starting position for the playback in seconds.";
-  }
-
-  /**
-   * Returns a quick info about the actor, which will be displayed in the GUI.
-   *
-   * @return		null if no info available, otherwise short string
-   */
-  @Override
-  public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "start", m_Start, "start: ");
+    return "Plays back an audio file (MP3/WAV).";
   }
 
   /**
@@ -189,29 +129,52 @@ public class AudioPlayback
     AudioFormat 	format;
     DataLine.Info 	info;
     Clip 		clip;
+    FileInputStream 	fis;
+    Player 		player;
 
     result             = null;
     file               = new PlaceholderFile(m_InputToken.getPayload(String.class));
     clip               = null;
     m_PlaybackFinished = false;
-    try {
-      ais    = AudioSystem.getAudioInputStream(file.getAbsoluteFile());
-      format = ais.getFormat();
-      info   = new DataLine.Info(Clip.class, format);
-      clip   = (Clip) AudioSystem.getLine(info);
-      clip.addLineListener(this);
-      clip.open(ais);
-      clip.start();
-      while (!isStopped() && !m_PlaybackFinished)
-	Utils.wait(this, 1000, 100);
+
+    // mp3
+    if (file.getName().toLowerCase().endsWith(".mp3")) {
+      fis = null;
+      try {
+	fis    = new FileInputStream(file.getAbsoluteFile());
+	player = new Player(fis);
+	player.play();
+        while (!isStopped() && !m_PlaybackFinished && !player.isComplete())
+          Utils.wait(this, 1000, 100);
+      }
+      catch (Exception e) {
+        result = handleException("Failed to playback file: " + file, e);
+      }
+      finally {
+	FileUtils.closeQuietly(fis);
+      }
     }
-    catch (Exception e) {
-      result = handleException("Failed to playback file: " + file, e);
-    }
-    finally {
-      if (clip != null) {
-	clip.removeLineListener(this);
-	clip.close();
+    // wav, etc
+    else {
+      try {
+        ais = AudioSystem.getAudioInputStream(file.getAbsoluteFile());
+        format = ais.getFormat();
+        info = new DataLine.Info(Clip.class, format);
+        clip = (Clip) AudioSystem.getLine(info);
+        clip.addLineListener(this);
+        clip.open(ais);
+        clip.start();
+        while (!isStopped() && !m_PlaybackFinished)
+          Utils.wait(this, 1000, 100);
+      }
+      catch (Exception e) {
+        result = handleException("Failed to playback file: " + file, e);
+      }
+      finally {
+        if (clip != null) {
+          clip.removeLineListener(this);
+          clip.close();
+        }
       }
     }
 
