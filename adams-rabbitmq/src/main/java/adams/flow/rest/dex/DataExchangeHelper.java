@@ -28,9 +28,9 @@ import adams.flow.rest.dex.DataExchange.TokenMessage;
 import adams.flow.rest.dex.clientauthentication.AbstractClientAuthentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fracpete.requests4j.Requests;
+import com.github.fracpete.requests4j.core.MediaTypeHelper;
 import com.github.fracpete.requests4j.request.Request;
 import com.github.fracpete.requests4j.response.BasicResponse;
-import org.apache.tika.mime.MediaType;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -117,7 +117,7 @@ public class DataExchangeHelper {
       return null;
 
     try {
-      request.formData().addStream(DataExchange.PARAMKEY_PAYLOAD, "data.ser", MediaType.OCTET_STREAM, new ByteArrayInputStream(data));
+      request.formData().addStream(DataExchange.PARAMKEY_PAYLOAD, "data.ser", MediaTypeHelper.OCTECT_STREAM, new ByteArrayInputStream(data));
       response = request.execute();
       if (response.statusCode() == 200) {
 	mapper   = new ObjectMapper();
