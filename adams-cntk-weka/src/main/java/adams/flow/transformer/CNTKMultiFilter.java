@@ -15,7 +15,7 @@
 
 /*
  * CNTKMultiFilter.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2020 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.transformer;
@@ -27,12 +27,11 @@ import adams.core.Utils;
 import adams.core.base.BaseRegExp;
 import adams.core.base.BaseString;
 import adams.core.option.OptionUtils;
+import adams.data.json.JsonHelper;
 import adams.data.weka.WekaAttributeIndex;
 import adams.data.weka.WekaAttributeRange;
 import adams.flow.container.CNTKMultiFilterResultContainer;
 import adams.flow.core.Token;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -659,20 +658,6 @@ public class CNTKMultiFilter
   }
 
   /**
-   * Generates pretty-printed string from the JSON object.
-   *
-   * @param json	the object to turn into string
-   * @return		the generated string
-   */
-  protected String toString(JsonObject json) {
-    Gson 	gson;
-
-    gson = new GsonBuilder().setPrettyPrinting().create();
-
-    return gson.toJson(json);
-  }
-
-  /**
    * Generates the dataset with the IDs (row id, sample id).
    *
    * @param data	the input data
@@ -708,7 +693,7 @@ public class CNTKMultiFilter
     for (Instance inst: filtered)
       result.addProperty("" + ((int) inst.value(0)), inst.stringValue(1));
 
-    return toString(result);
+    return JsonHelper.prettyPrint(result);
   }
 
   /**
@@ -820,7 +805,7 @@ public class CNTKMultiFilter
     }
     result.add("AttributeRanges", map);
 
-    return toString(result);
+    return JsonHelper.prettyPrint(result);
   }
 
   /**
