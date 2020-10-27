@@ -1,4 +1,27 @@
 --> dumpfile.txt
+== Model info
+
+Model                          
+meka.classifiers.multilabel.BR: Node #1
+
+ZeroR predicts class value: 0
+meka.classifiers.multilabel.BR: Node #2
+
+ZeroR predicts class value: 0
+meka.classifiers.multilabel.BR: Node #3
+
+ZeroR predicts class value: 0
+meka.classifiers.multilabel.BR: Node #4
+
+ZeroR predicts class value: 0
+meka.classifiers.multilabel.BR: Node #5
+
+ZeroR predicts class value: 0
+meka.classifiers.multilabel.BR: Node #6
+
+ZeroR predicts class value: 0
+
+
 == Evaluation Info
 
 Classifier                     meka.classifiers.multilabel.BR
