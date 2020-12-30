@@ -177,14 +177,13 @@ public class CNTKSaver
    */
   @Override
   public void setOptions(String[] options) throws Exception {
-    super.setOptions(options);
-
     setDebug(Utils.getFlag("D", options));
     setRowID(WekaOptionUtils.parse(options, "row-id", getDefaultRowID()));
     setInputs(WekaOptionUtils.parse(options, "inputs", getDefaultInputs()));
     setInputNames((BaseString[]) WekaOptionUtils.parse(options, "input-names", getDefaultInputNames()));
     setUseSparseFormat(Utils.getFlag("use-sparse-format", options));
     setSuppressMissing(Utils.getFlag("suppress-missing", options));
+    super.setOptions(options);
   }
 
   /**
