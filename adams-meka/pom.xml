@@ -80,7 +80,7 @@
     <dependency>
       <groupId>net.sf.meka</groupId>
       <artifactId>meka</artifactId>
-      <version>1.9.3</version>
+      <version>1.9.4</version>
       <exclusions>
         <exclusion>
           <groupId>nz.ac.waikato.cms.weka</groupId>
