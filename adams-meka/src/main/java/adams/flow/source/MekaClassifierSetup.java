@@ -20,6 +20,7 @@
 
 package adams.flow.source;
 
+import adams.core.ObjectCopyHelper;
 import adams.core.QuickInfoHelper;
 import adams.core.Shortening;
 import adams.core.option.OptionUtils;
@@ -168,7 +169,7 @@ public class MekaClassifierSetup
     result = null;
 
     try {
-      cls           = (meka.classifiers.multilabel.MultiLabelClassifier) OptionUtils.shallowCopy(m_Classifier);
+      cls           = ObjectCopyHelper.copyObject(m_Classifier);
       m_OutputToken = new Token(cls);
     }
     catch (Exception e) {
