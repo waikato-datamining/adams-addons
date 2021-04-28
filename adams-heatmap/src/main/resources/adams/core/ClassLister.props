@@ -5,7 +5,6 @@
 # class.name=package1,package2,...
 #
 # Author:  FracPete (fracpete at waikato dot ac dot nz)
-# Version: $Revision$
 
 # conversions that turn heatmaps into BufferedImage objects
 adams.data.conversion.HeatmapToBufferedImageConversion=\
@@ -42,6 +41,10 @@ adams.data.filter.heatmapcrop.AbstractHeatmapCrop=\
 # the threshold algorithms
 adams.data.filter.heatmapthreshold.AbstractHeatmapThreshold=\
   adams.data.filter.heatmapthreshold
+
+# the multi-heatmap operations
+adams.flow.transformer.multiheatmapoperation.AbstractMultiHeatmapOperation=\
+  adams.flow.transformer.multiheatmapoperation
 
 # the selection processors for the heatmap viewer
 adams.gui.visualization.heatmap.selection.AbstractSelectionProcessor=\
