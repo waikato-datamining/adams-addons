@@ -15,7 +15,7 @@
 
 /*
  * CNTKSpreadSheetReader.java
- * Copyright (C) 2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2017-2021 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -28,6 +28,7 @@ import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SparseDataRow;
 import adams.data.spreadsheet.SpreadSheet;
+import adams.env.Environment;
 
 import java.io.BufferedReader;
 import java.io.Reader;
@@ -312,5 +313,18 @@ public class CNTKSpreadSheetReader
     }
 
     return result;
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * Use the option {@link #OPTION_INPUT} to specify the input file.
+   * If the option {@link #OPTION_OUTPUT} is specified then the read sheet
+   * gets output as .csv files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, CNTKSpreadSheetReader.class, args);
   }
 }
