@@ -12,7 +12,7 @@
 #   java.lang.String[]=adams.gui.goe.GenericArrayEditor
 #
 #
-# Author: Ryan Smith
-# Version: $Revision$
+# Author: Ryan Smith, FracPete
 
+adams.core.RObjectPath=adams.gui.goe.RObjectPathEditor
 adams.core.scripting.RScript=adams.gui.goe.AbstractSimpleScriptEditor

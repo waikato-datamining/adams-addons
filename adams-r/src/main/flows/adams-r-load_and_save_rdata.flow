@@ -1,0 +1,10 @@
+# Project: adams
+# Date: 2021-06-03 16:57:13
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-r,adams-spreadsheet
+#
+adams.flow.control.Flow -annotation "Reads and writes an .rdata file." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/Data.WHEAT1.Rdata
+ adams.flow.transformer.RenjinFileReader
+ adams.flow.sink.RenjinFileWriter -output ${EXAMPLE_FLOWS}/output/out.rdata

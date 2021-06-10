@@ -14,7 +14,12 @@
 # "option.".
 #
 #
-# Author: Ryan Smith
+# Author: Ryan Smith, FracPete
+
+# RObjectPath objects
+adams.core.RObjectPath=true
+adams.core.RObjectPath#toString=adams.core.option.parsing.RObjectPathParsing#toString
+adams.core.RObjectPath#valueOf=adams.core.option.parsing.RObjectPathParsing#valueOf
 
 # R script objects
 adams.core.scripting.RScript=true

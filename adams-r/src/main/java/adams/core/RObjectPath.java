@@ -1,0 +1,331 @@
+/*
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * RObjectPath.java
+ * Copyright (C) 2021 University of Waikato, Hamilton, New Zealand
+ */
+package adams.core;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * Breaks up a string denoting a full name of an object within an R SEXP data 
+ * structure into the individual path elements.
+ *
+ * TODO: [x] to indicate indices of lists/vectors
+ *
+ * @author  fracpete (fracpete at waikato dot ac dot nz)
+ */
+public class RObjectPath
+  implements Comparable<RObjectPath>, Serializable {
+
+  private static final long serialVersionUID = -5734626103557090578L;
+
+  /** the elements of the path. */
+  protected String[] m_Parts;
+
+  /** the full path. */
+  protected String m_FullPath;
+
+  /**
+   * Initializes the path.
+   */
+  public RObjectPath() {
+    this("");
+  }
+
+  /**
+   * Initializes the path.
+   *
+   * @param path	the path to break up
+   */
+  public RObjectPath(String path) {
+    int		i;
+
+    m_FullPath = null;
+    if ((path == null) || (path.length() == 0)) {
+      m_Parts = new String[0];
+    }
+    else {
+      // mask escaped "." in names
+      path = path.replace("\\.", "\t");
+      // remove any trailing white spaces
+      path = path.replaceAll("\\s*$", "");
+
+      m_Parts = path.split("\\.");
+      for (i = 0; i < m_Parts.length; i++)
+	m_Parts[i] = m_Parts[i].replace("\t", ".");
+    }
+  }
+
+  /**
+   * Initializes the path with the specified elements.
+   *
+   * @param path	the path elements to use
+   */
+  public RObjectPath(String[] path) {
+    m_Parts    = path.clone();
+    m_FullPath = null;
+  }
+
+  /**
+   * Returns whether the path is empty or not.
+   *
+   * @return		true if empty
+   */
+  public boolean isEmpty() {
+    return (m_Parts.length == 0);
+  }
+
+  /**
+   * Returns a clone of the path elements.
+   *
+   * @return		the elements of the path
+   */
+  public String[] getPath() {
+    return m_Parts.clone();
+  }
+
+  /**
+   * Returns the number of path elements this path is made of.
+   *
+   * @return		the number of path elements
+   */
+  public int getPathCount() {
+    return m_Parts.length;
+  }
+
+  /**
+   * Returns the specified element of the path.
+   *
+   * @param element	the index of the element to retrieve
+   * @return		the specified path element
+   */
+  public String getPathComponent(int element) {
+    return m_Parts[element];
+  }
+
+  /**
+   * Returns the path without the last element.
+   *
+   * @return		the new path
+   */
+  public RObjectPath getParentPath() {
+    String[]	parts;
+    int		i;
+
+    if (m_Parts.length >= 1) {
+      parts = new String[m_Parts.length - 1];
+      for (i = 0; i < parts.length; i++)
+	parts[i] = new String(m_Parts[i]);
+    }
+    else {
+      parts = new String[0];
+    }
+
+    return new RObjectPath(parts);
+  }
+
+  /**
+   * Returns the path without the first element.
+   *
+   * @return		the new path
+   */
+  public RObjectPath getChildPath() {
+    String[]	parts;
+    int		i;
+
+    if (m_Parts.length >= 1) {
+      parts = new String[m_Parts.length - 1];
+      for (i = 1; i < m_Parts.length; i++)
+	parts[i - 1] = m_Parts[i];
+    }
+    else {
+      parts = new String[0];
+    }
+
+    return new RObjectPath(parts);
+  }
+
+  /**
+   * Returns the last path component, if available.
+   *
+   * @return		the last component, null if no path elements stored
+   */
+  public String getLastPathComponent() {
+    if (m_Parts.length > 0)
+      return m_Parts[m_Parts.length - 1];
+    else
+      return null;
+  }
+
+  /**
+   * Returns the first path component, if available.
+   *
+   * @return		the first component, null if no path elements stored
+   */
+  public String getFirstPathComponent() {
+    if (m_Parts.length > 0)
+      return m_Parts[0];
+    else
+      return null;
+  }
+
+  /**
+   * Checks whether the specified object path is a descendant of this
+   * object path object. A path is always a descendant of itself.
+   * [a, b, c] is a descendant of [a, b] and so is [a, b], but not [a].
+   *
+   * @param objectPath	the path to check whether it is a descendant
+   * @return		true if a descendant
+   */
+  public boolean isDescendant(RObjectPath objectPath) {
+    boolean	result;
+    int		i;
+
+    result = (objectPath.getPathCount() >= getPathCount());
+    if (result) {
+      for (i = 0; i < getPathCount(); i++) {
+	if (!getPathComponent(i).equals(objectPath.getPathComponent(i))) {
+	  result = false;
+	  break;
+	}
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Returns the path that denotes the common ancestor of this and the
+   * specified object path.
+   *
+   * @param objectPath	the object path to get the common ancestor for
+   * @return		the common ancestor (can have length 0!)
+   */
+  public RObjectPath getCommonAncestor(RObjectPath objectPath) {
+    List<String> 	parts;
+    int			i;
+
+    parts = new ArrayList<>();
+
+    for (i = 0; (i < getPathCount()) && (i < objectPath.getPathCount()); i++) {
+      if (getPathComponent(i).equals(objectPath.getPathComponent(i)))
+	parts.add(getPathComponent(i));
+      else
+	break;
+    }
+
+    return new RObjectPath(parts.toArray(new String[0]));
+  }
+
+  /**
+   * Creates a new path object that is the direct descendant of this path.
+   *
+   * @param path	the path element to use for the child
+   * @return		the child
+   */
+  public RObjectPath addChild(String path) {
+    String[]	elements;
+    int		i;
+
+    elements = new String[m_Parts.length + 1];
+    for (i = 0; i < m_Parts.length; i++)
+      elements[i] = m_Parts[i];
+    elements[elements.length - 1] = path;
+
+    return new RObjectPath(elements);
+  }
+
+  /**
+   * Compares this object with the specified object for order.  Returns a
+   * negative integer, zero, or a positive integer as this object is less
+   * than, equal to, or greater than the specified object.
+   *
+   * @param   o the object to be compared.
+   * @return  a negative integer, zero, or a positive integer as this object
+   *		is less than, equal to, or greater than the specified object.
+   *
+   * @throws ClassCastException if the specified object's type prevents it
+   *         from being compared to this object.
+   */
+  public int compareTo(RObjectPath o) {
+    int		result;
+    int		i;
+
+    // special case if one of the paths has no elements
+    if ((getPathCount() == 0) || (o.getPathCount() == 0))
+      return Integer.compare(getPathCount(), o.getPathCount());
+
+    result = 0;
+    for (i = 0; (i < getPathCount()) && (i < o.getPathCount()); i++) {
+      result = getPathComponent(i).compareTo(o.getPathComponent(i));
+      if ((result == 0) && ((i == getPathCount() - 1) || (i == o.getPathCount() - 1)))
+	result = Integer.compare(getPathCount(), o.getPathCount());
+      if (result != 0)
+	break;
+    }
+
+    return result;
+  }
+
+  /**
+   * Checks whether the provided object is the same as this one.
+   *
+   * @return		true if the object is an ActorPath and represents
+   * 			the same path elements
+   */
+  public boolean equals(Object o) {
+    if (o instanceof RObjectPath)
+      return (compareTo((RObjectPath) o) == 0);
+    else
+      return false;
+  }
+
+  /**
+   * Returns the hashcode of the underlying array.
+   *
+   * @return		the hashcode
+   */
+  public int hashCode() {
+    return Arrays.hashCode(m_Parts);
+  }
+
+  /**
+   * Returns the path as a single string.
+   *
+   * @return		the complete path
+   */
+  public String toString() {
+    StringBuilder path;
+
+    if (m_FullPath == null) {
+      path = new StringBuilder();
+
+      for (String part : m_Parts) {
+	if (path.length() > 0)
+	  path.append(".");
+	path.append(part.replace(".", "\\."));
+      }
+      m_FullPath = path.toString();
+    }
+
+    return m_FullPath;
+  }
+}

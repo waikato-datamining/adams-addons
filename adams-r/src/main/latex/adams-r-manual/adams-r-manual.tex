@@ -1,9 +1,6 @@
-% Copyright (c) 2012-2015 by the University of Waikato, Hamilton, NZ.
-% This work is made available under the terms of the 
+% This work is made available under the terms of the
 % Creative Commons Attribution-ShareAlike 4.0 license,
 % http://creativecommons.org/licenses/by-sa/4.0/.
-%
-% Version: $Revision$
 
 \documentclass[a4paper]{book}
 
@@ -49,7 +46,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2012-2015} &
+		\parbox[c][2cm]{2cm}{\copyright 2012-2021} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}}
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -69,7 +66,7 @@ by Rserve through this connection and the result of any calculations can be
 returned. 
 
 \section{Limitations}
-There are some limitations: 
+There are some limitations when using th Rserve approach (RStandalone, RSource, RTransformer, RSink):
 \begin{itemize}
 	\item Rserve does not provide any callback
 functionality so it cannot easily be used as a complete front-end for R;
@@ -83,7 +80,7 @@ to \textbf{1} on Windows, according to \url{http://www.rforge.net/Rserve/doc.htm
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Setup}
+\chapter{Setup for Rserve}
 \sloppy
 \begin{enumerate}
 	\item The R software package is required, and is available
@@ -114,11 +111,44 @@ to \textbf{1} on Windows, according to \url{http://www.rforge.net/Rserve/doc.htm
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
 \section{Actors}
-The following flow actors are available:
+The following standalone actors are available:
 \begin{itemize}
+	\item \textit{RenjinContext} -- the context for evaluating R scripts using Renjin.
+	\item \textit{Rserve} -- sets the context for sending/receiving data to/from R.
+	\item \textit{RStandalone} -- This is basically just a way to execute an R
+	script from within adams. It doesn't take any input or produce any output
+	within the flow.
+\end{itemize}
+
+\noindent The following source actors are available:
+\begin{itemize}
+	\item \textit{RenjinSource} -- executes an R script using Renjin and
+	forwards the result.
 	\item \textit{RSource} -- This can execute an R script and, like any other
 	source actor, produces output (in the form of integers, doubles, strings,
 	arrays of doubles, and matrices of doubles) to be passed through the flow.
+\end{itemize}
+
+\noindent The following transformer actors are available:
+\begin{itemize}
+	\item \textit{RenjinAddContext} -- adds the object passing through to the
+	local \textit{RenjinContext}.
+	\item \textit{RenjinFileReader} -- for reading .rdata files.
+	\item \textit{RenjinGetObject} -- obtains an object from a data structure using
+	the specified object path.
+	\item \textit{RenjinObjectInfo} -- outputs information on R objects.
+	\item \textit{RenjinTransformer} -- puts the object passing through in the local
+	\textit{RenjinContext} and executes the script.
+	\item \textit{RTransformer} -- This behaves much like a combination of RSource
+	and RSink in that it takes input data, and produces output data. It also takes
+	an R script and can access the input data just like RSink.
+\end{itemize}
+
+\noindent The following sink actors are available:
+\begin{itemize}
+	\item \textit{RenjinFileWriter} -- for writing data to .rdata files.
+	\item \textit{RenjinSink} -- puts the incoming object into the local \textit{RenjinContext}
+	and executes the scripts.
 	\item \textit{RSink} -- This sink takes input of the same types that RSource
 	produces as output and executes a supplied R script, which can refer to the
 	input data through the variable \verb|X|, other flow variables can be
@@ -126,16 +156,17 @@ The following flow actors are available:
 	Where \verb|X| is used, RSink (and RTransformer) simply substitue that text for the name of an assigned variable
 	in R, so to access an element of a matrix, for example, you would use
 	\verb|X[1][2]|, etc.
-	\item \textit{RTransformer} -- This behaves much like a combination of RSource
-	and RSink in that it takes input data, and produces output data. It also takes
-	an R script and can access the input data just like RSink.
-	\item \textit{RStandalone} -- This is basically just a way to execute an R
-	script from within adams. It doesn't take any input or produce any output
-	within the flow.
+\end{itemize}
+
+\noindent The following conversions are available:
+\begin{itemize}
+	\item \textit{RenjinDoubleArrayVectorToSpreadSheet} -- turns a double array vector
+	(matrix) into a spreadsheet.
+	\item \textit{RenjinListVectorToArray} -- turns an R list object into an array.
 \end{itemize}
 
 \newpage
-\section{Examples}
+\section{Rserve Examples}
 \subsection{Standalone script}
 ADAMS allows you to simply run R scripts that neither have input nor output,
 but you can still use variables and placeholders defined within the ADAMS
