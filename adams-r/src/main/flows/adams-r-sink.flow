@@ -1,8 +1,10 @@
 # Project: adams
-# Date: 2016-02-15 14:53:45
+# Date: 2021-06-11 16:01:16
 # User: fracpete
 # Charset: UTF-8
-adams.flow.control.Flow -annotation "Uses ADAMS to generate a double array of random numbers\\nand feeds that into the RSink actor to generate a plot.\\nThe filename of the generated plot is displayed." -flow-execution-listener adams.flow.execution.NullListener
+# Modules: adams-core,adams-r,adams-spreadsheet
+#
+adams.flow.control.Flow -annotation "Uses ADAMS to generate a double array of random numbers\\nand feeds that into the RSink actor to generate a plot.\\nThe generated plot is then displayed." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.Rserve
  adams.flow.standalone.SetVariable -name "number of random numbers" -var-name num -var-value 200
  adams.flow.standalone.SetVariable -name "plot output file" -var-name file -var-value ${FLOWS}/output/graph.png
@@ -10,9 +12,7 @@ adams.flow.control.Flow -annotation "Uses ADAMS to generate a double array of ra
  adams.flow.control.Trigger -name "using R"
   adams.flow.source.RandomNumberGenerator -generator adams.data.random.JavaRandomDouble -max-num @{num}
   adams.flow.transformer.SequenceToArray -length @{num}
-  adams.flow.sink.RSink -script "png(\\\"@{file}\\\")\\nplot(X)\\ntitle(\\\"Random numbers\\\")\\ndev.off()"
- adams.flow.control.Trigger -name "display output filename"
+  adams.flow.sink.RSink -script "png(\\\"@{file}\\\")\\nplot(X)\\ntitle(\\\"Random numbers\\\")\\ndev.off()" -placeholder true -variable true
+ adams.flow.control.Trigger -name "display image"
   adams.flow.source.Variable -var-name file
-  adams.flow.transformer.Convert -conversion "adams.data.conversion.StringToFile -placeholderfile true"
-  adams.flow.transformer.Convert -name Convert-1 -conversion "adams.data.conversion.FileToString -absolute true"
-  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
+  adams.flow.sink.FilePreview -display-type adams.flow.core.displaytype.Default -writer adams.gui.print.NullWriter -use-custom-preview true -preview adams.gui.tools.previewbrowser.ImageHandler

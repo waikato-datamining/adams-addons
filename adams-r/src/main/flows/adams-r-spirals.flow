@@ -1,7 +1,9 @@
 # Project: adams
-# Date: 2017-04-13 11:10:50
+# Date: 2021-06-11 14:03:13
 # User: fracpete
 # Charset: UTF-8
+# Modules: adams-core,adams-r,adams-spreadsheet
+#
 adams.flow.control.Flow -annotation "Demonstrates how to use Rserve in parallel by making some nice spirals."
  adams.flow.standalone.SetVariable -name radius -var-name radius -var-value 50
  adams.flow.standalone.SetVariable -name max -var-name max -var-value 2000
@@ -13,12 +15,12 @@ adams.flow.control.Flow -annotation "Demonstrates how to use Rserve in parallel 
   adams.flow.control.Trigger -name "1st spiral"
    adams.flow.standalone.Rserve -logging-level INFO
    adams.flow.source.ForLoop -lower 0 -upper @{max}
-   adams.flow.transformer.RTransformer -script "offset <- 2*@{radius}\\nscale <- @{radius} * (@{max} - X) / @{max} \\nx <- cos(X*pi/@{max}*(@{loops}*2))\\ny <- sin(X*pi/@{max}*(@{loops}*2))\\nc(offset + scale * x, offset + scale * y)" -return-type DoubleArray
+   adams.flow.transformer.RTransformer -script "offset <- 2*@{radius}\\nscale <- @{radius} * (@{max} - X) / @{max} \\nx <- cos(X*pi/@{max}*(@{loops}*2))\\ny <- sin(X*pi/@{max}*(@{loops}*2))\\nc(offset + scale * x, offset + scale * y)" -variable true -line-by-line false -return-type DoubleArray
    adams.flow.transformer.MakePlotContainer
    adams.flow.sink.CallableSink -callable SequencePlotter
   adams.flow.control.Trigger -name "2nd spiral"
    adams.flow.standalone.Rserve -logging-level INFO -port 6312
    adams.flow.source.ForLoop -lower 0 -upper @{max}
-   adams.flow.transformer.RTransformer -script "offset <- 2*@{radius}\\nscale <- 0.95 * @{radius} * X / @{max} \\nx <- cos((@{max}-X)*pi/@{max}*(@{loops}*2))\\ny <- sin((@{max}-X)*pi/@{max}*(@{loops}*2))\\nc(offset + scale * x, offset + scale * y)" -return-type DoubleArray
+   adams.flow.transformer.RTransformer -script "offset <- 2*@{radius}\\nscale <- 0.95 * @{radius} * X / @{max} \\nx <- cos((@{max}-X)*pi/@{max}*(@{loops}*2))\\ny <- sin((@{max}-X)*pi/@{max}*(@{loops}*2))\\nc(offset + scale * x, offset + scale * y)" -variable true -line-by-line false -return-type DoubleArray
    adams.flow.transformer.MakePlotContainer
    adams.flow.sink.CallableSink -callable SequencePlotter

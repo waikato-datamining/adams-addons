@@ -15,26 +15,25 @@
 
 /*
  * RStandaloneTest.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.standalone;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 import adams.core.option.AbstractArgumentOption;
 import adams.env.Environment;
 import adams.flow.AbstractRFlowTest;
 import adams.flow.control.Flow;
 import adams.flow.core.Actor;
 import adams.test.TmpFile;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * Test for RStandalone actor.
  *
  * @author fracpete
  * @author adams.core.option.FlowJUnitTestProducer (code generator)
- * @version $Revision$
  */
 public class RStandaloneTest
   extends AbstractRFlowTest {
@@ -113,8 +112,9 @@ public class RStandaloneTest
 
       // Flow.RStandalone
       adams.flow.standalone.RStandalone rstandalone3 = new adams.flow.standalone.RStandalone();
-      argOption = (AbstractArgumentOption) rstandalone3.getOptionManager().findByProperty("script");
-      rstandalone3.setScript((adams.core.scripting.RScript) argOption.valueOf("set.seed(1)\nx <- sample(1:100, 200, replace=T)\nwrite.table(x, file=\"${TMP}/dumpfile.txt\")"));
+      argOption = (AbstractArgumentOption) rstandalone3.getOptionManager().findByProperty("inlineScript");
+      rstandalone3.setInlineScript((adams.core.scripting.RScript) argOption.valueOf("set.seed(1)\nx <- sample(1:100, 200, replace=T)\nwrite.table(x, file=\"${TMP}/dumpfile.txt\")"));
+      rstandalone3.setScriptContainsPlaceholder(true);
 
       abstractactor1[1] = rstandalone3;
       flow.setActors(abstractactor1);

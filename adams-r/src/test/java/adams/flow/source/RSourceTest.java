@@ -15,26 +15,25 @@
 
 /*
  * RSourceTest.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.source;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 import adams.core.option.AbstractArgumentOption;
 import adams.env.Environment;
 import adams.flow.AbstractRFlowTest;
 import adams.flow.control.Flow;
 import adams.flow.core.Actor;
 import adams.test.TmpFile;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * Test for RSource actor.
  *
  * @author fracpete
  * @author adams.core.option.FlowJUnitTestProducer (code generator)
- * @version $Revision$
  */
 public class RSourceTest
   extends AbstractRFlowTest {
@@ -113,8 +112,8 @@ public class RSourceTest
 
       // Flow.RSource
       adams.flow.source.RSource rsource3 = new adams.flow.source.RSource();
-      argOption = (AbstractArgumentOption) rsource3.getOptionManager().findByProperty("script");
-      rsource3.setScript((adams.core.scripting.RScript) argOption.valueOf("set.seed(1)\nx <- sample(1:100, 200, replace=T)\nx2 <- log2(x)"));
+      argOption = (AbstractArgumentOption) rsource3.getOptionManager().findByProperty("inlineScript");
+      rsource3.setInlineScript((adams.core.scripting.RScript) argOption.valueOf("set.seed(1)\nx <- sample(1:100, 200, replace=T)\nx2 <- log2(x)"));
 
       argOption = (AbstractArgumentOption) rsource3.getOptionManager().findByProperty("returnType");
       rsource3.setReturnType((adams.core.RDataType) argOption.valueOf("DoubleArray"));

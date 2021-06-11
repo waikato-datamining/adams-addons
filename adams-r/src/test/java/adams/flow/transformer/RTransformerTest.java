@@ -15,13 +15,11 @@
 
 /*
  * RTransformerTest.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 import adams.core.base.BaseText;
 import adams.core.option.AbstractArgumentOption;
 import adams.env.Environment;
@@ -29,13 +27,14 @@ import adams.flow.AbstractRFlowTest;
 import adams.flow.control.Flow;
 import adams.flow.core.Actor;
 import adams.test.TmpFile;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * Test for RTransformer actor.
  *
  * @author fracpete
  * @author adams.core.option.FlowJUnitTestProducer (code generator)
- * @version $Revision$
  */
 public class RTransformerTest
   extends AbstractRFlowTest {
@@ -145,8 +144,8 @@ public class RTransformerTest
 
       // Flow.RTransformer
       adams.flow.transformer.RTransformer rtransformer11 = new adams.flow.transformer.RTransformer();
-      argOption = (AbstractArgumentOption) rtransformer11.getOptionManager().findByProperty("script");
-      rtransformer11.setScript((adams.core.scripting.RScript) argOption.valueOf("mean(X)"));
+      argOption = (AbstractArgumentOption) rtransformer11.getOptionManager().findByProperty("inlineScript");
+      rtransformer11.setInlineScript((adams.core.scripting.RScript) argOption.valueOf("mean(X)"));
 
       argOption = (AbstractArgumentOption) rtransformer11.getOptionManager().findByProperty("returnType");
       rtransformer11.setReturnType((adams.core.RDataType) argOption.valueOf("Double"));

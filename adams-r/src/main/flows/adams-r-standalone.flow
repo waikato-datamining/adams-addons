@@ -1,12 +1,12 @@
 # Project: adams
-# Date: 2016-02-15 14:54:09
+# Date: 2021-06-11 16:01:05
 # User: fracpete
 # Charset: UTF-8
-adams.flow.control.Flow -annotation "Generates a plot from a random sample of numbers and saves\\nit to a PNG file, all in the same R script. The filename of the \\ngenerated image is then displayed." -flow-execution-listener adams.flow.execution.NullListener
+# Modules: adams-core,adams-r,adams-spreadsheet
+#
+adams.flow.control.Flow -annotation "Generates a plot from a random sample of numbers and saves\\nit to a PNG file, all in the same R script. The generated image is \\nthen displayed." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.Rserve
- adams.flow.standalone.SetVariable -var-name file -var-value ${FLOWS}/output/graph.png
- adams.flow.standalone.RStandalone -script "x <- sample(1:100, 200, replace=T)\\npng(\\\"@{file}\\\")\\nplot(x)\\ndev.off()"
+ adams.flow.standalone.SetVariable -var-name file -var-value ${FLOWS}/output/graph.png -value-type FILE_FORWARD_SLASHES
+ adams.flow.standalone.RStandalone -script "x <- sample(1:100, 200, replace=T)\\npng(\\\"@{file}\\\")\\nplot(x)\\ndev.off()" -placeholder true -variable true
  adams.flow.source.Variable -var-name file
- adams.flow.transformer.Convert -conversion "adams.data.conversion.StringToFile -placeholderfile true"
- adams.flow.transformer.Convert -name Convert-1 -conversion "adams.data.conversion.FileToString -absolute true"
- adams.flow.sink.Display -writer adams.data.io.output.NullWriter
+ adams.flow.sink.FilePreview -display-type adams.flow.core.displaytype.Default -writer adams.gui.print.NullWriter -use-custom-preview true -preview adams.gui.tools.previewbrowser.ImageHandler

@@ -15,7 +15,7 @@
 
 /*
  * RSinkTest.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
@@ -37,7 +37,6 @@ import junit.framework.TestSuite;
  *
  * @author fracpete
  * @author adams.core.option.FlowJUnitTestProducer (code generator)
- * @version $Revision$
  */
 public class RSinkTest
   extends AbstractRFlowTest {
@@ -151,8 +150,8 @@ public class RSinkTest
 
       // Flow.RSink
       adams.flow.sink.RSink rsink11 = new adams.flow.sink.RSink();
-      argOption = (AbstractArgumentOption) rsink11.getOptionManager().findByProperty("script");
-      rsink11.setScript((adams.core.scripting.RScript) argOption.valueOf("\nwrite.table(X, file=\"/tmp/dumpfile.txt\")\n"));
+      argOption = (AbstractArgumentOption) rsink11.getOptionManager().findByProperty("inlineScript");
+      rsink11.setInlineScript((adams.core.scripting.RScript) argOption.valueOf("\nwrite.table(X, file=\"/tmp/dumpfile.txt\")\n"));
 
       abstractactor1[5] = rsink11;
       flow.setActors(abstractactor1);
