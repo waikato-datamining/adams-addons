@@ -140,16 +140,6 @@ public class RenjinSource
   }
 
   /**
-   * Resets the scheme.
-   */
-  @Override
-  protected void reset() {
-    super.reset();
-
-    m_Context = null;
-  }
-
-  /**
    * Adds options to the internal list of options.
    */
   @Override
