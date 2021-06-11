@@ -24,6 +24,8 @@ import adams.core.Placeholders;
 import adams.core.QuickInfoHelper;
 import adams.core.Shortening;
 import adams.core.Utils;
+import adams.core.base.BaseCharset;
+import adams.core.io.EncodingSupporter;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 import adams.core.scripting.RScript;
@@ -81,6 +83,11 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: ${CWD}
  * </pre>
  *
+ * <pre>-encoding &lt;adams.core.base.BaseCharset&gt; (property: encoding)
+ * &nbsp;&nbsp;&nbsp;The type of encoding to use when loading the script file.
+ * &nbsp;&nbsp;&nbsp;default: Default
+ * </pre>
+ *
  * <pre>-inline-script &lt;adams.core.scripting.RScript&gt; (property: inlineScript)
  * &nbsp;&nbsp;&nbsp;The inline script to execute (when no script file supplied).
  * &nbsp;&nbsp;&nbsp;default:
@@ -101,12 +108,16 @@ import java.util.List;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class RenjinStandalone
-  extends AbstractStandalone {
+  extends AbstractStandalone
+  implements EncodingSupporter {
 
   private static final long serialVersionUID = 1958559911609186904L;
 
   /** the script. */
   protected PlaceholderFile m_ScriptFile;
+
+  /** the encoding to use. */
+  protected BaseCharset m_Encoding;
 
   /** Script to pass to r */
   protected RScript m_InlineScript;
@@ -142,6 +153,10 @@ public class RenjinStandalone
     m_OptionManager.add(
       "script-file", "scriptFile",
       new PlaceholderFile("."));
+
+    m_OptionManager.add(
+      "encoding", "encoding",
+      new BaseCharset());
 
     m_OptionManager.add(
       "inline-script", "inlineScript",
@@ -183,6 +198,38 @@ public class RenjinStandalone
    */
   public String scriptFileTipText() {
     return "The script file to load and execute.";
+  }
+
+  /**
+   * Sets the encoding to use for the script file.
+   *
+   * @param value	the encoding, e.g. "UTF-8" or "UTF-16", empty string for default
+   */
+  @Override
+  public void setEncoding(BaseCharset value) {
+    m_Encoding = value;
+    reset();
+  }
+
+  /**
+   * Returns the encoding to use for the script file.
+   *
+   * @return		the encoding, e.g. "UTF-8" or "UTF-16", empty string for default
+   */
+  @Override
+  public BaseCharset getEncoding() {
+    return m_Encoding;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  @Override
+  public String encodingTipText() {
+    return "The type of encoding to use when loading the script file.";
   }
 
   /**
@@ -334,7 +381,7 @@ public class RenjinStandalone
     if (m_ScriptFile.isDirectory() || !m_ScriptFile.exists())
       script = m_InlineScript.getValue();
     else
-      script = Utils.flatten(FileUtils.loadFromFile(m_ScriptFile), "\n");
+      script = Utils.flatten(FileUtils.loadFromFile(m_ScriptFile, m_Encoding.getValue()), "\n");
 
     if (m_ScriptContainsVariable)
       script = getVariables().expand(script);
