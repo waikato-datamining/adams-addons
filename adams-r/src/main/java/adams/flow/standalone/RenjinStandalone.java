@@ -336,7 +336,7 @@ public class RenjinStandalone
     if (QuickInfoHelper.hasVariable(this, "scriptFile") || !m_ScriptFile.isDirectory())
       result = QuickInfoHelper.toString(this, "scriptFile", m_ScriptFile, "file: ");
     else
-      result = QuickInfoHelper.toString(this, "inlineScript", Shortening.shortenEnd(m_InlineScript.stringValue(), 50), "inline: ");
+      result = QuickInfoHelper.toString(this, "inlineScript", Shortening.shortenEnd(m_InlineScript.isEmpty() ? "-none-" : m_InlineScript.stringValue(), 50), "inline: ");
 
     options = new ArrayList<>();
     QuickInfoHelper.add(options, QuickInfoHelper.toString(this, "scriptContainsPlaceholder", m_ScriptContainsPlaceholder, "PH"));
@@ -387,6 +387,9 @@ public class RenjinStandalone
       script = getVariables().expand(script);
     if (m_ScriptContainsPlaceholder)
       script = Placeholders.getSingleton().expand(script);
+
+    if (isLoggingEnabled())
+      getLogger().info("Evaluating:\n" + script);
 
     try {
       m_Context.getEngine().eval(script);
