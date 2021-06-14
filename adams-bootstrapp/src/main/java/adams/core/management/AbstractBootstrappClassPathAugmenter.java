@@ -45,7 +45,7 @@ public abstract class AbstractBootstrappClassPathAugmenter
    *
    * @return		the dir above 'target' or 'lib' (if compressed)
    */
-  protected abstract String getBootstrappOutputDir();
+  public abstract String getBootstrappOutputDir();
 
   /**
    * Returns the actual directory with jars.

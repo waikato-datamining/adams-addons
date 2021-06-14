@@ -61,7 +61,7 @@ public class RenjinClassPathAugmenter
    * @return the dir above 'target' or 'lib' (if compressed)
    */
   @Override
-  protected String getBootstrappOutputDir() {
+  public String getBootstrappOutputDir() {
     return Environment.getInstance().getHome() + "/" + DIR;
   }
 }
