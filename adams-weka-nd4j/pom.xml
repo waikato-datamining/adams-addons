@@ -12,7 +12,7 @@
   <artifactId>adams-weka-nd4j</artifactId>
   <packaging>jar</packaging>
 
-  <name>adams-weka-dn4j</name>
+  <name>adams-weka-nd4j</name>
   <description>Weka components that use the ND4J library.</description>
   <url>https://adams.cms.waikato.ac.nz/</url>
   <organization>
