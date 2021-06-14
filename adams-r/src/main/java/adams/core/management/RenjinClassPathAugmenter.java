@@ -32,6 +32,9 @@ public class RenjinClassPathAugmenter
 
   private static final long serialVersionUID = 7003445505711413086L;
 
+  /** the directory to use in the ADAMS home dir. */
+  public final static String DIR = "renjin";
+
   /**
    * Returns a string describing the object.
    *
@@ -59,6 +62,6 @@ public class RenjinClassPathAugmenter
    */
   @Override
   protected String getBootstrappOutputDir() {
-    return Environment.getInstance().getHome() + "/renjin";
+    return Environment.getInstance().getHome() + "/" + DIR;
   }
 }
