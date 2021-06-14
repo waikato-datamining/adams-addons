@@ -23,7 +23,7 @@ package adams.core;
 import adams.core.io.FileUtils;
 import adams.core.logging.Logger;
 import adams.core.logging.LoggingHelper;
-import org.renjin.primitives.io.serialization.RDataReader;
+import org.renjin.serialization.RDataReader;
 import org.renjin.sexp.PairList;
 import org.renjin.sexp.PairList.Node;
 import org.renjin.sexp.SEXP;

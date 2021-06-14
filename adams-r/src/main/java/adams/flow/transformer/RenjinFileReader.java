@@ -24,7 +24,7 @@ import adams.core.io.FileUtils;
 import adams.core.io.GzipUtils;
 import adams.core.io.PlaceholderFile;
 import adams.flow.core.Token;
-import org.renjin.primitives.io.serialization.RDataReader;
+import org.renjin.serialization.RDataReader;
 import org.renjin.sexp.SEXP;
 
 import java.io.File;
@@ -132,7 +132,7 @@ public class RenjinFileReader
     PlaceholderFile	input;
     FileInputStream 	fis;
     GZIPInputStream 	gis;
-    RDataReader 	reader;
+    RDataReader reader;
     SEXP		data;
 
     result = null;

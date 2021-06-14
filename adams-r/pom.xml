@@ -76,6 +76,20 @@
     </dependency>
 
     <dependency>
+      <groupId>nz.ac.waikato.cms.adams</groupId>
+      <artifactId>adams-bootstrapp</artifactId>
+      <version>${adams.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>nz.ac.waikato.cms.adams</groupId>
+      <artifactId>adams-bootstrapp</artifactId>
+      <version>${adams.version}</version>
+      <scope>test</scope>
+      <type>test-jar</type>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-math</artifactId>
       <version>2.1</version>
@@ -90,7 +104,7 @@
     <dependency>
       <groupId>org.renjin</groupId>
       <artifactId>renjin-script-engine</artifactId>
-      <version>0.9.2716</version>
+      <version>3.5-beta76</version>
     </dependency>
   </dependencies>
 

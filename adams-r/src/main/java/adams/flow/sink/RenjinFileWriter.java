@@ -22,9 +22,9 @@ package adams.flow.sink;
 
 import adams.core.QuickInfoHelper;
 import adams.core.io.FileUtils;
-import org.renjin.primitives.io.serialization.HeadlessWriteContext;
-import org.renjin.primitives.io.serialization.RDataWriter;
-import org.renjin.primitives.io.serialization.Serialization.SerializationType;
+import org.renjin.serialization.HeadlessWriteContext;
+import org.renjin.serialization.RDataWriter;
+import org.renjin.serialization.Serialization.SerializationType;
 import org.renjin.sexp.SEXP;
 
 import java.io.FileOutputStream;
@@ -196,7 +196,7 @@ public class RenjinFileWriter
   protected String doExecute() {
     String		result;
     SEXP		input;
-    RDataWriter		writer;
+    RDataWriter writer;
     FileOutputStream	fos;
     GZIPOutputStream	gos;
 
