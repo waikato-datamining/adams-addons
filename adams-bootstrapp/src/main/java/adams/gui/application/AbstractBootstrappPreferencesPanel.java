@@ -30,13 +30,12 @@ import adams.core.io.FileUtils;
 import adams.core.logging.LoggingHelper;
 import adams.core.net.HtmlUtils;
 import adams.env.Environment;
-import adams.gui.core.BrowserHelper.DefaultHyperlinkListener;
+import adams.gui.core.BaseHtmlEditorPane;
 import adams.gui.core.ConsolePanel;
 import adams.gui.core.ParameterPanel;
 import adams.gui.goe.GenericArrayEditorPanel;
 import com.github.fracpete.bootstrapp.Main;
 
-import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -58,7 +57,7 @@ public abstract class AbstractBootstrappPreferencesPanel
   protected JPanel m_PanelInfo;
 
   /** the label with the option info text. */
-  protected JEditorPane m_EditorPaneInfo;
+  protected BaseHtmlEditorPane m_EditorPaneInfo;
 
   /** the parameters. */
   protected ParameterPanel m_PanelParameters;
@@ -86,11 +85,8 @@ public abstract class AbstractBootstrappPreferencesPanel
 
     m_PanelInfo = new JPanel(new FlowLayout(FlowLayout.LEFT));
     m_PanelInfo.setBackground(Color.WHITE);
-    m_EditorPaneInfo = new JEditorPane();
-    m_EditorPaneInfo.setEditable(false);
-    m_EditorPaneInfo.setAutoscrolls(true);
-    m_EditorPaneInfo.addHyperlinkListener(new DefaultHyperlinkListener());
-    m_EditorPaneInfo.setContentType("text/html");
+    m_EditorPaneInfo = new BaseHtmlEditorPane();
+    m_EditorPaneInfo.addDefaultHyperlinkListener();
     m_PanelInfo.add(m_EditorPaneInfo);
     add(m_PanelInfo, BorderLayout.NORTH);
 

@@ -24,7 +24,6 @@ import adams.env.Environment;
 import com.googlecode.jfilechooserbookmarks.gui.BaseScrollPane;
 import org.markdownj.MarkdownProcessor;
 
-import javax.swing.JEditorPane;
 import javax.swing.text.Document;
 import java.awt.BorderLayout;
 
@@ -47,7 +46,7 @@ public class MarkdownTextPane
   protected String m_Markdown;
 
   /** for rendering the markdown. */
-  protected JEditorPane m_PaneView;
+  protected BaseHtmlEditorPane m_PaneView;
 
   /**
    * Initializes the members.
@@ -69,9 +68,7 @@ public class MarkdownTextPane
 
     setLayout(new BorderLayout());
 
-    m_PaneView = new JEditorPane();
-    m_PaneView.setEditable(false);
-    m_PaneView.setContentType("text/html");
+    m_PaneView = new BaseHtmlEditorPane();
     add(new BaseScrollPane(m_PaneView), BorderLayout.CENTER);
   }
 

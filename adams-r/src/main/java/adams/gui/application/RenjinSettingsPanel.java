@@ -50,9 +50,13 @@ public class RenjinSettingsPanel
   @Override
   protected String getDefaultInfoText() {
     return "You can find artifact information on Renjin packages here:\n"
-      + "http://packages.renjin.org/\n\n"
+      + "http://packages.renjin.org/\n"
+      + "\n"
       + "The Maven repository for the Renjin packages is provided by betadriven:\n"
-      + "https://nexus.bedatadriven.com/content/groups/public/";
+      + "https://nexus.bedatadriven.com/content/groups/public/\n"
+      + "\n"
+      + "The downloaded artifacts get stored in:\n"
+      + new RenjinClassPathAugmenter().getActualLibDir();
   }
 
   /**

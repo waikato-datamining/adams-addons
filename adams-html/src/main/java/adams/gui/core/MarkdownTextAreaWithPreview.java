@@ -24,7 +24,6 @@ import adams.env.Environment;
 import com.googlecode.jfilechooserbookmarks.gui.BaseScrollPane;
 import org.markdownj.MarkdownProcessor;
 
-import javax.swing.JEditorPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.text.Document;
 import java.awt.BorderLayout;
@@ -49,7 +48,7 @@ public class MarkdownTextAreaWithPreview
   protected BaseTextArea m_TextCode;
 
   /** the preview. */
-  protected JEditorPane m_PanePreview;
+  protected BaseHtmlEditorPane m_PanePreview;
 
   /** the markdown processor. */
   protected MarkdownProcessor m_Processor;
@@ -80,9 +79,7 @@ public class MarkdownTextAreaWithPreview
     m_TextCode.setFont(Fonts.getMonospacedFont());
     m_TabbedPane.addTab("Write", new BaseScrollPane(m_TextCode));
 
-    m_PanePreview = new JEditorPane();
-    m_PanePreview.setEditable(false);
-    m_PanePreview.setContentType("text/html");
+    m_PanePreview = new BaseHtmlEditorPane();
     m_TabbedPane.addTab("Preview", new BaseScrollPane(m_PanePreview));
 
     m_TabbedPane.addChangeListener((ChangeEvent e) -> update());
