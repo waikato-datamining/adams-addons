@@ -23,17 +23,24 @@ package adams.gui.application;
 import adams.core.Properties;
 import adams.core.Utils;
 import adams.core.base.MavenArtifact;
+import adams.core.base.MavenArtifactExclusion;
 import adams.core.base.MavenRepository;
 import adams.core.bootstrapp.BootstrappUtils;
 import adams.core.io.FileUtils;
 import adams.core.logging.LoggingHelper;
+import adams.core.net.HtmlUtils;
 import adams.env.Environment;
+import adams.gui.core.BrowserHelper.DefaultHyperlinkListener;
 import adams.gui.core.ConsolePanel;
 import adams.gui.core.ParameterPanel;
 import adams.gui.goe.GenericArrayEditorPanel;
 import com.github.fracpete.bootstrapp.Main;
 
+import javax.swing.JEditorPane;
+import javax.swing.JPanel;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,11 +54,20 @@ public abstract class AbstractBootstrappPreferencesPanel
 
   private static final long serialVersionUID = -6716073907018119671L;
 
+  /** the panel with optional info text. */
+  protected JPanel m_PanelInfo;
+
+  /** the label with the option info text. */
+  protected JEditorPane m_EditorPaneInfo;
+
   /** the parameters. */
   protected ParameterPanel m_PanelParameters;
 
   /** the artifacts. */
   protected GenericArrayEditorPanel m_PanelArtifacts;
+
+  /** the exclusions. */
+  protected GenericArrayEditorPanel m_PanelExclusions;
 
   /** the repositories. */
   protected GenericArrayEditorPanel m_PanelRepositories;
@@ -68,6 +84,16 @@ public abstract class AbstractBootstrappPreferencesPanel
 
     setLayout(new BorderLayout());
 
+    m_PanelInfo = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    m_PanelInfo.setBackground(Color.WHITE);
+    m_EditorPaneInfo = new JEditorPane();
+    m_EditorPaneInfo.setEditable(false);
+    m_EditorPaneInfo.setAutoscrolls(true);
+    m_EditorPaneInfo.addHyperlinkListener(new DefaultHyperlinkListener());
+    m_EditorPaneInfo.setContentType("text/html");
+    m_PanelInfo.add(m_EditorPaneInfo);
+    add(m_PanelInfo, BorderLayout.NORTH);
+
     m_PanelParameters = new ParameterPanel();
     add(m_PanelParameters, BorderLayout.CENTER);
 
@@ -75,9 +101,47 @@ public abstract class AbstractBootstrappPreferencesPanel
     m_PanelArtifacts.setCurrent(getArtifacts());
     m_PanelParameters.addParameter("_Artifacts", m_PanelArtifacts);
 
+    m_PanelExclusions = new GenericArrayEditorPanel(new MavenArtifactExclusion[0]);
+    m_PanelExclusions.setCurrent(getExclusions());
+    m_PanelParameters.addParameter("_Exclusions", m_PanelExclusions);
+
     m_PanelRepositories = new GenericArrayEditorPanel(new MavenRepository[0]);
     m_PanelRepositories.setCurrent(getRepositories());
     m_PanelParameters.addParameter("Repositories", m_PanelRepositories);
+
+    setInfoText(getDefaultInfoText());
+  }
+
+  /**
+   * The default info text to display (gets converted to HTML automatically).
+   *
+   * @return		the text, null to disable
+   */
+  protected abstract String getDefaultInfoText();
+
+  /**
+   * Sets the info text to display (gets converted to HTML automatically).
+   *
+   * @param value	the text, null or empty string to hide
+   */
+  public void setInfoText(String value) {
+    if (value == null)
+      value = "";
+    else
+      value = value.trim();
+    value = HtmlUtils.markUpURLs(value, true);
+    value = HtmlUtils.convertLines(value, true);
+    m_EditorPaneInfo.setText(value);
+    m_PanelInfo.setVisible(value.length() > 0);
+  }
+
+  /**
+   * Returns the current info text.
+   *
+   * @return		the text
+   */
+  public String getInfoText() {
+    return m_EditorPaneInfo.getText();
   }
 
   /**
@@ -135,6 +199,29 @@ public abstract class AbstractBootstrappPreferencesPanel
   }
 
   /**
+   * Returns the exclusions to display.
+   *
+   * @return		the artifacts
+   */
+  protected MavenArtifactExclusion[] getExclusions() {
+    List<MavenArtifactExclusion> 	result;
+    String[]				parts;
+    MavenArtifactExclusion		artifact;
+
+    result = new ArrayList<>();
+    if (getProperties().hasKey(BootstrappUtils.KEY_EXCLUSIONS)) {
+      parts = getProperties().getProperty(BootstrappUtils.KEY_EXCLUSIONS).split(",");
+      for (String part: parts) {
+        artifact = new MavenArtifactExclusion(part);
+        if (!artifact.isEmpty())
+          result.add(artifact);
+      }
+    }
+
+    return result.toArray(new MavenArtifactExclusion[0]);
+  }
+
+  /**
    * Returns the repositories to display.
    *
    * @return		the repositories
@@ -175,6 +262,7 @@ public abstract class AbstractBootstrappPreferencesPanel
     result = new Properties();
 
     result.setProperty(BootstrappUtils.KEY_DEPENDENCIES, Utils.flatten((MavenArtifact[]) m_PanelArtifacts.getCurrent(), ","));
+    result.setProperty(BootstrappUtils.KEY_EXCLUSIONS, Utils.flatten((MavenArtifactExclusion[]) m_PanelExclusions.getCurrent(), ","));
     result.setProperty(BootstrappUtils.KEY_REPOSITORIES, Utils.flatten((MavenRepository[]) m_PanelRepositories.getCurrent(), ","));
 
     return result;
@@ -264,8 +352,14 @@ public abstract class AbstractBootstrappPreferencesPanel
 
     filename = Environment.getInstance().createPropertiesFilename(getPropertiesFile());
     if ((filename != null) && FileUtils.fileExists(filename)) {
-      if (!FileUtils.delete(filename))
+      if (!FileUtils.delete(filename)) {
 	return "Failed to remove custom settings: " + filename;
+      }
+      else {
+        m_PanelArtifacts.setCurrent(new MavenArtifact[0]);
+        m_PanelExclusions.setCurrent(new MavenArtifactExclusion[0]);
+        m_PanelRepositories.setCurrent(new MavenRepository[0]);
+      }
     }
 
     return null;

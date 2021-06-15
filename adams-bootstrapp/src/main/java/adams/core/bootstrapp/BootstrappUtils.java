@@ -38,6 +38,9 @@ public class BootstrappUtils {
   /** the key for the dependencies (comma-separated 'group:artifact:version'). */
   public final static String KEY_DEPENDENCIES = "Dependencies";
 
+  /** the key for the excluded dependencies (comma-separated 'group:artifact:'). */
+  public final static String KEY_EXCLUSIONS = "Exclusions";
+
   /** the key for the repositories (comma-separated 'id;name;url'). */
   public final static String KEY_REPOSITORIES = "Repositories";
 
@@ -69,6 +72,9 @@ public class BootstrappUtils {
       throw new IllegalArgumentException("Missing property for dependencies: " + KEY_DEPENDENCIES);
     result.dependencies(Arrays.asList(props.getProperty(KEY_DEPENDENCIES).split(",")));
 
+    if (props.hasKey(KEY_EXCLUSIONS))
+      result.exclusions(Arrays.asList(props.getProperty(KEY_EXCLUSIONS).split(",")));
+
     if (!props.hasKey(KEY_OUTPUTDIR))
       throw new IllegalArgumentException("Missing property for output directory: " + KEY_OUTPUTDIR);
     result.outputDir(new PlaceholderDirectory(props.getPath(KEY_OUTPUTDIR)).getAbsoluteFile());
@@ -99,6 +105,8 @@ public class BootstrappUtils {
 
     result = new Properties();
     result.setProperty(KEY_DEPENDENCIES, Utils.flatten(main.getDependencies(), ","));
+    if (main.getExclusions() != null)
+      result.setProperty(KEY_EXCLUSIONS, Utils.flatten(main.getExclusions(), ","));
     if (main.getRepositories() != null)
       result.setProperty(KEY_REPOSITORIES, Utils.flatten(main.getRepositories(), ","));
     result.setProperty(KEY_OUTPUTDIR, main.getOutputDir().getAbsolutePath());

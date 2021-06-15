@@ -43,6 +43,19 @@ public class RenjinSettingsPanel
   }
 
   /**
+   * The default info text to display (gets converted to HTML automatically).
+   *
+   * @return		the text, null to disable
+   */
+  @Override
+  protected String getDefaultInfoText() {
+    return "You can find artifact information on Renjin packages here:\n"
+      + "http://packages.renjin.org/\n\n"
+      + "The Maven repository for the Renjin packages is provided by betadriven:\n"
+      + "https://nexus.bedatadriven.com/content/groups/public/";
+  }
+
+  /**
    * Returns the name of the properties file to load.
    *
    * @return the filename (no path)
