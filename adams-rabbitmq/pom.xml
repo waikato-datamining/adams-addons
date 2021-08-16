@@ -13,7 +13,7 @@
   <packaging>jar</packaging>
 
   <name>adams-rabbitmq</name>
-  <description>Module for Celery (distributed task queue) support.</description>
+  <description>Module for RabbitMQ support.</description>
   <url>https://adams.cms.waikato.ac.nz/</url>
   <organization>
     <name>University of Waikato, Hamilton, NZ</name>
