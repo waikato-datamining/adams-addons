@@ -67,7 +67,7 @@
     <module>adams-rats-net</module>
     <module>adams-rats-rest</module>
     <module>adams-rats-webservice</module>
-    <module>adams-redis</module>
+    <!--module>adams-redis</module-->
     <module>adams-rest</module>
     <module>adams-security</module>
     <module>adams-tensorflow</module>
