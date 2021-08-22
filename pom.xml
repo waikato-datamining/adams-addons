@@ -22,8 +22,8 @@
   </organization>
 
   <scm>
-    <connection>scm:git:https://github.com/waikato-datamining/adams-addons</connection>
-    <developerConnection>scm:git:https://github.com/waikato-datamining/adams-addons</developerConnection>
+    <connection>scm:git:ssh://git@github.com/waikato-datamining/adams-addons</connection>
+    <developerConnection>scm:git:ssh://git@github.com/waikato-datamining/adams-addons</developerConnection>
     <url>https://github.com/waikato-datamining/adams-addons</url>
     <tag>HEAD</tag>
   </scm>
@@ -67,6 +67,7 @@
     <module>adams-rats-net</module>
     <module>adams-rats-rest</module>
     <module>adams-rats-webservice</module>
+    <module>adams-redis</module>
     <module>adams-rest</module>
     <module>adams-security</module>
     <module>adams-tensorflow</module>
