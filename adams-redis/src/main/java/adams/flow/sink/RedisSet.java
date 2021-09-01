@@ -146,8 +146,6 @@ public class RedisSet
     try {
       if (m_InputToken.hasPayload(String.class))
         m_Connection.getConnection().set(m_Key, (String) m_InputToken.getPayload());
-      else
-        m_Connection.getConnection().set(m_Key, (byte[]) m_InputToken.getPayload());
     }
     catch (Exception e) {
       result = handleException("Failed to set value for key: " + m_Key, e);
