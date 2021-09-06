@@ -1,0 +1,19 @@
+# Project: adams
+# Date: 2021-09-06 20:44:01
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-event,adams-meta,adams-rats-core,adams-rats-redis,adams-redis,adams-terminal
+#
+adams.flow.control.Flow -annotation "Shows how to send and receive data via Redis using Rats." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.RedisConnection
+ adams.flow.standalone.SetVariable -var-name counter -var-value 0
+ adams.flow.standalone.Rats
+  adams.flow.standalone.Rat -name Send -receiver "adams.flow.standalone.rats.input.Cron -input \"adams.flow.standalone.rats.input.Variable -variable-name counter\" -schedule \"0/5 * * * * ?\"" -transmitter "adams.flow.standalone.rats.output.RedisAction -action \"adams.flow.sink.redisaction.SetString -key name\"" -log-generator adams.flow.standalone.rats.log.LogEntryGenerator -scope-handling-variables SHARE
+   adams.flow.transformer.IncVariable -var-name counter
+  adams.flow.standalone.Rat -name Receive -receiver "adams.flow.standalone.rats.input.InputPolling -input \"adams.flow.standalone.rats.input.RedisAction -action \\\"adams.flow.source.redisaction.GetString -key name\\\"\"" -transmitter "adams.flow.standalone.rats.output.CallableActor -callable Display" -log-generator adams.flow.standalone.rats.log.LogEntryGenerator
+ adams.flow.source.Start
+ adams.flow.control.WhileLoop -condition adams.flow.condition.bool.True
+  adams.flow.source.Start
+  adams.flow.control.Sleep
