@@ -20,6 +20,7 @@
 
 package adams.flow.standalone;
 
+import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import redis.clients.jedis.Jedis;
 
@@ -152,6 +153,32 @@ public class RedisConnection
   }
 
   /**
+   * Creates a new connection.
+   *
+   * @param errors    for collecting errors
+   * @return          the connection, null if failed to create
+   */
+  public Jedis newConnection(MessageCollection errors) {
+    try {
+      return new Jedis(m_Host, m_Port);
+    }
+    catch (Exception e) {
+      errors.add("Failed to connect to Redis server: " + m_Host + ":" + m_Port, e);
+      return null;
+    }
+  }
+
+  /**
+   * Returns the database connection in use. Reconnects the database, to make
+   * sure that the database connection is the correct one.
+   *
+   * @return		the connection object
+   */
+  public Jedis getConnection() {
+    return m_Connection;
+  }
+
+  /**
    * Executes the actor.
    *
    * @return		null if everything is fine, otherwise error message
@@ -169,16 +196,6 @@ public class RedisConnection
     }
 
     return result;
-  }
-
-  /**
-   * Returns the database connection in use. Reconnects the database, to make
-   * sure that the database connection is the correct one.
-   *
-   * @return		the connection object
-   */
-  public Jedis getConnection() {
-    return m_Connection;
   }
 
   /**
