@@ -1,0 +1,15 @@
+# Project: adams
+# Date: 2021-09-06 13:39:08
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-meta,adams-redis
+#
+adams.flow.control.Flow -annotation "Simple sets a string value on the Redis instance and then reads it again from there." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.RedisConnection
+ adams.flow.source.ForLoop
+ adams.flow.control.Tee -name set
+  adams.flow.transformer.Convert -conversion adams.data.conversion.AnyToString
+  adams.flow.sink.RedisSink -action "adams.flow.sink.redisaction.SetString -key name"
+ adams.flow.control.Trigger -name get
+  adams.flow.source.RedisSource -action "adams.flow.source.redisaction.GetString -key name"
+  adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter

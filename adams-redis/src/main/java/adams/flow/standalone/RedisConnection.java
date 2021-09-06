@@ -20,12 +20,8 @@
 
 package adams.flow.standalone;
 
-import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import redis.clients.jedis.Jedis;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  <!-- globalinfo-start -->

@@ -18,23 +18,33 @@
  * Copyright (C) 2021 University of Waikato, Hamilton, New Zealand
  */
 
-package adams.flow.sink;
+package adams.flow.source;
 
+import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
+import adams.core.Utils;
 import adams.flow.core.ActorUtils;
-import adams.flow.core.Unknown;
+import adams.flow.core.Token;
+import adams.flow.source.redisaction.AbstractRedisAction;
 import adams.flow.standalone.RedisConnection;
 
 /**
- * TODO: What this class does.
+ <!-- globalinfo-start -->
+ <!-- globalinfo-end -->
+ *
+ <!-- flow-summary-start -->
+ <!-- flow-summary-end -->
+ *
+ <!-- options-start -->
+ <!-- options-end -->
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
-public class RedisSet
-    extends AbstractSink {
+public class RedisSource
+  extends AbstractSimpleSource {
 
-  /** the key to use for storing the object. */
-  protected String m_Key;
+  /** the action to execute. */
+  protected AbstractRedisAction m_Action;
 
   /** the current connection. */
   protected transient RedisConnection m_Connection;
@@ -46,7 +56,7 @@ public class RedisSet
    */
   @Override
   public String globalInfo() {
-    return "Stores the incoming object under the specified key.";
+    return "Executes the specified action to generate output.";
   }
 
   /**
@@ -57,27 +67,27 @@ public class RedisSet
     super.defineOptions();
 
     m_OptionManager.add(
-        "key", "key",
-        "");
+      "action", "action",
+      new adams.flow.source.redisaction.Null());
   }
 
   /**
-   * Sets the name of the Key.
+   * Sets the action to execute.
    *
-   * @param value	the name
+   * @param value	the action
    */
-  public void setKey(String value) {
-    m_Key = value;
+  public void setAction(AbstractRedisAction value) {
+    m_Action = value;
     reset();
   }
 
   /**
-   * Returns the name of the Key.
+   * Returns the action to execute.
    *
-   * @return 		the name
+   * @return 		the action
    */
-  public String getKey() {
-    return m_Key;
+  public AbstractRedisAction getAction() {
+    return m_Action;
   }
 
   /**
@@ -86,8 +96,8 @@ public class RedisSet
    * @return		tip text for this property suitable for
    *             	displaying in the GUI or for listing the options.
    */
-  public String KeyTipText() {
-    return "The name of the Key.";
+  public String actionTipText() {
+    return "The action to execute.";
   }
 
   /**
@@ -97,17 +107,17 @@ public class RedisSet
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "key", (m_Key.isEmpty() ? "-empty-" : m_Key), "key: ");
+    return QuickInfoHelper.toString(this, "action", m_Action, "action: ");
   }
 
   /**
-   * Returns the class that the consumer accepts.
+   * Returns the class of objects that it generates.
    *
-   * @return the Class of objects that can be processed
+   * @return the Class of the generated tokens
    */
   @Override
-  public Class[] accepts() {
-    return new Class[]{String.class, byte[].class};
+  public Class[] generates() {
+    return m_Action.generates();
   }
 
   /**
@@ -124,7 +134,7 @@ public class RedisSet
     if (result == null) {
       m_Connection = (RedisConnection) ActorUtils.findClosestType(this, RedisConnection.class);
       if (m_Connection == null)
-        result = "No " + RedisConnection.class.getName() + " actor found!";
+        result = "No " + Utils.classToString(RedisConnection.class) + " actor found!";
     }
 
     return result;
@@ -137,20 +147,23 @@ public class RedisSet
    */
   @Override
   protected String doExecute() {
-    String      result;
-    String      str;
-    byte[]      bytes;
+    String                result;
+    Object                output;
+    MessageCollection     errors;
 
     result = null;
-
+    errors = new MessageCollection();
     try {
-      if (m_InputToken.hasPayload(String.class))
-        m_Connection.getConnection().set(m_Key, (String) m_InputToken.getPayload());
+      output = m_Action.execute(m_Connection.getConnection(), errors);
+      if (!errors.isEmpty())
+        result = errors.toString();
+      else if (output != null)
+        m_OutputToken = new Token(output);
     }
     catch (Exception e) {
-      result = handleException("Failed to set value for key: " + m_Key, e);
+      result = handleException("Failed to execute action: " + m_Action, e);
     }
 
-    return null;
+    return result;
   }
 }

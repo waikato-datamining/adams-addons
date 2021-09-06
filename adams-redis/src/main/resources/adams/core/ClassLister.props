@@ -1,0 +1,15 @@
+# Configuration file listing the superclasses and the packages in which to
+# look for derived classes.
+#
+# Format:
+# class.name=package1,package2,...
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+
+# Redis source actions
+adams.flow.source.redisaction.AbstractRedisAction=\
+  adams.flow.source.redisaction
+
+# Redis sink actions
+adams.flow.sink.redisaction.AbstractRedisAction=\
+  adams.flow.sink.redisaction
