@@ -117,7 +117,7 @@ public class RedisSource
    */
   @Override
   public Class[] generates() {
-    return m_Action.generates();
+    return new Class[]{m_Action.generates()};
   }
 
   /**

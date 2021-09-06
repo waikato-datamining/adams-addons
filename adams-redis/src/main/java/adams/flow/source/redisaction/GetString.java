@@ -92,8 +92,8 @@ public class GetString
    * @return the classes
    */
   @Override
-  public Class[] generates() {
-    return new Class[]{String.class};
+  public Class generates() {
+    return String.class;
   }
 
   /**

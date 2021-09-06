@@ -50,7 +50,7 @@ public abstract class AbstractRedisAction
    *
    * @return		the classes
    */
-  public abstract Class[] generates();
+  public abstract Class generates();
 
   /**
    * For checking the state before executing the action.

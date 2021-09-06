@@ -48,8 +48,8 @@ public class Null
    * @return the classes
    */
   @Override
-  public Class[] generates() {
-    return new Class[]{Unknown.class};
+  public Class generates() {
+    return Unknown.class;
   }
 
   /**
