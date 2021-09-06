@@ -63,6 +63,7 @@
     <module>adams-rats</module>
     <module>adams-rats-core</module>
     <module>adams-rats-net</module>
+    <module>adams-rats-redis</module>
     <module>adams-rats-rest</module>
     <module>adams-rats-webservice</module>
     <module>adams-redis</module>
