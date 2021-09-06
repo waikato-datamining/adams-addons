@@ -14,7 +14,7 @@
  */
 
 /*
- * RedisSet.java
+ * RedisSink.java
  * Copyright (C) 2021 University of Waikato, Hamilton, New Zealand
  */
 
