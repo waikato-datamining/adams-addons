@@ -177,10 +177,9 @@ public class RedisSubscribe
   }
 
   /**
-   * Stops the execution.
+   * Cleans up the Redis data structures.
    */
-  @Override
-  public void stopExecution() {
+  protected void cleanUpRedis() {
     if (m_PubSub != null) {
       m_PubSub.unsubscribe(m_Channel);
       m_PubSub = null;
@@ -189,6 +188,23 @@ public class RedisSubscribe
       m_Connection.close();
       m_Connection = null;
     }
+  }
+
+  /**
+   * Stops the execution.
+   */
+  @Override
+  public void stopExecution() {
+    cleanUpRedis();
     super.stopExecution();
+  }
+
+  /**
+   * Cleans up data structures, frees up memory.
+   */
+  @Override
+  public void cleanUp() {
+    cleanUpRedis();
+    super.cleanUp();
   }
 }

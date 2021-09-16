@@ -73,12 +73,17 @@ The following standalones are available:
 
 \noindent The following sources are available:
 \begin{tight_itemize}
-  \item \textit{RedisSource} -- for accessing data from a Redis instance
+  \item \textit{RedisSource} -- generates data using the specified action
+\end{tight_itemize}
+
+\noindent The following transformers are available:
+\begin{tight_itemize}
+    \item \textit{RedisTransformer} -- transforms data using the specified action
 \end{tight_itemize}
 
 \noindent The following sinks are available:
 \begin{tight_itemize}
-  \item \textit{RedisSink} -- for storing data on a Redis instance
+  \item \textit{RedisSink} -- processes the incoming data with the specified action
 \end{tight_itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

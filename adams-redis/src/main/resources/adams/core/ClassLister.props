@@ -10,6 +10,10 @@
 adams.flow.source.redisaction.AbstractRedisAction=\
   adams.flow.source.redisaction
 
+# Redis transformer actions
+adams.flow.transformer.redisaction.AbstractRedisAction=\
+  adams.flow.transformer.redisaction
+
 # Redis sink actions
 adams.flow.sink.redisaction.AbstractRedisAction=\
   adams.flow.sink.redisaction
