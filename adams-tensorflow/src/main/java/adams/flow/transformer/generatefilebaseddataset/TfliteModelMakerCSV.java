@@ -38,15 +38,17 @@ import adams.flow.container.FileBasedDatasetContainer;
 import adams.flow.transformer.locateobjects.LocatedObject;
 import adams.flow.transformer.locateobjects.LocatedObjects;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
- * Generates a spreadsheet from the incoming files (to be saved as CSV).
+ * Generates a spreadsheet from the incoming files.
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class TfliteModelMakerCSV
-  extends AbstractFileBasedDatasetGeneration<SpreadSheet> {
+  extends AbstractFileBasedDatasetGeneration<SpreadSheet[]> {
 
   private static final long serialVersionUID = 590645786308393421L;
 
@@ -66,7 +68,9 @@ public class TfliteModelMakerCSV
    */
   @Override
   public String globalInfo() {
-    return "Generates a spreadsheet from the incoming files (to be saved as CSV).\n"
+    return "Generates two spreadsheets from the incoming files:\n"
+	+ "- annotations (to be saved as CSV)\n"
+	+ "- labels (in the order they appear in the training set)\n"
 	+ "Expects the annotations to be in ADAMS format alongside the image files.";
   }
 
@@ -200,7 +204,7 @@ public class TfliteModelMakerCSV
    */
   @Override
   public Class generates() {
-    return SpreadSheet.class;
+    return SpreadSheet[].class;
   }
 
   /**
@@ -245,8 +249,8 @@ public class TfliteModelMakerCSV
    * @return the generated output
    */
   @Override
-  protected SpreadSheet doGenerate(FileBasedDatasetContainer cont) {
-    SpreadSheet			result;
+  protected SpreadSheet[] doGenerate(FileBasedDatasetContainer cont) {
+    SpreadSheet[]		result;
     Row				row;
     String[]			files;
     String 			type;
@@ -255,11 +259,16 @@ public class TfliteModelMakerCSV
     int				width;
     int				height;
     LocatedObjects		objects;
+    Set<String> 		labels;
+    String			label;
+    boolean			isTrain;
 
-    result = new DefaultSpreadSheet();
+    result    = new SpreadSheet[2];
+    result[0] = new DefaultSpreadSheet();
+    result[1] = new DefaultSpreadSheet();
 
-    // header
-    row = result.getHeaderRow();
+    // headers
+    row = result[0].getHeaderRow();
     row.addCell("T").setContentAsString("type");
     row.addCell("F").setContentAsString("file");
     row.addCell("L").setContentAsString("label");
@@ -272,11 +281,18 @@ public class TfliteModelMakerCSV
     row.addCell("BLX").setContentAsString("bottom-left-x");
     row.addCell("BLY").setContentAsString("bottom-left-y");
 
+    row = result[1].getHeaderRow();
+    row.addCell("L").setContentAsString("label");
+
+    labels  = new HashSet<>();
+    isTrain = false;
     for (BaseString value: m_Values) {
       // annotation type
       type = value.getValue();
-      if (type.equals(FileBasedDatasetContainer.VALUE_TRAIN))
-        type = "Training";
+      if (type.equals(FileBasedDatasetContainer.VALUE_TRAIN)) {
+	type    = "Training";
+	isTrain = true;
+      }
       type = type.toUpperCase();
 
       // iterate files
@@ -299,11 +315,20 @@ public class TfliteModelMakerCSV
         objects = m_Finder.findObjects(report);
 
         for (LocatedObject object: objects) {
-	  row = result.addRow();
+	  row = result[0].addRow();
 	  row.addCell("T").setContentAsString(type);
 	  row.addCell("F").setContentAsString(file);
-	  if (object.getMetaData().containsKey(m_MetaDataKeyType))
-	    row.addCell("L").setContentAsString("" + object.getMetaData().get(m_MetaDataKeyType));
+	  label = null;
+	  if (object.getMetaData().containsKey(m_MetaDataKeyType)) {
+	    label = "" + object.getMetaData().get(m_MetaDataKeyType);
+	    row.addCell("L").setContentAsString(label);
+	    if (isTrain) {
+	      if (!labels.contains(label)) {
+	        labels.add(label);
+	        result[1].addRow().addCell("L").setContentAsString(label);
+	      }
+	    }
+	  }
 	  row.addCell("TLX").setContent((double) object.getX() / width);
 	  row.addCell("TLY").setContent((double) object.getY() / height);
 	  row.addCell("BRX").setContent((double) (object.getX() + object.getWidth() - 1) / width);
