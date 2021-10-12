@@ -61,6 +61,12 @@ public class TfliteModelMakerCSV
   /** the meta-data key for the type. */
   protected String m_MetaDataKeyType;
 
+  /** the default label. */
+  protected String m_DefaultLabel;
+
+  /** the directory prefix to use for the files. */
+  protected String m_DirectoryPrefix;
+
   /**
    * Returns a string describing the object.
    *
@@ -71,7 +77,9 @@ public class TfliteModelMakerCSV
     return "Generates two spreadsheets from the incoming files:\n"
 	+ "- annotations (to be saved as CSV)\n"
 	+ "- labels (in the order they appear in the training set)\n"
-	+ "Expects the annotations to be in ADAMS format alongside the image files.";
+	+ "Expects the annotations to be in ADAMS format alongside the image files.\n"
+        + "The actual directory part of the files can be replaced with a custom directory "
+        + "prefix (e.g., when using the dataset inside docker).";
   }
 
   /**
@@ -92,6 +100,14 @@ public class TfliteModelMakerCSV
     m_OptionManager.add(
 	"meta-data-key-type", "metaDataKeyType",
 	"type");
+
+    m_OptionManager.add(
+        "default-label", "defaultLabel",
+        "object");
+
+    m_OptionManager.add(
+        "directory-prefix", "directoryPrefix",
+        "");
   }
 
   /**
@@ -182,6 +198,64 @@ public class TfliteModelMakerCSV
   }
 
   /**
+   * Sets the default label to use if none found.
+   *
+   * @param value	the default
+   */
+  public void setDefaultLabel(String value) {
+    m_DefaultLabel = value;
+    reset();
+  }
+
+  /**
+   * Returns the default label to use if none found.
+   *
+   * @return		the default
+   */
+  public String getDefaultLabel() {
+    return m_DefaultLabel;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String defaultLabelTipText() {
+    return "The default label to use if none found in the annotations.";
+  }
+
+  /**
+   * Sets the custom directory prefix to use (ignored if empty).
+   *
+   * @param value	the prefix
+   */
+  public void setDirectoryPrefix(String value) {
+    m_DirectoryPrefix = value;
+    reset();
+  }
+
+  /**
+   * Returns the custom directory prefix to use (ignored if empty).
+   *
+   * @return		the prefix
+   */
+  public String getDirectoryPrefix() {
+    return m_DirectoryPrefix;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String directoryPrefixTipText() {
+    return "The custom directory prefix to use instead of the file's actual directory part (leave empty to use file path).";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -193,6 +267,8 @@ public class TfliteModelMakerCSV
     result = QuickInfoHelper.toString(this, "values", m_Values, "values: ");
     result += QuickInfoHelper.toString(this, "finder", m_Finder, ", finder: ");
     result += QuickInfoHelper.toString(this, "metaDataKeyType", m_MetaDataKeyType, ", type: ");
+    result += QuickInfoHelper.toString(this, "defaultLabel", m_DefaultLabel, ", default: ");
+    result += QuickInfoHelper.toString(this, "directoryPrefix", (m_DirectoryPrefix.isEmpty() ? "-use file-" : m_DirectoryPrefix), ", prefix: ");
 
     return result;
   }
@@ -262,6 +338,7 @@ public class TfliteModelMakerCSV
     Set<String> 		labels;
     String			label;
     boolean			isTrain;
+    String 			fileActual;
 
     result    = new SpreadSheet[2];
     result[0] = new DefaultSpreadSheet();
@@ -303,9 +380,6 @@ public class TfliteModelMakerCSV
 	  getLogger().warning("Image does not exist: " + file);
 	  continue;
 	}
-        img    = BufferedImageHelper.read(new PlaceholderFile(file));
-        width  = img.getWidth();
-        height = img.getHeight();
 
         report = loadReport(file);
         if (report == null) {
@@ -314,21 +388,37 @@ public class TfliteModelMakerCSV
         }
         objects = m_Finder.findObjects(report);
 
+        if (isLoggingEnabled())
+          getLogger().info("Loading: " + file);
+
+        img    = BufferedImageHelper.read(new PlaceholderFile(file));
+        width  = img.getWidth();
+        height = img.getHeight();
+
         for (LocatedObject object: objects) {
+          if ((object.getWidth() == 0) || (object.getHeight() == 0)) {
+            getLogger().warning("Skipping invalid annotation");
+            continue;
+          }
+
+          if (m_DirectoryPrefix.isEmpty())
+            fileActual = file;
+          else
+            fileActual = m_DirectoryPrefix + new PlaceholderFile(file).getName();
+
 	  row = result[0].addRow();
 	  row.addCell("T").setContentAsString(type);
-	  row.addCell("F").setContentAsString(file);
-	  label = null;
-	  if (object.getMetaData().containsKey(m_MetaDataKeyType)) {
+	  row.addCell("F").setContentAsString(fileActual);
+	  label = m_DefaultLabel;
+	  if (object.getMetaData().containsKey(m_MetaDataKeyType))
 	    label = "" + object.getMetaData().get(m_MetaDataKeyType);
-	    row.addCell("L").setContentAsString(label);
-	    if (isTrain) {
-	      if (!labels.contains(label)) {
-	        labels.add(label);
-	        result[1].addRow().addCell("L").setContentAsString(label);
-	      }
-	    }
-	  }
+          row.addCell("L").setContentAsString(label);
+          if (isTrain) {
+            if (!labels.contains(label)) {
+              labels.add(label);
+              result[1].addRow().addCell("L").setContentAsString(label);
+            }
+          }
 	  row.addCell("TLX").setContent((double) object.getX() / width);
 	  row.addCell("TLY").setContent((double) object.getY() / height);
 	  row.addCell("BRX").setContent((double) (object.getX() + object.getWidth() - 1) / width);
