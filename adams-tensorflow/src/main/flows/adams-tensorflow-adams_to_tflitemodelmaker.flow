@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2021-10-05 10:03:00
+# Date: 2021-10-13 11:07:36
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-imaging,adams-json,adams-math,adams-ml,adams-python,adams-spreadsheet,adams-tensorflow,adams-visualstats,adams-xml
@@ -8,7 +8,7 @@ adams.flow.control.Flow -annotation "Converts ADAMS annotations into Tflite Mode
  adams.flow.source.Start
  adams.flow.control.Trigger -name "prompt user"
   adams.flow.standalone.SetVariable -name "restore file" -var-name restore -var-value @{flow_filename_long}.props -value-type FILE_FORWARD_SLASHES -expand-value true
-  adams.flow.source.EnterManyValues -name Parameters -stop-if-canceled true -value "adams.flow.source.valuedefinition.DirectoryValueDefinition -name input_dir -display \"Input directory\" -help \"The ADAMS annotations\" -file-chooser-title \"Input dir\" -use-forward-slashes true" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name train_perc -display \"Training percentage (0-1)\" -type DOUBLE -default-value 0.7" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name val_perc -display \"Validation percentage (0-1)\" -type DOUBLE -default-value 0.15" -value "adams.flow.source.valuedefinition.DirectoryValueDefinition -name output_dir -display \"Output directory\" -help \"The directory for the images and the annotations in CSV format\" -file-chooser-title \"Output dir\" -use-forward-slashes true" -output-type MAP -restoration-enabled true -restoration-file @{restore}
+  adams.flow.source.EnterManyValues -name Parameters -stop-if-canceled true -value "adams.flow.source.valuedefinition.DirectoryValueDefinition -name input_dir -display \"Input directory\" -help \"The ADAMS annotations\" -file-chooser-title \"Input dir\" -use-forward-slashes true" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name train_perc -display \"Training percentage (0-1)\" -type DOUBLE -default-value 0.7" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name val_perc -display \"Validation percentage (0-1)\" -type DOUBLE -default-value 0.15" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name dir_prefix -display \"Directory prefix\" -help \"the directory to use instead of the file\\\'s directory, e.g., when using the annotations inside docker (leave empty to use file\\\'s directory as is)\"" -value "adams.flow.source.valuedefinition.DirectoryValueDefinition -name output_dir -display \"Output directory\" -help \"The directory for the images and the annotations in CSV format\" -file-chooser-title \"Output dir\" -use-forward-slashes true" -output-type MAP -restoration-enabled true -restoration-file @{restore}
   adams.flow.transformer.MapToVariables
   adams.flow.transformer.SetVariable -name annotations -var-name annotations_csv -var-value @{output_dir}/annotations.csv -value-type FILE_FORWARD_SLASHES -expand-value true
   adams.flow.transformer.SetVariable -name labels -var-name labels_txt -var-value @{output_dir}/labels.txt -value-type FILE_FORWARD_SLASHES -expand-value true
@@ -18,7 +18,7 @@ adams.flow.control.Flow -annotation "Converts ADAMS annotations into Tflite Mode
    adams.flow.transformer.ArrayToSequence
    adams.flow.transformer.CopyFile -target-dir @{output_dir}
   adams.flow.transformer.PrepareFileBasedDataset -preparation "adams.flow.transformer.preparefilebaseddataset.TrainValidateTestSplit -train-percentage @{train_perc} -validate-percentage @{val_perc}"
-  adams.flow.transformer.GenerateFileBasedDataset -generation "adams.flow.transformer.generatefilebaseddataset.TfliteModelMakerCSV -value Train -value Test -value Validation -finder adams.data.objectfinder.AllFinder"
+  adams.flow.transformer.GenerateFileBasedDataset -generation "adams.flow.transformer.generatefilebaseddataset.TfliteModelMakerCSV -value Train -value Test -value Validation -finder adams.data.objectfinder.AllFinder -directory-prefix @{dir_prefix}"
   adams.flow.control.Tee -name annotations
    adams.flow.transformer.GetArrayElement
    adams.flow.sink.SpreadSheetFileWriter -output @{annotations_csv} -writer "adams.data.io.output.CsvSpreadSheetWriter -no-header true"
