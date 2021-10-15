@@ -44,13 +44,10 @@
     <module>adams-groovy-webservice</module>
     <module>adams-groovy-rest</module>
     <module>adams-html</module>
-    <module>adams-image-webservice</module>
-    <module>adams-jooq</module>
     <module>adams-latex</module>
     <module>adams-maps</module>
     <module>adams-maven-plugin</module>
     <module>adams-meka</module>
-    <module>adams-meka-webservice</module>
     <module>adams-moa</module>
     <module>adams-mongodb</module>
     <module>adams-nlp</module>
@@ -76,7 +73,5 @@
     <module>adams-video</module>
     <module>adams-webservice-core</module>
     <module>adams-webservice</module>
-    <module>adams-weka-nd4j</module>
-    <module>adams-weka-webservice</module>
   </modules>
 </project>
