@@ -1,9 +1,9 @@
 --> dumpfile.trail
-# Trail.Height\tDataType=N
-# Trail.Width\tDataType=N
-# Trail.Height=600.0
 # Parent\ ID=-1
+# Trail.Height\tDataType=N
+# Trail.Height=600.0
 # Trail.Width=800.0
+# Trail.Width\tDataType=N
 Timestamp
 
 
