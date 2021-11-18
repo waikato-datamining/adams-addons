@@ -49,7 +49,6 @@
     <module>adams-maven-plugin</module>
     <module>adams-meka</module>
     <module>adams-moa</module>
-    <module>adams-mongodb</module>
     <module>adams-nlp</module>
     <module>adams-osm</module>
     <module>adams-python-weka</module>
