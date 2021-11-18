@@ -79,28 +79,16 @@
           <groupId>nz.ac.waikato.cms.weka</groupId>
           <artifactId>weka-dev</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>com.github.waikato</groupId>
+          <artifactId>jclasslocator</artifactId>  <!-- we're using a newer version -->
+        </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>xalan</artifactId>  <!-- contains an old, incompatible version of java_cup.runtime.lr_parser -->
+        </exclusion>
       </exclusions>
     </dependency>
-
-    <!-- temporary dependencies due to custom moa jar -->
-    <dependency>
-      <groupId>com.github.waikato</groupId>
-      <artifactId>fcms-widgets</artifactId>
-      <version>0.0.17</version>
-    </dependency>
-
-    <dependency>
-    	<groupId>com.opencsv</groupId>
-    	<artifactId>opencsv</artifactId>
-    	<version>4.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.github.fracpete</groupId>
-      <artifactId>jshell-scripting</artifactId>
-      <version>0.1.0</version>
-    </dependency>
-    <!-- temporary dependencies due to custom moa jar -->
 
     <dependency>
       <groupId>nz.ac.waikato.cms.adams</groupId>
@@ -168,6 +156,10 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
