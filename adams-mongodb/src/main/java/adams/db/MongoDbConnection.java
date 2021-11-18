@@ -15,7 +15,7 @@
 
 /*
  * MongoDbConnection.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2021 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -80,11 +80,6 @@ public class MongoDbConnection
 
   /** for managing the database connections. */
   private static MongoDbManager m_DatabaseManager;
-  static {
-    m_DatabaseManager = new MongoDbManager("adams");
-    MongoDbConnection dbcon = new MongoDbConnection();
-    m_DatabaseManager.setDefault(getSingleton(dbcon.getURL(), dbcon.getUser(), dbcon.getPassword(), dbcon.getAuthDB()));
-  }
 
   /** for managing the available options. */
   protected OptionManager m_OptionManager;
@@ -1401,6 +1396,20 @@ public class MongoDbConnection
   }
 
   /**
+   * Returns the database manager, instantiates it if necessary.
+   *
+   * @return		the manager
+   */
+  protected static synchronized MongoDbManager getMongoDatabaseManager() {
+    if (m_DatabaseManager == null) {
+      m_DatabaseManager = new MongoDbManager("adams");
+      MongoDbConnection dbcon = new MongoDbConnection();
+      m_DatabaseManager.setDefault(getSingleton(dbcon.getURL(), dbcon.getUser(), dbcon.getPassword(), dbcon.getAuthDB()));
+    }
+    return m_DatabaseManager;
+  }
+
+  /**
    * Returns the global database connection object. If not instantiated yet, it
    * will automatically try to connect to the database server.
    *
@@ -1411,13 +1420,13 @@ public class MongoDbConnection
    * @return		the singleton
    */
   public static synchronized MongoDbConnection getSingleton(String url, String user, BasePassword password, String authDB) {
-    if (!m_DatabaseManager.has(url, user, password, authDB)) {
-      m_DatabaseManager.add(new MongoDbConnection(url, user, password, authDB));
+    if (!getMongoDatabaseManager().has(url, user, password, authDB)) {
+      getMongoDatabaseManager().add(new MongoDbConnection(url, user, password, authDB));
     }
     else {
-      if (!m_DatabaseManager.get(url, user, password, authDB).isConnected()) {
+      if (!getMongoDatabaseManager().get(url, user, password, authDB).isConnected()) {
 	try {
-	  m_DatabaseManager.get(url, user, password, authDB).connect();
+          getMongoDatabaseManager().get(url, user, password, authDB).connect();
 	}
 	catch (Exception e) {
 	  e.printStackTrace();
@@ -1425,7 +1434,7 @@ public class MongoDbConnection
       }
     }
 
-    return m_DatabaseManager.get(url, user, password, authDB);
+    return getMongoDatabaseManager().get(url, user, password, authDB);
   }
 
   /**
@@ -1437,7 +1446,7 @@ public class MongoDbConnection
    * @see		#getConnectOnStartUp()
    */
   public static synchronized MongoDbConnection getSingleton() {
-    return m_DatabaseManager.getDefault();
+    return getMongoDatabaseManager().getDefault();
   }
 
   /**
@@ -1446,6 +1455,6 @@ public class MongoDbConnection
    * @return		the manager
    */
   public static MongoDbManager getDatabaseManager() {
-    return m_DatabaseManager;
+    return getMongoDatabaseManager();
   }
 }
