@@ -23,7 +23,7 @@ package adams.flow.source.redisaction;
 import adams.core.MessageCollection;
 import adams.core.QuickInfoSupporter;
 import adams.core.option.AbstractOptionHandler;
-import redis.clients.jedis.Jedis;
+import adams.flow.standalone.RedisConnection;
 
 /**
  * Ancestor for Redis source actions.
@@ -33,6 +33,8 @@ import redis.clients.jedis.Jedis;
 public abstract class AbstractRedisAction
   extends AbstractOptionHandler
   implements QuickInfoSupporter {
+
+  private static final long serialVersionUID = -6633809851744257300L;
 
   /**
    * Returns a quick info about the object, which can be displayed in the GUI.
@@ -58,7 +60,7 @@ public abstract class AbstractRedisAction
    * @param connection	the Redis connection
    * @return		null if successful, otherwise error message
    */
-  public String check(Jedis connection) {
+  public String check(RedisConnection connection) {
     if (connection == null)
       return "No Redis connection provided!";
     return null;
@@ -71,7 +73,7 @@ public abstract class AbstractRedisAction
    * @param errors      for collecting errors
    * @return		the generated object
    */
-  protected abstract Object doExecute(Jedis connection, MessageCollection errors);
+  protected abstract Object doExecute(RedisConnection connection, MessageCollection errors);
 
   /**
    * Performs the action on the specified object.
@@ -80,7 +82,7 @@ public abstract class AbstractRedisAction
    * @param errors      for collecting errors
    * @return		the generated object
    */
-  public Object execute(Jedis connection, MessageCollection errors) {
+  public Object execute(RedisConnection connection, MessageCollection errors) {
     Object	result;
     String      msg;
 

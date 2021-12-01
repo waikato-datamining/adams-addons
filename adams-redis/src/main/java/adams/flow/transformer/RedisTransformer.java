@@ -14,7 +14,7 @@
  */
 
 /*
- * RedisSet.java
+ * RedisTransformer.java
  * Copyright (C) 2021 University of Waikato, Hamilton, New Zealand
  */
 
@@ -30,18 +30,67 @@ import adams.flow.transformer.redisaction.AbstractRedisAction;
 
 /**
  <!-- globalinfo-start -->
+ * Executes the specified action to generate output.
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
+ * Input&#47;output:<br>
+ * - accepts:<br>
+ * &nbsp;&nbsp;&nbsp;adams.flow.core.Unknown<br>
+ * - generates:<br>
+ * &nbsp;&nbsp;&nbsp;adams.flow.core.Unknown<br>
+ * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ *
+ * <pre>-name &lt;java.lang.String&gt; (property: name)
+ * &nbsp;&nbsp;&nbsp;The name of the actor.
+ * &nbsp;&nbsp;&nbsp;default: RedisTransformer
+ * </pre>
+ *
+ * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
+ * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
+ * <pre>-skip &lt;boolean&gt; (property: skip)
+ * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded
+ * &nbsp;&nbsp;&nbsp;as it is.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
+ * &nbsp;&nbsp;&nbsp;actors.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-action &lt;adams.flow.transformer.redisaction.AbstractRedisAction&gt; (property: action)
+ * &nbsp;&nbsp;&nbsp;The action to execute.
+ * &nbsp;&nbsp;&nbsp;default: adams.flow.transformer.redisaction.PassThrough
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class RedisTransformer
-  extends AbstractTransformer {
+    extends AbstractTransformer {
+
+  private static final long serialVersionUID = 5884093134656945887L;
 
   /** the action to execute. */
   protected AbstractRedisAction m_Action;
@@ -67,8 +116,8 @@ public class RedisTransformer
     super.defineOptions();
 
     m_OptionManager.add(
-      "action", "action",
-      new adams.flow.transformer.redisaction.PassThrough());
+        "action", "action",
+        new adams.flow.transformer.redisaction.PassThrough());
   }
 
   /**
@@ -165,7 +214,7 @@ public class RedisTransformer
     errors = new MessageCollection();
     try {
       m_Action.setFlowContext(this);
-      output = m_Action.execute(m_Connection.getConnection(), m_InputToken.getPayload(), errors);
+      output = m_Action.execute(m_Connection, m_InputToken.getPayload(), errors);
       if (!errors.isEmpty())
         result = errors.toString();
       else if (output != null)

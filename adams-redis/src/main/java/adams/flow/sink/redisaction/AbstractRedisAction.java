@@ -22,7 +22,7 @@ package adams.flow.sink.redisaction;
 
 import adams.core.QuickInfoSupporter;
 import adams.core.option.AbstractOptionHandler;
-import redis.clients.jedis.Jedis;
+import adams.flow.standalone.RedisConnection;
 
 /**
  * Ancestor for Redis sink actions.
@@ -32,6 +32,8 @@ import redis.clients.jedis.Jedis;
 public abstract class AbstractRedisAction
   extends AbstractOptionHandler
   implements QuickInfoSupporter {
+
+  private static final long serialVersionUID = 4491414571309100640L;
 
   /**
    * Returns a quick info about the object, which can be displayed in the GUI.
@@ -58,7 +60,7 @@ public abstract class AbstractRedisAction
    * @param o		the object to process
    * @return		null if successful, otherwise error message
    */
-  public String check(Jedis connection, Object o) {
+  public String check(RedisConnection connection, Object o) {
     if (connection == null)
       return "No Redis connection provided!";
     if (o == null)
@@ -73,7 +75,7 @@ public abstract class AbstractRedisAction
    * @param o		the object to process
    * @return		null if successful, otherwise error message
    */
-  protected abstract String doExecute(Jedis connection, Object o);
+  protected abstract String doExecute(RedisConnection connection, Object o);
 
   /**
    * Performs the action on the specified object.
@@ -82,7 +84,7 @@ public abstract class AbstractRedisAction
    * @param o		the object to process
    * @return		null if successful, otherwise error message
    */
-  public String execute(Jedis connection, Object o) {
+  public String execute(RedisConnection connection, Object o) {
     String	result;
 
     result = check(connection, o);

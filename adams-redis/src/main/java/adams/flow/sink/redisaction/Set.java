@@ -14,26 +14,31 @@
  */
 
 /*
- * SetString.java
+ * Set.java
  * Copyright (C) 2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink.redisaction;
 
 import adams.core.QuickInfoHelper;
-import adams.flow.core.Unknown;
-import redis.clients.jedis.Jedis;
+import adams.data.redis.RedisDataType;
+import adams.flow.standalone.RedisConnection;
 
 /**
- * Sets the incoming string under the specified key.
+ * Sets the incoming data under the specified key.
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
-public class SetString
-  extends AbstractRedisAction {
+public class Set
+    extends AbstractRedisAction {
+
+  private static final long serialVersionUID = 719961140137073707L;
 
   /** the key to use for storing the object. */
   protected String m_Key;
+
+  /** the data type. */
+  protected RedisDataType m_Type;
 
   /**
    * Returns a string describing the object.
@@ -42,7 +47,7 @@ public class SetString
    */
   @Override
   public String globalInfo() {
-    return "Sets the incoming string under the specified key.";
+    return "Sets the incoming data under the specified key.";
   }
 
   /**
@@ -53,8 +58,12 @@ public class SetString
     super.defineOptions();
 
     m_OptionManager.add(
-      "key", "key",
-      "");
+	"key", "key",
+	"");
+
+    m_OptionManager.add(
+	"type", "type",
+	RedisDataType.STRING);
   }
 
   /**
@@ -87,13 +96,47 @@ public class SetString
   }
 
   /**
+   * Sets the type of the data.
+   *
+   * @param value	the type
+   */
+  public void setType(RedisDataType value) {
+    m_Type = value;
+    reset();
+  }
+
+  /**
+   * Returns the type of the data.
+   *
+   * @return 		the type
+   */
+  public RedisDataType getType() {
+    return m_Type;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String typeTipText() {
+    return "The type of the data.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "key", (m_Key.isEmpty() ? "-empty-" : m_Key), "key: ");
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "key", (m_Key.isEmpty() ? "-empty-" : m_Key), "key: ");
+    result += QuickInfoHelper.toString(this, "type", m_Type, ", type: ");
+
+    return result;
   }
 
   /**
@@ -103,7 +146,7 @@ public class SetString
    */
   @Override
   public Class[] accepts() {
-    return new Class[]{Unknown.class};
+    return new Class[]{m_Type.getDataClass()};
   }
 
   /**
@@ -114,8 +157,16 @@ public class SetString
    * @return null if successful, otherwise error message
    */
   @Override
-  protected String doExecute(Jedis connection, Object o) {
-    connection.set(m_Key, "" + o);
-    return null;
+  protected String doExecute(RedisConnection connection, Object o) {
+    switch (m_Type) {
+      case STRING:
+	connection.getConnection(m_Type.getCodecClass()).sync().set(m_Key, o);
+        return null;
+      case BYTE_ARRAY:
+	connection.getConnection(m_Type.getCodecClass()).sync().set(m_Key.getBytes(), o);
+        return null;
+      default:
+	return "Unhandled redis data type: " + m_Type;
+    }
   }
 }

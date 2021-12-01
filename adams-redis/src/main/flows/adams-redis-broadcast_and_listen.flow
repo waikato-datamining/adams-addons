@@ -1,0 +1,12 @@
+# Project: adams
+# Date: 2021-12-01 16:36:05
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-meta,adams-redis
+#
+adams.flow.control.Flow -annotation "Broadcasts integers as strings and listens for incoming data on another channel it subscribes to.\\nThe \\\"data/channel_forward.py\\\" Python script can be used as process that receives and forwards the data.\\nThis script only needs the \\\"redis\\\" dependecy installed and needs to run from the commandline with:\\n  python3 channel_forward.py raw processed" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.RedisConnection
+ adams.flow.source.ForLoop
+ adams.flow.transformer.Convert -conversion adams.data.conversion.AnyToString
+ adams.flow.transformer.RedisTransformer -action "adams.flow.transformer.redisaction.BroadcastAndListen -channel-out raw -channel-in processed -time-out 5000"
+ adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter

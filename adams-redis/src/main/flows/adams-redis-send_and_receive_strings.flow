@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2021-09-06 13:39:08
+# Date: 2021-12-01 15:26:46
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-meta,adams-redis
@@ -9,7 +9,7 @@ adams.flow.control.Flow -annotation "Simple sets a string value on the Redis ins
  adams.flow.source.ForLoop
  adams.flow.control.Tee -name set
   adams.flow.transformer.Convert -conversion adams.data.conversion.AnyToString
-  adams.flow.sink.RedisSink -action "adams.flow.sink.redisaction.SetString -key name"
+  adams.flow.sink.RedisSink -action "adams.flow.sink.redisaction.Set -key name"
  adams.flow.control.Trigger -name get
-  adams.flow.source.RedisSource -action "adams.flow.source.redisaction.GetString -key name"
+  adams.flow.source.RedisSource -action "adams.flow.source.redisaction.Get -key name"
   adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter

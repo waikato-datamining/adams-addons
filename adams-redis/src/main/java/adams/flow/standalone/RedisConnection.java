@@ -14,24 +14,86 @@
  */
 
 /*
- * RabbitMQConnection.java
- * Copyright (C) 2019 University of Waikato, Hamilton, New Zealand
+ * RedisConnection.java
+ * Copyright (C) 2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.standalone;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
-import redis.clients.jedis.Jedis;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.RedisURI;
+import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.codec.ByteArrayCodec;
+import io.lettuce.core.codec.StringCodec;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  <!-- globalinfo-start -->
+ * Defines a connection to a Redis server.
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
  <!-- flow-summary-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ *
+ * <pre>-name &lt;java.lang.String&gt; (property: name)
+ * &nbsp;&nbsp;&nbsp;The name of the actor.
+ * &nbsp;&nbsp;&nbsp;default: RedisConnection
+ * </pre>
+ *
+ * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
+ * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
+ * <pre>-skip &lt;boolean&gt; (property: skip)
+ * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded
+ * &nbsp;&nbsp;&nbsp;as it is.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
+ * &nbsp;&nbsp;&nbsp;actors.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-host &lt;java.lang.String&gt; (property: host)
+ * &nbsp;&nbsp;&nbsp;The host (name&#47;IP address) to connect to.
+ * &nbsp;&nbsp;&nbsp;default: localhost
+ * </pre>
+ *
+ * <pre>-port &lt;int&gt; (property: port)
+ * &nbsp;&nbsp;&nbsp;The port to connect to.
+ * &nbsp;&nbsp;&nbsp;default: 6379
+ * &nbsp;&nbsp;&nbsp;minimum: 1
+ * &nbsp;&nbsp;&nbsp;maximum: 65535
+ * </pre>
+ *
+ * <pre>-database &lt;int&gt; (property: database)
+ * &nbsp;&nbsp;&nbsp;The database to use (usually 0).
+ * &nbsp;&nbsp;&nbsp;default: 0
+ * &nbsp;&nbsp;&nbsp;minimum: 0
+ * &nbsp;&nbsp;&nbsp;maximum: 65535
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -48,8 +110,14 @@ public class RedisConnection
   /** the port. */
   protected int m_Port;
 
+  /** the database. */
+  protected int m_Database;
+
+  /** the client object. */
+  protected transient RedisClient m_Client;
+
   /** the connection object. */
-  protected transient Jedis m_Connection;
+  protected transient Map<Class, StatefulRedisConnection> m_Connections;
 
   /**
    * Returns a string describing the object.
@@ -75,6 +143,10 @@ public class RedisConnection
     m_OptionManager.add(
         "port", "port",
         6379, 1, 65535);
+
+    m_OptionManager.add(
+        "database", "database",
+        0, 0, 65535);
   }
 
   /**
@@ -88,6 +160,7 @@ public class RedisConnection
 
     result = QuickInfoHelper.toString(this, "host", m_Host);
     result += QuickInfoHelper.toString(this, "port", m_Port, ":");
+    result += QuickInfoHelper.toString(this, "database", m_Database, "/");
 
     return result;
   }
@@ -153,29 +226,77 @@ public class RedisConnection
   }
 
   /**
+   * Returns the database to use.
+   *
+   * @return		the database ID
+   */
+  public int getDatabase() {
+    return m_Database;
+  }
+
+  /**
+   * Sets the database to use.
+   *
+   * @param value	the database ID
+   */
+  public void setDatabase(int value) {
+    m_Database = value;
+    reset();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String databaseTipText() {
+    return "The database to use (usually 0).";
+  }
+
+  /**
    * Creates a new connection.
    *
    * @param errors    for collecting errors
    * @return          the connection, null if failed to create
    */
-  public Jedis newConnection(MessageCollection errors) {
+  public StatefulRedisConnection<String, String> newConnection(MessageCollection errors) {
     try {
-      return new Jedis(m_Host, m_Port);
+      return m_Client.connect();
     }
     catch (Exception e) {
-      errors.add("Failed to connect to Redis server: " + m_Host + ":" + m_Port, e);
+      errors.add("Failed to create new connection!", e);
       return null;
     }
   }
 
   /**
-   * Returns the database connection in use. Reconnects the database, to make
-   * sure that the database connection is the correct one.
+   * Returns the client in use.
    *
+   * @return		the client object
+   */
+  public RedisClient getClient() {
+    return m_Client;
+  }
+
+  /**
+   * Returns the connection in use.
+   *
+   * @param codec	the codec to use
    * @return		the connection object
    */
-  public Jedis getConnection() {
-    return m_Connection;
+  public StatefulRedisConnection getConnection(Class codec) {
+    if (m_Connections.containsKey(codec))
+      return m_Connections.get(codec);
+    if (codec == ByteArrayCodec.class) {
+      m_Connections.put(codec, m_Client.connect(new ByteArrayCodec()));
+      return m_Connections.get(codec);
+    }
+    if (codec == StringCodec.class) {
+      m_Connections.put(codec, m_Client.connect(StringCodec.UTF8));
+      return m_Connections.get(codec);
+    }
+    throw new IllegalStateException("Unhandled codec!");
   }
 
   /**
@@ -185,15 +306,17 @@ public class RedisConnection
    */
   @Override
   protected String doExecute() {
-    String				result;
+    String	result;
 
     result = null;
     try {
-      m_Connection = new Jedis(m_Host, m_Port);
+      m_Client = RedisClient.create(RedisURI.Builder.redis("localhost", 6379).withDatabase(m_Database).build());
     }
     catch (Exception e) {
-      result = handleException("Failed to connect to Redis server: " + m_Host + ":" + m_Port, e);
+      result = handleException("Failed to create Redis client: " + m_Host + ":" + m_Port + "/" + m_Database, e);
     }
+
+    m_Connections = new HashMap<>();
 
     return result;
   }
@@ -204,9 +327,14 @@ public class RedisConnection
    */
   @Override
   public void wrapUp() {
-    if (m_Connection != null) {
-      m_Connection.close();
-      m_Connection = null;
+    if (m_Connections != null) {
+      for (Class codec: m_Connections.keySet())
+        m_Connections.get(codec).close();
+      m_Connections = null;
+    }
+    if (m_Client != null) {
+      m_Client.shutdown();
+      m_Client = null;
     }
 
     super.wrapUp();

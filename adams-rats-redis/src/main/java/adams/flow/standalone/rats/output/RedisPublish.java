@@ -22,6 +22,7 @@ package adams.flow.standalone.rats.output;
 
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
+import adams.data.redis.RedisDataType;
 import adams.flow.core.ActorUtils;
 import adams.flow.standalone.RedisConnection;
 
@@ -33,8 +34,13 @@ import adams.flow.standalone.RedisConnection;
 public class RedisPublish
   extends AbstractRatOutput {
 
+  private static final long serialVersionUID = 2421975872152713034L;
+
   /** the name of the channel. */
   protected String m_Channel;
+
+  /** the data type. */
+  protected RedisDataType m_Type;
 
   /** the redis connection to use. */
   protected transient RedisConnection m_Connection;
@@ -59,6 +65,10 @@ public class RedisPublish
     m_OptionManager.add(
 	"channel", "channel",
 	"");
+
+    m_OptionManager.add(
+        "type", "type",
+        RedisDataType.STRING);
   }
 
   /**
@@ -91,13 +101,47 @@ public class RedisPublish
   }
 
   /**
+   * Sets the type of the data.
+   *
+   * @param value	the type
+   */
+  public void setType(RedisDataType value) {
+    m_Type = value;
+    reset();
+  }
+
+  /**
+   * Returns the type of the data.
+   *
+   * @return 		the type
+   */
+  public RedisDataType getType() {
+    return m_Type;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String typeTipText() {
+    return "The type of the data.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "channel", (m_Channel.isEmpty() ? "-empty-" : m_Channel), "channel: ");
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "channel", (m_Channel.isEmpty() ? "-empty-" : m_Channel), "channel: ");
+    result += QuickInfoHelper.toString(this, "type", m_Type, ", type: ");
+
+    return result;
   }
 
   /**
@@ -107,7 +151,7 @@ public class RedisPublish
    */
   @Override
   public Class[] accepts() {
-    return new Class[]{String.class};
+    return new Class[]{m_Type.getDataClass()};
   }
 
   /**
@@ -139,10 +183,17 @@ public class RedisPublish
   protected String doTransmit() {
     String    result;
 
-    result = null;
-
     try {
-      m_Connection.getConnection().publish(m_Channel, "" + m_Input);
+      switch (m_Type) {
+        case STRING:
+          m_Connection.getConnection(m_Type.getCodecClass()).sync().publish(m_Channel, "" + m_Input);
+          return null;
+        case BYTE_ARRAY:
+          m_Connection.getConnection(m_Type.getCodecClass()).sync().publish(m_Channel.getBytes(), ("" + m_Input).getBytes());
+          return null;
+        default:
+          return "Unhandled redis data type: " + m_Type;
+      }
     }
     catch (Exception e) {
       result = handleException("Failed to publish on channel '" + m_Channel + "': " + m_Input, e);

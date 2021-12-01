@@ -21,18 +21,25 @@
 package adams.flow.source.redisaction;
 
 import adams.core.MessageCollection;
-import redis.clients.jedis.Jedis;
+import adams.core.QuickInfoHelper;
+import adams.data.redis.RedisDataType;
+import adams.flow.standalone.RedisConnection;
 
 /**
- * Retrieves the bytes stored under the specified key.
+ * Retrieves the object stored under the specified key.
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
-public class GetBytes
-  extends AbstractRedisAction {
+public class Get
+    extends AbstractRedisAction {
 
-  /** the key of the string to get. */
+  private static final long serialVersionUID = -169586163362371666L;
+
+  /** the key of the object to get. */
   protected String m_Key;
+
+  /** the data type. */
+  protected RedisDataType m_Type;
 
   /**
    * Returns a string describing the object.
@@ -41,7 +48,7 @@ public class GetBytes
    */
   @Override
   public String globalInfo() {
-    return "Retrieves the bytes stored under the specified key.";
+    return "Retrieves the object stored under the specified key.";
   }
 
   /**
@@ -52,8 +59,12 @@ public class GetBytes
     super.defineOptions();
 
     m_OptionManager.add(
-      "key", "key",
-      "");
+	"key", "key",
+	"");
+
+    m_OptionManager.add(
+	"type", "type",
+	RedisDataType.STRING);
   }
 
   /**
@@ -86,13 +97,57 @@ public class GetBytes
   }
 
   /**
+   * Sets the type of the data.
+   *
+   * @param value	the type
+   */
+  public void setType(RedisDataType value) {
+    m_Type = value;
+    reset();
+  }
+
+  /**
+   * Returns the type of the data.
+   *
+   * @return 		the type
+   */
+  public RedisDataType getType() {
+    return m_Type;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String typeTipText() {
+    return "The type of the data.";
+  }
+
+  /**
+   * Returns a quick info about the actor, which will be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "key", (m_Key.isEmpty() ? "-empty-" : m_Key), "key: ");
+    result += QuickInfoHelper.toString(this, "type", m_Type, ", type: ");
+
+    return result;
+  }
+
+  /**
    * Returns the classes the action generates as output.
    *
    * @return the classes
    */
   @Override
   public Class generates() {
-    return byte[].class;
+    return m_Type.getDataClass();
   }
 
   /**
@@ -103,11 +158,20 @@ public class GetBytes
    * @return the generated object
    */
   @Override
-  protected Object doExecute(Jedis connection, MessageCollection errors) {
-    byte[]      result;
+  protected Object doExecute(RedisConnection connection, MessageCollection errors) {
+    Object      result;
 
-    result = connection.get(m_Key.getBytes());
-    // TODO nil?
+    switch (m_Type) {
+      case STRING:
+	result = connection.getConnection(m_Type.getCodecClass()).sync().get(m_Key);
+        break;
+      case BYTE_ARRAY:
+	result = connection.getConnection(m_Type.getCodecClass()).sync().get(m_Key.getBytes());
+        break;
+      default:
+        result = null;
+	errors.add("Unhandled redis data type: " + m_Type);
+    }
 
     return result;
   }

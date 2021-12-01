@@ -26,7 +26,7 @@ import adams.core.StoppableWithFeedback;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.Actor;
 import adams.flow.core.FlowContextHandler;
-import redis.clients.jedis.Jedis;
+import adams.flow.standalone.RedisConnection;
 
 /**
  * Ancestor for Redis sink actions.
@@ -36,6 +36,8 @@ import redis.clients.jedis.Jedis;
 public abstract class AbstractRedisAction
   extends AbstractOptionHandler
   implements QuickInfoSupporter, StoppableWithFeedback, FlowContextHandler {
+
+  private static final long serialVersionUID = 1092502634722311323L;
 
   /** whether the action has been stopped. */
   protected boolean m_Stopped;
@@ -102,7 +104,7 @@ public abstract class AbstractRedisAction
    * @param o		the object to process
    * @return		null if successful, otherwise error message
    */
-  public String check(Jedis connection, Object o) {
+  public String check(RedisConnection connection, Object o) {
     if (m_FlowContext == null)
       return "No flow context set!";
     if (connection == null)
@@ -120,7 +122,7 @@ public abstract class AbstractRedisAction
    * @param errors      for collecting errors
    * @return		the generated object
    */
-  protected abstract Object doExecute(Jedis connection, Object o, MessageCollection errors);
+  protected abstract Object doExecute(RedisConnection connection, Object o, MessageCollection errors);
 
   /**
    * Performs the action on the specified object.
@@ -130,7 +132,7 @@ public abstract class AbstractRedisAction
    * @param errors      for collecting errors
    * @return		the generated object
    */
-  public Object execute(Jedis connection, Object o, MessageCollection errors) {
+  public Object execute(RedisConnection connection, Object o, MessageCollection errors) {
     Object	result;
     String      msg;
 

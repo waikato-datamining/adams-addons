@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2021-09-16 15:55:00
+# Date: 2021-12-01 17:20:32
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-event,adams-meta,adams-rats-core,adams-rats-redis,adams-redis,adams-terminal
@@ -7,8 +7,9 @@
 adams.flow.control.Flow -annotation "Transforms data using another redis pub/sub process (in this case our Rats setup)" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.RedisConnection
  adams.flow.standalone.Rats
-  adams.flow.standalone.Rat -receiver "adams.flow.standalone.rats.input.RedisSubscribe -logging-level INFO -channel channel_out" -transmitter "adams.flow.standalone.rats.output.RedisPublish -logging-level INFO -channel channel_in" -log-generator adams.flow.standalone.rats.log.LogEntryGenerator
+  adams.flow.standalone.Rat -receiver "adams.flow.standalone.rats.input.RedisSubscribe -logging-level INFO -channel channel_out -time-out 10000" -transmitter "adams.flow.standalone.rats.output.RedisPublish -logging-level INFO -channel channel_in" -log-generator adams.flow.standalone.rats.log.LogEntryGenerator
    adams.flow.transformer.StringInsert -after true -value -done
  adams.flow.source.ForLoop
- adams.flow.transformer.RedisTransformer -action "adams.flow.transformer.redisaction.BroadcastAndListen -channel-out channel_out -channel-in channel_in"
+ adams.flow.transformer.Convert -conversion adams.data.conversion.AnyToString
+ adams.flow.transformer.RedisTransformer -action "adams.flow.transformer.redisaction.BroadcastAndListen -channel-out channel_out -channel-in channel_in -time-out 5000"
  adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter

@@ -35,6 +35,8 @@ import adams.flow.standalone.RedisConnection;
 public class RedisAction
   extends AbstractRatOutput {
 
+  private static final long serialVersionUID = 2632516604969652894L;
+
   /** the name of the action. */
   protected AbstractRedisAction m_Action;
 
@@ -142,7 +144,7 @@ public class RedisAction
     String    result;
 
     try {
-      result = m_Action.execute(m_Connection.getConnection(), "" + m_Input);
+      result = m_Action.execute(m_Connection, m_Input);
     }
     catch (Exception e) {
       result = handleException("Failed to execute action '" + m_Action + "' using: " + m_Input, e);

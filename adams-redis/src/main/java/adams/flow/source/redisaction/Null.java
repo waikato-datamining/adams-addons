@@ -22,7 +22,7 @@ package adams.flow.source.redisaction;
 
 import adams.core.MessageCollection;
 import adams.flow.core.Unknown;
-import redis.clients.jedis.Jedis;
+import adams.flow.standalone.RedisConnection;
 
 /**
  * Dummy, generates nothing.
@@ -31,6 +31,8 @@ import redis.clients.jedis.Jedis;
  */
 public class Null
   extends AbstractRedisAction {
+
+  private static final long serialVersionUID = -2641452562344340857L;
 
   /**
    * Returns a string describing the object.
@@ -60,7 +62,7 @@ public class Null
    * @return the generated object
    */
   @Override
-  protected Object doExecute(Jedis connection, MessageCollection errors) {
+  protected Object doExecute(RedisConnection connection, MessageCollection errors) {
     return null;
   }
 }

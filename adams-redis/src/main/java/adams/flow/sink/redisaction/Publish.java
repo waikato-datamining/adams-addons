@@ -21,8 +21,10 @@
 package adams.flow.sink.redisaction;
 
 import adams.core.QuickInfoHelper;
+import adams.data.redis.RedisDataType;
 import adams.flow.core.Unknown;
-import redis.clients.jedis.Jedis;
+import adams.flow.standalone.RedisConnection;
+import io.lettuce.core.codec.StringCodec;
 
 /**
  * Publishes the incoming message to the specified channel.
@@ -30,10 +32,15 @@ import redis.clients.jedis.Jedis;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class Publish
-  extends AbstractRedisAction {
+    extends AbstractRedisAction {
+
+  private static final long serialVersionUID = -5422044797578071875L;
 
   /** the name of the channel. */
   protected String m_Channel;
+
+  /** the data type. */
+  protected RedisDataType m_Type;
 
   /**
    * Returns a string describing the object.
@@ -53,8 +60,12 @@ public class Publish
     super.defineOptions();
 
     m_OptionManager.add(
-      "channel", "channel",
-      "");
+	"channel", "channel",
+	"");
+
+    m_OptionManager.add(
+	"type", "type",
+	RedisDataType.STRING);
   }
 
   /**
@@ -87,13 +98,47 @@ public class Publish
   }
 
   /**
+   * Sets the type of the data.
+   *
+   * @param value	the type
+   */
+  public void setType(RedisDataType value) {
+    m_Type = value;
+    reset();
+  }
+
+  /**
+   * Returns the type of the data.
+   *
+   * @return 		the type
+   */
+  public RedisDataType getType() {
+    return m_Type;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   *             	displaying in the GUI or for listing the options.
+   */
+  public String typeTipText() {
+    return "The type of the data.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "channel", (m_Channel.isEmpty() ? "-empty-" : m_Channel), "channel: ");
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "channel", (m_Channel.isEmpty() ? "-empty-" : m_Channel), "channel: ");
+    result += QuickInfoHelper.toString(this, "type", m_Type, ", type: ");
+
+    return result;
   }
 
   /**
@@ -103,7 +148,7 @@ public class Publish
    */
   @Override
   public Class[] accepts() {
-    return new Class[]{Unknown.class};
+    return new Class[]{m_Type.getDataClass()};
   }
 
   /**
@@ -114,8 +159,16 @@ public class Publish
    * @return null if successful, otherwise error message
    */
   @Override
-  protected String doExecute(Jedis connection, Object o) {
-    connection.publish(m_Channel, "" + o);
-    return null;
+  protected String doExecute(RedisConnection connection, Object o) {
+    switch (m_Type) {
+      case STRING:
+	connection.getConnection(m_Type.getCodecClass()).sync().publish(m_Channel, o);
+	return null;
+      case BYTE_ARRAY:
+	connection.getConnection(m_Type.getCodecClass()).sync().publish(m_Channel.getBytes(), o);
+	return null;
+      default:
+	return "Unhandled redis data type: " + m_Type;
+    }
   }
 }

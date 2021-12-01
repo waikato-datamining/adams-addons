@@ -1,0 +1,20 @@
+# Project: adams
+# Date: 2021-12-01 15:27:15
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-meta,adams-redis
+#
+adams.flow.control.Flow -annotation "Loads an image as byte array and stores it in Redis.\\nThen reads the byte array and stores it in a file in the \\\"output\\\" directory" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.RedisConnection
+ adams.flow.standalone.SetVariable -var-name out_file -var-value ${FLOWS}/output/out.jpg -value-type FILE_FORWARD_SLASHES
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name set
+  adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/3267694739_4981d2f944_z.jpg
+  adams.flow.transformer.BinaryFileReader -output-array true
+  adams.flow.sink.RedisSink -action "adams.flow.sink.redisaction.Set -key name -type BYTE_ARRAY"
+ adams.flow.control.Trigger -name "remove previous output"
+  adams.flow.source.Variable -var-name out_file -conversion adams.data.conversion.StringToString
+  adams.flow.transformer.DeleteFile
+ adams.flow.control.Trigger -name get
+  adams.flow.source.RedisSource -action "adams.flow.source.redisaction.Get -key name -type BYTE_ARRAY"
+  adams.flow.sink.BinaryFileWriter -output @{out_file}

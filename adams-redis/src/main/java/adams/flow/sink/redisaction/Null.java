@@ -21,7 +21,7 @@
 package adams.flow.sink.redisaction;
 
 import adams.flow.core.Unknown;
-import redis.clients.jedis.Jedis;
+import adams.flow.standalone.RedisConnection;
 
 /**
  * Dummy, does nothing.
@@ -30,6 +30,8 @@ import redis.clients.jedis.Jedis;
  */
 public class Null
   extends AbstractRedisAction {
+
+  private static final long serialVersionUID = -3671585727166274931L;
 
   /**
    * Returns a string describing the object.
@@ -59,7 +61,7 @@ public class Null
    * @return null if successful, otherwise error message
    */
   @Override
-  protected String doExecute(Jedis connection, Object o) {
+  protected String doExecute(RedisConnection connection, Object o) {
     return null;
   }
 }

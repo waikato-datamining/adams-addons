@@ -22,7 +22,7 @@ package adams.flow.transformer.redisaction;
 
 import adams.core.MessageCollection;
 import adams.flow.core.Unknown;
-import redis.clients.jedis.Jedis;
+import adams.flow.standalone.RedisConnection;
 
 /**
  * Just passes through the object, no Redis interaction.
@@ -31,6 +31,8 @@ import redis.clients.jedis.Jedis;
  */
 public class PassThrough
   extends AbstractRedisAction {
+
+  private static final long serialVersionUID = 8055384432247342770L;
 
   /**
    * Returns a string describing the object.
@@ -71,7 +73,7 @@ public class PassThrough
    * @return the generated object
    */
   @Override
-  protected Object doExecute(Jedis connection, Object o, MessageCollection errors) {
+  protected Object doExecute(RedisConnection connection, Object o, MessageCollection errors) {
     return o;
   }
 }
