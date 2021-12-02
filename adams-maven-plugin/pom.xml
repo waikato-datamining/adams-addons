@@ -27,7 +27,7 @@
   </parent>
 
   <artifactId>adams-maven-plugin</artifactId>
-  <version>21.12.0</version>
+  <version>21.12.1-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>ADAMS Maven Plugin</name>
@@ -73,7 +73,7 @@
       scm:git:https://github.com/waikato-datamining/adams-maven-plugin
     </developerConnection>
     <url>https://github.com/waikato-datamining/adams-maven-plugin</url>
-    <tag>adams-addons-pom-21.12.0</tag>
+    <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>GitHub</system>
