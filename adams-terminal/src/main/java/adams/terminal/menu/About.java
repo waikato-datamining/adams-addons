@@ -15,7 +15,7 @@
 
 /*
  * About.java
- * Copyright (C) 2016-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2022 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -62,7 +62,7 @@ public class About
       context,
       getTitle(),
       "Advanced Data Mining and Machine Learning System\n"
-	+ "(c) 2009-2019 University of Waikato\n"
+	+ "(c) 2009-2022 University of Waikato\n"
 	+ "Hamilton, New Zealand");
   }
 
