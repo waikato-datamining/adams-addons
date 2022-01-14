@@ -112,22 +112,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.openimaj</groupId>
-      <artifactId>video-processing</artifactId>
-      <version>${openimaj.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>jama</groupId>
-          <artifactId>jama</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javassist</groupId>
-          <artifactId>javassist</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
       <groupId>uk.co.caprica</groupId>
       <artifactId>vlcj</artifactId>
       <version>3.12.1</version>
