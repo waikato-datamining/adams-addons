@@ -28,7 +28,8 @@ import adams.flow.core.RatReference;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class RatReferenceParsing {
+public class RatReferenceParsing
+    extends AbstractParsing {
 
   /**
    * Returns the reference as string.

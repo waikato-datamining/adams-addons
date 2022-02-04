@@ -30,7 +30,8 @@ import weka.core.MOAUtils;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class MOAClassOptionParsing {
+public class MOAClassOptionParsing
+    extends AbstractParsing {
 
   /**
    * Returns the color as string.

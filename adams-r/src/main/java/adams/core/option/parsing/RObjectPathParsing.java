@@ -28,7 +28,8 @@ import adams.core.option.AbstractOption;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class RObjectPathParsing {
+public class RObjectPathParsing
+    extends AbstractParsing {
 
   /**
    * Returns the reference as string.

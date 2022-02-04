@@ -31,7 +31,8 @@ import java.lang.reflect.Constructor;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class GPSParsing {
+public class GPSParsing
+    extends AbstractParsing {
 
   /**
    * Turns the string into an instance of the specified GPS class.
