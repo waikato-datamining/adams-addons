@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SendEmail.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2022 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
 
@@ -45,7 +45,6 @@ import adams.flow.standalone.SMTPConnection;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SendEmail
   extends AbstractRatOutput {
@@ -176,7 +175,8 @@ public class SendEmail
 	    EmailHelper.getSmtpTimeout(), 
 	    EmailHelper.getSmtpRequiresAuthentication(), 
 	    EmailHelper.getSmtpUser(), 
-	    EmailHelper.getSmtpPassword());
+	    EmailHelper.getSmtpPassword(),
+            EmailHelper.getSmtpProtocols());
     }
   }
 
