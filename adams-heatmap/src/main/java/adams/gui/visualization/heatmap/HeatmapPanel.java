@@ -15,7 +15,7 @@
 
 /*
  * HeatmapPanel.java
- * Copyright (C) 2011-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2022 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.heatmap;
 
@@ -68,7 +68,6 @@ import java.util.List;
  * Panel for displaying a single heatmap.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class HeatmapPanel
   extends BasePanel
@@ -177,6 +176,7 @@ public class HeatmapPanel
     painter = new RectanglePainter();
     painter.setColor(Color.RED);
     m_HeatmapImage = new ImagePanel();
+    m_HeatmapImage.getUndo().setEnabled(false);
     m_HeatmapImage.setSelectionEnabled(true);
     m_HeatmapImage.setSelectionShapePainter(painter);
     m_HeatmapImage.addSelectionListener(this);

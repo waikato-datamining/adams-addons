@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * TrailPanel.java
- * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2022 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.trail;
 
@@ -54,7 +54,6 @@ import java.util.List;
  * Panel for displaying a single trail.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class TrailPanel
   extends BasePanel {
@@ -148,6 +147,7 @@ public class TrailPanel
     m_LogTabbedPane.addTab("Data", m_SplitPane);
 
     m_TrailImage = new ImagePanel();
+    m_TrailImage.getUndo().setEnabled(false);
     m_TrailTable = null;
 
     if (props.getBoolean("SpreadSheet.Show", true)) {

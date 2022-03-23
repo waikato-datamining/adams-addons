@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * ExtractBackgroundDialog.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2022 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.annotator;
@@ -46,7 +46,6 @@ import java.awt.image.BufferedImage;
  * Extracts the background from a video and stores it as an image
  *
  * @author sjb90
- * @version $Revision$
  */
 public class ExtractBackgroundDialog extends ApprovalDialog {
 
@@ -191,6 +190,7 @@ public class ExtractBackgroundDialog extends ApprovalDialog {
       (AbstractBufferedImageMultiImageOperation)m_MultiImageOperationSelectionPanel.getCurrent());
     add(ppanel, BorderLayout.NORTH);
     m_ImagePanel = new ImagePanel();
+    m_ImagePanel.getUndo().setEnabled(false);
     add(m_ImagePanel, BorderLayout.CENTER);
 
     m_ButtonPreview = new BaseButton("Preview");
