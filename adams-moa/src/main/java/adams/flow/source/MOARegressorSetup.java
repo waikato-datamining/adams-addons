@@ -15,7 +15,7 @@
 
 /*
  * MOARegressorSetup.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2022 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.source;
@@ -132,7 +132,7 @@ public class MOARegressorSetup
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String classifierTipText() {
+  public String regressorTipText() {
     return "The MOA regressor to output.";
   }
 
