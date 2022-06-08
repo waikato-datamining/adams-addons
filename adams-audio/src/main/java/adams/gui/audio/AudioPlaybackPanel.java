@@ -15,7 +15,7 @@
 
 /*
  * AudioPlaybackPanel.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2022 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.audio;
@@ -53,8 +53,8 @@ import java.io.File;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class AudioPlaybackPanel
-  extends BasePanel
-  implements CleanUpHandler, LineListener {
+    extends BasePanel
+    implements CleanUpHandler, LineListener {
 
   private static final long serialVersionUID = 3226494650794473459L;
 
@@ -126,12 +126,12 @@ public class AudioPlaybackPanel
     m_Slider.setMinimum(0);
     m_Slider.addChangeListener((ChangeEvent e) -> {
       if (m_Slider.getValueIsAdjusting()) {
-        if (m_Clip.isRunning())
-          m_Clip.stop();
+	if (m_Clip.isRunning())
+	  m_Clip.stop();
 	m_Clip.setMicrosecondPosition(m_Slider.getValue() * 1000);
       }
       else {
-        if ((m_Clip != null) && !m_Clip.isRunning()) {
+	if ((m_Clip != null) && !m_Clip.isRunning()) {
 	  m_Clip.setMicrosecondPosition(m_Slider.getValue() * 1000);
 	  if (!isPaused())
 	    m_Clip.start();
@@ -229,7 +229,7 @@ public class AudioPlaybackPanel
       m_Clip = (Clip) AudioSystem.getLine(info);
       m_Clip.addLineListener(this);
       m_Clip.open(ais);
-      m_RefreshTimer = new Timer(200, (ActionEvent e) -> updateTime(true));
+      m_RefreshTimer = new Timer(100, (ActionEvent e) -> updateTime(true));
       m_Playing = true;
       m_Paused  = false;
       m_Slider.setMinimum(0);
@@ -350,13 +350,13 @@ public class AudioPlaybackPanel
 	SwingUtilities.invokeLater(() -> m_Slider.setValue(current));
       SwingUtilities.invokeLater(() -> {
 	m_LabelTime.setText(
-	  Utils.padLeft("" + hours, '0', 2)
-	    + ":"
-	    + Utils.padLeft("" + mins, '0', 2)
-	    + ":"
-	    + Utils.padLeft("" + secs, '0', 2)
-	    + "."
-	    + Utils.padLeft("" + msecs, '0', 3));
+	    Utils.padLeft("" + hours, '0', 2)
+		+ ":"
+		+ Utils.padLeft("" + mins, '0', 2)
+		+ ":"
+		+ Utils.padLeft("" + secs, '0', 2)
+		+ "."
+		+ Utils.padLeft("" + msecs, '0', 3));
       });
     }
   }
@@ -397,10 +397,28 @@ public class AudioPlaybackPanel
       if (m_RefreshTimer != null)
 	m_RefreshTimer.stop();
       if (m_Clip.getMicrosecondLength() == m_Clip.getMicrosecondPosition())
-        stop();
+	stop();
       else
 	update();
     }
+  }
+
+  /**
+   * Sets the visible state of the slider.
+   *
+   * @param value	true to make it visible
+   */
+  public void setSliderVisible(boolean value) {
+    m_Slider.setVisible(value);
+  }
+
+  /**
+   * Returns whether the slider is visible.
+   *
+   * @return		true if visible
+   */
+  public boolean isSliderVisible() {
+    return m_Slider.isVisible();
   }
 
   /**
