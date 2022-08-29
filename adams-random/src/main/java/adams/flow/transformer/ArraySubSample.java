@@ -15,7 +15,7 @@
 
 /*
  * ArraySubSample.java
- * Copyright (C) 2014-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2022 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -28,7 +28,8 @@ import java.lang.reflect.Array;
 
 /**
  <!-- globalinfo-start -->
- * Generates a subset of the array, using a random sub-sample.
+ * Generates a subset of the array, using a random sub-sample.<br>
+ * Use '1.1' if you only want to have an array of length one.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -46,64 +47,72 @@ import java.lang.reflect.Array;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- * 
+ *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
  * &nbsp;&nbsp;&nbsp;default: ArraySubSample
  * </pre>
- * 
+ *
  * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
  * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
- * &nbsp;&nbsp;&nbsp;default: 
+ * &nbsp;&nbsp;&nbsp;default:
  * </pre>
- * 
+ *
  * <pre>-skip &lt;boolean&gt; (property: skip)
- * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
+ * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded
  * &nbsp;&nbsp;&nbsp;as it is.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
- * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
+ * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-silent &lt;boolean&gt; (property: silent)
- * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console.
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
+ * <pre>-generator &lt;adams.data.random.RandomIntegerRangeGenerator&gt; (property: generator)
+ * &nbsp;&nbsp;&nbsp;The random number generator to use for selecting the elements.
+ * &nbsp;&nbsp;&nbsp;default: adams.data.random.JavaRandomInt
+ * </pre>
+ *
+ * <pre>-split-result &lt;SPLIT|INVERSE|BOTH&gt; (property: splitResult)
+ * &nbsp;&nbsp;&nbsp;The type of data to return: e.g., the sample, the inverse of the sample
+ * &nbsp;&nbsp;&nbsp;or both (split and inverse).
+ * &nbsp;&nbsp;&nbsp;default: SPLIT
+ * </pre>
+ *
+ * <pre>-deep-copy &lt;boolean&gt; (property: deepCopy)
+ * &nbsp;&nbsp;&nbsp;If enabled, a deep copy of each array element is performed before transferring
+ * &nbsp;&nbsp;&nbsp;it into the target array.
+ * &nbsp;&nbsp;&nbsp;default: true
+ * </pre>
+ *
  * <pre>-size &lt;double&gt; (property: size)
  * &nbsp;&nbsp;&nbsp;The size of the sample: 0-1 = percentage, &gt;1 absolute number of elements.
  * &nbsp;&nbsp;&nbsp;default: 1.0
  * &nbsp;&nbsp;&nbsp;minimum: 0.0
  * </pre>
- * 
- * <pre>-generator &lt;adams.data.random.RandomIntegerRangeGenerator&gt; (property: generator)
- * &nbsp;&nbsp;&nbsp;The random number generator to use for selecting the elements.
- * &nbsp;&nbsp;&nbsp;default: adams.data.random.JavaRandomInt
- * </pre>
- * 
- * <pre>-split-result &lt;SPLIT|INVERSE|BOTH&gt; (property: splitResult)
- * &nbsp;&nbsp;&nbsp;The type of data to return: e.g., the sample, the inverse of the sample 
- * &nbsp;&nbsp;&nbsp;or both (split and inverse).
- * &nbsp;&nbsp;&nbsp;default: SPLIT
- * </pre>
- * 
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class ArraySubSample
-  extends AbstractArraySplitter {
+    extends AbstractArraySplitter {
 
   /** for serialization. */
   private static final long serialVersionUID = 8536100625511019961L;
 
   /** the size of the sub-sample. */
   protected double m_Size;
-  
+
   /**
    * Returns a string describing the object.
    *
@@ -113,7 +122,7 @@ public class ArraySubSample
   public String globalInfo() {
     return
         "Generates a subset of the array, using a random sub-sample.\n"
-          + "Use '1.1' if you only want to have an array of length one.";
+            + "Use '1.1' if you only want to have an array of length one.";
   }
 
   /**
@@ -124,8 +133,8 @@ public class ArraySubSample
     super.defineOptions();
 
     m_OptionManager.add(
-	    "size", "size",
-	    1.0, 0.0, null);
+        "size", "size",
+        1.0, 0.0, null);
   }
 
   /**
@@ -170,13 +179,13 @@ public class ArraySubSample
   @Override
   public String getQuickInfo() {
     String	result;
-    
+
     result  = QuickInfoHelper.toString(this, "size", m_Size, "size: ");
     result += ", " + super.getQuickInfo();
-    
+
     return result;
   }
-  
+
   /**
    * Executes the flow item.
    *
@@ -191,9 +200,9 @@ public class ArraySubSample
     int			size;
     TIntArrayList	available;
     TIntArrayList	indices;
-    
+
     result   = null;
-    
+
     // randomize indices
     arrayOld = m_InputToken.getPayload();
     if (m_Size <= 1)
@@ -209,37 +218,37 @@ public class ArraySubSample
     m_Generator.setMinValue(0);
     while (size > 0) {
       if (available.size() == 1) {
-	i = 0;
+        i = 0;
       }
       else {
-	m_Generator.setMaxValue(available.size() - 1);
-	i = m_Generator.next().intValue();
+        m_Generator.setMaxValue(available.size() - 1);
+        i = m_Generator.next().intValue();
       }
       indices.add(available.get(i));
       available.removeAt(i);
       size--;
     }
-    
+
     // create array(s)
     switch (m_SplitResult) {
       case SPLIT:
-	indices.sort();
-	arrayNew = newArray(arrayOld, indices, "split");
-	m_OutputToken = new Token(arrayNew);
-	break;
+        indices.sort();
+        arrayNew = newArray(arrayOld, indices, "split");
+        m_OutputToken = new Token(arrayNew);
+        break;
       case INVERSE:
-	arrayNew = newArray(arrayOld, available, "inverse");
-	m_OutputToken = new Token(arrayNew);
-	break;
+        arrayNew = newArray(arrayOld, available, "inverse");
+        m_OutputToken = new Token(arrayNew);
+        break;
       case BOTH:
-	indices.sort();
-	arrayNew = Array.newInstance(arrayOld.getClass(), 2);
-	Array.set(arrayNew, 0, newArray(arrayOld, indices, "split"));
-	Array.set(arrayNew, 1, newArray(arrayOld, available, "inverse"));
-	m_OutputToken = new Token(arrayNew);
-	break;
+        indices.sort();
+        arrayNew = Array.newInstance(arrayOld.getClass(), 2);
+        Array.set(arrayNew, 0, newArray(arrayOld, indices, "split"));
+        Array.set(arrayNew, 1, newArray(arrayOld, available, "inverse"));
+        m_OutputToken = new Token(arrayNew);
+        break;
       default:
-	throw new IllegalStateException("Unhandled split result: " + m_SplitResult);
+        throw new IllegalStateException("Unhandled split result: " + m_SplitResult);
     }
 
     m_OutputToken = new Token(arrayNew);

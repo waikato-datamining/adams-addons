@@ -15,7 +15,7 @@
 
 /*
  * ArrayFolds.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2022 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -49,57 +49,65 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- * 
+ *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
  * &nbsp;&nbsp;&nbsp;default: ArrayFolds
  * </pre>
- * 
+ *
  * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
  * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
- * 
+ *
  * <pre>-skip &lt;boolean&gt; (property: skip)
  * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
  * &nbsp;&nbsp;&nbsp;as it is.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
- * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
+ * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-silent &lt;boolean&gt; (property: silent)
- * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console.
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-generator &lt;adams.data.random.RandomIntegerRangeGenerator&gt; (property: generator)
  * &nbsp;&nbsp;&nbsp;The random number generator to use for selecting the elements.
  * &nbsp;&nbsp;&nbsp;default: adams.data.random.JavaRandomInt
  * </pre>
- * 
+ *
  * <pre>-split-result &lt;SPLIT|INVERSE|BOTH&gt; (property: splitResult)
- * &nbsp;&nbsp;&nbsp;The type of data to return: e.g., the sample, the inverse of the sample 
+ * &nbsp;&nbsp;&nbsp;The type of data to return: e.g., the sample, the inverse of the sample
  * &nbsp;&nbsp;&nbsp;or both (split and inverse).
  * &nbsp;&nbsp;&nbsp;default: SPLIT
  * </pre>
- * 
+ *
+ * <pre>-deep-copy &lt;boolean&gt; (property: deepCopy)
+ * &nbsp;&nbsp;&nbsp;If enabled, a deep copy of each array element is performed before transferring
+ * &nbsp;&nbsp;&nbsp;it into the target array.
+ * &nbsp;&nbsp;&nbsp;default: true
+ * </pre>
+ *
  * <pre>-folds &lt;int&gt; (property: folds)
  * &nbsp;&nbsp;&nbsp;The number of folds to generate.
  * &nbsp;&nbsp;&nbsp;default: 10
  * &nbsp;&nbsp;&nbsp;minimum: 1
  * </pre>
- * 
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class ArrayFolds
-  extends AbstractArraySplitter {
+    extends AbstractArraySplitter {
 
   /** for serialization. */
   private static final long serialVersionUID = 8536100625511019961L;
@@ -109,10 +117,10 @@ public class ArrayFolds
 
   /** the number of folds. */
   protected int m_Folds;
-  
+
   /** the queue of folds. */
   protected List<TIntArrayList> m_Queue;
-  
+
   /**
    * Returns a string describing the object.
    *
@@ -122,7 +130,7 @@ public class ArrayFolds
   public String globalInfo() {
     return
         "Generates a subset of the array, using folds similar to "
-	+ "cross-validation.";
+            + "cross-validation.";
   }
 
   /**
@@ -133,8 +141,8 @@ public class ArrayFolds
     super.defineOptions();
 
     m_OptionManager.add(
-	    "folds", "folds",
-	    10, 1, null);
+        "folds", "folds",
+        10, 1, null);
   }
 
   /**
@@ -143,20 +151,20 @@ public class ArrayFolds
   @Override
   protected void initialize() {
     super.initialize();
-    
+
     m_Queue = new ArrayList<TIntArrayList>();
   }
-  
+
   /**
    * Resets the scheme.
    */
   @Override
   protected void reset() {
     super.reset();
-    
+
     m_Queue.clear();
   }
-  
+
   /**
    * Sets the number of folds.
    *
@@ -199,10 +207,10 @@ public class ArrayFolds
   @Override
   public String getQuickInfo() {
     String	result;
-    
+
     result  = QuickInfoHelper.toString(this, "folds", m_Folds, "folds: ");
     result += ", " + super.getQuickInfo();
-    
+
     return result;
   }
 
@@ -212,10 +220,10 @@ public class ArrayFolds
   @Override
   protected void pruneBackup() {
     super.pruneBackup();
-    
+
     pruneBackup(BACKUP_QUEUE);
   }
-  
+
   /**
    * Backs up the current state of the actor before update the variables.
    *
@@ -263,9 +271,9 @@ public class ArrayFolds
     int			to;
     TIntArrayList	available;
     TIntArrayList	indices;
-    
+
     result   = null;
-    
+
     // randomize indices
     arrayOld = m_InputToken.getPayload();
     available = new TIntArrayList();
@@ -275,16 +283,16 @@ public class ArrayFolds
     m_Generator.setMinValue(0);
     while (available.size() > 0) {
       if (available.size() == 1) {
-	i = 0;
+        i = 0;
       }
       else {
-	m_Generator.setMaxValue(available.size() - 1);
-	i = m_Generator.next().intValue();
+        m_Generator.setMaxValue(available.size() - 1);
+        i = m_Generator.next().intValue();
       }
       indices.add(available.get(i));
       available.removeAt(i);
     }
-    
+
     // create folds
     m_Queue.clear();
     for (n = 0; n < m_Folds; n++) {
@@ -292,14 +300,14 @@ public class ArrayFolds
       to   = (int) Math.round((n + 1) * ((double) indices.size() / (double) m_Folds));
       available = new TIntArrayList();
       for (i = from; i < to; i++)
-	available.add(indices.get(i));
+        available.add(indices.get(i));
       available.sort();
       m_Queue.add(available);
     }
-    
+
     return result;
   }
-  
+
   /**
    * Checks whether there is pending output to be collected after
    * executing the flow item.
@@ -310,7 +318,7 @@ public class ArrayFolds
   public boolean hasPendingOutput() {
     return (m_Queue.size() > 0);
   }
-  
+
   /**
    * Returns the generated token.
    *
@@ -324,33 +332,33 @@ public class ArrayFolds
     Object		arrayNew;
     int			i;
     String		suffix;
-    
+
     indices   = m_Queue.remove(0);
     arrayOld  = m_InputToken.getPayload();
     available = new TIntArrayList();
     for (i = 0; i < Array.getLength(arrayOld); i++) {
       if (!indices.contains(i))
-	available.add(i);
+        available.add(i);
     }
 
     suffix = " " + (m_Folds - m_Queue.size()) + "/" + m_Folds;
     switch (m_SplitResult) {
       case SPLIT:
-	arrayNew = newArray(arrayOld, indices, "split" + suffix);
-	m_OutputToken = new Token(arrayNew);
-	break;
+        arrayNew = newArray(arrayOld, indices, "split" + suffix);
+        m_OutputToken = new Token(arrayNew);
+        break;
       case INVERSE:
-	arrayNew = newArray(arrayOld, available, "inverse" + suffix);
-	m_OutputToken = new Token(arrayNew);
-	break;
+        arrayNew = newArray(arrayOld, available, "inverse" + suffix);
+        m_OutputToken = new Token(arrayNew);
+        break;
       case BOTH:
-	arrayNew = Array.newInstance(arrayOld.getClass(), 2);
-	Array.set(arrayNew, 0, newArray(arrayOld, indices, "split" + suffix));
-	Array.set(arrayNew, 1, newArray(arrayOld, available, "inverse" + suffix));
-	m_OutputToken = new Token(arrayNew);
-	break;
+        arrayNew = Array.newInstance(arrayOld.getClass(), 2);
+        Array.set(arrayNew, 0, newArray(arrayOld, indices, "split" + suffix));
+        Array.set(arrayNew, 1, newArray(arrayOld, available, "inverse" + suffix));
+        m_OutputToken = new Token(arrayNew);
+        break;
       default:
-	throw new IllegalStateException("Unhandled split result: " + m_SplitResult);
+        throw new IllegalStateException("Unhandled split result: " + m_SplitResult);
     }
 
     return m_OutputToken;
