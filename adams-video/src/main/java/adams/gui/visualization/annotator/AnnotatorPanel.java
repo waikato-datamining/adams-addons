@@ -41,6 +41,7 @@ import adams.gui.chooser.TrailFileChooser;
 import adams.gui.core.BasePanel;
 import adams.gui.core.ExtensionFileFilter;
 import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import adams.gui.core.MenuBarProvider;
 import adams.gui.core.RecentFilesHandler;
 import adams.gui.core.TitleGenerator;
@@ -497,7 +498,7 @@ public class AnnotatorPanel extends BasePanel
       menu.addChangeListener(e -> updateMenu());
 
       // Video/Open
-      menuitem = new JMenuItem("Open...", GUIHelper.getIcon("open.gif"));
+      menuitem = new JMenuItem("Open...", ImageManager.getIcon("open.gif"));
       menuitem.setMnemonic('O');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed O"));
       menuitem.addActionListener(e -> {
@@ -532,7 +533,7 @@ public class AnnotatorPanel extends BasePanel
       menuitem.addActionListener((ActionEvent e) -> m_VideoPlayer.enterPlaybackSpeed());
       menu.add(menuitem);
 
-      menuitem = new JMenuItem("Quit", GUIHelper.getIcon("exit.png"));
+      menuitem = new JMenuItem("Quit", ImageManager.getIcon("exit.png"));
       menuitem.setMnemonic('Q');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed Q"));
       menuitem.addActionListener(e -> close());

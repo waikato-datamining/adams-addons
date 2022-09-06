@@ -23,7 +23,7 @@ package adams.flow.standalone.ratcontrol;
 import adams.flow.core.RatState;
 import adams.flow.standalone.Rat;
 import adams.gui.core.BaseButton;
-import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 
 import javax.swing.SwingWorker;
 import java.awt.event.ActionEvent;
@@ -50,7 +50,7 @@ public class RatControlPanel
   protected void initGUI() {
     super.initGUI();
 
-    m_ButtonStopStart = new BaseButton(GUIHelper.getIcon("run.gif"));
+    m_ButtonStopStart = new BaseButton(ImageManager.getIcon("run.gif"));
     m_ButtonStopStart.addActionListener((ActionEvent e) -> stopOrStart());
     add(m_ButtonStopStart);
   }
@@ -126,15 +126,15 @@ public class RatControlPanel
 
     m_ButtonPauseResume.setEnabled(m_Actor.isRunnableActive());
     if (m_Actor.isRunnableActive() && m_Actor.isPaused())
-      m_ButtonPauseResume.setIcon(GUIHelper.getIcon("resume.gif"));
+      m_ButtonPauseResume.setIcon(ImageManager.getIcon("resume.gif"));
     else
-      m_ButtonPauseResume.setIcon(GUIHelper.getIcon("pause.gif"));
+      m_ButtonPauseResume.setIcon(ImageManager.getIcon("pause.gif"));
 
     m_ButtonStopStart.setEnabled(true);
     if (m_Actor.isRunnableActive())
-      m_ButtonStopStart.setIcon(GUIHelper.getIcon("stop_blue.gif"));
+      m_ButtonStopStart.setIcon(ImageManager.getIcon("stop_blue.gif"));
     else
-      m_ButtonStopStart.setIcon(GUIHelper.getIcon("run.gif"));
+      m_ButtonStopStart.setIcon(ImageManager.getIcon("run.gif"));
   }
 
   /**

@@ -20,17 +20,16 @@
 
 package adams.gui.visualization.nlp;
 
-import java.awt.Component;
+import adams.gui.core.ImageManager;
+import adams.gui.core.json.JsonNode;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
-
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-import adams.gui.core.GUIHelper;
-import adams.gui.core.json.JsonNode;
+import java.awt.Component;
 
 /**
  * A specialized renderer for the JsonTree elements.
@@ -74,12 +73,12 @@ public class StanfordRenderer
    * Initializes the members.
    */
   protected void initialize() {
-    m_IconObject = GUIHelper.getIcon("object.gif");
-    m_IconArray  = GUIHelper.getIcon("brackets.gif");
-    m_IconOther  = GUIHelper.getEmptyIcon();
-    m_IconNum    = GUIHelper.getIcon("json_number.gif");
-    m_IconStr    = GUIHelper.getIcon("json_string.gif");
-    m_IconBool   = GUIHelper.getIcon("json_boolean.gif");
+    m_IconObject = ImageManager.getIcon("object.gif");
+    m_IconArray  = ImageManager.getIcon("brackets.gif");
+    m_IconOther  = ImageManager.getEmptyIcon();
+    m_IconNum    = ImageManager.getIcon("json_number.gif");
+    m_IconStr    = ImageManager.getIcon("json_string.gif");
+    m_IconBool   = ImageManager.getIcon("json_boolean.gif");
   }
 
   /**

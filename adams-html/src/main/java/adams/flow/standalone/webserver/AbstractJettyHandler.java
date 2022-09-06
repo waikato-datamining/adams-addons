@@ -22,7 +22,7 @@ package adams.flow.standalone.webserver;
 import adams.core.io.FileUtils;
 import adams.core.net.MimeTypeHelper;
 import adams.flow.control.RunningFlowsRegistry;
-import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import org.apache.tika.mime.MediaType;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpMethod;
@@ -104,7 +104,7 @@ public abstract class AbstractJettyHandler
     result = null;
     
     try {
-      fullname = GUIHelper.getImageFilename(name);
+      fullname = ImageManager.getImageFilename(name);
       url      = getClass().getClassLoader().getResource(fullname);
       if (url != null) {
 	res    = Resource.newResource(url);
@@ -133,7 +133,7 @@ public abstract class AbstractJettyHandler
     if (m_ImageMimeTypes.containsKey(ext))
       return m_ImageMimeTypes.get(ext);
     
-    fullname = GUIHelper.getImageFilename(image);
+    fullname = ImageManager.getImageFilename(image);
     if (fullname != null) {
       mime = MimeTypeHelper.getMimeType(fullname);
       m_ImageMimeTypes.put(ext, mime.toString());

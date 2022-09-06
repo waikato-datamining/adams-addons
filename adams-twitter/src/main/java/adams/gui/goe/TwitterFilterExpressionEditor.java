@@ -28,6 +28,7 @@ import adams.gui.core.BaseButton;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseTextArea;
 import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import adams.gui.help.HelpFrame;
 import adams.parser.TwitterFilter;
 
@@ -171,7 +172,7 @@ public class TwitterFilterExpressionEditor
     panelButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     panelAll.add(panelButtons, BorderLayout.SOUTH);
 
-    m_ButtonHelp = new BaseButton(GUIHelper.getIcon("help.gif"));
+    m_ButtonHelp = new BaseButton(ImageManager.getIcon("help.gif"));
     m_ButtonHelp.setToolTipText("Display grammar");
     m_ButtonHelp.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {

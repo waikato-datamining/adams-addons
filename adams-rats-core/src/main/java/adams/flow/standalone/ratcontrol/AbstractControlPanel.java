@@ -27,7 +27,7 @@ import adams.flow.standalone.Rats;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseCheckBox;
 import adams.gui.core.BasePanel;
-import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 
 import javax.swing.SwingWorker;
 import java.awt.FlowLayout;
@@ -80,7 +80,7 @@ public abstract class AbstractControlPanel<T extends Actor & Pausable>
     m_CheckBoxBulkAction.setToolTipText(getCheckBoxBulkActionToolTipText());
     add(m_CheckBoxBulkAction);
 
-    m_ButtonPauseResume = new BaseButton(GUIHelper.getIcon("pause.gif"));
+    m_ButtonPauseResume = new BaseButton(ImageManager.getIcon("pause.gif"));
     m_ButtonPauseResume.addActionListener((ActionEvent e) -> pauseOrResume());
     add(m_ButtonPauseResume);
   }
@@ -286,9 +286,9 @@ public abstract class AbstractControlPanel<T extends Actor & Pausable>
       return;
     m_ButtonPauseResume.setEnabled(true);
     if (m_Actor.isPaused())
-      m_ButtonPauseResume.setIcon(GUIHelper.getIcon("resume.gif"));
+      m_ButtonPauseResume.setIcon(ImageManager.getIcon("resume.gif"));
     else
-      m_ButtonPauseResume.setIcon(GUIHelper.getIcon("pause.gif"));
+      m_ButtonPauseResume.setIcon(ImageManager.getIcon("pause.gif"));
   }
 
   /**

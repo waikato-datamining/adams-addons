@@ -24,7 +24,7 @@ import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BasePanel;
-import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import adams.scripting.command.RemoteCommand;
 import adams.scripting.command.flow.GetRatControlStatus;
 import adams.scripting.command.flow.ListFlows;
@@ -210,13 +210,13 @@ public class RatsTab
       add(m_LabelName);
 
       if (m_Pausable) {
-	m_ButtonPauseResume = new BaseButton(m_Paused ? GUIHelper.getIcon("resume.gif") : GUIHelper.getIcon("pause.gif"));
+	m_ButtonPauseResume = new BaseButton(m_Paused ? ImageManager.getIcon("resume.gif") : ImageManager.getIcon("pause.gif"));
 	m_ButtonPauseResume.addActionListener((ActionEvent e) -> pauseResume());
 	add(m_ButtonPauseResume);
       }
 
       if (m_Stoppable) {
-	m_ButtonStopStart = new BaseButton(m_Stopped ? GUIHelper.getIcon("run.gif") : GUIHelper.getIcon("stop_blue.gif"));
+	m_ButtonStopStart = new BaseButton(m_Stopped ? ImageManager.getIcon("run.gif") : ImageManager.getIcon("stop_blue.gif"));
 	m_ButtonStopStart.addActionListener((ActionEvent e) -> stopStart());
 	add(m_ButtonStopStart);
       }
@@ -299,7 +299,7 @@ public class RatsTab
 
     panelRefresh = new JPanel(new FlowLayout(FlowLayout.LEFT));
     panelAll.add(panelRefresh, BorderLayout.NORTH);
-    m_ButtonRefreshRats = new BaseButton(GUIHelper.getIcon("refresh.gif"));
+    m_ButtonRefreshRats = new BaseButton(ImageManager.getIcon("refresh.gif"));
     m_ButtonRefreshRats.addActionListener((ActionEvent e) -> refreshRats());
     label = new JLabel("Refresh Rats status");
     label.setDisplayedMnemonic('R');

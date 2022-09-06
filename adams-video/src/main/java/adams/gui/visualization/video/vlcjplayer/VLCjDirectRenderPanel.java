@@ -30,6 +30,7 @@ import adams.gui.chooser.BaseFileChooser;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BasePanel;
 import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import adams.gui.core.MenuBarProvider;
 import adams.gui.core.RecentFilesHandler;
 import adams.gui.core.TitleGenerator;
@@ -280,19 +281,19 @@ public class VLCjDirectRenderPanel
     m_ControlsPanel.add(m_LabelMediaLength);
 
     // Buttons
-    m_ButtonPlay = new BaseButton(GUIHelper.getIcon("run_black.gif"));
+    m_ButtonPlay = new BaseButton(ImageManager.getIcon("run_black.gif"));
     m_ButtonPlay.addActionListener((ActionEvent e) -> play());
     m_ControlsPanel.add(m_ButtonPlay);
 
-    m_ButtonPause = new BaseButton(GUIHelper.getIcon("pause_black.gif"));
+    m_ButtonPause = new BaseButton(ImageManager.getIcon("pause_black.gif"));
     m_ButtonPause.addActionListener((ActionEvent e) -> pause());
     m_ControlsPanel.add(m_ButtonPause);
 
-    m_ButtonStop = new BaseButton(GUIHelper.getIcon("stop_black.gif"));
+    m_ButtonStop = new BaseButton(ImageManager.getIcon("stop_black.gif"));
     m_ButtonStop.addActionListener((ActionEvent e) -> stop());
     m_ControlsPanel.add(m_ButtonStop);
 
-    m_ButtonMute = new BaseButton(GUIHelper.getIcon("mute.png"));
+    m_ButtonMute = new BaseButton(ImageManager.getIcon("mute.png"));
     m_ButtonMute.addActionListener((ActionEvent e) -> toggleMute());
     m_ControlsPanel.add(m_ButtonMute);
   }
@@ -395,7 +396,7 @@ public class VLCjDirectRenderPanel
       menu.addChangeListener(e -> update());
 
       // File/Open
-      menuitem = new JMenuItem("Open...", GUIHelper.getIcon("open.gif"));
+      menuitem = new JMenuItem("Open...", ImageManager.getIcon("open.gif"));
       menuitem.setMnemonic('O');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed O"));
       menuitem.addActionListener(e -> open());
@@ -420,7 +421,7 @@ public class VLCjDirectRenderPanel
       m_MenuFileLoadRecent = submenu;
 
       // File/Close
-      menuitem = new JMenuItem("Close", GUIHelper.getIcon("exit.png"));
+      menuitem = new JMenuItem("Close", ImageManager.getIcon("exit.png"));
       menuitem.setMnemonic('C');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed Q"));
       menuitem.addActionListener(e -> close());
@@ -697,9 +698,9 @@ public class VLCjDirectRenderPanel
       m_ButtonPause.setEnabled(m_VideoPlaying && !m_VideoPaused);
       m_ButtonMute.setEnabled(m_VideoLoaded);
       if (isSoundMuted())
-        m_ButtonMute.setIcon(GUIHelper.getIcon("unmute.png"));
+        m_ButtonMute.setIcon(ImageManager.getIcon("unmute.png"));
       else
-        m_ButtonMute.setIcon(GUIHelper.getIcon("mute.png"));
+        m_ButtonMute.setIcon(ImageManager.getIcon("mute.png"));
 
       // Enables or disables the slider
       m_SliderPosition.setEnabled(m_VideoLoaded && m_VLCInstalled);

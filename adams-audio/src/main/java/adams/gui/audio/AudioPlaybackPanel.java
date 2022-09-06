@@ -26,6 +26,7 @@ import adams.gui.chooser.AudioFileChooser;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BasePanel;
 import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -151,15 +152,15 @@ public class AudioPlaybackPanel
     panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     add(panel, BorderLayout.SOUTH);
 
-    m_ButtonStart = new BaseButton(GUIHelper.getIcon("run.gif"));
+    m_ButtonStart = new BaseButton(ImageManager.getIcon("run.gif"));
     m_ButtonStart.addActionListener((ActionEvent e) -> start());
     panel.add(m_ButtonStart);
 
-    m_ButtonPauseResume = new BaseButton(GUIHelper.getIcon("pause.gif"));
+    m_ButtonPauseResume = new BaseButton(ImageManager.getIcon("pause.gif"));
     m_ButtonPauseResume.addActionListener((ActionEvent e) -> pauseOrResume());
     panel.add(m_ButtonPauseResume);
 
-    m_ButtonStop = new BaseButton(GUIHelper.getIcon("stop_blue.gif"));
+    m_ButtonStop = new BaseButton(ImageManager.getIcon("stop_blue.gif"));
     m_ButtonStop.addActionListener((ActionEvent e) -> stop());
     panel.add(m_ButtonStop);
   }
@@ -254,11 +255,11 @@ public class AudioPlaybackPanel
 
     if (isPaused()) {
       m_Clip.start();
-      m_ButtonPauseResume.setIcon(GUIHelper.getIcon("pause.gif"));
+      m_ButtonPauseResume.setIcon(ImageManager.getIcon("pause.gif"));
     }
     else {
       m_Clip.stop();
-      m_ButtonPauseResume.setIcon(GUIHelper.getIcon("resume.gif"));
+      m_ButtonPauseResume.setIcon(ImageManager.getIcon("resume.gif"));
     }
 
     m_Paused = !m_Paused;
@@ -281,7 +282,7 @@ public class AudioPlaybackPanel
       m_RefreshTimer.stop();
       m_RefreshTimer = null;
     }
-    m_ButtonPauseResume.setIcon(GUIHelper.getIcon("pause.gif"));
+    m_ButtonPauseResume.setIcon(ImageManager.getIcon("pause.gif"));
     resetTime();
     updateButtons();
   }

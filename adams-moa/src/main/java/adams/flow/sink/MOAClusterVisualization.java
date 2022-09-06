@@ -36,8 +36,11 @@ import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseSplitPane;
 import adams.gui.core.BaseTabbedPane;
-import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import adams.gui.dialog.TextPanel;
+import com.yahoo.labs.samoa.instances.DenseInstance;
+import com.yahoo.labs.samoa.instances.Instance;
+import com.yahoo.labs.samoa.instances.Instances;
 import moa.cluster.Clustering;
 import moa.clusterers.AbstractClusterer;
 import moa.clusterers.ClusterGenerator;
@@ -45,9 +48,6 @@ import moa.evaluation.MeasureCollection;
 import moa.gui.visualization.DataPoint;
 import moa.gui.visualization.GraphCanvas;
 import moa.gui.visualization.StreamPanel;
-import com.yahoo.labs.samoa.instances.DenseInstance;
-import com.yahoo.labs.samoa.instances.Instance;
-import com.yahoo.labs.samoa.instances.Instances;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -1002,7 +1002,7 @@ public class MOAClusterVisualization
     panel2 = new JPanel(new GridLayout(4, 1));
     panel.add(panel2, BorderLayout.NORTH);
 
-    button = new BaseButton("X", GUIHelper.getIcon("zoom_in.png"));
+    button = new BaseButton("X", ImageManager.getIcon("zoom_in.png"));
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -1011,7 +1011,7 @@ public class MOAClusterVisualization
     });
     panel2.add(button);
 
-    button = new BaseButton("X", GUIHelper.getIcon("zoom_out.png"));
+    button = new BaseButton("X", ImageManager.getIcon("zoom_out.png"));
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -1020,7 +1020,7 @@ public class MOAClusterVisualization
     });
     panel2.add(button);
 
-    button = new BaseButton("Y", GUIHelper.getIcon("zoom_in.png"));
+    button = new BaseButton("Y", ImageManager.getIcon("zoom_in.png"));
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -1029,7 +1029,7 @@ public class MOAClusterVisualization
     });
     panel2.add(button);
 
-    button = new BaseButton("Y", GUIHelper.getIcon("zoom_out.png"));
+    button = new BaseButton("Y", ImageManager.getIcon("zoom_out.png"));
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {

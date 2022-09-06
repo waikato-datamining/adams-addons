@@ -28,7 +28,7 @@ import adams.core.option.parsing.BaseMarkdownParsing;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseCheckBox;
 import adams.gui.core.BaseScrollPane;
-import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import adams.gui.core.MarkdownTextAreaWithPreview;
 
 import javax.swing.BorderFactory;
@@ -141,7 +141,7 @@ public class BaseMarkdownEditor
     panelButtons.add(panel, BorderLayout.WEST);
     buttonClear = new BaseButton("Clear");
     buttonClear.setMnemonic('l');
-    buttonClear.setIcon(GUIHelper.getIcon("new.gif"));
+    buttonClear.setIcon(ImageManager.getIcon("new.gif"));
     buttonClear.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
 	m_TextValue.setText("");

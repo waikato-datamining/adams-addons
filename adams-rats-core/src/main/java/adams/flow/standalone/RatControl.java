@@ -48,6 +48,7 @@ import adams.gui.core.BaseTextArea;
 import adams.gui.core.ConsolePanel;
 import adams.gui.core.Fonts;
 import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import adams.gui.core.ParameterPanel;
 import adams.gui.dialog.ApprovalDialog;
 import adams.gui.event.ConsolePanelEvent;
@@ -434,7 +435,7 @@ public class RatControl
 	BULKACTION_STOP,
       }));
       panel.add(comboBulkActions);
-      buttonApply = new BaseButton(GUIHelper.getIcon("validate.png"));
+      buttonApply = new BaseButton(ImageManager.getIcon("validate.png"));
       buttonApply.setToolTipText("Apply bulk action");
       buttonApply.addActionListener((ActionEvent e) -> {
         SwingWorker worker = new SwingWorker() {
@@ -459,12 +460,12 @@ public class RatControl
     panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     panelBottom.add(panel, BorderLayout.EAST);
 
-    buttonStop = new BaseButton(GUIHelper.getIcon("stop_blue.gif"));
+    buttonStop = new BaseButton(ImageManager.getIcon("stop_blue.gif"));
     buttonStop.setToolTipText("Stop flow");
     buttonStop.addActionListener((ActionEvent e) -> getRoot().stopExecution());
     panel.add(buttonStop);
 
-    buttonConsole = new BaseButton(GUIHelper.getIcon("log.gif"));
+    buttonConsole = new BaseButton(ImageManager.getIcon("log.gif"));
     buttonConsole.setToolTipText("Show console output");
     buttonConsole.addActionListener((ActionEvent e) -> showConsole());
     panel.add(buttonConsole);
@@ -703,7 +704,7 @@ public class RatControl
     menu.setMnemonic('F');
     menubar.add(menu);
 
-    menuitem = new JMenuItem("Save as...", GUIHelper.getIcon("save.gif"));
+    menuitem = new JMenuItem("Save as...", ImageManager.getIcon("save.gif"));
     menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed S"));
     menuitem.addActionListener((ActionEvent e) -> {
       TextFileChooser fileChooser = new TextFileChooser();
@@ -719,7 +720,7 @@ public class RatControl
 
     menu.addSeparator();
 
-    menuitem = new JMenuItem("Close", GUIHelper.getIcon("exit.png"));
+    menuitem = new JMenuItem("Close", ImageManager.getIcon("exit.png"));
     menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed Q"));
     menuitem.addActionListener((ActionEvent e) -> GUIHelper.closeParent(m_TextAreaConsole));
     menu.add(menuitem);

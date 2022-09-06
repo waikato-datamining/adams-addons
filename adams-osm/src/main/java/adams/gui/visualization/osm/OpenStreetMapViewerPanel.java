@@ -31,6 +31,7 @@ import adams.flow.sink.openstreetmapviewer.OpenStreetMapSource;
 import adams.gui.core.BasePanel;
 import adams.gui.core.ConsolePanel;
 import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import adams.gui.core.MenuBarProvider;
 import adams.gui.goe.GenericObjectEditorDialog;
 import adams.gui.sendto.SendToActionSupporter;
@@ -190,7 +191,7 @@ public class OpenStreetMapViewerPanel
       menuitem = new JMenuItem("Tile source...");
       menu.add(menuitem);
       menuitem.setMnemonic('s');
-      menuitem.setIcon(GUIHelper.getEmptyIcon());
+      menuitem.setIcon(ImageManager.getEmptyIcon());
       menuitem.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -202,7 +203,7 @@ public class OpenStreetMapViewerPanel
       menuitem = new JMenuItem("Tile loader...");
       menu.add(menuitem);
       menuitem.setMnemonic('l');
-      menuitem.setIcon(GUIHelper.getEmptyIcon());
+      menuitem.setIcon(ImageManager.getEmptyIcon());
       menuitem.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -220,7 +221,7 @@ public class OpenStreetMapViewerPanel
       menu.add(menuitem);
       menuitem.setMnemonic('C');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed Q"));
-      menuitem.setIcon(GUIHelper.getIcon("exit.png"));
+      menuitem.setIcon(ImageManager.getIcon("exit.png"));
       menuitem.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -244,7 +245,7 @@ public class OpenStreetMapViewerPanel
       menu.add(menuitem);
       menuitem.setSelected(m_Viewer.getViewer().isTileGridVisible());
       menuitem.setMnemonic('g');
-      menuitem.setIcon(GUIHelper.getEmptyIcon());
+      menuitem.setIcon(ImageManager.getEmptyIcon());
       menuitem.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -257,7 +258,7 @@ public class OpenStreetMapViewerPanel
       menu.add(menuitem);
       menuitem.setSelected(false);
       menuitem.setMnemonic('c');
-      menuitem.setIcon(GUIHelper.getIcon("crosshair.png"));
+      menuitem.setIcon(ImageManager.getIcon("crosshair.png"));
       menuitem.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent e) {
