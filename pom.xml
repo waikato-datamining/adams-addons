@@ -65,7 +65,6 @@
     <module>adams-redis</module>
     <module>adams-rest</module>
     <module>adams-security</module>
-    <module>adams-tensorflow</module>
     <module>adams-terminal</module>
     <module>adams-twitter</module>
     <module>adams-twitter-rats</module>
