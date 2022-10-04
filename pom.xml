@@ -49,7 +49,6 @@
     <module>adams-meka</module>
     <module>adams-moa</module>
     <module>adams-nlp</module>
-    <module>adams-osm</module>
     <module>adams-python-weka</module>
     <module>adams-r</module>
     <module>adams-rabbitmq</module>
@@ -65,8 +64,6 @@
     <module>adams-rest</module>
     <module>adams-security</module>
     <module>adams-terminal</module>
-    <module>adams-twitter</module>
-    <module>adams-twitter-rats</module>
     <module>adams-video</module>
     <module>adams-webservice-core</module>
     <module>adams-webservice</module>

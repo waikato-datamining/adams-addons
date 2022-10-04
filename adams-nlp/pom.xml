@@ -78,20 +78,6 @@
     </dependency>
 
     <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-twitter</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-twitter</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-      <type>test-jar</type>
-    </dependency>
-
-    <dependency>
       <groupId>edu.stanford.nlp</groupId>
       <artifactId>stanford-parser</artifactId>
       <version>3.5.2</version>
