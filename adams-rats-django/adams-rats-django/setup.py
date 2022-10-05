@@ -9,7 +9,7 @@ setup(
     author_email="fracpete@waikato.ac.nz",
     packages=find_packages(),
     install_requires=[
-        "Django >= 4.1",  # supported till 2020 https://www.djangoproject.com/download/
+        "Django >= 4.1, < 4.2",
         "jinja2",
         "requests",
     ],
