@@ -37,7 +37,6 @@
   <modules>
     <module>adams-audio</module>
     <module>adams-bootstrapp</module>
-    <module>adams-cqengine</module>
     <module>adams-ffmpeg</module>
     <module>adams-gnuplot</module>
     <module>adams-heatmap</module>
