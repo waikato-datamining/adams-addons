@@ -6,7 +6,7 @@
 
 <div class=".container">
   <div class=".container">
-    <form action="{% url 'remote_control:command' %}" method="POST">
+    <form action="{% url 'command' %}" method="POST">
       {% csrf_token %}
       <input type="hidden" name="id" value="{{ id }}"/>
         <table class="table table-nonfluid table-with-border">
@@ -24,18 +24,18 @@
                   <!-- pause/resume -->
                   {% if not rat|get_item:'stopped'  %}
                     {% if rat|get_item:'paused' %}
-                    <a type="button" class="btn btn-default applist-button" href="{% url 'remote_control:command' %}?id={{ id }}&rat={{ rat|get_item:'full' }}&command=resume&showbackbutton={{ showbackbutton }}"><img src="/static/img/resume.gif"/></a>
+                    <a type="button" class="btn btn-default applist-button" href="{% url 'command' %}?id={{ id }}&rat={{ rat|get_item:'full' }}&command=resume&showbackbutton={{ showbackbutton }}"><img src="/static/img/resume.gif"/></a>
                     {% else %}
                       {% if rat|get_item:'pausable' %}
-                      <a type="button" class="btn btn-default applist-button" href="{% url 'remote_control:command' %}?id={{ id }}&rat={{ rat|get_item:'full' }}&command=pause&showbackbutton={{ showbackbutton }}"><img src="/static/img/pause.gif"/></a>
+                      <a type="button" class="btn btn-default applist-button" href="{% url 'command' %}?id={{ id }}&rat={{ rat|get_item:'full' }}&command=pause&showbackbutton={{ showbackbutton }}"><img src="/static/img/pause.gif"/></a>
                       {% endif %}
                     {% endif %}
                   {% endif %}
                   <!-- start/stop -->
                   {% if rat|get_item:'stopped'  %}
-                  <a type="button" class="btn btn-default applist-button" href="{% url 'remote_control:command' %}?id={{ id }}&rat={{ rat|get_item:'full' }}&command=start&showbackbutton={{ showbackbutton }}"><img src="/static/img/start.gif"/></a>
+                  <a type="button" class="btn btn-default applist-button" href="{% url 'command' %}?id={{ id }}&rat={{ rat|get_item:'full' }}&command=start&showbackbutton={{ showbackbutton }}"><img src="/static/img/start.gif"/></a>
                   {% else %}
-                  <a type="button" class="btn btn-default applist-button" href="{% url 'remote_control:command' %}?id={{ id }}&rat={{ rat|get_item:'full' }}&command=stop&showbackbutton={{ showbackbutton }}"><img src="/static/img/stop.gif"/></a>
+                  <a type="button" class="btn btn-default applist-button" href="{% url 'command' %}?id={{ id }}&rat={{ rat|get_item:'full' }}&command=stop&showbackbutton={{ showbackbutton }}"><img src="/static/img/stop.gif"/></a>
                   {% endif %}
                 </td>
               </tr>
@@ -48,7 +48,7 @@
 </div>
 
 {% if showbackbutton %}
-<a type="button" class="btn btn-default applist-button" href="{% url 'remote_control:select' %}">Back</a>
+<a type="button" class="btn btn-default applist-button" href="{% url 'select' %}">Back</a>
 {% endif %}
 
 {% endblock %}

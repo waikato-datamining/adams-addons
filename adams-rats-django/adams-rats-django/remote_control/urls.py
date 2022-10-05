@@ -1,9 +1,9 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.select, name='select'),
-    url(r'^control$', views.control, name='control'),
-    url(r'^command$', views.command, name='command'),
+    re_path(r'^$', views.select, name='select'),
+    re_path(r'^control$', views.control, name='control'),
+    re_path(r'^command$', views.command, name='command'),
 ]

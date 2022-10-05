@@ -5,19 +5,23 @@ using a REST webservice.
 
 In order to be able to remote control Rat actors, you need to:
 
+* have a *RegisterFlow* standalone in your flow
 * have a *RatControl* standalone in your flow
 * all the *Rat* actors that should be remote controllable, need to have their
   *showInControl* flag set
 * have a *RESTServer* standalone with the *GenericServer* configured; the
   *GenericServer* must list at least the *RatControl* rest plugin.
 
+Example flow for testing:
+
+[adams-addons-all:adams-rest_rats.flow](https://github.com/waikato-datamining/adams-applications/blob/master/adams-addons-all/src/main/flows/adams-rest_rats.flow)
+
 
 ## Installation
 
 * Requirements
 
-  * git
-  * Python 3.5
+  * Python 3.8+
   * virtualenv
   
 * Uses
@@ -33,7 +37,7 @@ In order to be able to remote control Rat actors, you need to:
   * set up virtual environment (above directory with `requirements.txt`)
 
     ```commandline
-    virtualenv -p /usr/bin/python3.5 venv
+    virtualenv -p /usr/bin/python3 venv
     ```
   
   * install Django and required dependencies (change into dir with `requirements.txt`)
@@ -78,6 +82,13 @@ In order to be able to remote control Rat actors, you need to:
         LOGGING_DEFAULT_LEVEL = 'WARNING'
         ```
 
+      * Define the `RESTART_COMMAND` (replace `None` with a suitable command to restart the ADAMS backend):
+
+        ```python
+        RESTART_COMMAND = None
+        ```
+
+
 * Steps (for Windows)
 
   * install Python
@@ -86,7 +97,7 @@ In order to be able to remote control Rat actors, you need to:
   * set up virtual environment (above directory with `requirements.txt`)
 
     ```commandline
-    virtualenv -p C:\Python35\python.exe venv
+    virtualenv -p C:\Python38\python.exe venv
     ```
 
   * install Django and required dependencies (change into dir with `requirements.txt`)
@@ -131,6 +142,12 @@ In order to be able to remote control Rat actors, you need to:
         LOGGING_DEFAULT_LEVEL = 'WARNING'
         ```
 
+      * Define the `RESTART_COMMAND` (replace `None` with a suitable command to restart the ADAMS backend):
+
+        ```python
+        RESTART_COMMAND = None
+        ```
+
 
 ## Usage
 
@@ -138,9 +155,21 @@ In order to be able to remote control Rat actors, you need to:
 
 * change into project directory
 * change into `adams_rats_django`
+* initialize the database (Linux)
+
+  ```bash
+  ./venv/bin/python adams-rats-django/manage.py migrate
+  ```
+
+* initialize the database (Windows)
+
+  ```bash
+  .\venv\Scripts\python.exe adams-rats-django\manage.py migrate
+  ```
+
 * start up local webserver (Linux)
 
-  ```commandline
+  ```bash
   ./venv/bin/python adams-rats-django/manage.py runserver
   ```
 

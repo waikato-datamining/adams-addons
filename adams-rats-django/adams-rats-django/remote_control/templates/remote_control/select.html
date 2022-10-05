@@ -10,7 +10,7 @@
     <h3 class="panel-title">Search parameters</h3>
   </div>
   <div class="panel-body">
-    <form action="{% url 'remote_control:control' %}" method="POST">
+    <form action="{% url 'control' %}" method="POST">
       {% csrf_token %}
       <div class="table-responsive">
         <table class="table">
@@ -24,7 +24,7 @@
           </tr>
           {% for flow in flows %}
           <tr>
-            <td><a href="{% url 'remote_control:control' %}?id={{ flow|get_item:'id' }}">{{ flow|get_item:'id' }}</a></td>
+            <td><a href="{% url 'control' %}?id={{ flow|get_item:'id' }}">{{ flow|get_item:'id' }}</a></td>
             <td>{{ flow|get_item:'flow' }}</td>
             <td>{{ flow|get_item:'annotation' }}</td>
             <td>{{ flow|get_item:'paused' }}</td>

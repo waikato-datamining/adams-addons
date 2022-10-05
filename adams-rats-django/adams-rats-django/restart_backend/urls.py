@@ -1,8 +1,8 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.restart, name='restart'),
-    url(r'^results$', views.output, name='output'),
+    re_path(r'^$', views.restart, name='restart'),
+    re_path(r'^results$', views.output, name='output'),
 ]
