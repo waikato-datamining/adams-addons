@@ -14,7 +14,7 @@ In order to be able to remote control Rat actors, you need to:
 
 Example flow for testing:
 
-[adams-addons-all:adams-rest_rats.flow](https://github.com/waikato-datamining/adams-applications/blob/master/adams-addons-all/src/main/flows/adams-rest_rats.flow)
+[adams-addons-all:adams-addons-all-rest_rats.flow](https://github.com/waikato-datamining/adams-applications/blob/master/adams-addons-all/src/main/flows/adams-addons-all-rest_rats.flow)
 
 
 ## Installation
