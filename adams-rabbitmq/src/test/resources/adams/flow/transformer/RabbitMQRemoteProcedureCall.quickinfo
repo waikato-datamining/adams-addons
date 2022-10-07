@@ -1,1 +1,0 @@
-queue: -empty-, send: StringConverter (encoding: Default), receive: StringConverter (encoding: Default)
