@@ -82,7 +82,7 @@
     <mojo.java.target>1.8</mojo.java.target>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <maven-plugin-plugin.version>3.5.1</maven-plugin-plugin.version>
+    <maven-plugin-plugin.version>3.6.4</maven-plugin-plugin.version>
     <plexus-compiler-api.version>2.5</plexus-compiler-api.version>
     <plexus-utils.version>3.1.0</plexus-utils.version>
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
