@@ -93,7 +93,7 @@ public class ApplicationMenu
     menus   = new HashMap<>();
     for (Class cls: classes) {
       try {
-	definition = (AbstractMenuItemDefinition) cls.newInstance();
+	definition = (AbstractMenuItemDefinition) cls.getDeclaredConstructor().newInstance();
 	definition.setOwner(getOwner());
 	if (!menus.containsKey(definition.getCategory()))
 	  menus.put(definition.getCategory(), new ArrayList<>());

@@ -99,9 +99,9 @@ public class BaseMeasureCollection
   public MeasureCollection collectionValue() {
     try {
       if (getValue().contains("."))
-	return (MeasureCollection) ClassManager.getSingleton().forName(getValue()).newInstance();
+	return (MeasureCollection) ClassManager.getSingleton().forName(getValue()).getDeclaredConstructor().newInstance();
       else
-	return (MeasureCollection) ClassManager.getSingleton().forName(DEFAULT_PACKAGE + "." + getValue()).newInstance();
+	return (MeasureCollection) ClassManager.getSingleton().forName(DEFAULT_PACKAGE + "." + getValue()).getDeclaredConstructor().newInstance();
     }
     catch (Exception e) {
       return new F1();

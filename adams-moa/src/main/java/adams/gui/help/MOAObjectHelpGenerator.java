@@ -67,7 +67,7 @@ public class MOAObjectHelpGenerator
     MOAObject			obj;
 
     try {
-      obj = (MOAObject) cls.newInstance();
+      obj = (MOAObject) cls.getDeclaredConstructor().newInstance();
     }
     catch (Exception ex) {
       ConsolePanel.getSingleton().append(

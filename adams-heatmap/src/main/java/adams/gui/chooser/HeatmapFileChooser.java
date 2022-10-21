@@ -134,7 +134,7 @@ public class HeatmapFileChooser
 	  continue;
 	if (filter.accept(file)) {
 	  try {
-	    result = (AbstractDataContainerReader<Heatmap>) ClassManager.getSingleton().forName(filter.getClassname()).newInstance();
+	    result = (AbstractDataContainerReader<Heatmap>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
 	  }
 	  catch (Exception e) {
             handleException("Failed to instantiate reader: " + filter.getClassname(), e);
@@ -148,7 +148,7 @@ public class HeatmapFileChooser
 	    continue;
 	  if (filter.accept(file)) {
 	    try {
-	      result = (AbstractDataContainerReader<Heatmap>) ClassManager.getSingleton().forName(filter.getClassname()).newInstance();
+	      result = (AbstractDataContainerReader<Heatmap>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
 	    }
 	    catch (Exception e) {
               handleException("Failed to instantiate reader: " + filter.getClassname(), e);
@@ -179,7 +179,7 @@ public class HeatmapFileChooser
 	  continue;
 	if (filter.accept(file)) {
 	  try {
-	    result = (AbstractDataContainerWriter<Heatmap>) ClassManager.getSingleton().forName(filter.getClassname()).newInstance();
+	    result = (AbstractDataContainerWriter<Heatmap>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
 	  }
 	  catch (Exception e) {
             handleException("Failed to instantiate writer: " + filter.getClassname(), e);
@@ -193,7 +193,7 @@ public class HeatmapFileChooser
 	    continue;
 	  if (filter.accept(file)) {
 	    try {
-	      result = (AbstractDataContainerWriter<Heatmap>) ClassManager.getSingleton().forName(filter.getClassname()).newInstance();
+	      result = (AbstractDataContainerWriter<Heatmap>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
 	    }
 	    catch (Exception e) {
               handleException("Failed to instantiate writer: " + filter.getClassname(), e);

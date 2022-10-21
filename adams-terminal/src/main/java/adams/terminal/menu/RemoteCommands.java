@@ -67,7 +67,7 @@ public class RemoteCommands
     actions = new ArrayList<>();
     for (Class cls: classes) {
       try {
-	action = (AbstractRemoteCommandAction) cls.newInstance();
+	action = (AbstractRemoteCommandAction) cls.getDeclaredConstructor().newInstance();
 	action.setOwner(getOwner());
 	actions.add(action);
       }

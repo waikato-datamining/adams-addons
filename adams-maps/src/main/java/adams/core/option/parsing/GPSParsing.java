@@ -51,7 +51,7 @@ public class GPSParsing
     }
     catch (Exception e) {
       try {
-	result = (AbstractGPS) cls.newInstance();
+	result = (AbstractGPS) cls.getDeclaredConstructor().newInstance();
       }
       catch (Exception ex) {
 	System.err.println("Failed to instantiate " + cls.getName() + " as " + AbstractGPS.class.getName() + "!");

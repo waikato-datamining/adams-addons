@@ -19,12 +19,12 @@
  */
 package adams.data.conversion;
 
+import adams.core.Randomizable;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
-
-import adams.core.Randomizable;
 
 /**
  <!-- globalinfo-start -->
@@ -151,7 +151,7 @@ public class RandomizeCollection
     input = (Collection) m_Input;
     array = input.toArray();
     Collections.shuffle(Arrays.asList(array), new Random(m_Seed));
-    result = (Collection) input.getClass().newInstance();
+    result = (Collection) input.getClass().getDeclaredConstructor().newInstance();
     result.addAll(Arrays.asList(array));
     
     return result;
