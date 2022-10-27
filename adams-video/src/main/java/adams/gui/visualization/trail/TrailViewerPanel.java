@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * TrailViewerPanel.java
- * Copyright (C) 2011-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2022 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.trail;
 
@@ -76,7 +76,6 @@ import java.util.List;
  * Panel for viewing/processing trails.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 10634 $
  */
 public class TrailViewerPanel
   extends BasePanel
@@ -914,6 +913,7 @@ public class TrailViewerPanel
       else
 	m_DialogOverlay = new GenericObjectEditorDialog(getParentFrame(), true);
       m_DialogOverlay.setTitle("Select overlay");
+      m_DialogOverlay.setUISettingsPrefix(AbstractTrailOverlay.class);
       m_DialogOverlay.getGOEEditor().setClassType(AbstractTrailOverlay.class);
       m_DialogOverlay.getGOEEditor().setCanChangeClassInDialog(true);
       m_DialogOverlay.setCurrent(new Null());

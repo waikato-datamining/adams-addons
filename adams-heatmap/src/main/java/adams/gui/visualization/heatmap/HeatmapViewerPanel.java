@@ -15,7 +15,7 @@
 
 /*
  * HeatmapViewerPanel.java
- * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2022 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.heatmap;
 
@@ -1041,6 +1041,7 @@ public class HeatmapViewerPanel
       else
 	m_DialogOverlay = new GenericObjectEditorDialog(getParentFrame(), true);
       m_DialogOverlay.setTitle("Select overlay");
+      m_DialogOverlay.setUISettingsPrefix(AbstractHeatmapOverlay.class);
       m_DialogOverlay.getGOEEditor().setClassType(AbstractHeatmapOverlay.class);
       m_DialogOverlay.getGOEEditor().setCanChangeClassInDialog(true);
       m_DialogOverlay.setCurrent(new Centroid());
@@ -1067,6 +1068,7 @@ public class HeatmapViewerPanel
       else
 	m_DialogSelectionProcessor = new GenericObjectEditorDialog(getParentFrame(), true);
       m_DialogSelectionProcessor.setTitle("Select overlay");
+      m_DialogSelectionProcessor.setUISettingsPrefix(AbstractSelectionProcessor.class);
       m_DialogSelectionProcessor.getGOEEditor().setClassType(AbstractSelectionProcessor.class);
       m_DialogSelectionProcessor.getGOEEditor().setCanChangeClassInDialog(true);
       m_DialogSelectionProcessor.setCurrent(new NullProcessor());
@@ -1090,6 +1092,7 @@ public class HeatmapViewerPanel
       else
 	m_DialogColorGenerator = new GenericObjectEditorDialog(getParentFrame(), true);
       m_DialogColorGenerator.setTitle("Select color generator");
+      m_DialogColorGenerator.setUISettingsPrefix(AbstractColorGradientGenerator.class);
       m_DialogColorGenerator.getGOEEditor().setClassType(AbstractColorGradientGenerator.class);
       m_DialogColorGenerator.getGOEEditor().setCanChangeClassInDialog(true);
       m_DialogColorGenerator.setLocationRelativeTo(this);
