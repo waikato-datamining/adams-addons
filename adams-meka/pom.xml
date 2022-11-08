@@ -98,6 +98,10 @@
           <groupId>com.github.fracpete</groupId>
           <artifactId>jclipboardhelper</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.scalatest</groupId>
+          <artifactId>scalatest-maven-plugin</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
