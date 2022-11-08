@@ -87,6 +87,10 @@
           <groupId>xalan</groupId>
           <artifactId>xalan</artifactId>  <!-- contains an old, incompatible version of java_cup.runtime.lr_parser -->
         </exclusion>
+        <exclusion>
+          <groupId>jfree</groupId>
+          <artifactId>jfreechart</artifactId>  <!-- we're using newer version -->
+        </exclusion>
       </exclusions>
     </dependency>
 
