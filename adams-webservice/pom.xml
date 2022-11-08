@@ -193,17 +193,17 @@
       <version>${xjc.version}</version>
     </dependency>
 
-    <dependency>
+    <!--dependency>
       <groupId>net.java.dev.msv</groupId>
       <artifactId>msv-core</artifactId>
       <version>2011.1</version>
-    </dependency>
+    </dependency-->
 
-    <dependency>
+    <!--dependency>
       <groupId>org.daisy.libs</groupId>
       <artifactId>jing</artifactId>
       <version>20120724.0.0</version>
-    </dependency>
+    </dependency-->
   </dependencies>
 
   <build>
