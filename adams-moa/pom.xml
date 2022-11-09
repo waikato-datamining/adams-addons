@@ -95,6 +95,10 @@
           <groupId>jfree</groupId>
           <artifactId>jcommon</artifactId>  <!-- we're using newer version -->
         </exclusion>
+        <exclusion>
+          <groupId>nz.ac.waikato.cms.adams</groupId>
+          <artifactId>simple-directory-chooser</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 

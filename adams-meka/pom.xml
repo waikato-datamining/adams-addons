@@ -106,6 +106,10 @@
           <groupId>jfree</groupId>
           <artifactId>jfreechart</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>nz.ac.waikato.cms.adams</groupId>
+          <artifactId>simple-directory-chooser</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
