@@ -15,7 +15,7 @@
 
 /*
  * HeatmapDisplay.java
- * Copyright (C) 2011-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2022 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
@@ -25,8 +25,8 @@ import adams.core.option.OptionUtils;
 import adams.data.heatmap.Heatmap;
 import adams.flow.core.Token;
 import adams.gui.core.BasePanel;
-import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
+import adams.gui.visualization.core.ColorGradientGenerator;
 import adams.gui.visualization.heatmap.HeatmapPanel;
 import adams.gui.visualization.heatmap.overlay.AbstractHeatmapOverlay;
 
@@ -123,7 +123,7 @@ import java.awt.Color;
  * &nbsp;&nbsp;&nbsp;default: adams.gui.print.NullWriter
  * </pre>
  * 
- * <pre>-color-generator &lt;adams.gui.visualization.core.AbstractColorGradientGenerator&gt; (property: colorGenerator)
+ * <pre>-color-generator &lt;adams.gui.visualization.core.ColorGradientGenerator&gt; (property: colorGenerator)
  * &nbsp;&nbsp;&nbsp;The generator for the color gradient.
  * &nbsp;&nbsp;&nbsp;default: adams.gui.visualization.core.BiColorGenerator
  * </pre>
@@ -153,7 +153,6 @@ import java.awt.Color;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class HeatmapDisplay
   extends AbstractGraphicalDisplay
@@ -163,7 +162,7 @@ public class HeatmapDisplay
   private static final long serialVersionUID = -5963541661512220421L;
 
   /** the generator for the color gradient. */
-  protected AbstractColorGradientGenerator m_ColorGenerator;
+  protected ColorGradientGenerator m_ColorGenerator;
 
   /** the overlays to use. */
   protected AbstractHeatmapOverlay[] m_Overlays;
@@ -240,7 +239,7 @@ public class HeatmapDisplay
    *
    * @param value 	the generator
    */
-  public void setColorGenerator(AbstractColorGradientGenerator value) {
+  public void setColorGenerator(ColorGradientGenerator value) {
     m_ColorGenerator = value;
     reset();
   }
@@ -250,7 +249,7 @@ public class HeatmapDisplay
    *
    * @return 		the generator
    */
-  public AbstractColorGradientGenerator getColorGenerator() {
+  public ColorGradientGenerator getColorGenerator() {
     return m_ColorGenerator;
   }
 
@@ -472,7 +471,7 @@ public class HeatmapDisplay
 	super.initGUI();
 	setLayout(new BorderLayout());
 	m_HeatmapPanel = new HeatmapPanel(null);
-	m_HeatmapPanel.setColorGenerator((AbstractColorGradientGenerator) OptionUtils.shallowCopy(m_ColorGenerator));
+	m_HeatmapPanel.setColorGenerator((ColorGradientGenerator) OptionUtils.shallowCopy(m_ColorGenerator));
         for (AbstractHeatmapOverlay overlay: m_Overlays)
           m_HeatmapPanel.addOverlay(overlay);
 	m_HeatmapPanel.setMissingValueColor(m_MissingValueColor);

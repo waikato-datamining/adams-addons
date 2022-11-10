@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * HeatmapToBufferedImageExpression.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2022 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.conversion;
 
@@ -24,8 +24,8 @@ import adams.core.base.BaseString;
 import adams.data.heatmap.Heatmap;
 import adams.data.image.AbstractImageContainer;
 import adams.data.image.BufferedImageContainer;
-import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
+import adams.gui.visualization.core.ColorGradientGenerator;
 import adams.parser.GrammarSupplier;
 import adams.parser.MathematicalExpression;
 import adams.parser.MathematicalExpressionText;
@@ -170,7 +170,7 @@ import java.awt.image.BufferedImage;
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
  * 
- * <pre>-generator &lt;adams.gui.visualization.core.AbstractColorGradientGenerator&gt; (property: generator)
+ * <pre>-generator &lt;adams.gui.visualization.core.ColorGradientGenerator&gt; (property: generator)
  * &nbsp;&nbsp;&nbsp;The generator to use for creating the gradient colors.
  * &nbsp;&nbsp;&nbsp;default: adams.gui.visualization.core.BiColorGenerator
  * </pre>
@@ -188,7 +188,6 @@ import java.awt.image.BufferedImage;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class HeatmapToBufferedImageExpression
   extends AbstractConversion
@@ -198,7 +197,7 @@ public class HeatmapToBufferedImageExpression
   private static final long serialVersionUID = 2535421741524997185L;
 
   /** the generator to use. */
-  protected AbstractColorGradientGenerator m_Generator;
+  protected ColorGradientGenerator m_Generator;
 
   /** the color for missing values. */
   protected Color m_MissingValueColor;
@@ -277,7 +276,7 @@ public class HeatmapToBufferedImageExpression
    *
    * @param value	the generator
    */
-  public void setGenerator(AbstractColorGradientGenerator value) {
+  public void setGenerator(ColorGradientGenerator value) {
     m_Generator = value;
     reset();
   }
@@ -287,7 +286,7 @@ public class HeatmapToBufferedImageExpression
    *
    * @return		the generator
    */
-  public AbstractColorGradientGenerator getGenerator() {
+  public ColorGradientGenerator getGenerator() {
     return m_Generator;
   }
 

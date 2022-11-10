@@ -15,14 +15,14 @@
 
 /*
  * SpectrogramToBufferedImage.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2022 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.conversion;
 
 import adams.data.image.BufferedImageContainer;
-import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
+import adams.gui.visualization.core.ColorGradientGenerator;
 import com.musicg.wave.extension.Spectrogram;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
@@ -41,7 +41,7 @@ public class SpectrogramToBufferedImage
   private static final long serialVersionUID = 6569357563362936237L;
 
   /** the generator to use. */
-  protected AbstractColorGradientGenerator m_Generator;
+  protected ColorGradientGenerator m_Generator;
 
   /** the gradient colors. */
   protected transient Color[] m_GradientColors;
@@ -87,7 +87,7 @@ public class SpectrogramToBufferedImage
    *
    * @param value	the generator
    */
-  public void setGenerator(AbstractColorGradientGenerator value) {
+  public void setGenerator(ColorGradientGenerator value) {
     m_Generator = value;
     reset();
   }
@@ -97,7 +97,7 @@ public class SpectrogramToBufferedImage
    *
    * @return		the generator
    */
-  public AbstractColorGradientGenerator getGenerator() {
+  public ColorGradientGenerator getGenerator() {
     return m_Generator;
   }
 

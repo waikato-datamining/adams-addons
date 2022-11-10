@@ -49,6 +49,7 @@ import adams.gui.event.SearchEvent;
 import adams.gui.event.SearchListener;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
+import adams.gui.visualization.core.ColorGradientGenerator;
 import adams.gui.visualization.heatmap.overlay.AbstractHeatmapOverlay;
 import adams.gui.visualization.image.ImagePanel;
 import adams.gui.visualization.image.ImagePanel.PaintPanel;
@@ -110,7 +111,7 @@ public class HeatmapPanel
   protected AbstractHeatmapReader m_Reader;
 
   /** the color generator to use. */
-  protected AbstractColorGradientGenerator m_ColorGenerator;
+  protected ColorGradientGenerator m_ColorGenerator;
 
   /** the color to use for missing values. */
   protected Color m_MissingValueColor;
@@ -147,7 +148,7 @@ public class HeatmapPanel
     m_Reader             = null;
     m_ColorGenerator     = AbstractColorGradientGenerator.forCommandLine(props.getProperty("Image.GradientColorGenerator", new BiColorGenerator().toCommandLine()));
     m_MissingValueColor  = props.getColor("Image.MissingValueColor", ColorHelper.valueOf("#88ff0000"));
-    m_SelectionListeners = new HashSet<HeatmapPanelSelectionListener>();
+    m_SelectionListeners = new HashSet<>();
   }
 
   /**
@@ -363,7 +364,7 @@ public class HeatmapPanel
    * 
    * @param value	the generator
    */
-  public void setColorGenerator(AbstractColorGradientGenerator value) {
+  public void setColorGenerator(ColorGradientGenerator value) {
     m_ColorGenerator = value;
     refresh();
   }
@@ -373,7 +374,7 @@ public class HeatmapPanel
    * 
    * @return		the generator
    */
-  public AbstractColorGradientGenerator getColorGenerator() {
+  public ColorGradientGenerator getColorGenerator() {
     return m_ColorGenerator;
   }
 

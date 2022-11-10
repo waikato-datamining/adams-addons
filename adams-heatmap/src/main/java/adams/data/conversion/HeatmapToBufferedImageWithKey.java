@@ -16,7 +16,7 @@
 /*
  * HeatmapToBufferedImageWithKey.java
  * Copyright (C) 2014 Soilcares Research, Wageningen, The Netherlands
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2022 University of Waikato, Hamilton, NZ
  */
 package adams.data.conversion;
 
@@ -24,8 +24,8 @@ import adams.core.annotation.ThirdPartyCopyright;
 import adams.data.heatmap.Heatmap;
 import adams.data.image.AbstractImageContainer;
 import adams.data.image.BufferedImageContainer;
-import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
+import adams.gui.visualization.core.ColorGradientGenerator;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -45,7 +45,7 @@ import java.text.DecimalFormat;
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
  *
- * <pre>-generator &lt;adams.gui.visualization.core.AbstractColorGradientGenerator&gt; (property: generator)
+ * <pre>-generator &lt;adams.gui.visualization.core.ColorGradientGenerator&gt; (property: generator)
  * &nbsp;&nbsp;&nbsp;The generator to use for creating the gradient colors.
  * &nbsp;&nbsp;&nbsp;default: adams.gui.visualization.core.BiColorGenerator
  * </pre>
@@ -85,7 +85,6 @@ import java.text.DecimalFormat;
  <!-- options-end -->
  *
  * @author michael.fowke
- * @version $Revision$
  */
 @ThirdPartyCopyright(
     author = "Michael Fowke",
@@ -99,7 +98,7 @@ public class HeatmapToBufferedImageWithKey
   private static final long serialVersionUID = -9065168080375023679L;
 
   /** The generator to use */
-  protected AbstractColorGradientGenerator m_Generator;
+  protected ColorGradientGenerator m_Generator;
 
   /** Whether to use a use defined range */
   protected boolean m_UseCustomRange;
@@ -182,7 +181,7 @@ public class HeatmapToBufferedImageWithKey
    *
    * @param value	the number of colors
    */
-  public void setGenerator(AbstractColorGradientGenerator value) {
+  public void setGenerator(ColorGradientGenerator value) {
     m_Generator = value;
     reset();
   }
@@ -192,7 +191,7 @@ public class HeatmapToBufferedImageWithKey
    *
    * @return		the number of colors
    */
-  public AbstractColorGradientGenerator getGenerator() {
+  public ColorGradientGenerator getGenerator() {
     return m_Generator;
   }
 
