@@ -423,6 +423,24 @@ public class AudioPlaybackPanel
   }
 
   /**
+   * Sets the visible state of the time.
+   *
+   * @param value	true to make it visible
+   */
+  public void setTimeVisible(boolean value) {
+    m_LabelTime.setVisible(value);
+  }
+
+  /**
+   * Returns whether the time is visible.
+   *
+   * @return		true if visible
+   */
+  public boolean isTimeVisible() {
+    return m_LabelTime.isVisible();
+  }
+
+  /**
    * Cleans up data structures, frees up memory.
    */
   public void cleanUp() {
