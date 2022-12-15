@@ -15,7 +15,7 @@
 
 /*
  * Cron.java
- * Copyright (C) 2014-2021 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2022 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.input;
 
@@ -309,7 +309,7 @@ public class Cron
    * Stops the execution.
    */
   @Override
-  public void stopExecution() {
+  public synchronized void stopExecution() {
     stopScheduler();
     super.stopExecution();
   }
