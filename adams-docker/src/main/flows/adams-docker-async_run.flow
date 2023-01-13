@@ -1,0 +1,10 @@
+# Project: adams
+# Date: 2023-01-13 15:21:14
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-docker
+#
+adams.flow.control.Flow -annotation "Executes \\\'docker run\\\' in non-blocking fashion." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.SimpleDockerConnection
+ adams.flow.source.SimpleDockerCommand -command "adams.flow.source.simpledocker.Run -blocking false -remove-container true -options-string \"ubuntu bash -c \\\"for i in 1 2 3; do echo $i; sleep 3; done;\\\"\""
+ adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter

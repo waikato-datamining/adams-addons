@@ -1,0 +1,15 @@
+# Configuration file listing the superclasses and the packages in which to
+# look for derived classes.
+#
+# Format:
+# class.name=package1,package2,...
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+
+# the docker commands
+adams.docker.simpledocker.DockerCommand=\
+  adams.docker.simpledocker
+
+# the docker commands for transformers
+adams.docker.simpledocker.DockerCommandWithProgrammaticArguments=\
+  adams.docker.simpledocker

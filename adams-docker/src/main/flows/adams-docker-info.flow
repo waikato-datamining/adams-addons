@@ -1,0 +1,10 @@
+# Project: adams
+# Date: 2023-01-13 10:18:19
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-docker
+#
+adams.flow.control.Flow -annotation "Just outputs some information on the docker environment (\\\'docker info\\\')." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.SimpleDockerConnection
+ adams.flow.source.SimpleDockerCommand -command adams.flow.source.simpledocker.Info
+ adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter

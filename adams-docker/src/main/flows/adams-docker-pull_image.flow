@@ -1,0 +1,10 @@
+# Project: adams
+# Date: 2023-01-13 16:09:06
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-docker
+#
+adams.flow.control.Flow -annotation "Executes \\\'docker pull\\\' in non-blocking fashion." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.SimpleDockerConnection
+ adams.flow.source.SimpleDockerCommand -command "adams.flow.source.simpledocker.Pull -blocking false -image ubuntu"
+ adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter

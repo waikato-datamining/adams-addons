@@ -1,0 +1,17 @@
+# Project: adams
+# Date: 2023-01-13 16:37:16
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-docker
+#
+adams.flow.control.Flow -annotation "Executes \\\'docker container prune\\\'." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.SimpleDockerConnection
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "run image"
+  adams.flow.source.SimpleDockerCommand -command "adams.flow.source.simpledocker.Run -option hello-world"
+  adams.flow.sink.CallableSink -callable Display
+ adams.flow.control.Trigger -name "remove containers"
+  adams.flow.source.SimpleDockerCommand -command adams.flow.source.simpledocker.PruneContainers
+  adams.flow.sink.CallableSink -callable Display
