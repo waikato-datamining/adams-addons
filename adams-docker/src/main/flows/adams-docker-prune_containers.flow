@@ -10,8 +10,8 @@ adams.flow.control.Flow -annotation "Executes \\\'docker container prune\\\'." -
  adams.flow.standalone.SimpleDockerConnection
  adams.flow.source.Start
  adams.flow.control.Trigger -name "run image"
-  adams.flow.source.SimpleDockerCommand -command "adams.flow.source.simpledocker.Run -option hello-world"
+  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.Run -option hello-world"
   adams.flow.sink.CallableSink -callable Display
  adams.flow.control.Trigger -name "remove containers"
-  adams.flow.source.SimpleDockerCommand -command adams.flow.source.simpledocker.PruneContainers
+  adams.flow.source.SimpleDockerCommand -command adams.docker.simpledocker.PruneContainers
   adams.flow.sink.CallableSink -callable Display
