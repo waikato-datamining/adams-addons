@@ -21,6 +21,7 @@
 package adams.docker.simpledocker;
 
 import adams.core.QuickInfoHelper;
+import adams.core.base.DockerDirectoryMapping;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -144,6 +145,10 @@ public class Run
     result.add("run");
     if (m_RemoveContainer)
       result.add("--rm");
+    for (DockerDirectoryMapping mapping: m_Connection.getDirMappings()) {
+      result.add("-v");
+      result.add(mapping.getValue());
+    }
     result.addAll(Arrays.asList(getActualOptions()));
 
     return result;

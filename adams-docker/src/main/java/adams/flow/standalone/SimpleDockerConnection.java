@@ -22,6 +22,7 @@ package adams.flow.standalone;
 
 import adams.core.QuickInfoHelper;
 import adams.core.base.BasePassword;
+import adams.core.base.DockerDirectoryMapping;
 import adams.core.io.PlaceholderFile;
 import adams.core.management.CommandResult;
 import adams.core.management.OS;
@@ -91,6 +92,11 @@ import adams.docker.SimpleDockerHelper;
  * &nbsp;&nbsp;&nbsp;default: ${CWD}
  * </pre>
  *
+ * <pre>-dir-mapping &lt;adams.core.base.DockerDirectoryMapping&gt; [-dir-mapping ...] (property: dirMappings)
+ * &nbsp;&nbsp;&nbsp;The directory mappings to make available to the actual docker commands.
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
  * <pre>-login &lt;boolean&gt; (property: login)
  * &nbsp;&nbsp;&nbsp;Whether to log in to the registry when the flow starts.
  * &nbsp;&nbsp;&nbsp;default: false
@@ -121,6 +127,9 @@ public class SimpleDockerConnection
 
   /** the alternative docker binary to use. */
   protected PlaceholderFile m_Binary;
+
+  /** the directory mappings to use. */
+  protected DockerDirectoryMapping[] m_DirMappings;
 
   /** whether to login into the registry when starting the flow. */
   protected boolean m_Login;
@@ -164,6 +173,10 @@ public class SimpleDockerConnection
     m_OptionManager.add(
       "binary", "binary",
       new PlaceholderFile());
+
+    m_OptionManager.add(
+      "dir-mapping", "dirMappings",
+      new DockerDirectoryMapping[0]);
 
     m_OptionManager.add(
       "login", "login",
@@ -288,6 +301,35 @@ public class SimpleDockerConnection
    */
   public String binaryTipText() {
     return "The docker binary to use, uses default if pointing to dir.";
+  }
+
+  /**
+   * Sets the directory mappings to make available to the actual docker commands.
+   *
+   * @param value	the mappings
+   */
+  public void setDirMappings(DockerDirectoryMapping[] value) {
+    m_DirMappings = value;
+    reset();
+  }
+
+  /**
+   * Returns the directory mappings to make available to the actual docker commands.
+   *
+   * @return		the mappings
+   */
+  public DockerDirectoryMapping[] getDirMappings() {
+    return m_DirMappings;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String dirMappingsTipText() {
+    return "The directory mappings to make available to the actual docker commands.";
   }
 
   /**
