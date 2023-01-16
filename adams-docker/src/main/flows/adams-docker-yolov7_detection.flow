@@ -1,0 +1,48 @@
+# Project: adams
+# Date: 2023-01-16 16:52:27
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-docker,adams-net
+#
+adams.flow.control.Flow -annotation "Downloads a pre-trained yolov7 model and applies the following image:\\n  waikatodatamining/pytorch-yolov7:2022-01-21_cpu\\nto detect objects in a user-selected image, displaying the results.\\n\\nNB: The first time round, the flow has to download pre-trained and model \\nand docker image, which will take some time." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -name Info -short-title true -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
+  adams.flow.sink.DisplayPanelManager -display-type adams.flow.core.displaytype.Default -width 1200 -height 800 -x -3 -provider "adams.flow.sink.FilePreview -display-type adams.flow.core.displaytype.Default -writer adams.gui.print.NullWriter -use-custom-preview true -preview \"adams.gui.tools.previewbrowser.ImageHandler -image-reader adams.data.io.input.JAIImageReader\"" -entry-name-variable entry
+ adams.flow.standalone.SimpleDockerConnection -dir-mapping /home/fracpete/development/projects/waikato-datamining/adamsfamily/adams-addons/adams-docker/src/main/flows/output:/workspace
+ adams.flow.standalone.SetVariable -name model_url -var-name model_url -var-value https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7_training.pt
+ adams.flow.standalone.SetVariable -name model_name -var-name model_name -var-value yolov7_training.pt
+ adams.flow.standalone.SetVariable -name model_path -var-name model_path -var-value ${FLOWS}/output/@{model_name} -value-type FILE_FORWARD_SLASHES -expand-value true
+ adams.flow.standalone.SetVariable -name min_confidence -var-name min_confidence -var-value 0.8
+ adams.flow.standalone.SetVariable -name output_dir -var-name output_dir -var-value ${FLOWS}/output/prediction -value-type FILE_FORWARD_SLASHES
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "select image"
+  adams.flow.source.SelectFile -stop-if-canceled true -initial-dir ${EXAMPLE_FLOWS}/data -extension jpg -extension png -initial-file ${EXAMPLE_FLOWS}/data/2021_Toyota_GR_Yaris_Circuit_4WD_1.6_(1).jpg -absolute true
+  adams.flow.transformer.CopyFile -target-dir ${FLOWS}/output
+  adams.flow.control.Tee -name preview
+   adams.flow.transformer.SetVariable -var-name entry -var-value input
+   adams.flow.sink.CallableSink -callable DisplayPanelManager
+  adams.flow.control.Tee -name "container image"
+   adams.flow.transformer.BaseName
+   adams.flow.transformer.PrependDir -prefix /workspace -use-forward-slashes true
+   adams.flow.transformer.SetVariable -var-name image
+  adams.flow.control.Tee -name "overlayed image"
+   adams.flow.transformer.BaseName
+   adams.flow.transformer.PrependDir -prefix @{output_dir} -use-forward-slashes true
+   adams.flow.transformer.SetVariable -var-name predicted
+ adams.flow.control.ConditionalTrigger -name "download model" -condition "adams.flow.condition.bool.Not -condition \"adams.flow.condition.bool.FileExists -file @{model_path} -generator adams.core.io.NullFilenameGenerator\""
+  adams.flow.source.URLSupplier -url @{model_url}
+  adams.flow.control.Tee -name info
+   adams.flow.transformer.Convert -conversion adams.data.conversion.AnyToString
+   adams.flow.transformer.StringInsert -position first -value "downloading pre-trained model: "
+   adams.flow.sink.CallableSink -callable Info
+  adams.flow.sink.DownloadFile -output @{model_path} -buffer-size 102400
+ adams.flow.control.ConditionalTrigger -name "remove old output image" -condition "adams.flow.condition.bool.FileExists -file @{predicted} -generator adams.core.io.NullFilenameGenerator"
+  adams.flow.source.Variable -var-name predicted -conversion adams.data.conversion.StringToString
+  adams.flow.transformer.DeleteFile
+ adams.flow.control.Trigger -name "run docker image"
+  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.Run -logging-level INFO -blocking false -remove-container true -run-as-user true -options-string \"-w /workspace -t waikatodatamining/pytorch-yolov7:2022-10-08_cpu yolov7_detect --weights /workspace/@{model_name} --source @{image} --exist-ok --device cpu --conf-thres @{min_confidence} --no-trace --project . --name prediction\""
+  adams.flow.sink.CallableSink -callable Info
+ adams.flow.control.ConditionalTrigger -name "output image" -condition "adams.flow.condition.bool.FileExists -file @{predicted} -generator adams.core.io.NullFilenameGenerator"
+  adams.flow.source.Variable -var-name predicted -conversion adams.data.conversion.StringToString
+  adams.flow.transformer.SetVariable -var-name entry -var-value predicted
+  adams.flow.sink.CallableSink -callable DisplayPanelManager
