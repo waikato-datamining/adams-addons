@@ -406,6 +406,8 @@ public class SimpleDockerConnection
       result += QuickInfoHelper.toString(this, "password", m_Password, ", pw: ");
     result += QuickInfoHelper.toString(this, "login", m_Login, "login", ", ");
     result += QuickInfoHelper.toString(this, "logout", m_Logout, "logout", ", ");
+    if (getOptionManager().hasVariableForProperty("dirMappings") || m_DirMappings.length > 0)
+      result += QuickInfoHelper.toString(this, "dirMappings", m_DirMappings, ", mappings: ");
 
     return result;
   }
