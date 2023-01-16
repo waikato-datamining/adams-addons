@@ -168,7 +168,7 @@ public abstract class AbstractDockerCommand
   protected String commandResultToError(CommandResult res) {
     String	result;
 
-    result = "Failed to execute: " + Utils.flatten(res.command, ", ") + "\n"
+    result = "Failed to execute: " + Utils.flatten(res.command, " ") + "\n"
       + "Exit code: " + res.exitCode;
     if (res.stdout != null)
       result += "\nStdout: " + res.stdout;
