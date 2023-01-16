@@ -23,6 +23,7 @@ package adams.docker.simpledocker;
 import adams.core.QuickInfoHelper;
 import adams.core.base.BaseObject;
 import adams.core.base.BaseString;
+import adams.core.base.BaseText;
 import adams.core.option.OptionUtils;
 
 import java.util.logging.Level;
@@ -33,7 +34,8 @@ import java.util.logging.Level;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public abstract class AbstractDockerCommandWithOptions
-  extends AbstractDockerCommand {
+  extends AbstractDockerCommand
+  implements DockerCommandWithOptions {
 
   private static final long serialVersionUID = 7898785828472200774L;
 
@@ -41,7 +43,7 @@ public abstract class AbstractDockerCommandWithOptions
   protected BaseString[] m_Options;
 
   /** the options as single string. */
-  protected String m_OptionsString;
+  protected BaseText m_OptionsString;
 
   /**
    * Adds options to the internal list of options.
@@ -56,7 +58,7 @@ public abstract class AbstractDockerCommandWithOptions
 
     m_OptionManager.add(
       "options-string", "optionsString",
-      "");
+      new BaseText());
   }
 
   /**
@@ -77,6 +79,7 @@ public abstract class AbstractDockerCommandWithOptions
    *
    * @param value	the options
    */
+  @Override
   public void setOptions(BaseString[] value) {
     m_Options = value;
     reset();
@@ -87,6 +90,7 @@ public abstract class AbstractDockerCommandWithOptions
    *
    * @return		the options
    */
+  @Override
   public BaseString[] getOptions() {
     return m_Options;
   }
@@ -97,6 +101,7 @@ public abstract class AbstractDockerCommandWithOptions
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
+  @Override
   public String optionsTipText() {
     return "The options for the command.";
   }
@@ -106,7 +111,8 @@ public abstract class AbstractDockerCommandWithOptions
    *
    * @param value	the options
    */
-  public void setOptionsString(String value) {
+  @Override
+  public void setOptionsString(BaseText value) {
     m_OptionsString = value;
     reset();
   }
@@ -116,7 +122,8 @@ public abstract class AbstractDockerCommandWithOptions
    *
    * @return		the options
    */
-  public String getOptionsString() {
+  @Override
+  public BaseText getOptionsString() {
     return m_OptionsString;
   }
 
@@ -126,6 +133,7 @@ public abstract class AbstractDockerCommandWithOptions
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
+  @Override
   public String optionsStringTipText() {
     return "The options for the command as a single string; overrides the options array.";
   }
@@ -135,10 +143,11 @@ public abstract class AbstractDockerCommandWithOptions
    *
    * @return		the options
    */
-  protected String[] getActualOptions() {
+  @Override
+  public String[] getActualOptions() {
     try {
       if (!m_OptionsString.isEmpty())
-	return OptionUtils.splitOptions(m_OptionsString);
+	return OptionUtils.splitOptions(m_OptionsString.getValue());
       else
 	return BaseObject.toStringArray(m_Options);
     }
