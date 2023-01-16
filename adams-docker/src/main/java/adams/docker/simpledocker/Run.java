@@ -142,11 +142,11 @@ public class Run
     List<String> 	result;
 
     result = new ArrayList<>();
+    result.add("run");
     for (DockerDirectoryMapping mapping: m_Connection.getDirMappings()) {
       result.add("-v");
       result.add(mapping.getValue());
     }
-    result.add("run");
     if (m_RemoveContainer)
       result.add("--rm");
     result.addAll(Arrays.asList(getActualOptions()));
