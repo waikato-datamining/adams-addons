@@ -22,6 +22,7 @@ package adams.docker.simpledocker;
 
 import adams.core.QuickInfoHelper;
 import adams.core.base.DockerDirectoryMapping;
+import adams.core.management.User;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +41,9 @@ public class Run
 
   /** whether to remove the container after execution. */
   protected boolean m_RemoveContainer;
+
+  /** whether to run in user context (-u $(id -u):$(id -g)). */
+  protected boolean m_RunAsUser;
 
   /**
    * Returns a string describing the object.
@@ -65,6 +69,11 @@ public class Run
       m_OptionManager.size() - 2,
       "remove-container", "removeContainer",
       false);
+
+    m_OptionManager.insert(
+      m_OptionManager.size() - 2,
+      "run-as-user", "runAsUser",
+      false);
   }
 
   /**
@@ -76,8 +85,9 @@ public class Run
   public String getQuickInfo() {
     String	result;
 
-    result = super.getQuickInfo();
+    result = QuickInfoHelper.toString(this, "runAsUser", (m_RunAsUser ? "user" : "root"), "run as: ");
     result += QuickInfoHelper.toString(this, "removeContainer", m_RemoveContainer, "remove container", ", ");
+    result += ", " + super.getQuickInfo();
 
     return result;
   }
@@ -109,6 +119,35 @@ public class Run
    */
   public String removeContainerTipText() {
     return "If enabled, the --rm flag for removing the container is added to the command.";
+  }
+
+  /**
+   * Sets whether to run the container as the current user rather than root.
+   *
+   * @param value	true if to run as user
+   */
+  public void setRunAsUser(boolean value) {
+    m_RunAsUser = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to run the container as the current user rather than root.
+   *
+   * @return		true if to run as user
+   */
+  public boolean getRunAsUser() {
+    return m_RunAsUser;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String runAsUserTipText() {
+    return "If enabled, the container is run as the current user using the '-u' option.";
   }
 
   /**
@@ -149,6 +188,10 @@ public class Run
     }
     if (m_RemoveContainer)
       result.add("--rm");
+    if (m_RunAsUser) {
+      result.add("-u");
+      result.add(User.getUserID() + ":" + User.getGroupID());
+    }
     result.addAll(Arrays.asList(getActualOptions()));
 
     return result;
