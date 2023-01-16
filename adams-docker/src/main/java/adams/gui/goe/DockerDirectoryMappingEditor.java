@@ -23,7 +23,9 @@ package adams.gui.goe;
 
 import adams.core.base.BaseObject;
 import adams.core.base.DockerDirectoryMapping;
+import adams.core.io.PlaceholderDirectory;
 import adams.core.option.parsing.DockerDirectoryMappingParsing;
+import adams.gui.chooser.DirectoryChooserPanel;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseTextField;
 import adams.gui.core.GUIHelper;
@@ -31,7 +33,6 @@ import adams.gui.core.ParameterPanel;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.text.JTextComponent;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -54,19 +55,19 @@ public class DockerDirectoryMappingEditor
   implements MultiSelectionEditor {
 
   /** The text field with the key. */
-  protected JTextComponent m_TextLocal;
+  protected DirectoryChooserPanel m_TextLocal;
 
   /**
    * Accepts the input and closes the dialog.
    */
   protected void acceptInput() {
-    String 	key;
-    String 	value;
+    String 	localDir;
+    String 	containerDir;
     String	pair;
 
-    key   = m_TextLocal.getText();
-    value = m_TextValue.getText();
-    pair  = key + "=" + value;
+    localDir = m_TextLocal.getCurrent().getAbsolutePath();
+    containerDir = m_TextValue.getText();
+    pair  = localDir + ":" + containerDir;
     if (isValid(pair) && !isUnchanged(pair))
       setValue(parse(pair));
     closeDialog(APPROVE_OPTION);
@@ -90,7 +91,7 @@ public class DockerDirectoryMappingEditor
     panelPair = new ParameterPanel();
     panelAll.add(panelPair, BorderLayout.CENTER);
 
-    m_TextLocal = new BaseTextField(10);
+    m_TextLocal = new DirectoryChooserPanel();
     m_TextValue = new BaseTextField(30);
 
     panelPair.addParameter("_Local", m_TextLocal);
@@ -103,8 +104,8 @@ public class DockerDirectoryMappingEditor
     buttonClear.setMnemonic('l');
     buttonClear.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        m_TextLocal.setText("");
-        m_TextValue.setText("");
+	m_TextLocal.setCurrent(new PlaceholderDirectory());
+	m_TextValue.setText("");
       }
     });
     panelButtons.add(buttonClear);
@@ -113,7 +114,7 @@ public class DockerDirectoryMappingEditor
     buttonOK.setMnemonic('O');
     buttonOK.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        acceptInput();
+	acceptInput();
       }
     });
     panelButtons.add(buttonOK);
@@ -122,7 +123,7 @@ public class DockerDirectoryMappingEditor
     buttonClose.setMnemonic('C');
     buttonClose.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        discardInput();
+	discardInput();
       }
     });
     panelButtons.add(buttonClose);
@@ -141,8 +142,8 @@ public class DockerDirectoryMappingEditor
 
     value = (DockerDirectoryMapping) getValue();
 
-    if (!m_TextLocal.getText().equals(value.localDir()))
-      m_TextLocal.setText(value.localDir());
+    if (!m_TextLocal.getCurrent().getAbsolutePath().equals(value.localDir()))
+      m_TextLocal.setCurrent(new PlaceholderDirectory(value.localDir()));
     if (!m_TextValue.getText().equals(value.containerDir()))
       m_TextValue.setText(value.containerDir());
     m_TextLocal.setToolTipText(((BaseObject) getValue()).getTipText());
