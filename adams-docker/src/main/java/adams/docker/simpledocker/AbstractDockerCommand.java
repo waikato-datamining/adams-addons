@@ -24,6 +24,7 @@ import adams.core.Utils;
 import adams.core.logging.LoggingHelper;
 import adams.core.management.CommandResult;
 import adams.core.option.AbstractOptionHandler;
+import adams.flow.core.Actor;
 import adams.flow.standalone.SimpleDockerConnection;
 
 import java.util.ArrayList;
@@ -55,6 +56,9 @@ public abstract class AbstractDockerCommand
 
   /** for buffering output. */
   protected List m_Output;
+
+  /** the flow context. */
+  protected Actor m_FlowContext;
 
   /**
    * Initializes the members.
@@ -89,6 +93,24 @@ public abstract class AbstractDockerCommand
   }
 
   /**
+   * Sets the flow context.
+   *
+   * @param value the actor
+   */
+  public void setFlowContext(Actor value) {
+    m_FlowContext = value;
+  }
+
+  /**
+   * Returns the flow context, if any.
+   *
+   * @return the actor, null if none available
+   */
+  public Actor getFlowContext() {
+    return m_FlowContext;
+  }
+
+  /**
    * Sets the docker connection to use.
    *
    * @param value	the connection
@@ -118,8 +140,13 @@ public abstract class AbstractDockerCommand
 
     result = null;
 
-    if (m_Connection == null)
-      result = "No docker connection available! Missing " + Utils.classToString(SimpleDockerConnection.class) + " standalone?";
+    if (m_FlowContext == null)
+      result = "No flow context set!";
+
+    if (result == null) {
+      if (m_Connection == null)
+        result = "No docker connection available! Missing " + Utils.classToString(SimpleDockerConnection.class) + " standalone?";
+    }
 
     return result;
   }

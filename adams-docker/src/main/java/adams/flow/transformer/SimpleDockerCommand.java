@@ -224,6 +224,7 @@ public class SimpleDockerCommand
       result = m_InputToken.unhandledData();
 
     if (result == null) {
+      m_Command.setFlowContext(this);
       m_Command.setConnection(m_Connection);
       m_Command.setAdditionalArguments(args);
       result = m_Command.execute();

@@ -196,6 +196,7 @@ public class SimpleDockerCommand
    */
   @Override
   protected String doExecute() {
+    m_Command.setFlowContext(this);
     m_Command.setConnection(m_Connection);
     return m_Command.execute();
   }

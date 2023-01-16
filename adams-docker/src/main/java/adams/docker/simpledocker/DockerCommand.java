@@ -24,6 +24,7 @@ import adams.core.QuickInfoSupporter;
 import adams.core.StoppableWithFeedback;
 import adams.core.logging.LoggingSupporter;
 import adams.core.option.OptionHandler;
+import adams.flow.core.FlowContextHandler;
 import adams.flow.standalone.SimpleDockerConnection;
 
 /**
@@ -32,7 +33,7 @@ import adams.flow.standalone.SimpleDockerConnection;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public interface DockerCommand
-  extends OptionHandler, QuickInfoSupporter, StoppableWithFeedback, LoggingSupporter {
+  extends OptionHandler, QuickInfoSupporter, StoppableWithFeedback, LoggingSupporter, FlowContextHandler {
 
   /**
    * Sets the docker connection to use.

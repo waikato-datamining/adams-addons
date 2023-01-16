@@ -21,6 +21,7 @@
 package adams.docker.simpledocker;
 
 import adams.core.QuickInfoHelper;
+import adams.core.Variables;
 import adams.core.base.BaseObject;
 import adams.core.base.BaseString;
 import adams.core.base.BaseText;
@@ -103,7 +104,7 @@ public abstract class AbstractDockerCommandWithOptions
    */
   @Override
   public String optionsTipText() {
-    return "The options for the command.";
+    return "The options for the command; variables get expanded automatically.";
   }
 
   /**
@@ -135,7 +136,7 @@ public abstract class AbstractDockerCommandWithOptions
    */
   @Override
   public String optionsStringTipText() {
-    return "The options for the command as a single string; overrides the options array.";
+    return "The options for the command as a single string; overrides the options array; variables get expanded automatically.";
   }
 
   /**
@@ -145,11 +146,21 @@ public abstract class AbstractDockerCommandWithOptions
    */
   @Override
   public String[] getActualOptions() {
+    String[]	result;
+    int		i;
+    Variables	vars;
+
+    vars = m_FlowContext.getVariables();
     try {
-      if (!m_OptionsString.isEmpty())
-	return OptionUtils.splitOptions(m_OptionsString.getValue());
-      else
-	return BaseObject.toStringArray(m_Options);
+      if (!m_OptionsString.isEmpty()) {
+	result = OptionUtils.splitOptions(vars.expand(m_OptionsString.getValue()));
+      }
+      else {
+	result = BaseObject.toStringArray(m_Options);
+	for (i = 0; i < result.length; i++)
+	  result[i] = vars.expand(result[i]);
+      }
+      return result;
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to parse options!", e);
