@@ -70,7 +70,6 @@ public class Log
    */
   @Override
   public void processBlocking(String output) {
-    if (isLoggingEnabled())
-      getLogger().info(output);
+    processAsync(output);
   }
 }
