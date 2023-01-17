@@ -1,0 +1,25 @@
+# Project: adams
+# Date: 2023-01-17 16:43:01
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-docker,adams-net
+#
+adams.flow.control.Flow -annotation "Builds a simple image and executes it." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -name Info -short-title true -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.SimpleDockerConnection
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "get location of Dockerfile"
+  adams.flow.source.StringConstants -string ${FLOWS}/data -conversion adams.data.conversion.StringToString
+  adams.flow.transformer.Convert -conversion "adams.data.conversion.StringToFile -placeholderfile true"
+  adams.flow.transformer.Convert -name "Convert (2)" -conversion "adams.data.conversion.FileToString -absolute true -use-forward-slashes true"
+  adams.flow.transformer.SetVariable -var-name dockerfile
+ adams.flow.control.Trigger -name build
+  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.BuildImage -stderr-processing adams.docker.simpledocker.stderrprocessing.Log -blocking false -options-string \"-t my_hello_world @{dockerfile}\""
+  adams.flow.sink.CallableSink -callable Info
+ adams.flow.control.Trigger -name "add separator"
+  adams.flow.source.StringConstants -string "" -string ----------------------- -string "" -conversion adams.data.conversion.StringToString
+  adams.flow.sink.CallableSink -callable Info
+ adams.flow.control.Trigger -name run
+  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.Run -stderr-processing adams.docker.simpledocker.stderrprocessing.Log -remove-container true -run-as-user true -options-string my_hello_world"
+  adams.flow.sink.CallableSink -callable Info
