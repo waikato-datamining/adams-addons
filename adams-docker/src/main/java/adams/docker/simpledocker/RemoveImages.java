@@ -47,7 +47,7 @@ public class RemoveImages
    */
   @Override
   public String globalInfo() {
-    return "For removing images ('docker iamge rm').\n"
+    return "For removing images ('docker image rm').\n"
       + "For more information see:\n"
       + "https://docs.docker.com/engine/reference/commandline/image_rm/";
   }
