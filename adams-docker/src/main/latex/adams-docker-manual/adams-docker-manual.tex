@@ -88,13 +88,17 @@ The following source commands are supported:
   \item \textit{Generic} -- for running an arbitrary docker sub-command
   \item \textit{Info} -- outputs information about the docker environment (\texttt{docker info})
   \item \textit{ListContainers} -- lists container IDs (\texttt{docker container ls})
+  \item \textit{ListImages} -- lists image IDs (\texttt{docker image ls})
   \item \textit{PruneContainers} -- prunes containers (\texttt{docker container prune})
   \item \textit{PruneImages} -- prunes images (\texttt{docker image prune})
   \item \textit{Pull} -- pulls a specific image (\texttt{docker pull})
+  \item \textit{Push} -- pushes the specified image (\texttt{docker push})
   \item \textit{Run} -- executes the specified image (\texttt{docker run})
 \end{tight_itemize}
 The following transformer commands are supported:
 \begin{tight_itemize}
+  \item \textit{KillContainers} -- kills the specified containers
+  \item \textit{PauseContainers} -- pauses the specified containers
   \item \textit{StopContainers} -- stops the specified containers
 \end{tight_itemize}
 Some of the commands can be run in either \textit{blocking} or \textit{asynchronous} mode. The former waits till
