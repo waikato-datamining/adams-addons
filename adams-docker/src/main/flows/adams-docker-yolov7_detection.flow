@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2023-01-16 16:52:27
+# Date: 2023-01-18 10:12:33
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-docker,adams-net
@@ -8,7 +8,8 @@ adams.flow.control.Flow -annotation "Downloads a pre-trained yolov7 model and ap
  adams.flow.standalone.CallableActors
   adams.flow.sink.Display -name Info -short-title true -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
   adams.flow.sink.DisplayPanelManager -display-type adams.flow.core.displaytype.Default -width 1200 -height 800 -x -3 -provider "adams.flow.sink.FilePreview -display-type adams.flow.core.displaytype.Default -writer adams.gui.print.NullWriter -use-custom-preview true -preview \"adams.gui.tools.previewbrowser.ImageHandler -image-reader adams.data.io.input.JAIImageReader\"" -entry-name-variable entry
- adams.flow.standalone.SimpleDockerConnection -dir-mapping /home/fracpete/development/projects/waikato-datamining/adamsfamily/adams-addons/adams-docker/src/main/flows/output:/workspace
+ adams.flow.standalone.SetVariable -name mapping -var-name mapping -var-value ${FLOWS}/output:/workspace
+ adams.flow.standalone.SimpleDockerConnection -dir-mapping @{mapping}
  adams.flow.standalone.SetVariable -name model_url -var-name model_url -var-value https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7_training.pt
  adams.flow.standalone.SetVariable -name model_name -var-name model_name -var-value yolov7_training.pt
  adams.flow.standalone.SetVariable -name model_path -var-name model_path -var-value ${FLOWS}/output/@{model_name} -value-type FILE_FORWARD_SLASHES -expand-value true

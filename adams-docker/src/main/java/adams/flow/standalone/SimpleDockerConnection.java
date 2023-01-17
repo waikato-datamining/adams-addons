@@ -20,7 +20,9 @@
 
 package adams.flow.standalone;
 
+import adams.core.Placeholders;
 import adams.core.QuickInfoHelper;
+import adams.core.Variables;
 import adams.core.base.BasePassword;
 import adams.core.base.DockerDirectoryMapping;
 import adams.core.io.PlaceholderFile;
@@ -333,6 +335,33 @@ public class SimpleDockerConnection
   }
 
   /**
+   * Returns the directory mappings to make available to the actual docker commands, with any
+   * variables (local and container) and placeholders (local only) expanded.
+   *
+   * @return		the mappings
+   */
+  public DockerDirectoryMapping[] getExpandedDirMappings() {
+    DockerDirectoryMapping[] 	result;
+    int				i;
+    Variables			vars;
+    Placeholders		phs;
+
+    result = new DockerDirectoryMapping[m_DirMappings.length];
+    if (m_DirMappings.length > 0) {
+      vars = getVariables();
+      phs  = Placeholders.getSingleton();
+      for (i = 0; i < m_DirMappings.length; i++) {
+	result[i] = new DockerDirectoryMapping(
+	  vars.expand(phs.expand(m_DirMappings[i].localDir())),
+	  vars.expand(m_DirMappings[i].containerDir())
+	);
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Sets whether to log in to the registry when the flow starts.
    *
    * @param value	true if to login
@@ -426,16 +455,16 @@ public class SimpleDockerConnection
     if (result == null) {
       m_ActualBinary = null;
       if (!m_Binary.isDirectory()) {
-        if (!m_Binary.getAbsoluteFile().exists())
-          result = "Docker binary does not exist: " + m_Binary.getAbsolutePath();
-        else
-          m_ActualBinary = m_Binary.getAbsolutePath();
+	if (!m_Binary.getAbsoluteFile().exists())
+	  result = "Docker binary does not exist: " + m_Binary.getAbsolutePath();
+	else
+	  m_ActualBinary = m_Binary.getAbsolutePath();
       }
       else {
-        if (OS.isWindows())
-          m_ActualBinary = "docker.exe";
-        else
-          m_ActualBinary = "docker";
+	if (OS.isWindows())
+	  m_ActualBinary = "docker.exe";
+	else
+	  m_ActualBinary = "docker";
       }
     }
 
@@ -468,10 +497,10 @@ public class SimpleDockerConnection
     if ((result == null) && m_Login) {
       res = SimpleDockerHelper.login(getAcualBinary(), m_Registry, m_User, m_Password.getValue());
       if (res.exitCode != 0) {
-        result = "Login failed!\n"
-          + "exit code: " + res.exitCode
-          + (res.stdout != null ? "\nstdout:\n" + res.stdout : "")
-          + (res.stderr != null ? "\nstderr:\n" + res.stderr : "");
+	result = "Login failed!\n"
+	  + "exit code: " + res.exitCode
+	  + (res.stdout != null ? "\nstdout:\n" + res.stdout : "")
+	  + (res.stderr != null ? "\nstderr:\n" + res.stderr : "");
       }
     }
 
@@ -489,10 +518,10 @@ public class SimpleDockerConnection
     if ((m_ActualBinary != null) && m_Logout) {
       res = SimpleDockerHelper.logout(getAcualBinary(), m_Registry);
       if (res.exitCode != 0) {
-        getLogger().warning("Logout failed!\n"
-          + "exit code: " + res.exitCode
-          + (res.stdout != null ? "\nstdout:\n" + res.stdout : "")
-          + (res.stderr != null ? "\nstderr:\n" + res.stderr : ""));
+	getLogger().warning("Logout failed!\n"
+	  + "exit code: " + res.exitCode
+	  + (res.stdout != null ? "\nstdout:\n" + res.stdout : "")
+	  + (res.stderr != null ? "\nstderr:\n" + res.stderr : ""));
       }
     }
 

@@ -182,7 +182,7 @@ public class Run
 
     result = new ArrayList<>();
     result.add("run");
-    for (DockerDirectoryMapping mapping: m_Connection.getDirMappings()) {
+    for (DockerDirectoryMapping mapping: m_Connection.getExpandedDirMappings()) {
       result.add("-v");
       result.add(mapping.getValue());
     }
