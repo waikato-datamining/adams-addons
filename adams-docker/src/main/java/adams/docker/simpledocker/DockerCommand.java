@@ -24,6 +24,7 @@ import adams.core.QuickInfoSupporter;
 import adams.core.StoppableWithFeedback;
 import adams.core.logging.LoggingSupporter;
 import adams.core.option.OptionHandler;
+import adams.docker.simpledocker.stderrprocessing.AbstractStdErrProcessing;
 import adams.flow.core.FlowContextHandler;
 import adams.flow.standalone.SimpleDockerConnection;
 
@@ -48,6 +49,28 @@ public interface DockerCommand
    * @return		the connection, null if none set
    */
   public SimpleDockerConnection getConnection();
+
+  /**
+   * Sets the handler for processing the output received on stderr.
+   *
+   * @param value	the handler
+   */
+  public void setStdErrProcessing(AbstractStdErrProcessing value);
+
+  /**
+   * Returns the handler for processing the output received on stderr.
+   *
+   * @return		the handler
+   */
+  public AbstractStdErrProcessing getStdErrProcessing();
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String stdErrProcessingTipText();
 
   /**
    * Returns the class of the output the command generates.

@@ -24,6 +24,8 @@ import adams.core.Utils;
 import adams.core.logging.LoggingHelper;
 import adams.core.management.CommandResult;
 import adams.core.option.AbstractOptionHandler;
+import adams.docker.simpledocker.stderrprocessing.AbstractStdErrProcessing;
+import adams.docker.simpledocker.stderrprocessing.Log;
 import adams.flow.core.Actor;
 import adams.flow.standalone.SimpleDockerConnection;
 
@@ -41,6 +43,9 @@ public abstract class AbstractDockerCommand
   implements DockerCommand {
 
   private static final long serialVersionUID = -3060945925413859934L;
+
+  /** the handler for processing output on stderr. */
+  protected AbstractStdErrProcessing m_StdErrProcessing;
 
   /** the docker connection. */
   protected transient SimpleDockerConnection m_Connection;
@@ -61,6 +66,18 @@ public abstract class AbstractDockerCommand
   protected Actor m_FlowContext;
 
   /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "stderr-processing", "stdErrProcessing",
+      getDefaultStdErrProcessing());
+  }
+
+  /**
    * Initializes the members.
    */
   @Override
@@ -78,6 +95,44 @@ public abstract class AbstractDockerCommand
     super.reset();
 
     m_Output.clear();
+  }
+
+  /**
+   * Returns the default handler for processing output on stderr.
+   *
+   * @return		the handler
+   */
+  protected AbstractStdErrProcessing getDefaultStdErrProcessing() {
+    return new Log();
+  }
+
+  /**
+   * Sets the handler for processing the output received on stderr.
+   *
+   * @param value	the handler
+   */
+  public void setStdErrProcessing(AbstractStdErrProcessing value) {
+    m_StdErrProcessing = value;
+    reset();
+  }
+
+  /**
+   * Returns the handler for processing the output received on stderr.
+   *
+   * @return		the handler
+   */
+  public AbstractStdErrProcessing getStdErrProcessing() {
+    return m_StdErrProcessing;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String stdErrProcessingTipText() {
+    return "The handler for processing output received from the docker command on stderr.";
   }
 
   /**
@@ -145,8 +200,11 @@ public abstract class AbstractDockerCommand
 
     if (result == null) {
       if (m_Connection == null)
-        result = "No docker connection available! Missing " + Utils.classToString(SimpleDockerConnection.class) + " standalone?";
+	result = "No docker connection available! Missing " + Utils.classToString(SimpleDockerConnection.class) + " standalone?";
     }
+
+    if (result == null)
+      result = m_StdErrProcessing.setUp(this);
 
     return result;
   }
@@ -280,6 +338,8 @@ public abstract class AbstractDockerCommand
 	if (res != null) {
 	  if (res instanceof CommandResult) {
 	    cmdResult = (CommandResult) res;
+	    if ((cmdResult.stderr != null) && !cmdResult.stderr.isEmpty())
+	      m_StdErrProcessing.processBlocking(cmdResult.stderr);
 	    log(cmdResult);
 	    if (cmdResult.exitCode == 0) {
 	      if (cmdResult.stdout != null)

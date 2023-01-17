@@ -60,8 +60,8 @@ public class AsyncCapableDockerCommandOutputProcessor
    */
   public void processOutput(String line, boolean stdout) {
     if (stdout)
-      m_Owner.addOutput(line);
+      m_Owner.addStdOut(line);
     else
-      m_Owner.getLogger().severe(line);
+      m_Owner.addStdErr(line);
   }
 }

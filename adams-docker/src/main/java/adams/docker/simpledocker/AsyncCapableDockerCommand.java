@@ -51,9 +51,16 @@ public interface AsyncCapableDockerCommand
   public String blockingTipText();
 
   /**
-   * Adds the line received from the command to the output.
+   * Adds the line received on stdout from the command.
    *
    * @param line	the line to add
    */
-  public void addOutput(String line);
+  public void addStdOut(String line);
+
+  /**
+   * Adds the line received on stderr from the command.
+   *
+   * @param line	the line to add
+   */
+  public void addStdErr(String line);
 }

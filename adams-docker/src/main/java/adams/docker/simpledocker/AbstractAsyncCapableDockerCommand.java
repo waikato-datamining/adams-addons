@@ -100,13 +100,23 @@ public abstract class AbstractAsyncCapableDockerCommand
   }
 
   /**
-   * Adds the line received from the command to the output.
+   * Adds the line received on stdout from the command.
    *
    * @param line	the line to add
    */
   @Override
-  public void addOutput(String line) {
+  public void addStdOut(String line) {
     m_Output.add(postProcessOutputAsync(line));
+  }
+
+  /**
+   * Adds the line received on stderr from the command.
+   *
+   * @param line	the line to add
+   */
+  @Override
+  public void addStdErr(String line) {
+    m_StdErrProcessing.processAsync(line);
   }
 
   /**

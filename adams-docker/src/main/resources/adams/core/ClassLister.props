@@ -13,3 +13,7 @@ adams.docker.simpledocker.DockerCommand=\
 # the docker commands for transformers
 adams.docker.simpledocker.DockerCommandWithProgrammaticArguments=\
   adams.docker.simpledocker
+
+# the processors for stderr output
+adams.docker.simpledocker.stderrprocessing.AbstractStdErrProcessing=\
+  adams.docker.simpledocker.stderrprocessing
