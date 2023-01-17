@@ -37,7 +37,7 @@ public abstract class AbstractStdErrProcessing
   protected DockerCommand m_Owner;
 
   /**
-   * Configures handler.
+   * Configures the handler.
    *
    * @param owner 	the owning command
    * @return 		null if successfully setup, otherwise error message
