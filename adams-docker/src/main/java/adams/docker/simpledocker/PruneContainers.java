@@ -99,7 +99,7 @@ public class PruneContainers
    * 			displaying in the GUI or for listing the options.
    */
   public String filterTipText() {
-    return "The filter to apply (e.g. 'until=<timestamp>'), ignored if empty.";
+    return "The filter to apply (e.g. 'until=<timestamp>'), ignored if empty; variables get expanded automatically.";
   }
 
   /**
@@ -127,7 +127,7 @@ public class PruneContainers
     result.add("--force");
     if (!m_Filter.isEmpty()) {
       result.add("--filter");
-      result.add(m_Filter);
+      result.add(getFlowContext().getVariables().expand(m_Filter));
     }
     log(result);
 

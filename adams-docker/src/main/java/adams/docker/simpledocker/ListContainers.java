@@ -111,7 +111,7 @@ public class ListContainers
    * 			displaying in the GUI or for listing the options.
    */
   public String filterTipText() {
-    return "The filter to apply (e.g. 'until=<timestamp>'), ignored if empty.";
+    return "The filter to apply (e.g. 'until=<timestamp>'), ignored if empty; variables get automatically expanded.";
   }
 
   /**
@@ -170,7 +170,7 @@ public class ListContainers
       result.add("--all");
     if (!m_Filter.isEmpty()) {
       result.add("--filter");
-      result.add(m_Filter);
+      result.add(getFlowContext().getVariables().expand(m_Filter));
     }
     log(result);
 

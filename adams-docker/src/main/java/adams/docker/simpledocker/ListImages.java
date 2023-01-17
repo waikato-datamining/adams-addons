@@ -111,7 +111,7 @@ public class ListImages
    * 			displaying in the GUI or for listing the options.
    */
   public String filterTipText() {
-    return "The filter to apply, ignored if empty.";
+    return "The filter to apply, ignored if empty; variables get expanded automatically.";
   }
 
   /**
@@ -170,7 +170,7 @@ public class ListImages
       result.add("--all");
     if (!m_Filter.isEmpty()) {
       result.add("--filter");
-      result.add(m_Filter);
+      result.add(getFlowContext().getVariables().expand(m_Filter));
     }
     log(result);
 
