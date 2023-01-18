@@ -25,6 +25,7 @@ import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
+import adams.flow.core.CallableActorUser;
 import adams.flow.core.InputConsumer;
 import adams.flow.core.Token;
 
@@ -34,7 +35,8 @@ import adams.flow.core.Token;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class CallableActorSink
-  extends AbstractStdErrProcessing {
+  extends AbstractStdErrProcessing
+  implements CallableActorUser  {
 
   private static final long serialVersionUID = -2194306680981658479L;
 
@@ -106,6 +108,15 @@ public class CallableActorSink
    */
   public String callableNameTipText() {
     return "The name of the callable actor to use.";
+  }
+
+  /**
+   * Returns the currently set callable actor.
+   *
+   * @return		the actor, can be null
+   */
+  public Actor getCallableActor() {
+    return m_CallableActor;
   }
 
   /**
