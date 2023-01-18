@@ -20,12 +20,17 @@
 
 package adams.docker;
 
+import adams.core.base.DockerDirectoryMapping;
 import adams.core.logging.LoggingHelper;
 import adams.core.management.CommandResult;
 import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -68,9 +73,9 @@ public class SimpleDockerHelper {
       output = new CollectingProcessOutput();
       // send password?
       if ((pw != null) && !pw.isEmpty())
-        output.monitor(pw, builder);
+	output.monitor(pw, builder);
       else
-        output.monitor(builder);
+	output.monitor(builder);
       result = new CommandResult(cmd.toArray(new String[0]), output.getExitCode(), output.getStdOut(), output.getStdErr());
     }
     catch (Exception e) {
@@ -150,6 +155,48 @@ public class SimpleDockerHelper {
     }
     catch (Exception e) {
       result = new CommandResult(cmd.toArray(new String[0]), 1, null, "Failed to execute docker command:\n" + LoggingHelper.throwableToString(e));
+    }
+
+    return result;
+  }
+
+  /**
+   * Translates the local paths into container paths.
+   *
+   * @param paths		the local paths
+   * @return			the translated paths
+   * @throws IOException	if a path cannot be translated into a container one
+   */
+  public static String[] toContainerPaths(List<DockerDirectoryMapping> mappings, String[] paths) throws IOException {
+    String[]				result;
+    List<DockerDirectoryMapping>	sorted;
+    int					i;
+    Path				path;
+
+    result = new String[paths.length];
+    sorted = new ArrayList<>(mappings);
+    sorted.sort(new Comparator<DockerDirectoryMapping>() {
+      @Override
+      public int compare(DockerDirectoryMapping o1, DockerDirectoryMapping o2) {
+	return o1.length() - o2.length();
+      }
+    });
+
+    for (i = 0; i < paths.length; i++) {
+      path      = new File(paths[i]).toPath();
+      result[i] = null;
+      for (DockerDirectoryMapping mapping: sorted) {
+        if (path.startsWith(mapping.localDir())) {
+          result[i] = mapping.containerDir() + "/" + paths[i].substring(Math.min(paths[i].length(), mapping.localDir().length()));
+          while (result[i].contains("//"))
+	    result[i] = result[i].replace("//", "/");
+	  if (result[i].endsWith("/"))
+	    result[i] = result[i].substring(0, result[i].length() - 1);
+          break;
+	}
+      }
+      if (result[i] == null)
+        throw new IOException("Failed to translate local path '" + paths[i] + "' into container one using: " + mappings);
     }
 
     return result;
