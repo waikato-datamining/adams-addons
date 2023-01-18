@@ -21,7 +21,6 @@
 package adams.docker.simpledocker;
 
 import adams.core.QuickInfoHelper;
-import adams.docker.SimpleDockerHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -144,18 +143,17 @@ public class KillContainers
    */
   @Override
   protected Object doBlockingExecute() {
-    List<String> result;
+    List<String> cmd;
 
-    result = new ArrayList<>();
-    result.add("container");
-    result.add("kill");
-    result.add("--signal");
-    result.add("" + m_Signal);
+    cmd = new ArrayList<>();
+    cmd.add("container");
+    cmd.add("kill");
+    cmd.add("--signal");
+    cmd.add("" + m_Signal);
     if (m_AdditionalArguments != null)
-      result.addAll(Arrays.asList(m_AdditionalArguments));
-    log(result);
+      cmd.addAll(Arrays.asList(m_AdditionalArguments));
 
-    return SimpleDockerHelper.command(m_Connection.getAcualBinary(), result);
+    return doBlockingExecute(cmd);
   }
 
   /**

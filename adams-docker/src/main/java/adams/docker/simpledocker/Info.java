@@ -21,7 +21,6 @@
 package adams.docker.simpledocker;
 
 import adams.core.QuickInfoHelper;
-import adams.docker.SimpleDockerHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,17 +118,16 @@ public class Info
    */
   @Override
   protected Object doBlockingExecute() {
-    List<String> result;
+    List<String> 	cmd;
 
-    result = new ArrayList<>();
-    result.add("info");
+    cmd = new ArrayList<>();
+    cmd.add("info");
     if (!m_FormatString.isEmpty()) {
-      result.add("-f");
-      result.add(m_FormatString);
+      cmd.add("-f");
+      cmd.add(m_FormatString);
     }
-    log(result);
 
-    return SimpleDockerHelper.command(m_Connection.getAcualBinary(), result);
+    return doBlockingExecute(cmd);
   }
 
   /**

@@ -24,6 +24,7 @@ import adams.core.Utils;
 import adams.core.logging.LoggingHelper;
 import adams.core.management.CommandResult;
 import adams.core.option.AbstractOptionHandler;
+import adams.docker.SimpleDockerHelper;
 import adams.docker.simpledocker.stderrprocessing.AbstractStdErrProcessing;
 import adams.docker.simpledocker.stderrprocessing.Log;
 import adams.flow.core.Actor;
@@ -65,6 +66,9 @@ public abstract class AbstractDockerCommand
   /** the flow context. */
   protected Actor m_FlowContext;
 
+  /** the last command that was executed. */
+  protected transient String[] m_LastCommand;
+
   /**
    * Adds options to the internal list of options.
    */
@@ -95,6 +99,7 @@ public abstract class AbstractDockerCommand
     super.reset();
 
     m_Output.clear();
+    m_LastCommand = null;
   }
 
   /**
@@ -274,6 +279,18 @@ public abstract class AbstractDockerCommand
   }
 
   /**
+   * Executes the specified command in blocking fashion.
+   *
+   * @param cmd		the command to execute
+   * @return		the generated output
+   */
+  protected CommandResult doBlockingExecute(List<String> cmd) {
+    log(cmd);
+    m_LastCommand = cmd.toArray(new String[0]);
+    return SimpleDockerHelper.command(m_Connection.getAcualBinary(), cmd);
+  }
+
+  /**
    * Executes the command in blocking fashion (ie waits till it finishes).
    * The {@link #m_Running} flag is set to false automatically.
    *
@@ -318,9 +335,10 @@ public abstract class AbstractDockerCommand
     Object		res;
     CommandResult 	cmdResult;
 
-    m_Running  = false;
-    m_Executed = false;
-    m_Stopped  = false;
+    m_Running     = false;
+    m_Executed    = false;
+    m_Stopped     = false;
+    m_LastCommand = null;
     m_Output.clear();
 
     result = check();
@@ -368,6 +386,26 @@ public abstract class AbstractDockerCommand
     m_Executed = true;
 
     return result;
+  }
+
+  /**
+   * Checks whether a command has been executed (and recorded).
+   *
+   * @return		true if executed/recorded
+   */
+  @Override
+  public boolean hasLastCommand() {
+    return (m_LastCommand != null);
+  }
+
+  /**
+   * Returns the last command that was executed.
+   *
+   * @return		the last command, null if not available
+   */
+  @Override
+  public String[] getLastCommand() {
+    return m_LastCommand;
   }
 
   /**

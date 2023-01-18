@@ -31,7 +31,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Helper class for issuing docker commands.
@@ -186,17 +188,53 @@ public class SimpleDockerHelper {
       path      = new File(paths[i]).toPath();
       result[i] = null;
       for (DockerDirectoryMapping mapping: sorted) {
-        if (path.startsWith(mapping.localDir())) {
-          result[i] = mapping.containerDir() + "/" + paths[i].substring(Math.min(paths[i].length(), mapping.localDir().length()));
-          while (result[i].contains("//"))
+	if (path.startsWith(mapping.localDir())) {
+	  result[i] = mapping.containerDir() + "/" + paths[i].substring(Math.min(paths[i].length(), mapping.localDir().length()));
+	  while (result[i].contains("//"))
 	    result[i] = result[i].replace("//", "/");
 	  if (result[i].endsWith("/"))
 	    result[i] = result[i].substring(0, result[i].length() - 1);
-          break;
+	  break;
 	}
       }
       if (result[i] == null)
-        throw new IOException("Failed to translate local path '" + paths[i] + "' into container one using: " + mappings);
+	throw new IOException("Failed to translate local path '" + paths[i] + "' into container one using: " + mappings);
+    }
+
+    return result;
+  }
+
+  /**
+   * Checks whether a mapping can be added to the current list of directory mappings.
+   * Ensures that neither local nor container path are already in use.
+   *
+   * @param mappings	the mappings to far
+   * @param newMapping	the new mapping to check
+   * @return		null if it can be added, otherwise reason why not
+   */
+  public static String canAddMapping(List<DockerDirectoryMapping> mappings, DockerDirectoryMapping newMapping) {
+    String				result;
+    Map<File,DockerDirectoryMapping> 	dirs;
+    File				f;
+
+    result = null;
+
+    // check local dirs
+    dirs = new HashMap<>();
+    for (DockerDirectoryMapping m: mappings)
+      dirs.put(new File(m.localDir()), m);
+    f = new File(newMapping.localDir());
+    if (dirs.containsKey(f))
+      result = "Local directory already defined by: " + dirs.get(f);
+
+    // check container dirs
+    if (result == null) {
+      dirs = new HashMap<>();
+      for (DockerDirectoryMapping m: mappings)
+	dirs.put(new File(m.containerDir()), m);
+      f = new File(newMapping.containerDir());
+      if (dirs.containsKey(f))
+	result = "Container directory already defined by: " + dirs.get(f);
     }
 
     return result;

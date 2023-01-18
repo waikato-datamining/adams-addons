@@ -94,6 +94,20 @@ public interface DockerCommand
   public String execute();
 
   /**
+   * Checks whether a command has been executed (and recorded).
+   *
+   * @return		true if executed/recorded
+   */
+  public boolean hasLastCommand();
+
+  /**
+   * Returns the last command that was executed.
+   *
+   * @return		the last command, null if not available
+   */
+  public String[] getLastCommand();
+
+  /**
    * Returns whether the command was executed.
    *
    * @return		true if executed

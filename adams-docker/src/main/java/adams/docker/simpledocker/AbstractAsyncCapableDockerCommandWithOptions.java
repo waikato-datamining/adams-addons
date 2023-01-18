@@ -23,7 +23,6 @@ package adams.docker.simpledocker;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.logging.LoggingHelper;
-import adams.docker.SimpleDockerHelper;
 import com.github.fracpete.processoutput4j.output.StreamingProcessOutput;
 
 import java.util.List;
@@ -167,6 +166,7 @@ public abstract class AbstractAsyncCapableDockerCommandWithOptions
     cmd = buildCommand();
     cmd.add(0, m_Connection.getAcualBinary());
     log(cmd);
+    m_LastCommand = cmd.toArray(new String[0]);
 
     builder = new ProcessBuilder();
     builder.command(cmd);
@@ -198,11 +198,7 @@ public abstract class AbstractAsyncCapableDockerCommandWithOptions
    */
   @Override
   protected Object doBlockingExecute() {
-    List<String>	cmd;
-
-    cmd = buildCommand();
-    log(cmd);
-    return SimpleDockerHelper.command(m_Connection.getAcualBinary(), cmd);
+    return doBlockingExecute(buildCommand());
   }
 
   /**

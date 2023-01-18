@@ -21,7 +21,6 @@
 package adams.docker.simpledocker;
 
 import adams.core.QuickInfoHelper;
-import adams.docker.SimpleDockerHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -160,21 +159,20 @@ public class PruneImages
    */
   @Override
   protected Object doBlockingExecute() {
-    List<String> result;
+    List<String> cmd;
 
-    result = new ArrayList<>();
-    result.add("image");
-    result.add("prune");
-    result.add("--force");
+    cmd = new ArrayList<>();
+    cmd.add("image");
+    cmd.add("prune");
+    cmd.add("--force");
     if (m_All)
-      result.add("--all");
+      cmd.add("--all");
     if (!m_Filter.isEmpty()) {
-      result.add("--filter");
-      result.add(getFlowContext().getVariables().expand(m_Filter));
+      cmd.add("--filter");
+      cmd.add(getFlowContext().getVariables().expand(m_Filter));
     }
-    log(result);
 
-    return SimpleDockerHelper.command(m_Connection.getAcualBinary(), result);
+    return doBlockingExecute(cmd);
   }
 
   /**

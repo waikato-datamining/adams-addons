@@ -161,6 +161,7 @@ public abstract class AbstractAsyncCapableDockerCommand
     cmd = buildCommand();
     cmd.add(0, m_Connection.getAcualBinary());
     log(cmd);
+    m_LastCommand = cmd.toArray(new String[0]);
 
     builder = new ProcessBuilder();
     builder.command(cmd);

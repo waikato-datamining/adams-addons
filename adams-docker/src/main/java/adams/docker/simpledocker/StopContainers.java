@@ -21,7 +21,6 @@
 package adams.docker.simpledocker;
 
 import adams.core.QuickInfoHelper;
-import adams.docker.SimpleDockerHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -152,20 +151,19 @@ public class StopContainers
    */
   @Override
   protected Object doBlockingExecute() {
-    List<String> result;
+    List<String> cmd;
 
-    result = new ArrayList<>();
-    result.add("container");
-    result.add("stop");
-    result.add("--force");
-    result.add("--time");
-    result.add("" + m_Wait);
-    result.addAll(Arrays.asList(getActualOptions()));
+    cmd = new ArrayList<>();
+    cmd.add("container");
+    cmd.add("stop");
+    cmd.add("--force");
+    cmd.add("--time");
+    cmd.add("" + m_Wait);
+    cmd.addAll(Arrays.asList(getActualOptions()));
     if (m_AdditionalArguments != null)
-      result.addAll(Arrays.asList(m_AdditionalArguments));
-    log(result);
+      cmd.addAll(Arrays.asList(m_AdditionalArguments));
 
-    return SimpleDockerHelper.command(m_Connection.getAcualBinary(), result);
+    return doBlockingExecute(cmd);
   }
 
   /**
