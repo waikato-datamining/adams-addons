@@ -21,7 +21,7 @@
 package adams.docker.simpledocker.stderrprocessing;
 
 import adams.core.option.AbstractOptionHandler;
-import adams.docker.simpledocker.DockerCommand;
+import adams.flow.core.FlowContextHandler;
 
 /**
  * Ancestor for processing the Docker command output received on stderr.
@@ -34,7 +34,7 @@ public abstract class AbstractStdErrProcessing
   private static final long serialVersionUID = 7977194867431996321L;
 
   /** the owning command. */
-  protected DockerCommand m_Owner;
+  protected FlowContextHandler m_Owner;
 
   /**
    * Configures the handler.
@@ -42,7 +42,7 @@ public abstract class AbstractStdErrProcessing
    * @param owner 	the owning command
    * @return 		null if successfully setup, otherwise error message
    */
-  public String setUp(DockerCommand owner) {
+  public String setUp(FlowContextHandler owner) {
     if (owner == null)
       return "No owner set!";
 
