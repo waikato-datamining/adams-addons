@@ -80,6 +80,12 @@ The following standalones are available:
   command plugin, requires presence of a \textit{SimpleDockerConnection} (see \ref{simpledockercommands}).
 \end{tight_itemize}
 
+\noindent The following conversions are available:
+\begin{tight_itemize}
+  \item \textit{LocalPathToContainerPath} -- using the directory mappings defined by a \textit{SimpleDockerConnection},
+  the local path passing through gets converted into one to be used within the container.
+\end{tight_itemize}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Simple docker commands}
 \label(simpledockercommands)
