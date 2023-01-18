@@ -20,12 +20,12 @@
 
 package adams.docker.simpledocker.stderrprocessing;
 
-import adams.docker.simpledocker.DockerCommand;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.CallableActorHelper;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.CallableActorUser;
+import adams.flow.core.FlowContextHandler;
 import adams.flow.core.InputConsumer;
 import adams.flow.core.Token;
 
@@ -126,7 +126,7 @@ public class CallableActorSink
    * @return 		null if successfully setup, otherwise error message
    */
   @Override
-  public String setUp(DockerCommand owner) {
+  public String setUp(FlowContextHandler owner) {
     String	result;
 
     result = super.setUp(owner);

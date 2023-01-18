@@ -20,10 +20,10 @@
 
 package adams.docker.simpledocker.stderrprocessing;
 
-import adams.docker.simpledocker.DockerCommand;
 import adams.flow.control.StorageName;
 import adams.flow.control.StorageQueueHandler;
 import adams.flow.control.StorageUpdater;
+import adams.flow.core.FlowContextHandler;
 import adams.flow.core.QueueHelper;
 
 /**
@@ -113,7 +113,7 @@ public class Enqueue
   }
 
   @Override
-  public String setUp(DockerCommand owner) {
+  public String setUp(FlowContextHandler owner) {
     String	result;
 
     result = super.setUp(owner);
