@@ -23,6 +23,8 @@ package adams.docker.simpledocker;
 import adams.core.base.BaseString;
 import adams.core.base.BaseText;
 
+import java.util.List;
+
 /**
  * Interface for docker commands that take options.
  *
@@ -30,6 +32,20 @@ import adams.core.base.BaseText;
  */
 public interface DockerCommandWithOptions
   extends DockerCommand {
+
+  /**
+   * Sets the options for the command.
+   *
+   * @param value	the options
+   */
+  public void setOptions(List<String> value);
+
+  /**
+   * Sets the options for the command.
+   *
+   * @param value	the options
+   */
+  public void setOptions(String[] value);
 
   /**
    * Sets the options for the command.
@@ -52,6 +68,13 @@ public interface DockerCommandWithOptions
    * 			displaying in the GUI or for listing the options.
    */
   public String optionsTipText();
+
+  /**
+   * Sets the options for the command.
+   *
+   * @param value	the options
+   */
+  public void setOptionsString(String value);
 
   /**
    * Sets the options for the command.

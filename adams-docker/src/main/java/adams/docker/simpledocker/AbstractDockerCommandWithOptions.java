@@ -27,6 +27,7 @@ import adams.core.base.BaseString;
 import adams.core.base.BaseText;
 import adams.core.option.OptionUtils;
 
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -80,6 +81,24 @@ public abstract class AbstractDockerCommandWithOptions
    *
    * @param value	the options
    */
+  public void setOptions(List<String> value) {
+    setOptions(value.toArray(new String[0]));
+  }
+
+  /**
+   * Sets the options for the command.
+   *
+   * @param value	the options
+   */
+  public void setOptions(String[] value) {
+    setOptions((BaseString[]) BaseObject.toObjectArray(value, BaseString.class));
+  }
+
+  /**
+   * Sets the options for the command.
+   *
+   * @param value	the options
+   */
   @Override
   public void setOptions(BaseString[] value) {
     m_Options = value;
@@ -105,6 +124,15 @@ public abstract class AbstractDockerCommandWithOptions
   @Override
   public String optionsTipText() {
     return "The options for the command; variables get expanded automatically.";
+  }
+
+  /**
+   * Sets the options for the command.
+   *
+   * @param value	the options
+   */
+  public void setOptionsString(String value) {
+    setOptionsString(new BaseText(value));
   }
 
   /**
