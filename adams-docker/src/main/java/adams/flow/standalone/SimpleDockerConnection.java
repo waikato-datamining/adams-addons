@@ -133,6 +133,9 @@ public class SimpleDockerConnection
   /** the directory mappings to use. */
   protected DockerDirectoryMapping[] m_DirMappings;
 
+  /** the expanded directory mappings in use. */
+  protected transient DockerDirectoryMapping[] m_ExpandedDirMappings;
+
   /** whether to login into the registry when starting the flow. */
   protected boolean m_Login;
 
@@ -187,6 +190,16 @@ public class SimpleDockerConnection
     m_OptionManager.add(
       "logout", "logout",
       false);
+  }
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_ExpandedDirMappings = null;
   }
 
   /**
@@ -346,19 +359,22 @@ public class SimpleDockerConnection
     Variables			vars;
     Placeholders		phs;
 
-    result = new DockerDirectoryMapping[m_DirMappings.length];
-    if (m_DirMappings.length > 0) {
-      vars = getVariables();
-      phs  = Placeholders.getSingleton();
-      for (i = 0; i < m_DirMappings.length; i++) {
-	result[i] = new DockerDirectoryMapping(
-	  vars.expand(phs.expand(m_DirMappings[i].localDir())),
-	  vars.expand(m_DirMappings[i].containerDir())
-	);
+    if (m_ExpandedDirMappings == null) {
+      result = new DockerDirectoryMapping[m_DirMappings.length];
+      if (m_DirMappings.length > 0) {
+        vars = getVariables();
+        phs = Placeholders.getSingleton();
+        for (i = 0; i < m_DirMappings.length; i++) {
+          result[i] = new DockerDirectoryMapping(
+            vars.expand(phs.expand(m_DirMappings[i].localDir())),
+            vars.expand(m_DirMappings[i].containerDir())
+          );
+        }
       }
+      m_ExpandedDirMappings = result;
     }
 
-    return result;
+    return m_ExpandedDirMappings;
   }
 
   /**
