@@ -163,6 +163,39 @@ public class SimpleDockerHelper {
   }
 
   /**
+   * Fixes the path a bit, removing duplicate slashes, trailing slash.
+   *
+   * @param path	the path to fix
+   * @return		the fixed path
+   */
+  public static String fixPath(String path) {
+    String  result;
+
+    result = path;
+
+    // duplicate slashes
+    while (result.contains("//"))
+      result = result.replace("//", "/");
+
+    // trailing slash
+    if (result.endsWith("/"))
+      result = result.substring(0, result.length() - 1);
+
+    return result;
+  }
+
+  /**
+   * Translates the local path into a container path.
+   *
+   * @param path		the local path
+   * @return			the translated path
+   * @throws IOException	if the path cannot be translated into a container one
+   */
+  public static String toContainerPath(List<DockerDirectoryMapping> mappings, String path) throws IOException {
+    return toContainerPaths(mappings, new String[]{path})[0];
+  }
+
+  /**
    * Translates the local paths into container paths.
    *
    * @param paths		the local paths
@@ -189,11 +222,7 @@ public class SimpleDockerHelper {
       result[i] = null;
       for (DockerDirectoryMapping mapping: sorted) {
 	if (path.startsWith(mapping.localDir())) {
-	  result[i] = mapping.containerDir() + "/" + paths[i].substring(Math.min(paths[i].length(), mapping.localDir().length()));
-	  while (result[i].contains("//"))
-	    result[i] = result[i].replace("//", "/");
-	  if (result[i].endsWith("/"))
-	    result[i] = result[i].substring(0, result[i].length() - 1);
+	  result[i] = fixPath(mapping.containerDir() + "/" + paths[i].substring(Math.min(paths[i].length(), mapping.localDir().length())));
 	  break;
 	}
       }
@@ -238,5 +267,21 @@ public class SimpleDockerHelper {
     }
 
     return result;
+  }
+
+  /**
+   * Adds the mapping, if possible.
+   *
+   * @param mappings	the mappings to add to
+   * @param newMapping	the mapping to add
+   * @return		true if added otherwise false
+   */
+  public static boolean addMapping(List<DockerDirectoryMapping> mappings, DockerDirectoryMapping newMapping) {
+    if (canAddMapping(mappings, newMapping) == null) {
+      mappings.add(newMapping);
+      return true;
+    }
+
+    return false;
   }
 }
