@@ -15,7 +15,7 @@
 
 /*
  * BaseMarkdownEditor.java
- * Copyright (C) 2015-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2023 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -30,6 +30,7 @@ import adams.gui.core.BaseCheckBox;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.ImageManager;
 import adams.gui.core.MarkdownTextAreaWithPreview;
+import adams.gui.core.UISettings;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -150,10 +151,12 @@ public class BaseMarkdownEditor
     panel.add(buttonClear);
 
     checkLineWrap = new BaseCheckBox("Line wrap");
+    checkLineWrap.setSelected(UISettings.get(getClass(), "LineWrap", false));
     checkLineWrap.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
 	m_TextValue.setLineWrap(checkLineWrap.isSelected());
+        UISettings.set(BaseMarkdownEditor.this.getClass(), "LineWrap", checkLineWrap.isSelected());
       }
     });
     panel.add(checkLineWrap);
