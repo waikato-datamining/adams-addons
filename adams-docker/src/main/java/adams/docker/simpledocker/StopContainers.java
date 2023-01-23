@@ -22,7 +22,6 @@ package adams.docker.simpledocker;
 
 import adams.core.QuickInfoHelper;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -135,44 +134,24 @@ public class StopContainers
   }
 
   /**
-   * Whether the command is used in a blocking or async fashion.
+   * Assembles the command to run.
    *
-   * @return		true if blocking, false if async
+   * @return		the command
    */
   @Override
-  public boolean isUsingBlocking() {
-    return true;
-  }
+  protected List<String> buildCommand() {
+    List<String> result;
 
-  /**
-   * Executes the command.
-   *
-   * @return		the result of the command, either a CommandResult or a String object (= error message)
-   */
-  @Override
-  protected Object doBlockingExecute() {
-    List<String> cmd;
-
-    cmd = new ArrayList<>();
-    cmd.add("container");
-    cmd.add("stop");
-    cmd.add("--force");
-    cmd.add("--time");
-    cmd.add("" + m_Wait);
-    cmd.addAll(Arrays.asList(getActualOptions()));
+    result = super.buildCommand();
+    result.add("container");
+    result.add("stop");
+    result.add("--force");
+    result.add("--time");
+    result.add("" + m_Wait);
+    result.addAll(Arrays.asList(getActualOptions()));
     if (m_AdditionalArguments != null)
-      cmd.addAll(Arrays.asList(m_AdditionalArguments));
+      result.addAll(Arrays.asList(m_AdditionalArguments));
 
-    return doBlockingExecute(cmd);
-  }
-
-  /**
-   * Returns the class of the output the command generates.
-   *
-   * @return		the type
-   */
-  @Override
-  public Class generates() {
-    return String.class;
+    return result;
   }
 }

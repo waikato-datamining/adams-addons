@@ -1,11 +1,11 @@
 # Project: adams
-# Date: 2023-01-13 17:08:16
+# Date: 2023-01-23 17:09:29
 # User: fracpete
 # Charset: UTF-8
-# Modules: adams-core,adams-docker
+# Modules: adams-core,adams-docker,adams-net
 #
 adams.flow.control.Flow -annotation "Lists all currently present containers (docker container ls -a)." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.SimpleDockerConnection
- adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.ListContainers -all true"
+ adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.ListContainers -output-formatter adams.core.command.output.LineSplit -stdout-processor adams.core.command.stdout.Null -stderr-processor adams.core.command.stderr.Null -all true"
  adams.flow.transformer.StringJoin -glue \n
  adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter

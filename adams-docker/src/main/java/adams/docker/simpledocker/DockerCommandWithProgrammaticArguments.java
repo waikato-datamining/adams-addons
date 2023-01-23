@@ -20,26 +20,14 @@
 
 package adams.docker.simpledocker;
 
+import adams.core.command.ExternalCommandWithProgrammaticArguments;
+
 /**
- * Interface for docker commands that support programmatic options that
- * get appended to the command.
+ * Interface for docker commands that take additional arguments.
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public interface DockerCommandWithProgrammaticArguments
-  extends DockerCommand {
+  extends ExternalCommandWithProgrammaticArguments, DockerCommand {
 
-  /**
-   * Sets the additional arguments to append to the command.
-   *
-   * @param value	the arguments
-   */
-  public void setAdditionalArguments(String[] value);
-
-  /**
-   * Returns the additional arguments to append to the command.
-   *
-   * @return	the arguments
-   */
-  public String[] getAdditionalArguments();
 }

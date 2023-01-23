@@ -22,7 +22,6 @@ package adams.docker.simpledocker;
 
 import adams.core.QuickInfoHelper;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,8 +31,7 @@ import java.util.List;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class Pull
-  extends AbstractAsyncCapableDockerCommandWithOptions
-  implements AsyncCapableDockerCommand {
+  extends AbstractDockerCommandWithOptions {
 
   private static final long serialVersionUID = -3235247889827794116L;
 
@@ -119,7 +117,7 @@ public class Pull
   protected List<String> buildCommand() {
     List<String> 	result;
 
-    result = new ArrayList<>();
+    result = super.buildCommand();
     result.add("pull");
     result.addAll(Arrays.asList(getActualOptions()));
     result.add(m_Image);

@@ -21,8 +21,9 @@
 package adams.docker.simpledocker;
 
 import adams.core.QuickInfoHelper;
+import adams.core.command.output.LineSplit;
+import adams.core.command.output.OutputFormatter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -78,10 +79,21 @@ public class ListContainers
   public String getQuickInfo() {
     String	result;
 
-    result = QuickInfoHelper.toString(this, "filter", (m_Filter.isEmpty() ? "-none-" : m_Filter), "filter: ");
+    result = super.getQuickInfo();
+    result += QuickInfoHelper.toString(this, "filter", (m_Filter.isEmpty() ? "-none-" : m_Filter), ", filter: ");
     result += QuickInfoHelper.toString(this, "all", m_All, "all", ", ");
 
     return result;
+  }
+
+  /**
+   * Returns the default output formatter.
+   *
+   * @return		the default
+   */
+  @Override
+  protected OutputFormatter getDefaultOutputFormatter() {
+    return new LineSplit();
   }
 
   /**
@@ -143,56 +155,25 @@ public class ListContainers
   }
 
   /**
-   * Whether the command is used in a blocking or async fashion.
+   * Assembles the command to run.
    *
-   * @return		true if blocking, false if async
+   * @return		the command
    */
   @Override
-  public boolean isUsingBlocking() {
-    return true;
-  }
+  protected List<String> buildCommand() {
+    List<String> result;
 
-  /**
-   * Executes the command.
-   *
-   * @return		the result of the command, either a CommandResult or a String object (= error message)
-   */
-  @Override
-  protected Object doBlockingExecute() {
-    List<String> cmd;
-
-    cmd = new ArrayList<>();
-    cmd.add("container");
-    cmd.add("ls");
-    cmd.add("--quiet");
+    result = super.buildCommand();
+    result.add("container");
+    result.add("ls");
+    result.add("--quiet");
     if (m_All)
-      cmd.add("--all");
+      result.add("--all");
     if (!m_Filter.isEmpty()) {
-      cmd.add("--filter");
-      cmd.add(getFlowContext().getVariables().expand(m_Filter));
+      result.add("--filter");
+      result.add(getFlowContext().getVariables().expand(m_Filter));
     }
 
-    return doBlockingExecute(cmd);
-  }
-
-  /**
-   * For post-processing the output.
-   *
-   * @param output	the output
-   * @return		the generated output
-   */
-  @Override
-  protected Object postProcessOutputBlocking(String output) {
-    return output.trim().split("\n");
-  }
-
-  /**
-   * Returns the class of the output the command generates.
-   *
-   * @return		the type
-   */
-  @Override
-  public Class generates() {
-    return String[].class;
+    return result;
   }
 }

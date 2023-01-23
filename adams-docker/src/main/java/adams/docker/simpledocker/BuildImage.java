@@ -20,7 +20,6 @@
 
 package adams.docker.simpledocker;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,7 +30,7 @@ import java.util.List;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class BuildImage
-  extends AbstractAsyncCapableDockerCommandWithOptions {
+  extends AbstractDockerCommandWithOptions {
 
   private static final long serialVersionUID = -681107300094757081L;
 
@@ -78,7 +77,7 @@ public class BuildImage
   protected List<String> buildCommand() {
     List<String> 	result;
 
-    result = new ArrayList<>();
+    result = super.buildCommand();
     result.add("image");
     result.add("build");
     result.addAll(Arrays.asList(getActualOptions()));

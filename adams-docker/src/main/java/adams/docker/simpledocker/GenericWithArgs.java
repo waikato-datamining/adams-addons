@@ -20,7 +20,6 @@
 
 package adams.docker.simpledocker;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -78,9 +77,7 @@ public class GenericWithArgs
   protected List<String> buildCommand() {
     List<String> 	result;
 
-    result = new ArrayList<>();
-    result.add(m_Command);
-    result.addAll(Arrays.asList(getActualOptions()));
+    result = super.buildCommand();
     if (m_AdditionalArguments != null)
       result.addAll(Arrays.asList(m_AdditionalArguments));
 

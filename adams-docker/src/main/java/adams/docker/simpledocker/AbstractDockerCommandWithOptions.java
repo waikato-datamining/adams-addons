@@ -20,15 +20,13 @@
 
 package adams.docker.simpledocker;
 
-import adams.core.QuickInfoHelper;
-import adams.core.Variables;
-import adams.core.base.BaseObject;
-import adams.core.base.BaseString;
-import adams.core.base.BaseText;
-import adams.core.option.OptionUtils;
+import adams.core.Utils;
+import adams.core.command.AbstractAsyncCapableExternalCommandWithOptions;
+import adams.core.management.CommandResult;
+import adams.docker.SimpleDockerHelper;
+import adams.flow.standalone.SimpleDockerConnection;
 
 import java.util.List;
-import java.util.logging.Level;
 
 /**
  * Ancestor for commands that take options.
@@ -36,163 +34,86 @@ import java.util.logging.Level;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public abstract class AbstractDockerCommandWithOptions
-  extends AbstractDockerCommand
-  implements DockerCommandWithOptions {
+  extends AbstractAsyncCapableExternalCommandWithOptions
+  implements DockerCommand {
 
   private static final long serialVersionUID = 7898785828472200774L;
 
-  /** the options for the command. */
-  protected BaseString[] m_Options;
-
-  /** the options as single string. */
-  protected BaseText m_OptionsString;
+  /** the docker connection. */
+  protected transient SimpleDockerConnection m_Connection;
 
   /**
-   * Adds options to the internal list of options.
+   * Sets the docker connection to use.
+   *
+   * @param value	the connection
    */
   @Override
-  public void defineOptions() {
-    super.defineOptions();
-
-    m_OptionManager.add(
-      "option", "options",
-      new BaseString[0]);
-
-    m_OptionManager.add(
-      "options-string", "optionsString",
-      new BaseText());
+  public void setConnection(SimpleDockerConnection value) {
+    m_Connection = value;
   }
 
   /**
-   * Returns a quick info about the actor, which will be displayed in the GUI.
+   * Returns the docker connection in use.
    *
-   * @return		null if no info available, otherwise short string
+   * @return		the connection, null if none set
    */
   @Override
-  public String getQuickInfo() {
-    if (!m_OptionsString.isEmpty() || getOptionManager().hasVariableForProperty("optionsString"))
-      return QuickInfoHelper.toString(this, "optionsString", (m_OptionsString.isEmpty() ? "-none-" : m_OptionsString), "options string: ");
-    else
-      return QuickInfoHelper.toString(this, "options", m_Options, "options: ");
+  public SimpleDockerConnection getConnection() {
+    return m_Connection;
   }
 
   /**
-   * Sets the options for the command.
+   * Hook method for performing checks before executing the command.
    *
-   * @param value	the options
+   * @return		null if successful, otherwise error message
    */
-  public void setOptions(List<String> value) {
-    setOptions(value.toArray(new String[0]));
-  }
+  protected String check() {
+    String	result;
 
-  /**
-   * Sets the options for the command.
-   *
-   * @param value	the options
-   */
-  public void setOptions(String[] value) {
-    setOptions((BaseString[]) BaseObject.toObjectArray(value, BaseString.class));
-  }
+    result = super.check();
 
-  /**
-   * Sets the options for the command.
-   *
-   * @param value	the options
-   */
-  @Override
-  public void setOptions(BaseString[] value) {
-    m_Options = value;
-    reset();
-  }
-
-  /**
-   * Returns the options for the command.
-   *
-   * @return		the options
-   */
-  @Override
-  public BaseString[] getOptions() {
-    return m_Options;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  @Override
-  public String optionsTipText() {
-    return "The options for the command; variables get expanded automatically.";
-  }
-
-  /**
-   * Sets the options for the command.
-   *
-   * @param value	the options
-   */
-  public void setOptionsString(String value) {
-    setOptionsString(new BaseText(value));
-  }
-
-  /**
-   * Sets the options for the command.
-   *
-   * @param value	the options
-   */
-  @Override
-  public void setOptionsString(BaseText value) {
-    m_OptionsString = value;
-    reset();
-  }
-
-  /**
-   * Returns the options for the command as single string.
-   *
-   * @return		the options
-   */
-  @Override
-  public BaseText getOptionsString() {
-    return m_OptionsString;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  @Override
-  public String optionsStringTipText() {
-    return "The options for the command as a single string; overrides the options array; variables get expanded automatically.";
-  }
-
-  /**
-   * Returns the actual options to use. The options string takes precendence over the array.
-   *
-   * @return		the options
-   */
-  @Override
-  public String[] getActualOptions() {
-    String[]	result;
-    int		i;
-    Variables	vars;
-
-    vars = m_FlowContext.getVariables();
-    try {
-      if (!m_OptionsString.isEmpty()) {
-	result = OptionUtils.splitOptions(vars.expand(m_OptionsString.getValue()));
-      }
-      else {
-	result = BaseObject.toStringArray(m_Options);
-	for (i = 0; i < result.length; i++)
-	  result[i] = vars.expand(result[i]);
-      }
-      return result;
+    if (result == null) {
+      if (m_Connection == null)
+        result = "No docker connection available! Missing " + Utils.classToString(SimpleDockerConnection.class) + " standalone?";
     }
-    catch (Exception e) {
-      getLogger().log(Level.SEVERE, "Failed to parse options!", e);
-      return new String[0];
-    }
+
+    return result;
+  }
+
+  /**
+   * Assembles the command to run.
+   *
+   * @return		the command
+   */
+  protected List<String> buildCommand() {
+    List<String>  result;
+
+    result = super.buildCommand();
+    if (!isUsingBlocking())
+      result.add(m_Connection.getAcualBinary());
+
+    return result;
+  }
+
+  /**
+   * Executes the specified command in blocking fashion.
+   *
+   * @param cmd		the command to execute
+   * @return		the generated output
+   */
+  protected CommandResult doBlockingExecute(List<String> cmd) {
+    log(cmd);
+    m_LastCommand = cmd.toArray(new String[0]);
+    return SimpleDockerHelper.command(m_Connection.getAcualBinary(), cmd);
+  }
+
+  /**
+   * Executes the command.
+   *
+   * @return		the result of the command, either a CommandResult or a String object (= error message)
+   */
+  @Override
+  protected Object doBlockingExecute() {
+    return doBlockingExecute(buildCommand());
   }
 }

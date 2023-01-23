@@ -22,7 +22,6 @@ package adams.docker.simpledocker;
 
 import adams.core.QuickInfoHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -78,7 +77,8 @@ public class PruneImages
   public String getQuickInfo() {
     String  	result;
 
-    result = QuickInfoHelper.toString(this, "filter", (m_Filter.isEmpty() ? "-none-" : m_Filter), "filter: ");
+    result = super.getQuickInfo();
+    result += QuickInfoHelper.toString(this, "filter", (m_Filter.isEmpty() ? "-none-" : m_Filter), ", filter: ");
     result += QuickInfoHelper.toString(this, "all", m_All, "all", ", ");
 
     return result;
@@ -143,45 +143,25 @@ public class PruneImages
   }
 
   /**
-   * Whether the command is used in a blocking or async fashion.
+   * Assembles the command to run.
    *
-   * @return		true if blocking, false if async
+   * @return		the command
    */
   @Override
-  public boolean isUsingBlocking() {
-    return true;
-  }
+  protected List<String> buildCommand() {
+    List<String> result;
 
-  /**
-   * Executes the command.
-   *
-   * @return		the result of the command, either a CommandResult or a String object (= error message)
-   */
-  @Override
-  protected Object doBlockingExecute() {
-    List<String> cmd;
-
-    cmd = new ArrayList<>();
-    cmd.add("image");
-    cmd.add("prune");
-    cmd.add("--force");
+    result = super.buildCommand();
+    result.add("image");
+    result.add("prune");
+    result.add("--force");
     if (m_All)
-      cmd.add("--all");
+      result.add("--all");
     if (!m_Filter.isEmpty()) {
-      cmd.add("--filter");
-      cmd.add(getFlowContext().getVariables().expand(m_Filter));
+      result.add("--filter");
+      result.add(getFlowContext().getVariables().expand(m_Filter));
     }
 
-    return doBlockingExecute(cmd);
-  }
-
-  /**
-   * Returns the class of the output the command generates.
-   *
-   * @return		the type
-   */
-  @Override
-  public Class generates() {
-    return String.class;
+    return result;
   }
 }

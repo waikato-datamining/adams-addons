@@ -24,7 +24,6 @@ import adams.core.QuickInfoHelper;
 import adams.core.base.DockerDirectoryMapping;
 import adams.core.management.User;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,7 +34,7 @@ import java.util.List;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class Run
-  extends AbstractAsyncCapableDockerCommandWithOptions {
+  extends AbstractDockerCommandWithOptions {
 
   private static final long serialVersionUID = -681107300094757081L;
 
@@ -180,7 +179,7 @@ public class Run
   protected List<String> buildCommand() {
     List<String> 	result;
 
-    result = new ArrayList<>();
+    result = super.buildCommand();
     result.add("run");
     for (DockerDirectoryMapping mapping: m_Connection.getExpandedDirMappings()) {
       result.add("-v");

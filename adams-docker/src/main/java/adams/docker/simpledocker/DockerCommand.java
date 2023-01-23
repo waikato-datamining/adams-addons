@@ -20,12 +20,7 @@
 
 package adams.docker.simpledocker;
 
-import adams.core.QuickInfoSupporter;
-import adams.core.StoppableWithFeedback;
-import adams.core.logging.LoggingSupporter;
-import adams.core.option.OptionHandler;
-import adams.docker.simpledocker.stderrprocessing.AbstractStdErrProcessing;
-import adams.flow.core.FlowContextHandler;
+import adams.core.command.AsyncCapableExternalCommand;
 import adams.flow.standalone.SimpleDockerConnection;
 
 /**
@@ -34,7 +29,7 @@ import adams.flow.standalone.SimpleDockerConnection;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public interface DockerCommand
-  extends OptionHandler, QuickInfoSupporter, StoppableWithFeedback, LoggingSupporter, FlowContextHandler {
+  extends AsyncCapableExternalCommand {
 
   /**
    * Sets the docker connection to use.
@@ -49,96 +44,4 @@ public interface DockerCommand
    * @return		the connection, null if none set
    */
   public SimpleDockerConnection getConnection();
-
-  /**
-   * Sets the handler for processing the output received on stderr.
-   *
-   * @param value	the handler
-   */
-  public void setStdErrProcessing(AbstractStdErrProcessing value);
-
-  /**
-   * Returns the handler for processing the output received on stderr.
-   *
-   * @return		the handler
-   */
-  public AbstractStdErrProcessing getStdErrProcessing();
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String stdErrProcessingTipText();
-
-  /**
-   * Returns the class of the output the command generates.
-   *
-   * @return		the type
-   */
-  public Class generates();
-
-  /**
-   * Whether the command is used in a blocking or async fashion.
-   *
-   * @return		true if blocking, false if async
-   */
-  public boolean isUsingBlocking();
-
-  /**
-   * Executes the command.
-   *
-   * @return		null if successful, otherwise error message
-   */
-  public String execute();
-
-  /**
-   * Checks whether a command has been executed (and recorded).
-   *
-   * @return		true if executed/recorded
-   */
-  public boolean hasLastCommand();
-
-  /**
-   * Returns the last command that was executed.
-   *
-   * @return		the last command, null if not available
-   */
-  public String[] getLastCommand();
-
-  /**
-   * Returns whether the command was executed.
-   *
-   * @return		true if executed
-   */
-  public boolean isExecuted();
-
-  /**
-   * Returns whether the command is currently running.
-   *
-   * @return		true if running
-   */
-  public boolean isRunning();
-
-  /**
-   * Returns whether the command finished.
-   *
-   * @return		true if finished
-   */
-  public boolean isFinished();
-
-  /**
-   * Whether there is any pending output.
-   *
-   * @return		true if output pending
-   */
-  public boolean hasOutput();
-
-  /**
-   * Returns the next line in the output.
-   *
-   * @return		the line, null if none available
-   */
-  public Object output();
 }

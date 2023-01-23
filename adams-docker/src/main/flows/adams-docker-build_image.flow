@@ -19,14 +19,14 @@ adams.flow.control.Flow -annotation "Builds a simple image and executes it.\\nDu
   adams.flow.transformer.Convert -name "Convert (2)" -conversion "adams.data.conversion.FileToString -absolute true -use-forward-slashes true"
   adams.flow.transformer.SetVariable -var-name dockerfile
  adams.flow.control.Trigger -name "remove image"
-  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.ListImages -stderr-processing \"adams.docker.simpledocker.stderrprocessing.CallableActorSink -callable Errors\" -filter reference=my_hello_world"
-  adams.flow.transformer.SimpleDockerCommand -name "SimpleDockerCommand (2)" -command "adams.docker.simpledocker.RemoveImages -stderr-processing \"adams.docker.simpledocker.stderrprocessing.CallableActorSink -callable Errors\""
+  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.ListImages -stderr-processor \"adams.core.command.stderr.CallableActorSink -callable Errors\" -filter reference=my_hello_world"
+  adams.flow.transformer.SimpleDockerCommand -name "SimpleDockerCommand (2)" -command "adams.docker.simpledocker.RemoveImages -stderr-processor \"adams.core.command.stderr.CallableActorSink -callable Errors\""
  adams.flow.control.Trigger -name build
-  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.BuildImage -stderr-processing \"adams.docker.simpledocker.stderrprocessing.CallableActorSink -callable Errors\" -blocking false -options-string \"-t my_hello_world @{dockerfile}\""
+  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.BuildImage -stderr-processor \"adams.core.command.stderr.CallableActorSink -callable Errors\" -blocking false -options-string \"-t my_hello_world @{dockerfile}\""
   adams.flow.sink.CallableSink -callable Info
  adams.flow.control.ConditionalTrigger -name "add separator" -condition "adams.flow.condition.bool.Expression -expression \"not @{errors}\""
   adams.flow.source.StringConstants -string "" -string ----------------------- -string "" -conversion adams.data.conversion.StringToString
   adams.flow.sink.CallableSink -callable Info
  adams.flow.control.ConditionalTrigger -name run -condition "adams.flow.condition.bool.Expression -expression \"not @{errors}\""
-  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.Run -stderr-processing \"adams.docker.simpledocker.stderrprocessing.CallableActorSink -callable Errors\" -remove-container true -run-as-user true -options-string my_hello_world"
+  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.Run -stderr-processor \"adams.core.command.stderr.CallableActorSink -callable Errors\" -remove-container true -run-as-user true -options-string my_hello_world"
   adams.flow.sink.CallableSink -callable Info

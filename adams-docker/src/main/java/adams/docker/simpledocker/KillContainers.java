@@ -22,7 +22,6 @@ package adams.docker.simpledocker;
 
 import adams.core.QuickInfoHelper;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -74,7 +73,12 @@ public class KillContainers
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "signal", m_Signal, "signal: ");
+    String	result;
+
+    result = super.getQuickInfo();
+    result += QuickInfoHelper.toString(this, "signal", m_Signal, ", signal: ");
+
+    return result;
   }
 
   /**
@@ -127,42 +131,22 @@ public class KillContainers
   }
 
   /**
-   * Whether the command is used in a blocking or async fashion.
+   * Assembles the command to run.
    *
-   * @return		true if blocking, false if async
+   * @return		the command
    */
   @Override
-  public boolean isUsingBlocking() {
-    return true;
-  }
+  protected List<String> buildCommand() {
+    List<String> result;
 
-  /**
-   * Executes the command.
-   *
-   * @return		the result of the command, either a CommandResult or a String object (= error message)
-   */
-  @Override
-  protected Object doBlockingExecute() {
-    List<String> cmd;
-
-    cmd = new ArrayList<>();
-    cmd.add("container");
-    cmd.add("kill");
-    cmd.add("--signal");
-    cmd.add("" + m_Signal);
+    result = super.buildCommand();
+    result.add("container");
+    result.add("kill");
+    result.add("--signal");
+    result.add("" + m_Signal);
     if (m_AdditionalArguments != null)
-      cmd.addAll(Arrays.asList(m_AdditionalArguments));
+      result.addAll(Arrays.asList(m_AdditionalArguments));
 
-    return doBlockingExecute(cmd);
-  }
-
-  /**
-   * Returns the class of the output the command generates.
-   *
-   * @return		the type
-   */
-  @Override
-  public Class generates() {
-    return String.class;
+    return result;
   }
 }

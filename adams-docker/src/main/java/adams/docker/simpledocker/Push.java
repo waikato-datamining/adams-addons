@@ -22,7 +22,6 @@ package adams.docker.simpledocker;
 
 import adams.core.QuickInfoHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,8 +30,7 @@ import java.util.List;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class Push
-  extends AbstractAsyncCapableDockerCommand
-  implements AsyncCapableDockerCommand {
+  extends AbstractDockerCommand {
 
   private static final long serialVersionUID = -3235247889827794116L;
 
@@ -228,7 +226,7 @@ public class Push
   protected List<String> buildCommand() {
     List<String> 	result;
 
-    result = new ArrayList<>();
+    result = super.buildCommand();
     result.add("push");
     if (m_AllTags)
       result.add("--all-tags");
