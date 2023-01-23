@@ -244,4 +244,14 @@ public class SimpleDockerCommand
     m_Command.stopExecution();
     super.stopExecution();
   }
+
+  /**
+   * Cleans up after the execution has finished. Also removes graphical
+   * components.
+   */
+  @Override
+  public void cleanUp() {
+    m_Command.cleanUp();
+    super.cleanUp();
+  }
 }

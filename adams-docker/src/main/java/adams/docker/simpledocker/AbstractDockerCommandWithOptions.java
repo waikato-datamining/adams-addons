@@ -116,4 +116,13 @@ public abstract class AbstractDockerCommandWithOptions
   protected Object doBlockingExecute() {
     return doBlockingExecute(buildCommand());
   }
+
+  /**
+   * Cleans up data structures, frees up memory.
+   */
+  @Override
+  public void cleanUp() {
+    m_Connection = null;
+    super.cleanUp();
+  }
 }
