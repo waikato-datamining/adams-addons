@@ -78,7 +78,7 @@ import adams.flow.standalone.SimpleDockerConnection;
  *
  * <pre>-command &lt;adams.docker.simpledocker.DockerCommand&gt; (property: command)
  * &nbsp;&nbsp;&nbsp;The docker command to run.
- * &nbsp;&nbsp;&nbsp;default: adams.docker.simpledocker.Run
+ * &nbsp;&nbsp;&nbsp;default: adams.docker.simpledocker.Run -output-formatter adams.core.command.output.PassThrough -stdout-processor adams.core.command.stdout.Null -stderr-processor adams.core.command.stderr.Null
  * </pre>
  *
  <!-- options-end -->
@@ -181,9 +181,9 @@ public class SimpleDockerCommand
     if (result == null) {
       m_Connection = (SimpleDockerConnection) ActorUtils.findClosestType(this, SimpleDockerConnection.class, true);
       if (m_Connection == null)
-	result = "No " + Utils.classToString(SimpleDockerConnection.class) + " actor found!";
+        result = "No " + Utils.classToString(SimpleDockerConnection.class) + " actor found!";
       else if (m_Connection.getAcualBinary() == null)
-	result = "No docker binary available from: " + m_Connection.getFullName();
+        result = "No docker binary available from: " + m_Connection.getFullName();
     }
 
     return result;

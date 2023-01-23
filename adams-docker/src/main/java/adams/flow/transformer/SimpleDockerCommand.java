@@ -81,7 +81,7 @@ import adams.flow.standalone.SimpleDockerConnection;
  *
  * <pre>-command &lt;adams.docker.simpledocker.DockerCommandWithProgrammaticArguments&gt; (property: command)
  * &nbsp;&nbsp;&nbsp;The docker command to run.
- * &nbsp;&nbsp;&nbsp;default: adams.docker.simpledocker.StopContainers
+ * &nbsp;&nbsp;&nbsp;default: adams.docker.simpledocker.StopContainers -output-formatter adams.core.command.output.PassThrough -stdout-processor adams.core.command.stdout.Null -stderr-processor adams.core.command.stderr.Null
  * </pre>
  *
  <!-- options-end -->

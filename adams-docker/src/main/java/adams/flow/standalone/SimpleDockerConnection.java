@@ -471,16 +471,16 @@ public class SimpleDockerConnection
     if (result == null) {
       m_ActualBinary = null;
       if (!m_Binary.isDirectory()) {
-	if (!m_Binary.getAbsoluteFile().exists())
-	  result = "Docker binary does not exist: " + m_Binary.getAbsolutePath();
-	else
-	  m_ActualBinary = m_Binary.getAbsolutePath();
+        if (!m_Binary.getAbsoluteFile().exists())
+          result = "Docker binary does not exist: " + m_Binary.getAbsolutePath();
+        else
+          m_ActualBinary = m_Binary.getAbsolutePath();
       }
       else {
-	if (OS.isWindows())
-	  m_ActualBinary = "docker.exe";
-	else
-	  m_ActualBinary = "docker";
+        if (OS.isWindows())
+          m_ActualBinary = "docker.exe";
+        else
+          m_ActualBinary = "docker";
       }
     }
 
@@ -513,10 +513,10 @@ public class SimpleDockerConnection
     if ((result == null) && m_Login) {
       res = SimpleDockerHelper.login(getAcualBinary(), m_Registry, m_User, m_Password.getValue());
       if (res.exitCode != 0) {
-	result = "Login failed!\n"
-	  + "exit code: " + res.exitCode
-	  + (res.stdout != null ? "\nstdout:\n" + res.stdout : "")
-	  + (res.stderr != null ? "\nstderr:\n" + res.stderr : "");
+        result = "Login failed!\n"
+          + "exit code: " + res.exitCode
+          + (res.stdout != null ? "\nstdout:\n" + res.stdout : "")
+          + (res.stderr != null ? "\nstderr:\n" + res.stderr : "");
       }
     }
 
@@ -534,10 +534,10 @@ public class SimpleDockerConnection
     if ((m_ActualBinary != null) && m_Logout) {
       res = SimpleDockerHelper.logout(getAcualBinary(), m_Registry);
       if (res.exitCode != 0) {
-	getLogger().warning("Logout failed!\n"
-	  + "exit code: " + res.exitCode
-	  + (res.stdout != null ? "\nstdout:\n" + res.stdout : "")
-	  + (res.stderr != null ? "\nstderr:\n" + res.stderr : ""));
+        getLogger().warning("Logout failed!\n"
+          + "exit code: " + res.exitCode
+          + (res.stdout != null ? "\nstdout:\n" + res.stdout : "")
+          + (res.stderr != null ? "\nstderr:\n" + res.stderr : ""));
       }
     }
 
