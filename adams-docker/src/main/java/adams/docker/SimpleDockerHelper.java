@@ -185,7 +185,7 @@ public class SimpleDockerHelper {
   }
 
   /**
-   * Translates the local path into a container path.
+   * Translates the local path into a container path. Skips a string that does not start with a forward slash.
    *
    * @param path		the local path
    * @return			the translated path
@@ -196,7 +196,7 @@ public class SimpleDockerHelper {
   }
 
   /**
-   * Translates the local paths into container paths.
+   * Translates the local paths into container paths. Skips entries that do not start with a forward slash.
    *
    * @param paths		the local paths
    * @return			the translated paths
@@ -218,13 +218,18 @@ public class SimpleDockerHelper {
     });
 
     for (i = 0; i < paths.length; i++) {
-      path      = new File(paths[i]).toPath();
-      result[i] = null;
-      for (DockerDirectoryMapping mapping: sorted) {
-	if (path.startsWith(mapping.localDir())) {
-	  result[i] = fixPath(mapping.containerDir() + "/" + paths[i].substring(Math.min(paths[i].length(), mapping.localDir().length())));
-	  break;
-	}
+      if (paths[i].startsWith("/")) {
+        path      = new File(paths[i]).toPath();
+        result[i] = null;
+        for (DockerDirectoryMapping mapping: sorted) {
+          if (path.startsWith(mapping.localDir())) {
+            result[i] = fixPath(mapping.containerDir() + "/" + paths[i].substring(Math.min(paths[i].length(), mapping.localDir().length())));
+            break;
+          }
+        }
+      }
+      else {
+        result[i] = paths[i];
       }
       if (result[i] == null)
 	throw new IOException("Failed to translate local path '" + paths[i] + "' into container one using: " + mappings);
