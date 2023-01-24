@@ -21,8 +21,10 @@
 package adams.docker.simpledocker;
 
 import adams.core.QuickInfoHelper;
+import adams.core.Utils;
 import adams.core.base.DockerDirectoryMapping;
 import adams.core.management.User;
+import adams.flow.standalone.SimpleDockerConnection;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,6 +45,9 @@ public class Run
 
   /** whether to run in user context (-u $(id -u):$(id -g)). */
   protected boolean m_RunAsUser;
+
+  /** how to pull. */
+  protected PullType m_PullType;
 
   /**
    * Returns a string describing the object.
@@ -73,6 +78,11 @@ public class Run
       m_OptionManager.size() - 2,
       "run-as-user", "runAsUser",
       false);
+
+    m_OptionManager.insert(
+      m_OptionManager.size() - 2,
+      "pull-type", "pullType",
+      PullType.DEFAULT);
   }
 
   /**
@@ -86,6 +96,7 @@ public class Run
 
     result = QuickInfoHelper.toString(this, "runAsUser", (m_RunAsUser ? "user" : "root"), "run as: ");
     result += QuickInfoHelper.toString(this, "removeContainer", m_RemoveContainer, "remove container", ", ");
+    result += QuickInfoHelper.toString(this, "pullType", m_PullType, ", pull: ");
     result += ", " + super.getQuickInfo();
 
     return result;
@@ -150,6 +161,47 @@ public class Run
   }
 
   /**
+   * Sets how to pull the image (overriding setting from {@link SimpleDockerConnection}).
+   *
+   * @param value	the type
+   */
+  public void setPullType(PullType value) {
+    m_PullType = value;
+    reset();
+  }
+
+  /**
+   * Returns how to pull the image (overriding setting from {@link SimpleDockerConnection}).
+   *
+   * @return		the type
+   */
+  public PullType getPullType() {
+    return m_PullType;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String pullTypeTipText() {
+    return "Determines how to pull the image; used to override the setting defined in " + Utils.classToString(SimpleDockerConnection.class) + ".";
+  }
+
+  /**
+   * Returns the pull type to use.
+   *
+   * @return		the type
+   */
+  public PullType getActualPullType() {
+    if (m_Connection == null)
+      return m_PullType;
+    else
+      return m_Connection.getActualPullType(m_PullType);
+  }
+
+  /**
    * Hook method for performing checks before executing the command.
    *
    * @return		null if successful, otherwise error message
@@ -181,6 +233,10 @@ public class Run
 
     result = super.buildCommand();
     result.add("run");
+    if (getActualPullType() != PullType.DEFAULT) {
+      result.add("--pull");
+      result.add(getActualPullType().getType());
+    }
     for (DockerDirectoryMapping mapping: m_Connection.getExpandedDirMappings()) {
       result.add("-v");
       result.add(mapping.getValue());

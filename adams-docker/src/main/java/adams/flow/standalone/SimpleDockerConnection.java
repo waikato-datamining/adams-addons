@@ -29,6 +29,7 @@ import adams.core.io.PlaceholderFile;
 import adams.core.management.CommandResult;
 import adams.core.management.OS;
 import adams.docker.SimpleDockerHelper;
+import adams.docker.simpledocker.PullType;
 
 /**
  <!-- globalinfo-start -->
@@ -142,6 +143,9 @@ public class SimpleDockerConnection
   /** whether to logout from the registry when stopping the flow. */
   protected boolean m_Logout;
 
+  /** how to pull. */
+  protected PullType m_PullType;
+
   /** the actual docker binary to use. */
   protected String m_ActualBinary;
 
@@ -190,6 +194,10 @@ public class SimpleDockerConnection
     m_OptionManager.add(
       "logout", "logout",
       false);
+
+    m_OptionManager.add(
+      "pull-type", "pullType",
+      PullType.DEFAULT);
   }
 
   /**
@@ -362,14 +370,14 @@ public class SimpleDockerConnection
     if (m_ExpandedDirMappings == null) {
       result = new DockerDirectoryMapping[m_DirMappings.length];
       if (m_DirMappings.length > 0) {
-        vars = getVariables();
-        phs = Placeholders.getSingleton();
-        for (i = 0; i < m_DirMappings.length; i++) {
-          result[i] = new DockerDirectoryMapping(
-            vars.expand(phs.expand(m_DirMappings[i].localDir())),
-            vars.expand(m_DirMappings[i].containerDir())
-          );
-        }
+	vars = getVariables();
+	phs = Placeholders.getSingleton();
+	for (i = 0; i < m_DirMappings.length; i++) {
+	  result[i] = new DockerDirectoryMapping(
+	    vars.expand(phs.expand(m_DirMappings[i].localDir())),
+	    vars.expand(m_DirMappings[i].containerDir())
+	  );
+	}
       }
       m_ExpandedDirMappings = result;
     }
@@ -436,6 +444,35 @@ public class SimpleDockerConnection
   }
 
   /**
+   * Sets how to pull images.
+   *
+   * @param value	the type
+   */
+  public void setPullType(PullType value) {
+    m_PullType = value;
+    reset();
+  }
+
+  /**
+   * Returns how to pull images.
+   *
+   * @return		the type
+   */
+  public PullType getPullType() {
+    return m_PullType;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String pullTypeTipText() {
+    return "Determines how to pull images.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -453,6 +490,7 @@ public class SimpleDockerConnection
     result += QuickInfoHelper.toString(this, "logout", m_Logout, "logout", ", ");
     if (getOptionManager().hasVariableForProperty("dirMappings") || m_DirMappings.length > 0)
       result += QuickInfoHelper.toString(this, "dirMappings", m_DirMappings, ", mappings: ");
+    result += QuickInfoHelper.toString(this, "pullType", m_PullType, ", pull: ");
 
     return result;
   }
@@ -471,16 +509,16 @@ public class SimpleDockerConnection
     if (result == null) {
       m_ActualBinary = null;
       if (!m_Binary.isDirectory()) {
-        if (!m_Binary.getAbsoluteFile().exists())
-          result = "Docker binary does not exist: " + m_Binary.getAbsolutePath();
-        else
-          m_ActualBinary = m_Binary.getAbsolutePath();
+	if (!m_Binary.getAbsoluteFile().exists())
+	  result = "Docker binary does not exist: " + m_Binary.getAbsolutePath();
+	else
+	  m_ActualBinary = m_Binary.getAbsolutePath();
       }
       else {
-        if (OS.isWindows())
-          m_ActualBinary = "docker.exe";
-        else
-          m_ActualBinary = "docker";
+	if (OS.isWindows())
+	  m_ActualBinary = "docker.exe";
+	else
+	  m_ActualBinary = "docker";
       }
     }
 
@@ -494,6 +532,22 @@ public class SimpleDockerConnection
    */
   public String getAcualBinary() {
     return m_ActualBinary;
+  }
+
+  /**
+   * Determines the actual pull type to perform.
+   *
+   * @param override	the (potentical( override from another class
+   * @return		the actual type
+   */
+  public PullType getActualPullType(PullType override) {
+    PullType	result;
+
+    result = m_PullType;
+    if (override != PullType.DEFAULT)
+      result = override;
+
+    return result;
   }
 
   /**
@@ -513,10 +567,10 @@ public class SimpleDockerConnection
     if ((result == null) && m_Login) {
       res = SimpleDockerHelper.login(getAcualBinary(), m_Registry, m_User, m_Password.getValue());
       if (res.exitCode != 0) {
-        result = "Login failed!\n"
-          + "exit code: " + res.exitCode
-          + (res.stdout != null ? "\nstdout:\n" + res.stdout : "")
-          + (res.stderr != null ? "\nstderr:\n" + res.stderr : "");
+	result = "Login failed!\n"
+	  + "exit code: " + res.exitCode
+	  + (res.stdout != null ? "\nstdout:\n" + res.stdout : "")
+	  + (res.stderr != null ? "\nstderr:\n" + res.stderr : "");
       }
     }
 
@@ -534,10 +588,10 @@ public class SimpleDockerConnection
     if ((m_ActualBinary != null) && m_Logout) {
       res = SimpleDockerHelper.logout(getAcualBinary(), m_Registry);
       if (res.exitCode != 0) {
-        getLogger().warning("Logout failed!\n"
-          + "exit code: " + res.exitCode
-          + (res.stdout != null ? "\nstdout:\n" + res.stdout : "")
-          + (res.stderr != null ? "\nstderr:\n" + res.stderr : ""));
+	getLogger().warning("Logout failed!\n"
+	  + "exit code: " + res.exitCode
+	  + (res.stdout != null ? "\nstdout:\n" + res.stdout : "")
+	  + (res.stderr != null ? "\nstderr:\n" + res.stderr : ""));
       }
     }
 
