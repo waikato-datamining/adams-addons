@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class GenericWithArgs
   extends Generic
-  implements DockerCommandWithProgrammaticArguments{
+  implements DockerCommandWithProgrammaticArguments {
 
   private static final long serialVersionUID = -3235247889827794116L;
 
