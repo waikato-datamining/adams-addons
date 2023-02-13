@@ -13,12 +13,13 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractScriptletWithDataFile.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2023 University of Waikato, Hamilton, New Zealand
  */
 package adams.core.gnuplot;
 
+import adams.core.io.AbsolutePathSupporter;
 import adams.core.io.PlaceholderFile;
 
 /**
@@ -26,10 +27,10 @@ import adams.core.io.PlaceholderFile;
  * Specifies the data file.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public abstract class AbstractScriptletWithDataFile
-  extends AbstractScriptlet {
+  extends AbstractScriptlet
+  implements AbsolutePathSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = 8269710957096517396L;
@@ -98,6 +99,7 @@ public abstract class AbstractScriptletWithDataFile
    *
    * @param value	true if to use absolute path
    */
+  @Override
   public void setUseAbsolutePath(boolean value) {
     m_UseAbsolutePath = value;
     reset();
@@ -108,6 +110,7 @@ public abstract class AbstractScriptletWithDataFile
    *
    * @return		true if to use absolute path
    */
+  @Override
   public boolean getUseAbsolutePath() {
     return m_UseAbsolutePath;
   }
