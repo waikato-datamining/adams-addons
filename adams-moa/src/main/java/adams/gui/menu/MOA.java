@@ -21,11 +21,11 @@
 
 package adams.gui.menu;
 
-import moa.gui.GUI;
+import adams.core.option.UserMode;
 import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractBasicMenuItemDefinition;
 import adams.gui.application.ChildFrame;
-import adams.gui.application.UserMode;
+import moa.gui.GUI;
 
 /**
  * Displays the MOA GUI.
