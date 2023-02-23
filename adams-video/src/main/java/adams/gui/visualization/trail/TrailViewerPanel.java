@@ -512,7 +512,6 @@ public class TrailViewerPanel
       menu.add(menuitem);
       menuitem.setSelected(false);
       menuitem.setMnemonic('A');
-      menuitem.setIcon(ImageManager.getEmptyIcon());
       m_MenuItemViewOverlaysApplyAll = menuitem;
 
       // View/Remove all overlays
