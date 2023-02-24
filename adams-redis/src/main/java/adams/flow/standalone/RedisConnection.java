@@ -312,7 +312,7 @@ public class RedisConnection
 
     result = null;
     try {
-      m_Client = RedisClient.create(RedisURI.Builder.redis("localhost", m_Port).withDatabase(m_Database).build());
+      m_Client = RedisClient.create(RedisURI.Builder.redis(m_Host, m_Port).withDatabase(m_Database).build());
     }
     catch (Exception e) {
       result = handleException("Failed to create Redis client: " + m_Host + ":" + m_Port + "/" + m_Database, e);
