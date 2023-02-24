@@ -15,7 +15,7 @@
 
 /*
  * RedisConnection.java
- * Copyright (C) 2021 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2021-2023 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.standalone;
@@ -99,10 +99,12 @@ import java.util.Map;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class RedisConnection
-    extends AbstractStandalone {
+  extends AbstractStandalone {
 
   /** for serialization. */
   private static final long serialVersionUID = -1726172998200420556L;
+
+  public final static int DEFAULT_PORT = 6379;
 
   /** the host. */
   protected String m_Host;
@@ -137,16 +139,16 @@ public class RedisConnection
     super.defineOptions();
 
     m_OptionManager.add(
-        "host", "host",
-        "localhost");
+      "host", "host",
+      "localhost");
 
     m_OptionManager.add(
-        "port", "port",
-        6379, 1, 65535);
+      "port", "port",
+      DEFAULT_PORT, 1, 65535);
 
     m_OptionManager.add(
-        "database", "database",
-        0, 0, 65535);
+      "database", "database",
+      0, 0, 65535);
   }
 
   /**
@@ -310,7 +312,7 @@ public class RedisConnection
 
     result = null;
     try {
-      m_Client = RedisClient.create(RedisURI.Builder.redis("localhost", 6379).withDatabase(m_Database).build());
+      m_Client = RedisClient.create(RedisURI.Builder.redis("localhost", m_Port).withDatabase(m_Database).build());
     }
     catch (Exception e) {
       result = handleException("Failed to create Redis client: " + m_Host + ":" + m_Port + "/" + m_Database, e);
