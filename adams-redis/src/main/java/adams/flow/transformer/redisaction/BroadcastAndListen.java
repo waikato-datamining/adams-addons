@@ -24,7 +24,6 @@ import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.data.redis.RedisDataType;
-import adams.flow.core.Unknown;
 import adams.flow.standalone.RedisConnection;
 import io.lettuce.core.codec.ByteArrayCodec;
 import io.lettuce.core.codec.StringCodec;
