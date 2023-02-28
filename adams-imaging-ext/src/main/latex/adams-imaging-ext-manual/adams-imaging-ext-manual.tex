@@ -1,0 +1,93 @@
+% Copyright (c) 2023 by the University of Waikato, Hamilton, NZ.
+% This work is made available under the terms of the 
+% Creative Commons Attribution-ShareAlike 4.0 license,
+% http://creativecommons.org/licenses/by-sa/4.0/.
+
+\documentclass[a4paper]{book}
+
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{scalefnt}
+\usepackage{tikz}
+
+% watermark -- for draft stage
+%\usepackage[firstpage]{draftwatermark}
+%\SetWatermarkLightness{0.9}
+%\SetWatermarkScale{5}
+
+\input{latex_extensions}
+
+\title{
+  \textbf{ADAMS} \\
+  {\Large \textbf{A}dvanced \textbf{D}ata mining \textbf{A}nd \textbf{M}achine
+  learning \textbf{S}ystem} \\
+  {\Large Module: adams-imaging-ext} \\
+  \vspace{1cm}
+  \includegraphics[width=2cm]{images/imaging-ext-module.png} \\
+}
+\author{
+  Peter Reutemann
+}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+
+\thispagestyle{empty}
+\center
+\begin{table}[b]
+	\begin{tabular}{c l l}
+		\parbox[c][2cm]{2cm}{\copyright 2023} &
+		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
+	\end{tabular}
+	\includegraphics[width=12cm]{images/cc.png} \\
+\end{table}
+
+\end{titlepage}
+
+\tableofcontents
+%\listoffigures
+%\listoftables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Tools}
+This module represents \textit{extended} imaging support that relies on \textit{external}
+tools, like deep learning docker containers, to provide additional functionality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{DEXTR}
+DEXTR\cite{dextr} (Deep Extreme Cut) is a very useful tool for aiding human annotators in
+annotating images. The tool generates object masks using just four \textit{extreme points}
+(x/y pairs) on the edges of the object that is to be annotated.
+
+The \textit{ImageSegmentationAnnotator} transformer offers a DEXTR tool in its toolbox. In order
+to use the tool, you need the following:
+
+\begin{tight_itemize}
+  \item A computer (preferably a Linux machine) with Redis\cite{redis} and Docker\cite{docker} running,
+  this can be the local machine.
+  \item Run the following flow to start a DEXTR container: \\
+  \textit{adams-imaging-ext\_run-dextr.flow}.
+  \item Run \textit{adams-imaging-image\_segmentation\_annotation.flow} to annotate JPEG images with the help of DEXTR.
+  \begin{tight_itemize}
+    \item In the annotation interface, select the \textit{DEXTR} tool.
+    \item Adjust any connection parameters if necessary, though defaults work with the above flow when run on the
+    local machine, and click on the tick button to connect to the Redis instance. The cursor, when hovering over
+    the image, should be cross-hair now.
+    \item With the left mouse button, perform four left-clicks to choose the four extreme points (use the right mouse
+    button to remove the current points and start over) and hit \textit{ENTER} to send image and points to the docker
+    container for processing (on a CPU, this can take a couple of seconds).
+    \item If successful, the mask will be added to the current layer.
+  \end{tight_itemize}
+\end{tight_itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{bibliography}
+
+\end{document}

@@ -41,6 +41,7 @@
     <module>adams-ffmpeg</module>
     <module>adams-gnuplot</module>
     <module>adams-heatmap</module>
+    <module>adams-imaging-ext</module>
     <module>adams-groovy-rest</module>
     <module>adams-html</module>
     <module>adams-latex</module>
