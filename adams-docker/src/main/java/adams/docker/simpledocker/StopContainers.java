@@ -145,7 +145,6 @@ public class StopContainers
     result = super.buildCommand();
     result.add("container");
     result.add("stop");
-    result.add("--force");
     result.add("--time");
     result.add("" + m_Wait);
     result.addAll(Arrays.asList(getActualOptions()));
