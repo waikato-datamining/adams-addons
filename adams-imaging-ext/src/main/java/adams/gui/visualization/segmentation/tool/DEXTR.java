@@ -50,6 +50,7 @@ import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 
 import javax.swing.Icon;
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -467,9 +468,9 @@ public class DEXTR
    * Communicates with DEXTR and updates the canvas.
    */
   protected void applyDextr() {
+    SwingWorker		worker;
     MessageCollection 	errors;
-    JsonElement		out;
-    long		start;
+    JsonElement 	out;
 
     m_ReceivedData = null;
 
@@ -484,33 +485,46 @@ public class DEXTR
       return;
     }
 
-    // send data
-    m_PubSubListener   = newStringListener();
-    m_PubSubConnection = m_Client.connectPubSub(StringCodec.UTF8);
-    m_PubSubConnection.addListener(m_PubSubListener);
-    m_PubSubConnection.async().subscribe(m_RedisReceive);
-    m_Connection       = m_Client.connect(StringCodec.UTF8);
-    m_Connection.async().publish(m_RedisSend, out.toString());
+    worker = new SwingWorker() {
+      @Override
+      protected Object doInBackground() throws Exception {
+	long start;
 
-    // wait for data to arrive
-    errors.clear();
-    start = System.currentTimeMillis();
-    while ((m_ReceivedData == null) && (System.currentTimeMillis() - start < m_RedisTimeout)) {
-      Utils.wait(this, 100, 100);
-    }
-    if (m_ReceivedData != null) {
-      try {
-	fromJson((JsonObject) JsonParser.parseString(m_ReceivedData));
-      }
-      catch (Exception e) {
-	errors.add("Failed to parse data received from Redis!", e);
-	GUIHelper.showErrorMessage(getCanvas(), errors.toString());
-      }
-    }
+	// send data
+	m_PubSubListener   = newStringListener();
+	m_PubSubConnection = m_Client.connectPubSub(StringCodec.UTF8);
+	m_PubSubConnection.addListener(m_PubSubListener);
+	m_PubSubConnection.async().subscribe(m_RedisReceive);
+	m_Connection       = m_Client.connect(StringCodec.UTF8);
+	m_Connection.async().publish(m_RedisSend, out.toString());
 
-    m_ReceivedData = null;
-    getLayerManager().getMarkers().clear();
-    getLayerManager().update();
+	// wait for data to arrive
+	errors.clear();
+	start = System.currentTimeMillis();
+	while ((m_ReceivedData == null) && (System.currentTimeMillis() - start < m_RedisTimeout)) {
+	  Utils.wait(DEXTR.this, 100, 100);
+	}
+	if (m_ReceivedData != null) {
+	  try {
+	    fromJson((JsonObject) JsonParser.parseString(m_ReceivedData));
+	  }
+	  catch (Exception e) {
+	    errors.add("Failed to parse data received from Redis!", e);
+	    GUIHelper.showErrorMessage(getCanvas(), errors.toString());
+	  }
+	}
+	return null;
+      }
+
+      @Override
+      protected void done() {
+	super.done();
+	m_ReceivedData = null;
+	getLayerManager().getMarkers().clear();
+	getLayerManager().update();
+      }
+    };
+    worker.execute();
   }
 
   /**
