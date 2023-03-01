@@ -21,40 +21,24 @@
 package adams.gui.visualization.segmentation.tool;
 
 import adams.core.MessageCollection;
-import adams.core.Utils;
-import adams.core.base.BaseHostname;
 import adams.data.image.BufferedImageHelper;
+import adams.data.redis.RedisDataType;
 import adams.data.statistics.StatUtils;
-import adams.flow.standalone.RedisConnection;
 import adams.gui.chooser.ColorChooserPanel;
 import adams.gui.core.BaseFlatButton;
-import adams.gui.core.BaseObjectTextField;
-import adams.gui.core.BasePanel;
-import adams.gui.core.BaseTextField;
-import adams.gui.core.GUIHelper;
 import adams.gui.core.ImageManager;
 import adams.gui.core.MouseUtils;
 import adams.gui.core.NumberTextField;
 import adams.gui.core.ParameterPanel;
 import adams.gui.visualization.segmentation.ImageUtils;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisURI;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.codec.StringCodec;
-import io.lettuce.core.pubsub.RedisPubSubListener;
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 
 import javax.swing.Icon;
-import javax.swing.JPanel;
-import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -67,7 +51,7 @@ import java.util.Base64;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class DEXTR
-  extends AbstractTool {
+  extends AbstractRedisTool<String,String> {
 
   private static final long serialVersionUID = 8374950649752446530L;
 
@@ -76,18 +60,6 @@ public class DEXTR
 
   /** the marker color. */
   protected ColorChooserPanel m_PanelColor;
-
-  /** the redis host/port. */
-  protected BaseObjectTextField<BaseHostname> m_TextRedisHost;
-
-  /** the redis channel for sending. */
-  protected BaseTextField m_TextRedisSend;
-
-  /** the redis channel for receiving. */
-  protected BaseTextField m_TextRedisReceive;
-
-  /** the redis timeout. */
-  protected NumberTextField m_TextRedisTimeout;
 
   /** the apply button. */
   protected BaseFlatButton m_ButtonApply;
@@ -98,41 +70,8 @@ public class DEXTR
   /** the marker color. */
   protected Color m_MarkerColor;
 
-  /** the redis host. */
-  protected String m_RedisHost;
-
-  /** the redis port. */
-  protected int m_RedisPort;
-
-  /** the redis database. */
-  protected int m_RedisDB;
-
-  /** the redis send channel. */
-  protected String m_RedisSend;
-
-  /** the redis receive channel. */
-  protected String m_RedisReceive;
-
-  /** the timeout in milli-seconds. */
-  protected int m_RedisTimeout;
-
-  /** the data received via Redis. */
-  protected String m_ReceivedData;
-
-  /** the client object. */
-  protected transient RedisClient m_Client;
-
   /** the cached base image as base64 JPEG. */
   protected transient String m_BaseImageBase64;
-
-  /** the pub/sub connection object. */
-  protected transient StatefulRedisPubSubConnection<String,String> m_PubSubConnection;
-
-  /** the connection object. */
-  protected transient StatefulRedisConnection<String,String> m_Connection;
-
-  /** the pub/sub listener. */
-  protected transient RedisPubSubListener<String,String> m_PubSubListener;
 
   /**
    * Returns a string describing the object.
@@ -232,7 +171,7 @@ public class DEXTR
 	if ((e.getKeyCode() == KeyEvent.VK_ENTER) && (m_Client != null)) {
 	  if (getLayerManager().getMarkers().size() == 4) {
 	    e.consume();
-	    applyDextr();
+	    sendData();
 	  }
 	}
 	if (!e.isConsumed())
@@ -242,24 +181,13 @@ public class DEXTR
   }
 
   /**
-   * Checks the parameters before applying them.
-   *
-   * @return		null if checks passed, otherwise error message (gets displayed in GUI)
+   * Retrieves the parameters from the GUI.
    */
-  @Override
-  protected String checkBeforeApply() {
-    String	result;
+  protected void retrieveParameters() {
+    super.retrieveParameters();
 
-    result = super.checkBeforeApply();
-
-    if (result == null) {
-      if (m_TextRedisSend.getText().trim().isEmpty())
-	result = "'Send' channel is empty!";
-      else if (m_TextRedisReceive.getText().trim().isEmpty())
-	result = "'Receive' channel is empty!";
-    }
-
-    return result;
+    m_MarkerSize  = m_TextMarkerSize.getValue().intValue();
+    m_MarkerColor = m_PanelColor.getCurrent();
   }
 
   /**
@@ -267,44 +195,22 @@ public class DEXTR
    */
   @Override
   protected void doApply() {
-    m_MarkerSize   = m_TextMarkerSize.getValue().intValue();
-    m_MarkerColor  = m_PanelColor.getCurrent();
-    m_RedisHost    = m_TextRedisHost.getObject().hostnameValue();
-    m_RedisPort    = m_TextRedisHost.getObject().portValue(RedisConnection.DEFAULT_PORT);
-    m_RedisDB      = 0;
-    m_RedisSend    = m_TextRedisSend.getText();
-    m_RedisReceive = m_TextRedisReceive.getText();
-    m_RedisTimeout = m_TextRedisTimeout.getValue().intValue();
+    super.doApply();
 
     getLayerManager().getMarkers().setExtent(m_MarkerSize);
     getLayerManager().getMarkers().setColor(m_MarkerColor);
-
-    if (m_Client != null) {
-      m_Client.shutdown();
-      m_Client = null;
-    }
-
-    try {
-      m_Client = RedisClient.create(RedisURI.Builder.redis(m_RedisHost, m_RedisPort).withDatabase(m_RedisDB).build());
-    }
-    catch (Exception e) {
-      GUIHelper.showErrorMessage(getCanvas(), "Failed to create Redis client: " + m_RedisHost + ":" + m_RedisPort + "/" + m_RedisDB, e);
-    }
   }
 
   /**
-   * Creates the panel for setting the options.
+   * Sets up the panel with the parameters.
    *
-   * @return the options panel
+   * @return		the panel
    */
   @Override
-  protected BasePanel createOptionPanel() {
-    ParameterPanel	result;
-    JPanel		panel;
+  protected ParameterPanel createParameterPanel() {
+    ParameterPanel  result;
 
-    result = new ParameterPanel();
-
-    m_ButtonApply = createApplyButton();
+    result = super.createParameterPanel();
 
     m_TextMarkerSize = new NumberTextField(NumberTextField.Type.INTEGER, 10);
     m_TextMarkerSize.setCheckModel(new NumberTextField.BoundedNumberCheckModel(NumberTextField.Type.INTEGER, 1, null, getLayerManager().getMarkers().getExtent()));
@@ -314,79 +220,36 @@ public class DEXTR
     m_PanelColor = new ColorChooserPanel(getLayerManager().getMarkers().getColor());
     result.addParameter("- color", m_PanelColor);
 
-    m_TextRedisHost = new BaseObjectTextField<>(new BaseHostname("localhost:" + RedisConnection.DEFAULT_PORT));
-    m_TextRedisHost.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
-    result.addParameter("Redis host", m_TextRedisHost);
-
-    m_TextRedisSend = new BaseTextField("dextr_in", 10);
-    m_TextRedisSend.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
-    result.addParameter("- Send", m_TextRedisSend);
-
-    m_TextRedisReceive = new BaseTextField("dextr_out", 10);
-    m_TextRedisReceive.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
-    result.addParameter("- Receive", m_TextRedisReceive);
-
-    m_TextRedisTimeout = new NumberTextField(NumberTextField.Type.INTEGER, 10);
-    m_TextRedisTimeout.setCheckModel(new NumberTextField.BoundedNumberCheckModel(NumberTextField.Type.INTEGER, 1, null, 2000));
-    m_TextRedisTimeout.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
-    result.addParameter(" - Timeout (msec)", m_TextRedisTimeout);
-
-    panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    panel.add(m_ButtonApply);
-    result.addParameter("", panel);
-
     return result;
   }
 
   /**
-   * Returns a new pub/sub listener for strings.
+   * Returns the type of data to send.
    *
-   * @return		the listener
+   * @return the type of data
    */
-  protected RedisPubSubListener<String, String> newStringListener() {
-    return new RedisPubSubListener<>() {
-      @Override
-      public void message(String channel, String message) {
-	m_ReceivedData = message;
-	m_PubSubConnection.removeListener(m_PubSubListener);
-	m_PubSubConnection.async().unsubscribe(m_RedisReceive);
-	m_PubSubConnection = null;
-	m_PubSubListener   = null;
-      }
-      @Override
-      public void message(String pattern, String channel, String message) {
-	message(channel, message);
-      }
-      @Override
-      public void subscribed(String channel, long count) {
-	if (isLoggingEnabled())
-	  getLogger().info("Subscribed to channel: " + channel);
-      }
-      @Override
-      public void psubscribed(String pattern, long count) {
-	if (isLoggingEnabled())
-	  getLogger().info("Subscribed to pattern: " + pattern);
-      }
-      @Override
-      public void unsubscribed(String channel, long count) {
-	if (isLoggingEnabled())
-	  getLogger().info("Unsubscribed from channel: " + channel);
-      }
-      @Override
-      public void punsubscribed(String pattern, long count) {
-	if (isLoggingEnabled())
-	  getLogger().info("Unsubscribed from pattern: " + pattern);
-      }
-    };
+  @Override
+  protected RedisDataType getSendType() {
+    return RedisDataType.STRING;
   }
 
   /**
-   * Prepares the data to send to Redis.
+   * Returns the type of data to receive.
    *
-   * @param errors 	for recording errors
-   * @return		the data to send
+   * @return the type of data
    */
-  protected JsonObject toJson(MessageCollection errors) {
+  @Override
+  protected RedisDataType getReceiveType() {
+    return RedisDataType.STRING;
+  }
+
+  /**
+   * Method that assembles the data to send.
+   *
+   * @param errors 	for collecting errors
+   * @return		the data to send (String or byte[])
+   */
+  protected String assembleSendData(MessageCollection errors) {
     JsonObject		result;
     JsonArray		points;
     JsonArray		coords;
@@ -414,7 +277,7 @@ public class DEXTR
     }
     result.add("points", points);
 
-    return result;
+    return result.toString();
   }
 
   /**
@@ -465,66 +328,62 @@ public class DEXTR
   }
 
   /**
-   * Communicates with DEXTR and updates the canvas.
+   * Parses the received data and updates the GUI.
+   *
+   * @param data	the data to parse (String or byte[])
+   * @param errors	for collecting errors
    */
-  protected void applyDextr() {
-    SwingWorker		worker;
-    MessageCollection 	errors;
-    JsonElement 	out;
+  protected void parseReceivedData(String data, MessageCollection errors) {
+    JsonObject 		json;
+    String 		maskStr;
+    byte[]		bytes;
+    BufferedImage 	maskImage;
+    int[]		pixels;
+    int[]		colors;
+    int			width;
+    int			height;
+    BufferedImage	activeImage;
 
-    m_ReceivedData = null;
-
-    // generate json
-    errors = new MessageCollection();
-    out = toJson(errors);
-    if (out == null) {
-      if (errors.isEmpty())
-	GUIHelper.showErrorMessage(getCanvas(), "Failed to generate data to send to Redis!");
-      else
-	GUIHelper.showErrorMessage(getCanvas(), "Failed to generate data to send to Redis:\n" + errors);
+    if (data == null)
       return;
+
+    json      = (JsonObject) JsonParser.parseString(data);
+    maskStr   = json.get("mask").getAsString();
+    bytes     = Base64.getMimeDecoder().decode(maskStr);
+    errors    = new MessageCollection();
+    maskImage = BufferedImageHelper.fromBytes(bytes, errors);
+    width     = maskImage.getWidth();
+    height    = maskImage.getHeight();
+    pixels    = BufferedImageHelper.getPixels(maskImage);
+
+    // use transparent black
+    ImageUtils.replaceColor(pixels, Color.BLACK, new Color(0, 0, 0, 0));
+
+    // replace other colors with one from layer
+    colors = StatUtils.uniqueValues(pixels);
+    for (int color: colors) {
+      if (color != 0)
+	ImageUtils.replaceColor(pixels, new Color(color), getActiveColor());
     }
 
-    worker = new SwingWorker() {
-      @Override
-      protected Object doInBackground() throws Exception {
-	long start;
+    if (isAutomaticUndoEnabled())
+      getCanvas().getOwner().addUndoPoint();
 
-	// send data
-	m_PubSubListener   = newStringListener();
-	m_PubSubConnection = m_Client.connectPubSub(StringCodec.UTF8);
-	m_PubSubConnection.addListener(m_PubSubListener);
-	m_PubSubConnection.async().subscribe(m_RedisReceive);
-	m_Connection       = m_Client.connect(StringCodec.UTF8);
-	m_Connection.async().publish(m_RedisSend, out.toString());
+    // combine images
+    activeImage = getActiveImage();
+    maskImage   = new BufferedImage(width, height, activeImage.getType());
+    maskImage.setRGB(0, 0, width, height, pixels, 0, width);
+    ImageUtils.combineImages(maskImage, activeImage);
+  }
 
-	// wait for data to arrive
-	errors.clear();
-	start = System.currentTimeMillis();
-	while ((m_ReceivedData == null) && (System.currentTimeMillis() - start < m_RedisTimeout)) {
-	  Utils.wait(DEXTR.this, 100, 100);
-	}
-	if (m_ReceivedData != null) {
-	  try {
-	    fromJson((JsonObject) JsonParser.parseString(m_ReceivedData));
-	  }
-	  catch (Exception e) {
-	    errors.add("Failed to parse data received from Redis!", e);
-	    GUIHelper.showErrorMessage(getCanvas(), errors.toString());
-	  }
-	}
-	return null;
-      }
+  /**
+   * Finishes up the request.
+   */
+  protected void finishedRequest() {
+    super.finishedRequest();
 
-      @Override
-      protected void done() {
-	super.done();
-	m_ReceivedData = null;
-	getLayerManager().getMarkers().clear();
-	getLayerManager().update();
-      }
-    };
-    worker.execute();
+    getLayerManager().getMarkers().clear();
+    getLayerManager().update();
   }
 
   /**
@@ -534,31 +393,5 @@ public class DEXTR
   public void annotationsChanged() {
     super.annotationsChanged();
     m_BaseImageBase64 = null;
-  }
-
-  /**
-   * Cleans up data structures, frees up memory.
-   */
-  @Override
-  public void cleanUp() {
-    if (m_Connection != null) {
-      m_Connection.close();
-      m_Connection = null;
-    }
-
-    if (m_PubSubConnection != null) {
-      if (m_PubSubListener != null)
-	m_PubSubConnection.removeListener(m_PubSubListener);
-      m_PubSubConnection.async().unsubscribe(m_RedisReceive);
-      m_PubSubConnection = null;
-      m_PubSubListener   = null;
-    }
-
-    if (m_Client != null) {
-      m_Client.shutdown();
-      m_Client = null;
-    }
-
-    super.cleanUp();
   }
 }
