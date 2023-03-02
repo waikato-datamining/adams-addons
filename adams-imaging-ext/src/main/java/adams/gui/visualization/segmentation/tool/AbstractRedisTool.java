@@ -292,7 +292,7 @@ public abstract class AbstractRedisTool<O,I>
 	  getLogger().info("Message on channel '" + new String(channel) + "': " + new String(message));
 	m_ReceivedData = (I) message;
 	m_PubSubConnection.removeListener(m_PubSubListener);
-	m_PubSubConnection.async().unsubscribe(m_RedisReceive);
+	m_PubSubConnection.async().unsubscribe(m_RedisReceive.getBytes());
 	m_PubSubConnection = null;
 	m_PubSubListener   = null;
       }
@@ -398,7 +398,7 @@ public abstract class AbstractRedisTool<O,I>
 	    m_PubSubListener   = newBytesListener();
 	    m_PubSubConnection = m_Client.connectPubSub(new ByteArrayCodec());
 	    m_PubSubConnection.addListener(m_PubSubListener);
-	    m_PubSubConnection.async().subscribe(m_RedisReceive);
+	    m_PubSubConnection.async().subscribe(m_RedisReceive.getBytes());
 	    break;
 	  default:
 	    throw new IllegalStateException("Unhandled receive data type: " + getReceiveType());
@@ -410,7 +410,7 @@ public abstract class AbstractRedisTool<O,I>
 	    break;
 	  case BYTE_ARRAY:
 	    m_Connection = m_Client.connect(new ByteArrayCodec());
-	    m_Connection.async().publish(m_RedisSend, out);
+	    m_Connection.async().publish(m_RedisSend.getBytes(), out);
 	    break;
 	  default:
 	    throw new IllegalStateException("Unhandled send data type: " + getSendType());
@@ -473,7 +473,16 @@ public abstract class AbstractRedisTool<O,I>
     if (m_PubSubConnection != null) {
       if (m_PubSubListener != null)
 	m_PubSubConnection.removeListener(m_PubSubListener);
-      m_PubSubConnection.async().unsubscribe(m_RedisReceive);
+      switch (getReceiveType()) {
+	case STRING:
+	  m_PubSubConnection.async().unsubscribe(m_RedisReceive);
+	  break;
+	case BYTE_ARRAY:
+	  m_PubSubConnection.async().unsubscribe(m_RedisReceive.getBytes());
+	  break;
+	default:
+	  throw new IllegalStateException("Unhandled receive data type: " + getReceiveType());
+      }
       m_PubSubConnection = null;
       m_PubSubListener   = null;
     }
