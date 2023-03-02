@@ -159,6 +159,20 @@ public abstract class AbstractRedisTool<O,I>
   }
 
   /**
+   * The channel to send the data on.
+   *
+   * @return		the redis channel
+   */
+  protected abstract String getSendChannel();
+
+  /**
+   * The channel to receive the data on.
+   *
+   * @return		the redis channel
+   */
+  protected abstract String getReceiveChannel();
+
+  /**
    * Sets up the panel with the parameters.
    *
    * @return		the panel
@@ -172,11 +186,11 @@ public abstract class AbstractRedisTool<O,I>
     m_TextRedisHost.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
     result.addParameter("Redis host", m_TextRedisHost);
 
-    m_TextRedisSend = new BaseTextField("dextr_in", 10);
+    m_TextRedisSend = new BaseTextField(getSendChannel(), 10);
     m_TextRedisSend.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
     result.addParameter("- Send", m_TextRedisSend);
 
-    m_TextRedisReceive = new BaseTextField("dextr_out", 10);
+    m_TextRedisReceive = new BaseTextField(getReceiveChannel(), 10);
     m_TextRedisReceive.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
     result.addParameter("- Receive", m_TextRedisReceive);
 

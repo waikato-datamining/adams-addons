@@ -202,6 +202,24 @@ public class DEXTR
   }
 
   /**
+   * The channel to send the data on.
+   *
+   * @return		the redis channel
+   */
+  protected String getSendChannel() {
+    return "dextr_in";
+  }
+
+  /**
+   * The channel to receive the data on.
+   *
+   * @return		the redis channel
+   */
+  protected String getReceiveChannel() {
+    return "dextr_out";
+  }
+
+  /**
    * Sets up the panel with the parameters.
    *
    * @return		the panel
