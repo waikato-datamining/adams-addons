@@ -25,9 +25,7 @@ import adams.core.Utils;
 import adams.core.base.BaseHostname;
 import adams.data.redis.RedisDataType;
 import adams.flow.standalone.RedisConnection;
-import adams.gui.core.BaseFlatButton;
 import adams.gui.core.BaseObjectTextField;
-import adams.gui.core.BasePanel;
 import adams.gui.core.BaseTextField;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.NumberTextField;
@@ -40,10 +38,8 @@ import io.lettuce.core.codec.StringCodec;
 import io.lettuce.core.pubsub.RedisPubSubListener;
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 
-import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
-import java.awt.FlowLayout;
 
 /**
  * Ancestor for tools that exchange data via Redis.
@@ -53,7 +49,7 @@ import java.awt.FlowLayout;
  * @param <I> the incoming data (String or byte[])
  */
 public abstract class AbstractRedisTool<O,I>
-  extends AbstractTool {
+  extends AbstractToolWithParameterPanel {
 
   private static final long serialVersionUID = 8374950649752446530L;
 
@@ -68,9 +64,6 @@ public abstract class AbstractRedisTool<O,I>
 
   /** the redis timeout. */
   protected NumberTextField m_TextRedisTimeout;
-
-  /** the apply button. */
-  protected BaseFlatButton m_ButtonApply;
 
   /** the redis host. */
   protected String m_RedisHost;
@@ -172,55 +165,30 @@ public abstract class AbstractRedisTool<O,I>
    */
   protected abstract String getReceiveChannel();
 
+
   /**
-   * Sets up the panel with the parameters.
+   * Fills the parameter panel with the options.
    *
-   * @return		the panel
+   * @param paramPanel for adding the options to
    */
-  protected ParameterPanel createParameterPanel() {
-    ParameterPanel	result;
-
-    result = new ParameterPanel();
-
+  @Override
+  protected void addOptions(ParameterPanel paramPanel) {
     m_TextRedisHost = new BaseObjectTextField<>(new BaseHostname("localhost:" + RedisConnection.DEFAULT_PORT));
     m_TextRedisHost.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
-    result.addParameter("Redis host", m_TextRedisHost);
+    paramPanel.addParameter("Redis host", m_TextRedisHost);
 
     m_TextRedisSend = new BaseTextField(getSendChannel(), 10);
     m_TextRedisSend.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
-    result.addParameter("- Send", m_TextRedisSend);
+    paramPanel.addParameter("- Send", m_TextRedisSend);
 
     m_TextRedisReceive = new BaseTextField(getReceiveChannel(), 10);
     m_TextRedisReceive.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
-    result.addParameter("- Receive", m_TextRedisReceive);
+    paramPanel.addParameter("- Receive", m_TextRedisReceive);
 
     m_TextRedisTimeout = new NumberTextField(NumberTextField.Type.INTEGER, 10);
     m_TextRedisTimeout.setCheckModel(new NumberTextField.BoundedNumberCheckModel(NumberTextField.Type.INTEGER, 1, null, 2000));
     m_TextRedisTimeout.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
-    result.addParameter(" - Timeout (msec)", m_TextRedisTimeout);
-
-    return result;
-  }
-
-  /**
-   * Creates the panel for setting the options.
-   *
-   * @return the options panel
-   */
-  @Override
-  protected BasePanel createOptionPanel() {
-    ParameterPanel	result;
-    JPanel		panel;
-
-    result = createParameterPanel();
-
-    m_ButtonApply = createApplyButton();
-
-    panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    panel.add(m_ButtonApply);
-    result.addParameter("", panel);
-
-    return result;
+    paramPanel.addParameter(" - Timeout (msec)", m_TextRedisTimeout);
   }
 
   /**

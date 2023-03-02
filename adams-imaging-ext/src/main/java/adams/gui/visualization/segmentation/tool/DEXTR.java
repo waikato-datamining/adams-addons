@@ -25,7 +25,6 @@ import adams.data.image.BufferedImageHelper;
 import adams.data.redis.RedisDataType;
 import adams.data.statistics.StatUtils;
 import adams.gui.chooser.ColorChooserPanel;
-import adams.gui.core.BaseFlatButton;
 import adams.gui.core.ImageManager;
 import adams.gui.core.MouseUtils;
 import adams.gui.core.NumberTextField;
@@ -60,9 +59,6 @@ public class DEXTR
 
   /** the marker color. */
   protected ColorChooserPanel m_PanelColor;
-
-  /** the apply button. */
-  protected BaseFlatButton m_ButtonApply;
 
   /** the marker size. */
   protected int m_MarkerSize;
@@ -220,25 +216,21 @@ public class DEXTR
   }
 
   /**
-   * Sets up the panel with the parameters.
+   * Fills the parameter panel with the options.
    *
-   * @return		the panel
+   * @param paramPanel  for adding the options to
    */
   @Override
-  protected ParameterPanel createParameterPanel() {
-    ParameterPanel  result;
-
-    result = super.createParameterPanel();
+  protected void addOptions(ParameterPanel paramPanel) {
+    super.addOptions(paramPanel);
 
     m_TextMarkerSize = new NumberTextField(NumberTextField.Type.INTEGER, 10);
     m_TextMarkerSize.setCheckModel(new NumberTextField.BoundedNumberCheckModel(NumberTextField.Type.INTEGER, 1, null, getLayerManager().getMarkers().getExtent()));
     m_TextMarkerSize.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
-    result.addParameter("Marker size", m_TextMarkerSize);
+    paramPanel.addParameter("Marker size", m_TextMarkerSize);
 
     m_PanelColor = new ColorChooserPanel(getLayerManager().getMarkers().getColor());
-    result.addParameter("- color", m_PanelColor);
-
-    return result;
+    paramPanel.addParameter("- color", m_PanelColor);
   }
 
   /**
