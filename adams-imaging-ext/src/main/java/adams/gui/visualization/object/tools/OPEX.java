@@ -204,7 +204,7 @@ public class OPEX
 	lobj.getMetaData().put("score", pred.getScore());
       lobjs.add(lobj);
     }
-    prefix = "Object.";
+    prefix = LocatedObjects.DEFAULT_PREFIX;
     if (getCanvas().getOwner().getAnnotator() instanceof ObjectPrefixHandler)
       prefix = ((ObjectPrefixHandler) getCanvas().getOwner().getAnnotator()).getPrefix();
     report = lobjs.toReport(prefix);
