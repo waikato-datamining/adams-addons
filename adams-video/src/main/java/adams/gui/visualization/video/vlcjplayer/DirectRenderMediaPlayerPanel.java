@@ -187,7 +187,7 @@ public class DirectRenderMediaPlayerPanel extends BasePanel {
   }
 
   /**
-   * Retruns the current playback time
+   * Returns the current playback time
    * @return the current playback time
    */
   public long getTime() {
