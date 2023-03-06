@@ -316,7 +316,7 @@ public abstract class AbstractRedisTool<O,I>
   /**
    * Communicates with DEXTR and updates the canvas.
    */
-  protected void sendData() {
+  public void sendData() {
     SwingWorker		worker;
     MessageCollection 	errors;
     O 			out;
