@@ -114,6 +114,35 @@ In order to use the tool, you need the following:
   \end{tight_itemize}
 \end{tight_itemize}
 
+
+\section{DEXTR}
+DEXTR\cite{dextr} (Deep Extreme Cut) is a very useful tool for aiding human annotators in
+annotating images. The tool generates object masks using just four \textit{extreme points}
+(x/y pairs) on the edges of the object that is to be annotated. These masks can be converted into polygons
+and integrated into the annotations.
+
+The \textit{ImageObjectAnnotator} transformer offers a DEXTR tool in its toolbox. In order
+to use the tool, you need the following:
+
+\begin{tight_itemize}
+  \item A computer (preferably a Linux machine) with Redis\cite{redis} and Docker\cite{docker} running,
+  this can be the local machine.
+  \item Run the following flow to start a DEXTR container: \\
+  \textit{adams-imaging-ext\_run-dextr.flow}.
+  \item Run \textit{adams-imaging-annotate\_objects.flow} to annotate JPEG images with the help of DEXTR.
+  \begin{tight_itemize}
+    \item In the annotation interface, select the \textit{DEXTR} tool.
+    \item Adjust any connection parameters if necessary, though defaults work with the above flow when run on the
+    local machine, and click on the tick button to connect to the Redis instance. The cursor, when hovering over
+    the image, should be cross-hair now.
+    \item With the left mouse button, perform four left-clicks to choose the four extreme points (use the left mouse
+    button while holding CTRL to remove the current points and start over) and hit \textit{ENTER} to send image and
+    points to the docker container for processing (on a CPU, depending on the image size, this can take a couple of seconds).
+    \item If successful, the annotation(s) will be added to the current ones.
+  \end{tight_itemize}
+\end{tight_itemize}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
 
