@@ -184,15 +184,6 @@ public class DEXTR
 
     m_MarkerSize  = m_TextMarkerSize.getValue().intValue();
     m_MarkerColor = m_PanelColor.getCurrent();
-  }
-
-  /**
-   * Applies the settings.
-   */
-  @Override
-  protected void doApply() {
-    super.doApply();
-
     getLayerManager().getMarkers().setExtent(m_MarkerSize);
     getLayerManager().getMarkers().setColor(m_MarkerColor);
   }
