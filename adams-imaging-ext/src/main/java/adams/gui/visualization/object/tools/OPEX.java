@@ -208,6 +208,7 @@ public class OPEX
     if (getCanvas().getOwner().getAnnotator() instanceof ObjectPrefixHandler)
       prefix = ((ObjectPrefixHandler) getCanvas().getOwner().getAnnotator()).getPrefix();
     report = lobjs.toReport(prefix);
+    getCanvas().getOwner().addUndoPoint("OPEX predictions");
     getCanvas().getOwner().setReport(report);
     getCanvas().getOwner().annotationsChanged(this);
   }
