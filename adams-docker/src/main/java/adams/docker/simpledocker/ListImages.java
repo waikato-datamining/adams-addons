@@ -42,6 +42,9 @@ public class ListImages
   /** for filtering the images. */
   protected String m_Filter;
 
+  /** whether to only show the IDs. */
+  protected boolean m_ShowOnlyIDs;
+
   /**
    * Returns a string describing the object.
    *
@@ -68,6 +71,10 @@ public class ListImages
     m_OptionManager.add(
       "all", "all",
       false);
+
+    m_OptionManager.add(
+      "show-only-ids", "showOnlyIDs",
+      true);
   }
 
   /**
@@ -82,6 +89,7 @@ public class ListImages
     result = super.getQuickInfo();
     result += QuickInfoHelper.toString(this, "filter", (m_Filter.isEmpty() ? "-none-" : m_Filter), ", filter: ");
     result += QuickInfoHelper.toString(this, "all", m_All, "all", ", ");
+    result += QuickInfoHelper.toString(this, "showOnlyIDs", m_ShowOnlyIDs, "only IDs", ", ");
 
     return result;
   }
@@ -155,6 +163,35 @@ public class ListImages
   }
 
   /**
+   * Sets whether to list only the IDs or all the information.
+   *
+   * @param value	true if only IDs
+   */
+  public void setShowOnlyIDs(boolean value) {
+    m_ShowOnlyIDs = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to list only the IDs or all the information.
+   *
+   * @return		true if only IDs
+   */
+  public boolean getShowOnlyIDs() {
+    return m_ShowOnlyIDs;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String showOnlyIDsTipText() {
+    return "If enabled, only the IDs are output, otherwise all the information.";
+  }
+
+  /**
    * Assembles the command to run.
    *
    * @return		the command
@@ -166,7 +203,8 @@ public class ListImages
     result = super.buildCommand();
     result.add("image");
     result.add("ls");
-    result.add("--quiet");
+    if (m_ShowOnlyIDs)
+      result.add("--quiet");
     if (m_All)
       result.add("--all");
     if (!m_Filter.isEmpty()) {
