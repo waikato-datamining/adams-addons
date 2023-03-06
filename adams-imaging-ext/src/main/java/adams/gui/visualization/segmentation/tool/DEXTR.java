@@ -291,53 +291,6 @@ public class DEXTR
   }
 
   /**
-   * Interprets the data received from Redis.
-   *
-   * @param data	the received data, ignored if null
-   */
-  protected void fromJson(JsonObject data) {
-    String 		maskStr;
-    byte[]		bytes;
-    BufferedImage 	maskImage;
-    MessageCollection	errors;
-    int[]		pixels;
-    int[]		colors;
-    int			width;
-    int			height;
-    BufferedImage	activeImage;
-
-    if (data == null)
-      return;
-
-    maskStr   = data.get("mask").getAsString();
-    bytes     = Base64.getMimeDecoder().decode(maskStr);
-    errors    = new MessageCollection();
-    maskImage = BufferedImageHelper.fromBytes(bytes, errors);
-    width     = maskImage.getWidth();
-    height    = maskImage.getHeight();
-    pixels    = BufferedImageHelper.getPixels(maskImage);
-
-    // use transparent black
-    ImageUtils.replaceColor(pixels, Color.BLACK, new Color(0, 0, 0, 0));
-
-    // replace other colors with one from layer
-    colors = StatUtils.uniqueValues(pixels);
-    for (int color: colors) {
-      if (color != 0)
-	ImageUtils.replaceColor(pixels, new Color(color), getActiveColor());
-    }
-
-    if (isAutomaticUndoEnabled())
-      getCanvas().getOwner().addUndoPoint();
-
-    // combine images
-    activeImage = getActiveImage();
-    maskImage   = new BufferedImage(width, height, activeImage.getType());
-    maskImage.setRGB(0, 0, width, height, pixels, 0, width);
-    ImageUtils.combineImages(maskImage, activeImage);
-  }
-
-  /**
    * Parses the received data and updates the GUI.
    *
    * @param data	the data to parse (String or byte[])
