@@ -26,6 +26,7 @@ import adams.data.redis.RedisDataType;
 import adams.data.statistics.StatUtils;
 import adams.gui.chooser.ColorChooserPanel;
 import adams.gui.core.ImageManager;
+import adams.gui.core.KeyUtils;
 import adams.gui.core.MouseUtils;
 import adams.gui.core.NumberTextField;
 import adams.gui.core.ParameterPanel;
@@ -78,7 +79,7 @@ public class DEXTR
   public String globalInfo() {
     return "After connecting to the Redis server, click on four extreme points "
       + "with the left mouse button and then press ENTER to have a shape detected.\n"
-      + "Click on the right mouse button to reset the selected points.\n"
+      + "Left-Click while holding CTRL to reset the selected points.\n"
       + "Communicates with a DEXTR docker container suing Redis.\n"
       + "\n"
       + "More information:\n"
@@ -135,7 +136,7 @@ public class DEXTR
 	      (int) (e.getY() / getZoom())));
 	  e.consume();
 	}
-	else if (MouseUtils.isRightClick(e) && MouseUtils.hasNoModifierKey(e)) {
+	else if (MouseUtils.isLeftClick(e) && KeyUtils.isCtrlDown(e.getModifiersEx())) {
 	  getLayerManager().getMarkers().clear();
 	  e.consume();
 	}
