@@ -300,6 +300,9 @@ public class DockerImagesPanel
     m_TextSize.setText(value.getSize());
   }
 
+  /**
+   * Updates the enabled state of the widgets.
+   */
   @Override
   protected void updateButtons() {
     super.updateButtons();
