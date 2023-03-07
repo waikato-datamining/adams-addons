@@ -42,6 +42,7 @@ import adams.gui.core.ParameterPanelWithButtons;
 import adams.gui.core.SearchParameters;
 import adams.gui.dialog.ApprovalDialog;
 
+import javax.swing.JLabel;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -209,6 +210,8 @@ public class DockerImagesPanel
   @Override
   protected void initGUI() {
     super.initGUI();
+
+    m_TableValues.addToButtonsPanel(new JLabel());
 
     m_ButtonDelete = new BaseButton("Delete");
     m_ButtonDelete.addActionListener((ActionEvent e) -> deleteImages());
