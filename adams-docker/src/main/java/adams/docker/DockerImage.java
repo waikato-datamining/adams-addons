@@ -20,8 +20,6 @@
 
 package adams.docker;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -44,7 +42,7 @@ public class DockerImage
   /** the image ID (hash). */
   protected String m_ImageID;
 
-  /** whether the image was created. */
+  /** when the image was created. */
   protected String m_Created;
 
   /** the size of the image. */
@@ -119,7 +117,7 @@ public class DockerImage
    * @return	the comparison result
    */
   @Override
-  public int compareTo(@NotNull DockerImage o) {
+  public int compareTo(DockerImage o) {
     int		result;
 
     result = getRepository().compareTo(o.getRepository());
