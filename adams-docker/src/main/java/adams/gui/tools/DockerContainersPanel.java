@@ -44,6 +44,7 @@ import adams.gui.core.SearchParameters;
 import adams.gui.dialog.ApprovalDialog;
 
 import javax.swing.JLabel;
+import javax.swing.SwingWorker;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -556,17 +557,60 @@ public class DockerContainersPanel
   }
 
   /**
+   * Deletes the containers with the specified IDs.
+   *
+   * @param ids		the IDs to delete
+   */
+  protected void deleteContainers(String[] ids) {
+    SwingWorker worker;
+
+    worker = new SwingWorker() {
+      @Override
+      protected Object doInBackground() throws Exception {
+        Flow flow  = getDeleteFlow(ids);
+        StorageName sname = new StorageName("output");
+        String msg = flow.setUp();
+        if (msg != null) {
+          GUIHelper.showErrorMessage(DockerContainersPanel.this, "Failed to delete docker containers (flow setup):\n" + msg);
+          cleanUp(flow);
+          return null;
+        }
+
+        msg = flow.execute();
+        if (msg != null) {
+          GUIHelper.showErrorMessage(DockerContainersPanel.this, "Failed to delete docker containers (flow execution):\n" + msg);
+          cleanUp(flow);
+          return null;
+        }
+
+        if (flow.getStorage().has(sname)) {
+          String output = "" + flow.getStorage().get(sname);
+          output = output.trim();
+          if (output.length() > 0)
+            GUIHelper.showInformationMessage(DockerContainersPanel.this, "Output of deleting docker containers:\n" + output);
+        }
+
+        cleanUp(flow);
+        return null;
+      }
+
+      @Override
+      protected void done() {
+        super.done();
+        refresh();
+      }
+    };
+    worker.execute();
+  }
+
+  /**
    * Deletes the selected containers.
    */
   protected void deleteContainers() {
     int				retVal;
-    Flow			flow;
     List<DockerContainer>	selected;
     String[]			ids;
     int				i;
-    String			msg;
-    StorageName			sname;
-    String			output;
 
     selected = getSelectedValues();
 
@@ -578,32 +622,7 @@ public class DockerContainersPanel
     for (i = 0; i < selected.size(); i++)
       ids[i] = selected.get(i).getContainerID();
 
-    flow  = getDeleteFlow(ids);
-    sname = new StorageName("output");
-    msg = flow.setUp();
-    if (msg != null) {
-      GUIHelper.showErrorMessage(this, "Failed to delete docker containers (flow setup):\n" + msg);
-      cleanUp(flow);
-      return;
-    }
-
-    msg = flow.execute();
-    if (msg != null) {
-      GUIHelper.showErrorMessage(this, "Failed to delete docker containers (flow execution):\n" + msg);
-      cleanUp(flow);
-      return;
-    }
-
-    if (flow.getStorage().has(sname)) {
-      output = "" + flow.getStorage().get(sname);
-      output = output.trim();
-      if (output.length() > 0)
-	GUIHelper.showInformationMessage(this, "Output of deleting docker containers:\n" + output);
-    }
-
-    cleanUp(flow);
-
-    refresh();
+    deleteContainers(ids);
   }
 
   /**
