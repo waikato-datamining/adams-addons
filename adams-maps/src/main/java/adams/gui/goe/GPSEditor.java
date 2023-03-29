@@ -36,7 +36,6 @@ import javax.swing.text.JTextComponent;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
-import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -217,14 +216,14 @@ public class GPSEditor
    */
   @Override
   public void paintValue(java.awt.Graphics gfx, java.awt.Rectangle box) {
-    FontMetrics fm = gfx.getFontMetrics();
-    int vpad = (box.height - fm.getHeight()) / 2 ;
+    int[] offset;
     AbstractGPS gps = (AbstractGPS) getValue();
     String val = "No coordinates";
     if (gps != null)
       val = gps.toString();
     GUIHelper.configureAntiAliasing(gfx, true);
-    gfx.drawString(val, 2, fm.getHeight() + vpad);
+    offset = GUIHelper.calculateFontOffset(gfx, box);
+    gfx.drawString(val, offset[0], offset[1]);
   }
 
   /**
