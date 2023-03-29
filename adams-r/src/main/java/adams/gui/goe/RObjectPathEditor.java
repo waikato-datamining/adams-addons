@@ -26,6 +26,7 @@ import adams.core.Utils;
 import adams.core.option.parsing.RObjectPathParsing;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseTextField;
+import adams.gui.core.GUIHelper;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -113,6 +114,7 @@ public class RObjectPathEditor
     val  = getStringToPaint();
     if (val.isEmpty())
       val = AbstractPropertyEditorSupport.EMPTY;
+    GUIHelper.configureAntiAliasing(gfx, true);
     gfx.drawString(val, 2, fm.getHeight() + vpad);
   }
 

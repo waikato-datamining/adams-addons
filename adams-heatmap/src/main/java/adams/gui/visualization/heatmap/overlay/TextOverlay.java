@@ -23,6 +23,7 @@ package adams.gui.visualization.heatmap.overlay;
 import adams.data.report.Field;
 import adams.data.report.Report;
 import adams.gui.core.Fonts;
+import adams.gui.core.GUIHelper;
 import adams.gui.visualization.image.ImagePanel.PaintPanel;
 
 import java.awt.Color;
@@ -423,6 +424,7 @@ public class TextOverlay
 
     g.setColor(m_TextColor);
     g.setFont(m_Font);
+    GUIHelper.configureAntiAliasing(g, true);
     g.drawString(str, x + m_OffsetX, y + m_OffsetY);
   }
 }

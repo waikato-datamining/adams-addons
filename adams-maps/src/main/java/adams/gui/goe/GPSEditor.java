@@ -223,6 +223,7 @@ public class GPSEditor
     String val = "No coordinates";
     if (gps != null)
       val = gps.toString();
+    GUIHelper.configureAntiAliasing(gfx, true);
     gfx.drawString(val, 2, fm.getHeight() + vpad);
   }
 

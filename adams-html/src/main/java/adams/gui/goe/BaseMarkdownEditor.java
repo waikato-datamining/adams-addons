@@ -28,6 +28,7 @@ import adams.core.option.parsing.BaseMarkdownParsing;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseCheckBox;
 import adams.gui.core.BaseScrollPane;
+import adams.gui.core.GUIHelper;
 import adams.gui.core.ImageManager;
 import adams.gui.core.MarkdownTextAreaWithPreview;
 import adams.gui.core.UISettings;
@@ -110,6 +111,7 @@ public class BaseMarkdownEditor
       val = BaseMarkdownParsing.toString(null, getValue());
     if (val.isEmpty())
       val = AbstractPropertyEditorSupport.EMPTY;
+    GUIHelper.configureAntiAliasing(gfx, true);
     gfx.drawString(val, 2, fm.getHeight() + vpad);
   }
 
