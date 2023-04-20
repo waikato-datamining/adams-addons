@@ -100,7 +100,7 @@ public class DEXTR
     return "After connecting to the Redis server, click on four extreme points "
       + "with the left mouse button and then press ENTER to have a shape detected.\n"
       + "Left-Click while holding CTRL to reset the selected points.\n"
-      + "Communicates with a DEXTR docker container suing Redis.\n"
+      + "Communicates with a DEXTR docker container using Redis.\n"
       + "\n"
       + "More information:\n"
       + "https://github.com/waikato-datamining/pytorch/tree/master/dextr";
