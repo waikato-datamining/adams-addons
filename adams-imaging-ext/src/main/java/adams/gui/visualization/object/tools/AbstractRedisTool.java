@@ -166,6 +166,15 @@ public abstract class AbstractRedisTool<O,I>
   protected abstract String getReceiveChannel();
 
   /**
+   * Returns the default timeout in msec.
+   *
+   * @return		the timeout
+   */
+  protected int getDefaultTimeout() {
+    return 2000;
+  }
+
+  /**
    * Fills the parameter panel with the options.
    *
    * @param paramPanel for adding the options to
@@ -185,7 +194,7 @@ public abstract class AbstractRedisTool<O,I>
     paramPanel.addParameter("- Receive", m_TextRedisReceive);
 
     m_TextRedisTimeout = new NumberTextField(NumberTextField.Type.INTEGER, 10);
-    m_TextRedisTimeout.setCheckModel(new NumberTextField.BoundedNumberCheckModel(NumberTextField.Type.INTEGER, 1, null, 2000));
+    m_TextRedisTimeout.setCheckModel(new NumberTextField.BoundedNumberCheckModel(NumberTextField.Type.INTEGER, 1, null, getDefaultTimeout()));
     m_TextRedisTimeout.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
     paramPanel.addParameter(" - Timeout (msec)", m_TextRedisTimeout);
   }
