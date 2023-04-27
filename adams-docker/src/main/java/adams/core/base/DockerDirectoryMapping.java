@@ -20,10 +20,12 @@
 
 package adams.core.base;
 
+import adams.core.io.PlaceholderDirectory;
+
 import java.io.File;
 
 /**
- * TODO: What this class does.
+ * For mapping local dir with container dir.
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
@@ -45,7 +47,7 @@ public class DockerDirectoryMapping
    * @param mapping		the mapping (local dir : container dir)
    */
   public DockerDirectoryMapping(String mapping) {
-    super(mapping);
+    super(collapseLocalDir(mapping));
   }
 
   /**
@@ -55,7 +57,7 @@ public class DockerDirectoryMapping
    * @param containerDir	the container directory
    */
   public DockerDirectoryMapping(File localDir, File containerDir) {
-    this(localDir.getAbsolutePath(), containerDir.getAbsolutePath());
+    this(new PlaceholderDirectory(localDir).toString(), containerDir.getAbsolutePath());
   }
 
   /**
@@ -65,7 +67,7 @@ public class DockerDirectoryMapping
    * @param containerDir	the container directory
    */
   public DockerDirectoryMapping(String localDir, String containerDir) {
-    this(localDir + ":" + containerDir);
+    this(new PlaceholderDirectory(localDir) + ":" + containerDir);
   }
 
   /**
@@ -115,5 +117,21 @@ public class DockerDirectoryMapping
   @Override
   public String getTipText() {
     return "For mapping a host directory into a container, format: <abs. local dir>:<abs. container dir>";
+  }
+
+  /**
+   * Collapses the local dir in the mapping ("localDir:containerDir") into a placeholder one.
+   *
+   * @param mapping	the mapping to process
+   * @return		the updated mapping
+   */
+  public static String collapseLocalDir(String mapping) {
+    String[] 	parts;
+
+    if (!mapping.contains(":") || (mapping.split(":").length != 2))
+      return mapping;
+
+    parts = mapping.split(":");
+    return new PlaceholderDirectory(parts[0]) + ":" + parts[1];
   }
 }

@@ -1,12 +1,13 @@
 # Project: adams
-# Date: 2023-02-28 15:26:52
+# Date: 2023-04-28 09:30:20
 # User: fracpete
 # Charset: UTF-8
+# Modules: adams-core,adams-docker,adams-imaging,adams-imaging-ext,adams-json,adams-meta,adams-net,adams-redis,adams-spreadsheet,adams-xml
 #
 adams.flow.control.Flow -annotation "Runs the DEXTR (Deep Extreme Cut) docker image for aiding in annotating images.\\nA dialog asking to \\\"Stop DEXTR\\\" will pop up immediately, since the docker image\\ngets started asynchronously. You can ignore that dialog until you want to shut\\ndown the DEXTR instance (e.g., when the annotating work is done)." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.CallableActors
   adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -x -3 -writer adams.data.io.output.NullWriter
- adams.flow.standalone.SimpleDockerConnection -dir-mapping /home/fracpete/development/projects/waikato-datamining/adamsfamily/adams-addons/adams-imaging-ext/src/main/flows/cache:/.cache
+ adams.flow.standalone.SimpleDockerConnection -dir-mapping ${EXAMPLE_FLOWS}/cache:/.cache
  adams.flow.source.Start
  adams.flow.control.Trigger -name "prompt user"
   adams.flow.standalone.SetVariable -name "restore file" -var-name restore -var-value @{flow_filename_long}.props -value-type FILE_FORWARD_SLASHES -expand-value true
