@@ -239,7 +239,7 @@ public class Run
     }
     for (DockerDirectoryMapping mapping: m_Connection.getExpandedDirMappings()) {
       result.add("-v");
-      result.add(mapping.getValue());
+      result.add(mapping.getExpandedValue());
     }
     if (m_RemoveContainer)
       result.add("--rm");

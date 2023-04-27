@@ -97,7 +97,7 @@ public class DockerDirectoryMapping
    * @return		the local part
    */
   public String localDir() {
-    return getValue().split(":")[0];
+    return new PlaceholderDirectory(getValue().split(":")[0]).getAbsolutePath();
   }
 
   /**
@@ -107,6 +107,15 @@ public class DockerDirectoryMapping
    */
   public String containerDir() {
     return getValue().split(":")[1];
+  }
+
+  /**
+   * Returns the expanded value.
+   *
+   * @return		the expanded value
+   */
+  public String getExpandedValue() {
+    return localDir() + ":" + containerDir();
   }
 
   /**
