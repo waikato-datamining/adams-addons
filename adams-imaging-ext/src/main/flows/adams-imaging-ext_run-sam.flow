@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2023-04-28 09:30:25
+# Date: 2023-04-28 14:46:21
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-docker,adams-imaging,adams-imaging-ext,adams-json,adams-meta,adams-net,adams-redis,adams-spreadsheet,adams-xml
@@ -7,6 +7,7 @@
 adams.flow.control.Flow -annotation "Runs the SAM (Segment-Anything Model) docker image for aiding in annotating images.\\nA dialog asking to \\\"Stop SAM\\\" will pop up immediately, since the docker image\\ngets started asynchronously. You can ignore that dialog until you want to shut\\ndown the SAM instance (e.g., when the annotating work is done).\\n\\nModel size, speed (on CPU) and quality:\\n- vit_h: 2.4GB, 30-60s, high\\n- vit_l: 1.2GB, 15-30s, medium\\n- vit_b: 360MB, 5-10s, low" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.CallableActors
   adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -x -3 -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.SetVariable -name "reset gpu" -var-name gpu -var-value ""
  adams.flow.standalone.SimpleDockerConnection -dir-mapping ${EXAMPLE_FLOWS}/cache:/.cache -dir-mapping ${EXAMPLE_FLOWS}/output:/workspace
  adams.flow.source.Start
  adams.flow.control.Trigger -name "prompt user"
@@ -27,6 +28,8 @@ adams.flow.control.Flow -annotation "Runs the SAM (Segment-Anything Model) docke
      adams.flow.standalone.SetVariable -name model_name -var-name model_name -var-value sam_vit_b_01ec64.pth
     adams.flow.control.Stop -stop-msg "Unhandled model type: @{model_type}"
    adams.flow.transformer.SetVariable -name model_file -var-name model_file -var-value ${FLOWS}/output/@{model_name} -value-type FILE_FORWARD_SLASHES -expand-value true
+  adams.flow.control.ConditionalTrigger -name gpu? -condition "adams.flow.condition.bool.Expression -expression \"not contains(\\\\\\\"@{docker_image}\\\\\\\", \\\\\\\"_cpu\\\\\\\")\""
+   adams.flow.standalone.SetVariable -name "gpu arguments" -var-name gpu -var-value --gpus=all
  adams.flow.control.ConditionalTrigger -name "download model?" -condition "adams.flow.condition.bool.Not -condition \"adams.flow.condition.bool.FileExists -file @{model_file} -generator adams.core.io.NullFilenameGenerator\""
   adams.flow.source.URLSupplier -url @{model_url}
   adams.flow.control.Tee -name info
@@ -35,7 +38,7 @@ adams.flow.control.Flow -annotation "Runs the SAM (Segment-Anything Model) docke
    adams.flow.sink.CallableSink -callable Display
   adams.flow.sink.DownloadFile -logging-level INFO -output @{model_file} -buffer-size 1024000
  adams.flow.control.Trigger -name SAM -asynchronous true
-  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.Run -output-type BOTH -output-formatter adams.core.command.output.PassThrough -stdout-processor adams.core.command.stdout.Log -stderr-processor adams.core.command.stderr.Log -blocking false -remove-container true -run-as-user true -pull-type ALWAYS -options-string \"--net=host -t @{docker_image} sam_predict_redis --redis_in @{channel_in} --redis_out @{channel_out} --model /workspace/@{model_name} --model_type @{model_type} --verbose\\\\n\""
+  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.Run -output-type BOTH -output-formatter adams.core.command.output.PassThrough -stdout-processor adams.core.command.stdout.Log -stderr-processor adams.core.command.stderr.Log -blocking false -remove-container true -run-as-user true -pull-type ALWAYS -options-string \"@{gpu} --net=host -t @{docker_image} sam_predict_redis --redis_in @{channel_in} --redis_out @{channel_out} --model /workspace/@{model_name} --model_type @{model_type} --verbose\\\\n\""
   adams.flow.sink.CallableSink -callable Display
  adams.flow.control.ConditionalTrigger -name stop? -condition "adams.flow.condition.bool.PromptUser -message \"Do you want to stop SAM?\""
   adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.ListContainers -output-formatter adams.core.command.output.LineSplit -stdout-processor adams.core.command.stdout.Log -stderr-processor adams.core.command.stderr.Log -filter ancestor=@{docker_image}"

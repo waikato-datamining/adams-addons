@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2023-04-28 09:30:20
+# Date: 2023-04-28 14:46:15
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-docker,adams-imaging,adams-imaging-ext,adams-json,adams-meta,adams-net,adams-redis,adams-spreadsheet,adams-xml
@@ -7,14 +7,17 @@
 adams.flow.control.Flow -annotation "Runs the DEXTR (Deep Extreme Cut) docker image for aiding in annotating images.\\nA dialog asking to \\\"Stop DEXTR\\\" will pop up immediately, since the docker image\\ngets started asynchronously. You can ignore that dialog until you want to shut\\ndown the DEXTR instance (e.g., when the annotating work is done)." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.CallableActors
   adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -x -3 -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.SetVariable -name "reset gpu" -var-name gpu -var-value ""
  adams.flow.standalone.SimpleDockerConnection -dir-mapping ${EXAMPLE_FLOWS}/cache:/.cache
  adams.flow.source.Start
  adams.flow.control.Trigger -name "prompt user"
   adams.flow.standalone.SetVariable -name "restore file" -var-name restore -var-value @{flow_filename_long}.props -value-type FILE_FORWARD_SLASHES -expand-value true
   adams.flow.source.EnterManyValues -name Parameters -stop-if-canceled true -value "adams.flow.source.valuedefinition.ListSelectionValueDefinition -name docker_image -display \"Docker image\" -help \"select \\\"_cpu\\\" if no NVIDIA GPU present\" -value waikatodatamining/pytorch-dextr:0.1.2_cpu -value waikatodatamining/pytorch-dextr:0.1.2_cuda11.1 -default-value waikatodatamining/pytorch-dextr:0.1.2_cpu" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name channel_in -display \"Channel in\" -help \"the channel for DEXTR to listen for data\" -default-value dextr_in" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name channel_out -display \"Channel out\" -help \"the channel for DEXTR to broadcast the results on\" -default-value dextr_out" -output-type MAP -restoration-enabled true -restoration-file @{restore}
   adams.flow.transformer.MapToVariables
+  adams.flow.control.ConditionalTrigger -name gpu? -condition "adams.flow.condition.bool.Expression -expression \"not contains(\\\\\\\"@{docker_image}\\\\\\\", \\\\\\\"_cpu\\\\\\\")\""
+   adams.flow.standalone.SetVariable -name "gpu arguments" -var-name gpu -var-value --gpus=all
  adams.flow.control.Trigger -name "run DEXTR" -asynchronous true
-  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.Run -output-type BOTH -output-formatter adams.core.command.output.PassThrough -stdout-processor adams.core.command.stdout.Log -stderr-processor adams.core.command.stderr.Log -blocking false -remove-container true -run-as-user true -pull-type ALWAYS -options-string \"--net=host -t @{docker_image} dextr_predict_redis --redis_in @{channel_in} --redis_out @{channel_out} --verbose\\\\n\""
+  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.Run -output-type BOTH -output-formatter adams.core.command.output.PassThrough -stdout-processor adams.core.command.stdout.Log -stderr-processor adams.core.command.stderr.Log -blocking false -remove-container true -run-as-user true -pull-type ALWAYS -options-string \"@{gpu} --net=host -t @{docker_image} dextr_predict_redis --redis_in @{channel_in} --redis_out @{channel_out} --verbose\\\\n\""
   adams.flow.sink.CallableSink -callable Display
  adams.flow.control.ConditionalTrigger -name stop? -condition "adams.flow.condition.bool.PromptUser -message \"Do you want to stop DEXTR?\""
   adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.ListContainers -output-formatter adams.core.command.output.LineSplit -stdout-processor adams.core.command.stdout.Log -stderr-processor adams.core.command.stderr.Log -filter ancestor=@{docker_image}"

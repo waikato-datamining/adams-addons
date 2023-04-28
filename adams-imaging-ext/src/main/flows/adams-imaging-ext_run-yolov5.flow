@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2023-04-28 09:30:29
+# Date: 2023-04-28 14:46:26
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-docker,adams-imaging,adams-imaging-ext,adams-json,adams-meta,adams-net,adams-redis,adams-spreadsheet,adams-xml
@@ -7,6 +7,7 @@
 adams.flow.control.Flow -annotation "Runs a pretrained Yolov5 model for obtaining object annotations.\\nA dialog asking to \\\"Stop Yolov5\\\" will pop up immediately, since the docker image\\ngets started asynchronously. You can ignore that dialog until you want to shut\\ndown the Yolov5 instance (e.g., when the annotating work is done)." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.CallableActors
   adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -x -3 -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.SetVariable -name "reset gpu" -var-name gpu -var-value ""
  adams.flow.standalone.SimpleDockerConnection -dir-mapping ${EXAMPLE_FLOWS}/cache:/.cache -dir-mapping ${EXAMPLE_FLOWS}:/workspace
  adams.flow.source.Start
  adams.flow.control.Trigger -name "prompt user"
@@ -25,12 +26,14 @@ adams.flow.control.Flow -annotation "Runs a pretrained Yolov5 model for obtainin
    adams.flow.transformer.SetVariable -var-name local_yaml
    adams.flow.transformer.PrependDir -prefix ${FLOWS}/output -use-forward-slashes true
    adams.flow.transformer.SetVariable -name "SetVariable (2)" -var-name local_yaml_path
+  adams.flow.control.ConditionalTrigger -name gpu? -condition "adams.flow.condition.bool.Expression -expression \"not contains(\\\\\\\"@{docker_image}\\\\\\\", \\\\\\\"_cpu\\\\\\\")\""
+   adams.flow.standalone.SetVariable -name "gpu arguments" -var-name gpu -var-value --gpus=all
  adams.flow.control.ConditionalTrigger -name "download model?" -condition "adams.flow.condition.bool.Not -condition \"adams.flow.condition.bool.FileExists -file @{local_model_path} -generator adams.core.io.NullFilenameGenerator\""
   adams.flow.source.Variable -var-name yolov5_model -conversion adams.data.conversion.StringToString
   adams.flow.control.Tee -name info
    adams.flow.transformer.StringInsert -position first -value "Downloading model: "
    adams.flow.sink.CallableSink -callable Display
-  adams.flow.sink.DownloadFile -output @{local_model_path}
+  adams.flow.sink.DownloadFile -logging-level INFO -output @{local_model_path}
  adams.flow.control.ConditionalTrigger -name "download yaml?" -condition "adams.flow.condition.bool.Not -condition \"adams.flow.condition.bool.FileExists -file @{local_yaml_path} -generator adams.core.io.NullFilenameGenerator\""
   adams.flow.source.Variable -var-name coco_yaml -conversion adams.data.conversion.StringToString
   adams.flow.control.Tee -name info
@@ -38,7 +41,7 @@ adams.flow.control.Flow -annotation "Runs a pretrained Yolov5 model for obtainin
    adams.flow.sink.CallableSink -callable Display
   adams.flow.sink.DownloadFile -output @{local_yaml_path}
  adams.flow.control.Trigger -name "run Yolov5" -asynchronous true
-  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.Run -logging-level INFO -output-type BOTH -output-formatter adams.core.command.output.PassThrough -stdout-processor adams.core.command.stdout.Log -stderr-processor adams.core.command.stderr.Log -blocking false -remove-container true -run-as-user true -pull-type ALWAYS -options-string \"--net=host -t @{docker_image} yolov5_predict_redis --redis_in @{channel_in} --redis_out @{channel_out} --model /workspace/output/@{local_model} --data /workspace/output/@{local_yaml} --verbose\""
+  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.Run -logging-level INFO -output-type BOTH -output-formatter adams.core.command.output.PassThrough -stdout-processor adams.core.command.stdout.Log -stderr-processor adams.core.command.stderr.Log -blocking false -remove-container true -run-as-user true -pull-type ALWAYS -options-string \"@{gpu} --net=host -t @{docker_image} yolov5_predict_redis --redis_in @{channel_in} --redis_out @{channel_out} --model /workspace/output/@{local_model} --data /workspace/output/@{local_yaml} --verbose\""
   adams.flow.sink.CallableSink -callable Display
  adams.flow.control.ConditionalTrigger -name stop? -condition "adams.flow.condition.bool.PromptUser -message \"Do you want to stop Yolov5?\""
   adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.ListContainers -output-formatter adams.core.command.output.LineSplit -stdout-processor adams.core.command.stdout.Log -stderr-processor adams.core.command.stderr.Log -filter ancestor=@{docker_image}"
