@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Coordinate.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2023 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.gps;
 
@@ -25,7 +25,6 @@ import java.io.Serializable;
  * GPS coordinate container.
  * 
  * @author  dale (dale at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class Coordinate 
   implements Serializable, Comparable<Coordinate>, Cloneable {
@@ -160,8 +159,8 @@ public class Coordinate
    * @return	coordinate as decimal
    */
   public double toDecimal() {
-    double seconds = ((double) m_Minute * 60.0) + (double) m_Second;
-    double frac = (double) seconds / 3600.0;
+    double seconds = ((double) m_Minute * 60.0) + m_Second;
+    double frac = seconds / 3600.0;
     if (m_Negative)
       return -((double) m_Degree + frac);
     else
@@ -196,7 +195,7 @@ public class Coordinate
     if (o == null)
       return 1;
 
-    result = new Double(toDecimal()).compareTo(o.toDecimal());
+    result = Double.compare(toDecimal(), o.toDecimal());
     
     return result;
   }
