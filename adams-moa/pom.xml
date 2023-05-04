@@ -70,7 +70,7 @@
     </dependency>
 
     <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
+      <groupId>nz.ac.waikato.cms.moa</groupId>
       <artifactId>moa</artifactId>
       <version>${moa.version}</version>
       <type>jar</type>
