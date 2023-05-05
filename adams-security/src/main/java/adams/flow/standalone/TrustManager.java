@@ -15,7 +15,7 @@
 
 /*
  * TrustManager.java
- * Copyright (C) 2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2019-2023 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone;
@@ -137,7 +137,7 @@ public class TrustManager
 
   /** the keystore type. */
   protected String m_KeystoreType;
-  
+
   /** the location of the keystore. */
   protected PlaceholderFile m_KeystoreFile;
 
@@ -363,7 +363,7 @@ public class TrustManager
   public String promptForPasswordTipText() {
     return
       "If enabled, the user gets prompted "
-        + "for enter a password if none has been provided in the setup.";
+	+ "for enter a password if none has been provided in the setup.";
   }
 
   /**
@@ -423,7 +423,7 @@ public class TrustManager
   public String customStopMessageTipText() {
     return
       "The custom stop message to use in case a user cancelation stops the "
-        + "flow (default is the full name of the actor)";
+	+ "flow (default is the full name of the actor)";
   }
 
   /**
@@ -490,10 +490,11 @@ public class TrustManager
   /**
    * Performs the interaction with the user.
    *
-   * @return		true if successfully interacted
+   * @return		null if successfully interacted, otherwise error message
    */
-  public boolean doInteract() {
-    boolean		result;
+  @Override
+  public String doInteract() {
+    String		result;
     PasswordDialog	dlg;
 
     dlg = new PasswordDialog((Dialog) null, ModalityType.DOCUMENT_MODAL);
@@ -502,9 +503,12 @@ public class TrustManager
     ((Flow) getRoot()).registerWindow(dlg, dlg.getTitle());
     dlg.setVisible(true);
     ((Flow) getRoot()).deregisterWindow(dlg);
-    result = (dlg.getOption() == PasswordDialog.APPROVE_OPTION);
+    if (dlg.getOption() == PasswordDialog.APPROVE_OPTION)
+      result = null;
+    else
+      result = INTERACTION_CANCELED;
 
-    if (result)
+    if (result == null)
       m_ActualPassphrase = dlg.getPassword();
 
     return result;
@@ -522,16 +526,17 @@ public class TrustManager
   /**
    * Performs the interaction with the user in a headless environment.
    *
-   * @return		true if successfully interacted
+   * @return		null if successfully interacted, otherwise error message
    */
-  public boolean doInteractHeadless() {
-    boolean		result;
+  @Override
+  public String doInteractHeadless() {
+    String		result;
     BasePassword	password;
 
-    result   = false;
+    result   = INTERACTION_CANCELED;
     password = ConsoleHelper.enterPassword("Please enter keystore passphrase (" + getName() + "):");
     if (password != null) {
-      result           = true;
+      result           = null;
       m_ActualPassphrase = password;
     }
 
@@ -558,6 +563,7 @@ public class TrustManager
     String		result;
     KeyStore 		keystore;
     FileInputStream	fis;
+    String		msg;
 
     result = null;
 
@@ -566,32 +572,34 @@ public class TrustManager
 
       // prompt?
       if (m_PromptForPassword && (m_KeystorePassphrase.getValue().length() == 0)) {
-        if (!isHeadless()) {
-          if (!doInteract()) {
-            if (m_StopFlowIfCanceled) {
-              if ((m_CustomStopMessage == null) || (m_CustomStopMessage.trim().length() == 0))
-                StopHelper.stop(this, m_StopMode, "Flow canceled: " + getFullName());
-              else
-                StopHelper.stop(this, m_StopMode, m_CustomStopMessage);
-              result = getStopMessage();
-            }
-          }
-        }
-        else if (supportsHeadlessInteraction()) {
-          if (!doInteractHeadless()) {
-            if (m_StopFlowIfCanceled) {
-              if ((m_CustomStopMessage == null) || (m_CustomStopMessage.trim().length() == 0))
-                StopHelper.stop(this, m_StopMode, "Flow canceled: " + getFullName());
-              else
-                StopHelper.stop(this, m_StopMode, m_CustomStopMessage);
-              result = getStopMessage();
-            }
-          }
-        }
+	if (!isHeadless()) {
+	  msg = doInteract();
+	  if (msg != null) {
+	    if (m_StopFlowIfCanceled) {
+	      if ((m_CustomStopMessage == null) || (m_CustomStopMessage.trim().length() == 0))
+		StopHelper.stop(this, m_StopMode, "Flow canceled: " + getFullName());
+	      else
+		StopHelper.stop(this, m_StopMode, m_CustomStopMessage);
+	      result = getStopMessage();
+	    }
+	  }
+	}
+	else if (supportsHeadlessInteraction()) {
+	  msg = doInteractHeadless();
+	  if (msg != null) {
+	    if (m_StopFlowIfCanceled) {
+	      if ((m_CustomStopMessage == null) || (m_CustomStopMessage.trim().length() == 0))
+		StopHelper.stop(this, m_StopMode, "Flow canceled: " + getFullName());
+	      else
+		StopHelper.stop(this, m_StopMode, m_CustomStopMessage);
+	      result = getStopMessage();
+	    }
+	  }
+	}
       }
 
       if (result == null) {
-        fis = null;
+	fis = null;
 	try {
 	  keystore = KeyStore.getInstance(m_KeystoreType);
 	  fis      = new FileInputStream(m_KeystoreFile.getAbsolutePath());

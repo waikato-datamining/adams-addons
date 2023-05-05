@@ -672,21 +672,24 @@ public class RedisConnection
   /**
    * Performs the interaction with the user.
    *
-   * @return		true if successfully interacted
+   * @return		null if successfully interacted, otherwise error message
    */
   @Override
-  public boolean doInteract() {
-    boolean		result;
-    PasswordDialog dlg;
+  public String doInteract() {
+    String		result;
+    PasswordDialog 	dlg;
 
     dlg = new PasswordDialog((Dialog) null, Dialog.ModalityType.DOCUMENT_MODAL);
     dlg.setLocationRelativeTo(getParentComponent());
     ((Flow) getRoot()).registerWindow(dlg, dlg.getTitle());
     dlg.setVisible(true);
     ((Flow) getRoot()).deregisterWindow(dlg);
-    result = (dlg.getOption() == PasswordDialog.APPROVE_OPTION);
+    if (dlg.getOption() == PasswordDialog.APPROVE_OPTION)
+      result = null;
+    else
+      result = INTERACTION_CANCELED;
 
-    if (result)
+    if (result == null)
       m_ActualPassword = dlg.getPassword();
 
     return result;
@@ -705,17 +708,17 @@ public class RedisConnection
   /**
    * Performs the interaction with the user in a headless environment.
    *
-   * @return		true if successfully interacted
+   * @return		null if successfully interacted, otherwise error message
    */
   @Override
-  public boolean doInteractHeadless() {
-    boolean		result;
+  public String doInteractHeadless() {
+    String		result;
     BasePassword	password;
 
-    result   = false;
+    result   = INTERACTION_CANCELED;
     password = ConsoleHelper.enterPassword("Please enter password (" + getName() + "):");
     if (password != null) {
-      result           = true;
+      result           = null;
       m_ActualPassword = password;
     }
 
@@ -761,6 +764,7 @@ public class RedisConnection
   @Override
   protected String doExecute() {
     String	result;
+    String	msg;
 
     result = null;
 
@@ -772,7 +776,8 @@ public class RedisConnection
 
       if (m_PromptForPassword && (m_Password.getValue().length() == 0)) {
 	if (!isHeadless()) {
-	  if (!doInteract()) {
+	  msg = doInteract();
+	  if (msg != null) {
 	    if (m_StopFlowIfCanceled) {
 	      if ((m_CustomStopMessage == null) || (m_CustomStopMessage.trim().length() == 0))
 		StopHelper.stop(this, m_StopMode, "Flow canceled: " + getFullName());
@@ -783,7 +788,8 @@ public class RedisConnection
 	  }
 	}
 	else if (supportsHeadlessInteraction()) {
-	  if (!doInteractHeadless()) {
+	  msg = doInteractHeadless();
+	  if (msg != null) {
 	    if (m_StopFlowIfCanceled) {
 	      if ((m_CustomStopMessage == null) || (m_CustomStopMessage.trim().length() == 0))
 		StopHelper.stop(this, m_StopMode, "Flow canceled: " + getFullName());
