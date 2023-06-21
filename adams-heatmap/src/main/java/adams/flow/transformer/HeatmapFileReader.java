@@ -15,7 +15,7 @@
 
 /*
  * HeatmapFileReader.java
- * Copyright (C) 2011-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2023 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -75,7 +75,6 @@ import adams.data.io.input.SpreadSheetHeatmapReader;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class HeatmapFileReader
   extends AbstractDataContainerFileReader<Heatmap> {
@@ -102,14 +101,13 @@ public class HeatmapFileReader
   protected AbstractDataContainerReader getDefaultReader() {
     return new SpreadSheetHeatmapReader();
   }
-
   /**
-   * Returns the class of objects that it generates.
+   * Returns the base class of the items.
    *
-   * @return		<!-- flow-generates-start -->adams.data.heatmap.Heatmap.class<!-- flow-generates-end -->
+   * @return		the class
    */
   @Override
-  public Class[] generates() {
-    return new Class[]{Heatmap.class};
+  protected Class getItemClass() {
+    return Heatmap.class;
   }
 }

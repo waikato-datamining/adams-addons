@@ -15,7 +15,7 @@
 
 /*
  * TrailFileReader.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2023 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -80,7 +80,6 @@ import adams.data.trail.Trail;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class TrailFileReader
   extends AbstractDataContainerFileReader<Trail> {
@@ -109,12 +108,12 @@ public class TrailFileReader
   }
 
   /**
-   * Returns the class of objects that it generates.
+   * Returns the base class of the items.
    *
-   * @return		the data type
+   * @return		the class
    */
   @Override
-  public Class[] generates() {
-    return new Class[]{Trail.class};
+  protected Class getItemClass() {
+    return Trail.class;
   }
 }
