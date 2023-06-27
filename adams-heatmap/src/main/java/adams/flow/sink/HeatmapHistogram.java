@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * HeatmapHistogram.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2023 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.sink;
@@ -121,7 +121,6 @@ import java.awt.BorderLayout;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class HeatmapHistogram
   extends AbstractGraphicalDisplay
@@ -215,6 +214,16 @@ public class HeatmapHistogram
 
     panel = (HistogramPanel) m_Panel;
     panel.setData((Heatmap) token.getPayload());
+  }
+
+  /**
+   * Whether "clear" is supported and shows up in the menu.
+   *
+   * @return		true if supported
+   */
+  @Override
+  public boolean supportsClear() {
+    return true;
   }
 
   /**

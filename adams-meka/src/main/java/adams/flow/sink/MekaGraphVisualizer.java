@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * MekaGraphVisualizer.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2023 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.sink;
@@ -134,7 +134,6 @@ import java.util.logging.Level;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class MekaGraphVisualizer
   extends AbstractGraphicalDisplay
@@ -180,6 +179,16 @@ public class MekaGraphVisualizer
     result.add(m_TabbedPane, BorderLayout.CENTER);
 
     return result;
+  }
+
+  /**
+   * Whether "clear" is supported and shows up in the menu.
+   *
+   * @return		true if supported
+   */
+  @Override
+  public boolean supportsClear() {
+    return true;
   }
 
   /**

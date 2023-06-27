@@ -15,7 +15,7 @@
 
 /*
  * TrailDisplay.java
- * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2023 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
@@ -148,7 +148,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class TrailDisplay
   extends AbstractGraphicalDisplay
@@ -322,6 +321,16 @@ public class TrailDisplay
     result += QuickInfoHelper.toString(this, "zoom", m_Zoom, ", zoom: ");
     
     return result;
+  }
+
+  /**
+   * Whether "clear" is supported and shows up in the menu.
+   *
+   * @return		true if supported
+   */
+  @Override
+  public boolean supportsClear() {
+    return true;
   }
 
   /**
