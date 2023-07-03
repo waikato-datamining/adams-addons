@@ -15,7 +15,7 @@
 
 /*
  * AudioAnnotatorPanel.java
- * Copyright (C) 2015-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2023 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.tools.audioannotator;
@@ -23,6 +23,7 @@ package adams.gui.tools.audioannotator;
 import adams.core.CleanUpHandler;
 import adams.core.DateFormat;
 import adams.core.Properties;
+import adams.core.ShorteningType;
 import adams.core.io.PlaceholderFile;
 import adams.data.audioannotations.AudioAnnotations;
 import adams.data.io.input.AbstractAudioAnnotationsReader;
@@ -201,7 +202,7 @@ public class AudioAnnotatorPanel extends BasePanel
   @Override
   protected void initialize() {
     super.initialize();
-    m_TitleGenerator 		= new TitleGenerator("Annotator", true);
+    m_TitleGenerator 		= new TitleGenerator("Annotator", true, ShorteningType.START);
     m_dateFormatter  		= new DateFormat("HH:mm:ss");
     m_Bindings 			= new ArrayList<>();
     m_ExportFileChooser 	= new SpreadSheetFileChooser();

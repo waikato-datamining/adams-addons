@@ -15,7 +15,7 @@
 
 /*
  * AnnotatorPanel.java
- * Copyright (C) 2015-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2023 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.annotator;
@@ -23,6 +23,7 @@ package adams.gui.visualization.annotator;
 import adams.core.CleanUpHandler;
 import adams.core.DateFormat;
 import adams.core.Properties;
+import adams.core.ShorteningType;
 import adams.core.io.PlaceholderFile;
 import adams.data.image.AbstractImageContainer;
 import adams.data.image.BufferedImageContainer;
@@ -224,7 +225,7 @@ public class AnnotatorPanel extends BasePanel
   @Override
   protected void initialize() {
     super.initialize();
-    m_TitleGenerator 		= new TitleGenerator("Annotator", true);
+    m_TitleGenerator 		= new TitleGenerator("Annotator", true, ShorteningType.START);
     m_dateFormatter  		= new DateFormat("HH:mm:ss");
     m_Bindings 			= new ArrayList<>();
     m_ExportFileChooser 	= new SpreadSheetFileChooser();

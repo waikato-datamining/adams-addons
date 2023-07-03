@@ -15,7 +15,7 @@
 
 /*
  * VLCjPanel.java
- * Copyright (C) 2015-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2023 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.video.vlcjplayer;
@@ -24,6 +24,7 @@ import adams.core.CleanUpHandler;
 import adams.core.DateFormat;
 import adams.core.DateUtils;
 import adams.core.Properties;
+import adams.core.ShorteningType;
 import adams.core.logging.Logger;
 import adams.core.logging.LoggingHelper;
 import adams.gui.chooser.BaseFileChooser;
@@ -222,7 +223,7 @@ public class VLCjDirectRenderPanel
     super.initialize();
 
     m_Logger = LoggingHelper.getLogger(getClass());
-    m_TitleGenerator = new TitleGenerator("VLCj Video Player", true);
+    m_TitleGenerator = new TitleGenerator("VLCj Video Player", true, ShorteningType.START);
 
     m_PlayListeners = new HashSet<>();
     m_PauseListeners = new HashSet<>();
