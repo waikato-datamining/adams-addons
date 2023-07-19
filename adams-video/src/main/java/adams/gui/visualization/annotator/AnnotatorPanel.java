@@ -27,10 +27,10 @@ import adams.core.ShorteningType;
 import adams.core.io.PlaceholderFile;
 import adams.data.image.AbstractImageContainer;
 import adams.data.image.BufferedImageContainer;
-import adams.data.io.input.AbstractImageReader;
 import adams.data.io.input.AbstractTrailReader;
+import adams.data.io.input.ImageReader;
 import adams.data.io.output.AbstractDataContainerWriter;
-import adams.data.io.output.AbstractImageWriter;
+import adams.data.io.output.ImageWriter;
 import adams.data.io.output.SpreadSheetWriter;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.trail.Trail;
@@ -428,7 +428,7 @@ public class AnnotatorPanel extends BasePanel
 
   protected void openBackground(PlaceholderFile file) {
     AbstractImageContainer container;
-    AbstractImageReader reader = m_BackgroundFileChooser.getReader();
+    ImageReader reader = m_BackgroundFileChooser.getReader();
 
     container = reader.read(file);
 
@@ -441,7 +441,7 @@ public class AnnotatorPanel extends BasePanel
    */
   protected void saveBackground() {
     PlaceholderFile file;
-    AbstractImageWriter writer;
+    ImageWriter writer;
     BufferedImageContainer container;
     String error;
     int retVal;
