@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SimpleImageHeatmapWriter.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2023 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.output;
 
@@ -70,7 +70,7 @@ public class SimpleImageHeatmapWriter
   protected HeatmapToBufferedImage m_Conversion;
 
   /** the writer to use. */
-  protected AbstractImageWriter m_Writer;
+  protected ImageWriter m_Writer;
 
   /**
    * Returns a string describing the object.
@@ -165,7 +165,7 @@ public class SimpleImageHeatmapWriter
    *
    * @param value 	the writer
    */
-  public void setWriter(AbstractImageWriter value) {
+  public void setWriter(ImageWriter value) {
     m_Writer = value;
     reset();
   }
@@ -175,7 +175,7 @@ public class SimpleImageHeatmapWriter
    *
    * @return 		the writer
    */
-  public AbstractImageWriter getWriter() {
+  public ImageWriter getWriter() {
     return m_Writer;
   }
 

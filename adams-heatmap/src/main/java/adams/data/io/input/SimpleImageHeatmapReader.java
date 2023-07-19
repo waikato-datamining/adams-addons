@@ -15,7 +15,7 @@
 
 /*
  * SimpleImageHeatmapReader.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2023 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -59,7 +59,6 @@ import java.util.logging.Level;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SimpleImageHeatmapReader
   extends AbstractHeatmapReader {
@@ -68,7 +67,7 @@ public class SimpleImageHeatmapReader
   private static final long serialVersionUID = -2903357410192470809L;
 
   /** the image reader to use. */
-  protected AbstractImageReader m_Reader;
+  protected ImageReader m_Reader;
 
   /**
    * Returns a string describing the object.
@@ -99,7 +98,7 @@ public class SimpleImageHeatmapReader
    *
    * @param value 	the reader
    */
-  public void setReader(AbstractImageReader value) {
+  public void setReader(ImageReader value) {
     m_Reader = value;
     reset();
   }
@@ -109,7 +108,7 @@ public class SimpleImageHeatmapReader
    *
    * @return 		the reader
    */
-  public AbstractImageReader getReader() {
+  public ImageReader getReader() {
     return m_Reader;
   }
 
