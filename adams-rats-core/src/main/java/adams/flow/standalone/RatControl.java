@@ -15,7 +15,7 @@
 
 /*
  * RatControl.java
- * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2023 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
@@ -621,8 +621,10 @@ public class RatControl
     }
 
     if (result == null) {
-      ConsolePanel.getSingleton().removeListener(this);
-      ConsolePanel.getSingleton().addListener(this);
+      if (!isHeadless()) {
+        ConsolePanel.getSingleton().removeListener(this);
+        ConsolePanel.getSingleton().addListener(this);
+      }
     }
 
     return result;
