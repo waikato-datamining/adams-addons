@@ -756,7 +756,8 @@ public class RatControl
     }
 
     if (m_TextAreaConsole != null) {
-      ConsolePanel.getSingleton().removeListener(this);
+      if (!isHeadless())
+        ConsolePanel.getSingleton().removeListener(this);
       m_TextAreaConsole = null;
     }
 
