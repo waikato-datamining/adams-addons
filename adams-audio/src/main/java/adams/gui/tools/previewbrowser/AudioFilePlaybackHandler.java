@@ -65,7 +65,7 @@ public class AudioFilePlaybackHandler
    * @return the preview
    */
   @Override
-  protected PreviewPanel createPreview(File file) {
+  public PreviewPanel createPreview(File file) {
     BasePanel			result;
     AudioPlaybackPanel		panel;
 

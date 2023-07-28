@@ -90,7 +90,7 @@ public class HeatmapSpreadSheetHandler
    * @return		the view
    */
   @Override
-  protected PreviewPanel createPreview(File file) {
+  public PreviewPanel createPreview(File file) {
     BasePanel					result;
     AbstractDataContainerReader<Heatmap> 	reader;
     List<Heatmap>				maps;

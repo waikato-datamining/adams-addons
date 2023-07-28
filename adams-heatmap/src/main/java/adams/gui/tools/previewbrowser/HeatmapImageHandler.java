@@ -84,7 +84,7 @@ public class HeatmapImageHandler
    * @return		the view
    */
   @Override
-  protected PreviewPanel createPreview(File file) {
+  public PreviewPanel createPreview(File file) {
     HeatmapPanel				result;
     AbstractDataContainerReader<Heatmap> 	reader;
     List<Heatmap>				maps;

@@ -76,7 +76,7 @@ public class AudioFileInfoHandler
    * @return the preview
    */
   @Override
-  protected PreviewPanel createPreview(File file) {
+  public PreviewPanel createPreview(File file) {
     BasePanel 			result;
     KeyValuePairTableModel 	model;
     SortableAndSearchableTable 	table;
