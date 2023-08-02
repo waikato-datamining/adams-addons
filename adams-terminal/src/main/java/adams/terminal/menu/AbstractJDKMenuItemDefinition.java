@@ -13,12 +13,13 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractJDKMenuItemDefinition.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2023 University of Waikato, Hamilton, New Zealand
  */
 package adams.terminal.menu;
 
+import adams.core.management.EnvVar;
 import adams.core.management.Java;
 import adams.terminal.application.AbstractTerminalApplication;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
@@ -28,7 +29,6 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
  * Ancestor for menu items that require a JDK present.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public abstract class AbstractJDKMenuItemDefinition
   extends AbstractMenuItemDefinition {
@@ -68,7 +68,7 @@ public abstract class AbstractJDKMenuItemDefinition
     if (!Java.isJDK()) {
       MessageDialog.showMessageDialog(context, getTitle(),
 	"No JDK installed or JAVA_HOME does not point to it!\n"
-	  + "JAVA_HOME: " + System.getenv("JAVA_HOME"));
+	  + "JAVA_HOME: " + EnvVar.get("JAVA_HOME"));
       return;
     }
 
