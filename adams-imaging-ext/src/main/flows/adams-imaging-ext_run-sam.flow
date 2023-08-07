@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2023-07-04 16:59:45
+# Date: 2023-08-08 10:39:01
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-docker,adams-imaging,adams-imaging-ext,adams-json,adams-meta,adams-net,adams-redis,adams-spreadsheet,adams-xml
@@ -12,7 +12,7 @@ adams.flow.control.Flow -annotation "Runs the SAM (Segment-Anything Model) docke
  adams.flow.source.Start
  adams.flow.control.Trigger -name "prompt user"
   adams.flow.standalone.SetVariable -name "restore file" -var-name restore -var-value @{flow_filename_long}.props -value-type FILE_FORWARD_SLASHES -expand-value true
-  adams.flow.source.EnterManyValues -name Parameters -stop-if-canceled true -value "adams.flow.source.valuedefinition.ListSelectionValueDefinition -name model_type -display model_type -help \"the type of model to use\" -value vit_h -value vit_l -value vit_b -default-value vit_h" -value "adams.flow.source.valuedefinition.ListSelectionValueDefinition -name docker_image -display \"Docker image\" -help \"select \\\"_cpu\\\" if no NVIDIA GPU present, however a GPU is strongly recommended for speed reasons\" -value waikatodatamining/pytorch-sam:2023-04-16_cpu -value waikatodatamining/pytorch-sam:2023-04-16_cuda11.6 -default-value waikatodatamining/pytorch-sam:2023-04-16_cpu" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name channel_in -display \"Channel in\" -help \"the channel for SAM to listen for data\" -default-value sam_in" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name channel_out -display \"Channel out\" -help \"the channel for SAM to broadcast the results on\" -default-value sam_out" -output-type MAP -restoration-enabled true -restoration-file @{restore}
+  adams.flow.source.EnterManyValues -name Parameters -stop-if-canceled true -value "adams.flow.source.valuedefinition.ListSelectionValueDefinition -name model_type -display model_type -help \"the type of model to use\" -value vit_h -value vit_l -value vit_b -default-value vit_h" -value "adams.flow.source.valuedefinition.ListSelectionValueDefinition -name docker_image -display \"Docker image\" -help \"select \\\"_cpu\\\" if no NVIDIA GPU present, however a GPU is strongly recommended for speed reasons\" -value waikatodatamining/pytorch-sam:2023-04-16_cpu -value waikatodatamining/pytorch-sam:2023-04-16_cuda11.6 -default-value waikatodatamining/pytorch-sam:2023-04-16_cpu" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name channel_in -display \"Channel in\" -help \"the channel for SAM to listen for data\" -default-value sam_in" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name channel_out -display \"Channel out\" -help \"the channel for SAM to broadcast the results on\" -default-value sam_out" -output-type MAP -display-location NOTIFICATION_AREA -restoration-enabled true -restoration-file @{restore}
   adams.flow.transformer.MapToVariables
   adams.flow.control.Trigger -name "model URL/name/file"
    adams.flow.source.Variable -var-name model_type -conversion adams.data.conversion.StringToString
@@ -40,7 +40,7 @@ adams.flow.control.Flow -annotation "Runs the SAM (Segment-Anything Model) docke
  adams.flow.control.Trigger -name SAM -asynchronous true
   adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.Run -output-type BOTH -output-formatter adams.core.command.output.PassThrough -stdout-processor adams.core.command.stdout.Log -stderr-processor adams.core.command.stderr.Log -blocking false -remove-container true -run-as-user true -pull-type ALWAYS -options-string \"@{gpu} --net=host -t @{docker_image} sam_predict_redis --redis_in @{channel_in} --redis_out @{channel_out} --model /workspace/@{model_name} --model_type @{model_type} --verbose\\\\n\""
   adams.flow.sink.CallableSink -callable Display
- adams.flow.control.ConditionalTrigger -name stop? -condition "adams.flow.condition.bool.PromptUser -message \"Do you want to stop SAM?\""
+ adams.flow.control.ConditionalTrigger -name stop? -condition "adams.flow.condition.bool.PromptUser -message \"Do you want to stop SAM?\" -display-location NOTIFICATION_AREA"
   adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.ListContainers -output-formatter adams.core.command.output.LineSplit -stdout-processor adams.core.command.stdout.Log -stderr-processor adams.core.command.stderr.Log -filter ancestor=@{docker_image}"
   adams.flow.control.Tee -name stop
    adams.flow.transformer.SimpleDockerCommand -command "adams.docker.simpledocker.StopContainers -output-formatter adams.core.command.output.PassThrough -stdout-processor adams.core.command.stdout.Log -stderr-processor adams.core.command.stderr.Log"
