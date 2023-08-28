@@ -1,0 +1,53 @@
+# Project: adams
+# Date: 2023-08-28 15:11:34
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-docker,adams-imaging,adams-imaging-ext,adams-json,adams-meta,adams-net,adams-redis,adams-spreadsheet,adams-xml
+#
+adams.flow.control.Flow -annotation "Runs the SAM-HQ (Segment-Anything in High Quality) docker image for aiding in annotating images.\\nA prompt asking to \\\"Stop SAM-HQ\\\" will pop up immediately, since the docker image\\ngets started asynchronously. You can ignore that dialog until you want to shut\\ndown the SAM-HQ instance (e.g., when the annotating work is done).\\n\\nModel size, speed (on CPU) and quality:\\n- vit_h: 2.6GB, 15-30s, high\\n- vit_l: 1.3GB, 10-20s, medium\\n- vit_b: 380MB, 5-10s, low\\n- vit_tiny: 43MB, 1-2s, low/for mobile\\n" -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -display-type adams.flow.core.displaytype.DisplayInEditor -x -3 -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.SetVariable -name "reset gpu" -var-name gpu -var-value ""
+ adams.flow.standalone.SimpleDockerConnection -dir-mapping ${EXAMPLE_FLOWS}/cache:/.cache -dir-mapping ${EXAMPLE_FLOWS}/output:/workspace
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "prompt user"
+  adams.flow.standalone.SetVariable -name "restore file" -var-name restore -var-value @{flow_filename_long}.props -value-type FILE_FORWARD_SLASHES -expand-value true
+  adams.flow.source.EnterManyValues -name Parameters -stop-if-canceled true -value "adams.flow.source.valuedefinition.ListSelectionValueDefinition -name model_type -display model_type -help \"the type of model to use\" -value vit_h -value vit_l -value vit_b -value vit_tiny -default-value vit_h" -value "adams.flow.source.valuedefinition.ListSelectionValueDefinition -name docker_image -display \"Docker image\" -help \"select \\\"_cpu\\\" if no NVIDIA GPU present, however a GPU is strongly recommended for speed reasons\" -value waikatodatamining/pytorch-sam-hq:2023-08-17_cpu -value waikatodatamining/pytorch-sam-hq:2023-08-17_cuda11.6 -default-value waikatodatamining/pytorch-sam-hq:2023-08-17_cpu" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name channel_in -display \"Channel in\" -help \"the channel for SAM to listen for data\" -default-value samhq_in" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name channel_out -display \"Channel out\" -help \"the channel for SAM to broadcast the results on\" -default-value samhq_out" -output-type MAP -display-location NOTIFICATION_AREA -restoration-enabled true -restoration-file @{restore}
+  adams.flow.transformer.MapToVariables
+  adams.flow.control.Trigger -name "model URL/name/file"
+   adams.flow.source.Variable -var-name model_type -conversion adams.data.conversion.StringToString
+   adams.flow.control.Switch -condition "adams.flow.condition.bool.Expression -expression \"\\\\\\\"@{model_type}\\\\\\\" = \\\\\\\"vit_h\\\\\\\"\"" -condition "adams.flow.condition.bool.Expression -expression \"\\\\\\\"@{model_type}\\\\\\\" = \\\\\\\"vit_l\\\\\\\"\"" -condition "adams.flow.condition.bool.Expression -expression \"\\\\\\\"@{model_type}\\\\\\\" = \\\\\\\"vit_b\\\\\\\"\"" -condition adams.flow.condition.bool.True
+    adams.flow.control.Trigger -name vit_h
+     adams.flow.standalone.SetVariable -name model_url -var-name model_url -var-value https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_h.pth
+     adams.flow.standalone.SetVariable -name model_name -var-name model_name -var-value sam_hq_vit_h.pth
+    adams.flow.control.Trigger -name vit_l
+     adams.flow.standalone.SetVariable -name model_url -var-name model_url -var-value https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_l.pth
+     adams.flow.standalone.SetVariable -name model_name -var-name model_name -var-value sam_hq_vit_l.pth
+    adams.flow.control.Trigger -name vit_b
+     adams.flow.standalone.SetVariable -name model_url -var-name model_url -var-value https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_b.pth
+     adams.flow.standalone.SetVariable -name model_name -var-name model_name -var-value sam_hq_vit_b.pth
+    adams.flow.control.Trigger -name vit_tiny
+     adams.flow.standalone.SetVariable -name model_url -var-name model_url -var-value https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_tiny.pth
+     adams.flow.standalone.SetVariable -name model_name -var-name model_name -var-value sam_hq_vit_tiny.pth
+    adams.flow.control.Stop -stop-msg "Unhandled model type: @{model_type}"
+   adams.flow.transformer.SetVariable -name model_file -var-name model_file -var-value ${FLOWS}/output/@{model_name} -value-type FILE_FORWARD_SLASHES -expand-value true
+  adams.flow.control.ConditionalTrigger -name gpu? -condition "adams.flow.condition.bool.Expression -expression \"not contains(\\\\\\\"@{docker_image}\\\\\\\", \\\\\\\"_cpu\\\\\\\")\""
+   adams.flow.standalone.SetVariable -name "gpu arguments" -var-name gpu -var-value --gpus=all
+ adams.flow.control.ConditionalTrigger -name "download model?" -condition "adams.flow.condition.bool.Not -condition \"adams.flow.condition.bool.FileExists -file @{model_file} -generator adams.core.io.NullFilenameGenerator\""
+  adams.flow.source.URLSupplier -url @{model_url}
+  adams.flow.control.Tee -name info
+   adams.flow.transformer.Convert -conversion adams.data.conversion.AnyToString
+   adams.flow.transformer.StringInsert -position first -value "Downloading pretrained model:\\\\n"
+   adams.flow.sink.CallableSink -callable Display
+  adams.flow.sink.DownloadFile -logging-level INFO -output @{model_file} -buffer-size 1024000
+ adams.flow.control.Trigger -name SAM-HQ -asynchronous true
+  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.Run -output-type BOTH -output-formatter adams.core.command.output.PassThrough -stdout-processor adams.core.command.stdout.Log -stderr-processor adams.core.command.stderr.Log -blocking false -remove-container true -run-as-user true -pull-type ALWAYS -options-string \"@{gpu} --net=host -t @{docker_image} samhq_predict_redis --redis_in @{channel_in} --redis_out @{channel_out} --model /workspace/@{model_name} --model_type @{model_type} --verbose\\\\n\""
+  adams.flow.sink.CallableSink -callable Display
+ adams.flow.control.ConditionalTrigger -name stop? -condition "adams.flow.condition.bool.PromptUser -message \"Do you want to stop SAM-HQ?\" -display-location NOTIFICATION_AREA"
+  adams.flow.source.SimpleDockerCommand -command "adams.docker.simpledocker.ListContainers -output-formatter adams.core.command.output.LineSplit -stdout-processor adams.core.command.stdout.Log -stderr-processor adams.core.command.stderr.Log -filter ancestor=@{docker_image}"
+  adams.flow.control.Tee -name stop
+   adams.flow.transformer.SimpleDockerCommand -command "adams.docker.simpledocker.StopContainers -output-formatter adams.core.command.output.PassThrough -stdout-processor adams.core.command.stdout.Log -stderr-processor adams.core.command.stderr.Log"
+   adams.flow.sink.CallableSink -callable Display
+  adams.flow.control.Tee -name remove
+   adams.flow.transformer.SimpleDockerCommand -command "adams.docker.simpledocker.RemoveContainers -output-formatter adams.core.command.output.PassThrough -stdout-processor adams.core.command.stdout.Log -stderr-processor adams.core.command.stderr.Log -force true"
+   adams.flow.sink.CallableSink -callable Display
