@@ -1,10 +1,12 @@
 # Project: adams
-# Date: 2018-01-22 11:42:30
+# Date: 2024-01-09 21:14:34
 # User: fracpete
 # Charset: UTF-8
-adams.flow.control.Flow -annotation "Shows how to connect to a REST webservice, constructing URL \\nand connecting to service to obtain and display result.\\n\\nNB: Requires \\\"adams-rest-echo_server.flow\\\" to be running." -flow-execution-listener adams.flow.execution.NullListener
+# Modules: adams-core,adams-event,adams-json,adams-net,adams-rest,adams-security,adams-webservice-core
+#
+adams.flow.control.Flow -annotation "Shows how to connect to a REST webservice, constructing URL \\nand connecting to service to obtain and display result.\\n\\nNB: Requires \\\"adams-rest-generic_server.flow\\\" to be running." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.SetVariable -name "webservice URL" -var-name service_url -var-value http://localhost:8080/echo/
- adams.flow.source.EnterValue -stop-if-canceled true -message "Please value to send to webservice" -initial-value "The brown fox jumps over the lazy dog."
+ adams.flow.source.EnterValue -stop-if-canceled true -message "Please enter value to send to the webservice" -initial-value "The brown fox jumps over the lazy dog."
  adams.flow.control.Tee -name encode
   adams.flow.transformer.Convert -conversion adams.data.conversion.URLEncode
   adams.flow.transformer.StringInsert -position first -value @{service_url}
