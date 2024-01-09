@@ -15,7 +15,7 @@
 
 /*
  * RenjinSource.java
- * Copyright (C) 2021 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2021-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.source;
@@ -353,7 +353,7 @@ public class RenjinSource
     if (QuickInfoHelper.hasVariable(this, "scriptFile") || !m_ScriptFile.isDirectory())
       result = QuickInfoHelper.toString(this, "scriptFile", m_ScriptFile, "file: ");
     else
-      result = QuickInfoHelper.toString(this, "inlineScript", Shortening.shortenEnd(m_InlineScript.isEmpty() ? "-none-" : m_InlineScript.stringValue(), 50), ", inline: ");
+      result = QuickInfoHelper.toString(this, "inlineScript", Shortening.shortenEnd(m_InlineScript.isEmpty() ? "-none-" : m_InlineScript.stringValue(), 50), "inline: ");
 
     options = new ArrayList<>();
     QuickInfoHelper.add(options, QuickInfoHelper.toString(this, "scriptContainsPlaceholder", m_ScriptContainsPlaceholder, "PH"));
