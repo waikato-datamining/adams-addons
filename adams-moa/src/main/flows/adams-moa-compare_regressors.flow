@@ -1,8 +1,8 @@
 # Project: adams
-# Date: 2019-07-23 15:09:05
+# Date: 2024-01-09 20:25:08
 # User: fracpete
 # Charset: UTF-8
-# Modules: adams-core,adams-ml,adams-moa,adams-spreadsheet,adams-visualstats,adams-weka
+# Modules: adams-core,adams-json,adams-math,adams-ml,adams-moa,adams-spreadsheet,adams-visualstats,adams-weka
 #
 adams.flow.control.Flow -annotation "Compares the mean absolute error of a FIMTDD regressor\\nwith SGD on a RandomTree data stream." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
@@ -11,12 +11,12 @@ adams.flow.control.Flow -annotation "Compares the mean absolute error of a FIMTD
   adams.flow.sink.SequencePlotter -display-type adams.flow.core.displaytype.Default -writer adams.gui.print.NullWriter -paintlet "adams.gui.visualization.sequence.LinePaintlet -markers-disabled true -paint-all true" -overlay-paintlet "adams.gui.visualization.sequence.CirclePaintlet -meta-data-color adams.gui.visualization.sequence.metadatacolor.Dummy" -marker-paintlet adams.flow.sink.sequenceplotter.NoMarkers -error-paintlet adams.flow.sink.sequenceplotter.NoErrorPaintlet -mouse-click-action adams.flow.sink.sequenceplotter.NullClickAction -color-provider "adams.gui.visualization.core.CustomColorProvider -color #0000ff -color #ff0000 -color #00ffff -color #00ff00 -color #ff00ff -color #ffc800 -color #ffafaf" -overlay-color-provider adams.gui.visualization.core.DefaultColorProvider -title "Regressor comparison" -axis-x "adams.gui.visualization.core.AxisPanelOptions -label \"Evaluation step\" -tick-generator adams.gui.visualization.core.axis.FancyTickGenerator -nth-value 2 -width 40 -custom-format 0" -axis-y "adams.gui.visualization.core.AxisPanelOptions -label \"Mean absolute error\" -tick-generator adams.gui.visualization.core.axis.FancyTickGenerator -nth-value 2 -width 60 -custom-format 0.0" -plot-updater adams.flow.sink.sequenceplotter.SimplePlotUpdater -post-processor adams.flow.sink.sequenceplotter.PassThrough
  adams.flow.source.MOAStream -stream moa.streams.generators.RandomTreeGenerator
  adams.flow.control.Branch
-  adams.flow.control.Sequence -name hoeffding
+  adams.flow.control.Sequence -name fimtdd
    adams.flow.transformer.MOARegressorEvaluation -regressor FIMTDD -output-interval 100
    adams.flow.transformer.MOAMeasurementsFilter -regexp "mean absolute error.*"
    adams.flow.transformer.MOAMeasurementPlotGenerator -prefix "f: "
    adams.flow.sink.CallableSink -callable SequencePlotter
-  adams.flow.control.Sequence -name naivebayes
+  adams.flow.control.Sequence -name sgd
    adams.flow.transformer.MOARegressorEvaluation -regressor SGD -output-interval 100
    adams.flow.transformer.MOAMeasurementsFilter -regexp "mean absolute error.*"
    adams.flow.transformer.MOAMeasurementPlotGenerator -prefix "s: "
