@@ -2,7 +2,6 @@
 # Date: 2019-07-26 13:42:08
 # User: fracpete
 # Charset: UTF-8
-# Modules: adams-core,adams-ml,adams-net,adams-nlp,adams-spreadsheet,adams-twitter,adams-visualstats,adams-weka
 #
 adams.flow.control.Flow -annotation "Generates a word cloud from two books." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.GridView -name Frequencies -short-title true -display-type adams.flow.core.displaytype.Default -x -3 -num-cols 2 -writer adams.gui.print.NullWriter

@@ -2,7 +2,6 @@
 # Date: 2019-07-26 13:31:26
 # User: fracpete
 # Charset: UTF-8
-# Modules: adams-core,adams-ml,adams-net,adams-nlp,adams-spreadsheet,adams-twitter,adams-visualstats,adams-weka
 #
 adams.flow.control.Flow -annotation "Generates a word cloud from a book." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.source.Start
