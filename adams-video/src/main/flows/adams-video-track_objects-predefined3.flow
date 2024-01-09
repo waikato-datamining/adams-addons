@@ -2,7 +2,6 @@
 # Date: 2019-12-18 15:53:57
 # User: fracpete
 # Charset: UTF-8
-# Modules: adams-core,adams-ffmpeg,adams-imaging,adams-imaging-boofcv,adams-imaging-openimaj,adams-json,adams-spreadsheet,adams-video,adams-xml
 #
 adams.flow.control.Flow -annotation "Tracks an object throughout a movie using a predefined, initial location.\\nSaves and displays the generated trail object." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.TabView -width 1000 -x -3

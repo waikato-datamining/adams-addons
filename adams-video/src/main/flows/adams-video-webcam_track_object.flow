@@ -2,14 +2,13 @@
 # Date: 2019-12-18 15:55:36
 # User: fracpete
 # Charset: UTF-8
-# Modules: adams-core,adams-ffmpeg,adams-imaging,adams-imaging-boofcv,adams-imaging-openimaj,adams-json,adams-spreadsheet,adams-video,adams-xml
 #
 adams.flow.control.Flow -annotation "Displays frames obtained from the default webcam, till you stop the flow.\\nThe first frame is used to select the object to track, for instance, your head." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.source.WebcamImage -conversion adams.data.conversion.BufferedImageToBufferedImage
  adams.flow.transformer.Convert -conversion adams.data.conversion.BufferedImageToBoofCV
  adams.flow.transformer.SetStorageValue -storage-name frame
  adams.flow.control.Once -name "select object"
-  adams.flow.control.Inspect -provider "adams.flow.sink.ImageViewer -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.SelectObjectToTrack -selection-box-color #ff0000 -image-overlay adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport" -close-dialog true
+  adams.flow.control.Inspect -provider "adams.flow.sink.ImageViewer -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.SelectObjectToTrack -image-overlay adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport" -close-dialog true
   adams.flow.transformer.SetStorageValue -storage-name frame
  adams.flow.control.Trigger -name track
   adams.flow.source.StorageValue -storage-name frame

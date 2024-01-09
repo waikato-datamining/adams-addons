@@ -2,7 +2,6 @@
 # Date: 2019-12-18 15:54:36
 # User: fracpete
 # Charset: UTF-8
-# Modules: adams-core,adams-ffmpeg,adams-imaging,adams-imaging-boofcv,adams-imaging-openimaj,adams-json,adams-spreadsheet,adams-video,adams-xml
 #
 adams.flow.control.Flow -annotation "Let\\\'s the user select an initial object to be tracked.\\nIn this case, select the head of the person." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.GridView -width 1200 -num-cols 3 -add-headers true -writer adams.gui.print.NullWriter
@@ -15,7 +14,7 @@ adams.flow.control.Flow -annotation "Let\\\'s the user select an initial object 
  adams.flow.transformer.Convert -conversion adams.data.conversion.BufferedImageToBoofCV
  adams.flow.transformer.SetStorageValue -storage-name frame
  adams.flow.control.Once -name "select object"
-  adams.flow.control.Inspect -stop-if-canceled true -provider "adams.flow.sink.ImageViewer -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.SelectObjectToTrack -left-click-processor adams.gui.visualization.image.leftclick.NullProcessor -selection-box-color #ff0000 -image-overlay adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport" -close-dialog true
+  adams.flow.control.Inspect -stop-if-canceled true -provider "adams.flow.sink.ImageViewer -writer adams.gui.print.NullWriter -selection-processor adams.gui.visualization.image.selection.SelectObjectToTrack -left-click-processor adams.gui.visualization.image.leftclick.NullProcessor -image-overlay adams.gui.visualization.image.QuadrilateralLocationsOverlayFromReport" -close-dialog true
   adams.flow.transformer.SetStorageValue -storage-name frame
  adams.flow.control.Trigger -name track
   adams.flow.source.StorageValue -storage-name frame
