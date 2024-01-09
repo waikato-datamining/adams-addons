@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2019-10-08 10:07:54
+# Date: 2024-01-09 21:12:19
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-event,adams-json,adams-net,adams-rest,adams-security,adams-webservice-core
@@ -11,6 +11,6 @@ adams.flow.control.Flow -annotation "Flow for testing the CallableTextPipeline R
  adams.flow.transformer.TextFileReader -reader adams.data.io.input.LineByLineTextReader
  adams.flow.control.Tee -name "display input"
   adams.flow.sink.CallableSink -callable Display
- adams.flow.transformer.HttpRequest -url http://localhost:8080/process
+ adams.flow.transformer.HttpRequest -url http://localhost:8080/process -mime-type text/plain
  adams.flow.control.ContainerValuePicker -value Body
   adams.flow.sink.CallableSink -callable Display
