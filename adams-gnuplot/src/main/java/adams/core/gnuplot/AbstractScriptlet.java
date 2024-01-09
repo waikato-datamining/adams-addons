@@ -13,13 +13,14 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractScriptlet.java
- * Copyright (C) 2011-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.core.gnuplot;
 
 import adams.core.ErrorProvider;
+import adams.core.QuickInfoSupporter;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.Actor;
 
@@ -27,11 +28,10 @@ import adams.flow.core.Actor;
  * Ancestor for scriplets that generate Gnuplot scripts (or parts of it).
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public abstract class AbstractScriptlet
   extends AbstractOptionHandler
-  implements ErrorProvider {
+  implements ErrorProvider, QuickInfoSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = 8269710957096517396L;
@@ -89,7 +89,19 @@ public abstract class AbstractScriptlet
   public String getLastError() {
     return m_LastError;
   }
-  
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   * <br/>
+   * Default implementation returns null.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    return null;
+  }
+
   /**
    * Hook method for performing checks.
    * <br><br>

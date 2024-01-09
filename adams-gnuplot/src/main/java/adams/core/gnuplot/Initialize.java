@@ -13,12 +13,13 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Initialize.java
- * Copyright (C) 2011-2105 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.core.gnuplot;
 
+import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.io.PlaceholderFile;
 
@@ -68,7 +69,6 @@ import adams.core.io.PlaceholderFile;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class Initialize
   extends AbstractScriptlet {
@@ -332,6 +332,23 @@ public class Initialize
 	  result = "Output '" + m_OutputFile + "' is pointing to a directory!";
       }
     }
+
+    return result;
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "title", m_Title, "title: ");
+    result += QuickInfoHelper.toString(this, "XLabel", m_XLabel, ", x-label: ");
+    result += QuickInfoHelper.toString(this, "YLabel", m_YLabel, ", y-label: ");
+    result += QuickInfoHelper.toString(this, "ZLabel", m_ZLabel, ", z-label: ");
 
     return result;
   }

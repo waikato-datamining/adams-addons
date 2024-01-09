@@ -19,6 +19,7 @@
  */
 package adams.core.gnuplot;
 
+import adams.core.QuickInfoHelper;
 import adams.flow.core.Actor;
 
 /**
@@ -195,6 +196,16 @@ public class MultiScriptlet
     }
 
     return result;
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    return QuickInfoHelper.toString(this, "scriptlets", m_Scriptlets, "scriptlets: ");
   }
 
   /**

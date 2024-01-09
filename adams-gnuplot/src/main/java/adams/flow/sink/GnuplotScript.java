@@ -15,11 +15,12 @@
 
 /*
  * GnuplotScript.java
- * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
 
+import adams.core.QuickInfoHelper;
 import adams.core.gnuplot.AbstractScriptlet;
 import adams.core.gnuplot.AbstractScriptletWithDataFile;
 import adams.core.gnuplot.CustomScriptlet;
@@ -90,7 +91,6 @@ import java.io.FileWriter;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class GnuplotScript
   extends AbstractAppendableFileWriter {
@@ -175,6 +175,21 @@ public class GnuplotScript
    */
   public String scriptletTipText() {
     return "The scriplet to use for producing the Gnuplot script for plotting the data.";
+  }
+
+  /**
+   * Returns a quick info about the actor, which will be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    String	result;
+
+    result = super.getQuickInfo();
+    result += ", scriptlet: " + QuickInfoHelper.toString(this, "scriptlet", m_Scriptlet);
+
+    return result;
   }
 
   /**

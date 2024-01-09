@@ -19,6 +19,7 @@
  */
 package adams.core.gnuplot;
 
+import adams.core.QuickInfoHelper;
 import adams.core.base.BaseText;
 
 /**
@@ -101,6 +102,16 @@ public class CustomScriptlet
    */
   public String scriptTipText() {
     return "The custom script code.";
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    return QuickInfoHelper.toString(this, "script", m_Script, "script: ");
   }
 
   /**

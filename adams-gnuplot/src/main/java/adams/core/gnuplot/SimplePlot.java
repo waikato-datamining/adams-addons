@@ -20,6 +20,7 @@
 package adams.core.gnuplot;
 
 import adams.core.EnumWithCustomDisplay;
+import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.option.AbstractOption;
 
@@ -348,6 +349,21 @@ public class SimplePlot
    */
   public String firstPlotTipText() {
     return "If enabled, the plot is assumed to be the first plot.";
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "plotType", m_PlotType, "type: ");
+    result += QuickInfoHelper.toString(this, "plotName", m_PlotType, ", name: ");
+
+    return result;
   }
 
   /**

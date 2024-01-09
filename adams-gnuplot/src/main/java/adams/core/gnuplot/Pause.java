@@ -13,12 +13,13 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Pause.java
- * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.core.gnuplot;
 
+import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 
 /**
@@ -48,7 +49,6 @@ import adams.core.Utils;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class Pause
   extends AbstractScriptlet {
@@ -149,6 +149,21 @@ public class Pause
    */
   public String messageTipText() {
     return "The message to output in the terminal when pausing, ignored if empty.";
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "waitingPeriod", m_WaitingPeriod, "wait: ");
+    result += QuickInfoHelper.toString(this, "message", m_Message, ", msg: ");
+
+    return result;
   }
 
   /**
