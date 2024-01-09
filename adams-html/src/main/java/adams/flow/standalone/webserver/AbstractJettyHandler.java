@@ -15,11 +15,16 @@
 
 /*
  * AbstractJettyHandler.java
- * Copyright (C) 2013-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.webserver;
 
 import adams.core.io.FileUtils;
+import adams.core.logging.Logger;
+import adams.core.logging.LoggingHelper;
+import adams.core.logging.LoggingLevel;
+import adams.core.logging.LoggingLevelHandler;
+import adams.core.logging.LoggingSupporter;
 import adams.core.net.MimeTypeHelper;
 import adams.flow.control.RunningFlowsRegistry;
 import adams.gui.core.ImageManager;
@@ -36,16 +41,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 /**
  * Handler for displaying the currently running flows.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  * @see RunningFlowsRegistry
  */
 public abstract class AbstractJettyHandler
-  extends org.eclipse.jetty.server.handler.AbstractHandler {
+  extends org.eclipse.jetty.server.handler.AbstractHandler
+  implements LoggingSupporter, LoggingLevelHandler {
 
   /** the modifued timestamp for the images. */
   protected long m_ModifiedTimestamp = (System.currentTimeMillis() / 1000) * 1000L;
@@ -61,7 +67,13 @@ public abstract class AbstractJettyHandler
   
   /** the mimetypes cache (ext - mimetype). */
   protected HashMap<String,String> m_ImageMimeTypes;
-  
+
+  /** for logging. */
+  protected Logger m_Logger;
+
+  /** the logging level. */
+  protected LoggingLevel m_LoggingLevel;
+
   /**
    * Initializes the handler.
    */
@@ -74,11 +86,13 @@ public abstract class AbstractJettyHandler
    * Initializes the members.
    */
   protected void initialize() {
+    m_Logger            = null;
+    m_LoggingLevel      = LoggingHelper.getLoggingLevel(getClass());
     m_ServeIcon         = true;
     m_Favicon           = loadImage("adams_icon.ico");
     m_ModifiedTimestamp = (System.currentTimeMillis() / 1000) * 1000L;
-    m_ImageModified     = new HashMap<String,Long>();
-    m_ImageMimeTypes    = new HashMap<String,String>();
+    m_ImageModified     = new HashMap<>();
+    m_ImageMimeTypes    = new HashMap<>();
     m_ImageMimeTypes.put("gif",  "image/gif");
     m_ImageMimeTypes.put("png",  "image/png");
     m_ImageMimeTypes.put("ico",  "image/x-icon");
@@ -87,6 +101,46 @@ public abstract class AbstractJettyHandler
     m_ImageMimeTypes.put("tiff", "image/tiff");
     m_ImageMimeTypes.put("jpg",  "image/jpeg");
     m_ImageMimeTypes.put("jpeg", "image/jpeg");
+  }
+
+  /**
+   * Returns the logger in use.
+   *
+   * @return		the logger
+   */
+  public synchronized Logger getLogger() {
+    if (m_Logger == null)
+      m_Logger = LoggingHelper.getLogger(getClass());
+    return m_Logger;
+  }
+
+  /**
+   * Returns whether logging is enabled.
+   *
+   * @return		true if at least {@link Level#INFO}
+   */
+  public boolean isLoggingEnabled() {
+    return LoggingHelper.isAtLeast(getLogger(), Level.INFO);
+  }
+
+  /**
+   * Sets the logging level.
+   *
+   * @param value 	the level
+   */
+  public void setLoggingLevel(LoggingLevel value) {
+    m_LoggingLevel = value;
+    if (m_Logger != null)
+      m_Logger.setLevel(value.getLevel());
+  }
+
+  /**
+   * Returns the logging level.
+   *
+   * @return 		the level
+   */
+  public LoggingLevel getLoggingLevel() {
+    return m_LoggingLevel;
   }
 
   /**
@@ -112,7 +166,7 @@ public abstract class AbstractJettyHandler
       }
     }
     catch(Exception e) {
-      e.printStackTrace();
+      getLogger().log(Level.SEVERE, "Failed to load image: " + name, e);
     }
     
     return result;

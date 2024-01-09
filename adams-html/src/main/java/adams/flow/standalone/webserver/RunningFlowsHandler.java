@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * RunningFlowsHandler.java
- * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.webserver;
 
@@ -40,7 +40,6 @@ import java.io.OutputStream;
  * Handler for displaying the currently running flows.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  * @see RunningFlowsRegistry
  */
 @MixedCopyright(
@@ -148,7 +147,12 @@ public class RunningFlowsHandler
    */
   @Override
   public Handler configureHandler() {
-    return new CustomHandler();
+    CustomHandler	result;
+
+    result = new CustomHandler();
+    result.setLoggingLevel(getLoggingLevel());
+
+    return result;
   }
 
 }
