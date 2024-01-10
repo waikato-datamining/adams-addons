@@ -286,7 +286,7 @@ public abstract class AbstractHeatmapFeatureGeneratorTestCase
     cleanUpAfterRegression();
 
     // connect to default database
-    m_Properties = null;
+    m_DatabaseProperties = null;
     getDatabaseProperties();
   }
 

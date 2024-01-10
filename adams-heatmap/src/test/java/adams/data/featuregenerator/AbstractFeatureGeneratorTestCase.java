@@ -281,7 +281,7 @@ public abstract class AbstractFeatureGeneratorTestCase
     cleanUpAfterRegression();
 
     // connect to default database
-    m_Properties = null;
+    m_DatabaseProperties = null;
     getDatabaseProperties();
   }
 
