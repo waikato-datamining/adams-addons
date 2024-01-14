@@ -1,6 +1,5 @@
 --> dumpfile.txt
 <HTML lang="en">
-      
     <HEAD>
         <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
             
@@ -17,7 +16,6 @@
         <META content="Computer Science, Waikato University, Hamilton, New Zealand" name="keywords">
             
     </HEAD>
-      
     <BODY>
             
         <TABLE cellspacing="0" class="header" summary="" width="100%">
@@ -139,80 +137,82 @@
                                           
                             <TABLE cellpadding="0" cellspacing="0">
                                                 
-                                <TR>
-                                                      <TD valign="top">
+                                <TBODY>
+                                    <TR>
+                                                          <TD valign="top">
                     
-                                        <DIV class="frontRGList">
-                                                                  
-                                            <UL>
-                                                                        
-                                                <LI>
-                                                                              <A href="http://www.nzdl.org/" title="home of the Greenstone digital library software">
+                                            <DIV class="frontRGList">
+                                                                      
+                                                <UL>
+                                                                            
+                                                    <LI>
+                                                                                  <A href="http://www.nzdl.org/" title="home of the Greenstone digital library software">
                           Digital Libraries</A>
                         
-                                                </LI>
-                                                                        
-                                                <LI>
-                                                                              <A href="/Research/fm/">Formal
+                                                    </LI>
+                                                                            
+                                                    <LI>
+                                                                                  <A href="/Research/fm/">Formal
                           Methods</A>
                         
-                                                </LI>
-                                                
-                                                <LI>
-                                                                              <A href="/hci/">Human Computer
+                                                    </LI>
+                                                    
+                                                    <LI>
+                                                                                  <A href="/hci/">Human Computer
                           Interaction</A>
                         
-                                                </LI>
-                                                 
+                                                    </LI>
+                                                     
                      
                         
-                                                <LI>
-                                                                              <A href="http://isdb.cs.waikato.ac.nz/">Information
+                                                    <LI>
+                                                                                  <A href="http://isdb.cs.waikato.ac.nz/">Information
                           Systems
-                                                        <BR>
-                                                                                  &amp; Databases</A>
+                                                            <BR>
+                                                                                      &amp; Databases</A>
                         
-                                                </LI>
-                                                                      
-                                            </UL>
-                                                                
-                                        </DIV>
-                                                          </TD>
+                                                    </LI>
+                                                                          
+                                                </UL>
+                                                                    
+                                            </DIV>
+                                                              </TD>
                   <TD valign="top">
                     
-                                        <DIV class="frontRGList">
-                                                                  
-                                            <UL>
-                                                                        
-                                                <LI>
-                                                                              <A href="/ml/" title="home of the WEKA Workbench">Machine
+                                            <DIV class="frontRGList">
+                                                                      
+                                                <UL>
+                                                                            
+                                                    <LI>
+                                                                                  <A href="/ml/" title="home of the WEKA Workbench">Machine
                           Learning</A>
                         
-                                                </LI>
-                                                                        
-                                                <LI>
-                                                                              <A href="/research/jstar/">JStar Parallel Programming</A>
+                                                    </LI>
+                                                                            
+                                                    <LI>
+                                                                                  <A href="/research/jstar/">JStar Parallel Programming</A>
                         
-                                                </LI>
-                                                                        
-                                                <LI>
-                                                                              <A href="http://wand.cs.waikato.ac.nz/" title="Waikato Applied Network Dynamics">WAND
+                                                    </LI>
+                                                                            
+                                                    <LI>
+                                                                                  <A href="http://wand.cs.waikato.ac.nz/" title="Waikato Applied Network Dynamics">WAND
                           Network Research</A>
                         
-                                                </LI>
-                                                
-                                                <LI>
-                                                                              <A href="http://cgd.waikato.ac.nz/research">Computer Graphic Design</A>
+                                                    </LI>
+                                                    
+                                                    <LI>
+                                                                                  <A href="http://cgd.waikato.ac.nz/research">Computer Graphic Design</A>
                         
-                                                </LI>
-                                                                      
-                                            </UL>
-                                                                
-                                        </DIV>
-                                                          </TD>
+                                                    </LI>
+                                                                          
+                                                </UL>
+                                                                    
+                                            </DIV>
+                                                              </TD>
                 
-                                </TR>
-                                              
+                                    </TR>
+                                                  
+                                </TBODY>
                             </TABLE>
                                         </TD>
           
@@ -463,38 +463,40 @@ Visualisation</A>
                                                       
                                     <TABLE bgcolor="#FFFFFF" border="0" rules="none" summary="" width="100%">
                                                             
-                                        <TR>
-                                                                  <TD>
+                                        <TBODY>
+                                            <TR>
+                                                                      <TD>
                         <A href="http://www.google.com/"><IMG alt="Google" border="0" height="32" src="http://www.cs.waikato.ac.nz/images-cs/google.gif" width="75"></A>
                       </TD>
                       <TD>
                         <INPUT maxlength="255" name="q" size="26" type="text" value=""> <INPUT name="btnG" type="submit" value="Google Search"> <INPUT name="domains" type="hidden" value="cs.waikato.ac.nz">
-                                                <BR>
-                                                                        <INPUT name="sitesearch" type="radio" value=""> Web <INPUT checked name="sitesearch" type="radio" value="cs.waikato.ac.nz"> cs.waikato.ac.nz
-                                                <BR>
-                                                                      </TD>
+                                                    <BR>
+                                                                            <INPUT name="sitesearch" type="radio" value=""> Web <INPUT checked name="sitesearch" type="radio" value="cs.waikato.ac.nz"> cs.waikato.ac.nz
+                                                    <BR>
+                                                                          </TD>
                       <TD class="sitemap">
                         
-                                                <P>
-                                                                              <A href="https://i.waikato.ac.nz/portal/server.pt/community/fcms/204/cs_intranet/453791">
+                                                    <P>
+                                                                                  <A href="https://i.waikato.ac.nz/portal/server.pt/community/fcms/204/cs_intranet/453791">
                           Staff Intranet</A> | <A href="/search/">Site
                           Map</A>
                         
-                                                </P>
-                                                                      </TD>
+                                                    </P>
+                                                                          </TD>
                     
-                                        </TR>
-                                        		      
-                                        <TR>
-                                            		        <TD>
+                                            </TR>
+                                            		      
+                                            <TR>
+                                                		        <TD>
 		          
-                                                <P>
-                                                    Our online surveys are powered by SurveyGizmo's <A href="http://www.surveygizmo.com">survey software</A>
-                                                </P>
-                                                		        </TD>
+                                                    <P>
+                                                        Our online surveys are powered by SurveyGizmo's <A href="http://www.surveygizmo.com">survey software</A>
+                                                    </P>
+                                                    		        </TD>
 		      
-                                        </TR>
-                                                          
+                                            </TR>
+                                                              
+                                        </TBODY>
                                     </TABLE>
                                                     
                                 </DIV>
@@ -532,7 +534,6 @@ Visualisation</A>
                 
         </DIV>
           
-
 
     </BODY>
 </HTML>
