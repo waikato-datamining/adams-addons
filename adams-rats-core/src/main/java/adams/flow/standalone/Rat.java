@@ -15,7 +15,7 @@
 
 /*
  * Rat.java
- * Copyright (C) 2014-2023 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
@@ -1533,7 +1533,7 @@ public class Rat
     result = super.setUp();
 
     if (result == null) {
-      m_BreakpointPresent = (ActorUtils.enumerate(m_Actors, new Class[]{Breakpoint.class}).size() > 0);
+      m_BreakpointPresent = (!ActorUtils.enumerate(m_Actors, new Class[]{Breakpoint.class}).isEmpty());
       if (!m_PerformLazySetup || isBreakpointPresent())
 	result = m_Actors.setUp();
     }
@@ -1570,8 +1570,10 @@ public class Rat
     if (result == null) {
       m_LogActor = findCallableActor();
       if (m_LogActor == null) {
-        msg = "Couldn't find callable log actor '" + getLog() + "' - logging disabled!";
-        getLogger().info(msg);
+	if (!m_Log.getValue().equals(CallableActorReference.UNKNOWN)) {
+	  msg = "Couldn't find callable log actor '" + getLog() + "' - logging disabled!";
+	  getLogger().info(msg);
+	}
       }
       else {
 	comp = new Compatibility();
@@ -1580,7 +1582,7 @@ public class Rat
 	if (result == null) {
 	  variables = findVariables(m_LogActor);
 	  m_DetectedVariables.addAll(variables);
-	  if (m_DetectedVariables.size() > 0)
+	  if (!m_DetectedVariables.isEmpty())
 	    getVariables().addVariableChangeListener(this);
 	}
       }

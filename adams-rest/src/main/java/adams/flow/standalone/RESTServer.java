@@ -15,7 +15,7 @@
 
 /*
  * RESTServer.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
@@ -298,8 +298,10 @@ public class RESTServer
     if (result == null) {
       m_LogActor = findCallableActor();
       if (m_LogActor == null) {
-        msg = "Couldn't find callable log actor '" + getLog() + "' - logging disabled!";
-        getLogger().warning(msg);
+	if (!m_Log.getValue().equals(CallableActorReference.UNKNOWN)) {
+	  msg = "Couldn't find callable log actor '" + getLog() + "' - logging disabled!";
+	  getLogger().warning(msg);
+	}
       }
       else {
         comp = new Compatibility();
@@ -308,7 +310,7 @@ public class RESTServer
         if (result == null) {
           variables = findVariables(m_LogActor);
           m_DetectedVariables.addAll(variables);
-          if (m_DetectedVariables.size() > 0)
+          if (!m_DetectedVariables.isEmpty())
             getVariables().addVariableChangeListener(this);
         }
       }
@@ -328,7 +330,7 @@ public class RESTServer
     Properties		props;
     String		result;
 
-    if ((id != null) && (id.trim().length() == 0))
+    if ((id != null) && id.trim().isEmpty())
       id = null;
 
     // just log to console if not log actor

@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * WSServer.java
- * Copyright (C) 2012-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
@@ -87,7 +87,6 @@ import java.util.HashSet;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class WSServer
   extends AbstractStandalone
@@ -272,8 +271,10 @@ public class WSServer
     if (result == null) {
       m_LogActor = findCallableActor();
       if (m_LogActor == null) {
-        msg = "Couldn't find callable log actor '" + getLog() + "' - logging disabled!";
-        getLogger().warning(msg);
+	if (!m_Log.getValue().equals(CallableActorReference.UNKNOWN)) {
+	  msg = "Couldn't find callable log actor '" + getLog() + "' - logging disabled!";
+	  getLogger().warning(msg);
+	}
       }
       else {
 	comp = new Compatibility();
@@ -282,7 +283,7 @@ public class WSServer
 	if (result == null) {
 	  variables = findVariables(m_LogActor);
 	  m_DetectedVariables.addAll(variables);
-	  if (m_DetectedVariables.size() > 0)
+	  if (!m_DetectedVariables.isEmpty())
 	    getVariables().addVariableChangeListener(this);
 	}
       }
@@ -302,7 +303,7 @@ public class WSServer
     Properties		props;
     String		result;
 
-    if ((id != null) && (id.trim().length() == 0))
+    if ((id != null) && id.trim().isEmpty())
       id = null;
     
     // just log to console if not log actor
