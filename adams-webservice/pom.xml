@@ -209,6 +209,18 @@
       <groupId>net.java.dev.msv</groupId>
       <artifactId>msv-core</artifactId>
       <version>2011.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>relaxngDatatype</groupId>
+          <artifactId>relaxngDatatype</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>msv</groupId>
+      <artifactId>relaxngDatatype</artifactId>
+      <version>${relaxngDatatype.version}</version>
     </dependency>
 
     <dependency>
