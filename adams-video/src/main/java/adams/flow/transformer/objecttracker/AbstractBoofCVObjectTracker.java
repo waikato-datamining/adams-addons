@@ -58,7 +58,7 @@ public abstract class AbstractBoofCVObjectTracker
 
     m_OptionManager.add(
       "image-type", "imageType",
-      BoofCVImageType.UNSIGNED_INT_8);
+      BoofCVImageType.GRAYU8);
   }
 
   /**

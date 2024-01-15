@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Otsu.java
- * Copyright (C) 2015-2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.filter.heatmapthreshold;
@@ -27,14 +27,14 @@ import adams.data.boofcv.BoofCVHelper;
 import adams.data.boofcv.BoofCVImageType;
 import adams.data.heatmap.Heatmap;
 import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
 
 /**
  <!-- globalinfo-start -->
- * Computes the variance based threshold using Otsu's method from an input image (gray scale; boofcv.struct.image.ImageUInt8).<br>
+ * Computes the variance based threshold using Otsu's method from an input image (gray scale; boofcv.struct.image.GrayU8).<br>
  * <br>
  * For more information see:<br>
  * WikiPedia. Otsu's method.
@@ -67,7 +67,6 @@ import java.awt.image.BufferedImage;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class Otsu
   extends AbstractBufferedImageBasedHeatmapThreshold {
@@ -89,7 +88,7 @@ public class Otsu
   public String globalInfo() {
     return
 	"Computes the variance based threshold using Otsu's method from "
-	+ "an input image (gray scale; " + ImageUInt8.class.getName() + ").\n\n"
+	+ "an input image (gray scale; " + GrayU8.class.getName() + ").\n\n"
 	+ "For more information see:\n"
 	+ getTechnicalInformation();
   }
@@ -119,13 +118,16 @@ public class Otsu
   public void defineOptions() {
     super.defineOptions();
 
+    // TODO currently (boofcv 1.1.2) broken with range other than 0-255
+    /*
     m_OptionManager.add(
 	    "min", "min",
 	    0, 0, null);
 
     m_OptionManager.add(
 	    "max", "max",
-	    256, 1, null);
+	    255, 1, null);
+     */
   }
 
   /**
@@ -198,8 +200,12 @@ public class Otsu
     ImageBase 	gray;
     int		otsu;
 
-    gray   = BoofCVHelper.toBoofCVImage(img, BoofCVImageType.UNSIGNED_INT_8);
-    otsu   = GThresholdImageOps.computeOtsu((ImageUInt8) gray, m_Min, m_Max);
+    // TODO see defineOptions()
+    m_Min = 0;
+    m_Max = 255;
+
+    gray   = BoofCVHelper.toBoofCVImage(img, BoofCVImageType.GRAYU8);
+    otsu   = GThresholdImageOps.computeOtsu2((GrayU8) gray, m_Min, m_Max);
     result = m_Conversion.grayToIntensity(map, otsu);
     if (isLoggingEnabled())
       getLogger().info("Otsu (gray/intensity): " + otsu + "/" + result);

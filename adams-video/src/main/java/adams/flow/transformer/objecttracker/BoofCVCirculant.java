@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * BoofCVCirculant.java
- * Copyright (C) 2015-2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.transformer.objecttracker;
@@ -23,14 +23,14 @@ package adams.flow.transformer.objecttracker;
 import boofcv.abst.tracker.ConfigCirculantTracker;
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageFloat64;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSInt64;
-import boofcv.struct.image.ImageSInt8;
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayF64;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayS64;
+import boofcv.struct.image.GrayS8;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
 
 /**
  <!-- globalinfo-start -->
@@ -94,7 +94,6 @@ import boofcv.struct.image.ImageUInt8;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class BoofCVCirculant
   extends AbstractBoofCVObjectTracker {
@@ -426,22 +425,22 @@ public class BoofCVCirculant
     config.workSpace           = m_WorkSpace;
 
     switch (m_ImageType) {
-      case FLOAT_32:
-        return FactoryTrackerObjectQuad.circulant(config, ImageFloat32.class);
-      case FLOAT_64:
-        return FactoryTrackerObjectQuad.circulant(config, ImageFloat64.class);
-      case SIGNED_INT_16:
-        return FactoryTrackerObjectQuad.circulant(config, ImageSInt16.class);
-      case SIGNED_INT_32:
-        return FactoryTrackerObjectQuad.circulant(config, ImageSInt32.class);
-      case SIGNED_INT_64:
-        return FactoryTrackerObjectQuad.circulant(config, ImageSInt64.class);
-      case SIGNED_INT_8:
-        return FactoryTrackerObjectQuad.circulant(config, ImageSInt8.class);
-      case UNSIGNED_INT_16:
-        return FactoryTrackerObjectQuad.circulant(config, ImageUInt16.class);
-      case UNSIGNED_INT_8:
-        return FactoryTrackerObjectQuad.circulant(config, ImageUInt8.class);
+      case GRAYF32:
+        return FactoryTrackerObjectQuad.circulant(config, GrayF32.class);
+      case GRAYF64:
+        return FactoryTrackerObjectQuad.circulant(config, GrayF64.class);
+      case GRAYS16:
+        return FactoryTrackerObjectQuad.circulant(config, GrayS16.class);
+      case GRAYS32:
+        return FactoryTrackerObjectQuad.circulant(config, GrayS32.class);
+      case GRAYS64:
+        return FactoryTrackerObjectQuad.circulant(config, GrayS64.class);
+      case GRAYS8:
+        return FactoryTrackerObjectQuad.circulant(config, GrayS8.class);
+      case GRAYU16:
+        return FactoryTrackerObjectQuad.circulant(config, GrayU16.class);
+      case GRAYU8:
+        return FactoryTrackerObjectQuad.circulant(config, GrayU8.class);
       default:
         throw new IllegalStateException("Unhandled image type: " + m_ImageType);
     }

@@ -33,8 +33,8 @@ import adams.flow.core.Token;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoMjpegCodec;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 import org.apache.commons.codec.binary.Base64;
 
 import java.awt.image.BufferedImage;
@@ -47,7 +47,7 @@ import java.util.List;
 /**
  <!-- globalinfo-start -->
  * Streams the individual frames from the MJPEG video file obtained as input.<br>
- * Images are output as boofcv.struct.image.ImageFloat32 (FRAME) or java.awt.image.BufferedImage (GUIIMAGE).<br>
+ * Images are output as boofcv.struct.image.GrayF32 (FRAME) or java.awt.image.BufferedImage (GUIIMAGE).<br>
  * In case of output type BOTH, an array of frame (first) and GUI image (second) is output.
  * <br><br>
  <!-- globalinfo-end -->
@@ -150,7 +150,7 @@ public class MjpegImageSequence
   public String globalInfo() {
     return
       "Streams the individual frames from the MJPEG video file obtained as input.\n"
-	+ "Images are output as " + ImageFloat32.class.getName() + " (" + OutputType.FRAME + ") "
+	+ "Images are output as " + GrayF32.class.getName() + " (" + OutputType.FRAME + ") "
 	+ "or " + BufferedImage.class.getName() + " (" + OutputType.GUIIMAGE + ").\n"
 	+ "In case of output type " + OutputType.BOTH + ", an array of frame (first) "
 	+ "and GUI image (second) is output.";
@@ -306,7 +306,7 @@ public class MjpegImageSequence
       try {
 	codec   = new VideoMjpegCodec();
 	data    = codec.read(new FileInputStream(file.getAbsolutePath()));
-	m_Video = new JpegByteImageSequence<ImageFloat32>(ImageFloat32.class, data, false);
+	m_Video = new JpegByteImageSequence<GrayF32>(GrayF32.class, data, false);
       }
       catch (Exception e) {
 	result = handleException("Failed to open video file: " + payload, e);
@@ -322,7 +322,7 @@ public class MjpegImageSequence
 	}
 	codec   = new VideoMjpegCodec();
 	data    = codec.read(conn.getInputStream());
-	m_Video = new JpegByteImageSequence<ImageFloat32>(ImageFloat32.class, data, false);
+	m_Video = new JpegByteImageSequence<GrayF32>(GrayF32.class, data, false);
       }
       catch (Exception e) {
 	result = handleException("Failed to open video stream: " + payload, e);

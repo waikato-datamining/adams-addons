@@ -93,7 +93,7 @@
 
     <dependency>
       <groupId>org.boofcv</groupId>
-      <artifactId>WebcamCapture</artifactId>
+      <artifactId>boofcv-WebcamCapture</artifactId>
       <version>${boofcv.version}</version>
     </dependency>
 
