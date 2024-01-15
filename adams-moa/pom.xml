@@ -92,6 +92,14 @@
           <artifactId>jfreechart</artifactId>  <!-- we're using newer version -->
         </exclusion>
         <exclusion>
+          <groupId>jfreechart</groupId>
+          <artifactId>jfreechart</artifactId>  <!-- we're using newer version -->
+        </exclusion>
+        <exclusion>
+          <groupId>jcommon</groupId>
+          <artifactId>jcommon</artifactId>  <!-- we're using newer version -->
+        </exclusion>
+        <exclusion>
           <groupId>jfree</groupId>
           <artifactId>jcommon</artifactId>  <!-- we're using newer version -->
         </exclusion>
