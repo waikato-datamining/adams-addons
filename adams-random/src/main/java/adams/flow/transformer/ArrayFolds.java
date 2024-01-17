@@ -15,7 +15,7 @@
 
 /*
  * ArrayFolds.java
- * Copyright (C) 2014-2022 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -121,6 +121,9 @@ public class ArrayFolds
   /** the queue of folds. */
   protected List<TIntArrayList> m_Queue;
 
+  /** the current input. */
+  protected transient Token m_CurrentInput;
+
   /**
    * Returns a string describing the object.
    *
@@ -152,7 +155,8 @@ public class ArrayFolds
   protected void initialize() {
     super.initialize();
 
-    m_Queue = new ArrayList<TIntArrayList>();
+    m_Queue        = new ArrayList<>();
+    m_CurrentInput = null;
   }
 
   /**
@@ -163,6 +167,7 @@ public class ArrayFolds
     super.reset();
 
     m_Queue.clear();
+    m_CurrentInput = null;
   }
 
   /**
@@ -275,8 +280,9 @@ public class ArrayFolds
     result   = null;
 
     // randomize indices
-    arrayOld = m_InputToken.getPayload();
-    available = new TIntArrayList();
+    m_CurrentInput = m_InputToken;
+    arrayOld       = m_CurrentInput.getPayload();
+    available      = new TIntArrayList();
     for (i = 0; i < Array.getLength(arrayOld); i++)
       available.add(i);
     indices = new TIntArrayList();
@@ -333,8 +339,11 @@ public class ArrayFolds
     int			i;
     String		suffix;
 
+    if (m_Queue.isEmpty())
+      return null;
+
     indices   = m_Queue.remove(0);
-    arrayOld  = m_InputToken.getPayload();
+    arrayOld  = m_CurrentInput.getPayload();
     available = new TIntArrayList();
     for (i = 0; i < Array.getLength(arrayOld); i++) {
       if (!indices.contains(i))
@@ -361,6 +370,18 @@ public class ArrayFolds
         throw new IllegalStateException("Unhandled split result: " + m_SplitResult);
     }
 
+    if (m_Queue.isEmpty())
+      m_CurrentInput = null;
+
     return m_OutputToken;
+  }
+
+  /**
+   * Cleans up after the execution has finished.
+   */
+  @Override
+  public void wrapUp() {
+    m_CurrentInput = null;
+    super.wrapUp();
   }
 }

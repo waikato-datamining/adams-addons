@@ -15,7 +15,7 @@
 
 /*
  * RESTTransformer.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.transformer;
 
@@ -188,7 +188,12 @@ public class RESTTransformer
    */
   @Override
   protected String doExecute() {
-    return query();
+    String	result;
+
+    result       = query();
+    m_InputToken = null;
+
+    return result;
   }
 
   /**
