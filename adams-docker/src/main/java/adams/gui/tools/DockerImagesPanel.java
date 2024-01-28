@@ -15,18 +15,20 @@
 
 /*
  * DockerImagesPanel.java
- * Copyright (C) 2023 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2023-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.tools;
 
 import adams.core.Range;
+import adams.core.base.BaseString;
 import adams.data.conversion.StringToSpreadSheet;
 import adams.data.io.input.AutoWidthTabularSpreadSheetReader;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.docker.DockerImage;
 import adams.docker.simpledocker.ListImages;
+import adams.docker.simpledocker.PruneImages;
 import adams.docker.simpledocker.RemoveImages;
 import adams.flow.control.Flow;
 import adams.flow.control.StorageName;
@@ -34,7 +36,11 @@ import adams.flow.source.StringConstants;
 import adams.flow.standalone.SimpleDockerConnection;
 import adams.flow.transformer.Convert;
 import adams.flow.transformer.SetStorageValue;
+import adams.flow.transformer.SetVariable;
+import adams.flow.transformer.SetVariable.UpdateType;
+import adams.flow.transformer.StringInsert;
 import adams.flow.transformer.StringJoin;
+import adams.flow.transformer.StringTrim;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseTextField;
 import adams.gui.core.GUIHelper;
@@ -205,6 +211,9 @@ public class DockerImagesPanel
   /** the button for deleting selected images. */
   protected BaseButton m_ButtonDelete;
 
+  /** the button for pruning images. */
+  protected BaseButton m_ButtonPrune;
+
   /**
    * Initializes the widgets.
    */
@@ -217,6 +226,10 @@ public class DockerImagesPanel
     m_ButtonDelete = new BaseButton("Delete");
     m_ButtonDelete.addActionListener((ActionEvent e) -> deleteImages());
     m_TableValues.addToButtonsPanel(m_ButtonDelete);
+
+    m_ButtonPrune = new BaseButton("Prune");
+    m_ButtonPrune.addActionListener((ActionEvent e) -> pruneImages());
+    m_TableValues.addToButtonsPanel(m_ButtonPrune);
   }
 
   /**
@@ -318,7 +331,7 @@ public class DockerImagesPanel
    *
    * @return		the flow
    */
-  protected Flow getListFlow() {
+  protected Flow getListImagesFlow() {
     Flow 	result;
 
     result = new Flow();
@@ -354,7 +367,7 @@ public class DockerImagesPanel
    * @param ids 	the IDs of the images to remove
    * @return		the flow
    */
-  protected Flow getDeleteFlow(String[] ids) {
+  protected Flow getDeleteImagesFlow(String[] ids) {
     Flow 	result;
 
     result = new Flow();
@@ -368,7 +381,39 @@ public class DockerImagesPanel
     cmd.setCommand(remove);
     result.add(cmd);
 
-    result.add(new SetStorageValue("output"));
+    result.add(new StringTrim());
+
+    StringInsert insert = new StringInsert();
+    insert.setAfter(true);
+    insert.setValue(new BaseString("\n"));
+    result.add(insert);
+
+    SetVariable setvar = new SetVariable();
+    setvar.setVariableName("output");
+    setvar.setUpdateType(UpdateType.APPEND);
+    result.add(setvar);
+
+    return result;
+  }
+
+  /**
+   * Creates the flow for pruning stopped docker containers.
+   *
+   * @return		the flow
+   */
+  protected Flow getPruneImagesFlow() {
+    Flow 	result;
+
+    result = new Flow();
+    result.add(new SimpleDockerConnection());
+
+    adams.flow.source.SimpleDockerCommand cmd = new adams.flow.source.SimpleDockerCommand();
+    PruneImages prune = new PruneImages();
+    prune.setAll(true);
+    cmd.setCommand(prune);
+    result.add(cmd);
+
+    result.add(new SetVariable("output"));
 
     return result;
   }
@@ -399,7 +444,7 @@ public class DockerImagesPanel
 
     result = new ArrayList<>();
 
-    flow  = getListFlow();
+    flow  = getListImagesFlow();
     sname = new StorageName("sheet");
     msg = flow.setUp();
     if (msg != null) {
@@ -448,8 +493,8 @@ public class DockerImagesPanel
     worker = new SwingWorker() {
       @Override
       protected Object doInBackground() throws Exception {
-	Flow flow  = getDeleteFlow(ids);
-	StorageName sname = new StorageName("output");
+	Flow flow  = getDeleteImagesFlow(ids);
+	String vname = "output";
 	String msg = flow.setUp();
 	if (msg != null) {
 	  GUIHelper.showErrorMessage(DockerImagesPanel.this, "Failed to delete docker images (flow setup):\n" + msg);
@@ -464,10 +509,10 @@ public class DockerImagesPanel
 	  return null;
 	}
 
-	if (flow.getStorage().has(sname)) {
-	  String output = "" + flow.getStorage().get(sname);
+	if (flow.getVariables().has(vname)) {
+	  String output = flow.getVariables().get(vname);
 	  output = output.trim();
-	  if (output.length() > 0)
+	  if (!output.isEmpty())
 	    GUIHelper.showInformationMessage(DockerImagesPanel.this, "Output of deleting docker images:\n" + output);
 	}
 
@@ -504,6 +549,56 @@ public class DockerImagesPanel
       ids[i] = selected.get(i).getImageID();
 
     deleteImages(ids);
+  }
+
+  /**
+   * Prunes all stopped containers.
+   */
+  protected void pruneImages() {
+    SwingWorker worker;
+    int		retVal;
+
+    retVal = GUIHelper.showConfirmMessage(this, "Do you want to prune all docker images(s)?");
+    if (retVal != ApprovalDialog.APPROVE_OPTION)
+      return;
+
+    worker = new SwingWorker() {
+      @Override
+      protected Object doInBackground() throws Exception {
+	Flow flow    = getPruneImagesFlow();
+	String vname = "output";
+	String msg   = flow.setUp();
+	if (msg != null) {
+	  GUIHelper.showErrorMessage(DockerImagesPanel.this, "Failed to prune docker images (flow setup):\n" + msg);
+	  cleanUp(flow);
+	  return null;
+	}
+
+	msg = flow.execute();
+	if (msg != null) {
+	  GUIHelper.showErrorMessage(DockerImagesPanel.this, "Failed to prune prune docker images (flow execution):\n" + msg);
+	  cleanUp(flow);
+	  return null;
+	}
+
+	if (flow.getVariables().has(vname)) {
+	  String output = flow.getVariables().get(vname);
+	  output = output.trim();
+	  if (!output.isEmpty())
+	    GUIHelper.showInformationMessage(DockerImagesPanel.this, "Output of pruning docker images:\n" + output);
+	}
+
+	cleanUp(flow);
+	return null;
+      }
+
+      @Override
+      protected void done() {
+	super.done();
+	refresh();
+      }
+    };
+    worker.execute();
   }
 
   /**

@@ -15,18 +15,20 @@
 
 /*
  * DockerContainersPanel.java
- * Copyright (C) 2023 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2023-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.tools;
 
 import adams.core.Range;
+import adams.core.base.BaseString;
 import adams.data.conversion.StringToSpreadSheet;
 import adams.data.io.input.AutoWidthTabularSpreadSheetReader;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.docker.DockerContainer;
 import adams.docker.simpledocker.ListContainers;
+import adams.docker.simpledocker.PruneContainers;
 import adams.docker.simpledocker.RemoveContainers;
 import adams.docker.simpledocker.StopContainers;
 import adams.flow.control.Flow;
@@ -35,7 +37,11 @@ import adams.flow.source.StringConstants;
 import adams.flow.standalone.SimpleDockerConnection;
 import adams.flow.transformer.Convert;
 import adams.flow.transformer.SetStorageValue;
+import adams.flow.transformer.SetVariable;
+import adams.flow.transformer.SetVariable.UpdateType;
+import adams.flow.transformer.StringInsert;
 import adams.flow.transformer.StringJoin;
+import adams.flow.transformer.StringTrim;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseTextField;
 import adams.gui.core.GUIHelper;
@@ -229,6 +235,9 @@ public class DockerContainersPanel
   /** the button for deleting selected containers. */
   protected BaseButton m_ButtonDelete;
 
+  /** the button for pruning stopped containers. */
+  protected BaseButton m_ButtonPruneStopped;
+
   /**
    * Initializes the widgets.
    */
@@ -245,6 +254,10 @@ public class DockerContainersPanel
     m_ButtonDelete = new BaseButton("Delete");
     m_ButtonDelete.addActionListener((ActionEvent e) -> deleteContainers());
     m_TableValues.addToButtonsPanel(m_ButtonDelete);
+
+    m_ButtonPruneStopped = new BaseButton("Prune stopped");
+    m_ButtonPruneStopped.addActionListener((ActionEvent e) -> pruneStoppedContainers());
+    m_TableValues.addToButtonsPanel(m_ButtonPruneStopped);
   }
 
   /**
@@ -358,7 +371,7 @@ public class DockerContainersPanel
    *
    * @return		the flow
    */
-  protected Flow getListFlow() {
+  protected Flow getListContainersFlow() {
     Flow 	result;
 
     result = new Flow();
@@ -394,7 +407,7 @@ public class DockerContainersPanel
    * @param ids 	the IDs of the containers to stop
    * @return		the flow
    */
-  protected Flow getStopFlow(String[] ids) {
+  protected Flow getStopContainersFlow(String[] ids) {
     Flow 	result;
 
     result = new Flow();
@@ -408,7 +421,37 @@ public class DockerContainersPanel
     cmd.setCommand(stop);
     result.add(cmd);
 
-    result.add(new SetStorageValue("output"));
+    result.add(new StringTrim());
+
+    StringInsert insert = new StringInsert();
+    insert.setAfter(true);
+    insert.setValue(new BaseString("\n"));
+    result.add(insert);
+
+    SetVariable setvar = new SetVariable();
+    setvar.setVariableName("output");
+    setvar.setUpdateType(UpdateType.APPEND);
+    result.add(setvar);
+
+    return result;
+  }
+
+  /**
+   * Creates the flow for pruning stopped docker containers.
+   *
+   * @return		the flow
+   */
+  protected Flow getPruneStoppedContainersFlow() {
+    Flow 	result;
+
+    result = new Flow();
+    result.add(new SimpleDockerConnection());
+
+    adams.flow.source.SimpleDockerCommand cmd = new adams.flow.source.SimpleDockerCommand();
+    cmd.setCommand(new PruneContainers());
+    result.add(cmd);
+
+    result.add(new SetVariable("output"));
 
     return result;
   }
@@ -419,7 +462,7 @@ public class DockerContainersPanel
    * @param ids 	the IDs of the containers to remove
    * @return		the flow
    */
-  protected Flow getDeleteFlow(String[] ids) {
+  protected Flow getDeleteContainersFlow(String[] ids) {
     Flow 	result;
 
     result = new Flow();
@@ -434,7 +477,17 @@ public class DockerContainersPanel
     cmd.setCommand(remove);
     result.add(cmd);
 
-    result.add(new SetStorageValue("output"));
+    result.add(new StringTrim());
+
+    StringInsert insert = new StringInsert();
+    insert.setAfter(true);
+    insert.setValue(new BaseString("\n"));
+    result.add(insert);
+
+    SetVariable setvar = new SetVariable();
+    setvar.setVariableName("output");
+    setvar.setUpdateType(UpdateType.APPEND);
+    result.add(setvar);
 
     return result;
   }
@@ -465,7 +518,7 @@ public class DockerContainersPanel
 
     result = new ArrayList<>();
 
-    flow  = getListFlow();
+    flow  = getListContainersFlow();
     sname = new StorageName("sheet");
     msg = flow.setUp();
     if (msg != null) {
@@ -515,7 +568,7 @@ public class DockerContainersPanel
     String[]			ids;
     int				i;
     String			msg;
-    StorageName			sname;
+    String 			vname;
     String			output;
 
     selected = getSelectedValues();
@@ -528,9 +581,9 @@ public class DockerContainersPanel
     for (i = 0; i < selected.size(); i++)
       ids[i] = selected.get(i).getContainerID();
 
-    flow  = getStopFlow(ids);
-    sname = new StorageName("output");
-    msg = flow.setUp();
+    flow  = getStopContainersFlow(ids);
+    vname = "output";
+    msg   = flow.setUp();
     if (msg != null) {
       GUIHelper.showErrorMessage(this, "Failed to stop docker containers (flow setup):\n" + msg);
       cleanUp(flow);
@@ -544,10 +597,10 @@ public class DockerContainersPanel
       return;
     }
 
-    if (flow.getStorage().has(sname)) {
-      output = "" + flow.getStorage().get(sname);
+    if (flow.getVariables().has(vname)) {
+      output = flow.getVariables().get(vname);
       output = output.trim();
-      if (output.length() > 0)
+      if (!output.isEmpty())
 	GUIHelper.showInformationMessage(this, "Output of stopping docker containers:\n" + output);
     }
 
@@ -567,9 +620,9 @@ public class DockerContainersPanel
     worker = new SwingWorker() {
       @Override
       protected Object doInBackground() throws Exception {
-        Flow flow  = getDeleteFlow(ids);
-        StorageName sname = new StorageName("output");
-        String msg = flow.setUp();
+        Flow flow    = getDeleteContainersFlow(ids);
+        String vname = "output";
+        String msg   = flow.setUp();
         if (msg != null) {
           GUIHelper.showErrorMessage(DockerContainersPanel.this, "Failed to delete docker containers (flow setup):\n" + msg);
           cleanUp(flow);
@@ -583,10 +636,10 @@ public class DockerContainersPanel
           return null;
         }
 
-        if (flow.getStorage().has(sname)) {
-          String output = "" + flow.getStorage().get(sname);
+        if (flow.getVariables().has(vname)) {
+          String output = flow.getVariables().get(vname);
           output = output.trim();
-          if (output.length() > 0)
+          if (!output.isEmpty())
             GUIHelper.showInformationMessage(DockerContainersPanel.this, "Output of deleting docker containers:\n" + output);
         }
 
@@ -623,6 +676,56 @@ public class DockerContainersPanel
       ids[i] = selected.get(i).getContainerID();
 
     deleteContainers(ids);
+  }
+
+  /**
+   * Prunes all stopped containers.
+   */
+  protected void pruneStoppedContainers() {
+    SwingWorker worker;
+    int		retVal;
+
+    retVal = GUIHelper.showConfirmMessage(this, "Do you want to prune all stopped docker container(s)?");
+    if (retVal != ApprovalDialog.APPROVE_OPTION)
+      return;
+
+    worker = new SwingWorker() {
+      @Override
+      protected Object doInBackground() throws Exception {
+	Flow flow    = getPruneStoppedContainersFlow();
+	String vname = "output";
+	String msg   = flow.setUp();
+	if (msg != null) {
+	  GUIHelper.showErrorMessage(DockerContainersPanel.this, "Failed to prune stopped docker containers (flow setup):\n" + msg);
+	  cleanUp(flow);
+	  return null;
+	}
+
+	msg = flow.execute();
+	if (msg != null) {
+	  GUIHelper.showErrorMessage(DockerContainersPanel.this, "Failed to prune stopped docker containers (flow execution):\n" + msg);
+	  cleanUp(flow);
+	  return null;
+	}
+
+	if (flow.getVariables().has(vname)) {
+	  String output = flow.getVariables().get(vname);
+	  output = output.trim();
+	  if (!output.isEmpty())
+	    GUIHelper.showInformationMessage(DockerContainersPanel.this, "Output of pruning stopped docker containers:\n" + output);
+	}
+
+	cleanUp(flow);
+	return null;
+      }
+
+      @Override
+      protected void done() {
+	super.done();
+	refresh();
+      }
+    };
+    worker.execute();
   }
 
   /**
