@@ -2,16 +2,17 @@ from setuptools import setup, find_packages
 
 setup(
     name="adams-rats-django",
-    version="22.10.0",
+    version="24.5.0",
     license="GNU General Public License version 3.0 (GPLv3)",
     description="Django-based framework for remote control of ADAMS Rat actors.",
     author="Peter Reutemann",
     author_email="fracpete@waikato.ac.nz",
     packages=find_packages(),
     install_requires=[
-        "Django >= 4.1, < 4.2",
+        "Django",
         "jinja2",
         "requests",
+        "setuptools",
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
