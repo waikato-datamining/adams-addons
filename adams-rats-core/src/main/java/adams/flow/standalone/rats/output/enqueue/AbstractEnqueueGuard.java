@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractEnqueueGuard.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone.rats.output.enqueue;
@@ -44,9 +44,10 @@ public abstract class AbstractEnqueueGuard
    *
    * @param handler	the queue to use
    * @param input	the data to queue
+   * @param retrievalDelay 	the retrieval delay to impose
    * @return		null if successful, otherwise error message
    */
-  protected abstract String doEnqueue(StorageQueueHandler handler, Object input);
+  protected abstract String doEnqueue(StorageQueueHandler handler, Object input, long retrievalDelay);
 
   /**
    * Enqueues the object if possible.
@@ -57,7 +58,19 @@ public abstract class AbstractEnqueueGuard
    */
   public String enqueue(StorageQueueHandler handler, Object input) {
     m_Stopped = false;
-    return doEnqueue(handler, input);
+    return doEnqueue(handler, input, 0);
+  }
+
+  /**
+   * Enqueues the object if possible.
+   *
+   * @param handler	the queue to use
+   * @param input	the data to queue
+   * @return		null if successful, otherwise error message
+   */
+  public String enqueue(StorageQueueHandler handler, Object input, long retrievalDelay) {
+    m_Stopped = false;
+    return doEnqueue(handler, input, retrievalDelay);
   }
 
   /**

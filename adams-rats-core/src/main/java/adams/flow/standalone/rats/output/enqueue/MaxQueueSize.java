@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * PassThrough.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+/*
+ * MaxQueueSize.java
+ * Copyright (C) 2016-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone.rats.output.enqueue;
@@ -24,10 +24,9 @@ import adams.core.Utils;
 import adams.flow.control.StorageQueueHandler;
 
 /**
- * Just enqueues the data.
+ * Ensures that the queue doesn't exceed the specified size; waits till the queue can accept data again.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class MaxQueueSize
   extends AbstractEnqueueGuard {
@@ -47,7 +46,7 @@ public class MaxQueueSize
    */
   @Override
   public String globalInfo() {
-    return "Ensures that the queue doesn't exceed the specified size; waits till it reaches.";
+    return "Ensures that the queue doesn't exceed the specified size; waits till the queue can accept data again.";
   }
 
   /**
@@ -129,14 +128,15 @@ public class MaxQueueSize
    *
    * @param handler	the queue to use
    * @param input	the data to queue
+   * @param retrievalDelay 	the retrieval delay to impose
    * @return		null if successful, otherwise error message
    */
   @Override
-  protected String doEnqueue(StorageQueueHandler handler, Object input) {
+  protected String doEnqueue(StorageQueueHandler handler, Object input, long retrievalDelay) {
     String	result;
 
     if ((m_Limit < 1) || (handler.size() < m_Limit)) {
-      handler.add(input);
+      handler.addDelayedBy(input, retrievalDelay);
       return null;
     }
 
@@ -148,7 +148,7 @@ public class MaxQueueSize
 	break;
       }
       if (handler.size() < m_Limit) {
-	handler.add(input);
+	handler.addDelayedBy(input, retrievalDelay);
 	break;
       }
     }

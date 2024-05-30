@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * EnQueue.java
- * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone.rats.output;
 
@@ -52,7 +52,6 @@ import adams.flow.standalone.rats.output.enqueue.PassThrough;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class EnQueue
   extends AbstractRatOutput
@@ -66,6 +65,9 @@ public class EnQueue
 
   /** the guard for enqueuing the data. */
   protected AbstractEnqueueGuard m_Guard;
+
+  /** the retrieval delay in msecs. */
+  protected long m_RetrievalDelay;
 
   /**
    * Returns a string describing the object.
@@ -91,6 +93,10 @@ public class EnQueue
     m_OptionManager.add(
       "guard", "guard",
       new PassThrough());
+
+    m_OptionManager.add(
+      "retrieval-delay", "retrievalDelay",
+      0L, 0L, null);
   }
 
   /**
@@ -171,6 +177,35 @@ public class EnQueue
   }
 
   /**
+   * Sets the delay to enforce on the retrieval of objects from the queue.
+   *
+   * @param value	the delay
+   */
+  public void setRetrievalDelay(long value) {
+    m_RetrievalDelay = value;
+    reset();
+  }
+
+  /**
+   * Returns the delay to enforce on the retrieval of objects from the queue.
+   *
+   * @return		the delay
+   */
+  public long getRetrievalDelay() {
+    return m_RetrievalDelay;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String retrievalDelayTipText() {
+    return "The delay to enforce for the retrieval of objects from the queue.";
+  }
+
+  /**
    * Returns the type of data that gets accepted.
    * 
    * @return		the type of data
@@ -195,7 +230,7 @@ public class EnQueue
     if (queue == null)
       result = "Queue not available: " + m_StorageName;
     else
-      m_Guard.enqueue(queue, m_Input);
+      m_Guard.enqueue(queue, m_Input, m_RetrievalDelay);
 
     return result;
   }

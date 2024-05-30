@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * PassThrough.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone.rats.output.enqueue;
@@ -26,7 +26,6 @@ import adams.flow.control.StorageQueueHandler;
  * Just enqueues the data.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class PassThrough
   extends AbstractEnqueueGuard {
@@ -48,11 +47,12 @@ public class PassThrough
    *
    * @param handler	the queue to use
    * @param input	the data to queue
+   * @param retrievalDelay 	the retrieval delay to impose
    * @return		null if successful, otherwise error message
    */
   @Override
-  protected String doEnqueue(StorageQueueHandler handler, Object input) {
-    handler.add(input);
+  protected String doEnqueue(StorageQueueHandler handler, Object input, long retrievalDelay) {
+    handler.addDelayedBy(input, retrievalDelay);
     return null;
   }
 }
