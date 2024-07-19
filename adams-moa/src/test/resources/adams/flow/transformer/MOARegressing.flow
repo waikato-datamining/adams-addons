@@ -1,0 +1,13 @@
+# Project: adams
+# Date: 2024-07-19 13:33:09
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-json,adams-math,adams-ml,adams-moa,adams-spreadsheet,adams-visualstats,adams-weka
+#
+adams.flow.control.Flow -annotation "This flow trains a FIMTDD regressor on a random tree data stream\\nand stores the generated model in \\\"output/fimtdd.model\\\"." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.source.MOARegressorSetup
+ adams.flow.standalone.SetVariable -var-name output_file -var-value @{flow_dir}/../data/fimtdd.model -value-type FILE_FORWARD_SLASHES -expand-value true
+ adams.flow.source.MOAStream -stream "ArffFileStream -f ./src/test/resources/adams/flow/data/bolts.arff" -num-examples 40
+ adams.flow.transformer.MOATrainRegressor -name MOARegressor -output-interval 40
+ adams.flow.sink.MOAModelWriter -output @{output_file}
