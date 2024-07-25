@@ -90,7 +90,7 @@ public class HeatmapCentroid
   /** the Y of the centroid. */
   public final static String CENTROID_Y = "Centroid.Y";
 
-  /** the number of iterations to peform. */
+  /** the number of iterations to perform. */
   protected int m_NumIterations;
 
   /** the factor to shrink the heatmap after each iteration. */
