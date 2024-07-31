@@ -13,12 +13,14 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * MOACommandLineHandler.java
- * Copyright (C) 2012-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.core.option;
 
+import adams.core.MessageCollection;
+import adams.core.Utils;
 import moa.MOAObject;
 import nz.ac.waikato.cms.locator.ClassLocator;
 import weka.core.MOAUtils;
@@ -30,7 +32,6 @@ import java.util.logging.Level;
  * interface.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  * @see weka.core.OptionHandler
  */
 public class MOACommandLineHandler
@@ -43,16 +44,18 @@ public class MOACommandLineHandler
    * Generates an object from the specified commandline.
    *
    * @param cmd		the commandline to create the object from
+   * @param errors 	for recording errors
    * @return		the created object, null in case of error
    */
   @Override
-  public Object fromCommandLine(String cmd) {
+  public Object fromCommandLine(String cmd, MessageCollection errors) {
     Object	result;
 
     try {
       result = MOAUtils.fromCommandLine(Object.class, cmd);
     }
     catch (Exception e) {
+      errors.add("Failed to process commandline '" + cmd + "':", e);
       getLogger().log(Level.SEVERE, "Failed to process commandline '" + cmd + "':", e);
       result = null;
     }
@@ -64,11 +67,18 @@ public class MOACommandLineHandler
    * Generates an object from the commandline options.
    *
    * @param args	the commandline options to create the object from
+   * @param errors 	for recording errors
    * @return		the created object, null in case of error
    */
   @Override
-  public Object fromArray(String[] args) {
-    return MOAUtils.fromCommandLine(MOAObject.class, joinOptions(args));
+  public Object fromArray(String[] args, MessageCollection errors) {
+    Object	result;
+
+    result = MOAUtils.fromCommandLine(MOAObject.class, joinOptions(args));
+    if (result == null)
+      errors.add("Failed to process array (fromArray): " + Utils.arrayToString(args));
+
+    return result;
   }
 
   /**
