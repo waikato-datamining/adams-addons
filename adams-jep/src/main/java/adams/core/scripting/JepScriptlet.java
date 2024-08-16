@@ -388,4 +388,14 @@ public class JepScriptlet
 
     return result;
   }
+
+  /**
+   * Sets the error message and that the script has finished to true.
+   *
+   * @param msg		the error message to set
+   */
+  public void fail(String msg) {
+    m_LastError = msg;
+    m_Finished  = true;
+  }
 }

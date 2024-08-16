@@ -100,7 +100,10 @@ public class JepScriptingEngineThread
    */
   public void add(JepScriptlet scriptlet) {
     scriptlet.setOwner(this);
-    m_Scriptlets.add(scriptlet);
+    if (JepUtils.isPresent())
+      m_Scriptlets.add(scriptlet);
+    else
+      scriptlet.fail("Jep is not present! Python environment present and jep installed (pip install jep)?");
   }
 
   /**
@@ -190,11 +193,6 @@ public class JepScriptingEngineThread
     JepScriptlet 	scriptlet;
     boolean		success;
     String		lastError;
-
-    if (JepUtils.isPresent()) {
-      getOwner().getLogger().severe("Jep is not available, please install it in your Python environment: pip install jep");
-      return;
-    }
 
     try {
       m_Interpreter = new SharedInterpreter();
