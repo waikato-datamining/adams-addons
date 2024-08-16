@@ -191,7 +191,18 @@ public class JepScriptingEngineThread
     boolean		success;
     String		lastError;
 
-    m_Interpreter = new SharedInterpreter();
+    if (JepUtils.isPresent()) {
+      getOwner().getLogger().severe("Jep is not available, please install it in your Python environment: pip install jep");
+      return;
+    }
+
+    try {
+      m_Interpreter = new SharedInterpreter();
+    }
+    catch (Exception e) {
+      getOwner().getLogger().log(Level.SEVERE, "Failed to initialize Jep interpreter, cannot run Python scripts!", e);
+      return;
+    }
 
     while (m_Running) {
       try {
