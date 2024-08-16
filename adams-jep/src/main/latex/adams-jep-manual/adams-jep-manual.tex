@@ -59,7 +59,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Introduction}
-Jep embeds CPython in Java through JNI\cite{jep}.
+\textit{Jep} embeds CPython in Java through JNI\cite{jep}.
 
 \section{Flow}
 The following standalones are available:
@@ -73,6 +73,19 @@ The following sources are available:
 \begin{tight_itemize}
 	\item \textit{Jep} -- executes the script (inline or external) and outputs any specified variables as map.
 \end{tight_itemize}
+
+\section{Python environment}
+Jep utilizes the Python environment in which ADAMS has been started up. You have two options:
+\begin{tight_itemize}
+    \item install all necessary Python libraries globally
+    \item use a virtual environment\footnote{\url{https://docs.python.org/3/library/venv.html}{}}
+\end{tight_itemize}
+
+\noindent When using a \textit{virtual environment}, you need to activate this environment before you launch
+ADAMS. The \texttt{launcher.sh/.bat} and \texttt{exec.sh/.bat} scripts have a \texttt{-venv PATH}
+option that allow you to specify the virtual environment that you want to activate.
+If you are starting ADAMS from \texttt{start\_gui.sh/.bat}, then you will need to modify
+the script, appending \texttt{-venv PATH} to the launcher call, using the appropriate path.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
