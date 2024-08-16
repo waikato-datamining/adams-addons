@@ -104,6 +104,11 @@ import java.util.Map;
  * &nbsp;&nbsp;&nbsp;default:
  * </pre>
  *
+ * <pre>-expand-vars &lt;boolean&gt; (property: expandVariables)
+ * &nbsp;&nbsp;&nbsp;If enabled, all ADAMS variables get expanded before executing the script.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  * <pre>-inputs &lt;adams.flow.control.VariableNameStorageNamePair&gt; [-inputs ...] (property: inputs)
  * &nbsp;&nbsp;&nbsp;The storage items to add to the interpreter with the specified variable
  * &nbsp;&nbsp;&nbsp;names before executing the script.
@@ -134,6 +139,9 @@ public class Jep
 
   /** the inline script. */
   protected JepScript m_InlineScript;
+
+  /** whether to expand variables. */
+  protected boolean m_ExpandVariables;
 
   /** the input values. */
   protected VariableNameStorageNamePair[] m_Inputs;
@@ -183,6 +191,10 @@ public class Jep
       getDefaultInlineScript());
 
     m_OptionManager.add(
+      "expand-vars", "expandVariables",
+      false);
+
+    m_OptionManager.add(
       "inputs", "inputs",
       new VariableNameStorageNamePair[0]);
 
@@ -210,6 +222,7 @@ public class Jep
       result = QuickInfoHelper.toString(this, "inlineScript", Shortening.shortenEnd(m_InlineScript.stringValue(), 50));
     if (result == null)
       result = "-no script-";
+    result += QuickInfoHelper.toString(this, "expandVariables", m_ExpandVariables, "expand vars", ", ");
     result += QuickInfoHelper.toString(this, "inputs", m_Inputs, ", inputs: ");
     result += QuickInfoHelper.toString(this, "outputs", m_Outputs, ", outputs: ");
     result += QuickInfoHelper.toString(this, "forwards", m_Forwards, ", forwards: ");
@@ -282,6 +295,35 @@ public class Jep
    */
   public String inlineScriptTipText() {
     return "The inline script, if not using an external script file.";
+  }
+
+  /**
+   * Sets whether to expand ADAMS variables.
+   *
+   * @param value 	true if to expand
+   */
+  public void setExpandVariables(boolean value) {
+    m_ExpandVariables = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to expand ADAMS variables.
+   *
+   * @return 		true if to expand
+   */
+  public boolean getExpandVariables() {
+    return m_ExpandVariables;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   * 			displaying in the explorer/experimenter gui
+   */
+  public String expandVariablesTipText() {
+    return "If enabled, all ADAMS variables get expanded before executing the script.";
   }
 
   /**
@@ -417,9 +459,9 @@ public class Jep
     result = null;
 
     if (!m_ScriptFile.exists() || m_ScriptFile.isDirectory())
-      scriplet = new JepScriptlet(getFullName(), m_InlineScript.getValue(), m_Inputs, m_Outputs, m_Forwards);
+      scriplet = new JepScriptlet(getFullName(), m_InlineScript.getValue(), m_Inputs, m_Outputs, m_Forwards, m_ExpandVariables);
     else
-      scriplet = new JepScriptlet(getFullName(), m_ScriptFile, m_Inputs, m_Outputs, m_Forwards);
+      scriplet = new JepScriptlet(getFullName(), m_ScriptFile, m_Inputs, m_Outputs, m_Forwards, m_ExpandVariables);
     scriplet.setFlowContext(this);
     scriplet.setLoggingLevel(getLoggingLevel());
 

@@ -66,6 +66,9 @@ public class JepScriptlet
   /** the flow context. */
   protected Actor m_FlowContext;
 
+  /** whether to expand variables. */
+  protected boolean m_ExpandVariables;
+
   /** the inputs. */
   protected VariableNameStorageNamePair[] m_Inputs;
 
@@ -88,7 +91,7 @@ public class JepScriptlet
    * @param script	the script to execute
    */
   public JepScriptlet(String id, String script) {
-    this(id, script, null, null, null, null);
+    this(id, script, null, null, null, null, false);
   }
 
   /**
@@ -100,8 +103,8 @@ public class JepScriptlet
    * @param outputs 	the outputs from the script (to go back into storage)
    * @param forwards 	the variable values from the script to forward as map
    */
-  public JepScriptlet(String id, String script, VariableNameStorageNamePair[] inputs, VariableNameStorageNamePair[] outputs, BaseString[] forwards) {
-    this(id, script, null, inputs, outputs, forwards);
+  public JepScriptlet(String id, String script, VariableNameStorageNamePair[] inputs, VariableNameStorageNamePair[] outputs, BaseString[] forwards, boolean expandVars) {
+    this(id, script, null, inputs, outputs, forwards, expandVars);
   }
 
   /**
@@ -111,7 +114,7 @@ public class JepScriptlet
    * @param scriptFile	the script file to execute
    */
   public JepScriptlet(String id, File scriptFile) {
-    this(id, null, scriptFile, null, null, null);
+    this(id, null, scriptFile, null, null, null, false);
   }
 
   /**
@@ -123,8 +126,8 @@ public class JepScriptlet
    * @param outputs 	the outputs from the script (to go back into storage)
    * @param forwards 	the variable values from the script to forward as map
    */
-  public JepScriptlet(String id, File scriptFile, VariableNameStorageNamePair[] inputs, VariableNameStorageNamePair[] outputs, BaseString[] forwards) {
-    this(id, null, scriptFile, inputs, outputs, forwards);
+  public JepScriptlet(String id, File scriptFile, VariableNameStorageNamePair[] inputs, VariableNameStorageNamePair[] outputs, BaseString[] forwards, boolean expandVars) {
+    this(id, null, scriptFile, inputs, outputs, forwards, expandVars);
   }
 
   /**
@@ -137,7 +140,7 @@ public class JepScriptlet
    * @param outputs 	the outputs from the script (to go back into storage)
    * @param forwards 	the variable values from the script to forward as map
    */
-  public JepScriptlet(String id, String script, File scriptFile, VariableNameStorageNamePair[] inputs, VariableNameStorageNamePair[] outputs, BaseString[] forwards) {
+  public JepScriptlet(String id, String script, File scriptFile, VariableNameStorageNamePair[] inputs, VariableNameStorageNamePair[] outputs, BaseString[] forwards, boolean expandVars) {
     if ((script == null) && (scriptFile == null))
       throw new IllegalArgumentException("Either script or script file need to be provided!");
     if (scriptFile != null) {
@@ -147,15 +150,16 @@ public class JepScriptlet
 	throw new IllegalArgumentException("Script file points to directory: " + scriptFile);
     }
 
-    m_Owner       = null;
-    m_ID          = id;
-    m_Script      = script;
-    m_ScriptFile  = scriptFile;
-    m_Inputs      = ObjectCopyHelper.copyObjects(inputs);
-    m_Outputs     = ObjectCopyHelper.copyObjects(outputs);
-    m_Forwards    = ObjectCopyHelper.copyObjects(forwards);
-    m_FlowContext = null;
-    m_Finished = false;
+    m_Owner           = null;
+    m_ID              = id;
+    m_Script          = script;
+    m_ScriptFile      = scriptFile;
+    m_Inputs          = ObjectCopyHelper.copyObjects(inputs);
+    m_Outputs         = ObjectCopyHelper.copyObjects(outputs);
+    m_Forwards        = ObjectCopyHelper.copyObjects(forwards);
+    m_ExpandVariables = expandVars;
+    m_FlowContext     = null;
+    m_Finished        = false;
   }
 
   /**
@@ -261,6 +265,15 @@ public class JepScriptlet
   }
 
   /**
+   * Returns whether ADAMS variables get expanded in the script.
+   *
+   * @return		true if expanded
+   */
+  public boolean getExpandVariables() {
+    return m_ExpandVariables;
+  }
+
+  /**
    * Whether the scriptlet has finished execution.
    *
    * @return		true when finished
@@ -287,13 +300,16 @@ public class JepScriptlet
     SharedInterpreter 	interpreter;
     String		result;
     boolean		inline;
-    File		script;
+    File 		scriptFile;
+    String		script;
     StorageName 	sname;
     Object		value;
+    boolean		deleteScript;
 
-    result   = null;
-    inline   = ((m_ScriptFile == null) || !m_ScriptFile.exists() || m_ScriptFile.isDirectory());
-    script   = null;
+    result       = null;
+    inline       = ((m_ScriptFile == null) || !m_ScriptFile.exists() || m_ScriptFile.isDirectory());
+    scriptFile   = null;
+    deleteScript = false;
 
     try {
       interpreter = getOwner().getInterpreter();
@@ -311,15 +327,30 @@ public class JepScriptlet
 
       // execute script
       if (inline) {
-	script = TempUtils.createTempFile("jep", ".py");
-	getLogger().info("Writing script to: " + script);
-	FileUtils.writeToFile(script.getAbsolutePath(), m_Script, false);
+	deleteScript = true;
+	scriptFile   = TempUtils.createTempFile("jep", ".py");
+	script       = m_Script;
+	if (m_ExpandVariables && (m_FlowContext != null)) {
+	  getLogger().info("Expanding variables...");
+	  script = m_FlowContext.getVariables().expand(script);
+	}
+	getLogger().info("Writing script to: " + scriptFile);
+	FileUtils.writeToFile(scriptFile.getAbsolutePath(), script, false);
       }
       else {
-	script = m_ScriptFile;
+	scriptFile = m_ScriptFile;
+	if (m_ExpandVariables && (m_FlowContext != null)) {
+	  getLogger().info("Expanding variables...");
+	  script       = Utils.flatten(FileUtils.loadFromFile(m_ScriptFile), "\n");
+	  script       = m_FlowContext.getVariables().expand(script);
+	  deleteScript = true;
+	  scriptFile   = TempUtils.createTempFile("jep", ".py");
+	  getLogger().info("Writing script to: " + scriptFile);
+	  FileUtils.writeToFile(scriptFile.getAbsolutePath(), script, false);
+	}
       }
-      getLogger().info("Running script: " + script);
-      getOwner().runScript(script);
+      getLogger().info("Running script: " + scriptFile);
+      getOwner().runScript(scriptFile);
 
       // retrieve storage items
       if ((m_FlowContext != null) && (m_Inputs != null)) {
@@ -338,7 +369,7 @@ public class JepScriptlet
 	}
       }
 
-      getLogger().info("Finished script: " + script);
+      getLogger().info("Finished script: " + scriptFile);
     }
     catch (Exception e) {
       if (inline)
@@ -347,9 +378,9 @@ public class JepScriptlet
 	result = LoggingHelper.handleException(this, "Failed to execute script file: " + m_ScriptFile, e);
     }
 
-    if (inline && (script != null)) {
-      getLogger().info("Deleting script: " + script);
-      FileUtils.delete(script);
+    if (deleteScript && (scriptFile != null)) {
+      getLogger().info("Deleting script: " + scriptFile);
+      FileUtils.delete(scriptFile);
     }
 
     m_LastError = result;
