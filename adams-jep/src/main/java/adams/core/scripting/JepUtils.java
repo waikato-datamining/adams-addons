@@ -41,7 +41,7 @@ public class JepUtils {
    *
    * @return true if available
    */
-  public synchronized boolean isPresent() {
+  public static synchronized boolean isPresent() {
     if (m_Present == null) {
       try {
 	try (SharedInterpreter interpreter = JepUtils.getSharedInterpreter()) {
