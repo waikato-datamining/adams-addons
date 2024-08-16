@@ -1,0 +1,11 @@
+# Project: adams
+# Date: 2024-08-16 13:06:57
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-jep
+#
+adams.flow.control.Flow -annotation "Executes an inline Python script and outputs the result of a computation \\n(which was placed in storage after the execution of the script)." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.JepEngine
+ adams.flow.standalone.Jep -annotation "Execute script and store value of \\\"c\\\" in storage under \\\"c\\\"." -inline-script "a = 1\\nb = 2\\nc = a + b" -outputs c=c
+ adams.flow.source.StorageValue -storage-name c -conversion adams.data.conversion.UnknownToUnknown
+ adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
