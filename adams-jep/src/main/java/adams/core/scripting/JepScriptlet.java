@@ -283,6 +283,15 @@ public class JepScriptlet
   }
 
   /**
+   * Checks whether an error is present.
+   *
+   * @return		true if error present
+   */
+  public boolean hasLastError() {
+    return (m_LastError != null);
+  }
+
+  /**
    * Returns any error that was encountered.
    *
    * @return		the error, null if none encountered
