@@ -69,8 +69,8 @@ public class JepUtils {
     if (m_SharedInterpreterConfig == null) {
       m_SharedInterpreterConfig = new JepConfig();
       // ensure that Python's stdout/stderr are printed in IDE
-      m_SharedInterpreterConfig.redirectStdout(System.out);
-      m_SharedInterpreterConfig.redirectStdErr(System.err);
+      m_SharedInterpreterConfig.redirectStdout(new JepOutputStream(true));
+      m_SharedInterpreterConfig.redirectStdErr(new JepOutputStream(false));
       // set global config
       SharedInterpreter.setConfig(m_SharedInterpreterConfig);
     }
