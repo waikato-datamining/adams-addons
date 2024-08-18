@@ -199,6 +199,7 @@ public class JepScriptingEngineThread
     }
     catch (Exception e) {
       getOwner().getLogger().log(Level.SEVERE, "Failed to initialize Jep interpreter, cannot run Python scripts!", e);
+      m_Running = false;
       return;
     }
 
