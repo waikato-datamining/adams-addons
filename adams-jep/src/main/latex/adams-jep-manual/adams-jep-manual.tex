@@ -74,6 +74,7 @@ The following sources are available:
 	\item \textit{Jep} -- executes the script (inline or external) and outputs any specified variables as map.
 \end{tight_itemize}
 
+\clearpage
 \section{Python environment}
 Jep utilizes the Python environment in which ADAMS has been started up. You have two options:
 \begin{tight_itemize}
@@ -86,6 +87,26 @@ ADAMS. The \texttt{launcher.sh/.bat} and \texttt{exec.sh/.bat} scripts have a \t
 option that allow you to specify the virtual environment that you want to activate.
 If you are starting ADAMS from \texttt{start\_gui.sh/.bat}, then you will need to modify
 the script, appending \texttt{-venv PATH} to the launcher call, using the appropriate path.
+
+\clearpage
+\section{Tools}
+\subsection{Jep/Python console}
+The \textit{Jep/Python console} is a simple Python editor with syntax highlighting that allows you
+to execute the current script as well (see Figure \ref{jep-console}). With this interface you can
+prototype your scripts before they are being inserted into any flows. Please be aware that
+
+Python's output on stdout/stderr gets also redirected to the ADAMS \textit{Console window} (available
+from the \textit{Program} menu in the ADAMS main menu). However, output from other Python libraries
+may bypass that. It is advised to keep an eye on the output in the terminal from which ADAMS was
+launched.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{images/jep-console.png}
+	\caption{The Jep/Python console.}
+	\label{jep-console}
+\end{figure}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
