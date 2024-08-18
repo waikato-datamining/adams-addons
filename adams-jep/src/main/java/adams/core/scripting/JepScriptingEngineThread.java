@@ -195,6 +195,7 @@ public class JepScriptingEngineThread
     String		lastError;
 
     try {
+      JepUtils.configureSharedInterpeter();
       m_Interpreter = new SharedInterpreter();
     }
     catch (Exception e) {
