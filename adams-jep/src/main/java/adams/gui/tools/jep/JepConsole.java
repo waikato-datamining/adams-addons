@@ -23,6 +23,11 @@ package adams.gui.tools.jep;
 import adams.core.ShorteningType;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
+import adams.core.logging.Logger;
+import adams.core.logging.LoggingHelper;
+import adams.core.logging.LoggingSupporter;
+import adams.core.scripting.JepScriptingEngine;
+import adams.core.scripting.JepScriptlet;
 import adams.flow.sink.TextSupplier;
 import adams.gui.chooser.BaseFileChooser;
 import adams.gui.chooser.TextFileChooser;
@@ -44,6 +49,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
@@ -53,6 +59,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Console for editing and running Jep/Python scripts.
@@ -61,7 +68,7 @@ import java.util.List;
  */
 public class JepConsole
   extends BasePanel
-  implements MenuBarProvider, TextSupplier, SendToActionSupporter {
+  implements MenuBarProvider, TextSupplier, SendToActionSupporter, LoggingSupporter {
 
   /** the file to store the recent directories. */
   public final static String SESSION_FILE = "JepConsoleSession.props";
@@ -111,6 +118,9 @@ public class JepConsole
   /** the find next menu item. */
   protected JMenuItem m_MenuItemEditFindNext;
 
+  /** the execute menu item. */
+  protected JMenuItem m_MenuItemExecutionRun;
+
   /** for generating the title. */
   protected TitleGenerator m_TitleGenerator;
 
@@ -141,6 +151,12 @@ public class JepConsole
   /** for saving the content. */
   protected transient TextFileChooser m_FileChooser;
 
+  /** the logger in use. */
+  protected Logger m_Logger;
+
+  /** whether a script is running. */
+  protected boolean m_Running;
+
   /**
    * Initializes the members.
    */
@@ -154,6 +170,8 @@ public class JepConsole
     m_CurrentEncoding    = null;
     m_Undo               = new UndoManager();
     m_ChangeListeners    = new HashSet<>();
+    m_Running            = false;
+    m_Logger             = null;
   }
 
   /**
@@ -337,6 +355,20 @@ public class JepConsole
       menu.add(menuitem);
       m_MenuItemEditFindNext = menuitem;
 
+      // Execution
+      menu = new JMenu("Execution");
+      menu.setMnemonic('x');
+      menu.addChangeListener((ChangeEvent e) -> updateMenu());
+      result.add(menu);
+
+      // Execution/Run
+      menuitem = new JMenuItem("Run", ImageManager.getIcon("run.gif"));
+      menuitem.setMnemonic('R');
+      menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed R"));
+      menuitem.addActionListener((ActionEvent e) -> runScript());
+      menu.add(menuitem);
+      m_MenuItemExecutionRun = menuitem;
+
       m_MenuBar = result;
     }
     else {
@@ -388,6 +420,8 @@ public class JepConsole
       m_MenuItemEditPaste.setEnabled(m_TextPanel.canPaste());
       m_MenuItemEditFind.setEnabled(contentAvailable);
       m_MenuItemEditFindNext.setEnabled(contentAvailable && (m_TextPanel.getLastFind() != null));
+      // Execution
+      m_MenuItemExecutionRun.setEnabled(contentAvailable && !isRunning());
     });
   }
 
@@ -505,7 +539,7 @@ public class JepConsole
    * @param file	the file to load
    * @return		true if successfully opened
    */
-  public boolean  open(File file) {
+  public boolean open(File file) {
     return open(file, null);
   }
 
@@ -781,6 +815,54 @@ public class JepConsole
   }
 
   /**
+   * Returns whether a script is currently running.
+   *
+   * @return		true if running
+   */
+  public boolean isRunning() {
+    return m_Running;
+  }
+
+  /**
+   * Executes the current script.
+   */
+  public void runScript() {
+    final JepScriptlet	scriptlet;
+    SwingWorker 	worker;
+
+    if (m_TextPanel.getContent().isEmpty())
+      return;
+
+    if (isRunning()) {
+      GUIHelper.showErrorMessage(this, "A script is currently running. Please wait for it to finish before executing another one!");
+      return;
+    }
+
+    m_Running = true;
+    update();
+
+    scriptlet = new JepScriptlet("Jep/Python console", m_TextPanel.getContent());
+    worker = new SwingWorker() {
+      @Override
+      protected Object doInBackground() throws Exception {
+	JepScriptingEngine.getSingleton().add(scriptlet);
+	while (!scriptlet.hasFinished())
+	  Utils.wait(JepConsole.this, 1000, 100);
+	return null;
+      }
+      @Override
+      protected void done() {
+	m_Running = false;
+	update();
+	if (scriptlet.hasLastError())
+	  GUIHelper.showErrorMessage(JepConsole.this, "An error occurred executing the script:\n" + scriptlet.getLastError());
+	super.done();
+      }
+    };
+    worker.execute();
+  }
+
+  /**
    * Adds the given change listener to its internal list.
    *
    * @param l		the listener to add
@@ -825,7 +907,7 @@ public class JepConsole
    */
   @Override
   public ExtensionFileFilter getCustomTextFileFilter() {
-    return null;
+    return getFileFilter();
   }
 
   /**
@@ -883,6 +965,15 @@ public class JepConsole
   }
 
   /**
+   * Returns the filter for Python files.
+   *
+   * @return		the filter
+   */
+  protected ExtensionFileFilter getFileFilter() {
+    return new ExtensionFileFilter("Python", "py");
+  }
+
+  /**
    * Returns the file chooser and creates it if necessary.
    *
    * @return		the file chooser
@@ -893,12 +984,34 @@ public class JepConsole
     if (m_FileChooser == null) {
       m_FileChooser = new TextFileChooser();
       m_FileChooser.removeChoosableFileFilters();
-      filter = new ExtensionFileFilter("Python", "py");
+      filter = getFileFilter();
       m_FileChooser.addChoosableFileFilter(filter);
       m_FileChooser.setFileFilter(filter);
       m_FileChooser.setDefaultExtension(filter.getExtensions()[0]);
     }
 
     return m_FileChooser;
+  }
+
+  /**
+   * Returns the logger in use.
+   *
+   * @return		the logger
+   */
+  @Override
+  public synchronized Logger getLogger() {
+    if (m_Logger == null)
+      m_Logger = LoggingHelper.getLogger(getClass());
+    return m_Logger;
+  }
+
+  /**
+   * Returns whether logging is enabled.
+   *
+   * @return		true if at least {@link Level#INFO}
+   */
+  @Override
+  public boolean isLoggingEnabled() {
+    return LoggingHelper.isAtLeast(getLogger(), Level.INFO);
   }
 }
