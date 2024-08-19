@@ -50,12 +50,12 @@ public class JepUtils {
 	    interpreter.exec("if (importlib.util.find_spec('jep') is None): raise Exception('jep not installed! Use: pip install jep')");
 	    m_Present = true;
 	  }
-	  catch (Exception e) {
+	  catch (Throwable e) {
 	    m_Present = false;
 	  }
 	}
       }
-      catch (Exception e) {
+      catch (Throwable e) {
 	m_Present = false;
       }
     }
@@ -63,7 +63,7 @@ public class JepUtils {
   }
 
   /**
-   * Configures the shared interpeters.
+   * Configures the shared interpreters.
    */
   public static synchronized void configureSharedInterpeter() {
     if (m_SharedInterpreterConfig == null) {
