@@ -28,6 +28,7 @@ import adams.core.logging.LoggingHelper;
 import adams.core.logging.LoggingSupporter;
 import adams.core.scripting.JepScriptingEngine;
 import adams.core.scripting.JepScriptlet;
+import adams.core.scripting.JepUtils;
 import adams.flow.sink.TextSupplier;
 import adams.gui.chooser.BaseFileChooser;
 import adams.gui.chooser.TextFileChooser;
@@ -835,6 +836,11 @@ public class JepConsole
 
     if (isRunning()) {
       GUIHelper.showErrorMessage(this, "A script is currently running. Please wait for it to finish before executing another one!");
+      return;
+    }
+
+    if (!JepUtils.isPresent()) {
+      GUIHelper.showErrorMessage(this, "No Python environment or no Jep installed? Install with 'pip install jep' and restart ADAMS!");
       return;
     }
 
