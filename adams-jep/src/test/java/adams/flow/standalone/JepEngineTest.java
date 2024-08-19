@@ -64,6 +64,12 @@ public class JepEngineTest
   }
 
   /**
+   * Skipping, since Python environment may not be present.
+   */
+  public void testActor() {
+  }
+
+  /**
    * Runs the test from commandline.
    *
    * @param args	ignored
