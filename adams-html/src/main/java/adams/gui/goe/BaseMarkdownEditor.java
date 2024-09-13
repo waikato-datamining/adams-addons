@@ -15,7 +15,7 @@
 
 /*
  * BaseMarkdownEditor.java
- * Copyright (C) 2015-2023 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2024 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -55,6 +55,9 @@ public class BaseMarkdownEditor
 
   /** The text area with the value. */
   protected MarkdownTextAreaWithPreview m_TextValue;
+
+  /** The checkbox for the line wrap. */
+  protected BaseCheckBox m_CheckLineWrap;
 
   /**
    * Returns a custom string representation of the object.
@@ -125,7 +128,6 @@ public class BaseMarkdownEditor
     BaseButton 		buttonOK;
     BaseButton		buttonClear;
     JPanel		panel;
-    final BaseCheckBox	checkLineWrap;
 
     panelAll    = new JPanel(new BorderLayout());
     m_TextValue = new MarkdownTextAreaWithPreview();
@@ -149,16 +151,16 @@ public class BaseMarkdownEditor
     });
     panel.add(buttonClear);
 
-    checkLineWrap = new BaseCheckBox("Line wrap");
-    checkLineWrap.setSelected(UISettings.get(getClass(), "LineWrap", false));
-    checkLineWrap.addActionListener(new ActionListener() {
+    m_CheckLineWrap = new BaseCheckBox("Line wrap");
+    m_CheckLineWrap.setSelected(UISettings.get(getClass(), "LineWrap", false));
+    m_CheckLineWrap.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-	m_TextValue.setLineWrap(checkLineWrap.isSelected());
+	m_TextValue.setLineWrap(m_CheckLineWrap.isSelected());
         UISettings.set(BaseMarkdownEditor.this.getClass(), "LineWrap", m_TextValue.getLineWrap());
       }
     });
-    panel.add(checkLineWrap);
+    panel.add(m_CheckLineWrap);
     
     panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     panelButtons.add(panel, BorderLayout.EAST);
@@ -194,6 +196,7 @@ public class BaseMarkdownEditor
     super.initForDisplay();
     if (!m_TextValue.getText().equals("" + getValue()))
       m_TextValue.setText("" + getValue());
+    m_TextValue.setLineWrap(m_CheckLineWrap.isSelected());
   }
   
   /**
