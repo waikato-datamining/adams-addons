@@ -127,6 +127,9 @@ or building).
   \item \textit{Null} -- ignores any output.
 \end{tight_itemize}
 
+\noindent \textbf{NB:} When needing to start multiple Docker containers in a single flow, but still monitoring
+the output that they are generating (i.e., in blocking fashion), then the \textit{LaunchTee} or \textit{LaunchTrigger}
+control actor can be used to wrap the Docker command.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
