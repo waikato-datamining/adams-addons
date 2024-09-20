@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * StepComparator.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.trail;
@@ -26,7 +26,6 @@ import adams.data.container.DataPointComparator;
  * Comparator for Step objects.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class StepComparator
   extends DataPointComparator<Step> {
@@ -50,9 +49,9 @@ public class StepComparator
 
     result = o1.getTimestamp().compareTo(o2.getTimestamp());
     if (result == 0)
-      result = new Float(o1.getX()).compareTo(o2.getX());
+      result = Float.compare(o1.getX(), o2.getX());
     if (result == 0)
-      result = new Float(o1.getY()).compareTo(o2.getY());
+      result = Float.compare(o1.getY(), o2.getY());
 
     return result;
   }

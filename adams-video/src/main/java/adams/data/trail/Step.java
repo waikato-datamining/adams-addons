@@ -15,7 +15,7 @@
 
 /*
  * Step.java
- * Copyright (C) 2015-2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.trail;
@@ -233,9 +233,9 @@ public class Step
 
     result = getTimestamp().compareTo(other.getTimestamp());
     if (result == 0)
-      result = new Float(getX()).compareTo(other.getX());
+      result = Float.compare(getX(), other.getX());
     if (result == 0)
-      result = new Float(getY()).compareTo(other.getY());
+      result = Float.compare(getY(), other.getY());
 
     return result;
   }

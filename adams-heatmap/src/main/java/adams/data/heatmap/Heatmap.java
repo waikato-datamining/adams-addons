@@ -15,7 +15,7 @@
 
 /*
  * Heatmap.java
- * Copyright (C) 2011-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.heatmap;
 
@@ -570,7 +570,7 @@ public class Heatmap
 
     other = (Heatmap) o;
 
-    result = new Integer(size()).compareTo(new Integer(other.size()));
+    result = Integer.compare(size(), other.size());
 
     if (result == 0)
       result = compareToHeader(o);
@@ -652,15 +652,15 @@ public class Heatmap
 
     c = (Heatmap) o;
 
-    result = new Integer(getWidth()).compareTo(c.getWidth());
+    result = Integer.compare(getWidth(), c.getWidth());
 
     if (result == 0)
-      result = new Integer(getHeight()).compareTo(c.getHeight());
+      result = Integer.compare(getHeight(), c.getHeight());
 
     if (result == 0) {
       for (y = 0; y < getHeight(); y++) {
 	for (x = 0; x < getWidth(); x++) {
-	  result = new Double(get(y, x)).compareTo(c.get(y, x));
+	  result = Double.compare(get(y, x), c.get(y, x));
 	  if (result != 0)
 	    break;
 	}
@@ -942,14 +942,14 @@ public class Heatmap
    */
   @Override
   public DataPointComparator<HeatmapValue> newComparator() {
-    return new DataPointComparator<HeatmapValue>() {
+    return new DataPointComparator<>() {
       private static final long serialVersionUID = -7729686147234670766L;
       @Override
       public int compare(adams.data.heatmap.HeatmapValue o1, adams.data.heatmap.HeatmapValue o2) {
 	int result;
-	result = new Integer(o1.getY()).compareTo(new Integer(o2.getY()));
+	result = Integer.compare(o1.getY(), o2.getY());
 	if (result == 0)
-	  result = new Integer(o1.getX()).compareTo(new Integer(o2.getX()));
+	  result = Integer.compare(o1.getX(), o2.getX());
 	if (result == 0) {
 	  if (o1.isMissingValue() && o2.isMissingValue())
 	    result = 0;
@@ -958,7 +958,7 @@ public class Heatmap
 	  else if (o2.isMissingValue())
 	    result = 1;
 	  else
-	    result = new Double(o1.getValue()).compareTo(new Double(o2.getValue()));
+	    result = Double.compare(o1.getValue(), o2.getValue());
 	}
         return result;
       }

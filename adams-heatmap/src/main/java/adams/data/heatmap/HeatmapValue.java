@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * HeatmapValue.java
- * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.heatmap;
 
@@ -26,7 +26,6 @@ import adams.data.container.DataPoint;
  * Wrapper class for a value in a heatmap.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class HeatmapValue
   implements DataPoint {
@@ -175,10 +174,10 @@ public class HeatmapValue
     p = (HeatmapValue) o;
 
     if (result == 0)
-      result = new Integer(getY()).compareTo(new Integer(p.getY()));
+      result = Integer.compare(getY(), p.getY());
 
     if (result == 0)
-      result = new Integer(getX()).compareTo(new Integer(p.getX()));
+      result = Integer.compare(getX(), p.getX());
 
     if (result == 0) {
       if (isMissingValue() && p.isMissingValue())
@@ -188,7 +187,7 @@ public class HeatmapValue
       else if (p.isMissingValue())
 	result = 1;
       else
-	result = new Double(getValue()).compareTo(new Double(p.getValue()));
+	result = Double.compare(getValue(), p.getValue());
     }
 
     return result;
