@@ -13,19 +13,19 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Random.java
- * Copyright (C) 2010 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2024 University of Waikato, Hamilton, New Zealand
  * Copyright (C) Yann RICHET (JMathArray)
  */
 package adams.data.random;
-
-import java.io.Serializable;
 
 import adams.core.License;
 import adams.core.annotation.MixedCopyright;
 import edu.cornell.lassp.houle.RngPack.RandomSeedable;
 import edu.cornell.lassp.houle.RngPack.Ranmar;
+
+import java.io.Serializable;
 
 /**
  * Based on JMathArray's org.math.array.util.Random class. But in comparison
@@ -34,7 +34,6 @@ import edu.cornell.lassp.houle.RngPack.Ranmar;
  *
  * @author  Yann RICHET (original JMathArray code)
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 @MixedCopyright(
     copyright = "Yann RICHET (JMathArray)",
@@ -98,9 +97,7 @@ public class Random
    * @return An int between i0 and i1.
    */
   public int randInt(int i0, int i1) {
-    double x = raw();
-    int i = i0 + new Double(Math.floor((i1 - i0 + 1) * x)).intValue();
-    return i;
+    return i0 + (int) (Math.floor((i1 - i0 + 1) * raw()));
   }
 
   /**
@@ -113,8 +110,7 @@ public class Random
    * @return A double.
    */
   public double uniform(double min, double max) {
-    double x = min + (max - min) * raw();
-    return x;
+    return min + (max - min) * raw();
   }
 
   /**
@@ -152,8 +148,7 @@ public class Random
    * @return A double.
    */
   public double normal(double mu, double sigma) {
-    double x = mu + sigma * Math.cos(2 * Math.PI * raw()) * Math.sqrt(-2 * Math.log(raw()));
-    return x;
+    return mu + sigma * Math.cos(2 * Math.PI * raw()) * Math.sqrt(-2 * Math.log(raw()));
   }
 
   /**
@@ -195,8 +190,7 @@ public class Random
    * @return A double.
    */
   public double exponential(double lambda) {
-    double x = -1 / lambda * Math.log(raw());
-    return x;
+    return -1 / lambda * Math.log(raw());
   }
 
   /**
@@ -209,8 +203,7 @@ public class Random
    * @return A double.
    */
   public double triangular(double min, double max) {
-    double x = min / 2 + (max - min) * raw() / 2 + min / 2 + (max - min) * raw() / 2;
-    return x;
+    return min / 2 + (max - min) * raw() / 2 + min / 2 + (max - min) * raw() / 2;
   }
 
   /**
@@ -263,8 +256,7 @@ public class Random
    * @return A double.
    */
   public double cauchy(double mu, double sigma) {
-    double x = sigma * Math.tan(Math.PI * (raw() - 0.5)) + mu;
-    return x;
+    return sigma * Math.tan(Math.PI * (raw() - 0.5)) + mu;
   }
 
   /**
@@ -277,8 +269,7 @@ public class Random
    * @return A double.
    */
   public double weibull(double lambda, double c) {
-    double x = Math.pow(-Math.log(1 - raw()), 1 / c) / lambda;
-    return x;
+    return Math.pow(-Math.log(1 - raw()), 1 / c) / lambda;
   }
 
   /**

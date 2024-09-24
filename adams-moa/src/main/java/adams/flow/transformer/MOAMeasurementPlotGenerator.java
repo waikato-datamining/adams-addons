@@ -20,13 +20,13 @@
 
 package adams.flow.transformer;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import moa.core.Measurement;
 import adams.core.QuickInfoHelper;
 import adams.flow.container.SequencePlotterContainer;
 import adams.flow.core.Token;
+import moa.core.Measurement;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -228,9 +228,9 @@ public class MOAMeasurementPlotGenerator
     m_Counter++;
     for (i = 0; i < measurements.length; i++) {
       name = measurements[i].getName();
-      if (m_Prefix.length() > 0)
+      if (!m_Prefix.isEmpty())
 	name = m_Prefix + name;
-      cont = new SequencePlotterContainer(name, new Double(m_Counter), measurements[i].getValue());
+      cont = new SequencePlotterContainer(name, (double) m_Counter, measurements[i].getValue());
       m_Containers.add(cont);
     }
 
@@ -245,7 +245,7 @@ public class MOAMeasurementPlotGenerator
    */
   @Override
   public boolean hasPendingOutput() {
-    return (m_Containers != null) && (m_Containers.size() > 0);
+    return (m_Containers != null) && !m_Containers.isEmpty();
   }
 
   /**
