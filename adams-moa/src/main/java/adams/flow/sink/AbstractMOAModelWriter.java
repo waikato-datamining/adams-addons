@@ -15,23 +15,23 @@
 
 /*
  * AbstractMOAModelWriter.java
- * Copyright (C) 2011-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
 
-import java.util.Arrays;
-import java.util.Vector;
-
 import adams.core.SerializationHelper;
 import adams.flow.container.MOAModelContainer;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Ancestor for actors that serialize models.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @author  Corey Sterling (coreytsterling at gmail dot com)
- * @version $Revision$
  */
 public abstract class AbstractMOAModelWriter
   extends AbstractFileWriter {
@@ -57,9 +57,9 @@ public abstract class AbstractMOAModelWriter
    * @see		#getAdditionalAcceptedClasses()
    */
   public Class[] accepts() {
-    Vector<Class>	result;
+    List<Class> result;
 
-    result = new Vector<>();
+    result = new ArrayList<>();
     result.add(MOAModelContainer.class);
     result.addAll(Arrays.asList(getAdditionalAcceptedClasses()));
 
