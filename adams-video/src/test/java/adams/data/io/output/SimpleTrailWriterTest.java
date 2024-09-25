@@ -13,13 +13,14 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SimpleTrailWriterTest.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.output;
 
+import adams.core.logging.LoggingLevel;
 import adams.env.Environment;
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -28,7 +29,6 @@ import junit.framework.TestSuite;
  * Tests the SimpleTrailWriter class.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SimpleTrailWriterTest
   extends AbstractTrailWriterTestCase {
@@ -40,6 +40,17 @@ public class SimpleTrailWriterTest
    */
   public SimpleTrailWriterTest(String name) {
     super(name);
+  }
+
+  /**
+   * Returns whether to use java-version specific regression tests.
+   * Does not apply to quick info.
+   *
+   * @return		true if to use
+   */
+  @Override
+  protected boolean isRegressionJavaVersionSpecific() {
+    return true;
   }
 
   /**
@@ -69,9 +80,13 @@ public class SimpleTrailWriterTest
 
     result    = new SimpleTrailWriter[4];
     result[0] = new SimpleTrailWriter();
+    result[0].setLoggingLevel(LoggingLevel.INFO);
     result[1] = new SimpleTrailWriter();
+    result[1].setLoggingLevel(LoggingLevel.INFO);
     result[2] = new SimpleTrailWriter();
+    result[2].setLoggingLevel(LoggingLevel.INFO);
     result[3] = new SimpleTrailWriter();
+    result[3].setLoggingLevel(LoggingLevel.INFO);
     result[3].setStoreBackground(false);
 
     return result;

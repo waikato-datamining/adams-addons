@@ -15,7 +15,7 @@
 
 /*
  * AbstractRESTClientSink.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.rest;
 
@@ -24,7 +24,7 @@ import adams.core.QuickInfoSupporter;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.Actor;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.logging.Level;
 
 /**
@@ -186,7 +186,7 @@ public abstract class AbstractRESTClientSink<I>
   public void setAlternativeURL(String value) {
     if ((value != null) && !value.isEmpty()) {
       try {
-        new URL(value);
+        new URI(value).toURL();
         m_AlternativeURL = value;
         reset();
       }

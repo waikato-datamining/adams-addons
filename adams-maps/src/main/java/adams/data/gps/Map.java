@@ -13,27 +13,26 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Map.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.gps;
 
+import adams.data.filter.AbstractDerivative.Point;
+
+import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.net.URI;
 import java.net.URL;
 import java.util.Vector;
-
-import javax.imageio.ImageIO;
-
-import adams.data.filter.AbstractDerivative.Point;
 
 /**
  * ???
  * 
  * @author  dale (dale at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class Map {
 
@@ -85,7 +84,7 @@ public class Map {
 	  + "&size=" + m_x_pixels + "x" + m_y_pixels
 	  + "&maptype=" + m_maptype.toString()
 	  + "&sensor=true&scale=" + m_scale;
-      URL url = new URL(surl);
+      URL url = new URI(surl).toURL();
       m_mapImage = ImageIO.read(url);
     } catch(Exception e){
       return(false);

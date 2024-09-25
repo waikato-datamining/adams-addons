@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractWebServiceClientSink.java
- * Copyright (C) 2012-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
@@ -25,6 +25,7 @@ import adams.core.option.AbstractOptionHandler;
 import adams.flow.core.Actor;
 import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.logging.Level;
 
@@ -32,7 +33,6 @@ import java.util.logging.Level;
  * Ancestor for webservice clients.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  * @param <I> the type of input data to handle
  */
 public abstract class AbstractWebServiceClientSink<I>
@@ -196,7 +196,7 @@ public abstract class AbstractWebServiceClientSink<I>
   public void setAlternativeURL(String value) {
     if ((value != null) && !value.isEmpty()) {
       try {
-        new URL(value);
+        new URI(value).toURL();
         m_AlternativeURL = value;
         reset();
       }

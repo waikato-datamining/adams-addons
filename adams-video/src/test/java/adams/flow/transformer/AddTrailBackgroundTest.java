@@ -15,7 +15,7 @@
 
 /*
  * AddTrailBackgroundTest.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -48,7 +48,6 @@ import java.util.List;
  *
  * @author fracpete
  * @author adams.core.option.FlowJUnitTestProducer (code generator)
- * @version $Revision$
  */
 public class AddTrailBackgroundTest
   extends AbstractFlowTest {
@@ -60,6 +59,17 @@ public class AddTrailBackgroundTest
    */
   public AddTrailBackgroundTest(String name) {
     super(name);
+  }
+
+  /**
+   * Returns whether to use java-version specific regression tests.
+   * Does not apply to quick info.
+   *
+   * @return		true if to use
+   */
+  @Override
+  protected boolean isRegressionJavaVersionSpecific() {
+    return true;
   }
 
   /**

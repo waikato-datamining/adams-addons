@@ -15,7 +15,7 @@
 
 /*
  * AbstractRESTProvider.java
- * Copyright (C) 2018-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.rest;
 
@@ -36,7 +36,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.logging.Level;
 
 /**
@@ -123,7 +123,7 @@ public abstract class AbstractRESTProvider
    */
   public void setURL(String value) {
     try {
-      new URL(value);
+      new URI(value).toURL();
       m_URL = value;
       reset();
     }

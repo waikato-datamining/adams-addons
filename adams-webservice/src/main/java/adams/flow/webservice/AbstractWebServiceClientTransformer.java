@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractWebServiceClientTransformer.java
- * Copyright (C) 2012-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
@@ -28,6 +28,7 @@ import adams.flow.core.Actor;
 import adams.flow.webservice.interceptor.incoming.AbstractInInterceptorGenerator;
 import adams.flow.webservice.interceptor.outgoing.AbstractOutInterceptorGenerator;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.logging.Level;
@@ -224,7 +225,7 @@ public abstract class AbstractWebServiceClientTransformer<I, O>
   public void setAlternativeURL(String value) {
     if ((value != null) && !value.isEmpty()) {
       try {
-        new URL(value);
+        new URI(value).toURL();
         m_AlternativeURL = value;
         reset();
       }

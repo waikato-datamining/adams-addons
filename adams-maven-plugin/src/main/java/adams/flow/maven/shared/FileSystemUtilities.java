@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 
@@ -204,7 +205,7 @@ public final class FileSystemUtilities {
 
                 // JAR URLs generally contain layered protocols, such as:
                 // jar:file:/some/path/to/nazgul-tools-validation-aspect-4.0.2.jar!/the/package/ValidationAspect.class
-                final URL innerURL = new URL(tmp);
+                final URL innerURL = new URI(tmp).toURL();
 
                 // We can handle File protocol URLs here.
                 if ("file".equalsIgnoreCase(innerURL.getProtocol())) {

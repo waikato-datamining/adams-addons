@@ -15,7 +15,7 @@
 
 /*
  * AbstractWebServiceProvider.java
- * Copyright (C) 2012-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
@@ -35,7 +35,7 @@ import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.logging.Level;
 
 /**
@@ -119,7 +119,7 @@ public abstract class AbstractWebServiceProvider
    */
   public void setURL(String value) {
     try {
-      new URL(value);
+      new URI(value).toURL();
       m_URL = value;
       reset();
     }
