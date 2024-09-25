@@ -13,13 +13,15 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * DataTypeSetupPostGIS.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.db.datatype;
 
 import adams.core.logging.LoggingHelper;
+import net.postgis.jdbc.PGbox3d;
+import net.postgis.jdbc.PGgeometry;
 import org.postgresql.PGConnection;
 
 /**
@@ -37,7 +39,6 @@ import org.postgresql.PGConnection;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class DataTypeSetupPostGIS
   extends AbstractDataTypeSetup {
@@ -67,8 +68,8 @@ public class DataTypeSetupPostGIS
     result = null;
     
     try {
-      ((PGConnection) conn).addDataType("geometry", "org.postgis.PGgeometry");
-      ((PGConnection) conn).addDataType("box3d", "org.postgis.PGbox3d");
+      ((PGConnection) conn).addDataType("geometry", PGgeometry.class);
+      ((PGConnection) conn).addDataType("box3d", PGbox3d.class);
     }
     catch (Exception e) {
       result = LoggingHelper.handleException(this, "Failed to add data types!", e);

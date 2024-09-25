@@ -191,7 +191,7 @@ public class ActorExecutionMojo
 
     result = new ArrayList<>();
     try {
-      result.add(classOutputFile().toURL());
+      result.add(classOutputFile().toURI().toURL());
     }
     catch (Exception e) {
       getLog().error("Failed to generate URL from output file: " + classOutputFile(), e);
