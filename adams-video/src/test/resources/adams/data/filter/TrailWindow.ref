@@ -1,8 +1,8 @@
 --> mouse1-out0.trail
-# Parent\ ID\tDataType=U
 # Parent\ ID=-1
-# Trail.Height\tDataType=N
+# Parent\ ID\tDataType=U
 # Trail.Height=720.0
+# Trail.Height\tDataType=N
 # Trail.Width=1280.0
 # Trail.Width\tDataType=N
 Timestamp,X,Y
@@ -1451,10 +1451,10 @@ Timestamp,X,Y
 
 
 --> mouse1-out1.trail
-# Parent\ ID\tDataType=U
 # Parent\ ID=-1
-# Trail.Height\tDataType=N
+# Parent\ ID\tDataType=U
 # Trail.Height=720.0
+# Trail.Height\tDataType=N
 # Trail.Width=1280.0
 # Trail.Width\tDataType=N
 Timestamp,X,Y
@@ -2304,10 +2304,10 @@ Timestamp,X,Y
 
 
 --> mouse1-out2.trail
-# Parent\ ID\tDataType=U
 # Parent\ ID=-1
-# Trail.Height\tDataType=N
+# Parent\ ID\tDataType=U
 # Trail.Height=720.0
+# Trail.Height\tDataType=N
 # Trail.Width=1280.0
 # Trail.Width\tDataType=N
 Timestamp,X,Y

@@ -1,9 +1,9 @@
 --> simple_no_metadata-out0.trail
 ---
-# Parent\ ID\tDataType=U
 # Parent\ ID=-1
-# Trail.Height\tDataType=N
+# Parent\ ID\tDataType=U
 # Trail.Height=480.0
+# Trail.Height\tDataType=N
 # Trail.Width=640.0
 # Trail.Width\tDataType=N
 Background: false
@@ -16,10 +16,10 @@ Timestamp,X,Y
 
 --> simple_with_metadata-out1.trail
 ---
-# Parent\ ID\tDataType=U
 # Parent\ ID=-1
-# Trail.Height\tDataType=N
+# Parent\ ID\tDataType=U
 # Trail.Height=480.0
+# Trail.Height\tDataType=N
 # Trail.Width=640.0
 # Trail.Width\tDataType=N
 Background: false
@@ -32,10 +32,10 @@ Timestamp,X,Y,Meta-signal1,Meta-signal2
 
 --> simple_with_background-out2.trail
 ---
-# Parent\ ID\tDataType=U
 # Parent\ ID=-1
-# Trail.Height\tDataType=N
+# Parent\ ID\tDataType=U
 # Trail.Height=480.0
+# Trail.Height\tDataType=N
 # Trail.Width=640.0
 # Trail.Width\tDataType=N
 Background: true

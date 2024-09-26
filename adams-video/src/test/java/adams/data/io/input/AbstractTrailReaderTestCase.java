@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractTrailReaderTestCase.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -31,7 +31,6 @@ import java.util.List;
  * Ancestor for trail reader tests.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public abstract class AbstractTrailReaderTestCase
   extends AbstractDataContainerReaderTestCase<AbstractTrailReader, Trail> {
@@ -65,7 +64,7 @@ public abstract class AbstractTrailReaderTestCase
     for (Trail d: data) {
       content.append("---\n");
       if (d.hasReport()) {
-	props = d.getReport().toProperties().toComment();
+	props = d.getReport().toProperties().toComment(true);
 	lines = Utils.split(props, "\n");
 	for (i = 1; i < lines.length; i++) {
 	  if (i > 1)

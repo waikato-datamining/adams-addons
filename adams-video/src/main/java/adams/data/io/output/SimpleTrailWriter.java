@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SimpleTrailWriter.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.output;
@@ -63,7 +63,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SimpleTrailWriter
   extends AbstractTrailWriter {
@@ -188,7 +187,7 @@ public class SimpleTrailWriter
     TByteArrayList		uncompressed;
     byte[]			compressed;
 
-    if (data.size() == 0)
+    if (data.isEmpty())
       return false;
 
     trail   = data.get(0);
@@ -197,7 +196,7 @@ public class SimpleTrailWriter
     // report
     if (trail.hasReport()) {
       props = trail.getReport().toProperties();
-      swriter.write(props.toComment());
+      swriter.write(props.toComment(true));
     }
 
     // background (gzipped, bytes in RGBA order)
