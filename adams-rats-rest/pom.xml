@@ -97,7 +97,7 @@
         <groupId>com.github.fracpete</groupId>
         <artifactId>latex-maven-plugin</artifactId>
       </plugin>
-            
+
       <!-- for generating the license information -->
       <plugin>
         <groupId>org.bsc.maven</groupId>
