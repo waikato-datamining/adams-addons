@@ -34,7 +34,7 @@ import adams.event.RatStateListener;
 import adams.flow.container.ErrorContainer;
 import adams.flow.control.AtomicExecution;
 import adams.flow.control.Breakpoint;
-import adams.flow.control.LocalScopeTransformer;
+import adams.flow.control.LocalScopeSubProcess;
 import adams.flow.control.ScopeHandler.ScopeHandling;
 import adams.flow.control.StorageName;
 import adams.flow.core.Actor;
@@ -271,7 +271,7 @@ public class Rat
   protected RatInput m_Receiver;
   
   /** the actors for transforming the data. */
-  protected LocalScopeTransformer m_Actors;
+  protected LocalScopeSubProcess m_Actors;
   
   /** the transmitter to use. */
   protected RatOutput m_Transmitter;
@@ -437,7 +437,7 @@ public class Rat
   protected void initialize() {
     super.initialize();
     
-    m_Actors = new LocalScopeTransformer();
+    m_Actors = new LocalScopeSubProcess();
     m_Actors.setParent(this);
 
     m_LazySetupPeformed = false;
@@ -526,7 +526,7 @@ public class Rat
    * 
    * @return		the handler
    */
-  public LocalScopeTransformer getActorHandler() {
+  public LocalScopeSubProcess getActorHandler() {
     return m_Actors;
   }
   
@@ -1380,7 +1380,7 @@ public class Rat
    *
    * @return		the actor, null if not available
    */
-  public LocalScopeTransformer getLocalScope() {
+  public LocalScopeSubProcess getLocalScope() {
     return m_Actors;
   }
 

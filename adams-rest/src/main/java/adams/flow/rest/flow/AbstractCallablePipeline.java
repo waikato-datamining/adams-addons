@@ -15,14 +15,14 @@
 
 /*
  * AbstractCallablePipeline.java
- * Copyright (C) 2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2019-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.rest.flow;
 
 import adams.core.MessageCollection;
 import adams.core.Utils;
-import adams.flow.control.LocalScopeTransformer;
+import adams.flow.control.LocalScopeSubProcess;
 import adams.flow.control.ScopeHandler.ScopeHandling;
 import adams.flow.core.AbstractCallableActor;
 import adams.flow.core.Actor;
@@ -74,7 +74,7 @@ public abstract class AbstractCallablePipeline<T>
     return "Uses the specified callable transformer as template for processing "
       + "the incoming data and sending back the resulting data.\n"
       + "A copy of the callable transformer gets created with each request. "
-      + "The transformer itself gets wrapped in a " + Utils.classToString(LocalScopeTransformer.class)
+      + "The transformer itself gets wrapped in a " + Utils.classToString(LocalScopeSubProcess.class)
       + ", with the specified handling of variables and storage.";
   }
 
@@ -283,7 +283,7 @@ public abstract class AbstractCallablePipeline<T>
   protected Object doProcess(Object input, MessageCollection errors) {
     Object			result;
     String			msg;
-    LocalScopeTransformer	scope;
+    LocalScopeSubProcess	scope;
     Actor			pipeline;
 
     result = null;
@@ -297,7 +297,7 @@ public abstract class AbstractCallablePipeline<T>
     scope = null;
     try {
       pipeline = m_PipelineActor.shallowCopy();
-      scope = new LocalScopeTransformer();
+      scope = new LocalScopeSubProcess();
       scope.removeAll();
       scope.add(pipeline);
       scope.setScopeHandlingVariables(m_ScopeHandlingVariables);
