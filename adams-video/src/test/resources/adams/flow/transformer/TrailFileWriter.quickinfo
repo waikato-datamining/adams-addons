@@ -1,1 +1,1 @@
-SimpleTrailWriter
+writer: SimpleTrailWriter, output: ${CWD}, name: AUTOMATIC
