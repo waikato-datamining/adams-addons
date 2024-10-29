@@ -15,7 +15,7 @@
 
 /*
  * MOAInstanceDumper.java
- * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -198,6 +198,9 @@ public class MOAInstanceDumper
   /** the buffer. */
   protected List<Instance> m_Buffer;
 
+  /** whether currently writing to disk. */
+  protected boolean m_Writing;
+
   /**
    * Returns a string describing the object.
    *
@@ -251,7 +254,8 @@ public class MOAInstanceDumper
   protected void initialize() {
     super.initialize();
 
-    m_Buffer = new ArrayList<Instance>();
+    m_Buffer  = new ArrayList<>();
+    m_Writing = false;
   }
 
   /**
@@ -559,6 +563,7 @@ public class MOAInstanceDumper
     m_Counter = 0;
     m_Header  = null;
     m_Buffer.clear();
+    m_Writing = false;
   }
 
   /**
@@ -732,10 +737,15 @@ public class MOAInstanceDumper
     FileWriter		fwriter;
     BufferedWriter	writer;
 
+    if (m_Buffer.isEmpty())
+      return null;
+
+    m_Writing  = true;
     result     = null;
     outputFile = createFilename(m_Buffer.get(0).dataset());
     if (!outputFile.getParentFile().exists()) {
-      result = "Parent directory does not exist: " + outputFile.getParentFile();
+      result    = "Parent directory does not exist: " + outputFile.getParentFile();
+      m_Writing = false;
       return result;
     }
 
@@ -749,7 +759,7 @@ public class MOAInstanceDumper
       try {
         fwriter = new FileWriter(outputFile.getAbsolutePath(), true);
         writer  = new BufferedWriter(fwriter);
-        while (m_Buffer.size() > 0) {
+        while (!m_Buffer.isEmpty()) {
           writer.append(createRow(m_Buffer.get(0)));
           writer.newLine();
           m_Buffer.remove(0);
@@ -764,6 +774,8 @@ public class MOAInstanceDumper
         FileUtils.closeQuietly(writer);
       }
     }
+
+    m_Writing = false;
 
     return result;
   }
@@ -860,7 +872,11 @@ public class MOAInstanceDumper
    * Performs the flush.
    */
   public void performFlush() {
-    if (m_Buffer.size() > 0)
+    if (!m_Buffer.isEmpty()) {
+      while (m_Writing) {
+	Utils.wait(this, this, 1000, 50);
+      }
       writeToDisk(true);
+    }
   }
 }
