@@ -15,7 +15,7 @@
 
 /*
  * RatControl.java
- * Copyright (C) 2014-2023 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
@@ -56,6 +56,7 @@ import adams.gui.event.ConsolePanelListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -207,6 +208,21 @@ public class RatControl
   /** the line limit for the console output. */
   protected int m_ConsoleLineLimit;
 
+  /** the button for stopping. */
+  protected BaseButton m_ButtonStop;
+
+  /** the button for showing the console output. */
+  protected BaseButton m_ButtonConsole;
+
+  /** the button for apply the bulk actions. */
+  protected BaseButton m_ButtonApply;
+
+  /** the status label. */
+  protected JLabel m_LabelStatus;
+
+  /** whether the rat control is stopping. */
+  protected boolean m_RatControlStopping;
+
   /**
    * Returns a string describing the object.
    *
@@ -227,6 +243,7 @@ public class RatControl
     m_ControlPanels        = new ArrayList<>();
     m_ControlPanelsPerRats = new HashMap<>();
     m_ControlStates        = new ArrayList<>();
+    m_RatControlStopping   = false;
   }
 
   /**
@@ -315,17 +332,6 @@ public class RatControl
   }
 
   /**
-   * Returns whether to de-register in {@link #wrapUp()} or wait till 
-   * {@link #cleanUpGUI()}.
-   * 
-   * @return		true if to deregister already in {@link #wrapUp()}
-   */
-  @Override
-  public boolean deregisterInWrapUp() {
-    return true;
-  }
-
-  /**
    * Returns the current control panels.
    *
    * @return		the panels
@@ -378,10 +384,9 @@ public class RatControl
     ParameterPanel		param;
     JPanel			panel;
     JPanel			panelBottom;
-    BaseButton			buttonStop;
-    BaseButton			buttonConsole;
+    JPanel			panelButtons;
+    JPanel			panelStatus;
     final BaseComboBox<String> 	comboBulkActions;
-    BaseButton			buttonApply;
     int				i;
     boolean			inControl;
     
@@ -423,10 +428,20 @@ public class RatControl
     panelBottom = new JPanel(new BorderLayout(0, 0));
     panelBottom.setBorder(BorderFactory.createEmptyBorder());
 
+    panelButtons = new JPanel(new BorderLayout(0, 0));
+    panelButtons.setBorder(BorderFactory.createEmptyBorder());
+    panelBottom.add(panelButtons, BorderLayout.NORTH);
+
+    panelStatus  = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    panelStatus.setBorder(BorderFactory.createEmptyBorder());
+    panelBottom.add(panelStatus, BorderLayout.SOUTH);
+    m_LabelStatus = new JLabel();
+    panelStatus.add(m_LabelStatus);
+
     // bulk actions
     if (m_BulkActions) {
       panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-      panelBottom.add(panel, BorderLayout.WEST);
+      panelButtons.add(panel, BorderLayout.WEST);
       comboBulkActions = new BaseComboBox<>(new DefaultComboBoxModel<>(new String[]{
         BULKACTION_NONE,
 	BULKACTION_PAUSE,
@@ -435,40 +450,45 @@ public class RatControl
 	BULKACTION_STOP,
       }));
       panel.add(comboBulkActions);
-      buttonApply = new BaseButton(ImageManager.getIcon("validate.png"));
-      buttonApply.setToolTipText("Apply bulk action");
-      buttonApply.addActionListener((ActionEvent e) -> {
+      m_ButtonApply = new BaseButton(ImageManager.getIcon("validate.png"));
+      m_ButtonApply.setToolTipText("Apply bulk action");
+      m_ButtonApply.addActionListener((ActionEvent e) -> {
         SwingWorker worker = new SwingWorker() {
 	  @Override
 	  protected Object doInBackground() throws Exception {
-	    buttonApply.setEnabled(false);
+	    m_ButtonApply.setEnabled(false);
 	    applyBulkAction((String) comboBulkActions.getSelectedItem());
 	    return null;
 	  }
 	  @Override
 	  protected void done() {
 	    super.done();
-	    buttonApply.setEnabled(true);
+	    m_ButtonApply.setEnabled(true);
 	  }
 	};
         worker.execute();
       });
-      panel.add(buttonApply);
+    }
+    else {
+      m_ButtonApply = null;
     }
 
     // general buttons
     panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    panelBottom.add(panel, BorderLayout.EAST);
+    panelButtons.add(panel, BorderLayout.EAST);
 
-    buttonStop = new BaseButton(ImageManager.getIcon("stop_blue.gif"));
-    buttonStop.setToolTipText("Stop flow");
-    buttonStop.addActionListener((ActionEvent e) -> getRoot().stopExecution());
-    panel.add(buttonStop);
+    m_ButtonConsole = new BaseButton(ImageManager.getIcon("log.gif"));
+    m_ButtonConsole.setToolTipText("Show console output");
+    m_ButtonConsole.addActionListener((ActionEvent e) -> showConsole());
 
-    buttonConsole = new BaseButton(ImageManager.getIcon("log.gif"));
-    buttonConsole.setToolTipText("Show console output");
-    buttonConsole.addActionListener((ActionEvent e) -> showConsole());
-    panel.add(buttonConsole);
+    m_ButtonStop = new BaseButton(ImageManager.getIcon("stop_blue.gif"));
+    m_ButtonStop.setToolTipText("Stop flow");
+    m_ButtonStop.addActionListener((ActionEvent e) -> stopRatControl());
+
+    if (m_ButtonApply != null)
+      panel.add(m_ButtonApply);
+    panel.add(m_ButtonStop);
+    panel.add(m_ButtonConsole);
 
     m_TextAreaConsole = new BaseTextArea();
     m_TextAreaConsole.setFont(Fonts.getMonospacedFont());
@@ -762,5 +782,38 @@ public class RatControl
     }
 
     super.cleanUp();
+  }
+
+  /**
+   * Stops the actor.
+   */
+  public void stopRatControl() {
+    m_RatControlStopping = true;
+    SwingWorker worker = new SwingWorker() {
+      @Override
+      protected Object doInBackground() throws Exception {
+	if (m_ButtonApply != null)
+	  m_ButtonApply.setEnabled(false);
+	m_ButtonStop.setEnabled(false);
+	m_ButtonConsole.setEnabled(false);
+	for (AbstractControlPanel panel: m_ControlPanels)
+	  panel.wrapUp();
+	m_LabelStatus.setText("Stopping, this may take a while...");
+	getRoot().stopExecution("User stopped flow, waiting for background processes to finish. Check RatControl status for updates (at the bottom).");
+	m_LabelStatus.setText("Flow fully stopped!");
+	return null;
+      }
+    };
+    worker.execute();
+  }
+
+  /**
+   * Stops the execution. No message set.
+   */
+  @Override
+  public void stopExecution() {
+    if (!m_RatControlStopping)
+      stopRatControl();
+    super.stopExecution();
   }
 }

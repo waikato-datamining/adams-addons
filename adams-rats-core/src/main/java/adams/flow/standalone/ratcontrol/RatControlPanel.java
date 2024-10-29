@@ -15,7 +15,7 @@
 
 /*
  * RatControlPanel.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone.ratcontrol;
@@ -106,8 +106,6 @@ public class RatControlPanel
    * Stops/starts the rat.
    */
   public void stopOrStart() {
-    SwingWorker	worker;
-
     if (m_Actor == null)
       return;
 
@@ -121,16 +119,19 @@ public class RatControlPanel
    * Updates the state of the buttons.
    */
   public void updateButtons() {
+    m_ButtonPauseResume.setEnabled(!m_WrappedUp);
+    m_ButtonStopStart.setEnabled(!m_WrappedUp);
+
     if (m_Actor == null)
       return;
 
-    m_ButtonPauseResume.setEnabled(m_Actor.isRunnableActive());
+    m_ButtonPauseResume.setEnabled(m_Actor.isRunnableActive() && !m_WrappedUp);
     if (m_Actor.isRunnableActive() && m_Actor.isPaused())
       m_ButtonPauseResume.setIcon(ImageManager.getIcon("resume.gif"));
     else
       m_ButtonPauseResume.setIcon(ImageManager.getIcon("pause.gif"));
 
-    m_ButtonStopStart.setEnabled(true);
+    m_ButtonStopStart.setEnabled(!m_WrappedUp);
     if (m_Actor.isRunnableActive())
       m_ButtonStopStart.setIcon(ImageManager.getIcon("stop_blue.gif"));
     else

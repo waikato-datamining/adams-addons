@@ -15,7 +15,7 @@
 
 /*
  * AbstractControlPanel.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone.ratcontrol;
@@ -61,6 +61,18 @@ public abstract class AbstractControlPanel<T extends Actor & Pausable>
 
   /** whether to skip bulk triggers. */
   protected boolean m_SkipBulkActionTrigger;
+
+  /** whether the flow has wrapped up. */
+  protected boolean m_WrappedUp;
+
+  /**
+   * Initializes the member variables.
+   */
+  @Override
+  protected void initialize() {
+    super.initialize();
+    m_WrappedUp = false;
+  }
 
   /**
    * Initializes the widgets.
@@ -282,9 +294,11 @@ public abstract class AbstractControlPanel<T extends Actor & Pausable>
    * Updates the state of the buttons.
    */
   public void updateButtons() {
+    m_ButtonPauseResume.setEnabled(!m_WrappedUp);
+
     if (m_Actor == null)
       return;
-    m_ButtonPauseResume.setEnabled(true);
+
     if (m_Actor.isPaused())
       m_ButtonPauseResume.setIcon(ImageManager.getIcon("resume.gif"));
     else
@@ -307,5 +321,22 @@ public abstract class AbstractControlPanel<T extends Actor & Pausable>
    */
   public boolean isPausable() {
     return m_ButtonPauseResume.isVisible();
+  }
+
+  /**
+   * Disables the button.
+   */
+  public void wrapUp() {
+    SwingWorker	worker;
+
+    m_WrappedUp = true;
+    worker = new SwingWorker() {
+      @Override
+      protected Object doInBackground() throws Exception {
+	updateButtons();
+	return null;
+      }
+    };
+    worker.execute();
   }
 }
