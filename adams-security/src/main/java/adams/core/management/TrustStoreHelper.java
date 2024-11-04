@@ -70,9 +70,9 @@ public class TrustStoreHelper {
   /**
    * Returns the trust store file.
    *
-   * @return		the file, directory if no file defined
+   * @return		the file name, directory if no file defined
    */
-  public String getTrustStoreFile() {
+  public String getTrustStoreFileName() {
     String	result;
 
     result = m_Properties.getProperty(TRUST_STORE_FILE, "");
@@ -80,6 +80,15 @@ public class TrustStoreHelper {
       result = ".";
 
     return result;
+  }
+
+  /**
+   * Returns the trust store file.
+   *
+   * @return		the file name, directory if no file defined
+   */
+  public PlaceholderFile getTrustStoreFile() {
+    return new PlaceholderFile(getTrustStoreFileName());
   }
 
   /**
@@ -148,9 +157,9 @@ public class TrustStoreHelper {
   public void apply() {
     PlaceholderFile	file;
 
-    file = new PlaceholderFile(getTrustStoreFile());
+    file = getTrustStoreFile();
     if (file.exists() && !file.isDirectory()) {
-      System.setProperty("javax.net.ssl.trustStore", getTrustStoreFile());
+      System.setProperty("javax.net.ssl.trustStore", getTrustStoreFile().getAbsolutePath());
       System.setProperty("javax.net.ssl.trustStorePassword", getTrustStorePassword().getValue());
     }
   }
