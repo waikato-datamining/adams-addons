@@ -15,7 +15,7 @@
 
 /*
  * TrustManager.java
- * Copyright (C) 2019-2023 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2019-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone;
@@ -25,6 +25,7 @@ import adams.core.base.BasePassword;
 import adams.core.io.ConsoleHelper;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
+import adams.core.management.TrustStoreHelper;
 import adams.flow.control.Flow;
 import adams.flow.core.OptionalPasswordPrompt;
 import adams.flow.core.StopHelper;
@@ -188,11 +189,11 @@ public class TrustManager
 
     m_OptionManager.add(
       "keystore-file", "keystoreFile",
-      new PlaceholderFile());
+      TrustStoreHelper.getSingleton().getTrustStoreFile(), false);
 
     m_OptionManager.add(
       "keystore-passphrase", "keystorePassphrase",
-      new BasePassword(""), false);
+      TrustStoreHelper.getSingleton().getTrustStorePassword(), false);
 
     m_OptionManager.add(
       "prompt-for-password", "promptForPassword",
