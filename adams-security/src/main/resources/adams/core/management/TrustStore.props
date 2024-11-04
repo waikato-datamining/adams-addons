@@ -1,0 +1,8 @@
+# Properties file for defining the global trust store
+
+# the trust store file to use
+# (path; ignored if empty or pointing to dir)
+TrustStoreFile=.
+
+# the password for accessing the trust store
+TrustStorePassword=

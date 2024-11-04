@@ -42,7 +42,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2019} &
+		\parbox[c][2cm]{2cm}{\copyright 2019-2024} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -51,7 +51,7 @@
 \end{titlepage}
 
 \tableofcontents
-%\listoffigures
+\listoffigures
 %\listoftables
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -94,6 +94,23 @@ cross-platform Keystore Explorer\cite{kse} tool.
   \item \textit{Keytool} - for executing the \verb|keytool| executable, forwards
   the generated output to its sub-actors.
 \end{tight_itemize}
+
+
+%%%%%%%%%%%%%%%
+% Preferences %
+%%%%%%%%%%%%%%%
+\chapter{Preferences}
+In the \textit{Trust store} section of the global preferences of ADAMS (in the main menu,
+select *Program* and then *Preferences*), you can specify a Java trust store to use
+globally (see figure \ref{preferences_truststore}). This can be used, e.g., for connecting
+to MySQL databases that require SSL connections.
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=12.0cm]{images/preferences_truststore.png}
+  \caption{Preferences for specifying trust store}
+  \label{preferences_truststore}
+\end{figure}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
