@@ -50,7 +50,6 @@
     <module>adams-maven-plugin</module>
     <module>adams-meka</module>
     <module>adams-moa</module>
-    <module>adams-nlp</module>
     <module>adams-python-weka</module>
     <module>adams-r</module>
     <module>adams-random</module>
