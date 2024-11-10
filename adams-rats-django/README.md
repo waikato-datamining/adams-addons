@@ -36,13 +36,13 @@ Example flow for testing:
   * change into `adams-rats-django` directory
   * set up virtual environment (above directory with `requirements.txt`)
 
-    ```commandline
+    ```bash
     virtualenv -p /usr/bin/python3 venv
     ```
   
   * install Django and required dependencies (change into dir with `requirements.txt`)
 
-    ```commandline
+    ```bash
     ../venv/bin/pip install -r requirements.txt
     ```
 
@@ -163,7 +163,7 @@ Example flow for testing:
 
 * initialize the database (Windows)
 
-  ```bash
+  ```commandline
   .\venv\Scripts\python.exe adams-rats-django\manage.py migrate
   ```
 
@@ -190,10 +190,9 @@ Example flow for testing:
 
 ### Production
 
-Use the django application through WSGI
+Use the django application through WSGI:
 
-* [Linux](https://www.digitalocean.com/community/tutorials/how-to-serve-django-applications-with-apache-and-mod_wsgi-on-ubuntu-14-04)
-* [Windows](http://blog.mattwoodward.com/2016/07/running-django-application-on-windows.html) 
+https://docs.djangoproject.com/en/5.1/howto/deployment/wsgi/
 
 
 ## Authentication
@@ -203,7 +202,7 @@ which then can be used to create and configure other users.
 
 * run the following command to create superuser (Linux)
 
-  ```commandline
+  ```bash
   ./venv/bin/python adams-rats-django/manage.py createsuperuser --username=<name> --email=<email>
   ```
 
