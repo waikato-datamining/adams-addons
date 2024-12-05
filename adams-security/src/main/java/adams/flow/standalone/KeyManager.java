@@ -25,16 +25,13 @@ import adams.core.base.BasePassword;
 import adams.core.io.ConsoleHelper;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
-import adams.flow.control.Flow;
+import adams.flow.core.ActorUtils;
 import adams.flow.core.KeyManagerFactoryProvider;
 import adams.flow.core.OptionalPasswordPrompt;
 import adams.flow.core.StopHelper;
 import adams.flow.core.StopMode;
-import adams.gui.dialog.PasswordDialog;
 
 import javax.net.ssl.KeyManagerFactory;
-import java.awt.Dialog;
-import java.awt.Dialog.ModalityType;
 import java.io.FileInputStream;
 import java.security.KeyStore;
 import java.util.ArrayList;
@@ -498,24 +495,11 @@ public class KeyManager
    */
   @Override
   public String doInteract() {
-    String		result;
-    PasswordDialog	dlg;
-
-    dlg = new PasswordDialog((Dialog) null, ModalityType.DOCUMENT_MODAL);
-    dlg.setLabelPassword("Keystore passphrase");
-    dlg.setLocationRelativeTo(getParentComponent());
-    ((Flow) getRoot()).registerWindow(dlg, dlg.getTitle());
-    dlg.setVisible(true);
-    ((Flow) getRoot()).deregisterWindow(dlg);
-    if (dlg.getOption() == PasswordDialog.APPROVE_OPTION)
-      result = null;
+    m_ActualPassphrase = ActorUtils.promptPassword(this, "Keystore passphrase");
+    if (m_ActualPassphrase == null)
+      return INTERACTION_CANCELED;
     else
-      result = INTERACTION_CANCELED;
-
-    if (result == null)
-      m_ActualPassphrase = dlg.getPassword();
-
-    return result;
+      return null;
   }
 
   /**
