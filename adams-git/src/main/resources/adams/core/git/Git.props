@@ -1,0 +1,37 @@
+# Properties file for defining the default git settings
+
+# the location of the ssh key files to use
+# the following placeholders are supported
+#   %t - the temp directory
+#   %h - the user's home directory
+#   %p - the project's home directory
+#   %c - the current directory
+#   %% - gets replaced by a single percentage sign
+# (path)
+SshDir=%h/.ssh
+
+# the location of the known_hosts file to use
+# the following placeholders are supported
+#   %t - the temp directory
+#   %h - the user's home directory
+#   %p - the project's home directory
+#   %c - the current directory
+#   %% - gets replaced by a single percentage sign
+# (path)
+KnownHosts=%h/.ssh/known_hosts
+
+# The user name to use for commits, overrides .gitconfig settings
+# (string)
+User=
+
+# The email to use for commits, overrides .gitconfig settings
+# (email address)
+Email=
+
+# The default logging level for git operations
+# (OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST)
+LoggingLevel=INFO
+
+# Whether to enable git support in the Flow editor
+# (true|false)
+FlowEditorSupport=false
