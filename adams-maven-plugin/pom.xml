@@ -97,6 +97,12 @@
         <artifactId>adams-core</artifactId>
         <version>${adams.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>nz.ac.waikato.cms.adams</groupId>
+        <artifactId>adams-json</artifactId>
+        <version>${adams.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -104,6 +110,11 @@
     <dependency>
       <groupId>nz.ac.waikato.cms.adams</groupId>
       <artifactId>adams-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>nz.ac.waikato.cms.adams</groupId>
+      <artifactId>adams-json</artifactId>
     </dependency>
 
     <!-- QDox, used for JavaDoc processing -->

@@ -19,7 +19,10 @@ package adams.flow.maven;
  * under the License.
  */
 
+import adams.core.Utils;
+import adams.core.management.ProcessUtils;
 import adams.flow.maven.shared.FileSystemUtilities;
+import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
@@ -256,6 +259,30 @@ public abstract class AbstractAdamsMojo
 
       // All done.
       getLog().debug(builder.toString().replace("\n", NEWLINE));
+    }
+  }
+
+  /**
+   * Executes the command.
+   *
+   * @param cmd the command to execute
+   * @throws MojoExecutionException if command exits with code != 0 or an exception occurred
+   */
+  protected void execute(List<String> cmd) throws MojoExecutionException {
+    getLog().debug("Executing: " + Utils.flatten(cmd, " "));
+    try {
+      CollectingProcessOutput output = ProcessUtils.execute(cmd.toArray(new String[0]));
+      if (output.getExitCode() != 0) {
+	if (!output.getStdErr().isEmpty())
+	  getLog().error(output.getStdErr());
+	throw new Exception("Code generation failed with exit code: " + output.getExitCode());
+      }
+      else {
+	getLog().info(output.getStdOut());
+      }
+    }
+    catch (Exception e) {
+      throw new MojoExecutionException("Failed to execute command: " + Utils.flatten(cmd, " "), e);
     }
   }
 }

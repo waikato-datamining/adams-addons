@@ -7,9 +7,9 @@ from workflows.
 
 The adams-maven-plugin has the following goals:
 
-* [adams:exec](./exec-mojo.html) Generates Java code from a flows, with the 
+* [adams:exec](./exec-mojo.html) Generates Java code from a flow, with the 
   classes to be executed via their main method.
-* [adams:apply](./apply-mojo.html) Generates Java code from a flows, with the 
+* [adams:apply](./apply-mojo.html) Generates Java code from a flow, with the 
   flows to be executed as methods (via the `apply` method).
 
 ## Usage examples

@@ -14,8 +14,8 @@
  */
 
 /*
- * ClassListerMojo.java
- * Copyright (C) 2019 University of Waikato, Hamilton, NZ
+ * OptionListerMojo.java
+ * Copyright (C) 2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.maven;
@@ -23,6 +23,7 @@ package adams.flow.maven;
 import adams.core.ClassLister;
 import adams.core.Utils;
 import adams.core.management.Java;
+import adams.core.option.OptionLister;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -40,11 +41,11 @@ import java.util.List;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-@Mojo(name = "classlister",
+@Mojo(name = "optionlister",
         threadSafe = false,
         defaultPhase = LifecyclePhase.COMPILE,
         requiresDependencyResolution = ResolutionScope.COMPILE)
-public class ClassListerMojo
+public class OptionListerMojo
   extends AbstractAdamsMojo {
 
   /**
@@ -106,11 +107,11 @@ public class ClassListerMojo
     cmd.add(Java.getJavaExecutable());
     cmd.add("-classpath");
     cmd.add(Utils.flatten(getClasspath(), System.getProperty("path.separator")));
-    cmd.add(ClassLister.class.getName());
-    cmd.add("-action");
-    cmd.add("packages");
+    cmd.add(OptionLister.class.getName());
+    cmd.add("-input");
+    cmd.add(outputDirectory.getAbsolutePath() + File.separator + ClassLister.CLASSLISTER_CLASSES);
     cmd.add("-output");
-    cmd.add(outputDirectory.getAbsolutePath() + File.separator + ClassLister.CLASSLISTER_PACKAGES);
+    cmd.add(outputDirectory.getAbsolutePath() + File.separator + "OptionLister.json");
     execute(cmd);
 
     return true;
