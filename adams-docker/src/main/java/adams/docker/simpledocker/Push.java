@@ -15,7 +15,7 @@
 
 /*
  * Push.java
- * Copyright (C) 2023 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2023-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.docker.simpledocker;
@@ -75,7 +75,7 @@ public class Push
       false);
 
     m_OptionManager.add(
-      "disable-content-trust", "disableConentTrust",
+      "disable-content-trust", "disableContentTrust",
       false);
 
     m_OptionManager.add(
