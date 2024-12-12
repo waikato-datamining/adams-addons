@@ -28,6 +28,7 @@ import adams.gui.action.AbstractBaseAction;
 import adams.gui.core.ImageManager;
 import adams.gui.flow.FlowEditorPanel;
 import adams.gui.flow.menu.git.AbstractFlowEditorGitMenuItem;
+import adams.gui.flow.menu.git.ResetSession;
 import org.eclipse.jgit.api.Git;
 
 import javax.swing.JMenu;
@@ -79,6 +80,21 @@ public class GitSubMenu
   }
 
   /**
+   * Adds the menuitem to the sub-menu and the list of managed menuitems.
+   *
+   * @param menuitem	the menuitem to add
+   */
+  protected void addMenuItem(AbstractFlowEditorGitMenuItem menuitem) {
+    m_MenuItems.add(menuitem);
+    if (menuitem.hasAction())
+      m_SubMenu.add(menuitem.getAction());
+    else if (menuitem.hasMenuItem())
+      m_SubMenu.add(menuitem.getMenuItem());
+    else if (menuitem.hasSubMenu())
+      m_SubMenu.add(menuitem.getSubMenu());
+  }
+
+  /**
    * Creates the submenu to use.
    *
    * @return		the submenu
@@ -94,20 +110,20 @@ public class GitSubMenu
     m_SubMenu.setIcon(ImageManager.getIcon("git"));
     m_MenuItems = new ArrayList<>();
     for (Class cls: ClassLister.getSingleton().getClasses(AbstractFlowEditorGitMenuItem.class)) {
+      if (cls.equals(ResetSession.class))
+	continue;
       try {
 	menuitem = (AbstractFlowEditorGitMenuItem) cls.getDeclaredConstructor().newInstance();
-	m_MenuItems.add(menuitem);
-	if (menuitem.hasAction())
-	  m_SubMenu.add(menuitem.getAction());
-	else if (menuitem.hasMenuItem())
-	  m_SubMenu.add(menuitem.getMenuItem());
-	else if (menuitem.hasSubMenu())
-	  m_SubMenu.add(menuitem.getSubMenu());
+	addMenuItem(menuitem);
       }
       catch (Exception e) {
 	getLogger().log(Level.SEVERE, "Failed to instantiate: " + Utils.classToString(cls), e);
       }
     }
+
+    m_SubMenu.addSeparator();
+    addMenuItem(new ResetSession());
+
 
     return m_SubMenu;
   }
@@ -134,27 +150,20 @@ public class GitSubMenu
 
     m_SubMenu.setEnabled(
       (m_Owner != null)
-	&& m_Owner.hasCurrentPanel()
-	&& (m_Owner.getCurrentFile() != null)
-	&& m_Owner.getCurrentFile().exists()
-	&& !m_Owner.getCurrentFile().isDirectory());
+	&& m_Owner.hasCurrentPanel());
 
-    if (m_SubMenu.isEnabled()) {
+    if ((m_Owner.getCurrentFile() != null)
+	  && m_Owner.getCurrentFile().exists()
+	  && !m_Owner.getCurrentFile().isDirectory()) {
       git = null;
       if (GitSession.getSingleton().isWithinRepo(m_Owner.getCurrentFile())) {
 	git = GitSession.getSingleton().repoFor(m_Owner.getCurrentFile());
 	getLogger().info("git repo dir: " + git.getRepository().getWorkTree());
-	m_SubMenu.setEnabled(true);
-      }
-      else {
-	m_SubMenu.setEnabled(false);
       }
 
-      if (m_SubMenu.isEnabled()) {
-	for (AbstractFlowEditorGitMenuItem menuitem : m_MenuItems) {
-	  menuitem.setOwner(m_Owner);
-	  menuitem.update(git);
-	}
+      for (AbstractFlowEditorGitMenuItem menuitem : m_MenuItems) {
+	menuitem.setOwner(m_Owner);
+	menuitem.update(git);
       }
     }
   }

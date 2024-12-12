@@ -24,6 +24,7 @@ import adams.core.git.GitSettingsHelper;
 import adams.core.io.FileUtils;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.core.GUIHelper;
+import adams.gui.dialog.ApprovalDialog;
 import adams.gui.flow.FlowPanelNotificationArea.NotificationType;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -54,6 +55,13 @@ public class Commit
       private static final long serialVersionUID = 5856785085545656193L;
       @Override
       protected void doActionPerformed(ActionEvent e) {
+	if (m_Owner.isModified()) {
+	  int retVal = GUIHelper.showConfirmMessage(m_Owner, "Flow is modified - save?");
+	  if (retVal != ApprovalDialog.APPROVE_OPTION)
+	    return;
+	  m_Owner.save();
+	}
+
 	String relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), m_Owner.getCurrentFile());
 	String msg = GUIHelper.showInputDialog(m_Owner, "Commit message for " + m_Owner.getCurrentFile().getName() + ":");
 	if (msg == null)
@@ -102,6 +110,11 @@ public class Commit
     Status 	status;
     File 	file;
     String 	relPath;
+
+    if (m_Git == null) {
+      m_Action.setEnabled(false);
+      return;
+    }
 
     file    = m_Owner.getCurrentFile();
     relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), file);

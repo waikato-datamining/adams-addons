@@ -56,6 +56,6 @@ public class ResetSession
    */
   @Override
   public void update() {
-    m_Action.setEnabled(true);
+    m_Action.setEnabled(m_Git != null);
   }
 }

@@ -91,6 +91,11 @@ public class Rollback
     File 	file;
     String 	relPath;
 
+    if (m_Git == null) {
+      m_Action.setEnabled(false);
+      return;
+    }
+
     file    = m_Owner.getCurrentFile();
     relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), file);
     try {

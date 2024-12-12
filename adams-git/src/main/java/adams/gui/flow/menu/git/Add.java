@@ -23,6 +23,7 @@ package adams.gui.flow.menu.git;
 import adams.core.io.FileUtils;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.core.GUIHelper;
+import adams.gui.dialog.ApprovalDialog;
 import org.eclipse.jgit.api.Status;
 
 import javax.swing.SwingWorker;
@@ -51,6 +52,13 @@ public class Add
       private static final long serialVersionUID = -7027399409999957965L;
       @Override
       protected void doActionPerformed(ActionEvent e) {
+	if (m_Owner.isModified()) {
+	  int retVal = GUIHelper.showConfirmMessage(m_Owner, "Flow is modified - save?");
+	  if (retVal != ApprovalDialog.APPROVE_OPTION)
+	    return;
+	  m_Owner.save();
+	}
+
 	SwingWorker worker = new SwingWorker() {
 	  @Override
 	  protected Object doInBackground() throws Exception {
@@ -81,6 +89,11 @@ public class Add
     Status 	status;
     File 	file;
     String 	relPath;
+
+    if (m_Git == null) {
+      m_Action.setEnabled(false);
+      return;
+    }
 
     file    = m_Owner.getCurrentFile();
     relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), file);
