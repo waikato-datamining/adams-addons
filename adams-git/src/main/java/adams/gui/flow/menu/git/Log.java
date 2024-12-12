@@ -14,18 +14,16 @@
  */
 
 /*
- * Commit.java
+ * Log.java
  * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.flow.menu.git;
 
 import adams.core.git.GitHelper;
-import adams.core.git.GitSettingsHelper;
 import adams.core.io.FileUtils;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.core.GUIHelper;
-import adams.gui.dialog.ApprovalDialog;
 import adams.gui.flow.FlowPanelNotificationArea.NotificationType;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -36,11 +34,11 @@ import java.io.File;
 import java.util.logging.Level;
 
 /**
- * Performs a "git commit".
+ * Performs a "git log".
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
-public class Commit
+public class Log
   extends AbstractFlowEditorGitMenuItem {
 
   private static final long serialVersionUID = -2869403192412073396L;
@@ -52,45 +50,26 @@ public class Commit
    */
   @Override
   protected AbstractBaseAction newAction() {
-    return new AbstractBaseAction("Commit...", "save") {
+    return new AbstractBaseAction("Log...", "log") {
       private static final long serialVersionUID = 5856785085545656193L;
       @Override
       protected void doActionPerformed(ActionEvent e) {
-	if (m_Owner.isModified()) {
-	  int retVal = GUIHelper.showConfirmMessage(m_Owner, "Flow is modified - save?");
-	  if (retVal != ApprovalDialog.APPROVE_OPTION)
-	    return;
-	  m_Owner.save();
-	}
-
 	String relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), m_Owner.getCurrentFile());
-	String msg = GUIHelper.showInputDialog(m_Owner, "Commit message for " + m_Owner.getCurrentFile().getName() + ":");
-	if (msg == null)
-	  return;
-	String user = GitSettingsHelper.getSingleton().getUser();
-	if (user.isEmpty())
-	  user = GUIHelper.showInputDialog(m_Owner, "Please enter user for commit:");
-	if (user == null)
-	  return;
-	String email = GitSettingsHelper.getSingleton().getEmail();
-	if (email.isEmpty())
-	  email = GUIHelper.showInputDialog(m_Owner, "Please enter email for commit:");
-	if (email == null)
-	  return;
-	final String fUser = user;
-	final String fEmail = email;
 	SwingWorker worker = new SwingWorker() {
 	  @Override
 	  protected Object doInBackground() throws Exception {
 	    try {
-	      RevCommit result = m_Git.commit()
-		.setOnly(relPath)
-		.setCommitter(fUser, fEmail)
-		.setMessage(msg)
-		.call();
-	      String msg = GitHelper.format(result, GitHelper.FORMAT_REVCOMMIT_LONG);
-	      getLogger().info(msg);
-	      getOwner().getCurrentPanel().showNotification(msg, NotificationType.INFO);
+	      Iterable<RevCommit> result = m_Git.log()
+					     .addPath(relPath)
+					     .call();
+	      StringBuilder info = new StringBuilder();
+	      for (RevCommit commit: result) {
+		if (info.length() > 0)
+		  info.append("\n");
+		info.append(GitHelper.format(commit, GitHelper.FORMAT_REVCOMMIT_LONG));
+	      }
+	      getLogger().info(info.toString());
+	      getOwner().getCurrentPanel().showNotification(info.toString(), NotificationType.INFO);
 	    }
 	    catch (Exception ex) {
 	      getLogger().log(Level.SEVERE, "Failed to commit: " + relPath, e);
@@ -126,7 +105,7 @@ public class Commit
 		 .call();
       m_Action.setEnabled(
 	status.getModified().contains(relPath)
-	  || status.getAdded().contains(relPath));
+	  || status.isClean());
     }
     catch (Exception e) {
       m_Action.setEnabled(false);
