@@ -20,6 +20,7 @@
 
 package adams.gui.flow.menu.git;
 
+import adams.core.git.GitHelper;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.core.GUIHelper;
 import adams.gui.flow.FlowPanelNotificationArea.NotificationType;
@@ -63,7 +64,7 @@ public class Push
 		if (combined.length() > 0)
 		  combined.append("\n");
 		for (RemoteRefUpdate update: result.getRemoteUpdates())
-		  combined.append(update).append("\n");
+		  combined.append(GitHelper.format(update)).append("\n");
 	      }
 	      getLogger().info(combined.toString());
 	      getOwner().getCurrentPanel().showNotification(combined.toString(), NotificationType.INFO);

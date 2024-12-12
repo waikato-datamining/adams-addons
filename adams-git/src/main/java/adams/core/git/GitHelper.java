@@ -23,6 +23,7 @@ package adams.core.git;
 import adams.core.DateUtils;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.transport.RemoteRefUpdate;
 
 /**
  * Helper class for git.
@@ -45,12 +46,15 @@ public class GitHelper {
       "Hash.....: " + PH_HASH + "\n"
     + "Timestamp: " + PH_TIMESTAMP + "\n"
     + "Committer: " + PH_COMMITTER + "\n"
-    + "Message..: " + PH_FULL_MESSAGE;
+    + "Message..: " + PH_FULL_MESSAGE + "\n";
 
-  public final static String FORMAT_REVCOMMIT_SHORT = PH_TIMESTAMP + "/" + PH_COMMITTER + ": " + PH_SHORT_MESSAGE;
+  public final static String FORMAT_REVCOMMIT_SHORT = PH_TIMESTAMP + "/" + PH_COMMITTER + ": " + PH_SHORT_MESSAGE + "\n";
 
   /**
    * Returns a commit as a string.
+   * <br>
+   * Supported placeholders:
+   * {@link #PH_HASH}, {@link #PH_COMMITTER}, {@link #PH_FULL_MESSAGE}, {@link #PH_SHORT_MESSAGE}, {@link #PH_TIMESTAMP}
    *
    * @param commit	the commit to format
    * @param format 	the format to use
@@ -68,6 +72,24 @@ public class GitHelper {
     result = result.replace(PH_SHORT_MESSAGE, commit.getShortMessage());
     result = result.replace(PH_TIMESTAMP, DateUtils.getTimestampFormatter().format(ident.getWhen()));
 
+    return result;
+  }
+
+  /**
+   * Turns the update into a string.
+   *
+   * @param update	the update to format
+   * @return		the generated string
+   */
+  public static String format(RemoteRefUpdate update) {
+    String	result;
+
+    result = update.getSrcRef() + " -> " + update.getRemoteName() + ": " + update.getStatus();
+    result += "\n" + (update.getExpectedOldObjectId() != null ? update.getExpectedOldObjectId().name() : "(null)")
+		+ "..."
+		+ (update.getNewObjectId() != null ? update.getNewObjectId().name() : "(null)");
+    if (update.getMessage() != null)
+      result += "\nMessage: " + update.getMessage();
     return result;
   }
 }
