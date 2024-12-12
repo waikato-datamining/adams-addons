@@ -14,7 +14,7 @@
  */
 
 /*
- * Reset.java
+ * ResetSession.java
  * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
  */
 
@@ -30,7 +30,7 @@ import java.awt.event.ActionEvent;
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
-public class Reset
+public class ResetSession
   extends AbstractFlowEditorGitMenuItem {
 
   private static final long serialVersionUID = -2869403192412073396L;
