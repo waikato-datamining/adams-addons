@@ -20,6 +20,7 @@
 
 package adams.gui.flow.menu.git;
 
+import adams.core.git.GitHelper;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.core.GUIHelper;
 import adams.gui.flow.FlowPanelNotificationArea.NotificationType;
@@ -57,8 +58,9 @@ public class Pull
 	    try {
 	      PullCommand cmd = setTransportConfigCallbackIfNecessary(m_Git.pull());
 	      PullResult result = cmd.call();
-	      getLogger().info(result.toString());
-	      getOwner().getCurrentPanel().showNotification(result.toString(), NotificationType.INFO);
+	      String msg = GitHelper.format(result);
+	      getLogger().info(msg);
+	      getOwner().getCurrentPanel().showNotification(msg, NotificationType.INFO);
 	    }
 	    catch (Exception ex) {
 	      getLogger().log(Level.SEVERE, "Failed to pull: " + m_Git.getRepository().getWorkTree(), e);

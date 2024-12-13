@@ -21,9 +21,15 @@
 package adams.core.git;
 
 import adams.core.DateUtils;
+import org.eclipse.jgit.api.MergeResult;
+import org.eclipse.jgit.api.PullResult;
+import org.eclipse.jgit.api.RebaseResult;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.transport.FetchResult;
 import org.eclipse.jgit.transport.RemoteRefUpdate;
+
+import java.util.Map;
 
 /**
  * Helper class for git.
@@ -91,5 +97,76 @@ public class GitHelper {
     if (update.getMessage() != null)
       result += "\nMessage: " + update.getMessage();
     return result;
+  }
+
+  /**
+   * Formats a fetch result.
+   *
+   * @param fetch	the result to format
+   * @return		the generated string
+   */
+  public static String format(FetchResult fetch) {
+    StringBuilder		result;
+    Map<String, FetchResult>	submods;
+
+    result  = new StringBuilder();
+    submods = fetch.submoduleResults();
+    for (String key: submods.keySet()) {
+      if (result.length() > 0)
+	result.append(", ");
+      result.append(key);
+    }
+
+    return result.toString();
+  }
+
+  /**
+   * Formats a merge result.
+   *
+   * @param merge	the result to format
+   * @return		the generated string
+   */
+  public static String format(MergeResult merge) {
+    return merge.toString();
+  }
+
+  /**
+   * Formats a rebase result.
+   *
+   * @param rebase	the result to format
+   * @return		the generated string
+   */
+  public static String format(RebaseResult rebase) {
+    return rebase.toString();
+  }
+
+  /**
+   * Turns the pull result into a legible string.
+   *
+   * @param pull	the result to format
+   * @return		the generated string
+   */
+  public static String format(PullResult pull) {
+    StringBuilder 	result;
+
+    result = new StringBuilder();
+
+    // fetch
+    if (pull.getFetchResult() != null)
+      result.append(format(pull.getFetchResult()));
+    else
+      result.append("No fetch result");
+    if (result.length() > 0)
+      result.append("\n");
+
+    // merge or rebase
+    if (pull.getMergeResult() != null)
+      result.append(format(pull.getMergeResult()));
+    else if (pull.getRebaseResult() != null)
+      result.append(format(pull.getRebaseResult()));
+    else
+      result.append("No update result");
+
+    return result.toString();
   }
 }
