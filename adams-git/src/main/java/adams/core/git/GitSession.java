@@ -126,7 +126,7 @@ public class GitSession
     RepositoryBuilder 	builder;
     Git			git;
 
-    if (!m_Controlled.containsKey(path)) {
+    if (!m_Controlled.containsKey(path.getAbsoluteFile())) {
       // already a repo present?
       git = repoFor(path);
 
@@ -134,9 +134,9 @@ public class GitSession
       if (git == null) {
 	try {
 	  if (path.isDirectory())
-	    builder = new RepositoryBuilder().findGitDir(path);
+	    builder = new RepositoryBuilder().findGitDir(path.getAbsoluteFile());
 	  else
-	    builder = new RepositoryBuilder().findGitDir(path.getParentFile());
+	    builder = new RepositoryBuilder().findGitDir(path.getParentFile().getAbsoluteFile());
 	  git = new Git(builder.build());
 	  getLogger().info("path: " + path);
 	  getLogger().info("-> git repo dir: " + git.getRepository().getWorkTree());
@@ -150,12 +150,12 @@ public class GitSession
 
       // update cache
       if (git != null)
-	m_Controlled.put(path, git);
+	m_Controlled.put(path.getAbsoluteFile(), git);
       else
-	m_Controlled.put(path, false);
+	m_Controlled.put(path.getAbsoluteFile(), false);
     }
 
-    return (m_Controlled.get(path) instanceof Git);
+    return (m_Controlled.get(path.getAbsoluteFile()) instanceof Git);
   }
 
   /**
