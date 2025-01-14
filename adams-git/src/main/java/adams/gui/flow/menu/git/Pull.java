@@ -63,7 +63,7 @@ public class Pull
 	      getOwner().getCurrentPanel().showNotification(msg, NotificationType.INFO);
 	    }
 	    catch (Exception ex) {
-	      getLogger().log(Level.SEVERE, "Failed to pull: " + m_Git.getRepository().getWorkTree(), e);
+	      getLogger().log(Level.SEVERE, "Failed to pull: " + m_Git.getRepository().getWorkTree(), ex);
 	      GUIHelper.showErrorMessage(m_Owner, "Failed to pull: " + m_Git.getRepository().getWorkTree(), ex);
 	    }
 	    return null;

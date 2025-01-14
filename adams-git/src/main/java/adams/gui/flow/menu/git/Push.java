@@ -70,7 +70,7 @@ public class Push
 	      getOwner().getCurrentPanel().showNotification(combined.toString(), NotificationType.INFO);
 	    }
 	    catch (Exception ex) {
-	      getLogger().log(Level.SEVERE, "Failed to push: " + m_Git.getRepository().getWorkTree(), e);
+	      getLogger().log(Level.SEVERE, "Failed to push: " + m_Git.getRepository().getWorkTree(), ex);
 	      GUIHelper.showErrorMessage(m_Owner, "Failed to push: " + m_Git.getRepository().getWorkTree(), ex);
 	    }
 	    return null;

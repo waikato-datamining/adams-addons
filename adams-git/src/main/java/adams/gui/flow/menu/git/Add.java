@@ -70,7 +70,7 @@ public class Add
 		.call();
 	    }
 	    catch (Exception ex) {
-	      getLogger().log(Level.SEVERE, "Failed to add: " + absFile, e);
+	      getLogger().log(Level.SEVERE, "Failed to add: " + absFile, ex);
 	      GUIHelper.showErrorMessage(m_Owner, "Failed to add:\n" + absFile, ex);
 	    }
 	    return null;

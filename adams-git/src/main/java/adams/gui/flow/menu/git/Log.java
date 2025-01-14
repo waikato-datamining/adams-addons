@@ -72,7 +72,7 @@ public class Log
 	      getOwner().getCurrentPanel().showNotification(info.toString(), NotificationType.INFO);
 	    }
 	    catch (Exception ex) {
-	      getLogger().log(Level.SEVERE, "Failed to commit: " + relPath, e);
+	      getLogger().log(Level.SEVERE, "Failed to commit: " + relPath, ex);
 	      GUIHelper.showErrorMessage(m_Owner, "Failed to commit:\n" + relPath, ex);
 	    }
 	    return null;

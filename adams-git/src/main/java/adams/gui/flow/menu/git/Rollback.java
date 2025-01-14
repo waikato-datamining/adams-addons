@@ -71,7 +71,7 @@ public class Rollback
 	      getOwner().getCurrentPanel().revert();
 	    }
 	    catch (Exception ex) {
-	      getLogger().log(Level.SEVERE, "Failed to roll back: " + relPath, e);
+	      getLogger().log(Level.SEVERE, "Failed to roll back: " + relPath, ex);
 	      GUIHelper.showErrorMessage(m_Owner, "Failed to roll back:\n" + relPath, ex);
 	    }
 	    return null;
