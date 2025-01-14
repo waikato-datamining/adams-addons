@@ -15,22 +15,16 @@
 
 /*
  * Rollback.java
- * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2024-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.flow.menu.git;
 
-import adams.core.io.FileUtils;
 import adams.gui.action.AbstractBaseAction;
-import adams.gui.core.GUIHelper;
 import adams.gui.flow.FlowPanelNotificationArea.NotificationType;
-import org.eclipse.jgit.api.Status;
-import org.eclipse.jgit.lib.Constants;
 
 import javax.swing.SwingWorker;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.logging.Level;
 
 /**
  * Performs a "git commit".
@@ -53,26 +47,14 @@ public class Rollback
       private static final long serialVersionUID = 5856785085545656193L;
       @Override
       protected void doActionPerformed(ActionEvent e) {
-	String relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), m_Owner.getCurrentFile());
 	SwingWorker worker = new SwingWorker() {
 	  @Override
 	  protected Object doInBackground() throws Exception {
-	    try {
-	      Status status = m_Git.status()
-			 .addPath(relPath)
-			 .call();
-	      if (status.getAdded().contains(relPath))
-		m_Git.reset().setRef(Constants.HEAD).addPath(relPath).call();
-	      else
-		m_Git.checkout().addPath(relPath).call();
+	    if (m_Operation.rollback(m_Owner.getCurrentFile())) {
 	      String msg = "Rolled back:\n" + m_Owner.getCurrentFile().getAbsolutePath();
 	      getLogger().info(msg);
 	      getOwner().getCurrentPanel().showNotification(msg, NotificationType.INFO);
 	      getOwner().getCurrentPanel().revert();
-	    }
-	    catch (Exception ex) {
-	      getLogger().log(Level.SEVERE, "Failed to roll back: " + relPath, ex);
-	      GUIHelper.showErrorMessage(m_Owner, "Failed to roll back:\n" + relPath, ex);
 	    }
 	    return null;
 	  }
@@ -87,28 +69,6 @@ public class Rollback
    */
   @Override
   public void update() {
-    Status 	status;
-    File 	file;
-    String 	relPath;
-
-    if (m_Git == null) {
-      m_Action.setEnabled(false);
-      return;
-    }
-
-    file    = m_Owner.getCurrentFile();
-    relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), file);
-    try {
-      status = m_Git.status()
-		 .addPath(relPath)
-		 .call();
-      m_Action.setEnabled(
-	status.getModified().contains(relPath)
-	  || status.getAdded().contains(relPath));
-    }
-    catch (Exception e) {
-      m_Action.setEnabled(false);
-      getLogger().log(Level.SEVERE, "Failed to query status of repo!", e);
-    }
+    m_Action.setEnabled(m_Operation.canRollback(m_Owner.getCurrentFile()));
   }
 }

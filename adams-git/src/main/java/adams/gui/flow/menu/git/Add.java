@@ -15,21 +15,17 @@
 
 /*
  * Add.java
- * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2024-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.flow.menu.git;
 
-import adams.core.io.FileUtils;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.core.GUIHelper;
 import adams.gui.dialog.ApprovalDialog;
-import org.eclipse.jgit.api.Status;
 
 import javax.swing.SwingWorker;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.logging.Level;
 
 /**
  * Performs a "git add".
@@ -62,17 +58,7 @@ public class Add
 	SwingWorker worker = new SwingWorker() {
 	  @Override
 	  protected Object doInBackground() throws Exception {
-	    String absFile = m_Owner.getCurrentFile().getAbsolutePath();
-	    String relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), m_Owner.getCurrentFile());
-	    try {
-	      m_Git.add()
-		.addFilepattern(relPath)
-		.call();
-	    }
-	    catch (Exception ex) {
-	      getLogger().log(Level.SEVERE, "Failed to add: " + absFile, ex);
-	      GUIHelper.showErrorMessage(m_Owner, "Failed to add:\n" + absFile, ex);
-	    }
+	    m_Operation.add(m_Owner.getCurrentFile());
 	    return null;
 	  }
 	};
@@ -86,26 +72,6 @@ public class Add
    */
   @Override
   public void update() {
-    Status 	status;
-    File 	file;
-    String 	relPath;
-
-    if (m_Git == null) {
-      m_Action.setEnabled(false);
-      return;
-    }
-
-    file    = m_Owner.getCurrentFile();
-    relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), file);
-    try {
-      status = m_Git.status()
-		 .addPath(relPath)
-		 .call();
-      m_Action.setEnabled(status.getUntracked().contains(relPath));
-    }
-    catch (Exception e) {
-      m_Action.setEnabled(false);
-      getLogger().log(Level.SEVERE, "Failed to query status of repo!", e);
-    }
+    m_Action.setEnabled(m_Operation.canAdd(m_Owner.getCurrentFile()));
   }
 }

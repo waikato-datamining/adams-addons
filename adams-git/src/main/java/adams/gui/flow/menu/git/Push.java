@@ -15,22 +15,16 @@
 
 /*
  * Push.java
- * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2024-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.flow.menu.git;
 
-import adams.core.git.GitHelper;
 import adams.gui.action.AbstractBaseAction;
-import adams.gui.core.GUIHelper;
 import adams.gui.flow.FlowPanelNotificationArea.NotificationType;
-import org.eclipse.jgit.api.PushCommand;
-import org.eclipse.jgit.transport.PushResult;
-import org.eclipse.jgit.transport.RemoteRefUpdate;
 
 import javax.swing.SwingWorker;
 import java.awt.event.ActionEvent;
-import java.util.logging.Level;
 
 /**
  * Performs a "git push".
@@ -56,22 +50,10 @@ public class Push
 	SwingWorker worker = new SwingWorker() {
 	  @Override
 	  protected Object doInBackground() throws Exception {
-	    try {
-	      PushCommand cmd = setTransportConfigCallbackIfNecessary(m_Git.push());
-	      Iterable<PushResult> results = cmd.call();
-	      StringBuilder combined = new StringBuilder();
-	      for (PushResult result: results) {
-		if (combined.length() > 0)
-		  combined.append("\n");
-		for (RemoteRefUpdate update: result.getRemoteUpdates())
-		  combined.append(GitHelper.format(update)).append("\n");
-	      }
-	      getLogger().info(combined.toString());
-	      getOwner().getCurrentPanel().showNotification(combined.toString(), NotificationType.INFO);
-	    }
-	    catch (Exception ex) {
-	      getLogger().log(Level.SEVERE, "Failed to push: " + m_Git.getRepository().getWorkTree(), ex);
-	      GUIHelper.showErrorMessage(m_Owner, "Failed to push: " + m_Git.getRepository().getWorkTree(), ex);
+	    String msgPush = m_Operation.push();
+	    if (msgPush != null) {
+	      getLogger().info(msgPush);
+	      getOwner().getCurrentPanel().showNotification(msgPush, NotificationType.INFO);
 	    }
 	    return null;
 	  }
@@ -86,6 +68,6 @@ public class Push
    */
   @Override
   public void update() {
-    m_Action.setEnabled((m_Git != null) && isRemoteRepo());
+    m_Action.setEnabled(m_Operation.canPush());
   }
 }

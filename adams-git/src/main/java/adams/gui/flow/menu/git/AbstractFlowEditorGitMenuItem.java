@@ -15,19 +15,17 @@
 
 /*
  * AbstractFlowEditorGitMenuItem.java
- * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2024-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.flow.menu.git;
 
-import adams.core.git.GitSession;
+import adams.core.git.GitOperation;
 import adams.core.git.GitSettingsHelper;
 import adams.core.logging.LoggingHelper;
 import adams.core.logging.LoggingLevel;
 import adams.gui.flow.menu.AbstractFlowEditorMenuItem;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.TransportCommand;
-import org.eclipse.jgit.transport.SshTransport;
 
 /**
  * Ancestor for menuitems in the git sub-menu.
@@ -42,6 +40,9 @@ public abstract class AbstractFlowEditorGitMenuItem
   /** the current git instance to use. */
   protected Git m_Git;
 
+  /** for managing git operations. */
+  protected GitOperation m_Operation;
+
   /**
    * Initializes the menu item.
    */
@@ -54,6 +55,9 @@ public abstract class AbstractFlowEditorGitMenuItem
     level = GitSettingsHelper.getSingleton().getLoggingLevel();
     if (!LoggingHelper.isAtLeast(getLogger(), level.getLevel()))
       getLogger().setLevel(level.getLevel());
+
+    m_Operation = new GitOperation();
+    m_Operation.setShowErrors(true);
   }
 
   /**
@@ -73,35 +77,7 @@ public abstract class AbstractFlowEditorGitMenuItem
    */
   public void update(Git git) {
     m_Git = git;
+    m_Operation.setGit(git);
     update();
-  }
-
-  /**
-   * Adds the transport config callback (with sshd factory) if necessary.
-   * If the remote url starts with "git@", then we assume that ssh keys are used.
-   *
-   * @param cmd		the command to update
-   * @return		the updated command
-   */
-  protected <T  extends TransportCommand> T setTransportConfigCallbackIfNecessary(T cmd) {
-    String 	url;
-
-    url = m_Git.getRepository().getConfig().getString("remote", "origin", "url");
-    // do we need ssh key?
-    if ((url != null) && url.startsWith("git@")) {
-      cmd.setTransportConfigCallback(transport -> ((SshTransport) transport).setSshSessionFactory(
-	GitSession.getSingleton().getSshdSessionFactory()));
-    }
-
-    return cmd;
-  }
-
-  /**
-   * Checks whether the repository has a remote URL.
-   *
-   * @return		true if remote URL available
-   */
-  protected boolean isRemoteRepo() {
-    return (m_Git.getRepository().getConfig().getString("remote", "origin", "url") != null);
   }
 }

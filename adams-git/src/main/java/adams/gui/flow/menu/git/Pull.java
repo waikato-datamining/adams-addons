@@ -15,21 +15,16 @@
 
 /*
  * Pull.java
- * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2024-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.flow.menu.git;
 
-import adams.core.git.GitHelper;
 import adams.gui.action.AbstractBaseAction;
-import adams.gui.core.GUIHelper;
 import adams.gui.flow.FlowPanelNotificationArea.NotificationType;
-import org.eclipse.jgit.api.PullCommand;
-import org.eclipse.jgit.api.PullResult;
 
 import javax.swing.SwingWorker;
 import java.awt.event.ActionEvent;
-import java.util.logging.Level;
 
 /**
  * Performs a "git pull".
@@ -55,16 +50,10 @@ public class Pull
 	SwingWorker worker = new SwingWorker() {
 	  @Override
 	  protected Object doInBackground() throws Exception {
-	    try {
-	      PullCommand cmd = setTransportConfigCallbackIfNecessary(m_Git.pull());
-	      PullResult result = cmd.call();
-	      String msg = GitHelper.format(result);
-	      getLogger().info(msg);
-	      getOwner().getCurrentPanel().showNotification(msg, NotificationType.INFO);
-	    }
-	    catch (Exception ex) {
-	      getLogger().log(Level.SEVERE, "Failed to pull: " + m_Git.getRepository().getWorkTree(), ex);
-	      GUIHelper.showErrorMessage(m_Owner, "Failed to pull: " + m_Git.getRepository().getWorkTree(), ex);
+	    String pullMsg = m_Operation.pull();
+	    if (pullMsg != null) {
+	      getLogger().info(pullMsg);
+	      getOwner().getCurrentPanel().showNotification(pullMsg, NotificationType.INFO);
 	    }
 	    return null;
 	  }
@@ -79,6 +68,6 @@ public class Pull
    */
   @Override
   public void update() {
-    m_Action.setEnabled((m_Git != null) && isRemoteRepo());
+    m_Action.setEnabled(m_Operation.canPull());
   }
 }

@@ -21,6 +21,7 @@
 package adams.core.git;
 
 import adams.core.DateUtils;
+import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeResult;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.RebaseResult;
@@ -168,5 +169,15 @@ public class GitHelper {
       result.append("No update result");
 
     return result.toString();
+  }
+
+  /**
+   * Checks whether the repo is a remote one.
+   *
+   * @param git		the repo to check
+   * @return		true if remote
+   */
+  public static boolean isRemoteRepo(Git git) {
+    return (git.getRepository().getConfig().getString("remote", "origin", "url") != null);
   }
 }

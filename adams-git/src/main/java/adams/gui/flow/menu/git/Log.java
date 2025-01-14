@@ -15,23 +15,16 @@
 
 /*
  * Log.java
- * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2024-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.flow.menu.git;
 
-import adams.core.git.GitHelper;
-import adams.core.io.FileUtils;
 import adams.gui.action.AbstractBaseAction;
-import adams.gui.core.GUIHelper;
 import adams.gui.flow.FlowPanelNotificationArea.NotificationType;
-import org.eclipse.jgit.api.Status;
-import org.eclipse.jgit.revwalk.RevCommit;
 
 import javax.swing.SwingWorker;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.logging.Level;
 
 /**
  * Performs a "git log".
@@ -54,27 +47,12 @@ public class Log
       private static final long serialVersionUID = 5856785085545656193L;
       @Override
       protected void doActionPerformed(ActionEvent e) {
-	String relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), m_Owner.getCurrentFile());
 	SwingWorker worker = new SwingWorker() {
 	  @Override
 	  protected Object doInBackground() throws Exception {
-	    try {
-	      Iterable<RevCommit> result = m_Git.log()
-					     .addPath(relPath)
-					     .call();
-	      StringBuilder info = new StringBuilder();
-	      for (RevCommit commit: result) {
-		if (info.length() > 0)
-		  info.append("\n");
-		info.append(GitHelper.format(commit, GitHelper.FORMAT_REVCOMMIT_LONG));
-	      }
-	      getLogger().info(info.toString());
-	      getOwner().getCurrentPanel().showNotification(info.toString(), NotificationType.INFO);
-	    }
-	    catch (Exception ex) {
-	      getLogger().log(Level.SEVERE, "Failed to commit: " + relPath, ex);
-	      GUIHelper.showErrorMessage(m_Owner, "Failed to commit:\n" + relPath, ex);
-	    }
+	    String logMsg = m_Operation.log(m_Owner.getCurrentFile());
+	    getLogger().info(logMsg);
+	    getOwner().getCurrentPanel().showNotification(logMsg, NotificationType.INFO);
 	    return null;
 	  }
 	};
@@ -88,28 +66,6 @@ public class Log
    */
   @Override
   public void update() {
-    Status 	status;
-    File 	file;
-    String 	relPath;
-
-    if (m_Git == null) {
-      m_Action.setEnabled(false);
-      return;
-    }
-
-    file    = m_Owner.getCurrentFile();
-    relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), file);
-    try {
-      status = m_Git.status()
-		 .addPath(relPath)
-		 .call();
-      m_Action.setEnabled(
-	status.getModified().contains(relPath)
-	  || status.isClean());
-    }
-    catch (Exception e) {
-      m_Action.setEnabled(false);
-      getLogger().log(Level.SEVERE, "Failed to query status of repo!", e);
-    }
+    m_Action.setEnabled(m_Operation.canLog(m_Owner.getCurrentFile()));
   }
 }
