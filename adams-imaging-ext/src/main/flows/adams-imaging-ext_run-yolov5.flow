@@ -1,12 +1,12 @@
 # Project: adams
-# Date: 2023-08-08 10:39:09
+# Date: 2025-01-15 15:30:42
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-docker,adams-imaging,adams-imaging-ext,adams-json,adams-meta,adams-net,adams-redis,adams-spreadsheet,adams-xml
 #
 adams.flow.control.Flow -annotation "Runs a pretrained Yolov5 model for obtaining object annotations.\\nA dialog asking to \\\"Stop Yolov5\\\" will pop up immediately, since the docker image\\ngets started asynchronously. You can ignore that dialog until you want to shut\\ndown the Yolov5 instance (e.g., when the annotating work is done)." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.CallableActors
-  adams.flow.sink.Display -display-type adams.flow.core.displaytype.DisplayInEditor -x -3 -writer adams.data.io.output.NullWriter
+  adams.flow.sink.Display -display-type adams.flow.core.displaytype.DisplayInEditor -x -3 -writer adams.data.io.output.NullWriter -max-lines 1000
  adams.flow.standalone.SetVariable -name "reset gpu" -var-name gpu -var-value ""
  adams.flow.standalone.SimpleDockerConnection -dir-mapping ${EXAMPLE_FLOWS}/cache:/.cache -dir-mapping ${EXAMPLE_FLOWS}:/workspace
  adams.flow.source.Start
