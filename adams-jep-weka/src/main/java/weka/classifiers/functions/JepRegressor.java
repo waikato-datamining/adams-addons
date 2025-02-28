@@ -20,6 +20,7 @@
 
 package weka.classifiers.functions;
 
+import adams.core.Placeholders;
 import adams.core.StoppableWithFeedback;
 import adams.core.UniqueIDs;
 import adams.core.base.BaseString;
@@ -85,7 +86,7 @@ public class JepRegressor
 	     + "At prediction time, the model is available as 'model', the predictors via 'pred_x' and the result must be stored in 'pred_y'.\n"
 	     + "In order to avoid clashes between variables when models are used concurrently, the placeholder '" + VAR_PREFIX + "' "
 	     + "can be used, e.g.: " + VAR_PREFIX + "train_X. This prefix gets replaced with a unique ID before the script is executed.\n"
-	     + "Flow variables get expanded automatically.";
+	     + "Flow variables and placeholders get expanded automatically.";
   }
 
   /**
@@ -211,6 +212,18 @@ public class JepRegressor
   }
 
   /**
+   * Expands flow variables and placeholders in the script.
+   *
+   * @param script	the script to expand
+   * @return		the expanded script
+   */
+  protected BaseString expand(String script) {
+    script = m_FlowContext.getVariables().expand(script);
+    script = Placeholders.getSingleton().expand(script);
+    return new BaseString(script);
+  }
+
+  /**
    * Determines the variable prefix to use in the script. Also replaces {@link #VAR_PREFIX}
    * in the script.
    *
@@ -272,12 +285,12 @@ public class JepRegressor
     y = data.attributeToDoubleArray(clsIndex);
 
     // execute script
-    script    = new BaseString(m_FlowContext.getVariables().expand(m_TrainScript.getValue()));
+    script    = expand(m_TrainScript.getValue());
     varPrefix = determineVarPrefix(script);
-    inputs = new HashMap<>();
+    inputs    = new HashMap<>();
     inputs.put(varPrefix + "train_X", new NDArray<>(X, data.numInstances(), data.numAttributes() - 1));
     inputs.put(varPrefix + "train_y", new NDArray<>(y));
-    scriptlet = new SimpleJepScriptlet(getClass().getName() + "-" + UniqueIDs.nextLong(), script.getValue(), inputs, new String[]{varPrefix + "model"});
+    scriptlet = new SimpleJepScriptlet(getClass().getName() + "-" + UniqueIDs.nextLong(), script.getValue(), inputs, null, new String[]{varPrefix + "model"});
     scriptlet.setFlowContext(m_FlowContext);
     scriptlet.setLoggingLevel(getLoggingLevel());
     m_Engine.getEngine().add(scriptlet);
@@ -333,9 +346,9 @@ public class JepRegressor
     }
 
     // execute script
-    script = new BaseString(m_FlowContext.getVariables().expand(m_ClassifyScript.getValue()));
+    script    = expand(m_ClassifyScript.getValue());
     varPrefix = determineVarPrefix(script);
-    inputs = new HashMap<>();
+    inputs    = new HashMap<>();
     inputs.put(varPrefix + "pred_x", new NDArray<>(x));
     if (m_Model != null)
       inputs.put(varPrefix + "model", m_Model);
