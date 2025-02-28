@@ -23,8 +23,11 @@ package adams.core.scripting;
 import adams.core.logging.LoggingHelper;
 import jep.SharedInterpreter;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -46,22 +49,41 @@ public class SimpleJepScriptlet
   /** the output names. */
   protected String[] m_OutputNames;
 
+  /** the optional output names. */
+  protected String[] m_OptionalOutputNames;
+
   /** the outputs. */
   protected Map<String,Object> m_Outputs;
 
   /**
    * Initializes the scriptlet.
    *
-   * @param id 		the ID of the script
-   * @param script 	the script to execute (line by line)
+   * @param id 			the ID of the script
+   * @param script 		the script to execute (line by line)
+   * @param inputs 		the inputs for the script (name/object)
+   * @param outputNames 	the names of the outputs to retrieve
    */
   public SimpleJepScriptlet(String id, String script, Map<String,Object> inputs, String[] outputNames) {
+    this(id, script, inputs, outputNames, null);
+  }
+
+  /**
+   * Initializes the scriptlet.
+   *
+   * @param id 			the ID of the script
+   * @param script 		the script to execute (line by line)
+   * @param inputs 		the inputs for the script (name/object)
+   * @param outputNames 	the names of the outputs to retrieve
+   * @param optionalOutputNames the names of the optional outputs (won't throw an exception if not present)
+   */
+  public SimpleJepScriptlet(String id, String script, Map<String,Object> inputs, String[] outputNames, String[] optionalOutputNames) {
     super(id);
 
-    m_Script      = script;
-    m_Inputs      = (inputs == null) ? new HashMap<>() : new HashMap<>(inputs);
-    m_OutputNames = (outputNames == null) ? new String[0] : outputNames.clone();
-    m_Outputs     = new HashMap<>();
+    m_Script              = script;
+    m_Inputs              = (inputs == null) ? new HashMap<>() : new HashMap<>(inputs);
+    m_OutputNames         = (outputNames == null) ? new String[0] : outputNames.clone();
+    m_OptionalOutputNames = (optionalOutputNames == null) ? new String[0] : optionalOutputNames.clone();
+    m_Outputs             = new HashMap<>();
   }
 
   /**
@@ -92,6 +114,16 @@ public class SimpleJepScriptlet
   }
 
   /**
+   * Returns the names of the optional outputs, i.e., ones that won't throw and
+   * exception when not present.
+   *
+   * @return		the names
+   */
+  public String[] getOptionalOutputNames() {
+    return m_OptionalOutputNames;
+  }
+
+  /**
    * Returns the output map. Gets populated after execution.
    *
    * @return		the outputs (name/value)
@@ -109,6 +141,7 @@ public class SimpleJepScriptlet
   public String execute() {
     SharedInterpreter 	interpreter;
     String		result;
+    Set<String>		optional;
 
     result = null;
 
@@ -134,14 +167,25 @@ public class SimpleJepScriptlet
 
       // retrieving outputs
       m_Outputs.clear();
+      optional = new HashSet<>(Arrays.asList(m_OptionalOutputNames));
       for (String name: m_OutputNames) {
 	if (isLoggingEnabled())
 	  getLogger().info("Getting output: " + name);
-	try {
-	  m_Outputs.put(name, interpreter.getValue(name));
+	if (optional.contains(name)) {
+	  try {
+	    m_Outputs.put(name, interpreter.getValue(name));
+	  }
+	  catch (Exception e) {
+	    // suppress error
+	  }
 	}
-	catch (Exception e) {
-	  getLogger().log(Level.SEVERE, "Failed to get output '" + name + "'!", e);
+	else {
+	  try {
+	    m_Outputs.put(name, interpreter.getValue(name));
+	  }
+	  catch (Exception e) {
+	    getLogger().log(Level.SEVERE, "Failed to get output '" + name + "'!", e);
+	  }
 	}
       }
     }
