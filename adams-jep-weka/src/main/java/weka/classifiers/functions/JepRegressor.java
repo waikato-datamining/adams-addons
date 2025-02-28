@@ -84,7 +84,8 @@ public class JepRegressor
 	     + "The trained model must be stored in variable 'model'.\n"
 	     + "At prediction time, the model is available as 'model', the predictors via 'pred_x' and the result must be stored in 'pred_y'.\n"
 	     + "In order to avoid clashes between variables when models are used concurrently, the placeholder '" + VAR_PREFIX + "' "
-	     + "can be used, e.g.: " + VAR_PREFIX + "train_X. This prefix gets replaced with a unique ID before the script is executed.";
+	     + "can be used, e.g.: " + VAR_PREFIX + "train_X. This prefix gets replaced with a unique ID before the script is executed.\n"
+	     + "Flow variables get expanded automatically.";
   }
 
   /**
@@ -129,7 +130,7 @@ public class JepRegressor
    * 			displaying in the explorer/experimenter gui
    */
   public String trainScriptTipText() {
-    return "The script to use for training.";
+    return "The script to use for training; flow variables get expanded automatically.";
   }
 
   /**
@@ -158,7 +159,7 @@ public class JepRegressor
    * 			displaying in the explorer/experimenter gui
    */
   public String classifyScriptTipText() {
-    return "The script to use for classifying Instance objects.";
+    return "The script to use for classifying Instance objects; flow variables get expanded automatically.";
   }
 
   /**
