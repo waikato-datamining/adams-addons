@@ -109,7 +109,6 @@ public class SimpleJepScriptlet
   public String execute() {
     SharedInterpreter 	interpreter;
     String		result;
-    String[]		lines;
 
     result = null;
 
@@ -129,12 +128,9 @@ public class SimpleJepScriptlet
       }
 
       // execute script
-      lines = m_Script.split("\n");
-      for (String line: lines) {
-	if (isLoggingEnabled())
-	  getLogger().info("Executing: " + line);
-	interpreter.exec(line);
-      }
+      if (isLoggingEnabled())
+	getLogger().info("Executing: " + m_Script);
+      interpreter.exec(m_Script);
 
       // retrieving outputs
       m_Outputs.clear();
