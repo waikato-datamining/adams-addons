@@ -1,5 +1,4 @@
-% Copyright (c) 2024 by the University of Waikato, Hamilton, NZ. 
-% This work is made available under the terms of the 
+% This work is made available under the terms of the
 % Creative Commons Attribution-ShareAlike 4.0 license,
 % http://creativecommons.org/licenses/by-sa/4.0/.
 
@@ -44,7 +43,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2024} &
+		\parbox[c][2cm]{2cm}{\copyright 2024-2025} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -106,6 +105,22 @@ launched.
 	\caption{The Jep/Python console.}
 	\label{jep-console}
 \end{figure}
+
+\clearpage
+\section{Troubleshooting}
+\heading{jep.JepException: class 'TypeError': Expected sequence or array-like, got class 'jep.NDArray'}
+When installing jep, jep checks whether numpy is present and only then enables numpy support. The
+above error messages occurs when jep does not have numpy support. You can check whether jep got
+installed with numpy support using the following statement (from within your Java process)\footnote{Source: \url{https://github.com/ninia/jep/issues/560}{}}:
+\begin{verbatim}
+import jep
+print(jep.JEP_NUMPY_ENABLED)
+\end{verbatim}
+If that outputs \texttt{0}, then numpy support is not enabled. You can fix that by reinstalling jep:
+\begin{verbatim}
+pip uninstall jep
+pip install --no-cache-dir jep
+\end{verbatim}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
