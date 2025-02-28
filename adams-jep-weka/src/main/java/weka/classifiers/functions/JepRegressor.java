@@ -60,6 +60,9 @@ public class JepRegressor
   /** the classify script. */
   protected JepScript m_ClassifyScript;
 
+  /** whether the classifier was stopped. */
+  protected boolean m_Stopped;
+
   /** the flow context. */
   protected transient Actor m_FlowContext;
 
@@ -67,10 +70,7 @@ public class JepRegressor
   protected transient JepEngine m_Engine;
 
   /** the model object. */
-  protected Object m_Model;
-
-  /** whether the classifier was stopped. */
-  protected boolean m_Stopped;
+  protected transient Object m_Model;
 
   /**
    * Returns a string describing the object.
@@ -288,8 +288,6 @@ public class JepRegressor
 	throw new Exception(scriptlet.getLastError());
       if (scriptlet.getOutputs().containsKey(varPrefix + "model"))
 	m_Model = scriptlet.getOutputs().get(varPrefix + "model");
-      else
-	throw new IllegalStateException("Model was not stored as variable '" + (varPrefix.isEmpty() ? "" : VAR_PREFIX) + "model'!");
     }
   }
 
@@ -338,7 +336,8 @@ public class JepRegressor
     varPrefix = determineVarPrefix(script);
     inputs = new HashMap<>();
     inputs.put(varPrefix + "pred_x", new NDArray<>(x));
-    inputs.put(varPrefix + "model", m_Model);
+    if (m_Model != null)
+      inputs.put(varPrefix + "model", m_Model);
     scriptlet = new SimpleJepScriptlet(getClass().getName() + "-" + UniqueIDs.nextLong(), script.getValue(), inputs, new String[]{varPrefix + "pred_y"});
     scriptlet.setFlowContext(m_FlowContext);
     scriptlet.setLoggingLevel(getLoggingLevel());
