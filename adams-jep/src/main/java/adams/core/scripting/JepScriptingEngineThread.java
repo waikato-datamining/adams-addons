@@ -15,7 +15,7 @@
 
 /*
  * JepScriptingEngineThread.java
- * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2024-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.core.scripting;
@@ -43,7 +43,7 @@ public class JepScriptingEngineThread
   protected JepScriptingEngine m_Owner;
 
   /** the current command queue. */
-  protected LinkedBlockingQueue<JepScriptlet> m_Scriptlets;
+  protected LinkedBlockingQueue<AbstractJepScriptlet> m_Scriptlets;
 
   /** whether the thread is running. */
   protected boolean m_Running;
@@ -98,7 +98,7 @@ public class JepScriptingEngineThread
    *
    * @param scriptlet	the scriptlet to add
    */
-  public void add(JepScriptlet scriptlet) {
+  public void add(AbstractJepScriptlet scriptlet) {
     scriptlet.setOwner(this);
     if (JepUtils.isPresent())
       m_Scriptlets.add(scriptlet);
@@ -157,7 +157,7 @@ public class JepScriptingEngineThread
    *
    * @param scriptlet	the scriptlet that is about to be executed
    */
-  protected void preProcess(JepScriptlet scriptlet) {
+  protected void preProcess(AbstractJepScriptlet scriptlet) {
     getOwner().getLogger().info("Executing script: " + scriptlet.getID());
   }
 
@@ -167,7 +167,7 @@ public class JepScriptingEngineThread
    * @param scriptlet	the scriptlet to execute
    * @return		the error message, null if no problems occurred
    */
-  protected String doProcess(JepScriptlet scriptlet) {
+  protected String doProcess(AbstractJepScriptlet scriptlet) {
     return scriptlet.execute();
   }
 
@@ -178,7 +178,7 @@ public class JepScriptingEngineThread
    * @param success	true if successfully executed
    * @param lastError	the error, or null if none happened
    */
-  protected void postProcess(JepScriptlet scriptlet, boolean success, String lastError) {
+  protected void postProcess(AbstractJepScriptlet scriptlet, boolean success, String lastError) {
     if (success)
       getOwner().getLogger().info("Script " + scriptlet.getID() + " successfully executed.");
     else
@@ -190,7 +190,7 @@ public class JepScriptingEngineThread
    */
   @Override
   public void run() {
-    JepScriptlet 	scriptlet;
+    AbstractJepScriptlet scriptlet;
     boolean		success;
     String		lastError;
 

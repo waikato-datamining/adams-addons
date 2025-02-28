@@ -15,7 +15,7 @@
 
 /*
  * Jep.java
- * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2024-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.standalone;
@@ -24,9 +24,9 @@ import adams.core.QuickInfoHelper;
 import adams.core.Shortening;
 import adams.core.Utils;
 import adams.core.io.PlaceholderFile;
+import adams.core.scripting.FlowJepScriptlet;
 import adams.core.scripting.JepScript;
 import adams.core.scripting.JepScriptingEngine;
-import adams.core.scripting.JepScriptlet;
 import adams.core.scripting.JepUtils;
 import adams.flow.control.VariableNameStorageNamePair;
 import adams.flow.core.ActorUtils;
@@ -385,27 +385,27 @@ public class Jep
   @Override
   protected String doExecute() {
     String		result;
-    JepScriptlet 	scriplet;
+    FlowJepScriptlet 	scriptlet;
 
     result = null;
 
     if (!m_ScriptFile.exists() || m_ScriptFile.isDirectory())
-      scriplet = new JepScriptlet(getFullName(), m_InlineScript.getValue(), m_Inputs, m_Outputs, null, m_ExpandVariables);
+      scriptlet = new FlowJepScriptlet(getFullName(), m_InlineScript.getValue(), m_Inputs, m_Outputs, null, m_ExpandVariables);
     else
-      scriplet = new JepScriptlet(getFullName(), m_ScriptFile, m_Inputs, m_Outputs, null, m_ExpandVariables);
-    scriplet.setFlowContext(this);
-    scriplet.setLoggingLevel(getLoggingLevel());
+      scriptlet = new FlowJepScriptlet(getFullName(), m_ScriptFile, m_Inputs, m_Outputs, null, m_ExpandVariables);
+    scriptlet.setFlowContext(this);
+    scriptlet.setLoggingLevel(getLoggingLevel());
 
     if (m_Engine == null)
-      JepScriptingEngine.getSingleton().add(scriplet);
+      JepScriptingEngine.getSingleton().add(scriptlet);
     else
-      m_Engine.getEngine().add(scriplet);
+      m_Engine.getEngine().add(scriptlet);
 
-    while (!isStopped() && !scriplet.hasFinished())
+    while (!isStopped() && !scriptlet.hasFinished())
       Utils.wait(this, 1000, 100);
 
     if (!isStopped())
-      result = scriplet.getLastError();
+      result = scriptlet.getLastError();
 
     return result;
   }

@@ -14,7 +14,7 @@
  */
 
 /*
- * JepScriptlet.java
+ * FlowJepScriptlet.java
  * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
  */
 
@@ -25,12 +25,9 @@ import adams.core.Utils;
 import adams.core.base.BaseString;
 import adams.core.io.FileUtils;
 import adams.core.io.TempUtils;
-import adams.core.logging.CustomLoggingLevelObject;
 import adams.core.logging.LoggingHelper;
 import adams.flow.control.StorageName;
 import adams.flow.control.VariableNameStorageNamePair;
-import adams.flow.core.Actor;
-import adams.flow.core.FlowContextHandler;
 import jep.SharedInterpreter;
 
 import java.io.File;
@@ -38,33 +35,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Encapsulates Jep/Python scripts.
+ * Encapsulates Jep/Python scripts that are run in the flow.
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
-public class JepScriptlet
-  extends CustomLoggingLevelObject
-  implements FlowContextHandler {
+public class FlowJepScriptlet
+  extends AbstractJepScriptlet {
 
   private static final long serialVersionUID = 7919172085779747176L;
-
-  /** the owning thread (with the interpreter). */
-  protected JepScriptingEngineThread m_Owner;
-
-  /** the ID of the scriptlet. */
-  protected String m_ID;
-
-  /** the last error. */
-  protected String m_LastError;
 
   /** the script to execute. */
   protected String m_Script;
 
   /** the script file to execute. */
   protected File m_ScriptFile;
-
-  /** the flow context. */
-  protected Actor m_FlowContext;
 
   /** whether to expand variables. */
   protected boolean m_ExpandVariables;
@@ -81,16 +65,13 @@ public class JepScriptlet
   /** the forwards map. */
   protected Map<String,Object> m_ForwardsMap;
 
-  /** whether the scriplet has been executed. */
-  protected boolean m_Finished;
-
   /**
    * Initializes the scriptlet.
    *
    * @param id		the ID of the script
    * @param script	the script to execute
    */
-  public JepScriptlet(String id, String script) {
+  public FlowJepScriptlet(String id, String script) {
     this(id, script, null, null, null, null, false);
   }
 
@@ -103,7 +84,7 @@ public class JepScriptlet
    * @param outputs 	the outputs from the script (to go back into storage)
    * @param forwards 	the variable values from the script to forward as map
    */
-  public JepScriptlet(String id, String script, VariableNameStorageNamePair[] inputs, VariableNameStorageNamePair[] outputs, BaseString[] forwards, boolean expandVars) {
+  public FlowJepScriptlet(String id, String script, VariableNameStorageNamePair[] inputs, VariableNameStorageNamePair[] outputs, BaseString[] forwards, boolean expandVars) {
     this(id, script, null, inputs, outputs, forwards, expandVars);
   }
 
@@ -113,7 +94,7 @@ public class JepScriptlet
    * @param id		the ID of the script
    * @param scriptFile	the script file to execute
    */
-  public JepScriptlet(String id, File scriptFile) {
+  public FlowJepScriptlet(String id, File scriptFile) {
     this(id, null, scriptFile, null, null, null, false);
   }
 
@@ -126,7 +107,7 @@ public class JepScriptlet
    * @param outputs 	the outputs from the script (to go back into storage)
    * @param forwards 	the variable values from the script to forward as map
    */
-  public JepScriptlet(String id, File scriptFile, VariableNameStorageNamePair[] inputs, VariableNameStorageNamePair[] outputs, BaseString[] forwards, boolean expandVars) {
+  public FlowJepScriptlet(String id, File scriptFile, VariableNameStorageNamePair[] inputs, VariableNameStorageNamePair[] outputs, BaseString[] forwards, boolean expandVars) {
     this(id, null, scriptFile, inputs, outputs, forwards, expandVars);
   }
 
@@ -140,7 +121,8 @@ public class JepScriptlet
    * @param outputs 	the outputs from the script (to go back into storage)
    * @param forwards 	the variable values from the script to forward as map
    */
-  public JepScriptlet(String id, String script, File scriptFile, VariableNameStorageNamePair[] inputs, VariableNameStorageNamePair[] outputs, BaseString[] forwards, boolean expandVars) {
+  public FlowJepScriptlet(String id, String script, File scriptFile, VariableNameStorageNamePair[] inputs, VariableNameStorageNamePair[] outputs, BaseString[] forwards, boolean expandVars) {
+    super(id);
     if ((script == null) && (scriptFile == null))
       throw new IllegalArgumentException("Either script or script file need to be provided!");
     if (scriptFile != null) {
@@ -150,70 +132,12 @@ public class JepScriptlet
 	throw new IllegalArgumentException("Script file points to directory: " + scriptFile);
     }
 
-    m_Owner           = null;
-    m_ID              = id;
     m_Script          = script;
     m_ScriptFile      = scriptFile;
     m_Inputs          = ObjectCopyHelper.copyObjects(inputs);
     m_Outputs         = ObjectCopyHelper.copyObjects(outputs);
     m_Forwards        = ObjectCopyHelper.copyObjects(forwards);
     m_ExpandVariables = expandVars;
-    m_FlowContext     = null;
-    m_Finished        = false;
-  }
-
-  /**
-   * Initializes the logger.
-   */
-  @Override
-  protected void configureLogger() {
-    m_Logger = LoggingHelper.getLogger(m_ID);
-    m_Logger.setLevel(m_LoggingLevel.getLevel());
-  }
-
-  /**
-   * Sets the owning thread.
-   *
-   * @param value	the owner
-   */
-  public void setOwner(JepScriptingEngineThread value) {
-    m_Owner = value;
-  }
-
-  /**
-   * Returns the owning thread.
-   *
-   * @return		the owner
-   */
-  public JepScriptingEngineThread getOwner() {
-    return m_Owner;
-  }
-
-  /**
-   * Sets the flow context.
-   *
-   * @param value	the actor
-   */
-  public void setFlowContext(Actor value) {
-    m_FlowContext = value;
-  }
-
-  /**
-   * Returns the flow context, if any.
-   *
-   * @return		the actor, null if none available
-   */
-  public Actor getFlowContext() {
-    return m_FlowContext;
-  }
-
-  /**
-   * Returns the ID of the script.
-   *
-   * @return		the ID
-   */
-  public String getID() {
-    return m_ID;
   }
 
   /**
@@ -274,37 +198,11 @@ public class JepScriptlet
   }
 
   /**
-   * Whether the scriptlet has finished execution.
-   *
-   * @return		true when finished
-   */
-  public boolean hasFinished() {
-    return m_Finished;
-  }
-
-  /**
-   * Checks whether an error is present.
-   *
-   * @return		true if error present
-   */
-  public boolean hasLastError() {
-    return (m_LastError != null);
-  }
-
-  /**
-   * Returns any error that was encountered.
-   *
-   * @return		the error, null if none encountered
-   */
-  public String getLastError() {
-    return m_LastError;
-  }
-
-  /**
    * Executes the script.
    *
    * @return		null if successful, otherwise error message
    */
+  @Override
   public String execute() {
     SharedInterpreter 	interpreter;
     String		result;
@@ -396,15 +294,5 @@ public class JepScriptlet
     m_Finished  = true;
 
     return result;
-  }
-
-  /**
-   * Sets the error message and that the script has finished to true.
-   *
-   * @param msg		the error message to set
-   */
-  public void fail(String msg) {
-    m_LastError = msg;
-    m_Finished  = true;
   }
 }

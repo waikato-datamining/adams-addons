@@ -26,8 +26,8 @@ import adams.core.io.FileUtils;
 import adams.core.logging.Logger;
 import adams.core.logging.LoggingHelper;
 import adams.core.logging.LoggingSupporter;
+import adams.core.scripting.FlowJepScriptlet;
 import adams.core.scripting.JepScriptingEngine;
-import adams.core.scripting.JepScriptlet;
 import adams.core.scripting.JepUtils;
 import adams.flow.sink.TextSupplier;
 import adams.gui.chooser.BaseFileChooser;
@@ -828,7 +828,7 @@ public class JepConsole
    * Executes the current script.
    */
   public void runScript() {
-    final JepScriptlet	scriptlet;
+    final FlowJepScriptlet scriptlet;
     SwingWorker 	worker;
 
     if (m_TextPanel.getContent().isEmpty())
@@ -847,7 +847,7 @@ public class JepConsole
     m_Running = true;
     update();
 
-    scriptlet = new JepScriptlet("Jep/Python console", m_TextPanel.getContent());
+    scriptlet = new FlowJepScriptlet("Jep/Python console", m_TextPanel.getContent());
     worker = new SwingWorker() {
       @Override
       protected Object doInBackground() throws Exception {

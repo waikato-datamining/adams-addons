@@ -15,7 +15,7 @@
 
 /*
  * JepScriptingEngine.java
- * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2024-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.core.scripting;
@@ -55,7 +55,7 @@ public class JepScriptingEngine
    *
    * @param scriplet	the scriplet to execute
    */
-  public void add(JepScriptlet scriplet) {
+  public void add(AbstractJepScriptlet scriplet) {
     if (getProcessingThread().isRunning())
       getProcessingThread().add(scriplet);
     else
