@@ -1,12 +1,12 @@
 # Project: adams
-# Date: 2025-02-28 16:23:32
+# Date: 2025-03-03 10:07:53
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-jep,adams-jep-weka,adams-json,adams-math,adams-ml,adams-spreadsheet,adams-visualstats,adams-weka
 #
 adams.flow.control.Flow -annotation "Trains, serializes, deserializes and tests a sklearn model via JepRegressor." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.CallableActors
-  adams.flow.source.WekaClassifierSetup -classifier "weka.classifiers.functions.JepRegressor -train-script \"import pickle\\\\nfrom sklearn.cross_decomposition import PLSRegression\\\\nmodel = PLSRegression(n_components=5)\\\\nmodel.fit(train_X, train_y)\\\\n# serialize model outside Java\\\\nwith open(\\\\\\\"@{python_model}\\\\\\\", \\\\\\\"wb\\\\\\\") as fp:\\\\n    pickle.dump(model, fp, pickle.HIGHEST_PROTOCOL)\\\\ndel model\" -classify-script \"# deserialize model if necessary\\\\nif \\\\\\\"model\\\\\\\" not in globals():\\\\n    import pickle\\\\n    with open(\\\\\\\"${EXAMPLE_FLOWS}/output/pls.pkl\\\\\\\", \\\\\\\"rb\\\\\\\") as fp:\\\\n        model = pickle.load(fp)\\\\n# make prediction\\\\npred_y = model.predict(pred_x.reshape(1, -1))\""
+  adams.flow.source.WekaClassifierSetup -classifier "weka.classifiers.functions.JepRegressor -train-script \"import pickle\\\\nfrom sklearn.cross_decomposition import PLSRegression\\\\nmodel = PLSRegression(n_components=5)\\\\nmodel.fit(train_X, train_y)\\\\n# serialize model outside Java\\\\nwith open(\\\\\\\"@{python_model}\\\\\\\", \\\\\\\"wb\\\\\\\") as fp:\\\\n    pickle.dump(model, fp, pickle.HIGHEST_PROTOCOL)\\\\ndel model\" -classify-script \"# deserialize model if necessary\\\\nif \\\\\\\"model\\\\\\\" not in globals():\\\\n    import pickle\\\\n    with open(\\\\\\\"@{python_model}\\\\\\\", \\\\\\\"rb\\\\\\\") as fp:\\\\n        model = pickle.load(fp)\\\\n# make prediction\\\\npred_y = model.predict(pred_x.reshape(1, -1))\""
   adams.flow.source.StorageValue -name test_set -storage-name test -conversion adams.data.conversion.UnknownToUnknown
   adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
  adams.flow.standalone.JepEngine
