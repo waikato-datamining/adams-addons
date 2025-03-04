@@ -18,7 +18,7 @@
  * Copyright (C) 2025 University of Waikato, Hamilton, New Zealand
  */
 
-package weka.classifiers.functions;
+package weka.classifiers.meta;
 
 import adams.core.StoppableWithFeedback;
 import adams.core.UniqueIDs;
