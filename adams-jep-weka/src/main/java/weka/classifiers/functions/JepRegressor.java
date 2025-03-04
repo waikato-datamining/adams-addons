@@ -20,17 +20,17 @@
 
 package weka.classifiers.functions;
 
-import adams.core.Placeholders;
 import adams.core.StoppableWithFeedback;
 import adams.core.UniqueIDs;
-import adams.core.base.BaseString;
 import adams.core.scripting.JepScript;
 import adams.core.scripting.SimpleJepScriptlet;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
-import adams.flow.core.FlowContextHandler;
 import adams.flow.standalone.JepEngine;
+import adams.gui.core.AbstractAdvancedScript;
 import jep.NDArray;
+import weka.classifiers.ScriptedClassifier;
+import weka.classifiers.ScriptedClassifierUtils;
 import weka.classifiers.simple.AbstractSimpleClassifier;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
@@ -49,7 +49,7 @@ import java.util.Map;
  */
 public class JepRegressor
   extends AbstractSimpleClassifier
-  implements FlowContextHandler, StoppableWithFeedback {
+  implements StoppableWithFeedback, ScriptedClassifier {
 
   private static final long serialVersionUID = 2387124102209234888L;
 
@@ -72,6 +72,12 @@ public class JepRegressor
 
   /** the model object. */
   protected transient Object m_Model;
+
+  /** the classify script instance to use. */
+  protected transient JepScript m_ClassifyScriptActual;
+
+  /** the variable prefix to use at prediction time. */
+  protected transient String m_ClassifyVarPrefix;
 
   /**
    * Returns a string describing the object.
@@ -212,36 +218,6 @@ public class JepRegressor
   }
 
   /**
-   * Expands flow variables and placeholders in the script.
-   *
-   * @param script	the script to expand
-   * @return		the expanded script
-   */
-  protected BaseString expand(String script) {
-    script = m_FlowContext.getVariables().expand(script);
-    script = Placeholders.getSingleton().expand(script);
-    return new BaseString(script);
-  }
-
-  /**
-   * Determines the variable prefix to use in the script. Also replaces {@link #VAR_PREFIX}
-   * in the script.
-   *
-   * @param script	the script to inspect and update
-   * @return		the generated variable prefix, empty string if not required
-   */
-  protected String determineVarPrefix(BaseString script) {
-    String result;
-
-    result = "";
-    if (script.getValue().contains(VAR_PREFIX)) {
-      result = "v" + UniqueIDs.nextLong() + "_";
-      script.setValue(script.getValue().replace(VAR_PREFIX, result));
-    }
-    return result;
-  }
-
-  /**
    * Generates a classifier. Must initialize all fields of the classifier
    * that are not being set via options (ie. multiple calls of buildClassifier
    * must always lead to the same result). Must not change the dataset
@@ -259,12 +235,13 @@ public class JepRegressor
     int			i;
     int			n;
     int			m;
-    BaseString		script;
+    AbstractAdvancedScript 	script;
     SimpleJepScriptlet	scriptlet;
     Map<String,Object>	inputs;
     String		varPrefix;
 
     m_Stopped = false;
+    m_Model   = null;
 
     setupJepEngine();
     getCapabilities().test(data);
@@ -285,12 +262,12 @@ public class JepRegressor
     y = data.attributeToDoubleArray(clsIndex);
 
     // execute script
-    script    = expand(m_TrainScript.getValue());
-    varPrefix = determineVarPrefix(script);
+    script    = ScriptedClassifierUtils.expand(m_TrainScript, m_FlowContext);
+    varPrefix = ScriptedClassifierUtils.determineUniqueID(script, VAR_PREFIX, true, true);
     inputs    = new HashMap<>();
     inputs.put(varPrefix + "train_X", new NDArray<>(X, data.numInstances(), data.numAttributes() - 1));
     inputs.put(varPrefix + "train_y", new NDArray<>(y));
-    scriptlet = new SimpleJepScriptlet(getClass().getName() + "-" + UniqueIDs.nextLong(), script.getValue(), inputs, null, new String[]{varPrefix + "model"});
+    scriptlet = new SimpleJepScriptlet(getClass().getName() + "-" + UniqueIDs.nextLong(), script.getValue(), inputs, new String[]{varPrefix + "model"}, new String[]{varPrefix + "model"});
     scriptlet.setFlowContext(m_FlowContext);
     scriptlet.setLoggingLevel(getLoggingLevel());
     m_Engine.getEngine().add(scriptlet);
@@ -300,8 +277,30 @@ public class JepRegressor
     if (!isStopped()) {
       if (scriptlet.hasLastError())
 	throw new Exception(scriptlet.getLastError());
-      if (scriptlet.getOutputs().containsKey(varPrefix + "model"))
+      if (scriptlet.getOutputs().containsKey(varPrefix + "model")) {
+	if (isLoggingEnabled())
+	  getLogger().info("Retrieving model: " + varPrefix + "model");
 	m_Model = scriptlet.getOutputs().get(varPrefix + "model");
+      }
+      else {
+	if (isLoggingEnabled())
+	  getLogger().info("Cannot retrieve model: " + varPrefix + "model");
+      }
+    }
+  }
+
+  /**
+   * Prepares the classifier for predictions.
+   *
+   * @param context	the context to use
+   */
+  public void initPrediction(Actor context) {
+    m_FlowContext = context;
+    if (m_ClassifyScriptActual == null) {
+      m_ClassifyScriptActual = ScriptedClassifierUtils.expand(m_ClassifyScript, m_FlowContext);
+      m_ClassifyVarPrefix    = ScriptedClassifierUtils.determineUniqueID(m_ClassifyScriptActual, VAR_PREFIX, true, true);
+      if (isLoggingEnabled())
+	getLogger().info("Actual classify script:\n" + m_ClassifyScriptActual.getValue());
     }
   }
 
@@ -317,21 +316,20 @@ public class JepRegressor
    */
   @Override
   public double classifyInstance(Instance instance) throws Exception {
-    double		result;
-    double[]		x;
-    double[]		row;
-    int			i;
-    int			n;
-    int			clsIndex;
-    BaseString		script;
-    SimpleJepScriptlet	scriptlet;
-    Map<String,Object>	inputs;
-    Object		output;
-    String		varPrefix;
+    double			result;
+    double[]			x;
+    double[]			row;
+    int				i;
+    int				n;
+    int				clsIndex;
+    SimpleJepScriptlet		scriptlet;
+    Map<String,Object>		inputs;
+    Object			output;
 
     result = Utils.missingValue();
 
     setupJepEngine();
+    initPrediction(m_FlowContext);
 
     // convert instance
     clsIndex = instance.classIndex();
@@ -346,13 +344,11 @@ public class JepRegressor
     }
 
     // execute script
-    script    = expand(m_ClassifyScript.getValue());
-    varPrefix = determineVarPrefix(script);
-    inputs    = new HashMap<>();
-    inputs.put(varPrefix + "pred_x", new NDArray<>(x));
+    inputs = new HashMap<>();
+    inputs.put(m_ClassifyVarPrefix + "pred_x", new NDArray<>(x));
     if (m_Model != null)
-      inputs.put(varPrefix + "model", m_Model);
-    scriptlet = new SimpleJepScriptlet(getClass().getName() + "-" + UniqueIDs.nextLong(), script.getValue(), inputs, new String[]{varPrefix + "pred_y"});
+      inputs.put(m_ClassifyVarPrefix + "model", m_Model);
+    scriptlet = new SimpleJepScriptlet(getClass().getName() + "-" + UniqueIDs.nextLong(), m_ClassifyScriptActual.getValue(), inputs, new String[]{m_ClassifyVarPrefix + "pred_y"});
     scriptlet.setFlowContext(m_FlowContext);
     scriptlet.setLoggingLevel(getLoggingLevel());
     m_Engine.getEngine().add(scriptlet);
@@ -363,15 +359,15 @@ public class JepRegressor
     if (!isStopped()) {
       if (scriptlet.hasLastError())
 	throw new Exception(scriptlet.getLastError());
-      if (scriptlet.getOutputs().containsKey(varPrefix + "pred_y")) {
-	output = scriptlet.getOutputs().get(varPrefix + "pred_y");
+      if (scriptlet.getOutputs().containsKey(m_ClassifyVarPrefix + "pred_y")) {
+	output = scriptlet.getOutputs().get(m_ClassifyVarPrefix + "pred_y");
 	if (output instanceof Number)
 	  result = ((Number) output).doubleValue();
 	else if (output instanceof NDArray)
 	  result = (double) Array.get(((NDArray) output).getData(), 0);
       }
       else {
-	throw new IllegalStateException("Prediction was not stored as variable '" + (varPrefix.isEmpty() ? "" : VAR_PREFIX) + "pred_y'!");
+	throw new IllegalStateException("Prediction was not stored as variable '" + (m_ClassifyVarPrefix.isEmpty() ? "" : VAR_PREFIX) + "pred_y'!");
       }
     }
 
