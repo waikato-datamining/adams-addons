@@ -15,7 +15,7 @@
 
 /*
  * GroovyServer.java
- * Copyright (C) 2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2019-2025 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.rest;
@@ -25,6 +25,7 @@ import adams.core.io.PlaceholderFile;
 import adams.core.logging.LoggingLevelHandler;
 import adams.core.scripting.Groovy;
 import adams.flow.core.FlowContextHandler;
+import adams.flow.core.FlowContextUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 
@@ -216,8 +217,8 @@ public class GroovyServer
     int		i;
 
     for (i = 0; i < plugins.length; i++) {
-      if (plugins[i] instanceof FlowContextHandler)
-	((FlowContextHandler) plugins[i]).setFlowContext(getFlowContext());
+      if (FlowContextUtils.isHandler(plugins[i]))
+	FlowContextUtils.update(plugins[i], getFlowContext());
       if (plugins[i] instanceof LoggingLevelHandler)
 	((LoggingLevelHandler) plugins[i]).setLoggingLevel(getLoggingLevel());
     }

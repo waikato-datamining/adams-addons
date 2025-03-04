@@ -13,14 +13,14 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * WebsocketOutput.java
- * Copyright (C) 2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2017-2025 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone.rats.output;
 
-import adams.flow.core.FlowContextHandler;
+import adams.flow.core.FlowContextUtils;
 import adams.flow.websocket.client.SimpleSendGenerator;
 import adams.flow.websocket.client.WebSocketClientGenerator;
 
@@ -52,7 +52,6 @@ import java.util.logging.Level;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class WebsocketOutput
   extends AbstractRatOutput {
@@ -176,8 +175,8 @@ public class WebsocketOutput
     if (m_Client == null) {
       try {
 	m_Client = m_Generator.generateClient();
-	if (m_Client instanceof FlowContextHandler)
-	  ((FlowContextHandler) m_Client).setFlowContext(getOwner());
+	if (FlowContextUtils.isHandler(m_Client))
+	  FlowContextUtils.update(m_Client, getOwner());
       }
       catch (Exception e) {
 	result = handleException("Failed to generate websocket client!", e);

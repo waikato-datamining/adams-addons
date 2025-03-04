@@ -15,7 +15,7 @@
 
 /*
  * GenericServer.java
- * Copyright (C) 2018-2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2025 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.rest;
@@ -24,6 +24,7 @@ import adams.core.AdditionalInformationHandler;
 import adams.core.ObjectCopyHelper;
 import adams.core.Utils;
 import adams.flow.core.FlowContextHandler;
+import adams.flow.core.FlowContextUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 
@@ -179,8 +180,8 @@ public class GenericServer
     int		i;
 
     for (i = 0; i < plugins.length; i++) {
-      if (plugins[i] instanceof FlowContextHandler)
-	((FlowContextHandler) plugins[i]).setFlowContext(getFlowContext());
+      if (FlowContextUtils.isHandler(plugins[i]))
+	FlowContextUtils.update(plugins[i], getFlowContext());
     }
   }
 
