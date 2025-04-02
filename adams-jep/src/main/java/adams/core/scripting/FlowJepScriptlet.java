@@ -15,16 +15,16 @@
 
 /*
  * FlowJepScriptlet.java
- * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2024-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.core.scripting;
 
 import adams.core.ObjectCopyHelper;
+import adams.core.Shortening;
 import adams.core.Utils;
 import adams.core.base.BaseString;
 import adams.core.io.FileUtils;
-import adams.core.io.TempUtils;
 import adams.core.logging.LoggingHelper;
 import adams.flow.control.StorageName;
 import adams.flow.control.VariableNameStorageNamePair;
@@ -207,16 +207,12 @@ public class FlowJepScriptlet
     SharedInterpreter 	interpreter;
     String		result;
     boolean		inline;
-    File 		scriptFile;
     String		script;
     StorageName 	sname;
     Object		value;
-    boolean		deleteScript;
 
-    result       = null;
-    inline       = ((m_ScriptFile == null) || !m_ScriptFile.exists() || m_ScriptFile.isDirectory());
-    scriptFile   = null;
-    deleteScript = false;
+    result = null;
+    inline = ((m_ScriptFile == null) || !m_ScriptFile.exists() || m_ScriptFile.isDirectory());
 
     try {
       interpreter = getOwner().getInterpreter();
@@ -233,31 +229,18 @@ public class FlowJepScriptlet
       }
 
       // execute script
-      if (inline) {
-	deleteScript = true;
-	scriptFile   = TempUtils.createTempFile("jep", ".py");
-	script       = m_Script;
-	if (m_ExpandVariables && (m_FlowContext != null)) {
+      if (inline)
+	script = m_Script;
+      else
+	script = Utils.flatten(FileUtils.loadFromFile(m_ScriptFile), "\n");
+      if (m_ExpandVariables && (m_FlowContext != null)) {
+	if (isLoggingEnabled())
 	  getLogger().info("Expanding variables...");
-	  script = m_FlowContext.getVariables().expand(script);
-	}
-	getLogger().info("Writing script to: " + scriptFile);
-	FileUtils.writeToFile(scriptFile.getAbsolutePath(), script, false);
+	script = m_FlowContext.getVariables().expand(script);
       }
-      else {
-	scriptFile = m_ScriptFile;
-	if (m_ExpandVariables && (m_FlowContext != null)) {
-	  getLogger().info("Expanding variables...");
-	  script       = Utils.flatten(FileUtils.loadFromFile(m_ScriptFile), "\n");
-	  script       = m_FlowContext.getVariables().expand(script);
-	  deleteScript = true;
-	  scriptFile   = TempUtils.createTempFile("jep", ".py");
-	  getLogger().info("Writing script to: " + scriptFile);
-	  FileUtils.writeToFile(scriptFile.getAbsolutePath(), script, false);
-	}
-      }
-      getLogger().info("Running script: " + scriptFile);
-      getOwner().runScript(scriptFile);
+      if (isLoggingEnabled())
+	getLogger().info("Running script: " + Shortening.shortenEnd(script, 50));
+      getOwner().getInterpreter().exec(script);
 
       // retrieve storage items
       if ((m_FlowContext != null) && (m_Inputs != null)) {
@@ -276,18 +259,14 @@ public class FlowJepScriptlet
 	}
       }
 
-      getLogger().info("Finished script: " + scriptFile);
+      if (isLoggingEnabled())
+	getLogger().info("Finished script: " + Shortening.shortenEnd(script, 50));
     }
     catch (Exception e) {
       if (inline)
 	result = LoggingHelper.handleException(this, "Failed to execute inline script!", e);
       else
 	result = LoggingHelper.handleException(this, "Failed to execute script file: " + m_ScriptFile, e);
-    }
-
-    if (deleteScript && (scriptFile != null)) {
-      getLogger().info("Deleting script: " + scriptFile);
-      FileUtils.delete(scriptFile);
     }
 
     m_LastError = result;
