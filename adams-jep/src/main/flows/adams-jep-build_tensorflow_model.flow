@@ -1,5 +1,5 @@
 # Project: adams
-# Date: 2024-08-16 13:06:58
+# Date: 2025-04-03 08:52:09
 # User: fracpete
 # Charset: UTF-8
 # Modules: adams-core,adams-jep
@@ -13,7 +13,7 @@ adams.flow.control.Flow -annotation "Builds a Tensorflow model on the abalone da
   adams.flow.source.StringConstants -output-array true -string 0.455 -string 0.365 -string 0.095 -string 0.514 -string 0.2245 -string 0.101 -string 0.15 -conversion adams.data.conversion.StringToDouble
   adams.flow.transformer.SetStorageValue -storage-name data
  adams.flow.control.Trigger -name "make prediction"
-  adams.flow.source.Jep -inline-script "preds = abalone_model.predict(np.array(data).reshape((1, 7)), verbose=0)" -inputs abalone_model=model -inputs data=data -forwards preds
-  adams.flow.transformer.GetMapValue -key preds
+  adams.flow.source.Jep -inline-script "preds = abalone_model.predict(np.array(data).reshape((1, 7)), verbose=0)\\npred = preds[0][0]" -inputs abalone_model=model -inputs data=data -forwards pred
+  adams.flow.transformer.GetMapValue -key pred
   adams.flow.transformer.Convert -conversion adams.data.conversion.AnyToString
   adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
