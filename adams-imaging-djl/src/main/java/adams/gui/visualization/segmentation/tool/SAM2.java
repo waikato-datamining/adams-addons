@@ -20,6 +20,7 @@
 
 package adams.gui.visualization.segmentation.tool;
 
+import adams.data.sam2.SAM2Utils;
 import adams.gui.chooser.ColorChooserPanel;
 import adams.gui.core.BaseComboBox;
 import adams.gui.core.GUIHelper;
@@ -31,17 +32,10 @@ import adams.gui.core.NumberTextField.Type;
 import adams.gui.core.ParameterPanel;
 import adams.gui.visualization.segmentation.ImageUtils;
 import ai.djl.inference.Predictor;
-import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.modality.cv.output.DetectedObjects.DetectedObject;
-import ai.djl.modality.cv.output.Mask;
 import ai.djl.modality.cv.translator.Sam2Translator.Sam2Input;
-import ai.djl.modality.cv.translator.Sam2Translator.Sam2Input.Builder;
-import ai.djl.modality.cv.translator.Sam2TranslatorFactory;
-import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.training.util.ProgressBar;
+import com.github.fracpete.javautils.struct.Struct2;
 
 import javax.swing.Icon;
 import javax.swing.SwingWorker;
@@ -52,6 +46,7 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 /**
  * Uses SAM (via docker and redis) to aid human in annotating.
@@ -91,7 +86,7 @@ public class SAM2
   protected double m_MinProbabilityDetection;
 
   /** the minimum probability for the mask pixels. */
-  protected double m_MinProbabilityMask;
+  protected float m_MinProbabilityMask;
 
   /** the current model. */
   protected transient ZooModel<Sam2Input, DetectedObjects> m_Model;
@@ -140,7 +135,10 @@ public class SAM2
    */
   @Override
   protected Cursor createCursor() {
-    return Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
+    if (m_ModelName == null)
+      return Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+    else
+      return Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
   }
 
   /**
@@ -243,7 +241,7 @@ public class SAM2
     m_PanelColor = new ColorChooserPanel(getLayerManager().getMarkers().getColor());
     paramPanel.addParameter("- color", m_PanelColor);
 
-    m_ComboBoxModelName = new BaseComboBox<>(new String[]{"sam2-hiera-tiny", "sam2-hiera-large"});
+    m_ComboBoxModelName = new BaseComboBox<>(SAM2Utils.MODEL_NAMES);
     m_ComboBoxModelName.setSelectedIndex(0);
     paramPanel.addParameter("Model", m_ComboBoxModelName);
 
@@ -264,42 +262,28 @@ public class SAM2
    * @throws Exception	if model loading fails
    */
   protected void loadModel() throws Exception {
-    Criteria<Sam2Input, DetectedObjects> 	criteria;
+    Struct2<ZooModel<Sam2Input, DetectedObjects>, Predictor<Sam2Input, DetectedObjects>> data;
 
     if (m_Model != null)
       return;
 
-    criteria = Criteria.builder()
-		 .setTypes(Sam2Input.class, DetectedObjects.class)
-		 .optModelUrls("djl://ai.djl.pytorch/" + m_ModelName)
-		 .optTranslatorFactory(new Sam2TranslatorFactory())
-		 .optProgress(new ProgressBar())
-		 .build();
-
-    m_Model     = criteria.loadModel();
-    m_Predictor = m_Model.newPredictor();
+    data        = SAM2Utils.loadModel(m_ModelName);
+    m_Model     = data.value1;
+    m_Predictor = data.value2;
   }
 
   /**
    * Applies SAM2 to the image and points.
    */
   protected void detect() {
-    Image 		image;
-    Builder		builder;
-    Sam2Input 		input;
     DetectedObjects 	detection;
-    int			i;
-    DetectedObject	detected;
-    Mask		mask;
     BufferedImage	img;
-    float[][] 		probs;
-    int[]		pixels;
-    int			w;
-    int			h;
-    int			x;
-    int			y;
-    int			active;
-    int black;
+    List<float[][]> 	probDists;
+
+    if (m_ModelName == null) {
+      GUIHelper.showErrorMessage(getCanvas().getOwner(), "Please apply options first!");
+      return;
+    }
 
     try {
       loadModel();
@@ -309,50 +293,24 @@ public class SAM2
       return;
     }
 
-    image   = ImageFactory.getInstance().fromImage(getLayerManager().getImageLayer().getImage());
-    builder = Sam2Input.builder(image);
-    for (Point p: getLayerManager().getMarkers().getPoints())
-      builder.addPoint((int) p.getX(), (int) p.getY());
-    input = builder.build();
-
     try {
-      detection = m_Predictor.predict(input);
-      for (i = 0; i < detection.getNumberOfObjects(); i++) {
-	detected = detection.item(i);
-	if (detected.getProbability() < m_MinProbabilityDetection)
-	  continue;
-	if (detected.getBoundingBox() instanceof Mask) {
-	  mask   = (Mask) detected.getBoundingBox();
-	  w      = (int) mask.getBounds().getWidth();
-	  h      = (int) mask.getBounds().getHeight();
-	  probs  = mask.getProbDist();
-	  pixels = new int[w * h];
-	  active = getActiveColor().getRGB();
-	  black  = new Color(0, 0, 0, 0).getRGB();
-	  for (y = 0; y < h; y++) {
-	    for (x = 0; x < w; x++) {
-	      if (probs[y][x] >= m_MinProbabilityMask)
-		pixels[y*w + x] = active;
-	      else
-		pixels[y*w + x] = black;
-	    }
-	  }
-	  img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-	  img.setRGB(0, 0, w, h, pixels, 0, w);
-
-	  if (isAutomaticUndoEnabled())
-	    getCanvas().getOwner().addUndoPoint();
-	  if (mask.isFullImageMask())
-	    ImageUtils.combineImages(img, getActiveImage());
-	  else
-	    getLogger().severe("Can only combine full images at this stage!"); // TODO
-	}
+      detection = SAM2Utils.detectObjects(m_Predictor, getLayerManager().getImageLayer().getImage(), getLayerManager().getMarkers().getPoints());
+      probDists = SAM2Utils.probabilityDistributions(detection, m_MinProbabilityDetection);
+      img       = SAM2Utils.combineProbabilityDistributions(probDists, m_MinProbabilityMask, getActiveColor());
+      if (img == null) {
+	GUIHelper.showErrorMessage(getCanvas().getOwner(), "Failed to generate image from SAM2 detections!");
+	return;
       }
     }
     catch (Exception e) {
       GUIHelper.showErrorMessage(getCanvas().getOwner(), "Failed to apply SAM2 model to model!", e);
       return;
     }
+
+    if (isAutomaticUndoEnabled())
+      getCanvas().getOwner().addUndoPoint();
+
+    ImageUtils.combineImages(img, getActiveImage());
 
     getLayerManager().getMarkers().clear();
     getLayerManager().update();
