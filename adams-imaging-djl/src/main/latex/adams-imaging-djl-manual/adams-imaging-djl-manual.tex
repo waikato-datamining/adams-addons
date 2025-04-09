@@ -1,0 +1,85 @@
+% This work is made available under the terms of the 
+% Creative Commons Attribution-ShareAlike 4.0 license,
+% http://creativecommons.org/licenses/by-sa/4.0/.
+
+\documentclass[a4paper]{book}
+
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{scalefnt}
+\usepackage{tikz}
+
+% watermark -- for draft stage
+%\usepackage[firstpage]{draftwatermark}
+%\SetWatermarkLightness{0.9}
+%\SetWatermarkScale{5}
+
+\input{latex_extensions}
+
+\title{
+  \textbf{ADAMS} \\
+  {\Large \textbf{A}dvanced \textbf{D}ata mining \textbf{A}nd \textbf{M}achine
+  learning \textbf{S}ystem} \\
+  {\Large Module: adams-imaging-djl} \\
+  \vspace{1cm}
+  \includegraphics[width=2cm]{images/imaging-djl-module.png} \\
+}
+\author{
+  Peter Reutemann
+}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+
+\thispagestyle{empty}
+\center
+\begin{table}[b]
+	\begin{tabular}{c l l}
+		\parbox[c][2cm]{2cm}{\copyright 2025} &
+		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
+	\end{tabular}
+	\includegraphics[width=12cm]{images/cc.png} \\
+\end{table}
+
+\end{titlepage}
+
+\tableofcontents
+%\listoffigures
+%\listoftables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Tools}
+This module extends the imaging support using the Deep Java Library\cite{djl}, an open source
+library that makes Deep Learning available in Java.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter(Image segmentation)
+\section{SAM2}
+SAM2\cite{sam} (Segment Anything Model 2) is another very useful tool for aiding human annotators in
+annotating images. The tool generates object masks using one or more points as prompt
+within the object that is to be annotated.
+
+The \textit{ImageSegmentationAnnotator} transformer offers a SAM2
+tool in their toolboxes. In order to use the tool, you need to do the following:
+
+\begin{tight_itemize}
+  \item In the annotation interface, select the \textit{SAM2} tool (the icon shows \textit{SA2}).
+  \item Adjust any parameters if necessary, such as model name (\textit{tiny} is recommended on a CPU-only machine)
+  and minimum probabilities.
+  \item With the left mouse button, perform one or more left-clicks to choose the prompt points (use the left mouse
+  button while holding CTRL to remove the current points and start over) and hit \textit{ENTER} to have this image analyzed.
+  \item If successful, the annotation(s) will be added to the current ones.
+\end{tight_itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{bibliography}
+
+\end{document}

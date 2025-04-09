@@ -42,6 +42,7 @@
     <module>adams-git</module>
     <module>adams-gnuplot</module>
     <module>adams-heatmap</module>
+    <module>adams-imaging-djl</module>
     <module>adams-imaging-ext</module>
     <module>adams-jep</module>
     <module>adams-jep-weka</module>
