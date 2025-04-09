@@ -303,7 +303,7 @@ public class SAM2
       }
     }
     catch (Exception e) {
-      GUIHelper.showErrorMessage(getCanvas().getOwner(), "Failed to apply SAM2 model to model!", e);
+      GUIHelper.showErrorMessage(getCanvas().getOwner(), "Failed to apply SAM2 model to image!", e);
       return;
     }
 
