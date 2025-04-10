@@ -78,6 +78,22 @@ tool in their toolboxes. In order to use the tool, you need to do the following:
   \item If successful, the annotation(s) will be added to the current ones.
 \end{tight_itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Object detection}
+\section{SAM2}
+Just like with image segmentation, a SAM2\cite{sam2} tool is available from the \textit{ImageObjectAnnotator}
+transformer's toolbox. It takes the probability distribution masks that SAM2 returns, turns them into polygons
+and adds them as annotation.
+
+\begin{tight_itemize}
+  \item In the annotation interface, select the \textit{SAM2} tool (the icon shows \textit{SA2}).
+  \item Adjust any parameters if necessary, such as model name (\textit{tiny} is recommended on a CPU-only machine)
+  and minimum probabilities.
+  \item With the left mouse button, perform one or more left-clicks to choose the prompt points (use the left mouse
+  button while holding CTRL to remove the current points and start over) and hit \textit{ENTER} to have this image analyzed.
+  \item If successful, the annotation(s) will be added to the current ones.
+\end{tight_itemize}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
