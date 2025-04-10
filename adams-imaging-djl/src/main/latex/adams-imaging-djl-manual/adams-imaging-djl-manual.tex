@@ -56,8 +56,19 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Tools}
-This module extends the imaging support using the Deep Java Library\cite{djl}, an open source
+This module extends the imaging support using the Deep Java Library\cite{djl} (DJL), an open source
 library that makes Deep Learning available in Java.
+
+\section{DJL files}
+DJL downloads models and libraries on demand, depending on operating system and whether a GPU is present.
+The advantage of that is that it does not increase the size of the ADAMS installation itself. The downside
+is that the initial use can take a while, as DJL may have to download a few hundred megabyte first.
+
+\noindent You can find these files in the following directory:
+\begin{tight_itemize}
+    \item Linux: \texttt{\$HOME/.djl.ai}
+    \item Windows; \texttt{\%USERPROFILE\%\textbackslash.djl.ai}
+\end{tight_itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Image segmentation}
