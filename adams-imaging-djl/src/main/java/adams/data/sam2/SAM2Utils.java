@@ -36,6 +36,7 @@ import com.github.fracpete.javautils.struct.Struct2;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,6 +88,20 @@ public class SAM2Utils {
    * @throws Exception	if detection fails
    */
   public static DetectedObjects detectObjects(Predictor<Sam2Input, DetectedObjects> predictor, BufferedImage img, List<Point> points) throws Exception {
+    return detectObjects(predictor, img, points, null);
+  }
+
+  /**
+   * Applies SAM2 to the image and points, limiting the detection to the specified rectangle.
+   *
+   * @param predictor 	the predictor instance to use
+   * @param img 	the image to analyze
+   * @param points 	the prompt points
+   * @param box 	the rectangle to limit the detection to, ignored if null
+   * @return 		the detected objects
+   * @throws Exception	if detection fails
+   */
+  public static DetectedObjects detectObjects(Predictor<Sam2Input, DetectedObjects> predictor, BufferedImage img, List<Point> points, Rectangle box) throws Exception {
     Image 		image;
     Builder 		builder;
     Sam2Input 		input;
@@ -95,6 +110,8 @@ public class SAM2Utils {
     builder = Sam2Input.builder(image);
     for (Point p: points)
       builder.addPoint((int) p.getX(), (int) p.getY());
+    if (box != null)
+      builder.addBox(box.x, box.y, box.x+box.width-1, box.y+box.height-1);
     input = builder.build();
 
     return predictor.predict(input);
@@ -104,25 +121,40 @@ public class SAM2Utils {
    * Extracts the (full-image) probability distributions from the detected objects.
    *
    * @param detection	the detected objects to process
-   * @param minProb	the minimum probability that detections require
+   * @param minDetect	the minimum probability that detections require
+   * @param minMask 	the minimum probability in the masks, use <=0 for no restriction
    * @return		the distributions
    */
-  public static List<float[][]> probabilityDistributions(DetectedObjects detection, double minProb) {
+  public static List<float[][]> probabilityDistributions(DetectedObjects detection, double minDetect, double minMask) {
     List<float[][]>	result;
     int			i;
     DetectedObject 	detected;
     Mask		mask;
+    float[][]		probDist;
+    int			x;
+    int			y;
 
     result = new ArrayList<>();
 
     for (i = 0; i < detection.getNumberOfObjects(); i++) {
       detected = detection.item(i);
-      if (detected.getProbability() < minProb)
+      if (detected.getProbability() < minDetect)
 	continue;
       if (detected.getBoundingBox() instanceof Mask) {
 	mask = (Mask) detected.getBoundingBox();
-	if (mask.isFullImageMask())
-	  result.add(mask.getProbDist());
+	if (mask.isFullImageMask()) {
+	  probDist = mask.getProbDist();
+	  if (minMask > 0) {
+	    probDist = probDist.clone();
+	    for (y = 0; y < probDist.length; y++) {
+	      for (x = 0; x < probDist[y].length; x++) {
+		if (probDist[y][x] < minMask)
+		  probDist[y][x] = 0f;
+	      }
+	    }
+	  }
+	  result.add(probDist);
+	}
       }
     }
 
@@ -130,14 +162,13 @@ public class SAM2Utils {
   }
 
   /**
-   * Combines the probability distribution masks into a single image segmenation layer.
+   * Combines the probability distribution masks into a single image segmentation layer.
    *
    * @param probDists	the distributions to combine
-   * @param minProb	the probability threshold fot the masks
    * @param color	the color to use in the image
    * @return		the generated ARGB image, null if no masks provided
    */
-  public static BufferedImage combineProbabilityDistributions(List<float[][]> probDists, float minProb, Color color) {
+  public static BufferedImage combineProbabilityDistributions(List<float[][]> probDists, Color color) {
     BufferedImage 	result;
     int[]		pixels;
     int			w;
@@ -160,7 +191,7 @@ public class SAM2Utils {
     for (float[][] probDist: probDists) {
       for (y = 0; y < h; y++) {
 	for (x = 0; x < w; x++) {
-	  if (probDist[y][x] >= minProb)
+	  if (probDist[y][x] > 0)
 	    pixels[y * w + x] = active;
 	}
       }

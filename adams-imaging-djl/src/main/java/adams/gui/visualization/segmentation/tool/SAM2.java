@@ -20,6 +20,7 @@
 
 package adams.gui.visualization.segmentation.tool;
 
+import adams.data.opencv.ContoursHelper;
 import adams.data.sam2.SAM2Utils;
 import adams.gui.chooser.ColorChooserPanel;
 import adams.gui.core.BaseComboBox;
@@ -30,19 +31,21 @@ import adams.gui.core.MouseUtils;
 import adams.gui.core.NumberTextField;
 import adams.gui.core.NumberTextField.Type;
 import adams.gui.core.ParameterPanel;
-import adams.gui.visualization.segmentation.ImageUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.translator.Sam2Translator.Sam2Input;
 import ai.djl.repository.zoo.ZooModel;
 import com.github.fracpete.javautils.struct.Struct2;
+import org.bytedeco.opencv.opencv_core.MatVector;
 
 import javax.swing.Icon;
 import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -73,6 +76,12 @@ public class SAM2
   /** the minimum mask pixel probability. */
   protected NumberTextField m_TextMinProbabilityMask;
 
+  /** the minimum object size (width/height). */
+  protected NumberTextField m_TextMinObjectSize;
+
+  /** the maximum object size (width/height). */
+  protected NumberTextField m_TextMaxObjectSize;
+
   /** the marker size. */
   protected int m_MarkerSize;
 
@@ -87,6 +96,12 @@ public class SAM2
 
   /** the minimum probability for the mask pixels. */
   protected float m_MinProbabilityMask;
+
+  /** the minimum object size (width/height). */
+  protected int m_MinObjectSize;
+
+  /** the maximum object size (width/height). */
+  protected int m_MaxObjectSize;
 
   /** the current model. */
   protected transient ZooModel<Sam2Input, DetectedObjects> m_Model;
@@ -106,6 +121,17 @@ public class SAM2
       + "\n"
       + "More information:\n"
       + "https://github.com/facebookresearch/sam2";
+  }
+
+  /**
+   * Initializes the members.
+   */
+  @Override
+  protected void initialize() {
+    super.initialize();
+
+    m_MinObjectSize = -1;
+    m_MaxObjectSize = -1;
   }
 
   /**
@@ -213,6 +239,31 @@ public class SAM2
   }
 
   /**
+   * Checks the parameters before applying them.
+   *
+   * @return		null if checks passed, otherwise error message (gets displayed in GUI)
+   */
+  @Override
+  protected String checkBeforeApply() {
+    String	result;
+    int		min;
+    int		max;
+
+    result = super.checkBeforeApply();
+
+    if (result == null) {
+      min = m_TextMinObjectSize.getValue().intValue();
+      max = m_TextMaxObjectSize.getValue().intValue();
+      if ((min > 0) && (max > 0)) {
+	if (max <= min)
+	  result = "Maximum object size must be larger than minimum size, but: min=" + min + " and max=" + max;
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Applies the settings.
    */
   @Override
@@ -222,6 +273,8 @@ public class SAM2
     m_ModelName               = m_ComboBoxModelName.getSelectedItem();
     m_MinProbabilityDetection = m_TextMinProbabilityDetection.getValue().doubleValue();
     m_MinProbabilityMask      = m_TextMinProbabilityMask.getValue().floatValue();
+    m_MinObjectSize           = m_TextMinObjectSize.getValue().intValue();
+    m_MaxObjectSize           = m_TextMaxObjectSize.getValue().intValue();
     getLayerManager().getMarkers().setExtent(m_MarkerSize);
     getLayerManager().getMarkers().setColor(m_MarkerColor);
   }
@@ -254,6 +307,18 @@ public class SAM2
     m_TextMinProbabilityMask.setCheckModel(new NumberTextField.BoundedNumberCheckModel(Type.FLOAT, 0.0f, 1.0f, 1.0f));
     m_TextMinProbabilityMask.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
     paramPanel.addParameter("Min mask prob", m_TextMinProbabilityMask);
+
+    m_TextMinObjectSize = new NumberTextField(NumberTextField.Type.INTEGER, 10);
+    m_TextMinObjectSize.setCheckModel(new NumberTextField.BoundedNumberCheckModel(NumberTextField.Type.INTEGER, -1, null, m_MinObjectSize));
+    m_TextMinObjectSize.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
+    m_TextMinObjectSize.setToolTipText("The minimum object size; fulfilled if either width or height at least this amount; ignored if <1");
+    paramPanel.addParameter("Min. object size", m_TextMinObjectSize);
+
+    m_TextMaxObjectSize = new NumberTextField(NumberTextField.Type.INTEGER, 10);
+    m_TextMaxObjectSize.setCheckModel(new NumberTextField.BoundedNumberCheckModel(NumberTextField.Type.INTEGER, -1, null, m_MaxObjectSize));
+    m_TextMaxObjectSize.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
+    m_TextMaxObjectSize.setToolTipText("The maximum object size; fulfilled if either width or height at most this amount; ignored if <1");
+    paramPanel.addParameter("Max. object size", m_TextMaxObjectSize);
   }
 
   /**
@@ -279,6 +344,9 @@ public class SAM2
     DetectedObjects 	detection;
     BufferedImage	img;
     List<float[][]> 	probDists;
+    MatVector 		contours;
+    List<Polygon>	polys;
+    Graphics2D		g2d;
 
     if (m_ModelName == null) {
       GUIHelper.showErrorMessage(getCanvas().getOwner(), "Please apply options first!");
@@ -295,12 +363,15 @@ public class SAM2
 
     try {
       detection = SAM2Utils.detectObjects(m_Predictor, getLayerManager().getImageLayer().getImage(), getLayerManager().getMarkers().getPoints());
-      probDists = SAM2Utils.probabilityDistributions(detection, m_MinProbabilityDetection);
-      img       = SAM2Utils.combineProbabilityDistributions(probDists, m_MinProbabilityMask, getActiveColor());
+      probDists = SAM2Utils.probabilityDistributions(detection, m_MinProbabilityDetection, m_MinProbabilityMask);
+      img       = SAM2Utils.combineProbabilityDistributions(probDists, Color.WHITE);
       if (img == null) {
 	GUIHelper.showErrorMessage(getCanvas().getOwner(), "Failed to generate image from SAM2 detections!");
 	return;
       }
+      contours = ContoursHelper.findContours(img, 127, false);
+      polys    = ContoursHelper.contoursToPolygons(contours, m_MinObjectSize, m_MaxObjectSize);
+      contours.close();
     }
     catch (Exception e) {
       GUIHelper.showErrorMessage(getCanvas().getOwner(), "Failed to apply SAM2 model to image!", e);
@@ -310,7 +381,12 @@ public class SAM2
     if (isAutomaticUndoEnabled())
       getCanvas().getOwner().addUndoPoint();
 
-    ImageUtils.combineImages(img, getActiveImage());
+    img = getActiveImage();
+    g2d = img.createGraphics();
+    g2d.setColor(getActiveColor());
+    for (Polygon poly: polys)
+      g2d.fillPolygon(poly);
+    g2d.dispose();
 
     getLayerManager().getMarkers().clear();
     getLayerManager().update();

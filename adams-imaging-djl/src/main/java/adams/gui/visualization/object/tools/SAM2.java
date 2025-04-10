@@ -20,7 +20,7 @@
 
 package adams.gui.visualization.object.tools;
 
-import adams.data.opencv.OpenCVHelper;
+import adams.data.opencv.ContoursHelper;
 import adams.data.report.Report;
 import adams.data.sam2.SAM2Utils;
 import adams.flow.transformer.locateobjects.LocatedObject;
@@ -335,20 +335,18 @@ public class SAM2
    * Gets called by the marker.
    */
   public void detect() {
-    DetectedObjects 		detection;
-    List<float[][]> 		probDists;
-    BufferedImage		img;
-    MatVector 			contours;
-    int				i;
-    Struct2<int[],int[]>	coords;
-    Polygon 			poly;
-    Rectangle 			rect;
-    LocatedObjects 		lobjsNew;
-    LocatedObjects		lobjsCur;
-    LocatedObject 		lobj;
-    Report 			reportNew;
-    Report 			reportCur;
-    String			prefix;
+    DetectedObjects 	detection;
+    List<float[][]> 	probDists;
+    BufferedImage	img;
+    MatVector 		contours;
+    List<Polygon>	polys;
+    Rectangle 		rect;
+    LocatedObjects 	lobjsNew;
+    LocatedObjects	lobjsCur;
+    LocatedObject 	lobj;
+    Report 		reportNew;
+    Report 		reportCur;
+    String		prefix;
 
     if (m_ModelName == null) {
       GUIHelper.showErrorMessage(getCanvas().getOwner(), "Please apply options first!");
@@ -367,34 +365,23 @@ public class SAM2
 
     try {
       detection = SAM2Utils.detectObjects(m_Predictor, getCanvas().getImage(), m_Points);
-      probDists = SAM2Utils.probabilityDistributions(detection, m_MinProbabilityDetection);
-      img       = SAM2Utils.combineProbabilityDistributions(probDists, m_MinProbabilityMask, Color.WHITE);
+      probDists = SAM2Utils.probabilityDistributions(detection, m_MinProbabilityDetection, m_MinProbabilityMask);
+      img       = SAM2Utils.combineProbabilityDistributions(probDists, Color.WHITE);
       if (img == null) {
 	GUIHelper.showErrorMessage(getCanvas().getOwner(), "Failed to generate image from SAM2 detections!");
 	return;
       }
-      contours = OpenCVHelper.findContours(img, 127, false);
-      for (i = 0; i < contours.size(); i++) {
-	coords = OpenCVHelper.contourToCoordinates(contours.get(i));
-	poly   = new Polygon(coords.value1, coords.value2, coords.value1.length);
-	rect   = poly.getBounds();
-	// check restrictions
-	if (m_MinObjectSize > -1) {
-	  if ((rect.width < m_MinObjectSize) || (rect.height < m_MinObjectSize))
-	    continue;
-	}
-	if (m_MaxObjectSize > -1) {
-	  if ((rect.width > m_MaxObjectSize) || (rect.height > m_MaxObjectSize))
-	    continue;
-	}
+      contours = ContoursHelper.findContours(img, 127, false);
+      polys    = ContoursHelper.contoursToPolygons(contours, m_MinObjectSize, m_MaxObjectSize);
+      contours.close();
+      for (Polygon poly: polys) {
+	rect = poly.getBounds();
 	lobj = new LocatedObject(null, rect);
 	lobj.setPolygon(poly);
 	if (m_Annotator.getCurrentLabel() != null)
 	  lobj.getMetaData().put("type", m_Annotator.getCurrentLabel());
 	lobjsNew.add(lobj);
       }
-      contours.clear();
-      contours.close();
     }
     catch (Exception e) {
       GUIHelper.showErrorMessage(getCanvas().getOwner(), "Failed to apply SAM2 model to image!", e);
