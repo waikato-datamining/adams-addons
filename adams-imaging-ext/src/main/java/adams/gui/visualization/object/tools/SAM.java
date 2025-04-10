@@ -15,7 +15,7 @@
 
 /*
  * SAM.java
- * Copyright (C) 2023 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2023-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.object.tools;
@@ -439,6 +439,8 @@ public class SAM
       // add object
       lobj = new LocatedObject(null, poly.toBBox().toRectangle());
       lobj.setPolygon(poly.toPolygon());
+      if (m_Annotator.getCurrentLabel() != null)
+	lobj.getMetaData().put("type", m_Annotator.getCurrentLabel());
       lobjs.add(lobj);
     }
 
