@@ -141,8 +141,11 @@ public class SAM2
     m_Annotator = new SAM2Markers();
     m_Annotator.setTool(this);
 
-    m_MinObjectSize = -1;
-    m_MaxObjectSize = -1;
+    m_ModelName               = SAM2Utils.MODEL_NAMES[0];
+    m_MinProbabilityDetection = 0.0;
+    m_MinProbabilityMask      = 1.0f;
+    m_MinObjectSize           = -1;
+    m_MaxObjectSize           = -1;
   }
 
   /**
@@ -259,16 +262,16 @@ public class SAM2
     paramPanel.addParameter("- color", m_PanelColor);
 
     m_ComboBoxModelName = new BaseComboBox<>(SAM2Utils.MODEL_NAMES);
-    m_ComboBoxModelName.setSelectedIndex(0);
+    m_ComboBoxModelName.setSelectedItem(m_ModelName);
     paramPanel.addParameter("Model", m_ComboBoxModelName);
 
     m_TextMinProbabilityDetection = new NumberTextField(Type.DOUBLE, 10);
-    m_TextMinProbabilityDetection.setCheckModel(new NumberTextField.BoundedNumberCheckModel(Type.DOUBLE, 0.0, 1.0, 0.0));
+    m_TextMinProbabilityDetection.setCheckModel(new NumberTextField.BoundedNumberCheckModel(Type.DOUBLE, 0.0, 1.0, m_MinProbabilityDetection));
     m_TextMinProbabilityDetection.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
     paramPanel.addParameter("Min detection prob", m_TextMinProbabilityDetection);
 
     m_TextMinProbabilityMask = new NumberTextField(Type.FLOAT, 10);
-    m_TextMinProbabilityMask.setCheckModel(new NumberTextField.BoundedNumberCheckModel(Type.FLOAT, 0.0f, 1.0f, 1.0f));
+    m_TextMinProbabilityMask.setCheckModel(new NumberTextField.BoundedNumberCheckModel(Type.FLOAT, 0.0f, 1.0f, m_MinProbabilityMask));
     m_TextMinProbabilityMask.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
     paramPanel.addParameter("Min mask prob", m_TextMinProbabilityMask);
 
@@ -380,11 +383,6 @@ public class SAM2
       return;
     }
 
-    if (lobjsNew.isEmpty()) {
-      getLogger().warning("No objects to add!");
-      return;
-    }
-
     for (Polygon poly: polys) {
       rect = poly.getBounds();
       lobj = new LocatedObject(null, rect);
@@ -392,6 +390,11 @@ public class SAM2
       if (m_Annotator.getCurrentLabel() != null)
 	lobj.getMetaData().put("type", m_Annotator.getCurrentLabel());
       lobjsNew.add(lobj);
+    }
+
+    if (lobjsNew.isEmpty()) {
+      getLogger().warning("No objects to add!");
+      return;
     }
 
     prefix = LocatedObjects.DEFAULT_PREFIX;
