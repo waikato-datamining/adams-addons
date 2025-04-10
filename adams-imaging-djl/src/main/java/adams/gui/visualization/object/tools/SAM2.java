@@ -374,14 +374,6 @@ public class SAM2
       contours = ContoursHelper.findContours(img, 127, false);
       polys    = ContoursHelper.contoursToPolygons(contours, m_MinObjectSize, m_MaxObjectSize);
       contours.close();
-      for (Polygon poly: polys) {
-	rect = poly.getBounds();
-	lobj = new LocatedObject(null, rect);
-	lobj.setPolygon(poly);
-	if (m_Annotator.getCurrentLabel() != null)
-	  lobj.getMetaData().put("type", m_Annotator.getCurrentLabel());
-	lobjsNew.add(lobj);
-      }
     }
     catch (Exception e) {
       GUIHelper.showErrorMessage(getCanvas().getOwner(), "Failed to apply SAM2 model to image!", e);
@@ -393,6 +385,15 @@ public class SAM2
       return;
     }
 
+    for (Polygon poly: polys) {
+      rect = poly.getBounds();
+      lobj = new LocatedObject(null, rect);
+      lobj.setPolygon(poly);
+      if (m_Annotator.getCurrentLabel() != null)
+	lobj.getMetaData().put("type", m_Annotator.getCurrentLabel());
+      lobjsNew.add(lobj);
+    }
+
     prefix = LocatedObjects.DEFAULT_PREFIX;
     if (getCanvas().getOwner().getAnnotator() instanceof ObjectPrefixHandler)
       prefix = ((ObjectPrefixHandler) getCanvas().getOwner().getAnnotator()).getPrefix();
@@ -400,6 +401,7 @@ public class SAM2
     lobjsCur = LocatedObjects.fromReport(reportCur, prefix);
     lobjsNew.addAll(lobjsCur);
     reportNew = lobjsNew.toReport(prefix, 0, true);
+
     getCanvas().getOwner().addUndoPoint("SAM2 predictions");
     getCanvas().getOwner().setReport(reportNew);
     getCanvas().getOwner().annotationsChanged(this);
