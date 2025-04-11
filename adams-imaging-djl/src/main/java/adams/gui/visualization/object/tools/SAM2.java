@@ -20,6 +20,7 @@
 
 package adams.gui.visualization.object.tools;
 
+import adams.data.objectfilter.SimplifyPolygons;
 import adams.data.opencv.ContoursHelper;
 import adams.data.report.Report;
 import adams.data.sam2.SAM2Utils;
@@ -83,6 +84,9 @@ public class SAM2
   /** the maximum object size (width/height). */
   protected NumberTextField m_TextMaxObjectSize;
 
+  /** the tolerance parameter for simplification. */
+  protected NumberTextField m_TextToleranceSimplification;
+
   /** the marker size. */
   protected int m_MarkerSize;
 
@@ -103,6 +107,9 @@ public class SAM2
 
   /** the maximum object size (width/height). */
   protected int m_MaxObjectSize;
+
+  /** the tolerance for polygon simplification. */
+  protected double m_ToleranceSimplification;
 
   /** the points to send. */
   protected List<Point> m_Points;
@@ -146,6 +153,7 @@ public class SAM2
     m_MinProbabilityMask      = 1.0f;
     m_MinObjectSize           = -1;
     m_MaxObjectSize           = -1;
+    m_ToleranceSimplification = 0;
   }
 
   /**
@@ -242,6 +250,7 @@ public class SAM2
     m_MinProbabilityMask      = m_TextMinProbabilityMask.getValue().floatValue();
     m_MinObjectSize           = m_TextMinObjectSize.getValue().intValue();
     m_MaxObjectSize           = m_TextMaxObjectSize.getValue().intValue();
+    m_ToleranceSimplification = m_TextToleranceSimplification.getValue().doubleValue();
     m_Annotator.setColor(m_MarkerColor);
     m_Annotator.setExtent(m_MarkerSize);
   }
@@ -256,23 +265,28 @@ public class SAM2
     m_TextMarkerSize = new NumberTextField(NumberTextField.Type.INTEGER, 10);
     m_TextMarkerSize.setCheckModel(new NumberTextField.BoundedNumberCheckModel(NumberTextField.Type.INTEGER, 1, null, m_Annotator.getExtent()));
     m_TextMarkerSize.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
+    m_TextMarkerSize.setToolTipText("The size of markers in pixel when selecting prompt points");
     paramPanel.addParameter("Marker size", m_TextMarkerSize);
 
     m_PanelColor = new ColorChooserPanel(m_Annotator.getColor());
+    m_PanelColor.setToolTipText("The color to use for the markers");
     paramPanel.addParameter("- color", m_PanelColor);
 
     m_ComboBoxModelName = new BaseComboBox<>(SAM2Utils.MODEL_NAMES);
     m_ComboBoxModelName.setSelectedItem(m_ModelName);
+    m_ComboBoxModelName.setToolTipText("The model to use for generating the masks");
     paramPanel.addParameter("Model", m_ComboBoxModelName);
 
     m_TextMinProbabilityDetection = new NumberTextField(Type.DOUBLE, 10);
     m_TextMinProbabilityDetection.setCheckModel(new NumberTextField.BoundedNumberCheckModel(Type.DOUBLE, 0.0, 1.0, m_MinProbabilityDetection));
     m_TextMinProbabilityDetection.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
+    m_TextMinProbabilityDetection.setToolTipText("The minimum probability that detections must have to be considered; ignored if <=0");
     paramPanel.addParameter("Min detection prob", m_TextMinProbabilityDetection);
 
     m_TextMinProbabilityMask = new NumberTextField(Type.FLOAT, 10);
     m_TextMinProbabilityMask.setCheckModel(new NumberTextField.BoundedNumberCheckModel(Type.FLOAT, 0.0f, 1.0f, m_MinProbabilityMask));
     m_TextMinProbabilityMask.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
+    m_TextMinProbabilityMask.setToolTipText("The minimum probability that mask pixels must have to be included; ignored if <=0");
     paramPanel.addParameter("Min mask prob", m_TextMinProbabilityMask);
 
     m_TextMinObjectSize = new NumberTextField(NumberTextField.Type.INTEGER, 10);
@@ -286,6 +300,12 @@ public class SAM2
     m_TextMaxObjectSize.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
     m_TextMaxObjectSize.setToolTipText("The maximum object size; fulfilled if either width or height at most this amount; ignored if <1");
     paramPanel.addParameter("Max. object size", m_TextMaxObjectSize);
+
+    m_TextToleranceSimplification = new NumberTextField(Type.DOUBLE, 10);
+    m_TextToleranceSimplification.setCheckModel(new NumberTextField.BoundedNumberCheckModel(Type.DOUBLE, -1.0, null, m_ToleranceSimplification));
+    m_TextToleranceSimplification.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
+    m_TextToleranceSimplification.setToolTipText("Simplifies the predicted polygons if >=1");
+    paramPanel.addParameter("Tolerance (simplify)", m_TextToleranceSimplification);
   }
 
   /**
@@ -350,6 +370,7 @@ public class SAM2
     Report 		reportNew;
     Report 		reportCur;
     String		prefix;
+    SimplifyPolygons	simplify;
 
     if (m_ModelName == null) {
       GUIHelper.showErrorMessage(getCanvas().getOwner(), "Please apply options first!");
@@ -395,6 +416,14 @@ public class SAM2
     if (lobjsNew.isEmpty()) {
       getLogger().warning("No objects to add!");
       return;
+    }
+
+    // simplify polygons?
+    if (m_ToleranceSimplification >= 1) {
+      simplify = new SimplifyPolygons();
+      simplify.setHighQuality(true);
+      simplify.setTolerance(m_ToleranceSimplification);
+      lobjsNew = simplify.filter(lobjsNew);
     }
 
     prefix = LocatedObjects.DEFAULT_PREFIX;
