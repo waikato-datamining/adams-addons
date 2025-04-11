@@ -292,23 +292,28 @@ public class SAM2
     m_TextMarkerSize = new NumberTextField(NumberTextField.Type.INTEGER, 10);
     m_TextMarkerSize.setCheckModel(new NumberTextField.BoundedNumberCheckModel(NumberTextField.Type.INTEGER, 1, null, getLayerManager().getMarkers().getExtent()));
     m_TextMarkerSize.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
+    m_TextMarkerSize.setToolTipText("The size of markers in pixel when selecting prompt points");
     paramPanel.addParameter("Marker size", m_TextMarkerSize);
 
     m_PanelColor = new ColorChooserPanel(getLayerManager().getMarkers().getColor());
+    m_PanelColor.setToolTipText("The color to use for the markers");
     paramPanel.addParameter("- color", m_PanelColor);
 
     m_ComboBoxModelName = new BaseComboBox<>(SAM2Utils.MODEL_NAMES);
     m_ComboBoxModelName.setSelectedItem(m_ModelName);
+    m_ComboBoxModelName.setToolTipText("The model to use for generating the masks");
     paramPanel.addParameter("Model", m_ComboBoxModelName);
 
     m_TextMinProbabilityDetection = new NumberTextField(Type.DOUBLE, 10);
     m_TextMinProbabilityDetection.setCheckModel(new NumberTextField.BoundedNumberCheckModel(Type.DOUBLE, 0.0, 1.0, m_MinProbabilityDetection));
     m_TextMinProbabilityDetection.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
+    m_TextMinProbabilityDetection.setToolTipText("The minimum probability that detections must have to be considered; ignored if <=0");
     paramPanel.addParameter("Min detection prob", m_TextMinProbabilityDetection);
 
     m_TextMinProbabilityMask = new NumberTextField(Type.FLOAT, 10);
     m_TextMinProbabilityMask.setCheckModel(new NumberTextField.BoundedNumberCheckModel(Type.FLOAT, 0.0f, 1.0f, m_MinProbabilityMask));
     m_TextMinProbabilityMask.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
+    m_TextMinProbabilityMask.setToolTipText("The minimum probability that mask pixels must have to be included; ignored if <=0");
     paramPanel.addParameter("Min mask prob", m_TextMinProbabilityMask);
 
     m_TextMinObjectSize = new NumberTextField(NumberTextField.Type.INTEGER, 10);
