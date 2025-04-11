@@ -239,9 +239,11 @@ public class SAM
     m_TextMarkerSize = new NumberTextField(NumberTextField.Type.INTEGER, 10);
     m_TextMarkerSize.setCheckModel(new NumberTextField.BoundedNumberCheckModel(NumberTextField.Type.INTEGER, 1, null, getLayerManager().getMarkers().getExtent()));
     m_TextMarkerSize.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
+    m_TextMarkerSize.setToolTipText("The size of markers in pixel when selecting prompt points");
     paramPanel.addParameter("Marker size", m_TextMarkerSize);
 
     m_PanelColor = new ColorChooserPanel(getLayerManager().getMarkers().getColor());
+    m_PanelColor.setToolTipText("The color to use for the markers");
     paramPanel.addParameter("- color", m_PanelColor);
 
     m_CheckBoxForeground = new BaseCheckBox();
