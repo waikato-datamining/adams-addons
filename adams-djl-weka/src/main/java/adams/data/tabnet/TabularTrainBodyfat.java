@@ -12,7 +12,7 @@ import java.nio.file.Path;
 public class TabularTrainBodyfat {
 
   public static void main(String[] args) throws Exception {
-    Instances instances = DataSource.read("/home/fracpete/development/datasets/numeric/bodyfat.arff");
+    Instances instances = DataSource.read("src/main/flows/data/bodyfat.arff");
     InstancesDataset dataset = InstancesDataset.builder()
 			    .data(instances)
 			    .setSampling(32, true)

@@ -9,11 +9,11 @@
     <version>25.1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>adams-djl-weka</artifactId>
+  <artifactId>adams-djl</artifactId>
   <packaging>jar</packaging>
 
-  <name>adams-djl-weka</name>
-  <description>Module for using Deep Java Library (DJL) from within Weka.</description>
+  <name>adams-djl</name>
+  <description>Module for using Deep Java Library (DJL) within ADAMS.</description>
   <url>https://adams.cms.waikato.ac.nz/</url>
   <organization>
     <name>University of Waikato, Hamilton, NZ</name>
@@ -59,30 +59,46 @@
 
     <dependency>
       <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-weka</artifactId>
+      <artifactId>adams-groovy</artifactId>
       <version>${adams.version}</version>
     </dependency>
 
     <dependency>
       <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-weka</artifactId>
+      <artifactId>adams-groovy</artifactId>
       <version>${adams.version}</version>
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>
 
     <dependency>
-      <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-djl</artifactId>
-      <version>${adams.version}</version>
+      <groupId>ai.djl</groupId>
+      <artifactId>api</artifactId>
+      <version>${djl.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ai.djl</groupId>
+      <artifactId>basicdataset</artifactId>
+      <version>${djl.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ai.djl</groupId>
+      <artifactId>djl-zero</artifactId>
+      <version>${djl.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ai.djl.pytorch</groupId>
+      <artifactId>pytorch-engine</artifactId>
+      <version>${djl.version}</version>
     </dependency>
 
     <dependency>
       <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-djl</artifactId>
-      <version>${adams.version}</version>
-      <scope>test</scope>
-      <type>test-jar</type>
+      <artifactId>djl-arff</artifactId>
+      <version>0.0.2</version>
     </dependency>
   </dependencies>
 

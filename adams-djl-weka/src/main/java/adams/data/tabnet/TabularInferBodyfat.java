@@ -20,7 +20,7 @@ public class TabularInferBodyfat {
     Model model = Model.newInstance("bodyfat");
 
     // TODO without dataset?
-    Instances instances = DataSource.read("/home/fracpete/development/datasets/numeric/bodyfat.arff");
+    Instances instances = DataSource.read("src/main/flows/data/bodyfat.arff");
     InstancesDataset dataset = InstancesDataset.builder()
 				 .setSampling(32, true)
 				 .data(instances)

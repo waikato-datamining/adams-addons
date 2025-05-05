@@ -1,0 +1,19 @@
+# Configuration file listing the superclasses and the packages in which to
+# look for derived classes.
+#
+# Format:
+# class.name=package1,package2,...
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+
+# the DJL ID generators
+adams.data.djl.idgenerator.IDGenerator=\
+  adams.data.djl.idgenerator
+
+# the DJL network generators
+adams.data.djl.networkgenerator.NetworkGenerator=\
+  adams.data.djl.networkgenerator
+
+# the DJL output directory generators
+adams.data.djl.outputdirgenerator.OutputDirGenerator=\
+  adams.data.djl.outputdirgenerator
