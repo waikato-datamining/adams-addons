@@ -1,0 +1,37 @@
+# Project: adams
+# Date: 2025-05-05 13:23:40
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-djl-weka,adams-excel,adams-groovy,adams-json,adams-math,adams-ml,adams-spreadsheet,adams-visualstats,adams-weka
+#
+adams.flow.control.Flow -annotation "Trains, serializes, deserializes and tests a sklearn model via JepRegressor." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.CallableActors
+  adams.flow.source.WekaClassifierSetup -classifier "weka.classifiers.meta.DJLRegressor -network adams.data.djl.networkgenerator.TabularRegressionGenerator -id \"adams.data.djl.idgenerator.VariableID -id @{djl_id}\" -output-dir \"adams.data.djl.outputdirgenerator.VariableDir -output-dir @{djl_output_dir}\""
+  adams.flow.source.StorageValue -name test_set -storage-name test -conversion adams.data.conversion.UnknownToUnknown
+  adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.SetVariable -name java_model -var-name java_model -var-value ${EXAMPLE_FLOWS}/output/tabnet.model
+ adams.flow.standalone.SetVariable -name djl_output_dir -var-name djl_output_dir -var-value ${EXAMPLE_FLOWS}/output
+ adams.flow.standalone.SetVariable -name djl_id -var-name djl_id -var-value tabnet
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "load data"
+  adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/bolts.arff
+  adams.flow.transformer.WekaFileReader -loader "weka.core.converters.SimpleArffLoader -encoding Default"
+  adams.flow.transformer.WekaClassSelector
+  adams.flow.transformer.WekaRandomSplit -generator weka.classifiers.DefaultRandomSplitGenerator
+  adams.flow.control.ContainerValuePicker -value Train
+   adams.flow.transformer.SetStorageValue -storage-name train
+  adams.flow.control.ContainerValuePicker -name "ContainerValuePicker (2)" -value Test
+   adams.flow.transformer.SetStorageValue -storage-name test
+ adams.flow.control.Trigger -name "train/serialize model"
+  adams.flow.source.StorageValue -storage-name train -conversion adams.data.conversion.UnknownToUnknown
+  adams.flow.transformer.WekaTrainClassifier
+  adams.flow.sink.Serialize -output @{java_model} -writer adams.data.io.output.SerializedObjectWriter
+ adams.flow.control.Trigger -name deserialize
+  adams.flow.source.Variable -var-name java_model -conversion adams.data.conversion.StringToString
+  adams.flow.transformer.Deserialize -reader adams.data.io.input.SerializedObjectReader
+  adams.flow.transformer.SetStorageValue -storage-name model
+ adams.flow.control.Trigger -name evaluate
+  adams.flow.source.StorageValue -storage-name model -conversion adams.data.conversion.UnknownToUnknown
+  adams.flow.transformer.WekaTestSetEvaluator -output weka.classifiers.evaluation.output.prediction.Null -testset test_set
+  adams.flow.transformer.WekaEvaluationSummary
+  adams.flow.sink.CallableSink -callable Display
