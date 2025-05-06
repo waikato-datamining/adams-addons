@@ -20,6 +20,8 @@
 
 package adams.data.djl.idgenerator;
 
+import adams.core.base.BaseString;
+
 /**
  * Expands any variables in the supplied string and returns that as ID.
  *
@@ -31,7 +33,7 @@ public class VariableID
   private static final long serialVersionUID = -8875224901669801709L;
 
   /** the text to use as ID. */
-  protected String m_ID;
+  protected BaseString m_ID;
 
   /**
    * Returns a string describing the object.
@@ -52,7 +54,7 @@ public class VariableID
 
     m_OptionManager.add(
       "id", "ID",
-      "djl");
+      new BaseString("djl"));
   }
 
   /**
@@ -60,7 +62,7 @@ public class VariableID
    *
    * @param value 	the ID
    */
-  public void setID(String value) {
+  public void setID(BaseString value) {
     m_ID = value;
     reset();
   }
@@ -70,7 +72,7 @@ public class VariableID
    *
    * @return 		the ID
    */
-  public String getID() {
+  public BaseString getID() {
     return m_ID;
   }
 
@@ -101,6 +103,6 @@ public class VariableID
    */
   @Override
   public String generate() {
-    return m_FlowContext.getVariables().expand(m_ID);
+    return m_FlowContext.getVariables().expand(m_ID.getValue());
   }
 }

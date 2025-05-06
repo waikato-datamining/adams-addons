@@ -20,6 +20,7 @@
 
 package adams.data.djl.outputdirgenerator;
 
+import adams.core.base.BaseString;
 import adams.core.io.PlaceholderDirectory;
 
 /**
@@ -33,7 +34,7 @@ public class VariableDir
   private static final long serialVersionUID = -8875224901669801709L;
 
   /** the text to use as dir. */
-  protected String m_OutputDir;
+  protected BaseString m_OutputDir;
 
   /**
    * Returns a string describing the object.
@@ -54,7 +55,7 @@ public class VariableDir
 
     m_OptionManager.add(
       "output-dir", "outputDir",
-      ".");
+      new BaseString("."));
   }
 
   /**
@@ -62,7 +63,7 @@ public class VariableDir
    *
    * @param value 	the dir
    */
-  public void setOutputDir(String value) {
+  public void setOutputDir(BaseString value) {
     m_OutputDir = value;
     reset();
   }
@@ -72,7 +73,7 @@ public class VariableDir
    *
    * @return 		the dir
    */
-  public String getOutputDir() {
+  public BaseString getOutputDir() {
     return m_OutputDir;
   }
 
@@ -103,6 +104,6 @@ public class VariableDir
    */
   @Override
   public PlaceholderDirectory generate() {
-    return new PlaceholderDirectory(m_FlowContext.getVariables().expand(m_OutputDir));
+    return new PlaceholderDirectory(m_FlowContext.getVariables().expand(m_OutputDir.getValue()));
   }
 }
