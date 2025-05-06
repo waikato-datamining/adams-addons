@@ -377,11 +377,19 @@ public class DJLRegressor
     Dataset 				validateDataset;
     TrainingConfig 			trainingConfig;
     ZooModel<ListFeatures, Float> 	zooModel;
+    String 				modelID;
+    Path 				modelPath;
 
     getCapabilities().test(data);
     m_Network.setFlowContext(m_FlowContext);
     m_OutputDir.setFlowContext(m_FlowContext);
     m_ID.setFlowContext(m_FlowContext);
+
+    modelID   = m_ID.generate();
+    modelPath = Path.of(m_OutputDir.generate().getAbsolutePath());
+
+    if (isLoggingEnabled())
+      getLogger().info("Training model: " + modelID);
 
     m_Dataset = InstancesDataset.builder()
 		.setSampling(m_BatchSize, true)
@@ -409,8 +417,10 @@ public class DJLRegressor
     m_Translator = m_Dataset.matchingTranslatorOptions().option(ListFeatures.class, Float.class);
     m_Header     = new Instances(data, 0);
 
+    if (isLoggingEnabled())
+      getLogger().info("Saving model '" + modelID + "' to: " + modelPath);
     zooModel = new ZooModel<>(m_Model, m_Translator);
-    zooModel.save(Path.of(m_OutputDir.generate().getAbsolutePath()), m_ID.generate());
+    zooModel.save(modelPath, modelID);
   }
 
   /**
@@ -419,11 +429,20 @@ public class DJLRegressor
    * @param context	the context to use
    */
   public void initPrediction(Actor context) {
+    String 	modelID;
+    Path 	modelPath;
+
     m_FlowContext = context;
     m_Network.setFlowContext(m_FlowContext);
     m_OutputDir.setFlowContext(m_FlowContext);
     m_ID.setFlowContext(m_FlowContext);
+
+    modelID   = m_ID.generate();
+    modelPath = Path.of(m_OutputDir.generate().getAbsolutePath());
+
     if (m_Model == null) {
+      if (isLoggingEnabled())
+	getLogger().info("Loading model '" + modelID + "': " + modelPath);
       try {
 	m_Dataset = InstancesDataset.builder()
 		      .setSampling(m_BatchSize, true)
@@ -431,17 +450,20 @@ public class DJLRegressor
 		      .fromJson(m_DatasetConfig)
 		      .build();
 	m_Translator = m_Dataset.matchingTranslatorOptions().option(ListFeatures.class, Float.class);
-	m_Model = Model.newInstance(m_ID.generate());
+	m_Model = Model.newInstance(modelID);
 	m_Model.setBlock(m_Network.generate(m_Dataset));
-	m_Model.load(Path.of(m_OutputDir.generate().getAbsolutePath()));
+	m_Model.load(modelPath);
       }
       catch (Exception e) {
 	throw new IllegalStateException("Failed to recreate DJL dataset from config!", e);
       }
     }
 
-    if (m_Predictor == null)
+    if (m_Predictor == null) {
+      if (isLoggingEnabled())
+	getLogger().info("Instantiating predictor for model: " + modelID);
       m_Predictor = m_Model.newPredictor(m_Translator);
+    }
   }
 
   /**
