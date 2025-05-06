@@ -442,7 +442,7 @@ public class DJLRegressor
 
     if (m_Model == null) {
       if (isLoggingEnabled())
-	getLogger().info("Loading model '" + modelID + "': " + modelPath);
+	getLogger().info("Loading model '" + modelID + "' from: " + modelPath);
       try {
 	m_Dataset = InstancesDataset.builder()
 		      .setSampling(m_BatchSize, true)
