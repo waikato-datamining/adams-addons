@@ -36,6 +36,32 @@ public class FixedDir
   protected PlaceholderDirectory m_OutputDir;
 
   /**
+   * Default constructor.
+   */
+  public FixedDir() {
+    super();
+  }
+
+  /**
+   * Instantiates the generator and sets the dir to use.
+   *
+   * @param dir		the dir to use
+   */
+  public FixedDir(String dir) {
+    this(new PlaceholderDirectory(dir));
+  }
+
+  /**
+   * Instantiates the generator and sets the dir to use.
+   *
+   * @param dir		the dir to use
+   */
+  public FixedDir(PlaceholderDirectory dir) {
+    super();
+    setOutputDir(dir);
+  }
+
+  /**
    * Returns a string describing the object.
    *
    * @return a description suitable for displaying in the gui

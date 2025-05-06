@@ -37,6 +37,32 @@ public class VariableDir
   protected BaseString m_OutputDir;
 
   /**
+   * Default constructor.
+   */
+  public VariableDir() {
+    super();
+  }
+
+  /**
+   * Instantiates the generator and sets the dir to use.
+   *
+   * @param dir		the dir to use
+   */
+  public VariableDir(String dir) {
+    this(new BaseString(dir));
+  }
+
+  /**
+   * Instantiates the generator and sets the dir to use.
+   *
+   * @param dir		the dir to use
+   */
+  public VariableDir(BaseString dir) {
+    super();
+    setOutputDir(dir);
+  }
+
+  /**
    * Returns a string describing the object.
    *
    * @return a description suitable for displaying in the gui

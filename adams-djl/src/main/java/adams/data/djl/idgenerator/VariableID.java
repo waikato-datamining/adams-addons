@@ -36,6 +36,32 @@ public class VariableID
   protected BaseString m_ID;
 
   /**
+   * Default constructor.
+   */
+  public VariableID() {
+    super();
+  }
+
+  /**
+   * Initializes the generator with the specified ID.
+   *
+   * @param id		the ID to use
+   */
+  public VariableID(String id) {
+    this(new BaseString(id));
+  }
+
+  /**
+   * Initializes the generator with the specified ID.
+   *
+   * @param id		the ID to use
+   */
+  public VariableID(BaseString id) {
+    super();
+    setID(id);
+  }
+
+  /**
    * Returns a string describing the object.
    *
    * @return a description suitable for displaying in the gui

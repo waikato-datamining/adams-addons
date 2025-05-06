@@ -39,6 +39,32 @@ public class StringExpressionID
   protected StringExpressionText m_ID;
 
   /**
+   * Default constructor.
+   */
+  public StringExpressionID() {
+    super();
+  }
+
+  /**
+   * Initializes the generator with the specified ID.
+   *
+   * @param id		the ID to use
+   */
+  public StringExpressionID(String id) {
+    this(new StringExpressionText(id));
+  }
+
+  /**
+   * Initializes the generator with the specified ID.
+   *
+   * @param id		the ID to use
+   */
+  public StringExpressionID(StringExpressionText id) {
+    super();
+    setID(id);
+  }
+
+  /**
    * Returns a string describing the object.
    *
    * @return a description suitable for displaying in the gui

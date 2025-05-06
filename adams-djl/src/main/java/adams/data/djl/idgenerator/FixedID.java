@@ -34,6 +34,23 @@ public class FixedID
   protected String m_ID;
 
   /**
+   * Default constructor.
+   */
+  public FixedID() {
+    super();
+  }
+
+  /**
+   * Instantiates the generator and sets the ID to use.
+   *
+   * @param id		the ID to use
+   */
+  public FixedID(String id) {
+    super();
+    setID(id);
+  }
+
+  /**
    * Returns a string describing the object.
    *
    * @return a description suitable for displaying in the gui

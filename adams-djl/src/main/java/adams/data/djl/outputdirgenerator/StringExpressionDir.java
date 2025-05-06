@@ -40,6 +40,32 @@ public class StringExpressionDir
   protected StringExpressionText m_OutputDir;
 
   /**
+   * Default constructor.
+   */
+  public StringExpressionDir() {
+    super();
+  }
+
+  /**
+   * Instantiates the generator and sets the expression to use.
+   *
+   * @param exp		the expression to use
+   */
+  public StringExpressionDir(String exp) {
+    this(new StringExpressionText(exp));
+  }
+
+  /**
+   * Instantiates the generator and sets the expression to use.
+   *
+   * @param exp		the expression to use
+   */
+  public StringExpressionDir(StringExpressionText exp) {
+    super();
+    setOutputDir(exp);
+  }
+
+  /**
    * Returns a string describing the object.
    *
    * @return a description suitable for displaying in the gui
