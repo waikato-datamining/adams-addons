@@ -15,7 +15,7 @@
 
 /*
  * AbstractProcessMOAInstanceWithModel.java
- * Copyright (C) 2011-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.transformer;
 
@@ -371,10 +371,7 @@ public abstract class AbstractProcessMOAInstanceWithModel<T>
     String	result;
     String	value;
 
-    result  = QuickInfoHelper.toString(this, "modelLoadingType", getModelLoadingType(), "type: ");
-    result += QuickInfoHelper.toString(this, "modelFile", getModelFile(), ", model: ");
-    result += QuickInfoHelper.toString(this, "modelSource", getModelActor(), ", source: ");
-    result += QuickInfoHelper.toString(this, "modelStorage", getModelStorage(), ", storage: ");
+    result = m_ModelLoader.getQuickInfo(this);
     value  = QuickInfoHelper.toString(this, "modelResetVariable", (m_UseModelResetVariable ? "reset: " + m_ModelResetVariable : ""));
     if (value != null)
       result += ", " + value;
