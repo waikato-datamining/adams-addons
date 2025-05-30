@@ -129,8 +129,6 @@ public class InstancesDataset extends TabularDataset {
 
     protected Set<String> ignoredColumns;
 
-    protected boolean classAdded;
-
     protected boolean allFeaturesAdded;
 
     protected Set<String> matchingFeaturesAdded;
