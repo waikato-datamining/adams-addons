@@ -46,6 +46,7 @@ import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.Utils;
 import weka.djl.InstancesDataset;
 
 import java.nio.file.Path;
@@ -68,7 +69,7 @@ public class DJLRegressor
   protected int m_TrainPercentage;
 
   /** the batchsize. */
-  protected int m_BatchSize;
+  protected int m_MiniBatchSize;
 
   /** the number of epochs to train. */
   protected int m_NumEpochs;
@@ -126,7 +127,7 @@ public class DJLRegressor
       80, 1, 99);
 
     m_OptionManager.add(
-      "batch-size", "batchSize",
+      "mini-batch-size", "miniBatchSize",
       32, 1, null);
 
     m_OptionManager.add(
@@ -207,9 +208,9 @@ public class DJLRegressor
    *
    * @param value 	the batch size
    */
-  public void setBatchSize(int value) {
-    if (getOptionManager().isValid("batchSize", value)) {
-      m_BatchSize = value;
+  public void setMiniBatchSize(int value) {
+    if (getOptionManager().isValid("miniBatchSize", value)) {
+      m_MiniBatchSize = value;
       reset();
     }
   }
@@ -219,8 +220,8 @@ public class DJLRegressor
    *
    * @return 		the batch size
    */
-  public int getBatchSize() {
-    return m_BatchSize;
+  public int getMiniBatchSize() {
+    return m_MiniBatchSize;
   }
 
   /**
@@ -229,7 +230,7 @@ public class DJLRegressor
    * @return		tip text for this property suitable for
    * 			displaying in the explorer/experimenter gui
    */
-  public String batchSizeTipText() {
+  public String miniBatchSizeTipText() {
     return "The batch size to use.";
   }
 
@@ -392,7 +393,7 @@ public class DJLRegressor
       getLogger().info("Training model: " + modelID);
 
     m_Dataset = InstancesDataset.builder()
-		.setSampling(m_BatchSize, true)
+		.setSampling(m_MiniBatchSize, true)
 		.data(data)
 		.addAllFeatures()
 		.build();
@@ -445,7 +446,7 @@ public class DJLRegressor
 	getLogger().info("Loading model '" + modelID + "' from: " + modelPath);
       try {
 	m_Dataset = InstancesDataset.builder()
-		      .setSampling(m_BatchSize, true)
+		      .setSampling(m_MiniBatchSize, true)
 		      .data(m_Header)
 		      .fromJson(m_DatasetConfig)
 		      .build();
@@ -495,6 +496,26 @@ public class DJLRegressor
     }
     pred = m_Predictor.predict(input);
     return pred.doubleValue();
+  }
+
+  /**
+   * Returns a short description of the setup.
+   *
+   * @return		the description
+   */
+  @Override
+  public String toString() {
+    StringBuilder	result;
+
+    result = new StringBuilder();
+    result.append("Network generator...: ").append(Utils.toCommandLine(getNetwork())).append("\n");
+    result.append("Train %.............: ").append(getTrainPercentage()).append("\n");
+    result.append("Mini batch size.....: ").append(getMiniBatchSize()).append("\n");
+    result.append("# epochs............: ").append(getNumEpochs()).append("\n");
+    result.append("ID generator........: ").append(Utils.toCommandLine(getID())).append("\n");
+    result.append("Output dir generator: ").append(Utils.toCommandLine(getOutputDir())).append("\n");
+
+    return result.toString();
   }
 
   /**
