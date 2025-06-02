@@ -49,6 +49,7 @@ import weka.core.Instances;
 import weka.core.Utils;
 import weka.djl.InstancesDataset;
 
+import java.io.File;
 import java.nio.file.Path;
 
 /**
@@ -379,6 +380,7 @@ public class DJLRegressor
     TrainingConfig 			trainingConfig;
     ZooModel<ListFeatures, Float> 	zooModel;
     String 				modelID;
+    File				modelDir;
     Path 				modelPath;
 
     getCapabilities().test(data);
@@ -387,7 +389,16 @@ public class DJLRegressor
     m_ID.setFlowContext(m_FlowContext);
 
     modelID   = m_ID.generate();
-    modelPath = Path.of(m_OutputDir.generate().getAbsolutePath());
+    modelDir  = m_OutputDir.generate();
+    modelPath = Path.of(modelDir.getAbsolutePath());
+
+    // delete any left-over .params files
+    for (File f: modelDir.listFiles()) {
+      if (f.getName().matches("^" + modelID + "-[0-9]+.params$")) {
+	if (isLoggingEnabled())
+	  getLogger().info("Removing: " + f);
+      }
+    }
 
     if (isLoggingEnabled())
       getLogger().info("Training model: " + modelID);
