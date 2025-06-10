@@ -21,7 +21,6 @@
 package adams.gui.flow.menu.git;
 
 import adams.gui.action.AbstractBaseAction;
-import adams.gui.flow.FlowPanelNotificationArea.NotificationType;
 
 import javax.swing.SwingWorker;
 import java.awt.event.ActionEvent;
@@ -53,7 +52,7 @@ public class Pull
 	    String pullMsg = m_Operation.pull();
 	    if (pullMsg != null) {
 	      getLogger().info(pullMsg);
-	      getOwner().getCurrentPanel().showNotification(pullMsg, NotificationType.INFO);
+	      getOwner().getCurrentPanel().showNotification(pullMsg, "git.png");
 	    }
 	    return null;
 	  }

@@ -21,7 +21,6 @@
 package adams.gui.flow.menu.git;
 
 import adams.gui.action.AbstractBaseAction;
-import adams.gui.flow.FlowPanelNotificationArea.NotificationType;
 
 import javax.swing.SwingWorker;
 import java.awt.event.ActionEvent;
@@ -52,7 +51,7 @@ public class Log
 	  protected Object doInBackground() throws Exception {
 	    String logMsg = m_Operation.log(m_Owner.getCurrentFile());
 	    getLogger().info(logMsg);
-	    getOwner().getCurrentPanel().showNotification(logMsg, NotificationType.INFO);
+	    getOwner().getCurrentPanel().showNotification(logMsg, "git.png");
 	    return null;
 	  }
 	};

@@ -21,7 +21,6 @@
 package adams.gui.flow.menu.git;
 
 import adams.gui.action.AbstractBaseAction;
-import adams.gui.flow.FlowPanelNotificationArea.NotificationType;
 
 import javax.swing.SwingWorker;
 import java.awt.event.ActionEvent;
@@ -53,7 +52,7 @@ public class Rollback
 	    if (m_Operation.rollback(m_Owner.getCurrentFile())) {
 	      String msg = "Rolled back:\n" + m_Owner.getCurrentFile().getAbsolutePath();
 	      getLogger().info(msg);
-	      getOwner().getCurrentPanel().showNotification(msg, NotificationType.INFO);
+	      getOwner().getCurrentPanel().showNotification(msg, "git.png");
 	      getOwner().getCurrentPanel().revert();
 	    }
 	    return null;

@@ -24,7 +24,6 @@ import adams.core.git.GitSettingsHelper;
 import adams.gui.action.AbstractBaseAction;
 import adams.gui.core.GUIHelper;
 import adams.gui.dialog.ApprovalDialog;
-import adams.gui.flow.FlowPanelNotificationArea.NotificationType;
 
 import javax.swing.SwingWorker;
 import java.awt.event.ActionEvent;
@@ -78,7 +77,7 @@ public class Commit
 	    String commitMsg = m_Operation.commit(m_Owner.getCurrentFile(), fUser, fEmail, msg);
 	    if (commitMsg != null) {
 	      getLogger().info(commitMsg);
-	      getOwner().getCurrentPanel().showNotification(commitMsg, NotificationType.INFO);
+	      getOwner().getCurrentPanel().showNotification(commitMsg, "git.png");
 	    }
 	    return null;
 	  }
