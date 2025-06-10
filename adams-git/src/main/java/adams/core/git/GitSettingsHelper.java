@@ -15,7 +15,7 @@
 
 /*
  * GitSettingsHelper.java
- * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2024-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.core.git;
 
@@ -179,13 +179,20 @@ public class GitSettingsHelper {
    * @return		the global user, empty string if not available
    */
   public String getGlobalUser() {
+    String	result;
+
     try {
-      return SystemReader.getInstance().getUserConfig().getString("user", null, "name");
+      result = SystemReader.getInstance().getUserConfig().getString("user", null, "name");
     }
     catch (Exception e) {
       // ignored
       return "";
     }
+
+    if (result == null)
+      result = "";
+
+    return result;
   }
 
   /**
@@ -219,13 +226,20 @@ public class GitSettingsHelper {
    * @return		the global email, empty string if not available
    */
   public String getGlobalEmail() {
+    String	result;
+
     try {
-      return SystemReader.getInstance().getUserConfig().getString("user", null, "email");
+      result = SystemReader.getInstance().getUserConfig().getString("user", null, "email");
     }
     catch (Exception e) {
       // ignored
       return "";
     }
+
+    if (result == null)
+      result = "";
+
+    return result;
   }
 
   /**
