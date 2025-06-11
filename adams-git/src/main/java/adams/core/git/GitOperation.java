@@ -21,14 +21,18 @@
 package adams.core.git;
 
 import adams.core.MessageCollection;
+import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.core.logging.CustomLoggingLevelObject;
 import adams.gui.core.GUIHelper;
+import org.eclipse.jgit.api.AddCommand;
+import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullCommand;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.Status;
+import org.eclipse.jgit.api.StatusCommand;
 import org.eclipse.jgit.api.TransportCommand;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -383,30 +387,7 @@ public class GitOperation
    * @return		true if can be added
    */
   public boolean canAdd(File file, MessageCollection errors) {
-    Status 	status;
-    String 	relPath;
-    String	msg;
-
-    if (!canProceed()) {
-      if (errors != null)
-	errors. add("Not configured, cannot proceed!");
-      return false;
-    }
-
-    relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), file);
-    try {
-      status = m_Git.status()
-		 .addPath(relPath)
-		 .call();
-      return status.getUntracked().contains(relPath);
-    }
-    catch (Exception e) {
-      msg = "Failed to query status of repo!";
-      if (errors != null)
-	errors.add(msg);
-      getLogger().log(Level.SEVERE, msg, e);
-    }
-    return false;
+    return canAdd(new File[]{file}, errors);
   }
 
   /**
@@ -427,9 +408,35 @@ public class GitOperation
    * @return		true if successful
    */
   public boolean add(File file, MessageCollection errors) {
-    String 	absPath;
-    String 	relPath;
-    String	msg;
+    return add(new File[]{file}, errors);
+  }
+
+  /**
+   * Checks whether the files can be added.
+   *
+   * @param files	the files to check
+   * @return		true if can be added
+   */
+  public boolean canAdd(File[] files) {
+    return canAdd(files, null);
+  }
+
+  /**
+   * Checks whether the files can be added.
+   *
+   * @param files	the files to check
+   * @param errors	for collecting errors, can be null
+   * @return		true if can be added
+   */
+  public boolean canAdd(File[] files, MessageCollection errors) {
+    StatusCommand	cmd;
+    Status 		status;
+    String[] 		relPaths;
+    String		msg;
+    boolean		contained;
+
+    if ((files == null) || (files.length == 0))
+      return false;
 
     if (!canProceed()) {
       if (errors != null)
@@ -437,17 +444,70 @@ public class GitOperation
       return false;
     }
 
-    absPath = file.getAbsolutePath();
-    relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), file);
+    relPaths = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), files);
+    try {
+      cmd = m_Git.status();
+      for (String relPath: relPaths)
+	cmd.addPath(relPath);
+      status = cmd.call();
+      contained = false;
+      for (String relPath: relPaths)
+	contained = contained || status.getUntracked().contains(relPath);
+      return contained;
+    }
+    catch (Exception e) {
+      msg = "Failed to query status of repo!";
+      if (errors != null)
+	errors.add(msg);
+      getLogger().log(Level.SEVERE, msg, e);
+    }
+    return false;
+  }
+
+  /**
+   * Adds the specified files.
+   *
+   * @param files	the files to add
+   * @return		true if successful
+   */
+  public boolean add(File[] files) {
+    return add(files, null);
+  }
+
+  /**
+   * Adds the specified files.
+   *
+   * @param files	the files to add
+   * @param errors 	for storing errors, can be null
+   * @return		true if successful
+   */
+  public boolean add(File[] files, MessageCollection errors) {
+    String[] 	absPaths;
+    String[] 	relPaths;
+    AddCommand	cmd;
+    String	msg;
+    int		i;
+
+    if (!canProceed()) {
+      if (errors != null)
+	errors. add("Not configured, cannot proceed!");
+      return false;
+    }
+
+    absPaths = new String[files.length];
+    for (i = 0; i < files.length; i++)
+      absPaths[i] = files[i].getAbsolutePath();
+    relPaths = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), files);
 
     try {
-      m_Git.add()
-	.addFilepattern(relPath)
-	.call();
+      cmd = m_Git.add();
+      for (String relPath: relPaths)
+	cmd.addFilepattern(relPath);
+      cmd.call();
       return true;
     }
     catch (Exception e) {
-      msg = "Failed to add: " + absPath;
+      msg = "Failed to add:\n" + Utils.flatten(absPaths, "\n");
       if (errors != null)
 	errors.add(msg, e);
       getLogger().log(Level.SEVERE, msg, e);
@@ -476,30 +536,7 @@ public class GitOperation
    * @return		true if can be committed
    */
   public boolean canCommit(File file, MessageCollection errors) {
-    Status 	status;
-    String 	relPath;
-    String	msg;
-
-    if (!canProceed()) {
-      if (errors != null)
-	errors. add("Not configured, cannot proceed!");
-      return false;
-    }
-
-    relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), file);
-    try {
-      status = m_Git.status()
-		 .addPath(relPath)
-		 .call();
-      return status.getModified().contains(relPath) || status.getAdded().contains(relPath);
-    }
-    catch (Exception e) {
-      msg = "Failed to query status of repo!";
-      if (errors != null)
-	errors.add(msg, e);
-      getLogger().log(Level.SEVERE, msg, e);
-    }
-    return false;
+    return canCommit(new File[]{file}, errors);
   }
 
   /**
@@ -526,10 +563,91 @@ public class GitOperation
    * @return		the result string of the commit, null if failed
    */
   public String commit(File file, String user, String email, String message, MessageCollection errors) {
-    String	result;
-    String	msg;
-    RevCommit 	resultCommit;
-    String	relPath;
+    return commit(new File[]{file}, user, email, message, errors);
+  }
+
+  /**
+   * Checks whether files can be committed.
+   *
+   * @param files	the files to check
+   * @return		true if can be committed
+   */
+  public boolean canCommit(File[] files) {
+    return canCommit(files, null);
+  }
+
+  /**
+   * Checks whether files can be committed.
+   *
+   * @param files	the files to check
+   * @param errors	for collecting errors, can be null
+   * @return		true if can be committed
+   */
+  public boolean canCommit(File[] files, MessageCollection errors) {
+    Status 		status;
+    String[] 		relPaths;
+    StatusCommand	cmd;
+    String		msg;
+    boolean		contained;
+
+    if ((files == null) || (files.length == 0))
+      return false;
+
+    if (!canProceed()) {
+      if (errors != null)
+	errors. add("Not configured, cannot proceed!");
+      return false;
+    }
+
+    relPaths = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), files);
+    try {
+      cmd = m_Git.status();
+      for (String relPath: relPaths)
+	cmd.addPath(relPath);
+      status = cmd.call();
+      contained = false;
+      for (String relPath: relPaths)
+	contained = contained || status.getModified().contains(relPath) || status.getAdded().contains(relPath);
+      return contained;
+    }
+    catch (Exception e) {
+      msg = "Failed to query status of repo!";
+      if (errors != null)
+	errors.add(msg, e);
+      getLogger().log(Level.SEVERE, msg, e);
+    }
+    return false;
+  }
+
+  /**
+   * Commits the specified files.
+   *
+   * @param files	the files to commit
+   * @param user	the user to use in the commit
+   * @param email	the email to use in the commit
+   * @param message	the commit message
+   * @return		the result string of the commit, null if failed
+   */
+  public String commit(File[] files, String user, String email, String message) {
+    return commit(files, user, email, message, null);
+  }
+
+  /**
+   * Commits the specified files.
+   *
+   * @param files	the files to commit
+   * @param user	the user to use in the commit
+   * @param email	the email to use in the commit
+   * @param message	the commit message
+   * @param errors 	for storing errors, can be null
+   * @return		the result string of the commit, null if failed
+   */
+  public String commit(File[] files, String user, String email, String message, MessageCollection errors) {
+    String		result;
+    CommitCommand	cmd;
+    String		msg;
+    RevCommit 		resultCommit;
+    String[] 		relPaths;
 
     if (!canProceed()) {
       if (errors != null)
@@ -537,18 +655,20 @@ public class GitOperation
       return null;
     }
 
-    result  = null;
-    relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), file);
+    result   = null;
+    relPaths = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), files);
     try {
-      resultCommit = m_Git.commit()
-		       .setOnly(relPath)
+      cmd = m_Git.commit();
+      for (String relPath: relPaths)
+	cmd.setOnly(relPath);
+      resultCommit = cmd
 		       .setCommitter(user, email)
 		       .setMessage(message)
 		       .call();
       result = GitHelper.format(resultCommit, GitHelper.FORMAT_REVCOMMIT_LONG);
     }
     catch (Exception e) {
-      msg = "Failed to commit: " + relPath;
+      msg = "Failed to commit: " + Utils.flatten(relPaths, ", ");
       if (errors != null)
 	errors.add(msg, e);
       getLogger().log(Level.SEVERE, msg, e);
@@ -576,30 +696,7 @@ public class GitOperation
    * @return		true if rollback possible
    */
   public boolean canRollback(File file, MessageCollection errors) {
-    String	relPath;
-    Status 	status;
-    String	msg;
-
-    if (!canProceed()) {
-      if (errors != null)
-	errors. add("Not configured, cannot proceed!");
-      return false;
-    }
-
-    relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), file);
-    try {
-      status = m_Git.status()
-		 .addPath(relPath)
-		 .call();
-      return status.getModified().contains(relPath) || status.getAdded().contains(relPath);
-    }
-    catch (Exception e) {
-      msg = "Failed to query status of repo!";
-      if (errors != null)
-	errors.add(msg, e);
-      getLogger().log(Level.SEVERE, msg, e);
-    }
-    return false;
+    return canRollback(new File[]{file}, errors);
   }
 
   /**
@@ -620,9 +717,35 @@ public class GitOperation
    * @return		true if successfully rolled back
    */
   public boolean rollback(File file, MessageCollection errors) {
-    String	relPath;
-    Status 	status;
-    String	msg;
+    return rollback(new File[]{file}, errors);
+  }
+
+  /**
+   * Checks whether files can be rolled back.
+   *
+   * @param files	the files to roll back
+   * @return		true if rollback possible
+   */
+  public boolean canRollback(File[] files) {
+    return canRollback(files, null);
+  }
+
+  /**
+   * Checks whether files can be rolled back.
+   *
+   * @param files	the files to roll back
+   * @param errors	for collecting errors, can be null
+   * @return		true if rollback possible
+   */
+  public boolean canRollback(File[] files, MessageCollection errors) {
+    String[] 		relPaths;
+    StatusCommand	cmd;
+    Status 		status;
+    String		msg;
+    boolean		contained;
+
+    if ((files == null) || (files.length == 0))
+      return false;
 
     if (!canProceed()) {
       if (errors != null)
@@ -630,25 +753,80 @@ public class GitOperation
       return false;
     }
 
-    relPath = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), file);
+    relPaths = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), files);
+    try {
+      cmd = m_Git.status();
+      for (String relPath: relPaths)
+	cmd.addPath(relPath);
+      status = cmd.call();
+      contained = false;
+      for (String relPath: relPaths)
+	contained = contained || status.getModified().contains(relPath) || status.getAdded().contains(relPath);
+      return contained;
+    }
+    catch (Exception e) {
+      msg = "Failed to query status of repo!";
+      if (errors != null)
+	errors.add(msg, e);
+      getLogger().log(Level.SEVERE, msg, e);
+    }
+    return false;
+  }
+
+  /**
+   * Performs a rollback on files.
+   *
+   * @param files	the files to revert the changes for
+   * @return		true if successfully rolled back
+   */
+  public boolean rollback(File[] files) {
+    return rollback(files, null);
+  }
+
+  /**
+   * Performs a rollback on files.
+   *
+   * @param files	the files to revert the changes for
+   * @param errors	for collecting errors, can be null
+   * @return		true if successfully rolled back
+   */
+  public boolean rollback(File[] files, MessageCollection errors) {
+    String[] 		relPaths;
+    StatusCommand	cmd;
+    Status 		status;
+    String		msg;
+
+    if ((files == null) || (files.length == 0))
+      return false;
+
+    if (!canProceed()) {
+      if (errors != null)
+	errors. add("Not configured, cannot proceed!");
+      return false;
+    }
+
+    relPaths = FileUtils.relativePath(m_Git.getRepository().getWorkTree(), files);
 
     try {
-      status = m_Git.status()
-		 .addPath(relPath)
-		 .call();
-      if (status.getAdded().contains(relPath))
-	m_Git.reset().setRef(Constants.HEAD).addPath(relPath).call();
-      else
-	m_Git.checkout().addPath(relPath).call();
+      cmd = m_Git.status();
+      for (String relPath: relPaths)
+	cmd.addPath(relPath);
+      status = cmd.call();
+      for (String relPath: relPaths) {
+	if (status.getAdded().contains(relPath))
+	  m_Git.reset().setRef(Constants.HEAD).addPath(relPath).call();
+	else
+	  m_Git.checkout().addPath(relPath).call();
+      }
       return true;
     }
     catch (Exception e) {
-      msg = "Failed to roll back: " + relPath;
+      msg = "Failed to roll back: " + Utils.flatten(relPaths, ", ");
       if (errors != null)
 	errors.add(msg, e);
       getLogger().log(Level.SEVERE, msg, e);
       if (getShowErrors())
-	GUIHelper.showErrorMessage(m_Parent, "Failed to roll back:\n" + relPath, e);
+	GUIHelper.showErrorMessage(m_Parent, "Failed to roll back:\n" + Utils.flatten(relPaths, ", "), e);
     }
     return false;
   }
