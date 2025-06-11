@@ -15,7 +15,7 @@
 
 /*
  * GitSubMenu.java
- * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2024-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.flow.menu;
@@ -158,7 +158,8 @@ public class GitSubMenu
       git = null;
       if (GitSession.getSingleton().isWithinRepo(m_Owner.getCurrentFile())) {
 	git = GitSession.getSingleton().repoFor(m_Owner.getCurrentFile());
-	getLogger().info("git repo dir: " + git.getRepository().getWorkTree());
+	if (git != null)
+	  getLogger().info("git repo dir: " + git.getRepository().getWorkTree());
       }
 
       for (AbstractFlowEditorGitMenuItem menuitem : m_MenuItems) {
