@@ -15,7 +15,7 @@
 
 /*
  * GitSession.java
- * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2024-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.core.git;
@@ -100,12 +100,14 @@ public class GitSession
     Git		result;
     String 	pathStr;
     String	parentStr;
+    String	parentStrSlash;
 
     result  = null;
     pathStr = FileUtils.useForwardSlashes(path.getAbsolutePath());
     for (File parent: m_Repos.keySet()) {
-      parentStr = FileUtils.useForwardSlashes(parent.getAbsolutePath()) + "/";
-      if (pathStr.startsWith(parentStr)) {
+      parentStr      = FileUtils.useForwardSlashes(parent.getAbsolutePath());
+      parentStrSlash = parentStr + "/";
+      if (pathStr.startsWith(parentStrSlash) || pathStr.equals(parentStr)) {
 	result = m_Repos.get(parent);
 	break;
       }
