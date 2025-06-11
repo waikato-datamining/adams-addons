@@ -50,6 +50,8 @@ public class Log
 	  @Override
 	  protected Object doInBackground() throws Exception {
 	    String logMsg = m_Operation.log(m_Owner.getCurrentFile());
+	    if (logMsg == null)
+	      logMsg = "No log message available!";
 	    getLogger().info(logMsg);
 	    getOwner().getCurrentPanel().showNotification(logMsg, "git.png");
 	    return null;
