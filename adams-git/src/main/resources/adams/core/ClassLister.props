@@ -9,3 +9,7 @@
 # menuitems in the git sub-menu of the flow editor
 adams.gui.flow.menu.git.AbstractFlowEditorGitMenuItem=\
   adams.gui.flow.menu.git
+
+# the action plugins for the FileCommander
+adams.gui.tools.filecommander.AbstractFileCommanderAction=\
+  adams.gui.tools.filecommander.git
