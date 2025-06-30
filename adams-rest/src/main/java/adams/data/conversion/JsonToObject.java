@@ -19,8 +19,10 @@
  */
 package adams.data.conversion;
 
+import adams.core.LenientModeSupporter;
 import adams.core.QuickInfoHelper;
 import adams.core.base.BaseClassname;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
@@ -35,6 +37,7 @@ import java.util.HashMap;
  * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
+ * &nbsp;&nbsp;&nbsp;min-user-mode: Expert
  * </pre>
  *
  * <pre>-classname &lt;adams.core.base.BaseClassname&gt; (property: classname)
@@ -42,18 +45,27 @@ import java.util.HashMap;
  * &nbsp;&nbsp;&nbsp;default: java.util.HashMap
  * </pre>
  *
+ * <pre>-lenient &lt;boolean&gt; (property: lenient)
+ * &nbsp;&nbsp;&nbsp;If enabled, unknown properties won't cause an error.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class JsonToObject
-  extends AbstractConversionFromString {
+  extends AbstractConversionFromString
+  implements LenientModeSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = 1383459505178870114L;
 
   /** the class to map the json to. */
   protected BaseClassname m_Classname;
+
+  /** whether to use lenient mode. */
+  protected boolean m_Lenient;
 
   /** the mapper instance to use. */
   protected transient ObjectMapper m_Mapper;
@@ -77,6 +89,10 @@ public class JsonToObject
     m_OptionManager.add(
       "classname", "classname",
       new BaseClassname(HashMap.class));
+
+    m_OptionManager.add(
+      "lenient", "lenient",
+      false);
   }
 
   /**
@@ -109,13 +125,52 @@ public class JsonToObject
   }
 
   /**
+   * Sets whether to parse JSON in lenient mode or not.
+   * Latter will raise an exception if unknown properties are encountered.
+   *
+   * @param value 	true if lenient
+   */
+  @Override
+  public void setLenient(boolean value) {
+    m_Lenient = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to parse JSON in lenient mode or not.
+   * Latter will raise an exception if unknown properties are encountered.
+   *
+   * @return 		true if lenient
+   */
+  @Override
+  public boolean getLenient() {
+    return m_Lenient;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  @Override
+  public String lenientTipText() {
+    return "If enabled, unknown properties won't cause an error.";
+  }
+
+  /**
    * Returns a quick info about the object, which can be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "classname", m_Classname);
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "classname", m_Classname);
+    result += QuickInfoHelper.toString(this, "lenient", m_Lenient, "lenient", ", ");
+
+    return result;
   }
 
   /**
@@ -135,8 +190,10 @@ public class JsonToObject
    * @throws Exception	if something goes wrong with the conversion
    */
   protected Object doConvert() throws Exception {
-    if (m_Mapper == null)
+    if (m_Mapper == null) {
       m_Mapper = new ObjectMapper();
+      m_Mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, !m_Lenient);
+    }
 
     return m_Mapper.readValue((String) m_Input, m_Classname.classValue());
   }
