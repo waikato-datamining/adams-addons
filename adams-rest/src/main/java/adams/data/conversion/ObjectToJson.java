@@ -19,6 +19,7 @@
  */
 package adams.data.conversion;
 
+import adams.core.annotation.DeprecatedClass;
 import adams.flow.core.Unknown;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,6 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
+@DeprecatedClass(useInstead = ObjectToString.class)
 public class ObjectToJson
   extends AbstractConversionToString {
 

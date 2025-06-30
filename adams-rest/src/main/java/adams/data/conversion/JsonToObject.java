@@ -21,6 +21,7 @@ package adams.data.conversion;
 
 import adams.core.LenientModeSupporter;
 import adams.core.QuickInfoHelper;
+import adams.core.annotation.DeprecatedClass;
 import adams.core.base.BaseClassname;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,6 +55,7 @@ import java.util.HashMap;
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
+@DeprecatedClass(useInstead = StringToObject.class)
 public class JsonToObject
   extends AbstractConversionFromString
   implements LenientModeSupporter {
