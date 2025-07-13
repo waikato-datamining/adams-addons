@@ -27,7 +27,7 @@ import adams.data.report.Report;
 import adams.flow.transformer.locateobjects.LocatedObject;
 import adams.flow.transformer.locateobjects.LocatedObjects;
 import adams.flow.transformer.locateobjects.ObjectPrefixHandler;
-import adams.gui.chooser.ColorChooserPanel;
+import adams.gui.core.BaseColorTextField;
 import adams.gui.core.ImageManager;
 import adams.gui.core.NumberTextField;
 import adams.gui.core.ParameterPanel;
@@ -61,7 +61,7 @@ public class DEXTR
   protected NumberTextField m_TextMarkerSize;
 
   /** the marker color. */
-  protected ColorChooserPanel m_PanelColor;
+  protected BaseColorTextField m_PanelColor;
 
   /** the minimum object size (width/height). */
   protected NumberTextField m_TextMinObjectSize;
@@ -215,7 +215,7 @@ public class DEXTR
     super.retrieveParameters();
 
     m_MarkerSize    = m_TextMarkerSize.getValue().intValue();
-    m_MarkerColor   = m_PanelColor.getCurrent();
+    m_MarkerColor   = m_PanelColor.getColor();
     m_MinObjectSize = m_TextMinObjectSize.getValue().intValue();
     m_MaxObjectSize = m_TextMaxObjectSize.getValue().intValue();
     m_Annotator.setColor(m_MarkerColor);
@@ -255,7 +255,7 @@ public class DEXTR
     m_TextMarkerSize.setToolTipText("The size of markers in pixel when selecting extreme points");
     paramPanel.addParameter("Marker size", m_TextMarkerSize);
 
-    m_PanelColor = new ColorChooserPanel(m_Annotator.getColor());
+    m_PanelColor = new BaseColorTextField(m_Annotator.getColor());
     m_PanelColor.setToolTipText("The color to use for the markers");
     paramPanel.addParameter("- color", m_PanelColor);
 
