@@ -15,7 +15,7 @@
 
 /*
  * SAM.java
- * Copyright (C) 2023 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2023-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.segmentation.tool;
@@ -24,8 +24,8 @@ import adams.core.MessageCollection;
 import adams.data.image.BufferedImageHelper;
 import adams.data.redis.RedisDataType;
 import adams.data.statistics.StatUtils;
-import adams.gui.chooser.ColorChooserPanel;
 import adams.gui.core.BaseCheckBox;
+import adams.gui.core.BaseColorTextField;
 import adams.gui.core.ImageManager;
 import adams.gui.core.KeyUtils;
 import adams.gui.core.MouseUtils;
@@ -60,7 +60,7 @@ public class SAM
   protected NumberTextField m_TextMarkerSize;
 
   /** the marker color. */
-  protected ColorChooserPanel m_PanelColor;
+  protected BaseColorTextField m_TextMarkerColor;
 
   /** whether foreground or background. */
   protected BaseCheckBox m_CheckBoxForeground;
@@ -191,7 +191,7 @@ public class SAM
     super.retrieveParameters();
 
     m_MarkerSize  = m_TextMarkerSize.getValue().intValue();
-    m_MarkerColor = m_PanelColor.getCurrent();
+    m_MarkerColor = m_TextMarkerColor.getColor();
     m_Foreground  = m_CheckBoxForeground.isSelected();
     getLayerManager().getMarkers().setExtent(m_MarkerSize);
     getLayerManager().getMarkers().setColor(m_MarkerColor);
@@ -242,9 +242,10 @@ public class SAM
     m_TextMarkerSize.setToolTipText("The size of markers in pixel when selecting prompt points");
     paramPanel.addParameter("Marker size", m_TextMarkerSize);
 
-    m_PanelColor = new ColorChooserPanel(getLayerManager().getMarkers().getColor());
-    m_PanelColor.setToolTipText("The color to use for the markers");
-    paramPanel.addParameter("- color", m_PanelColor);
+    m_TextMarkerColor = new BaseColorTextField(getLayerManager().getMarkers().getColor());
+    m_TextMarkerColor.addAnyChangeListener((ChangeEvent e) -> setApplyButtonState(m_ButtonApply, true));
+    m_TextMarkerColor.setToolTipText("The color to use for the markers");
+    paramPanel.addParameter("- color", m_TextMarkerColor);
 
     m_CheckBoxForeground = new BaseCheckBox();
     m_CheckBoxForeground.setSelected(true);
