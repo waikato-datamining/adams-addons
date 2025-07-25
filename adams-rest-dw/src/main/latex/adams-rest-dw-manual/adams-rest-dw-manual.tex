@@ -1,0 +1,153 @@
+% This work is made available under the terms of the
+% Creative Commons Attribution-ShareAlike 4.0 license,
+% http://creativecommons.org/licenses/by-sa/4.0/.
+
+\documentclass[a4paper]{book}
+
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{scalefnt}
+\usepackage{tikz}
+
+% watermark -- for draft stage
+%\usepackage[firstpage]{draftwatermark}
+%\SetWatermarkLightness{0.9}
+%\SetWatermarkScale{5}
+
+\input{latex_extensions}
+
+\title{
+  \textbf{ADAMS} \\
+  {\Large \textbf{A}dvanced \textbf{D}ata mining \textbf{A}nd \textbf{M}achine
+  learning \textbf{S}ystem} \\
+  {\Large Module: adams-rest-dw} \\
+  \vspace{1cm}
+  \includegraphics[width=2cm]{images/rest-dw-module.png} \\
+}
+\author{
+  Peter Reutemann
+}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+
+\thispagestyle{empty}
+\center
+\begin{table}[b]
+	\begin{tabular}{c l l}
+		\parbox[c][2cm]{2cm}{\copyright 2025} &
+		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
+	\end{tabular}
+	\includegraphics[width=12cm]{images/cc.png} \\
+\end{table}
+
+\end{titlepage}
+
+\tableofcontents
+%\listoffigures
+%\listoftables
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introduction}
+REST webservices\cite{rest} are a popular variant of webservices, typically using
+JSON for exchanging information.
+
+ADAMS provides a general framework for accessing and implementing REST webservices
+using Dropwizard\cite{dropwizard}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Using REST}
+The following sections describe how you can access REST webservices (\textit{client})
+and write your own ones (\textit{server}).
+
+\section{Client}
+Instead of custom Java classes for communicating with the REST server, you can use
+existing flow components:
+
+\begin{tight_itemize}
+    \item \texttt{source.HTTPRequest} -- best used for \texttt{GET} requests
+    with all the relevant information in the URL.
+    \item \texttt{transformer.HTTPRequest} -- used for sending textual data (e.g.,
+    plain text or JSON) to the server via a POST request.
+\end{tight_itemize}
+Both actors return a container of type \texttt{HttpRequestResult}, which typically
+contains the status code/message and the response body. These can be accessed
+using the \texttt{ContainerValuePicker} control actor.
+
+Here are some useful conversion classes:
+\begin{tight_itemize}
+    \item \textit{MapToJson} -- converts a Java Map object into a JSON object
+    \item \textit{JsonObjectToMap} -- does the reverse conversion
+    \item \textit{ObjectToJson} -- serializes a Java Bean object to a JSON string
+    \item \textit{JsonToObject} -- deserializes a JSON string into a Java Bean object
+    \item \textit{URLEncode} -- ensures that the string can be used in a URL
+    \item \textit{URLDecode} -- the reverse operation
+\end{tight_itemize}
+
+\heading{Timing}
+If you want to record how long requests are taking, you can use the \textit{TimedSource}
+or \textit{TimedSubProcess} actors to wrap the relevant \textit{HTTPRequest} actor.
+
+
+\clearpage
+\section{Server}
+For defining a REST server, you need to add the \textit{DropwizardRESTServer} standalone
+to your flow and then specify the relevant classes implementing the \textit{RESTProvider}
+interface. The following providers are part of this module:
+\begin{tight_itemize}
+    \item \textit{EchoServer} -- simple example provider that just returns the data that the
+    client sent via a \texttt{GET} request.
+    \item \textit{GenericServer} -- To avoid having to reimplement the wheel, this provider
+    takes one or more classes that implement the \textit{RESTPlugin} interface. These plugins
+    will automatically get registered. In Dropwizard terms, such a plugin is referred to as
+    a \textit{resource}. You can also add your own health checks
+    \footnote{\url{https://www.dropwizard.io/en/stable/manual/core.html\#health-checks}{}}.
+\end{tight_itemize}
+
+\subsection{RESTPlugin}
+The \textit{RESTPlugin} interface is rather light-weight, as all necessary REST information is indicated via jakarta
+annotations\footnote{\url{https://jakarta.ee/learn/docs/jakartaee-tutorial/current/websvcs/rest/rest.html}{}}.
+For convenience, you can simply sub-class the \textit{AbstractRESTPlugin} class (or one of its
+other sub-classes). The \textit{Echo} plugin/resource for the \textit{EchoServer} looks like this:
+
+{\scriptsize
+\begin{verbatim}
+@Path("/echo/{input}")  // @Path needs to be at class level!
+@Produces("text/plain")
+public class Echo extends AbstractRESTPlugin {
+
+  private static final long serialVersionUID = 1L;
+
+  public String globalInfo() {
+    return "Simple echo of the input.;
+  }
+
+  @GET
+  public String ping(@PathParam("input") String input) {
+    return input;
+  }
+}
+\end{verbatim}}
+
+
+\subsection{Logging}
+You can turn off \textit{request logging} with the following in the YAML
+config file (see \cite{dropwizardconfig} for full documentation):
+
+\begin{verbatim}
+server:
+  requestLog:
+    appenders: []
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{bibliography}
+
+\end{document}
