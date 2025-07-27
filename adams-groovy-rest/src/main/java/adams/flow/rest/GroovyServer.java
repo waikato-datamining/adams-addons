@@ -217,8 +217,7 @@ public class GroovyServer
     int		i;
 
     for (i = 0; i < plugins.length; i++) {
-      if (FlowContextUtils.isHandler(plugins[i]))
-	FlowContextUtils.update(plugins[i], getFlowContext());
+      FlowContextUtils.update(plugins[i], getFlowContext());
       if (plugins[i] instanceof LoggingLevelHandler)
 	((LoggingLevelHandler) plugins[i]).setLoggingLevel(getLoggingLevel());
     }

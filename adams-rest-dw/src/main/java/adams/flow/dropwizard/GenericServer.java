@@ -276,10 +276,8 @@ public class GenericServer
   public void configurePlugins(RESTPlugin[] plugins) {
     int		i;
 
-    for (i = 0; i < plugins.length; i++) {
-      if (FlowContextUtils.isHandler(plugins[i]))
-	FlowContextUtils.update(plugins[i], getFlowContext());
-    }
+    for (i = 0; i < plugins.length; i++)
+      FlowContextUtils.update(plugins[i], getFlowContext());
   }
 
   /**

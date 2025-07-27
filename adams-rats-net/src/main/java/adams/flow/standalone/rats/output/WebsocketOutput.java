@@ -175,8 +175,7 @@ public class WebsocketOutput
     if (m_Client == null) {
       try {
 	m_Client = m_Generator.generateClient();
-	if (FlowContextUtils.isHandler(m_Client))
-	  FlowContextUtils.update(m_Client, getOwner());
+	FlowContextUtils.update(m_Client, getOwner());
       }
       catch (Exception e) {
 	result = handleException("Failed to generate websocket client!", e);
