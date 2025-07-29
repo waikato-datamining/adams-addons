@@ -79,11 +79,11 @@
   </issueManagement>
 
   <properties>
-    <mavenVersion>3.8.1</mavenVersion>
+    <mavenVersion>3.9.11</mavenVersion>
     <mojo.java.target>11</mojo.java.target>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
-    <maven-plugin-plugin.version>3.6.4</maven-plugin-plugin.version>
+    <maven-plugin-plugin.version>3.15.1</maven-plugin-plugin.version>
     <plexus-compiler-api.version>2.5</plexus-compiler-api.version>
     <plexus-utils.version>3.1.0</plexus-utils.version>
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
