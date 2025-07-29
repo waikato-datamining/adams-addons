@@ -281,13 +281,11 @@
         <artifactId>maven-plugin-plugin</artifactId>
         <version>${maven-plugin-plugin.version}</version>
         <configuration>
-          <requirements>
-            <!--
-            NOTE: Maven 2.x does not interpolate properties of the form project.*|pom.* so the Maven Plugin Plugin
-            gets garbage when manually examining the config of the Maven Compiler Plugin.
-            -->
-            <jdk>${mojo.java.target}</jdk>
-          </requirements>
+          <!--
+          NOTE: Maven 2.x does not interpolate properties of the form project.*|pom.* so the Maven Plugin Plugin
+          gets garbage when manually examining the config of the Maven Compiler Plugin.
+          -->
+          <requiredJavaVersion>${mojo.java.target}</requiredJavaVersion>
         </configuration>
       </plugin>
     </plugins>
