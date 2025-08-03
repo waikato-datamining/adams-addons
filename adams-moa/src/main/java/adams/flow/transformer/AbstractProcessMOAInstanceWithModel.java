@@ -30,6 +30,7 @@ import adams.flow.core.AbstractModelLoader;
 import adams.flow.core.AbstractModelLoader.ModelLoadingType;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.DynamicModelLoaderSupporter;
+import adams.flow.core.OptionalModelResetWithVariable;
 import adams.flow.core.Token;
 import com.yahoo.labs.samoa.instances.Instance;
 
@@ -45,7 +46,7 @@ import java.util.Hashtable;
  */
 public abstract class AbstractProcessMOAInstanceWithModel<T>
   extends AbstractTransformer
-  implements DynamicModelLoaderSupporter {
+  implements DynamicModelLoaderSupporter, OptionalModelResetWithVariable {
 
   /** for serialization. */
   private static final long serialVersionUID = 3850507205836680544L;
