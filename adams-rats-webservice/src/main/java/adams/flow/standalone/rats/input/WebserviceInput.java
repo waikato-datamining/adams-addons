@@ -97,6 +97,8 @@ public class WebserviceInput
    * @return		null if accepted, otherwise error message
    */
   protected String checkClient(WebServiceClient value) {
+    if (value == null)
+      return "Client is null!";
     if (!(value instanceof WebServiceClientProducer))
       return "Does not implement " + WebServiceClientProducer.class.getName() + "!";
     return null;
