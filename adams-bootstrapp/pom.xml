@@ -67,7 +67,7 @@
     <dependency>
       <groupId>com.github.fracpete</groupId>
       <artifactId>bootstrapp</artifactId>
-      <version>0.1.13</version>
+      <version>0.1.14</version>
     </dependency>
   </dependencies>
 
