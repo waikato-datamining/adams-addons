@@ -13,16 +13,16 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * HeatmapSpreadSheetHandler.java
- * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.tools.previewbrowser;
 
 import adams.core.io.PlaceholderFile;
 import adams.data.conversion.HeatmapToSpreadSheet;
 import adams.data.heatmap.Heatmap;
-import adams.data.io.input.AbstractDataContainerReader;
+import adams.data.io.input.DataContainerReader;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.gui.chooser.HeatmapFileChooser;
 import adams.gui.core.BasePanel;
@@ -54,7 +54,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class HeatmapSpreadSheetHandler
   extends AbstractContentHandler {
@@ -91,13 +90,13 @@ public class HeatmapSpreadSheetHandler
    */
   @Override
   public PreviewPanel createPreview(File file) {
-    BasePanel					result;
-    AbstractDataContainerReader<Heatmap> 	reader;
-    List<Heatmap>				maps;
-    HeatmapToSpreadSheet			hm2ss;
-    SpreadSheetTable				table;
-    String					msg;
-    SpreadSheetTableModel			model;
+    BasePanel				result;
+    DataContainerReader<Heatmap> 	reader;
+    List<Heatmap>			maps;
+    HeatmapToSpreadSheet		hm2ss;
+    SpreadSheetTable			table;
+    String				msg;
+    SpreadSheetTableModel		model;
 
     result = new BasePanel(new BorderLayout());
 
@@ -108,7 +107,7 @@ public class HeatmapSpreadSheetHandler
     reader.setInput(new PlaceholderFile(file));
     maps = reader.read();
 
-    if (maps.size() > 0) {
+    if (!maps.isEmpty()) {
       hm2ss = new HeatmapToSpreadSheet();
       hm2ss.setInput(maps.get(0));
       msg = hm2ss.convert();

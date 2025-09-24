@@ -15,7 +15,7 @@
 
 /*
  * TrailViewerPanel.java
- * Copyright (C) 2011-2022 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.trail;
 
@@ -26,7 +26,7 @@ import adams.core.io.PlaceholderFile;
 import adams.data.filter.Filter;
 import adams.data.filter.TrailWindow;
 import adams.data.io.input.AbstractTrailReader;
-import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.output.DataContainerWriter;
 import adams.data.trail.Trail;
 import adams.gui.chooser.TrailFileChooser;
 import adams.gui.core.BasePanel;
@@ -239,7 +239,6 @@ public class TrailViewerPanel
     int			i;
     int[]		zooms;
     String[]		shortcuts;
-    String[]		plugins;
 
     if (m_MenuBar == null) {
       result = new JMenuBar();
@@ -497,7 +496,7 @@ public class TrailViewerPanel
 	else
 	  menuitem = new JMenuItem(zooms[i] + "%");
 	submenu.add(menuitem);
-	if (shortcuts[i].length() > 0)
+	if (!shortcuts[i].isEmpty())
 	  menuitem.setAccelerator(GUIHelper.getKeyStroke(shortcuts[i]));
 	menuitem.addActionListener(new ActionListener() {
 	  public void actionPerformed(ActionEvent e) {
@@ -610,11 +609,11 @@ public class TrailViewerPanel
     List<TrailPanel>	result;
     int			i;
 
-    result = new ArrayList<TrailPanel>();
+    result = new ArrayList<>();
     for (i = 0; i < m_TabbedPane.getTabCount(); i++)
       result.add(getPanelAt(i));
 
-    return result.toArray(new TrailPanel[result.size()]);
+    return result.toArray(new TrailPanel[0]);
   }
 
   /**
@@ -723,7 +722,7 @@ public class TrailViewerPanel
           showStatus("Loading file: " + file);
           reader.setInput(new PlaceholderFile(file));
           List<Trail> maps = reader.read();
-          if (maps.size() == 0) {
+          if (maps.isEmpty()) {
             GUIHelper.showErrorMessage(TrailViewerPanel.this, "Failed to read trail from:\n" + reader.getInput());
 	    showStatus("");
             return;
@@ -782,7 +781,7 @@ public class TrailViewerPanel
     int				retVal;
     Trail			map;
     PlaceholderFile		file;
-    AbstractDataContainerWriter	writer;
+    DataContainerWriter	writer;
     
     retVal = m_FileChooser.showSaveDialog(this);
     if (retVal != TrailFileChooser.APPROVE_OPTION)

@@ -15,13 +15,13 @@
 
 /*
  * AudioAnnotationsFileWriter.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
 import adams.data.audioannotations.AudioAnnotations;
-import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.output.DataContainerWriter;
 import adams.data.io.output.SimpleAudioAnnotationsWriter;
 
 /**
@@ -74,7 +74,7 @@ import adams.data.io.output.SimpleAudioAnnotationsWriter;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
- * <pre>-writer &lt;adams.data.io.output.AbstractDataContainerWriter&gt; (property: writer)
+ * <pre>-writer &lt;adams.data.io.output.DataContainerWriter&gt; (property: writer)
  * &nbsp;&nbsp;&nbsp;The writer to use for saving the data.
  * &nbsp;&nbsp;&nbsp;default: adams.data.io.output.SimpleTrailWriter
  * </pre>
@@ -125,7 +125,7 @@ public class AudioAnnotationsFileWriter
    * @return		the default writer
    */
   @Override
-  protected AbstractDataContainerWriter<AudioAnnotations> getDefaultWriter() {
+  protected DataContainerWriter<AudioAnnotations> getDefaultWriter() {
     return new SimpleAudioAnnotationsWriter();
   }
 

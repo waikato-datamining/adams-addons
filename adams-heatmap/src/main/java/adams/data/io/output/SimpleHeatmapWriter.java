@@ -76,11 +76,10 @@ import java.util.zip.GZIPOutputStream;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2018 $
  */
 public class SimpleHeatmapWriter
   extends AbstractHeatmapWriter 
-  implements CompressionSupporter {
+  implements CompressionSupporter<Heatmap> {
 
   /** for serialization. */
   private static final long serialVersionUID = 5290679698357490093L;

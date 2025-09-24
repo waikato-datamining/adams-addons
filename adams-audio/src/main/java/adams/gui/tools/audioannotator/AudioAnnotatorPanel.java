@@ -15,7 +15,7 @@
 
 /*
  * AudioAnnotatorPanel.java
- * Copyright (C) 2015-2023 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.tools.audioannotator;
@@ -27,7 +27,7 @@ import adams.core.ShorteningType;
 import adams.core.io.PlaceholderFile;
 import adams.data.audioannotations.AudioAnnotations;
 import adams.data.io.input.AbstractAudioAnnotationsReader;
-import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.output.DataContainerWriter;
 import adams.data.io.output.SpreadSheetWriter;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.gui.action.AbstractBaseAction;
@@ -669,7 +669,7 @@ public class AudioAnnotatorPanel extends BasePanel
   protected void saveAnnotations() {
     AudioAnnotations annotations;
     PlaceholderFile file;
-    AbstractDataContainerWriter writer;
+    DataContainerWriter writer;
 
     int retVal;
     retVal = m_AnnotationsFileChooser.showSaveDialog(this);

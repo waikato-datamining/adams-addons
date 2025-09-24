@@ -13,15 +13,15 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * HeatmapImageHandler.java
- * Copyright (C) 2011-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.tools.previewbrowser;
 
 import adams.core.io.PlaceholderFile;
 import adams.data.heatmap.Heatmap;
-import adams.data.io.input.AbstractDataContainerReader;
+import adams.data.io.input.DataContainerReader;
 import adams.gui.chooser.HeatmapFileChooser;
 import adams.gui.visualization.heatmap.HeatmapPanel;
 
@@ -48,7 +48,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class HeatmapImageHandler
   extends AbstractContentHandler {
@@ -85,9 +84,9 @@ public class HeatmapImageHandler
    */
   @Override
   public PreviewPanel createPreview(File file) {
-    HeatmapPanel				result;
-    AbstractDataContainerReader<Heatmap> 	reader;
-    List<Heatmap>				maps;
+    HeatmapPanel			result;
+    DataContainerReader<Heatmap> 	reader;
+    List<Heatmap>			maps;
 
     result = new HeatmapPanel(null);
     result.setSearchPanelVisible(false);
@@ -99,7 +98,7 @@ public class HeatmapImageHandler
     reader.setInput(new PlaceholderFile(file));
     maps = reader.read();
 
-    if (maps.size() > 0)
+    if (!maps.isEmpty())
       result.setHeatmap(maps.get(0));
 
     return new PreviewPanel(result);

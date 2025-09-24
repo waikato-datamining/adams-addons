@@ -15,7 +15,7 @@
 
 /*
  * AnnotatorPanel.java
- * Copyright (C) 2015-2023 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.annotator;
@@ -29,7 +29,7 @@ import adams.data.image.AbstractImageContainer;
 import adams.data.image.BufferedImageContainer;
 import adams.data.io.input.AbstractTrailReader;
 import adams.data.io.input.ImageReader;
-import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.output.DataContainerWriter;
 import adams.data.io.output.ImageWriter;
 import adams.data.io.output.SpreadSheetWriter;
 import adams.data.spreadsheet.SpreadSheet;
@@ -864,7 +864,7 @@ public class AnnotatorPanel extends BasePanel
   protected void saveAnnotations() {
     Trail trail;
     PlaceholderFile file;
-    AbstractDataContainerWriter writer;
+    DataContainerWriter writer;
 
     int retVal;
     retVal = m_AnnotationsFileChooser.showSaveDialog(this);
@@ -902,7 +902,7 @@ public class AnnotatorPanel extends BasePanel
     reader.setInput(file);
 
     readTrail = reader.read();
-    if(readTrail.size() == 0)
+    if(readTrail.isEmpty())
       return;
     m_EventQueue.loadTrail(readTrail.get(0));
     m_RecentAnnotationsHandler.addRecentItem(file);

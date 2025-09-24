@@ -15,13 +15,13 @@
 
 /*
  * HeatmapFileReader.java
- * Copyright (C) 2011-2023 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
 import adams.data.heatmap.Heatmap;
-import adams.data.io.input.AbstractDataContainerReader;
+import adams.data.io.input.DataContainerReader;
 import adams.data.io.input.SpreadSheetHeatmapReader;
 
 /**
@@ -67,7 +67,7 @@ import adams.data.io.input.SpreadSheetHeatmapReader;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
- * <pre>-reader &lt;adams.data.io.input.AbstractDataContainerReader&gt; (property: reader)
+ * <pre>-reader &lt;adams.data.io.input.DataContainerReader&gt; (property: reader)
  * &nbsp;&nbsp;&nbsp;The reader to use for importing the data.
  * &nbsp;&nbsp;&nbsp;default: adams.data.io.input.SpreadSheetHeatmapReader -reader \"adams.data.io.input.CsvSpreadSheetReader -spreadsheet-type adams.data.spreadsheet.SpreadSheet\"
  * </pre>
@@ -98,7 +98,7 @@ public class HeatmapFileReader
    * @return		the default reader
    */
   @Override
-  protected AbstractDataContainerReader getDefaultReader() {
+  protected DataContainerReader getDefaultReader() {
     return new SpreadSheetHeatmapReader();
   }
   /**

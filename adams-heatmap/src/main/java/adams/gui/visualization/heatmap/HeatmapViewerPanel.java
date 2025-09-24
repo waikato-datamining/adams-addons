@@ -15,7 +15,7 @@
 
 /*
  * HeatmapViewerPanel.java
- * Copyright (C) 2011-2022 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.heatmap;
 
@@ -27,7 +27,7 @@ import adams.data.filter.Filter;
 import adams.data.filter.HeatmapNormalize;
 import adams.data.heatmap.Heatmap;
 import adams.data.io.input.AbstractHeatmapReader;
-import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.output.DataContainerWriter;
 import adams.gui.chooser.BaseColorChooser;
 import adams.gui.chooser.HeatmapFileChooser;
 import adams.gui.core.BasePanel;
@@ -533,7 +533,7 @@ public class HeatmapViewerPanel
 	else
 	  menuitem = new JMenuItem(zooms[i] + "%");
 	submenu.add(menuitem);
-	if (shortcuts[i].length() > 0)
+	if (!shortcuts[i].isEmpty())
 	  menuitem.setAccelerator(GUIHelper.getKeyStroke(shortcuts[i]));
 	menuitem.addActionListener(new ActionListener() {
 	  public void actionPerformed(ActionEvent e) {
@@ -713,11 +713,11 @@ public class HeatmapViewerPanel
     List<HeatmapPanel>	result;
     int			i;
 
-    result = new ArrayList<HeatmapPanel>();
+    result = new ArrayList<>();
     for (i = 0; i < m_MultiPagePane.getPageCount(); i++)
       result.add(getPanelAt(i));
 
-    return result.toArray(new HeatmapPanel[result.size()]);
+    return result.toArray(new HeatmapPanel[0]);
   }
 
   /**
@@ -846,7 +846,7 @@ public class HeatmapViewerPanel
 	  showStatus("Loading file: " + file);
 	  reader.setInput(new PlaceholderFile(file));
 	  List<Heatmap> maps = reader.read();
-	  if (maps.size() == 0) {
+	  if (maps.isEmpty()) {
 	    GUIHelper.showErrorMessage(HeatmapViewerPanel.this, "Failed to read heatmap from:\n" + reader.getInput());
 	    showStatus("");
 	    return null;
@@ -910,7 +910,7 @@ public class HeatmapViewerPanel
     int				retVal;
     Heatmap			map;
     PlaceholderFile		file;
-    AbstractDataContainerWriter	writer;
+    DataContainerWriter		writer;
 
     retVal = m_FileChooser.showSaveDialog(this);
     if (retVal != HeatmapFileChooser.APPROVE_OPTION)

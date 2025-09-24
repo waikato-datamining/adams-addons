@@ -15,17 +15,17 @@
 
 /*
  * HeatmapFileChooser.java
- * Copyright (C) 2011-2020 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.chooser;
 
 import adams.core.classmanager.ClassManager;
 import adams.data.heatmap.Heatmap;
-import adams.data.io.input.AbstractDataContainerReader;
 import adams.data.io.input.AbstractHeatmapReader;
-import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.input.DataContainerReader;
 import adams.data.io.output.AbstractHeatmapWriter;
+import adams.data.io.output.DataContainerWriter;
 
 import java.io.File;
 import java.util.List;
@@ -37,7 +37,7 @@ import java.util.List;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class HeatmapFileChooser
-  extends AbstractDataContainerFileChooser<Heatmap, AbstractDataContainerReader<Heatmap>, AbstractDataContainerWriter<Heatmap>> {
+  extends AbstractDataContainerFileChooser<Heatmap, DataContainerReader<Heatmap>, DataContainerWriter<Heatmap>> {
 
   /** for serialization. */
   private static final long serialVersionUID = -5373058011025481738L;
@@ -73,7 +73,7 @@ public class HeatmapFileChooser
    * @return		the default reader
    */
   @Override
-  protected AbstractDataContainerReader<Heatmap> getDefaultReader() {
+  protected DataContainerReader<Heatmap> getDefaultReader() {
     return new adams.data.io.input.SimpleHeatmapReader();
   }
 
@@ -83,7 +83,7 @@ public class HeatmapFileChooser
    * @return		the default writer
    */
   @Override
-  protected AbstractDataContainerWriter<Heatmap> getDefaultWriter() {
+  protected DataContainerWriter<Heatmap> getDefaultWriter() {
     return new adams.data.io.output.SimpleHeatmapWriter();
   }
 
@@ -122,8 +122,8 @@ public class HeatmapFileChooser
    * @param file	the file to determine a reader for
    * @return		the reader, null if none found
    */
-  public AbstractDataContainerReader<Heatmap> getReaderForFile(File file) {
-    AbstractDataContainerReader	result;
+  public DataContainerReader<Heatmap> getReaderForFile(File file) {
+    DataContainerReader	result;
 
     result = null;
 
@@ -134,7 +134,7 @@ public class HeatmapFileChooser
 	  continue;
 	if (filter.accept(file)) {
 	  try {
-	    result = (AbstractDataContainerReader<Heatmap>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
+	    result = (DataContainerReader<Heatmap>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
 	  }
 	  catch (Exception e) {
             handleException("Failed to instantiate reader: " + filter.getClassname(), e);
@@ -148,7 +148,7 @@ public class HeatmapFileChooser
 	    continue;
 	  if (filter.accept(file)) {
 	    try {
-	      result = (AbstractDataContainerReader<Heatmap>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
+	      result = (DataContainerReader<Heatmap>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
 	    }
 	    catch (Exception e) {
               handleException("Failed to instantiate reader: " + filter.getClassname(), e);
@@ -167,8 +167,8 @@ public class HeatmapFileChooser
    * @param file	the file to determine a reader for
    * @return		the writer, null if none found
    */
-  public AbstractDataContainerWriter<Heatmap> getWriterForFile(File file) {
-    AbstractDataContainerWriter<Heatmap>	result;
+  public DataContainerWriter<Heatmap> getWriterForFile(File file) {
+    DataContainerWriter<Heatmap>	result;
 
     result = null;
 
@@ -179,7 +179,7 @@ public class HeatmapFileChooser
 	  continue;
 	if (filter.accept(file)) {
 	  try {
-	    result = (AbstractDataContainerWriter<Heatmap>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
+	    result = (DataContainerWriter<Heatmap>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
 	  }
 	  catch (Exception e) {
             handleException("Failed to instantiate writer: " + filter.getClassname(), e);
@@ -193,7 +193,7 @@ public class HeatmapFileChooser
 	    continue;
 	  if (filter.accept(file)) {
 	    try {
-	      result = (AbstractDataContainerWriter<Heatmap>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
+	      result = (DataContainerWriter<Heatmap>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
 	    }
 	    catch (Exception e) {
               handleException("Failed to instantiate writer: " + filter.getClassname(), e);

@@ -15,12 +15,12 @@
 
 /*
  * TrailFileWriter.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
-import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.output.DataContainerWriter;
 import adams.data.io.output.SimpleTrailWriter;
 import adams.data.trail.Trail;
 
@@ -74,7 +74,7 @@ import adams.data.trail.Trail;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
- * <pre>-writer &lt;adams.data.io.output.AbstractDataContainerWriter&gt; (property: writer)
+ * <pre>-writer &lt;adams.data.io.output.DataContainerWriter&gt; (property: writer)
  * &nbsp;&nbsp;&nbsp;The writer to use for saving the data.
  * &nbsp;&nbsp;&nbsp;default: adams.data.io.output.SimpleTrailWriter
  * </pre>
@@ -126,7 +126,7 @@ public class TrailFileWriter
    * @return		the default writer
    */
   @Override
-  protected AbstractDataContainerWriter<Trail> getDefaultWriter() {
+  protected DataContainerWriter<Trail> getDefaultWriter() {
     return new SimpleTrailWriter();
   }
 

@@ -15,13 +15,13 @@
 
 /*
  * AudioAnnotationsFileReader.java
- * Copyright (C) 2018-2023 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
 import adams.data.audioannotations.AudioAnnotations;
-import adams.data.io.input.AbstractDataContainerReader;
+import adams.data.io.input.DataContainerReader;
 import adams.data.io.input.SimpleAudioAnnotationsReader;
 
 /**
@@ -72,7 +72,7 @@ import adams.data.io.input.SimpleAudioAnnotationsReader;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
- * <pre>-reader &lt;adams.data.io.input.AbstractDataContainerReader&gt; (property: reader)
+ * <pre>-reader &lt;adams.data.io.input.DataContainerReader&gt; (property: reader)
  * &nbsp;&nbsp;&nbsp;The reader to use for importing the data.
  * &nbsp;&nbsp;&nbsp;default: adams.data.io.input.SimpleTrailReader
  * </pre>
@@ -103,7 +103,7 @@ public class AudioAnnotationsFileReader
    * @return		the default reader
    */
   @Override
-  protected AbstractDataContainerReader getDefaultReader() {
+  protected DataContainerReader getDefaultReader() {
     return new SimpleAudioAnnotationsReader();
   }
 

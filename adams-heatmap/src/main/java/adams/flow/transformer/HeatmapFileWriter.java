@@ -15,13 +15,13 @@
 
 /*
  * HeatmapFileWriter.java
- * Copyright (C) 2011-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
 import adams.data.heatmap.Heatmap;
-import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.output.DataContainerWriter;
 import adams.data.io.output.SpreadSheetHeatmapWriter;
 
 /**
@@ -68,7 +68,7 @@ import adams.data.io.output.SpreadSheetHeatmapWriter;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
- * <pre>-writer &lt;adams.data.io.output.AbstractDataContainerWriter&gt; (property: writer)
+ * <pre>-writer &lt;adams.data.io.output.DataContainerWriter&gt; (property: writer)
  * &nbsp;&nbsp;&nbsp;The writer to use for saving the data.
  * &nbsp;&nbsp;&nbsp;default: adams.data.io.output.SpreadSheetHeatmapWriter -writer adams.data.io.output.CsvSpreadSheetWriter
  * </pre>
@@ -81,7 +81,6 @@ import adams.data.io.output.SpreadSheetHeatmapWriter;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class HeatmapFileWriter
   extends AbstractDataContainerFileWriter<Heatmap> {
@@ -105,7 +104,7 @@ public class HeatmapFileWriter
    * @return		the default writer
    */
   @Override
-  protected AbstractDataContainerWriter getDefaultWriter() {
+  protected DataContainerWriter getDefaultWriter() {
     return new SpreadSheetHeatmapWriter();
   }
 

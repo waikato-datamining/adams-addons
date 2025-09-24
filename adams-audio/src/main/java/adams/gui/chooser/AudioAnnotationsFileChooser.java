@@ -15,7 +15,7 @@
 
 /*
  * AudioAnnotationsFileChooser.java
- * Copyright (C) 2018-2020 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.chooser;
@@ -23,9 +23,9 @@ package adams.gui.chooser;
 import adams.core.classmanager.ClassManager;
 import adams.data.audioannotations.AudioAnnotations;
 import adams.data.io.input.AbstractAudioAnnotationsReader;
-import adams.data.io.input.AbstractDataContainerReader;
+import adams.data.io.input.DataContainerReader;
 import adams.data.io.output.AbstractAudioAnnotationsWriter;
-import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.output.DataContainerWriter;
 
 import java.io.File;
 import java.util.List;
@@ -37,7 +37,7 @@ import java.util.List;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class AudioAnnotationsFileChooser
-  extends AbstractDataContainerFileChooser<AudioAnnotations, AbstractDataContainerReader<AudioAnnotations>, AbstractDataContainerWriter<AudioAnnotations>> {
+  extends AbstractDataContainerFileChooser<AudioAnnotations, DataContainerReader<AudioAnnotations>, DataContainerWriter<AudioAnnotations>> {
 
   /** for serialization. */
   private static final long serialVersionUID = -5373058011025481738L;
@@ -73,7 +73,7 @@ public class AudioAnnotationsFileChooser
    * @return		the default reader
    */
   @Override
-  protected AbstractDataContainerReader<AudioAnnotations> getDefaultReader() {
+  protected DataContainerReader<AudioAnnotations> getDefaultReader() {
     return new adams.data.io.input.SimpleAudioAnnotationsReader();
   }
 
@@ -83,7 +83,7 @@ public class AudioAnnotationsFileChooser
    * @return		the default writer
    */
   @Override
-  protected AbstractDataContainerWriter<AudioAnnotations> getDefaultWriter() {
+  protected DataContainerWriter<AudioAnnotations> getDefaultWriter() {
     return new adams.data.io.output.SimpleAudioAnnotationsWriter();
   }
 
@@ -122,8 +122,8 @@ public class AudioAnnotationsFileChooser
    * @param file	the file to determine a reader for
    * @return		the reader, null if none found
    */
-  public AbstractDataContainerReader<AudioAnnotations> getReaderForFile(File file) {
-    AbstractDataContainerReader	result;
+  public DataContainerReader<AudioAnnotations> getReaderForFile(File file) {
+    DataContainerReader	result;
 
     result = null;
 
@@ -134,7 +134,7 @@ public class AudioAnnotationsFileChooser
 	  continue;
 	if (filter.accept(file)) {
 	  try {
-	    result = (AbstractDataContainerReader<AudioAnnotations>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
+	    result = (DataContainerReader<AudioAnnotations>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
 	  }
 	  catch (Exception e) {
 	    handleException("Failed to instantiate reader: " + filter.getClassname(), e);
@@ -148,7 +148,7 @@ public class AudioAnnotationsFileChooser
 	    continue;
 	  if (filter.accept(file)) {
 	    try {
-	      result = (AbstractDataContainerReader<AudioAnnotations>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
+	      result = (DataContainerReader<AudioAnnotations>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
 	    }
 	    catch (Exception e) {
 	      handleException("Failed to instantiate reader: " + filter.getClassname(), e);
@@ -167,8 +167,8 @@ public class AudioAnnotationsFileChooser
    * @param file	the file to determine a reader for
    * @return		the writer, null if none found
    */
-  public AbstractDataContainerWriter<AudioAnnotations> getWriterForFile(File file) {
-    AbstractDataContainerWriter<AudioAnnotations>	result;
+  public DataContainerWriter<AudioAnnotations> getWriterForFile(File file) {
+    DataContainerWriter<AudioAnnotations>	result;
 
     result = null;
 
@@ -179,7 +179,7 @@ public class AudioAnnotationsFileChooser
 	  continue;
 	if (filter.accept(file)) {
 	  try {
-	    result = (AbstractDataContainerWriter<AudioAnnotations>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
+	    result = (DataContainerWriter<AudioAnnotations>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
 	  }
 	  catch (Exception e) {
 	    handleException("Failed to instantiate writer: " + filter.getClassname(), e);
@@ -193,7 +193,7 @@ public class AudioAnnotationsFileChooser
 	    continue;
 	  if (filter.accept(file)) {
 	    try {
-	      result = (AbstractDataContainerWriter<AudioAnnotations>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
+	      result = (DataContainerWriter<AudioAnnotations>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
 	    }
 	    catch (Exception e) {
 	      handleException("Failed to instantiate writer: " + filter.getClassname(), e);

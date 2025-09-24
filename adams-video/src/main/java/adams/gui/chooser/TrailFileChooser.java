@@ -15,16 +15,16 @@
 
 /*
  * TrailFileChooser.java
- * Copyright (C) 2011-2020 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.chooser;
 
 import adams.core.classmanager.ClassManager;
-import adams.data.io.input.AbstractDataContainerReader;
 import adams.data.io.input.AbstractTrailReader;
-import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.input.DataContainerReader;
 import adams.data.io.output.AbstractTrailWriter;
+import adams.data.io.output.DataContainerWriter;
 import adams.data.trail.Trail;
 
 import java.io.File;
@@ -37,7 +37,7 @@ import java.util.List;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class TrailFileChooser
-  extends AbstractDataContainerFileChooser<Trail, AbstractDataContainerReader<Trail>, AbstractDataContainerWriter<Trail>> {
+  extends AbstractDataContainerFileChooser<Trail, DataContainerReader<Trail>, DataContainerWriter<Trail>> {
 
   /** for serialization. */
   private static final long serialVersionUID = -5373058011025481738L;
@@ -73,7 +73,7 @@ public class TrailFileChooser
    * @return		the default reader
    */
   @Override
-  protected AbstractDataContainerReader<Trail> getDefaultReader() {
+  protected DataContainerReader<Trail> getDefaultReader() {
     return new adams.data.io.input.SimpleTrailReader();
   }
 
@@ -83,7 +83,7 @@ public class TrailFileChooser
    * @return		the default writer
    */
   @Override
-  protected AbstractDataContainerWriter<Trail> getDefaultWriter() {
+  protected DataContainerWriter<Trail> getDefaultWriter() {
     return new adams.data.io.output.SimpleTrailWriter();
   }
 
@@ -122,8 +122,8 @@ public class TrailFileChooser
    * @param file	the file to determine a reader for
    * @return		the reader, null if none found
    */
-  public AbstractDataContainerReader<Trail> getReaderForFile(File file) {
-    AbstractDataContainerReader	result;
+  public DataContainerReader<Trail> getReaderForFile(File file) {
+    DataContainerReader	result;
 
     result = null;
 
@@ -134,7 +134,7 @@ public class TrailFileChooser
 	  continue;
 	if (filter.accept(file)) {
 	  try {
-	    result = (AbstractDataContainerReader<Trail>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
+	    result = (DataContainerReader<Trail>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
 	  }
 	  catch (Exception e) {
 	    handleException("Failed to instantiate reader: " + filter.getClassname(), e);
@@ -148,7 +148,7 @@ public class TrailFileChooser
 	    continue;
 	  if (filter.accept(file)) {
 	    try {
-	      result = (AbstractDataContainerReader<Trail>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
+	      result = (DataContainerReader<Trail>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
 	    }
 	    catch (Exception e) {
 	      handleException("Failed to instantiate reader: " + filter.getClassname(), e);
@@ -167,8 +167,8 @@ public class TrailFileChooser
    * @param file	the file to determine a reader for
    * @return		the writer, null if none found
    */
-  public AbstractDataContainerWriter<Trail> getWriterForFile(File file) {
-    AbstractDataContainerWriter<Trail>	result;
+  public DataContainerWriter<Trail> getWriterForFile(File file) {
+    DataContainerWriter<Trail>	result;
 
     result = null;
 
@@ -179,7 +179,7 @@ public class TrailFileChooser
 	  continue;
 	if (filter.accept(file)) {
 	  try {
-	    result = (AbstractDataContainerWriter<Trail>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
+	    result = (DataContainerWriter<Trail>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
 	  }
 	  catch (Exception e) {
 	    handleException("Failed to instantiate writer: " + filter.getClassname(), e);
@@ -193,7 +193,7 @@ public class TrailFileChooser
 	    continue;
 	  if (filter.accept(file)) {
 	    try {
-	      result = (AbstractDataContainerWriter<Trail>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
+	      result = (DataContainerWriter<Trail>) ClassManager.getSingleton().forName(filter.getClassname()).getDeclaredConstructor().newInstance();
 	    }
 	    catch (Exception e) {
 	      handleException("Failed to instantiate writer: " + filter.getClassname(), e);
