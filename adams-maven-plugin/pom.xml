@@ -24,11 +24,11 @@
   <parent>
     <groupId>nz.ac.waikato.cms.adams</groupId>
     <artifactId>adams-pom</artifactId>
-    <version>25.9.0-SNAPSHOT</version>
+    <version>25.10.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>adams-maven-plugin</artifactId>
-  <version>25.9.0-SNAPSHOT</version>
+  <version>25.10.0-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>ADAMS Maven Plugin</name>
@@ -88,7 +88,7 @@
     <plexus-utils.version>3.1.0</plexus-utils.version>
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
     <qdox.version>2.0-M10</qdox.version>
-    <adams.version>25.9.0-SNAPSHOT</adams.version>
+    <adams.version>25.10.0-SNAPSHOT</adams.version>
   </properties>
 
   <dependencyManagement>
