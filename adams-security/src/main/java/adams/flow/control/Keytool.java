@@ -167,7 +167,7 @@ public class Keytool
 
     m_OptionManager.add(
       "executable", "executable",
-      new PlaceholderFile(getKeytoolExecutablePath()), false);
+      new PlaceholderFile(getKeytoolExecutablePath())).dontOutputDefaultValue();
 
     m_OptionManager.add(
       "additional", "additionalOptions",

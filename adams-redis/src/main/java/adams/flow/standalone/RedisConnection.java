@@ -246,7 +246,7 @@ public class RedisConnection
 
     m_OptionManager.add(
       "password", "password",
-      new BasePassword(""), false);
+      new BasePassword("")).dontOutputDefaultValue();
 
     m_OptionManager.add(
       "prompt-for-password", "promptForPassword",

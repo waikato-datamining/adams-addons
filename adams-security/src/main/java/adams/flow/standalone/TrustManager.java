@@ -186,11 +186,11 @@ public class TrustManager
 
     m_OptionManager.add(
       "keystore-file", "keystoreFile",
-      TrustStoreHelper.getSingleton().getTrustStoreFile(), false);
+      TrustStoreHelper.getSingleton().getTrustStoreFile()).dontOutputDefaultValue();
 
     m_OptionManager.add(
       "keystore-passphrase", "keystorePassphrase",
-      TrustStoreHelper.getSingleton().getTrustStorePassword(), false);
+      TrustStoreHelper.getSingleton().getTrustStorePassword()).dontOutputDefaultValue();
 
     m_OptionManager.add(
       "prompt-for-password", "promptForPassword",
