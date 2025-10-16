@@ -31,9 +31,22 @@ import jodd.mail.ReceivedEmail;
 
 /**
  <!-- globalinfo-start -->
+ * Executes the specified IMAP operation and forwards the generated output.
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * &nbsp;&nbsp;&nbsp;min-user-mode: Expert
+ * </pre>
+ *
+ * <pre>-operation &lt;adams.flow.source.imapsource.AbstractIMAPOperation&gt; (property: operation)
+ * &nbsp;&nbsp;&nbsp;The IMAP operation to perform.
+ * &nbsp;&nbsp;&nbsp;default: adams.flow.source.imapsource.ListFolders
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
