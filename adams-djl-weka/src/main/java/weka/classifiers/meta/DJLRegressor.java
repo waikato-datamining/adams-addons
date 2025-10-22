@@ -20,6 +20,7 @@
 
 package weka.classifiers.meta;
 
+import adams.core.UniqueIDs;
 import adams.data.djl.idgenerator.FixedID;
 import adams.data.djl.idgenerator.IDGenerator;
 import adams.data.djl.networkgenerator.NetworkGenerator;
@@ -46,6 +47,7 @@ import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.Randomizable;
 import weka.core.Utils;
 import weka.djl.InstancesDataset;
 
@@ -62,12 +64,15 @@ import java.util.Map;
  */
 public class DJLRegressor
   extends AbstractSimpleClassifier
-  implements ScriptedClassifier, AutoCloseable {
+  implements ScriptedClassifier, AutoCloseable, Randomizable {
 
   private static final long serialVersionUID = -8361229968357782660L;
 
   /** for keeping track of models. */
   protected static Map<String,Model> m_Models = new HashMap<>();
+
+  /** the seed to use. */
+  protected int m_Seed;
 
   /** the network generator to use. */
   protected NetworkGenerator m_Network;
@@ -86,6 +91,9 @@ public class DJLRegressor
 
   /** the output dir generator. */
   protected OutputDirGenerator m_OutputDir;
+
+  /** whether to support parallel execution. */
+  protected boolean m_SupportParallelExecution;
 
   /** the flow context. */
   protected transient Actor m_FlowContext;
@@ -126,6 +134,10 @@ public class DJLRegressor
     super.defineOptions();
 
     m_OptionManager.add(
+      "seed", "seed",
+      1);
+
+    m_OptionManager.add(
       "network", "network",
       new TabularRegressionGenerator());
 
@@ -148,6 +160,41 @@ public class DJLRegressor
     m_OptionManager.add(
       "output-dir", "outputDir",
       new FixedDir());
+
+    m_OptionManager.add(
+      "support-parallel-execution", "supportParallelExecution",
+      true);
+  }
+
+  /**
+   * Set the seed for random number generation.
+   *
+   * @param value the seed
+   */
+  @Override
+  public void setSeed(int value) {
+    m_Seed = value;
+    reset();
+  }
+
+  /**
+   * Gets the seed for the random number generations
+   *
+   * @return the seed for the random number generation
+   */
+  @Override
+  public int getSeed() {
+    return m_Seed;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   * 			displaying in the explorer/experimenter gui
+   */
+  public String seedTipText() {
+    return "The seed to use for random number generations.";
   }
 
   /**
@@ -331,6 +378,35 @@ public class DJLRegressor
   }
 
   /**
+   * Sets whether to support parallel execution by appending a unique ID to the model ID.
+   *
+   * @param value 	true if to support
+   */
+  public void setSupportParallelExecution(boolean value) {
+    m_SupportParallelExecution = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to support parallel execution by appending a unique ID to the model ID.
+   *
+   * @return 		true if supported
+   */
+  public boolean getSupportParallelExecution() {
+    return m_SupportParallelExecution;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return		tip text for this property suitable for
+   * 			displaying in the explorer/experimenter gui
+   */
+  public String supportParallelExecutionTipText() {
+    return "If enabled, supports parallel execution, i.e., a unique ID gets attached to the model ID; downside: you need to manually delete left-over model files.";
+  }
+
+  /**
    * Sets the flow context.
    *
    * @param value	the context
@@ -395,7 +471,7 @@ public class DJLRegressor
     m_OutputDir.setFlowContext(m_FlowContext);
     m_ID.setFlowContext(m_FlowContext);
 
-    modelID   = m_ID.generate();
+    modelID   = m_ID.generate() + (m_SupportParallelExecution ? UniqueIDs.next() : "");
     modelDir  = m_OutputDir.generate().getAbsoluteFile();
     modelPath = Path.of(modelDir.getAbsolutePath());
     modelName = modelDir + "|" + modelID;
@@ -430,6 +506,8 @@ public class DJLRegressor
     trainDataset    = splitDataset[0];
     validateDataset = splitDataset[1];
 
+    //DJLUtils.registerPytorch();
+    //DJLUtils.setPyTorchSeed(m_Seed);
 
     synchronized (m_Models) {
       if (m_Models.containsKey(modelName)) {

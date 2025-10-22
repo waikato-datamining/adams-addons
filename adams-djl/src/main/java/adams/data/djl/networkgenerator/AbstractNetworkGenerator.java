@@ -67,7 +67,8 @@ public abstract class AbstractNetworkGenerator
    *
    * @return		true if required
    */
-  protected boolean requiresFlowContext() {
+  @Override
+  public boolean requiresFlowContext() {
     return false;
   }
 

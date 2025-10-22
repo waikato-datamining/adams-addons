@@ -196,8 +196,11 @@ public class GroovyGenerator
    * @return		true if required
    */
   @Override
-  protected boolean requiresFlowContext() {
-    return true;
+  public boolean requiresFlowContext() {
+    if (m_GeneratorObject != null)
+      return m_GeneratorObject.requiresFlowContext();
+    else
+      return false;
   }
 
   /**

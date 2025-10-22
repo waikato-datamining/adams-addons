@@ -33,6 +33,13 @@ public interface NetworkGenerator
   extends FlowContextHandler {
 
   /**
+   * Returns whether flow context is required.
+   *
+   * @return		true if required
+   */
+  public boolean requiresFlowContext();
+
+  /**
    * Generates the network using the supplied dataset.
    *
    * @param dataset	the dataset to generate the network for
