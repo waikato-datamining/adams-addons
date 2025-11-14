@@ -151,7 +151,7 @@ public class GnuplotSpreadSheetReader
     if (lines == null)
       return null;
     
-    result = m_SpreadSheetType.newInstance();
+    result = getSpreadSheetType().newInstance();
 
     first = true;
     for (String line: lines) {
