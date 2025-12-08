@@ -815,6 +815,28 @@ public class Heatmap
   }
 
   /**
+   * Replaces all the points with the collection of points.
+   *
+   * @param points	the points to use from now on
+   */
+  @Override
+  public void replaceAll(Collection points) {
+    replaceAll(points, false);
+  }
+
+  /**
+   * Replaces all the points with the collection of points.
+   *
+   * @param points	the points to use from now on
+   * @param sorted 	whether the data points are sorted - ignored
+   */
+  @Override
+  public void replaceAll(Collection points, boolean sorted) {
+    clear();
+    addAll(points);
+  }
+
+  /**
    * Sets the value at the location of the provided object to missing.
    *
    * @param o		the heatmap value with the coordinates to remove
