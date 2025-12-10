@@ -15,7 +15,7 @@
 
 /*
  * AbstractRESTProvider.java
- * Copyright (C) 2018-2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.rest;
 
@@ -330,8 +330,10 @@ public abstract class AbstractRESTProvider
    * @throws Exception	if stopping fails
    */
   protected void doStop() throws Exception {
-    if (m_Server != null)
+    if (m_Server != null) {
       m_Server.stop();
+      m_Server.destroy();
+    }
   }
 
   /**
