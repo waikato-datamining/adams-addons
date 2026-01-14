@@ -20,6 +20,7 @@
 
 package adams.flow.standalone;
 
+import adams.core.EnvironmentPasswordSupporter;
 import adams.core.PasswordHelper;
 import adams.core.PasswordPrompter;
 import adams.core.QuickInfoHelper;
@@ -129,7 +130,7 @@ import java.util.List;
  */
 public class KeyManager
   extends AbstractStandalone
-  implements PasswordPrompter, InteractiveActor, KeyManagerFactoryProvider {
+  implements PasswordPrompter, EnvironmentPasswordSupporter, InteractiveActor, KeyManagerFactoryProvider {
 
   private static final long serialVersionUID = 3990761211470952210L;
 
@@ -144,6 +145,9 @@ public class KeyManager
 
   /** the actual password to use. */
   protected BasePassword m_ActualPassphrase;
+
+  /** the environment variable to obtain the password from. */
+  protected String m_PasswordEnvVar;
 
   /** whether to prompt the user for a password if none provided. */
   protected boolean m_PromptForPassword;
@@ -193,6 +197,10 @@ public class KeyManager
     m_OptionManager.add(
       "keystore-passphrase", "keystorePassphrase",
       new BasePassword("")).dontOutputDefaultValue();
+
+    m_OptionManager.add(
+      "password-env-var", "passwordEnvVar",
+      "");
 
     m_OptionManager.add(
       "prompt-for-password", "promptForPassword",
@@ -354,6 +362,38 @@ public class KeyManager
   @Override
   public BasePassword getPassword() {
     return m_KeystorePassphrase;
+  }
+
+  /**
+   * Sets the environment variable to obtaining the password from.
+   *
+   * @param value	the variable
+   */
+  @Override
+  public void setPasswordEnvVar(String value) {
+    m_PasswordEnvVar = value;
+    reset();
+  }
+
+  /**
+   * Returns the environment variable to obtaining the password from.
+   *
+   * @return 		the variable
+   */
+  @Override
+  public String getPasswordEnvVar() {
+    return m_PasswordEnvVar;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  @Override
+  public String passwordEnvVarTipText() {
+    return "The environment variable to obtain the password from, before potentially prompting for it; ignored if empty.";
   }
 
   /**
@@ -582,7 +622,9 @@ public class KeyManager
 
     if (m_KeyManagerFactory == null) {
       m_ActualPassphrase = m_KeystorePassphrase;
-      result             = PasswordHelper.prompt(this);
+      result             = PasswordHelper.fromEnvVar(this);
+      if ((result == null) && (m_ActualPassphrase.isEmpty()))
+	result = PasswordHelper.prompt(this);
 
       if (result == null) {
 	fis = null;

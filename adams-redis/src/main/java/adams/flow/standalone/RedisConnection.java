@@ -20,6 +20,7 @@
 
 package adams.flow.standalone;
 
+import adams.core.EnvironmentPasswordSupporter;
 import adams.core.MessageCollection;
 import adams.core.PasswordHelper;
 import adams.core.PasswordPrompter;
@@ -152,7 +153,7 @@ import java.util.Map;
  */
 public class RedisConnection
   extends AbstractStandalone
-  implements PasswordPrompter, InteractiveActor {
+  implements PasswordPrompter, EnvironmentPasswordSupporter, InteractiveActor {
 
   /** for serialization. */
   private static final long serialVersionUID = -1726172998200420556L;
@@ -182,6 +183,9 @@ public class RedisConnection
 
   /** the actual password to use. */
   protected BasePassword m_ActualPassword;
+
+  /** the environment variable to obtain the password from. */
+  protected String m_PasswordEnvVar;
 
   /** whether to prompt the user for a password if none provided. */
   protected boolean m_PromptForPassword;
@@ -245,6 +249,10 @@ public class RedisConnection
     m_OptionManager.add(
       "password", "password",
       new BasePassword("")).dontOutputDefaultValue();
+
+    m_OptionManager.add(
+      "password-env-var", "passwordEnvVar",
+      "");
 
     m_OptionManager.add(
       "prompt-for-password", "promptForPassword",
@@ -497,6 +505,38 @@ public class RedisConnection
    */
   public String passwordTipText() {
     return "The password to use for connecting.";
+  }
+
+  /**
+   * Sets the environment variable to obtaining the password from.
+   *
+   * @param value	the variable
+   */
+  @Override
+  public void setPasswordEnvVar(String value) {
+    m_PasswordEnvVar = value;
+    reset();
+  }
+
+  /**
+   * Returns the environment variable to obtaining the password from.
+   *
+   * @return 		the variable
+   */
+  @Override
+  public String getPasswordEnvVar() {
+    return m_PasswordEnvVar;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  @Override
+  public String passwordEnvVarTipText() {
+    return "The environment variable to obtain the password from, before potentially prompting for it; ignored if empty.";
   }
 
   /**
@@ -767,7 +807,9 @@ public class RedisConnection
 	getLogger().info("Starting new session");
 
       m_ActualPassword = m_Password;
-      result           = PasswordHelper.prompt(this);
+      result           = PasswordHelper.fromEnvVar(this);
+      if ((result == null) && (m_ActualPassword.isEmpty()))
+	result = PasswordHelper.prompt(this);
 
       if (result == null)
 	result = connect();
