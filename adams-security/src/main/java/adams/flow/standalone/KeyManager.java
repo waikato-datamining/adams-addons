@@ -15,20 +15,19 @@
 
 /*
  * KeyManager.java
- * Copyright (C) 2019-2023 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2019-2026 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone;
 
+import adams.core.PasswordHelper;
+import adams.core.PasswordPrompter;
 import adams.core.QuickInfoHelper;
 import adams.core.base.BasePassword;
-import adams.core.io.ConsoleHelper;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
-import adams.flow.core.ActorUtils;
+import adams.flow.core.InteractiveActor;
 import adams.flow.core.KeyManagerFactoryProvider;
-import adams.flow.core.OptionalPasswordPrompt;
-import adams.flow.core.StopHelper;
 import adams.flow.core.StopMode;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -130,7 +129,7 @@ import java.util.List;
  */
 public class KeyManager
   extends AbstractStandalone
-  implements OptionalPasswordPrompt, KeyManagerFactoryProvider {
+  implements PasswordPrompter, InteractiveActor, KeyManagerFactoryProvider {
 
   private static final long serialVersionUID = 3990761211470952210L;
 
@@ -337,6 +336,27 @@ public class KeyManager
   }
 
   /**
+   * Sets the IMAP password to use.
+   *
+   * @param value	the password
+   */
+  @Override
+  public void setPassword(BasePassword value) {
+    m_KeystorePassphrase = value;
+    reset();
+  }
+
+  /**
+   * Returns the IMAP password to use.
+   *
+   * @return		the password
+   */
+  @Override
+  public BasePassword getPassword() {
+    return m_KeystorePassphrase;
+  }
+
+  /**
    * Sets whether to prompt for a password if none currently provided.
    *
    * @param value	true if to prompt for a password
@@ -365,6 +385,26 @@ public class KeyManager
     return
       "If enabled, the user gets prompted "
 	+ "for enter a password if none has been provided in the setup.";
+  }
+
+  /**
+   * Sets the actual password to use.
+   *
+   * @param value	the password
+   */
+  @Override
+  public void setActualPassword(BasePassword value) {
+    m_ActualPassphrase = value;
+  }
+
+  /**
+   * Returns the current actual password in use.
+   *
+   * @return		the password
+   */
+  @Override
+  public BasePassword getActualPassword() {
+    return m_ActualPassphrase;
   }
 
   /**
@@ -495,11 +535,7 @@ public class KeyManager
    */
   @Override
   public String doInteract() {
-    m_ActualPassphrase = ActorUtils.promptPassword(this, "Keystore passphrase");
-    if (m_ActualPassphrase == null)
-      return INTERACTION_CANCELED;
-    else
-      return null;
+    return PasswordHelper.interact(this);
   }
 
   /**
@@ -518,17 +554,7 @@ public class KeyManager
    */
   @Override
   public String doInteractHeadless() {
-    String		result;
-    BasePassword	password;
-
-    result   = INTERACTION_CANCELED;
-    password = ConsoleHelper.enterPassword("Please enter keystore passphrase (" + getName() + "):");
-    if (password != null) {
-      result             = null;
-      m_ActualPassphrase = password;
-    }
-
-    return result;
+    return PasswordHelper.interactHeadless(this);
   }
 
   /**
@@ -551,40 +577,12 @@ public class KeyManager
     String		result;
     KeyStore 		keystore;
     FileInputStream	fis;
-    String		msg;
 
     result = null;
 
     if (m_KeyManagerFactory == null) {
       m_ActualPassphrase = m_KeystorePassphrase;
-
-      // prompt?
-      if (m_PromptForPassword && (m_KeystorePassphrase.getValue().length() == 0)) {
-	if (!isHeadless()) {
-	  msg = doInteract();
-	  if (msg != null) {
-	    if (m_StopFlowIfCanceled) {
-	      if ((m_CustomStopMessage == null) || (m_CustomStopMessage.trim().length() == 0))
-		StopHelper.stop(this, m_StopMode, "Flow canceled: " + getFullName());
-	      else
-		StopHelper.stop(this, m_StopMode, m_CustomStopMessage);
-	      result = getStopMessage();
-	    }
-	  }
-	}
-	else if (supportsHeadlessInteraction()) {
-	  msg = doInteractHeadless();
-	  if (msg != null) {
-	    if (m_StopFlowIfCanceled) {
-	      if ((m_CustomStopMessage == null) || (m_CustomStopMessage.trim().length() == 0))
-		StopHelper.stop(this, m_StopMode, "Flow canceled: " + getFullName());
-	      else
-		StopHelper.stop(this, m_StopMode, m_CustomStopMessage);
-	      result = getStopMessage();
-	    }
-	  }
-	}
-      }
+      result             = PasswordHelper.prompt(this);
 
       if (result == null) {
 	fis = null;
