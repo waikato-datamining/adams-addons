@@ -91,8 +91,8 @@ public class Log
   /**
    * Checks whether the git operation can be executed.
    *
-   * @param errors for storing errors, can be null
-   * @return whether operation can be executed
+   * @param errors 	for storing errors, can be null
+   * @return 		whether operation can be executed
    */
   @Override
   protected boolean doCanExecute(MessageCollection errors) {
@@ -102,8 +102,8 @@ public class Log
   /**
    * Executes the git operation.
    *
-   * @param errors for storing errors, can be null
-   * @return the log output, null if failed
+   * @param errors 	for storing errors, can be null
+   * @return 		the operation output, null if failed
    */
   @Override
   protected String doExecute(MessageCollection errors) {

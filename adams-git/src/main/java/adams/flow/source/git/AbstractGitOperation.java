@@ -89,7 +89,7 @@ public abstract class AbstractGitOperation
    * Executes the git operation.
    *
    * @param errors 	for storing errors, can be null
-   * @return		the log output, null if failed
+   * @return		the operation output, null if failed
    */
   protected abstract String doExecute(MessageCollection errors);
 
