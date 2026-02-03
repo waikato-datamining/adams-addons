@@ -1,0 +1,10 @@
+# Project: adams
+# Date: 2026-02-04 11:29:25
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-git
+#
+adams.flow.control.Flow -annotation "Performs a simple git pull on the git repo specified by the GitRepo standalone.\\nYou will have to adjust the repo dir of the GitRepo actor." -execute-on-error adams.flow.control.postflowexecution.Null -execute-on-finish adams.flow.control.postflowexecution.Null -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.standalone.GitRepo
+ adams.flow.source.Git -operation adams.flow.source.git.Pull
+ adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter -line-wrap true -wrap-style-word true

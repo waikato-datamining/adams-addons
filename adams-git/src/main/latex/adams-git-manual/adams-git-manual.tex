@@ -44,7 +44,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2024} &
+		\parbox[c][2cm]{2cm}{\copyright 2024-2026} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -99,6 +99,17 @@ repository (local or clone from remote), then you can do the following:
     \item \textit{Push} -- allows pushing out your changes to the remote origin (not enabled for local repositories)
     \item \textit{Rollback} -- reverts changes to local files or adding files to git
     \item \textit{Reset session} -- clears the session cache
+\end{tight_itemize}
+
+
+\section{Flow}
+The following standalone actors are available:
+\begin{tight_itemize}
+    \item \textit{GitRepo} -- for specifying a git repository's location
+\end{tight_itemize}
+The following source actors are available:
+\begin{tight_itemize}
+    \item \textit{Git} -- performs the specified git operation and forwards its output.
 \end{tight_itemize}
 
 
