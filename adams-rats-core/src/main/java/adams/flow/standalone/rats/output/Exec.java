@@ -15,7 +15,7 @@
 
 /*
  * Exec.java
- * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2026 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone.rats.output;
@@ -243,7 +243,7 @@ public class Exec
    */
   @Override
   public String envVarsTipText() {
-    return "The environment variables to overlay on top of the current ones.";
+    return "The environment variables to overlay on top of the current ones; flow variables in the values part get automatically expanded.";
   }
 
   /**
@@ -338,7 +338,7 @@ public class Exec
     if (m_CommandContainsPlaceholder)
       cmd = Placeholders.getSingleton().expand(cmd);
     cwd = m_WorkingDirectory.isEmpty() ? null : new PlaceholderDirectory(m_WorkingDirectory);
-    env = ProcessUtils.getEnvironment(m_EnvVars, true);
+    env = ProcessUtils.getEnvironment(m_EnvVars, true, getOwner().getVariables());
 
     try {
       m_ProcessOutput = ProcessUtils.execute(OptionUtils.splitOptions(cmd), env, cwd);
