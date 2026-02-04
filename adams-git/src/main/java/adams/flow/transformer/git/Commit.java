@@ -21,6 +21,7 @@
 package adams.flow.transformer.git;
 
 import adams.core.MessageCollection;
+import adams.core.QuickInfoHelper;
 import adams.core.base.BaseText;
 
 import java.io.File;
@@ -87,6 +88,16 @@ public class Commit
    */
   public String messageTipText() {
     return "The message to use for the commit.";
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    return QuickInfoHelper.toString(this, "message", (m_Message.isEmpty() ? "-none-" : m_Message), "message: ");
   }
 
   /**

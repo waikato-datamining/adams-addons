@@ -218,16 +218,19 @@ public class Git
     result = null;
     input  = m_InputToken.getPayload();
 
-    if (m_GitRepo == null) {
-      m_GitRepo = (GitRepo) ActorUtils.findClosestType(this, GitRepo.class, true);
-      if (m_GitRepo == null)
-	result = "Failed to locate " + Utils.classToString(GitRepo.class) + " actor!";
-      else if (m_GitRepo.getGit() == null)
-	result = "No Git instance available from " + Utils.classToString(GitRepo.class) + " actor!";
+    if (m_Operation.requiresGitRepo()) {
+      if (m_GitRepo == null) {
+	m_GitRepo = (GitRepo) ActorUtils.findClosestType(this, GitRepo.class, true);
+	if (m_GitRepo == null)
+	  result = "Failed to locate " + Utils.classToString(GitRepo.class) + " actor!";
+	else if (m_GitRepo.getGit() == null)
+	  result = "No Git instance available from " + Utils.classToString(GitRepo.class) + " actor!";
+      }
+      if (m_GitRepo != null)
+	m_Operation.setGitRepo(m_GitRepo);
     }
 
     if (result == null) {
-      m_Operation.setGitRepo(m_GitRepo);
       errors = new MessageCollection();
       if (m_Operation.canExecute(input, errors)) {
 	errors.clear();

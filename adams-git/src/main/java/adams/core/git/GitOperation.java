@@ -15,7 +15,7 @@
 
 /*
  * GitOperation.java
- * Copyright (C) 2025 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2025-2026 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.core.git;
@@ -24,8 +24,10 @@ import adams.core.MessageCollection;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.core.logging.CustomLoggingLevelObject;
+import adams.core.logging.LoggingHelper;
 import adams.gui.core.GUIHelper;
 import org.eclipse.jgit.api.AddCommand;
+import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullCommand;
@@ -42,6 +44,7 @@ import org.eclipse.jgit.transport.SshTransport;
 
 import java.awt.Component;
 import java.io.File;
+import java.net.URI;
 import java.util.logging.Level;
 
 /**
@@ -126,6 +129,91 @@ public class GitOperation
     }
 
     return cmd;
+  }
+
+  /**
+   * Checks whether the repo can be cloned.
+   *
+   * @param uri		the URI of the repo
+   * @param directory	the directory to clone into
+   * @return		true if can be cloned
+   */
+  public static boolean canClone(String uri, File directory) {
+    return canClone(uri, directory, null);
+  }
+
+  /**
+   * Checks whether the repo can be cloned.
+   *
+   * @param uri		the URI of the repo
+   * @param directory	the directory to clone into
+   * @param errors 	for logging errors
+   * @return		true if can be committed
+   */
+  public static boolean canClone(String uri, File directory, MessageCollection errors) {
+    if (uri.isEmpty()) {
+      if (errors != null)
+	errors.add("No URI for cloning!");
+      return false;
+    }
+
+    try {
+      new URI(uri);
+    }
+    catch (Exception e) {
+      if (errors != null)
+	errors.add("Invalid repository URI: " + uri);
+      return false;
+    }
+
+    if (directory.exists()) {
+      if (errors != null)
+	errors.add("Directory already exists: " + directory);
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Clones the specified repo.
+   *
+   * @param uri		the URI of the repo
+   * @param directory	the directory to clone into
+   * @return		the git instance if successful, otherwise null
+   */
+  public static Git clone(String uri, File directory) {
+    return clone(uri, directory, null);
+  }
+
+  /**
+   * Clones the specified repo.
+   *
+   * @param uri		the URI of the repo
+   * @param directory	the directory to clone into
+   * @return		the git instance if successful, otherwise null
+   */
+  public static Git clone(String uri, File directory, MessageCollection errors) {
+    CloneCommand	cmd;
+    Git			git;
+    String		msg;
+
+    try {
+      cmd = Git.cloneRepository()
+	      .setURI(uri)
+	      .setDirectory(directory.getAbsoluteFile());
+      git = cmd.call();
+      GitSession.getSingleton().addRepo(git);
+      return git;
+    }
+    catch (Exception e) {
+      msg = "Failed to clone: " + uri;
+      if (errors != null)
+	errors.add(msg, e);
+      LoggingHelper.global().log(Level.SEVERE, msg, e);
+    }
+
+    return null;
   }
 
   /**

@@ -21,6 +21,7 @@
 package adams.flow.transformer.git;
 
 import adams.core.MessageCollection;
+import adams.core.QuickInfoSupporter;
 import adams.core.Utils;
 import adams.core.git.GitOperation;
 import adams.core.io.PlaceholderFile;
@@ -38,7 +39,8 @@ import java.util.List;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public abstract class AbstractGitOperation
-  extends AbstractOptionHandler {
+  extends AbstractOptionHandler
+  implements QuickInfoSupporter {
 
   private static final long serialVersionUID = 1538753872785242893L;
 
@@ -49,6 +51,27 @@ public abstract class AbstractGitOperation
   protected GitOperation m_GitOperation;
 
   /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   * <br>
+   * Default implementation returns null.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    return null;
+  }
+
+  /**
+   * Whether a GitRepo instance is required.
+   *
+   * @return		true if required
+   */
+  public boolean requiresGitRepo() {
+    return true;
+  }
+
+  /**
    * Sets the GitRepo instance to use.
    *
    * @param value	the instance to use
@@ -57,6 +80,7 @@ public abstract class AbstractGitOperation
     m_GitRepo      = value;
     m_GitOperation = new GitOperation();
     m_GitOperation.setGit(m_GitRepo.getGit());
+    m_GitOperation.setShowErrors(false);
   }
 
   /**
@@ -90,8 +114,11 @@ public abstract class AbstractGitOperation
   protected void check(Object input, MessageCollection errors) {
     Compatibility	comp;
 
-    if (m_GitOperation == null)
-      errors.add("No GitOperation instance set!");
+    if (requiresGitRepo()) {
+      if (m_GitOperation == null)
+	errors.add("No GitOperation instance set!");
+    }
+
     if (input == null)
       errors.add("No input data provided!");
 

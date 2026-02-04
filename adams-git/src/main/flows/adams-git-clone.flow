@@ -1,0 +1,9 @@
+# Project: adams
+# Date: 2026-02-04 14:11:17
+# User: fracpete
+# Charset: UTF-8
+# Modules: adams-core,adams-git
+#
+adams.flow.control.Flow -annotation "Clones an ADAMS repository." -execute-on-error adams.flow.control.postflowexecution.Null -execute-on-finish adams.flow.control.postflowexecution.Null -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
+ adams.flow.source.Git -operation "adams.flow.source.git.Clone -repository https://github.com/waikato-datamining/adams-applications.git -directory ${FLOWS}/output/adams-applications"
+ adams.flow.sink.Display -display-type adams.flow.core.displaytype.Default -writer adams.data.io.output.NullWriter -line-wrap true -wrap-style-word true

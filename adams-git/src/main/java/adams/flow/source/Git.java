@@ -25,6 +25,7 @@ import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.Token;
+import adams.flow.core.Unknown;
 import adams.flow.source.git.AbstractGitOperation;
 import adams.flow.source.git.Pull;
 import adams.flow.standalone.GitRepo;
@@ -168,7 +169,10 @@ public class Git
    */
   @Override
   public Class[] generates() {
-    return new Class[]{String.class};
+    if (m_Operation == null)
+      return new Class[]{Unknown.class};
+    else
+      return m_Operation.generates();
   }
 
   /**
@@ -190,20 +194,23 @@ public class Git
   protected String doExecute() {
     String		result;
     MessageCollection	errors;
-    String		output;
+    Object		output;
 
     result = null;
 
-    if (m_GitRepo == null) {
-      m_GitRepo = (GitRepo) ActorUtils.findClosestType(this, GitRepo.class, true);
-      if (m_GitRepo == null)
-	result = "Failed to locate " + Utils.classToString(GitRepo.class) + " actor!";
-      else if (m_GitRepo.getGit() == null)
-	result = "No Git instance available from " + Utils.classToString(GitRepo.class) + " actor!";
+    if (m_Operation.requiresGitRepo()) {
+      if (m_GitRepo == null) {
+	m_GitRepo = (GitRepo) ActorUtils.findClosestType(this, GitRepo.class, true);
+	if (m_GitRepo == null)
+	  result = "Failed to locate " + Utils.classToString(GitRepo.class) + " actor!";
+	else if (m_GitRepo.getGit() == null)
+	  result = "No Git instance available from " + Utils.classToString(GitRepo.class) + " actor!";
+      }
+      if (m_GitRepo != null)
+	m_Operation.setGitRepo(m_GitRepo);
     }
 
     if (result == null) {
-      m_Operation.setGitRepo(m_GitRepo);
       errors = new MessageCollection();
       if (m_Operation.canExecute(errors)) {
 	errors.clear();

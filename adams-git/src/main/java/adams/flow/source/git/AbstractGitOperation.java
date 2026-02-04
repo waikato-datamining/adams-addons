@@ -21,6 +21,7 @@
 package adams.flow.source.git;
 
 import adams.core.MessageCollection;
+import adams.core.QuickInfoSupporter;
 import adams.core.git.GitOperation;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.standalone.GitRepo;
@@ -31,7 +32,8 @@ import adams.flow.standalone.GitRepo;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public abstract class AbstractGitOperation
-  extends AbstractOptionHandler {
+  extends AbstractOptionHandler
+  implements QuickInfoSupporter {
 
   private static final long serialVersionUID = 1538753872785242893L;
 
@@ -42,6 +44,27 @@ public abstract class AbstractGitOperation
   protected GitOperation m_GitOperation;
 
   /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   * <br>
+   * Default implementation returns null.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    return null;
+  }
+
+  /**
+   * Whether a GitRepo instance is required.
+   *
+   * @return		true if required
+   */
+  public boolean requiresGitRepo() {
+    return true;
+  }
+
+  /**
    * Sets the GitRepo instance to use.
    *
    * @param value	the instance to use
@@ -50,6 +73,7 @@ public abstract class AbstractGitOperation
     m_GitRepo      = value;
     m_GitOperation = new GitOperation();
     m_GitOperation.setGit(m_GitRepo.getGit());
+    m_GitOperation.setShowErrors(false);
   }
 
   /**
@@ -62,11 +86,20 @@ public abstract class AbstractGitOperation
   }
 
   /**
+   * Returns the type of data of the output.
+   *
+   * @return		the type of data
+   */
+  public abstract Class[] generates();
+
+  /**
    * Hook method for checking.
    */
   protected void check(MessageCollection errors) {
-    if (m_GitRepo == null)
-      errors.add("No GitRepo instance set!");
+    if (requiresGitRepo()) {
+      if (m_GitRepo == null)
+	errors.add("No GitRepo instance set!");
+    }
   }
 
   /**
@@ -97,7 +130,7 @@ public abstract class AbstractGitOperation
    * @param errors 	for storing errors, can be null
    * @return		the operation output, null if failed
    */
-  protected abstract String doExecute(MessageCollection errors);
+  protected abstract Object doExecute(MessageCollection errors);
 
   /**
    * Executes the git operation.
@@ -105,7 +138,7 @@ public abstract class AbstractGitOperation
    * @param errors 	for storing errors, can be null
    * @return		the operation output, null if failed
    */
-  public String execute(MessageCollection errors) {
+  public Object execute(MessageCollection errors) {
     check(errors);
     if (!errors.isEmpty())
       return null;

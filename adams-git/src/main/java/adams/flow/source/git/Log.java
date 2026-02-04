@@ -89,6 +89,16 @@ public class Log
   }
 
   /**
+   * Returns the type of data of the output.
+   *
+   * @return		the type of data
+   */
+  @Override
+  public Class[] generates() {
+    return new Class[]{String.class};
+  }
+
+  /**
    * Checks whether the git operation can be executed.
    *
    * @param errors 	for storing errors, can be null
@@ -106,7 +116,7 @@ public class Log
    * @return 		the operation output, null if failed
    */
   @Override
-  protected String doExecute(MessageCollection errors) {
+  protected Object doExecute(MessageCollection errors) {
     return m_GitOperation.log(new File(m_Target), errors);
   }
 }
