@@ -22,6 +22,7 @@ package adams.flow.standalone;
 
 import adams.core.QuickInfoHelper;
 import adams.core.git.GitSession;
+import adams.core.git.GitSettingsHelper;
 import adams.core.io.PlaceholderDirectory;
 import org.eclipse.jgit.api.Git;
 
@@ -77,6 +78,14 @@ import org.eclipse.jgit.api.Git;
  * &nbsp;&nbsp;&nbsp;default: ${CWD}
  * </pre>
  *
+ * <pre>-user &lt;java.lang.String&gt; (property: user)
+ * &nbsp;&nbsp;&nbsp;The user name to use.
+ * </pre>
+ *
+ * <pre>-email &lt;java.lang.String&gt; (property: email)
+ * &nbsp;&nbsp;&nbsp;The email to use.
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
@@ -88,6 +97,12 @@ public class GitRepo
 
   /** the repo directory. */
   protected PlaceholderDirectory m_RepoDir;
+
+  /** the user name to use. */
+  protected String m_User;
+
+  /** the email to use. */
+  protected String m_Email;
 
   /** the git instance of the repo. */
   protected Git m_Git;
@@ -112,6 +127,16 @@ public class GitRepo
     m_OptionManager.add(
       "repo-dir", "repoDir",
       new PlaceholderDirectory());
+
+    m_OptionManager.add(
+	"user", "user",
+	GitSettingsHelper.getSingleton().getUser())
+      .dontOutputDefaultValue();
+
+    m_OptionManager.add(
+	"email", "email",
+	GitSettingsHelper.getSingleton().getEmail())
+      .dontOutputDefaultValue();
   }
 
   /**
@@ -154,13 +179,77 @@ public class GitRepo
   }
 
   /**
+   * Sets the user name.
+   *
+   * @param value 	the user name
+   */
+  public void setUser(String value) {
+    m_User = value;
+    reset();
+  }
+
+  /**
+   * Returns the user name.
+   *
+   * @return 		the user name
+   */
+  public String getUser() {
+    return m_User;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String userTipText() {
+    return "The user name to use.";
+  }
+
+  /**
+   * Sets the email to use.
+   *
+   * @param value 	the email
+   */
+  public void setEmail(String value) {
+    m_Email = value;
+    reset();
+  }
+
+  /**
+   * Returns the email to use.
+   *
+   * @return 		the email
+   */
+  public String getEmail() {
+    return m_Email;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String emailTipText() {
+    return "The email to use.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "repoDir", m_RepoDir, "repo dir: ");
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "repoDir", m_RepoDir, "repo dir: ");
+    result += QuickInfoHelper.toString(this, "user", (m_User.isEmpty() ? "-none-" : m_User), ", user: ");
+    result += QuickInfoHelper.toString(this, "email", (m_Email.isEmpty() ? "-none-" : m_Email), ", email: ");
+
+    return result;
   }
 
   /**
