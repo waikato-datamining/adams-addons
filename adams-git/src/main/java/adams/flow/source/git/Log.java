@@ -96,7 +96,7 @@ public class Log
    */
   @Override
   protected boolean doCanExecute(MessageCollection errors) {
-    return m_Operation.canLog(new File(m_Target), errors);
+    return m_GitOperation.canLog(new File(m_Target), errors);
   }
 
   /**
@@ -107,6 +107,6 @@ public class Log
    */
   @Override
   protected String doExecute(MessageCollection errors) {
-    return m_Operation.log(new File(m_Target), errors);
+    return m_GitOperation.log(new File(m_Target), errors);
   }
 }

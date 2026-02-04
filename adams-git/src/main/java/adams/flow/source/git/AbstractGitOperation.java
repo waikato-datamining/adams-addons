@@ -14,7 +14,7 @@
  */
 
 /*
- * AbstractGitOperation.java
+ * AbstractGitRepo.java
  * Copyright (C) 2026 University of Waikato, Hamilton, New Zealand
  */
 
@@ -23,6 +23,7 @@ package adams.flow.source.git;
 import adams.core.MessageCollection;
 import adams.core.git.GitOperation;
 import adams.core.option.AbstractOptionHandler;
+import adams.flow.standalone.GitRepo;
 
 /**
  * Ancestor for git operations.
@@ -34,33 +35,38 @@ public abstract class AbstractGitOperation
 
   private static final long serialVersionUID = 1538753872785242893L;
 
-  /** the git operation instance to use. */
-  protected GitOperation m_Operation;
+  /** the GitRepo instance to use. */
+  protected GitRepo m_GitRepo;
+
+  /** the git operation to use. */
+  protected GitOperation m_GitOperation;
 
   /**
-   * Sets the operation to use.
+   * Sets the GitRepo instance to use.
    *
    * @param value	the instance to use
    */
-  public void setOperation(GitOperation value) {
-    m_Operation = value;
+  public void setGitRepo(GitRepo value) {
+    m_GitRepo      = value;
+    m_GitOperation = new GitOperation();
+    m_GitOperation.setGit(m_GitRepo.getGit());
   }
 
   /**
-   * Returns the operation in use.
+   * Returns the GitRepo instancee in use.
    *
    * @return		the instance in use
    */
-  public GitOperation getOperation() {
-    return m_Operation;
+  public GitRepo getGitRepo() {
+    return m_GitRepo;
   }
 
   /**
    * Hook method for checking.
    */
   protected void check(MessageCollection errors) {
-    if (m_Operation == null)
-      errors.add("No GitOperation instance set!");
+    if (m_GitRepo == null)
+      errors.add("No GitRepo instance set!");
   }
 
   /**

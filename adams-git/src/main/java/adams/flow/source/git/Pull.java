@@ -50,7 +50,7 @@ public class Pull
    */
   @Override
   protected boolean doCanExecute(MessageCollection errors) {
-    return m_Operation.canPull(errors);
+    return m_GitOperation.canPull(errors);
   }
 
   /**
@@ -61,6 +61,6 @@ public class Pull
    */
   @Override
   protected String doExecute(MessageCollection errors) {
-    return m_Operation.pull(errors);
+    return m_GitOperation.pull(errors);
   }
 }

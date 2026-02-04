@@ -23,7 +23,6 @@ package adams.flow.source;
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
-import adams.core.git.GitOperation;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.Token;
 import adams.flow.source.git.AbstractGitOperation;
@@ -100,9 +99,6 @@ public class Git
 
   /** the GitRepo context. */
   protected transient GitRepo m_GitRepo;
-
-  /** the instance for the operations. */
-  protected transient GitOperation m_GitOperation;
 
   /**
    * Returns a string describing the object.
@@ -207,12 +203,7 @@ public class Git
     }
 
     if (result == null) {
-      if (m_GitOperation == null) {
-	m_GitOperation = new GitOperation();
-	m_GitOperation.setGit(m_GitRepo.getGit());
-      }
-
-      m_Operation.setOperation(m_GitOperation);
+      m_Operation.setGitRepo(m_GitRepo);
       errors = new MessageCollection();
       if (m_Operation.canExecute(errors)) {
 	errors.clear();

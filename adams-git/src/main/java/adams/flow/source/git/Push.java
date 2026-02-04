@@ -50,7 +50,7 @@ public class Push
    */
   @Override
   protected boolean doCanExecute(MessageCollection errors) {
-    return m_Operation.canPush(errors);
+    return m_GitOperation.canPush(errors);
   }
 
   /**
@@ -61,6 +61,6 @@ public class Push
    */
   @Override
   protected String doExecute(MessageCollection errors) {
-    return m_Operation.push(errors);
+    return m_GitOperation.push(errors);
   }
 }
