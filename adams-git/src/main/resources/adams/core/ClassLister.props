@@ -13,3 +13,11 @@ adams.gui.flow.menu.git.AbstractFlowEditorGitMenuItem=\
 # the action plugins for the FileCommander
 adams.gui.tools.filecommander.AbstractFileCommanderAction=\
   adams.gui.tools.filecommander.git
+
+# the git source operations
+adams.flow.source.git.AbstractGitOperation=\
+  adams.flow.source.git
+
+# the git transformer operations
+adams.flow.transformer.git.AbstractGitOperation=\
+  adams.flow.transformer.git
