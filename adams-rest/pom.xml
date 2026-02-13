@@ -147,6 +147,18 @@
     </dependency>
 
     <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
+      <version>${cxf.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>swagger-ui</artifactId>
+      <version>3.52.5</version>
+    </dependency>
+
+    <dependency>
       <groupId>javax.jws</groupId>
       <artifactId>jsr181-api</artifactId>
       <version>1.0-MR1</version>

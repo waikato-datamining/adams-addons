@@ -15,7 +15,7 @@
 
 /*
  * GenericServer.java
- * Copyright (C) 2018-2025 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2026 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.rest;
@@ -27,13 +27,17 @@ import adams.flow.core.FlowContextHandler;
 import adams.flow.core.FlowContextUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  <!-- globalinfo-start -->
  * Generic REST service provider, which allows you to assemble the REST plugins that should make up the service.<br>
- * Automatically sets the flow context of plugins, if they should implement the adams.flow.core.FlowContextHandler interface.
+ * Automatically sets the flow context of plugins, if they should implement the adams.flow.core.FlowContextHandler interface.<br>
+ * Optionally, OpenAPI documentation can be made available at &lt;URL&gt;&#47;api-docs&#47;?url=&#47;openapi.json
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -41,6 +45,7 @@ import java.util.Arrays;
  * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
+ * &nbsp;&nbsp;&nbsp;min-user-mode: Expert
  * </pre>
  *
  * <pre>-url &lt;java.lang.String&gt; (property: URL)
@@ -63,6 +68,11 @@ import java.util.Arrays;
  * &nbsp;&nbsp;&nbsp;default:
  * </pre>
  *
+ * <pre>-enable-openapi &lt;boolean&gt; (property: enableOpenAPI)
+ * &nbsp;&nbsp;&nbsp;Whether to enable OpenAPI documentation at &lt;URL&gt;&#47;api-docs&#47;?url=&#47;openapi.json
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -76,6 +86,9 @@ public class GenericServer
   /** the plugins that make up the server. */
   protected RESTPlugin[] m_Plugins;
 
+  /** whether to enable open api documentation. */
+  protected boolean m_EnableOpenAPI;
+
   /**
    * Returns a string describing the object.
    *
@@ -87,7 +100,8 @@ public class GenericServer
       "Generic REST service provider, which allows you to assemble the REST "
 	+ "plugins that should make up the service.\n"
 	+ "Automatically sets the flow context of plugins, if they should implement "
-	+ "the " + Utils.classToString(FlowContextHandler.class) + " interface.";
+	+ "the " + Utils.classToString(FlowContextHandler.class) + " interface.\n"
+	+ "Optionally, OpenAPI documentation can be made available at <URL>/api-docs/?url=/openapi.json";
   }
 
   /**
@@ -104,7 +118,7 @@ public class GenericServer
     result = new StringBuilder();
     for (RESTPlugin plugin: m_Plugins) {
       if (result.length() > 0)
-        result.append("\n");
+	result.append("\n");
       result.append(RESTUtils.getAdditionalInformation(plugin));
     }
 
@@ -121,6 +135,10 @@ public class GenericServer
     m_OptionManager.add(
       "plugin", "plugins",
       getDefaultPlugins());
+
+    m_OptionManager.add(
+      "enable-openapi", "enableOpenAPI",
+      false);
   }
 
   /**
@@ -162,6 +180,35 @@ public class GenericServer
   }
 
   /**
+   * Sets whether to enable OpenAPI documentation.
+   *
+   * @param value	true if to enable
+   */
+  public void setEnableOpenAPI(boolean value) {
+    m_EnableOpenAPI = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to enable OpenAPI documentation.
+   *
+   * @return		true if to enable
+   */
+  public boolean getEnableOpenAPI() {
+    return m_EnableOpenAPI;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String enableOpenAPITipText() {
+    return "Whether to enable OpenAPI documentation at <URL>/api-docs/?url=/openapi.json";
+  }
+
+  /**
    * Returns the default URL for the service.
    *
    * @return		the URL
@@ -193,6 +240,8 @@ public class GenericServer
   protected Server doStart() throws Exception {
     JAXRSServerFactoryBean 	factory;
     RESTPlugin[] 		plugins;
+    OpenApiFeature 		openApiFeature;
+    Set<String> 		resourceClasses;
 
     factory = new JAXRSServerFactoryBean();
     configureInterceptors(factory);
@@ -203,6 +252,16 @@ public class GenericServer
     factory.setAddress(getURL());
 
     configureTLS(factory);
+
+    if (m_EnableOpenAPI) {
+      openApiFeature = new OpenApiFeature();
+      openApiFeature.setTitle("ADAMS");
+      resourceClasses = new HashSet<>();
+      for (RESTPlugin plugin : plugins)
+	resourceClasses.add(plugin.getClass().getName());
+      openApiFeature.setResourceClasses(resourceClasses);
+      factory.getFeatures().add(openApiFeature);
+    }
 
     return factory.create();
   }
