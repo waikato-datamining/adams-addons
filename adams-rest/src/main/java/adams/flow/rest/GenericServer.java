@@ -79,7 +79,7 @@ import java.util.Set;
  */
 public class GenericServer
   extends AbstractRESTProvider
-  implements AdditionalInformationHandler {
+  implements AdditionalInformationHandler, OpenAPISupporter {
 
   private static final long serialVersionUID = 6759800194384027943L;
 
@@ -184,6 +184,7 @@ public class GenericServer
    *
    * @param value	true if to enable
    */
+  @Override
   public void setEnableOpenAPI(boolean value) {
     m_EnableOpenAPI = value;
     reset();
@@ -194,6 +195,7 @@ public class GenericServer
    *
    * @return		true if to enable
    */
+  @Override
   public boolean getEnableOpenAPI() {
     return m_EnableOpenAPI;
   }
@@ -204,6 +206,7 @@ public class GenericServer
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
+  @Override
   public String enableOpenAPITipText() {
     return "Whether to enable OpenAPI documentation at <URL>/api-docs/?url=/openapi.json";
   }
