@@ -18,6 +18,10 @@ adams.flow.rest.RESTPlugin=\
   adams.flow.rest.echo,\
   adams.flow.rest.flow
 
+# the optional features for the GenericServer
+adams.flow.rest.feature.AbstractFeature=\
+  adams.flow.rest.feature
+
 # REST clients
 adams.flow.rest.RESTClient=\
   adams.flow.rest,\

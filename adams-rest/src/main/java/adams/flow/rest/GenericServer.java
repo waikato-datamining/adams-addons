@@ -25,13 +25,11 @@ import adams.core.ObjectCopyHelper;
 import adams.core.Utils;
 import adams.flow.core.FlowContextHandler;
 import adams.flow.core.FlowContextUtils;
+import adams.flow.rest.feature.AbstractFeature;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  <!-- globalinfo-start -->
@@ -68,9 +66,9 @@ import java.util.Set;
  * &nbsp;&nbsp;&nbsp;default:
  * </pre>
  *
- * <pre>-enable-openapi &lt;boolean&gt; (property: enableOpenAPI)
- * &nbsp;&nbsp;&nbsp;Whether to enable OpenAPI documentation at &lt;URL&gt;&#47;api-docs&#47;?url=&#47;openapi.json
- * &nbsp;&nbsp;&nbsp;default: false
+ * <pre>-feature &lt;adams.flow.rest.feature.AbstractFeature&gt; [-feature ...] (property: features)
+ * &nbsp;&nbsp;&nbsp;The features to add to the REST server.
+ * &nbsp;&nbsp;&nbsp;default:
  * </pre>
  *
  <!-- options-end -->
@@ -79,15 +77,15 @@ import java.util.Set;
  */
 public class GenericServer
   extends AbstractRESTProvider
-  implements AdditionalInformationHandler, OpenAPISupporter {
+  implements AdditionalInformationHandler {
 
   private static final long serialVersionUID = 6759800194384027943L;
 
   /** the plugins that make up the server. */
   protected RESTPlugin[] m_Plugins;
 
-  /** whether to enable open api documentation. */
-  protected boolean m_EnableOpenAPI;
+  /** the features to use. */
+  protected AbstractFeature[] m_Features;
 
   /**
    * Returns a string describing the object.
@@ -137,8 +135,8 @@ public class GenericServer
       getDefaultPlugins());
 
     m_OptionManager.add(
-      "enable-openapi", "enableOpenAPI",
-      false);
+      "feature", "features",
+      new AbstractFeature[0]);
   }
 
   /**
@@ -180,24 +178,22 @@ public class GenericServer
   }
 
   /**
-   * Sets whether to enable OpenAPI documentation.
+   * Sets the features to use.
    *
-   * @param value	true if to enable
+   * @param value	the features
    */
-  @Override
-  public void setEnableOpenAPI(boolean value) {
-    m_EnableOpenAPI = value;
+  public void setFeatures(AbstractFeature[] value) {
+    m_Features = value;
     reset();
   }
 
   /**
-   * Returns whether to enable OpenAPI documentation.
+   * Returns the features to use.
    *
-   * @return		true if to enable
+   * @return		the features
    */
-  @Override
-  public boolean getEnableOpenAPI() {
-    return m_EnableOpenAPI;
+  public AbstractFeature[] getFeatures() {
+    return m_Features;
   }
 
   /**
@@ -206,9 +202,8 @@ public class GenericServer
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  @Override
-  public String enableOpenAPITipText() {
-    return "Whether to enable OpenAPI documentation at <URL>/api-docs/?url=/openapi.json";
+  public String featuresTipText() {
+    return "The features to add to the REST server.";
   }
 
   /**
@@ -243,8 +238,6 @@ public class GenericServer
   protected Server doStart() throws Exception {
     JAXRSServerFactoryBean 	factory;
     RESTPlugin[] 		plugins;
-    OpenApiFeature 		openApiFeature;
-    Set<String> 		resourceClasses;
 
     factory = new JAXRSServerFactoryBean();
     configureInterceptors(factory);
@@ -256,14 +249,9 @@ public class GenericServer
 
     configureTLS(factory);
 
-    if (m_EnableOpenAPI) {
-      openApiFeature = new OpenApiFeature();
-      openApiFeature.setTitle("ADAMS");
-      resourceClasses = new HashSet<>();
-      for (RESTPlugin plugin : plugins)
-	resourceClasses.add(plugin.getClass().getName());
-      openApiFeature.setResourceClasses(resourceClasses);
-      factory.getFeatures().add(openApiFeature);
+    for (AbstractFeature feature: m_Features) {
+      if (!feature.applyFeature(factory, m_Plugins))
+	throw new IllegalStateException("Failed to apply feature: " + Utils.classToString(feature));
     }
 
     return factory.create();
