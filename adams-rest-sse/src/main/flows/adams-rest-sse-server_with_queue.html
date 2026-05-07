@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CXF SSE Monitor</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; background: #f4f4f9; }
+        #log { 
+            background: #2d2d2d; color: #61dafb; padding: 20px; 
+            border-radius: 8px; height: 300px; overflow-y: auto;
+            font-family: 'Courier New', monospace; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .status { margin-bottom: 10px; font-weight: bold; }
+        .connected { color: green; }
+        .disconnected { color: red; }
+        .event-entry { margin-bottom: 5px; border-left: 3px solid #61dafb; padding-left: 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>Server-Sent Events Monitor</h2>
+    <div class="status">
+        Status: <span id="status-text" class="disconnected">Disconnected</span>
+    </div>
+    
+    <div id="log">
+        <div class="event-entry">Waiting for events...</div>
+    </div>
+
+    <script>
+        const logElement = document.getElementById('log');
+        const statusText = document.getElementById('status-text');
+
+        // Update this URL to match your CXF service location
+        const eventSource = new EventSource('http://localhost:8080/events');
+
+        // Connection opened
+        eventSource.onopen = () => {
+            statusText.innerText = "Connected";
+            statusText.className = "connected";
+            addLog("Connection established.");
+        };
+
+        // Listen for the specific event name "update" defined in Java
+        eventSource.addEventListener('update', (event) => {
+            addLog(`[Update] ${event.data}`);
+        });
+
+        // Listen for generic messages (or the "End of Stream" message)
+        eventSource.onmessage = (event) => {
+            addLog(`[Message] ${event.data}`);
+        };
+
+        // Connection error or closed by server
+        eventSource.onerror = (err) => {
+            if (eventSource.readyState === EventSource.CLOSED) {
+                addLog("Connection closed by server.");
+            } else {
+                addLog("Error: Could not connect to server.");
+            }
+            statusText.innerText = "Disconnected";
+            statusText.className = "disconnected";
+        };
+
+        function addLog(message) {
+            const entry = document.createElement('div');
+            entry.className = 'event-entry';
+            entry.innerText = `${new Date().toLocaleTimeString()}: ${message}`;
+            logElement.appendChild(entry);
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+    </script>
+</body>
+</html>

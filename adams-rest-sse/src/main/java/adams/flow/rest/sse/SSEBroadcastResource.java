@@ -11,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
+import java.util.logging.Level;
 
 @Path("/events")
 @CrossOriginResourceSharing(allowAllOrigins = true)
@@ -18,6 +19,16 @@ public class SSEBroadcastResource
   extends AbstractRESTPlugin {
 
   private static final long serialVersionUID = -5398548431850555138L;
+
+  /**
+   * Returns a string describing the object.
+   *
+   * @return a description suitable for displaying in the gui
+   */
+  @Override
+  public String globalInfo() {
+    return "Runs a continuous thread that sends 10 tickers in one go when contacted.";
+  }
 
   @GET
   @Produces(MediaType.SERVER_SENT_EVENTS)
@@ -41,19 +52,10 @@ public class SSEBroadcastResource
 
 	// Sending a 'closing' event
 	eventSink.send(sse.newEvent("End of Stream"));
-      } catch (Exception e) {
-	e.printStackTrace();
+      }
+      catch (Exception e) {
+	getLogger().log(Level.SEVERE, "SSE error!", e);
       }
     }).start();
-  }
-
-  /**
-   * Returns a string describing the object.
-   *
-   * @return a description suitable for displaying in the gui
-   */
-  @Override
-  public String globalInfo() {
-    return "";
   }
 }
