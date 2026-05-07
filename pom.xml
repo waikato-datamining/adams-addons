@@ -66,6 +66,8 @@
     <module>adams-rats-webservice</module>
     <module>adams-redis</module>
     <module>adams-rest</module>
+    <module>adams-rest-openapi</module>
+    <module>adams-rest-sse</module>
     <module>adams-security</module>
     <module>adams-terminal</module>
     <module>adams-video</module>
