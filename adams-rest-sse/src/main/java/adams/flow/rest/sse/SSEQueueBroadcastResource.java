@@ -26,6 +26,9 @@ public class SSEQueueBroadcastResource
   /** the name of the queue in the internal storage. */
   protected StorageName m_StorageName;
 
+  /** the poll interval in msec. */
+  protected int m_Interval;
+
   /** the name of the event. */
   protected String m_EventName;
 
@@ -49,6 +52,10 @@ public class SSEQueueBroadcastResource
     m_OptionManager.add(
       "storage-name", "storageName",
       new StorageName("queue"));
+
+    m_OptionManager.add(
+      "interval", "interval",
+      50, 1, null);
 
     m_OptionManager.add(
       "event-name", "eventName",
@@ -91,6 +98,35 @@ public class SSEQueueBroadcastResource
    */
   public String storageNameTipText() {
     return "The name of the queue in the internal storage.";
+  }
+
+  /**
+   * Sets the polling interval in seconds.
+   *
+   * @param value	the interval
+   */
+  public void setInterval(int value) {
+    m_Interval = value;
+    reset();
+  }
+
+  /**
+   * Returns the polling interval in milli-seconds.
+   *
+   * @return		the interval
+   */
+  public int getInterval() {
+    return m_Interval;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String intervalTipText() {
+    return "The polling interval in milli-seconds.";
   }
 
   /**
@@ -139,6 +175,11 @@ public class SSEQueueBroadcastResource
 					   .data(String.class, data.toString())
 					   .build();
 		eventSink.send(event);
+	      }
+	      else {
+		synchronized (this) {
+		  wait(m_Interval);
+		}
 	      }
 	    }
 	    catch (Exception e) {
