@@ -15,7 +15,7 @@
 
 /*
  * WebsocketOutput.java
- * Copyright (C) 2017-2025 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2017-2026 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.standalone.rats.output;
@@ -65,7 +65,7 @@ public class WebsocketOutput
   protected boolean m_Disconnect;
 
   /** the client instance. */
-  protected transient com.pusher.java_websocket.client.WebSocketClient m_Client;
+  protected transient org.java_websocket.client.WebSocketClient m_Client;
 
   /**
    * Returns a string describing the object.
