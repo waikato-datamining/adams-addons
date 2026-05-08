@@ -166,15 +166,19 @@ public class SSEQueueBroadcastResource
 	StorageQueueHandler queue = QueueHelper.getQueue(getFlowContext(), m_StorageName);
 	boolean stopped = false;
 	if (queue != null) {
-	  while (!stopped) {
+	  while (!stopped && !eventSink.isClosed()) {
 	    try {
 	      if (queue.canRemove()) {
 		Object data = queue.remove();
-		OutboundSseEvent event = sse.newEventBuilder()
-					   .name(m_EventName)
-					   .data(String.class, data.toString())
-					   .build();
-		eventSink.send(event);
+		if (data != null) {
+		  getLogger().info("Data obtained from queue: " + m_StorageName);
+		  OutboundSseEvent event = sse.newEventBuilder()
+					     .name(m_EventName)
+					     .data(String.class, data.toString())
+					     .build();
+		  eventSink.send(event);
+		  getLogger().info("Data sent as event: " + m_EventName);
+		}
 	      }
 	      else {
 		synchronized (this) {
@@ -184,8 +188,10 @@ public class SSEQueueBroadcastResource
 	    }
 	    catch (Exception e) {
 	      stopped = true;
+	      getLogger().log(Level.INFO, "Exception occurred!", e);
 	    }
 	  }
+	  getLogger().info("Exiting loop monitoring queue: " + m_StorageName);
 	}
 	else {
 	  getLogger().warning("Queue not found: " + m_StorageName);
