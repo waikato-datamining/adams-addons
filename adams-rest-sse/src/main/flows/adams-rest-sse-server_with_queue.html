@@ -31,6 +31,7 @@
     <script>
         const logElement = document.getElementById('log');
         const statusText = document.getElementById('status-text');
+        var count = 0;
 
         // Update this URL to match your CXF service location
         const eventSource = new EventSource('http://localhost:8080/events');
@@ -44,12 +45,16 @@
 
         // Listen for the specific event name "update" defined in Java
         eventSource.addEventListener('update', (event) => {
+            globalThis.count++;
             addLog(`[Update] ${event.data}`);
+            addLog(`[Count] ${count}`);
         });
 
         // Listen for generic messages (or the "End of Stream" message)
         eventSource.onmessage = (event) => {
+            globalThis.count++;
             addLog(`[Message] ${event.data}`);
+            addLog(`[Count] ${count}`);
         };
 
         // Connection error or closed by server
