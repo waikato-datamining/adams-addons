@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Enables OpenAPI documentation at <URL>/api-docs/?url=/openapi.json
+ * Enables OpenAPI documentation at {@link #URL_SUFFIX}
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
@@ -37,6 +37,8 @@ public class OpenAPIFeature
 
   private static final long serialVersionUID = -2311121309380593978L;
 
+  public final static String URL_SUFFIX = "/api-docs/?url=/openapi.json";
+
   /**
    * Returns a string describing the object.
    *
@@ -44,7 +46,7 @@ public class OpenAPIFeature
    */
   @Override
   public String globalInfo() {
-    return "Enables OpenAPI documentation at <URL>/api-docs/?url=/openapi.json";
+    return "Enables OpenAPI documentation at: " + URL_SUFFIX;
   }
 
   /**
@@ -66,6 +68,10 @@ public class OpenAPIFeature
       resourceClasses.add(plugin.getClass().getName());
     openApiFeature.setResourceClasses(resourceClasses);
     factory.getFeatures().add(openApiFeature);
+
+    if (isLoggingEnabled())
+      getLogger().info("Enabling OpenAPI support at: " + URL_SUFFIX);
+
     return true;
   }
 }
