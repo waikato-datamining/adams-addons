@@ -20,6 +20,7 @@
 package adams.flow.webservice.interceptor.incoming;
 
 import adams.core.CleanUpHandler;
+import adams.core.OptionalHandler;
 import adams.core.option.AbstractOptionHandler;
 
 /**
@@ -30,7 +31,7 @@ import adams.core.option.AbstractOptionHandler;
  */
 public abstract class AbstractInInterceptorGenerator<T extends AbstractInInterceptor>
   extends AbstractOptionHandler
-  implements CleanUpHandler {
+  implements CleanUpHandler, OptionalHandler {
 
   /** for serialization. */
   private static final long serialVersionUID = -8741445331354712393L;
@@ -58,6 +59,7 @@ public abstract class AbstractInInterceptorGenerator<T extends AbstractInInterce
    *
    * @param value	true if enabled
    */
+  @Override
   public void setEnabled(boolean value) {
     m_Enabled = value;
     reset();
@@ -68,6 +70,7 @@ public abstract class AbstractInInterceptorGenerator<T extends AbstractInInterce
    *
    * @return		true if enabled
    */
+  @Override
   public boolean getEnabled() {
     return m_Enabled;
   }
@@ -78,6 +81,7 @@ public abstract class AbstractInInterceptorGenerator<T extends AbstractInInterce
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
+  @Override
   public String enabledTipText() {
     return "Interceptor gets only instantiated if the generator is enabled.";
   }
