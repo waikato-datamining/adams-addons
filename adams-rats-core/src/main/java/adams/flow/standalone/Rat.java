@@ -15,7 +15,7 @@
 
 /*
  * Rat.java
- * Copyright (C) 2014-2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2026 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.standalone;
 
@@ -33,7 +33,6 @@ import adams.event.RatStateEvent;
 import adams.event.RatStateListener;
 import adams.flow.container.ErrorContainer;
 import adams.flow.control.AtomicExecution;
-import adams.flow.control.Breakpoint;
 import adams.flow.control.LocalScopeSubProcess;
 import adams.flow.control.ScopeHandler.ScopeHandling;
 import adams.flow.control.StorageName;
@@ -1533,7 +1532,7 @@ public class Rat
     result = super.setUp();
 
     if (result == null) {
-      m_BreakpointPresent = (!ActorUtils.enumerate(m_Actors, new Class[]{Breakpoint.class}).isEmpty());
+      m_BreakpointPresent = ActorUtils.breakPointPresent(m_Actors);
       if (!m_PerformLazySetup || isBreakpointPresent())
 	result = m_Actors.setUp();
     }
