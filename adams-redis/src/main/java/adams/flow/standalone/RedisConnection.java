@@ -22,10 +22,13 @@ package adams.flow.standalone;
 
 import adams.core.EnvironmentPasswordSupporter;
 import adams.core.MessageCollection;
+import adams.core.ParametersFromFileHelper;
+import adams.core.ParametersFromFileSupporter;
 import adams.core.PasswordHelper;
 import adams.core.PasswordPrompter;
 import adams.core.QuickInfoHelper;
 import adams.core.base.BasePassword;
+import adams.core.io.PlaceholderFile;
 import adams.flow.core.InteractiveActor;
 import adams.flow.core.StopMode;
 import io.lettuce.core.RedisClient;
@@ -125,6 +128,12 @@ import java.util.Map;
  * &nbsp;&nbsp;&nbsp;The password to use for connecting.
  * </pre>
  *
+ * <pre>-password-env-var &lt;java.lang.String&gt; (property: passwordEnvVar)
+ * &nbsp;&nbsp;&nbsp;The environment variable to obtain the password from, before potentially
+ * &nbsp;&nbsp;&nbsp;prompting for it; ignored if empty.
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
  * <pre>-prompt-for-password &lt;boolean&gt; (property: promptForPassword)
  * &nbsp;&nbsp;&nbsp;If enabled, the user gets prompted for enter a password if none has been
  * &nbsp;&nbsp;&nbsp;provided in the setup.
@@ -147,13 +156,21 @@ import java.util.Map;
  * &nbsp;&nbsp;&nbsp;default: GLOBAL
  * </pre>
  *
+ * <pre>-parameters-file &lt;adams.core.io.PlaceholderFile&gt; (property: parametersFile)
+ * &nbsp;&nbsp;&nbsp;The Java properties file containing the parameters and their associated
+ * &nbsp;&nbsp;&nbsp;values to apply. The properties in the file must align with the Bean properties
+ * &nbsp;&nbsp;&nbsp;&#47;ADAMS option of the object that is to be updated. If the option takes an
+ * &nbsp;&nbsp;&nbsp;array, then the values for the array must be blank-separated.
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class RedisConnection
   extends AbstractStandalone
-  implements PasswordPrompter, EnvironmentPasswordSupporter, InteractiveActor {
+  implements PasswordPrompter, EnvironmentPasswordSupporter, InteractiveActor, ParametersFromFileSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = -1726172998200420556L;
@@ -198,6 +215,9 @@ public class RedisConnection
 
   /** the custom stop message to use if flow gets stopped due to cancelation. */
   protected String m_CustomStopMessage;
+
+  /** the parameters file to load. */
+  protected PlaceholderFile m_ParametersFile;
 
   /** the client object. */
   protected transient RedisClient m_Client;
@@ -269,6 +289,10 @@ public class RedisConnection
     m_OptionManager.add(
       "stop-mode", "stopMode",
       StopMode.GLOBAL);
+
+    m_OptionManager.add(
+      "parameters-file", "parametersFile",
+      new PlaceholderFile());
   }
 
   /**
@@ -280,6 +304,9 @@ public class RedisConnection
   public String getQuickInfo() {
     String  result;
     List<String> options;
+
+    if (!getParametersFile().isDirectory())
+      return QuickInfoHelper.toString(this, "parametersFile", m_ParametersFile, "parameters from: ");
 
     result = QuickInfoHelper.toString(this, "host", m_Host);
     result += QuickInfoHelper.toString(this, "port", m_Port, ":");
@@ -686,6 +713,38 @@ public class RedisConnection
   }
 
   /**
+   * Sets the properties file with the parameters to load. Ignored if pointing to a directory.
+   *
+   * @param value	the file
+   */
+  @Override
+  public void setParametersFile(PlaceholderFile value) {
+    m_ParametersFile = value;
+    reset();
+  }
+
+  /**
+   * Returns the properties file with the parameters to load. Ignored if pointing to a directory.
+   *
+   * @return 		the file
+   */
+  @Override
+  public PlaceholderFile getParametersFile() {
+    return m_ParametersFile;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  @Override
+  public String parametersFileTipText() {
+    return ParametersFromFileHelper.parametersFileTipText();
+  }
+
+  /**
    * Creates a new connection.
    *
    * @param errors    for collecting errors
@@ -800,23 +859,24 @@ public class RedisConnection
   protected String doExecute() {
     String	result;
 
-    result = null;
+    result = ParametersFromFileHelper.applyParameters(this);
+    if (result == null) {
+      if (m_Client == null) {
+	if (isLoggingEnabled())
+	  getLogger().info("Starting new session");
 
-    if (m_Client == null) {
-      if (isLoggingEnabled())
-	getLogger().info("Starting new session");
+	m_ActualPassword = m_Password;
+	result = PasswordHelper.fromEnvVar(this);
+	if ((result == null) && (m_ActualPassword.isEmpty()))
+	  result = PasswordHelper.prompt(this);
 
-      m_ActualPassword = m_Password;
-      result           = PasswordHelper.fromEnvVar(this);
-      if ((result == null) && (m_ActualPassword.isEmpty()))
-	result = PasswordHelper.prompt(this);
-
-      if (result == null)
-	result = connect();
-    }
-    else {
-      if (isLoggingEnabled())
-	getLogger().info("Re-using current session");
+	if (result == null)
+	  result = connect();
+      }
+      else {
+	if (isLoggingEnabled())
+	  getLogger().info("Re-using current session");
+      }
     }
 
     return result;

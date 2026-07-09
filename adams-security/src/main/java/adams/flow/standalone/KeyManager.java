@@ -21,6 +21,8 @@
 package adams.flow.standalone;
 
 import adams.core.EnvironmentPasswordSupporter;
+import adams.core.ParametersFromFileHelper;
+import adams.core.ParametersFromFileSupporter;
 import adams.core.PasswordHelper;
 import adams.core.PasswordPrompter;
 import adams.core.QuickInfoHelper;
@@ -52,6 +54,7 @@ import java.util.List;
  * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
+ * &nbsp;&nbsp;&nbsp;min-user-mode: Expert
  * </pre>
  *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
@@ -75,12 +78,14 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
  * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
+ * &nbsp;&nbsp;&nbsp;min-user-mode: Expert
  * </pre>
  *
  * <pre>-silent &lt;boolean&gt; (property: silent)
  * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
  * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
  * &nbsp;&nbsp;&nbsp;default: false
+ * &nbsp;&nbsp;&nbsp;min-user-mode: Expert
  * </pre>
  *
  * <pre>-keystore-type &lt;java.lang.String&gt; (property: keystoreType)
@@ -95,6 +100,12 @@ import java.util.List;
  *
  * <pre>-keystore-passphrase &lt;adams.core.base.BasePassword&gt; (property: keystorePassphrase)
  * &nbsp;&nbsp;&nbsp;The passphrase for the keystore file, ignored if empty.
+ * </pre>
+ *
+ * <pre>-password-env-var &lt;java.lang.String&gt; (property: passwordEnvVar)
+ * &nbsp;&nbsp;&nbsp;The environment variable to obtain the password from, before potentially
+ * &nbsp;&nbsp;&nbsp;prompting for it; ignored if empty.
+ * &nbsp;&nbsp;&nbsp;default:
  * </pre>
  *
  * <pre>-prompt-for-password &lt;boolean&gt; (property: promptForPassword)
@@ -124,13 +135,22 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: SunX509
  * </pre>
  *
+ * <pre>-parameters-file &lt;adams.core.io.PlaceholderFile&gt; (property: parametersFile)
+ * &nbsp;&nbsp;&nbsp;The Java properties file containing the parameters and their associated
+ * &nbsp;&nbsp;&nbsp;values to apply. The properties in the file must align with the Bean properties
+ * &nbsp;&nbsp;&nbsp;&#47;ADAMS option of the object that is to be updated. If the option takes an
+ * &nbsp;&nbsp;&nbsp;array, then the values for the array must be blank-separated.
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class KeyManager
   extends AbstractStandalone
-  implements PasswordPrompter, EnvironmentPasswordSupporter, InteractiveActor, KeyManagerFactoryProvider {
+  implements PasswordPrompter, EnvironmentPasswordSupporter, InteractiveActor, KeyManagerFactoryProvider,
+	       ParametersFromFileSupporter {
 
   private static final long serialVersionUID = 3990761211470952210L;
 
@@ -164,6 +184,9 @@ public class KeyManager
   /** the algorithm to use. */
   protected String m_Algorithm;
 
+  /** the parameters file to load. */
+  protected PlaceholderFile m_ParametersFile;
+
   /** the key manager factory in use. */
   protected transient KeyManagerFactory m_KeyManagerFactory;
 
@@ -175,8 +198,8 @@ public class KeyManager
   @Override
   public String globalInfo() {
     return "Initializes a KeyManagerFactory instance using the specified keystore file and algorithm.\n"
-      + "For keystore types, please refer to:\n"
-      + "https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html#keystore-types";
+	     + "For keystore types, please refer to:\n"
+	     + "https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html#keystore-types";
   }
 
   /**
@@ -221,6 +244,10 @@ public class KeyManager
     m_OptionManager.add(
       "algorithm", "algorithm",
       "SunX509");
+
+    m_OptionManager.add(
+      "parameters-file", "parametersFile",
+      new PlaceholderFile());
   }
 
   /**
@@ -242,6 +269,9 @@ public class KeyManager
   public String getQuickInfo() {
     String		result;
     List<String> 	options;
+
+    if (!getParametersFile().isDirectory())
+      return QuickInfoHelper.toString(this, "parametersFile", m_ParametersFile, "parameters from: ");
 
     result = QuickInfoHelper.toString(this, "keystoreType", m_KeystoreType, "type: ");
     result += QuickInfoHelper.toString(this, "keystoreFile", m_KeystoreFile, ", file: ");
@@ -569,6 +599,38 @@ public class KeyManager
   }
 
   /**
+   * Sets the properties file with the parameters to load. Ignored if pointing to a directory.
+   *
+   * @param value	the file
+   */
+  @Override
+  public void setParametersFile(PlaceholderFile value) {
+    m_ParametersFile = value;
+    reset();
+  }
+
+  /**
+   * Returns the properties file with the parameters to load. Ignored if pointing to a directory.
+   *
+   * @return 		the file
+   */
+  @Override
+  public PlaceholderFile getParametersFile() {
+    return m_ParametersFile;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  @Override
+  public String parametersFileTipText() {
+    return ParametersFromFileHelper.parametersFileTipText();
+  }
+
+  /**
    * Performs the interaction with the user.
    *
    * @return		null if successfully interacted, otherwise error message
@@ -618,29 +680,30 @@ public class KeyManager
     KeyStore 		keystore;
     FileInputStream	fis;
 
-    result = null;
+    result = ParametersFromFileHelper.applyParameters(this);
+    if (result == null) {
+      if (m_KeyManagerFactory == null) {
+	m_ActualPassphrase = m_KeystorePassphrase;
+	result = PasswordHelper.fromEnvVar(this);
+	if ((result == null) && (m_ActualPassphrase.isEmpty()))
+	  result = PasswordHelper.prompt(this);
 
-    if (m_KeyManagerFactory == null) {
-      m_ActualPassphrase = m_KeystorePassphrase;
-      result             = PasswordHelper.fromEnvVar(this);
-      if ((result == null) && (m_ActualPassphrase.isEmpty()))
-	result = PasswordHelper.prompt(this);
+	if (result == null) {
+	  fis = null;
+	  try {
+	    keystore = KeyStore.getInstance(m_KeystoreType);
+	    fis = new FileInputStream(m_KeystoreFile.getAbsolutePath());
+	    keystore.load(fis, m_ActualPassphrase.getValue().toCharArray());
 
-      if (result == null) {
-	fis = null;
-	try {
-	  keystore = KeyStore.getInstance(m_KeystoreType);
-	  fis      = new FileInputStream(m_KeystoreFile.getAbsolutePath());
-	  keystore.load(fis, m_ActualPassphrase.getValue().toCharArray());
-
-	  m_KeyManagerFactory = KeyManagerFactory.getInstance(m_Algorithm);
-	  m_KeyManagerFactory.init(keystore, m_ActualPassphrase.getValue().toCharArray());
-	}
-	catch (Exception e) {
-	  result = handleException("Failed to initialize the KeyManagerFactory!", e);
-	}
-	finally {
-	  FileUtils.closeQuietly(fis);
+	    m_KeyManagerFactory = KeyManagerFactory.getInstance(m_Algorithm);
+	    m_KeyManagerFactory.init(keystore, m_ActualPassphrase.getValue().toCharArray());
+	  }
+	  catch (Exception e) {
+	    result = handleException("Failed to initialize the KeyManagerFactory!", e);
+	  }
+	  finally {
+	    FileUtils.closeQuietly(fis);
+	  }
 	}
       }
     }
