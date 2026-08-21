@@ -15,7 +15,7 @@
 
 /*
  * RenjinFileReader.java
- * Copyright (C) 2021 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2021-2026 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.transformer;
@@ -150,7 +150,7 @@ public class RenjinFileReader
       try {
         if (GzipUtils.isGzipCompressed(input)) {
           fis = new FileInputStream(input.getAbsolutePath());
-          gis = new GZIPInputStream(fis);
+          gis = new GZIPInputStream(fis, GzipUtils.BUFFER_SIZE_GZIPSTREAMS);
           reader = new RDataReader(gis);
         }
         else {
