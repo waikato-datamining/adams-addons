@@ -15,26 +15,20 @@
 
 /*
  * RObjectInspector.java
- * Copyright (C) 2021 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2021-2026 University of Waikato, Hamilton, NZ
  */
 
 package adams.core;
 
-import adams.core.io.FileUtils;
 import adams.core.logging.Logger;
 import adams.core.logging.LoggingHelper;
-import org.renjin.serialization.RDataReader;
 import org.renjin.sexp.PairList;
 import org.renjin.sexp.PairList.Node;
 import org.renjin.sexp.SEXP;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.zip.GZIPInputStream;
 
 /**
  * Helper class for inspection R objects (SEXP).
@@ -137,26 +131,5 @@ public class RObjectInspector {
     }
 
     return result;
-  }
-
-  // For testing only
-  public static void main(String[] args) throws Exception {
-    ScriptEngineManager manager = new ScriptEngineManager();
-    ScriptEngine engine = manager.getEngineByName("Renjin");
-    if(engine == null)
-      throw new RuntimeException("Some error msg");
-
-    FileInputStream in = new FileInputStream("/home/fracpete/temp/spectral/rdata/Data.WHEAT1.Rdata");
-    GZIPInputStream zin = new GZIPInputStream(in);
-    RDataReader reader = new RDataReader(zin);
-    SEXP robj = reader.readFile();
-    List<RObjectPath> paths = list(robj);
-    for (RObjectPath path: paths) {
-      System.out.println("\n--> " + path);
-      System.out.println(get(robj, path));
-    }
-    reader.close();
-    FileUtils.closeQuietly(zin);
-    FileUtils.closeQuietly(in);
   }
 }
