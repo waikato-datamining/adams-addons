@@ -13,25 +13,25 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SpreadSheetToKML.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2026 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.conversion;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import adams.core.QuickInfoHelper;
+import adams.core.XMLUtils;
 import adams.data.gps.AbstractGPS;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.SpreadSheetColumnIndex;
 import adams.env.Environment;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  <!-- globalinfo-start -->
@@ -77,7 +77,6 @@ import adams.env.Environment;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SpreadSheetToKML
   extends AbstractConversion {
@@ -324,6 +323,7 @@ public class SpreadSheetToKML
     // initialize document
     factory = DocumentBuilderFactory.newInstance();
     factory.setNamespaceAware(true);
+    XMLUtils.secureFactory(factory);
     builder = factory.newDocumentBuilder();
     domImpl = builder.getDOMImplementation();
     result  = domImpl.createDocument("http://earth.google.com/kml/2.0", "kml", null);
