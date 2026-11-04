@@ -15,14 +15,16 @@
 
 /*
  * ClassListerJsonMojo.java
- * Copyright (C) 2024 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2024-2026 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.maven;
 
-import adams.core.ClassListerJson;
+import adams.core.ClassLister;
 import adams.core.Utils;
+import adams.core.io.FileUtils;
 import adams.core.management.Java;
+import adams.data.map.MapToJson;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -93,28 +95,28 @@ public class ClassListerJsonMojo
     List<String> cmd = new ArrayList<>();
     cmd.add(Java.getJavaExecutable());
     cmd.add("-classpath");
-    cmd.add(Utils.flatten(getClasspath(), System.getProperty("path.separator")));
-    cmd.add(ClassListerJson.class.getName());
+    cmd.add(Utils.flatten(getClasspath(), File.pathSeparator));
+    cmd.add(ClassLister.class.getName());
     cmd.add("-action");
     cmd.add("classes");
     cmd.add("-output");
-    cmd.add(outputDirectory.getAbsolutePath() + File.separator + ClassListerJson.CLASSLISTERJSON_CLASSES);
+    cmd.add(outputDirectory.getAbsolutePath() + File.separator + FileUtils.replaceExtension(ClassLister.CLASSLISTER_CLASSES, ".json"));
     cmd.add("-format");
-    cmd.add("json");
+    cmd.add(MapToJson.class.getName());
     execute(cmd);
 
     // packages
     cmd = new ArrayList<>();
     cmd.add(Java.getJavaExecutable());
     cmd.add("-classpath");
-    cmd.add(Utils.flatten(getClasspath(), System.getProperty("path.separator")));
-    cmd.add(ClassListerJson.class.getName());
+    cmd.add(Utils.flatten(getClasspath(), File.pathSeparator));
+    cmd.add(ClassLister.class.getName());
     cmd.add("-action");
     cmd.add("packages");
     cmd.add("-output");
-    cmd.add(outputDirectory.getAbsolutePath() + File.separator + ClassListerJson.CLASSLISTERJSON_PACKAGES);
+    cmd.add(outputDirectory.getAbsolutePath() + File.separator + FileUtils.replaceExtension(ClassLister.CLASSLISTER_PACKAGES, ".json"));
     cmd.add("-format");
-    cmd.add("json");
+    cmd.add(MapToJson.class.getName());
     execute(cmd);
 
     return true;
