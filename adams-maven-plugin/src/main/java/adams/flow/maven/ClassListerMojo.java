@@ -15,7 +15,7 @@
 
 /*
  * ClassListerMojo.java
- * Copyright (C) 2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2019-2026 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.maven;
@@ -93,7 +93,7 @@ public class ClassListerMojo
     List<String> cmd = new ArrayList<>();
     cmd.add(Java.getJavaExecutable());
     cmd.add("-classpath");
-    cmd.add(Utils.flatten(getClasspath(), System.getProperty("path.separator")));
+    cmd.add(Utils.flatten(getClasspath(), File.pathSeparator));
     cmd.add(ClassLister.class.getName());
     cmd.add("-action");
     cmd.add("classes");
@@ -105,7 +105,7 @@ public class ClassListerMojo
     cmd = new ArrayList<>();
     cmd.add(Java.getJavaExecutable());
     cmd.add("-classpath");
-    cmd.add(Utils.flatten(getClasspath(), System.getProperty("path.separator")));
+    cmd.add(Utils.flatten(getClasspath(), File.pathSeparator));
     cmd.add(ClassLister.class.getName());
     cmd.add("-action");
     cmd.add("packages");
