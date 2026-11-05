@@ -15,7 +15,7 @@
 
 /*
  * OptionListerMojo.java
- * Copyright (C) 2024 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2024-2026 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.maven;
@@ -37,9 +37,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Outputs the classes or packages as props files.
+ * Outputs the options for the classes in JSON format.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
+ * @see OptionLister
  */
 @Mojo(name = "optionlister",
         threadSafe = false,
@@ -94,7 +95,7 @@ public class OptionListerMojo
     List<String> cmd = new ArrayList<>();
     cmd.add(Java.getJavaExecutable());
     cmd.add("-classpath");
-    cmd.add(Utils.flatten(getClasspath(), System.getProperty("path.separator")));
+    cmd.add(Utils.flatten(getClasspath(), File.pathSeparator));
     cmd.add(ClassLister.class.getName());
     cmd.add("-action");
     cmd.add("classes");
@@ -106,7 +107,7 @@ public class OptionListerMojo
     cmd = new ArrayList<>();
     cmd.add(Java.getJavaExecutable());
     cmd.add("-classpath");
-    cmd.add(Utils.flatten(getClasspath(), System.getProperty("path.separator")));
+    cmd.add(Utils.flatten(getClasspath(), File.pathSeparator));
     cmd.add(OptionLister.class.getName());
     cmd.add("-input");
     cmd.add(outputDirectory.getAbsolutePath() + File.separator + ClassLister.CLASSLISTER_CLASSES);
